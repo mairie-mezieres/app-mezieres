@@ -481,7 +481,7 @@ function showTyping(){
 }
 
 async function sendChat(){
-  const inp=document.getElementById('chat-inp');
+  const inp=document.getElementById('chat-input');
   const txt=inp.value.trim();
   if(!txt||melBusy)return;
   inp.value='';
@@ -495,6 +495,9 @@ async function sendChat(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:melHist.slice(-6)})
     });
+    if(!r.ok){
+    throw new Error("Erreur serveur");
+    }
     const d=await r.json();
     const reply=(d.reply||'Désolée, erreur technique. Contactez la mairie au 02 38 45 61 76.')
       .replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
@@ -509,7 +512,7 @@ async function sendChat(){
 }
 
 function sendSug(btn){
-  document.getElementById('chat-inp').value=btn.textContent.trim();
+  document.getElementById('chat-input').value=btn.textContent.trim();
   sendChat();
 }
 
