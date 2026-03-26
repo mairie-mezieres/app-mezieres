@@ -174,11 +174,11 @@ html,body{height:100%;background:var(--bg);font-family:"Source Sans 3",sans-seri
     <div class="page on" id="p-home">
       <div class="hero">
         <div class="hero-title">Bonjour Macérien !</div>
-        <div class="hero-sub">Bienvenue dans l'application officielle de Mézières-lez-Cléry — À l'orée de la Sologne.</div>
+        <div class="hero-sub">Bienvenue dans l'application officielle de Mézières-lez-Cléry.</div>
         <div class="hero-badges">
-          <span class="hbadge">854 habitants</span>
-          <span class="hbadge">70% de forêt</span>
-          <span class="hbadge">15 km d'Orléans</span>
+          <span class="hbadge">S'informer</span>
+          <span class="hbadge">Communiquer</span>
+          <span class="hbadge">Alerter</span>
         </div>
       </div>
 
@@ -464,13 +464,13 @@ function goPage(name){
 // ── MEL Chatbot ───────────────────────────────────────────────────────────────
 let melInited=false, melLoading=false;
 const melHistory=[];
-const ANTHROPIC_KEY=''; // À remplir
+const ANTHROPIC_KEY='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'; // À remplir
 
 const MEL_SYSTEM=`Tu es MEL (Mézières En Ligne), l'assistante virtuelle de la mairie de Mézières-lez-Cléry (45370, Loiret).
 📍 36 rue du bourg — 📞 02 38 45 61 76 — ✉️ mairie@mezieres-lez-clery.fr
 🕐 Lun 14h-17h30 | Mer sur RDV | Ven 8h30-11h30
 🚌 Bus Rémi Ligne 8 — DEUX arrêts : "Mairie" et "Le Bréau"
-INSTRUCTIONS: Réponds en français, convivial, concis (3-4 phrases). Emojis pour structurer. Pas de Markdown (**). Si inconnu: "Toutes mes excuses 🙏 Romuald ou Fabrice vous répondront incessamment. Contactez-nous au 02 38 45 61 76 ou mairie@mezieres-lez-clery.fr 😊"`;
+INSTRUCTIONS: Réponds en français, convivial, concis (1-2 phrases). Emojis pour structurer. Pas de Markdown (**). Si inconnu: "Toutes mes excuses 🙏 Romuald ou Fabrice vous répondront incessamment. Contactez-nous au 02 38 45 61 76 ou mairie@mezieres-lez-clery.fr 😊"`;
 
 function initMel(){
   addMelMsg("bot","🌲 Bonjour ! Je suis MEL, l'assistante virtuelle de la mairie de Mézières-lez-Cléry. Comment puis-je vous aider ? 😊");
@@ -622,7 +622,7 @@ function resetMap(){
 
 // ── Agenda (iCal) ─────────────────────────────────────────────────────────────
 async function loadAgenda(){
-  const ICAL_URL=''; // À remplir avec l'URL iCal
+  const ICAL_URL='https://calendar.google.com/calendar/ical/1d48f14b59e12907917ff669d0437e29a06a7578a68d14d761e669750e7776b4%40group.calendar.google.com/private-ee29dc4f9f6a7c36809edf58f64a6469/basic.ics'; // À remplir avec l'URL iCal
   const list=document.getElementById('agenda-list');
   try{
     if(!ICAL_URL){
