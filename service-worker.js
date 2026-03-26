@@ -1,4 +1,4 @@
-const CACHE_NAME = "mezieres-v1";
+const CACHE_NAME = "mezieres-v2";
 
 const URLS_TO_CACHE = [
   "./",
