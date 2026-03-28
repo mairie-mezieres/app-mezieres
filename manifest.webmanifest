@@ -1,29 +1,20 @@
 {
-  "name": "Mézières-lez-Cléry",
-  "short_name": "Mézières",
+  "name": "MAT — Mézières Avec Toi",
+  "short_name": "MAT",
+  "description": "Application officielle de la commune de Mézières-lez-Cléry",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#1e3a1e",
-  "theme_color": "#1e3a1e",
+  "background_color": "#1a3d2b",
+  "theme_color": "#1a3d2b",
   "orientation": "portrait",
+  "lang": "fr",
+  "categories": ["government","lifestyle"],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src":"icon-192.png", "sizes":"192x192", "type":"image/png", "purpose":"any maskable" },
+    { "src":"icon-512.png", "sizes":"512x512", "type":"image/png", "purpose":"any maskable" }
+  ],
+  "shortcuts": [
+    { "name":"MEL — Assistante", "short_name":"MEL", "url":"./#mel", "icons":[{"src":"icon-192.png","sizes":"192x192"}] },
+    { "name":"Signalement", "short_name":"Signal", "url":"./#signal", "icons":[{"src":"icon-192.png","sizes":"192x192"}] }
   ]
 }
