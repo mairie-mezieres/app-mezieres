@@ -766,7 +766,7 @@ async function loadIdees(){
   } catch(e) {
     ideas = getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));
   }
-  if(!ideas.length){ el.innerHTML='<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>'; return; }
+  if(!ideas.length){ el.innerHTML='<div class="no-ideas">Aucune idée pour l’instant.<br>Soyez le premier à proposer !</div>'; return; }
   el.innerHTML = ideas.map(idea=>`
     <div class="idea-card">
       <div class="idea-votes">
@@ -781,4 +781,57 @@ async function loadIdees(){
     </div>`).join('');
 }
 
+// ── Actualités (publications Radio Mézières) ──
+async function loadActus(){
+  const el = document.getElementById('actu-list');
+  try{
+    const r = await fetch(ACTU_URL);
+    const d = await r.json();
+    if(!d.actus||!d.actus.length){ el.innerHTML='<div class="actu-empty">Aucune publication récente.<br>Publiez sur Facebook avec #app-mezieres</div>'; return; }
+    el.innerHTML = d.actus.map(a=>`
+      <div class="actu-item">
+        <div class="actu-dot"></div>
+        <div>
+          <div class="actu-title">${a.title}</div>
+          <div class="actu-date">${a.date}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    el.innerHTML='<div class="actu-empty">Actualités indisponibles.<br>Consultez <a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Radio Mézières</a></div>';
+  }
+}
 
+// ── Notifications Push ────────────────
+let pushRegistered = false;
+async function togglePush(){
+  const btn = document.getElementById('push-btn');
+  if(pushRegistered){ btn.textContent='Activer'; btn.classList.add('off'); pushRegistered=false; return; }
+  if(!('Notification' in window)){ alert('Notifications non supportées sur ce navigateur.'); return; }
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ alert('Notifications refusées. Modifiez les paramètres de votre navigateur.'); return; }
+  if('serviceWorker' in navigator){
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(VAPID_PUB) });
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
+      btn.textContent='Désactiver'; btn.classList.remove('off'); pushRegistered=true;
+      alert('✅ Notifications activées\u00a0! Vous serez alerté des nouvelles publications Radio Mézières.');
+    }catch(e){ alert('Erreur lors de l\'activation des notifications.'); }
+  }
+}
+
+function urlBase64ToUint8Array(b64){
+  const pad = '='.repeat((4-b64.length%4)%4);
+  const raw = atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
+  return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+
+// ── Service Worker ────────────────────
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js').catch(()=>{}); }
+
+// ── Init ──────────────────────────────
+loadMeteo();
+loadEvents();
+</script>
+</body>
+</html>
