@@ -6,571 +6,320 @@
 <meta name="theme-color" content="#1a3d2b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Mézières">
-<title>Mézières-lez-Cléry</title>
-<!-- VERSION 2.2 -->
+<meta name="apple-mobile-web-app-title" content="MAT">
+<title>MAT — Mézières Avec Toi</title>
+<!-- VERSION 3.0 -->
 <link rel="manifest" href="manifest.webmanifest">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════
-   MÉZIÈRES-LEZ-CLÉRY — PWA v2.2
-   Charte : Nature & Modernité — Vert forêt,
-   crème chaud, or solognot, touches de ciel.
-═══════════════════════════════════════════ */
-:root {
-  --forest:  #1a3d2b;
-  --leaf:    #2d6a4f;
-  --sage:    #52b788;
-  --mist:    #d8f3dc;
-  --sky:     #e8f4f8;
-  --gold:    #d4a843;
-  --amber:   #f4a261;
-  --cream:   #faf7f2;
-  --warm:    #f0ebe3;
-  --card:    #ffffff;
-  --text:    #1c2b1f;
-  --muted:   #5a7065;
-  --border:  rgba(0,0,0,0.07);
-  --shadow:  0 2px 16px rgba(26,61,43,0.10);
-  --shadow-lg: 0 8px 32px rgba(26,61,43,0.16);
-  --r:       20px;
+:root{
+  --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
+  --gold:#d4a843;--amber:#f4a261;--cream:#faf7f2;--warm:#f4f0ea;
+  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.07);
+  --shadow:0 2px 16px rgba(26,61,43,0.10);
+  --shadow-lg:0 8px 32px rgba(26,61,43,0.16);
+  --r:18px;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  min-height: 100%;
-  background: var(--warm);
-  font-family: 'Nunito', 'Segoe UI', sans-serif;
-  font-size: 17px;
-  line-height: 1.55;
-  color: var(--text);
-  -webkit-text-size-adjust: 100%;
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}
 
-/* ── Bannière d'installation (en haut, disparaît après install) ── */
-#install-banner {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--amber) 100%);
-  padding: 14px 18px;
-  padding-top: calc(14px + env(safe-area-inset-top,0px));
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  animation: pulse-banner 3s ease-in-out infinite;
-}
-@keyframes pulse-banner {
-  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0); }
-  50% { box-shadow: 0 0 0 6px rgba(212,168,67,0.2); }
-}
-#install-banner.hidden { display: none; }
-.ib-ico {
-  width: 46px; height: 46px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.ib-text { flex: 1; }
-.ib-title { font-size: 0.92rem; font-weight: 800; color: #3d2000; line-height: 1.2; }
-.ib-sub { font-size: 0.72rem; color: rgba(61,32,0,0.7); margin-top: 1px; }
-.ib-btn {
-  background: rgba(255,255,255,0.9);
-  color: #3d2000;
-  border: none;
-  border-radius: 12px;
-  padding: 8px 14px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 800;
-  cursor: pointer;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.ib-close {
-  background: none; border: none;
-  color: rgba(61,32,0,0.5);
-  font-size: 1.1rem; cursor: pointer;
-  padding: 4px; flex-shrink: 0;
-}
+/* ── Bannière install ── */
+#install-banner{background:linear-gradient(135deg,var(--gold),var(--amber));padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;cursor:pointer;}
+#install-banner.hidden{display:none;}
+.ib-ico{width:40px;height:40px;background:rgba(255,255,255,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ib-t{flex:1;}
+.ib-title{font-size:0.82rem;font-weight:900;color:#3d2000;}
+.ib-sub{font-size:0.65rem;color:rgba(61,32,0,0.7);}
+.ib-btn{background:rgba(255,255,255,0.9);color:#3d2000;border:none;border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;cursor:pointer;flex-shrink:0;}
+.ib-x{background:none;border:none;color:rgba(61,32,0,0.4);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0;}
 
+/* ── Header MAT ── */
+.header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
+.mat-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+.mat-img{height:130px;width:auto;object-fit:contain;object-position:bottom;margin-bottom:-2px;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));}
+.mat-text{flex:1;padding-bottom:12px;}
+.mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:4px;}
+.mat-title{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--cream);line-height:1.15;}
+.mat-sub{font-size:0.68rem;color:rgba(216,243,220,0.7);font-style:italic;font-family:'Fraunces',serif;margin-top:3px;}
+.mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:6px;}
 
-/* ── Aide installation ── */
-.ih.hidden { display: none; }
-.ih {
-  position: fixed; inset: 0; z-index: 300;
-  background: rgba(26,61,43,0.55);
-  backdrop-filter: blur(5px);
-  display: flex; align-items: flex-end; justify-content: center;
-}
-.ih-panel {
-  width: min(100%, 520px);
-  background: var(--cream);
-  border-radius: 24px 24px 0 0;
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  animation: slideUp 0.22s ease;
-}
-.ih-head {
-  display: flex; align-items: center; gap: 12px;
-  padding: 18px 18px 14px;
-  background: linear-gradient(135deg, var(--forest), var(--leaf));
-  color: var(--cream);
-}
-.ih-icon {
-  width: 46px; height: 46px; border-radius: 14px;
-  background: rgba(255,255,255,0.16);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.ih-title { font-size: 1rem; font-weight: 800; line-height: 1.2; }
-.ih-sub { font-size: 0.72rem; color: rgba(255,255,255,0.72); margin-top: 2px; }
-.ih-close {
-  margin-left: auto; border: none; background: rgba(255,255,255,0.12);
-  color: white; width: 34px; height: 34px; border-radius: 50%;
-  font-size: 1rem; cursor: pointer; flex-shrink: 0;
-}
-.ih-body { padding: 16px 18px 10px; }
-.ih-steps {
-  padding-left: 20px;
-  display: grid; gap: 10px;
-  color: var(--text); font-size: 0.96rem; line-height: 1.45;
-}
-.ih-tip {
-  margin-top: 14px;
-  background: #fff7df;
-  border: 1px solid rgba(212,168,67,0.28);
-  color: #5b4614;
-  border-radius: 14px;
-  padding: 11px 12px;
-  font-size: 0.82rem;
-}
-.ih-actions {
-  display: flex; gap: 10px; padding: 14px 18px 18px;
-}
-.ih-primary, .ih-secondary {
-  flex: 1; border-radius: 14px; padding: 12px 14px;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem;
-  border: none; cursor: pointer;
-}
-.ih-primary {
-  background: linear-gradient(135deg, var(--forest), var(--leaf));
-  color: white;
-}
-.ih-secondary {
-  background: white; color: var(--text); border: 1px solid var(--border);
-}
+/* ── Météo strip ── */
+.meteo-strip{background:rgba(255,255,255,0.10);border-radius:12px;margin:0 0 0 0;padding:8px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.meteo-ico{font-size:1.4rem;flex-shrink:0;}
+.meteo-temp{font-size:1.1rem;font-weight:900;color:var(--cream);}
+.meteo-desc{font-size:0.68rem;color:rgba(216,243,220,0.8);flex:1;}
+.meteo-alerte{background:rgba(244,162,97,0.3);color:#ffe4c0;font-size:0.62rem;font-weight:800;padding:3px 8px;border-radius:8px;border:1px solid rgba(244,162,97,0.4);}
+.meteo-loading{font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;}
 
-/* ── En-tête ── */
-.header {
-  background: linear-gradient(160deg, var(--forest) 0%, var(--leaf) 100%);
-  padding: 22px 20px 20px;
-  position: relative;
-  overflow: hidden;
-}
-.header::before {
-  content: '';
-  position: absolute; right: -40px; top: -40px;
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(82,183,136,0.15) 0%, transparent 70%);
-  border-radius: 50%;
-}
-.header::after {
-  content: '🌲';
-  position: absolute; right: 10px; bottom: -10px;
-  font-size: 80px; opacity: 0.06; line-height: 1;
-  pointer-events: none;
-}
-.header-top {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.header-badge {
-  font-size: 0.6rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--sage);
-  font-weight: 700; margin-bottom: 5px;
-}
-.header-title {
-  font-family: 'Fraunces', serif;
-  font-size: 1.65rem; font-weight: 600;
-  color: var(--cream); letter-spacing: -0.01em;
-  line-height: 1.15;
-}
-.header-sub {
-  font-size: 0.75rem; color: rgba(216,243,220,0.7);
-  font-style: italic; margin-top: 4px;
-  font-family: 'Fraunces', serif;
-}
-.header-version-pill {
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.4);
-  font-size: 0.55rem; font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 3px 8px; border-radius: 20px;
-  font-family: monospace; flex-shrink: 0;
-}
-
-/* ── Météo / tags ── */
-.header-tags {
-  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
-}
-.htag {
-  background: rgba(255,255,255,0.12);
-  color: var(--mist);
-  font-size: 0.68rem; font-weight: 600;
-  padding: 4px 11px; border-radius: 20px;
-}
+/* ── Prochains événements ── */
+.events-strip{display:flex;gap:8px;margin-top:10px;}
+.event-chip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 12px;flex:1;min-width:0;}
+.event-date{font-size:0.6rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;}
+.event-name{font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.event-days{font-size:0.62rem;color:var(--sage);margin-top:2px;}
+.event-loading{font-size:0.68rem;color:rgba(255,255,255,0.3);font-style:italic;padding:8px 12px;}
 
 /* ── Contenu ── */
-.content {
-  padding: 16px 14px;
-  max-width: 520px;
-  margin: 0 auto;
-  padding-bottom: calc(28px + env(safe-area-inset-bottom,0px));
-}
+.content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
+.sec{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);padding:12px 2px 8px;}
+.sec:first-child{padding-top:4px;}
 
-/* ── Label de section ── */
-.sec {
-  font-size: 0.65rem; font-weight: 800;
-  text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--muted); padding: 14px 2px 8px;
-}
-.sec:first-child { padding-top: 4px; }
+/* ── Grille 2 par ligne ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:0;}
 
-/* ── Cartes ── */
-.card {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--card);
-  border-radius: var(--r);
-  padding: 16px 18px;
-  margin-bottom: 10px;
-  text-decoration: none;
-  color: var(--text);
-  border: none; width: 100%; text-align: left;
-  cursor: pointer; font-family: 'Nunito', sans-serif;
-  box-shadow: var(--shadow);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  overflow: hidden;
-}
-.card::before {
-  content: '';
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: transparent;
-  border-radius: 3px 0 0 3px;
-  transition: background 0.2s;
-}
-.card:active { transform: scale(0.97); box-shadow: 0 1px 6px rgba(26,61,43,0.08); }
-.card:hover::before { background: var(--sage); }
+/* ── Cartes boutons ── */
+.card{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:var(--r);padding:14px 14px;text-decoration:none;color:var(--text);border:none;width:100%;text-align:left;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
+.card:active{transform:scale(0.97);}
+.ico{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ct{flex:1;min-width:0;}
+.ct-label{font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
+.ct-sub{font-size:0.62rem;color:var(--muted);font-weight:600;margin-top:1px;}
+.arr{color:#ccc;font-size:1rem;flex-shrink:0;}
 
-/* Icônes */
-.ico {
-  width: 50px; height: 50px;
-  border-radius: 15px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; flex-shrink: 0;
-  transition: transform 0.2s;
-}
-.card:active .ico { transform: scale(0.92); }
-.ico-mel    { background: linear-gradient(135deg, #e8f8f0, #d0f0e0); }
-.ico-site   { background: linear-gradient(135deg, #e8f0fc, #d0e4f8); }
-.ico-radio  { background: linear-gradient(135deg, #fde8f0, #f8d0e4); }
-.ico-hab    { background: linear-gradient(135deg, #ede8f8, #ddd0f0); }
-.ico-cal    { background: linear-gradient(135deg, #fef3e0, #fce8c0); }
-.ico-rando  { background: linear-gradient(135deg, #eaf8e8, #d4f0d4); }
-.ico-pocket { background: linear-gradient(135deg, #fff0e8, #ffe0d0); }
+/* Couleurs icônes */
+.ico-mel{background:linear-gradient(135deg,#e8f8f0,#d0f0e0);}
+.ico-site{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
+.ico-radio{background:linear-gradient(135deg,#fde8f0,#f8d0e4);}
+.ico-hab{background:linear-gradient(135deg,#ede8f8,#ddd0f0);}
+.ico-cal{background:linear-gradient(135deg,#fef3e0,#fce8c0);}
+.ico-rando{background:linear-gradient(135deg,#eaf8e8,#d4f0d4);}
+.ico-pocket{background:linear-gradient(135deg,#fff0e8,#ffe0d0);}
+.ico-signal{background:linear-gradient(135deg,#fde8e8,#fcc);}
+.ico-ideas{background:linear-gradient(135deg,#fffbe8,#fff3c0);}
+.ico-rgpd{background:linear-gradient(135deg,#f0f0f0,#e0e0e0);}
+.ico-notif{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
 
-/* Texte des cartes */
-.ct { flex: 1; min-width: 0; }
-.ct-label {
-  font-size: 1.0rem; font-weight: 700;
-  color: var(--text); line-height: 1.25;
-}
-.ct-sub {
-  font-size: 0.72rem; color: var(--muted);
-  font-weight: 400; margin-top: 2px;
-}
-.arr { color: #c5d5ca; font-size: 1.1rem; flex-shrink: 0; margin-left: 4px; }
+/* ── Overlay générique ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(26,61,43,0.6);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;}
+.ov.open{display:flex;animation:fadeOv 0.2s ease;}
+@keyframes fadeOv{from{opacity:0}to{opacity:1}}
+.panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+.panel-hdr{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.panel-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.panel-title{font-family:'Fraunces',serif;font-size:0.95rem;color:var(--cream);font-weight:600;flex:1;}
+.panel-close{background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:rgba(255,255,255,0.8);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.panel-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
+
+/* ── MEL Chat ── */
+.mel-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:var(--mist);border-radius:2px;}
+.msg{display:flex;gap:8px;animation:msgIn 0.2s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse;}
+.mav{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:3px;}
+.msg.bot .mav{background:var(--forest);color:var(--gold);}
+.msg.user .mav{background:#6b4c35;color:#fff;}
+.bub{max-width:82%;padding:10px 14px;border-radius:16px;font-size:0.9rem;line-height:1.5;}
+.msg.bot .bub{background:white;border:1px solid var(--border);border-bottom-left-radius:4px;}
+.msg.user .bub{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-bottom-right-radius:4px;}
+.typ{display:flex;gap:4px;align-items:center;padding:10px 14px;}
+.typ span{width:6px;height:6px;background:var(--sage);border-radius:50%;animation:bo 1.2s infinite;}
+.typ span:nth-child(2){animation-delay:0.2s;}.typ span:nth-child(3){animation-delay:0.4s;}
+@keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.sugs{padding:6px 14px 4px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;}
+.sugs::-webkit-scrollbar{display:none;}
+.sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.8rem;font-weight:700;padding:6px 12px;border-radius:18px;white-space:nowrap;cursor:pointer;font-family:'Nunito',sans-serif;}
+.sug:active{background:var(--mist);}
+.mbar{padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));background:white;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.minp{flex:1;border:1.5px solid rgba(0,0,0,0.12);border-radius:22px;padding:9px 14px;font-size:0.9rem;font-family:'Nunito',sans-serif;outline:none;background:var(--warm);}
+.minp:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(82,183,136,0.15);}
+.msnd{width:40px;height:40px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+/* ── Signalement ── */
+.form-group{margin-bottom:14px;}
+.form-label{font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:6px;display:block;}
+.form-cats{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.cat-btn{background:white;border:2px solid var(--border);border-radius:12px;padding:10px 8px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;}
+.cat-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
+.form-textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;resize:none;height:80px;}
+.form-textarea:focus{border-color:var(--sage);}
+.photo-btn{width:100%;background:white;border:2px dashed var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:700;color:var(--muted);transition:all 0.15s;}
+.photo-btn:hover{border-color:var(--sage);color:var(--leaf);}
+.photo-preview{width:100%;height:150px;object-fit:cover;border-radius:12px;display:none;}
+.submit-btn{width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:14px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;cursor:pointer;margin-top:6px;}
+.submit-btn:active{opacity:0.9;}
+.success-msg{text-align:center;padding:20px;display:none;}
+.success-msg .s-ico{font-size:2.5rem;margin-bottom:8px;}
+.success-msg .s-title{font-size:1rem;font-weight:800;color:var(--leaf);}
+.success-msg .s-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
+
+/* ── Boîte à idées ── */
+.idea-form{background:white;border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border);}
+.idea-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;resize:none;height:70px;}
+.idea-input:focus{border-color:var(--gold);}
+.idea-cats{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap;}
+.idea-cat{background:var(--warm);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;}
+.idea-cat.on{background:#fffbe8;border-color:var(--gold);color:#8a6200;}
+.idea-submit{background:linear-gradient(135deg,var(--gold),var(--amber));color:#3d2000;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;width:100%;margin-top:6px;}
+.ideas-list{display:flex;flex-direction:column;gap:9px;}
+.idea-card{background:white;border-radius:14px;padding:13px 14px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.idea-votes{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.vote-btn{background:none;border:2px solid var(--border);border-radius:10px;width:38px;height:38px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.vote-btn.voted{background:var(--mist);border-color:var(--sage);}
+.vote-btn:active{transform:scale(0.9);}
+.vote-count{font-size:0.82rem;font-weight:900;color:var(--leaf);}
+.idea-content{flex:1;min-width:0;}
+.idea-cat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:3px;}
+.idea-text{font-size:0.84rem;font-weight:600;color:var(--text);line-height:1.4;}
+.idea-date{font-size:0.62rem;color:var(--muted);margin-top:4px;}
+.no-ideas{text-align:center;padding:24px;color:var(--muted);font-size:0.82rem;}
+
+/* ── RGPD ── */
+.rgpd-section{margin-bottom:18px;}
+.rgpd-title{font-size:0.88rem;font-weight:800;color:var(--forest);margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+.rgpd-text{font-size:0.78rem;color:var(--muted);line-height:1.65;}
+.rgpd-table{width:100%;border-collapse:collapse;font-size:0.74rem;margin:10px 0;}
+.rgpd-table th{background:var(--mist);color:var(--leaf);font-weight:800;padding:7px 10px;text-align:left;}
+.rgpd-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--muted);}
+.rgpd-contact{background:var(--mist);border-radius:12px;padding:12px 14px;margin-top:8px;font-size:0.76rem;color:var(--leaf);}
+
+/* ── Notifications ── */
+.notif-banner{background:white;border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.notif-ico{font-size:1.8rem;flex-shrink:0;}
+.notif-text{flex:1;}
+.notif-title{font-size:0.85rem;font-weight:800;color:var(--text);}
+.notif-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.notif-btn{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
+.notif-btn.off{background:var(--warm);color:var(--muted);border:1px solid var(--border);}
+.actu-item{background:white;border-radius:12px;padding:12px 13px;margin-bottom:8px;border:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;}
+.actu-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);margin-top:5px;flex-shrink:0;}
+.actu-title{font-size:0.82rem;font-weight:700;color:var(--forest);}
+.actu-date{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
 
 /* ── Footer ── */
-.footer {
-  text-align: center;
-  padding: 4px 14px 16px;
-  font-size: 0.6rem; color: #a0b0aa;
-  letter-spacing: 0.05em;
-}
-
-/* ═══════════════════════════════════
-   OVERLAY MEL
-═══════════════════════════════════ */
-.ov {
-  display: none; position: fixed; inset: 0;
-  background: rgba(26,61,43,0.6);
-  backdrop-filter: blur(4px);
-  z-index: 200; align-items: flex-end;
-}
-.ov.open { display: flex; animation: fadeOv 0.2s ease; }
-@keyframes fadeOv { from{opacity:0} to{opacity:1} }
-.panel {
-  background: var(--warm);
-  width: 100%; max-width: 520px;
-  margin: 0 auto;
-  border-radius: 24px 24px 0 0;
-  height: 90vh;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 -8px 40px rgba(26,61,43,0.25);
-  animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-@keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:none;opacity:1} }
-
-.mhd {
-  background: linear-gradient(135deg, var(--forest), var(--leaf));
-  padding: 16px 18px;
-  display: flex; align-items: center; gap: 12px;
-  flex-shrink: 0;
-}
-.mav {
-  width: 46px; height: 46px;
-  background: linear-gradient(135deg, var(--gold), var(--amber));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(212,168,67,0.4);
-}
-.mname { font-size: 1.0rem; color: var(--cream); font-weight: 700; font-family: 'Fraunces', serif; }
-.mstat { font-size: 0.67rem; color: var(--sage); margin-top: 1px; }
-.mcls {
-  margin-left: auto;
-  background: rgba(255,255,255,0.15);
-  border: none; border-radius: 50%;
-  width: 34px; height: 34px;
-  color: rgba(255,255,255,0.8); font-size: 1rem;
-  cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-  flex-shrink: 0; transition: background 0.2s;
-}
-.mcls:hover { background: rgba(255,255,255,0.25); }
-
-.msgs {
-  flex: 1; overflow-y: auto;
-  padding: 16px 14px;
-  display: flex; flex-direction: column; gap: 12px;
-  -webkit-overflow-scrolling: touch;
-}
-.msgs::-webkit-scrollbar { width: 3px; }
-.msgs::-webkit-scrollbar-thumb { background: var(--mist); border-radius: 2px; }
-
-.msg { display: flex; gap: 8px; animation: msgIn 0.2s ease; }
-@keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-.msg.user { flex-direction: row-reverse; }
-.mav2 {
-  width: 30px; height: 30px; border-radius: 50%;
-  flex-shrink: 0; display: flex;
-  align-items: center; justify-content: center;
-  font-size: 13px; margin-top: 3px;
-}
-.msg.bot  .mav2 { background: var(--forest); color: var(--gold); }
-.msg.user .mav2 { background: #6b4c35; color: #fff; }
-.bub {
-  max-width: 82%; padding: 11px 15px;
-  border-radius: 18px; font-size: 0.96rem;
-  line-height: 1.55;
-}
-.msg.bot  .bub { background: white; border: 1px solid var(--border); border-bottom-left-radius: 5px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-.msg.user .bub { background: linear-gradient(135deg, var(--forest), var(--leaf)); color: white; border-bottom-right-radius: 5px; }
-.typ { display: flex; gap: 4px; align-items: center; padding: 11px 15px; }
-.typ span { width: 7px; height: 7px; background: var(--sage); border-radius: 50%; animation: bo 1.2s infinite; }
-.typ span:nth-child(2){animation-delay:0.2s} .typ span:nth-child(3){animation-delay:0.4s}
-@keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-
-.sugs {
-  padding: 8px 14px 4px;
-  display: flex; gap: 8px; overflow-x: auto; flex-shrink: 0;
-}
-.sugs::-webkit-scrollbar { display: none; }
-.sug {
-  background: white;
-  border: 1.5px solid var(--sage);
-  color: var(--leaf);
-  font-size: 0.84rem; font-weight: 600;
-  padding: 7px 14px; border-radius: 20px;
-  white-space: nowrap; cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  transition: background 0.15s;
-}
-.sug:active { background: var(--mist); }
-
-.mbar {
-  padding: 10px 14px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom,0px));
-  background: white; border-top: 1px solid var(--border);
-  display: flex; gap: 10px; flex-shrink: 0;
-}
-.minp {
-  flex: 1;
-  border: 1.5px solid rgba(0,0,0,0.12);
-  border-radius: 24px;
-  padding: 10px 16px;
-  font-size: 0.96rem;
-  font-family: 'Nunito', sans-serif;
-  outline: none; background: var(--warm);
-  color: var(--text);
-}
-.minp:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(82,183,136,0.15); }
-.msnd {
-  width: 44px; height: 44px;
-  background: linear-gradient(135deg, var(--forest), var(--leaf));
-  border: none; border-radius: 50%;
-  color: white; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(26,61,43,0.3);
-  transition: transform 0.15s;
-}
-.msnd:active { transform: scale(0.92); }
+.footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
 </style>
 </head>
 <body>
 
-<!-- ── Bannière installation ── -->
-<div id="install-banner" class="hidden" onclick="installApp()">
-  <div class="ib-ico" id="install-ico">📲</div>
-  <div class="ib-text">
-    <div class="ib-title" id="install-title">Installez l'application</div>
-    <div class="ib-sub" id="install-sub">Accès rapide depuis votre téléphone</div>
+<!-- Bannière install -->
+<div id="install-banner" onclick="installApp()">
+  <div class="ib-ico">📲</div>
+  <div class="ib-t">
+    <div class="ib-title">Installez MAT sur votre téléphone !</div>
+    <div class="ib-sub">Accès rapide · Fonctionne hors ligne</div>
   </div>
-  <button class="ib-btn" id="install-btn" onclick="installApp();event.stopPropagation()">Installer</button>
-  <button class="ib-close" onclick="hideBanner(event)" title="Fermer">✕</button>
+  <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
+  <button class="ib-x" onclick="hideBanner(event)">✕</button>
 </div>
 
-<div id="install-help" class="ih hidden" aria-hidden="true" onclick="closeInstallHelp(event)">
-  <div class="ih-panel" onclick="event.stopPropagation()">
-    <div class="ih-head">
-      <div class="ih-icon" id="help-icon">📲</div>
-      <div>
-        <div class="ih-title" id="help-title">Installer l'application</div>
-        <div class="ih-sub" id="help-sub">Suivez les étapes ci-dessous</div>
-      </div>
-      <button class="ih-close" onclick="closeInstallHelp()">✕</button>
-    </div>
-    <div class="ih-body">
-      <ol id="help-steps" class="ih-steps"></ol>
-      <div class="ih-tip" id="help-tip"></div>
-    </div>
-    <div class="ih-actions">
-      <button class="ih-primary" onclick="retryInstall()">Réessayer</button>
-      <button class="ih-secondary" onclick="closeInstallHelp()">Fermer</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── En-tête ── -->
+<!-- Header MAT -->
 <div class="header">
-  <div class="header-top">
-<div class="header">
-  <div class="header-commune">Commune de</div>
-  <div class="header-title">Mézières-lez-Cléry</div>
-</div>
-    <div class="header-version-pill">v2.2</div>
+  <div class="mat-hero">
+    <div class="mat-text">
+      <div class="mat-badge">Application officielle</div>
+      <div class="mat-title">Mézières<br>Avec Toi</div>
+      <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
+      <div class="mat-version">v3.0</div>
+    </div>
+    <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'">
   </div>
-  <div class="header-tags">
-    <span class="htag">S'informer</span>
-    <span class="htag">Communiquer</span>
-    <span class="htag">Alerter</span>
+
+  <!-- Météo -->
+  <div class="meteo-strip" onclick="openMeteo()">
+    <div class="meteo-ico" id="meteo-ico">🌤️</div>
+    <div>
+      <div class="meteo-temp" id="meteo-temp"><span class="meteo-loading">Chargement météo…</span></div>
+      <div class="meteo-desc" id="meteo-desc"></div>
+    </div>
+    <div class="meteo-alerte" id="meteo-alerte" style="display:none"></div>
+  </div>
+
+  <!-- Prochains événements -->
+  <div class="events-strip" id="events-strip">
+    <div class="event-loading">Chargement événements…</div>
   </div>
 </div>
 
-<!-- ── Contenu ── -->
+<!-- Contenu principal -->
 <div class="content">
 
   <div class="sec">Services municipaux</div>
-
-  <button class="card" onclick="openMel()">
-    <div class="ico ico-mel">👩‍💼</div>
-    <div class="ct">
-      <div class="ct-label">Assistante virtuelle MEL</div>
-      <div class="ct-sub">Posez vos questions à la mairie</div>
-    </div>
-    <span class="arr">›</span>
-  </button>
-
-  <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
-    <div class="ico ico-site">🌐</div>
-    <div class="ct">
-      <div class="ct-label">Site de la commune</div>
-      <div class="ct-sub">mezieres-lez-clery.fr</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
+  <div class="grid2">
+    <button class="card" onclick="openMel()">
+      <div class="ico ico-mel">👩‍💼</div>
+      <div class="ct"><div class="ct-label">MEL</div><div class="ct-sub">Assistante IA</div></div>
+    </button>
+    <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
+      <div class="ico ico-site">🌐</div>
+      <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">Commune</div></div>
+    </a>
+  </div>
 
   <div class="sec">Réseaux sociaux</div>
-
-  <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
-    <div class="ico ico-radio">📻</div>
-    <div class="ct">
-      <div class="ct-label">Radio Mézières</div>
-      <div class="ct-sub">Page Facebook officielle</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
-
-  <a class="card" href="https://www.facebook.com/" target="_blank" id="lien-communaute">
-    <div class="ico ico-hab">👥</div>
-    <div class="ct">
-      <div class="ct-label">Communauté des habitants</div>
-      <div class="ct-sub">Groupe Facebook Macériens</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <a class="card" href="https://www.facebook.com/" target="_blank" id="lien-communaute">
+      <div class="ico ico-hab">👥</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Habitants</div></div>
+    </a>
+  </div>
 
   <div class="sec">Agenda &amp; sorties</div>
+  <div class="grid2">
+    <a class="card" href="https://calendar.google.com/calendar/u/1?cid=MWQ0OGYxNGI1OWUxMjkwNzkxN2ZmNjY5ZDA0MzdlMjlhMDZhNzU3OGE2OGQxNGQ3NjFlNjY5NzUwZTc3NzZiNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank">
+      <div class="ico ico-cal">📅</div>
+      <div class="ct"><div class="ct-label">Calendrier</div><div class="ct-sub">Événements</div></div>
+    </a>
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
+      <div class="ico ico-rando">🥾</div>
+      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">14 circuits</div></div>
+    </a>
+  </div>
 
-  <a class="card" href="https://calendar.google.com/calendar/u/1?cid=MWQ0OGYxNGI1OWUxMjkwNzkxN2ZmNjY5ZDA0MzdlMjlhMDZhNzU3OGE2OGQxNGQ3NjFlNjY5NzUwZTc3NzZiNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank">
-    <div class="ico ico-cal">📅</div>
-    <div class="ct">
-      <div class="ct-label">Calendrier communal</div>
-      <div class="ct-sub">Manifestations et événements</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
+  <div class="sec">Participez</div>
+  <div class="grid2">
+    <button class="card" onclick="openSignal()">
+      <div class="ico ico-signal">🚨</div>
+      <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Problème voirie…</div></div>
+    </button>
+    <button class="card" onclick="openIdees()">
+      <div class="ico ico-ideas">💡</div>
+      <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
+    </button>
+  </div>
 
-  <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
-    <div class="ico ico-rando">🥾</div>
-    <div class="ct">
-      <div class="ct-label">Randonnées</div>
-      <div class="ct-sub">14 circuits balisés</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
+  <div class="sec">Notifications &amp; infos</div>
+  <div class="grid2">
+    <a class="card" href="https://app.panneaupocket.com/ville/1115293898-mezieres-lez-clery-45370" target="_blank">
+      <div class="ico ico-pocket">📢</div>
+      <div class="ct"><div class="ct-label">Panneau Pocket</div><div class="ct-sub">Alertes officielles</div></div>
+    </a>
+    <button class="card" onclick="openNotifs()">
+      <div class="ico ico-notif">🔔</div>
+      <div class="ct"><div class="ct-label">Actualités MAT</div><div class="ct-sub">Publications Radio</div></div>
+    </button>
+  </div>
 
-  <div class="sec">Notifications</div>
-
-  <a class="card" href="https://app.panneaupocket.com/ville/1115293898-mezieres-lez-clery-45370" target="_blank">
-    <div class="ico ico-pocket">📢</div>
-    <div class="ct">
-      <div class="ct-label">Panneau Pocket</div>
-      <div class="ct-sub">Alertes et notifications officielles</div>
-    </div>
-    <span class="arr">›</span>
-  </a>
+  <div class="grid2" style="margin-top:9px">
+    <button class="card" onclick="openRgpd()">
+      <div class="ico ico-rgpd">🔒</div>
+      <div class="ct"><div class="ct-label">Données perso</div><div class="ct-sub">RGPD &amp; vie privée</div></div>
+    </button>
+    <button class="card" onclick="installApp()">
+      <div class="ico" style="background:linear-gradient(135deg,#f0f8e8,#d4f0d4)">📲</div>
+      <div class="ct"><div class="ct-label">Installer l'app</div><div class="ct-sub">Écran d'accueil</div></div>
+    </button>
+  </div>
 
 </div>
 
-<div class="footer">Application officielle · Mairie de Mézières-lez-Cléry · 45370 · Loiret</div>
+<div class="footer">MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
 
-<!-- ═══════════════════════════════════
-     OVERLAY MEL
-═══════════════════════════════════ -->
-<div class="ov" id="ov" onclick="ovClick(event)">
-  <div class="panel">
-    <div class="mhd">
-      <div class="mav">👩‍💼</div>
-      <div>
-        <div class="mname">MEL — Mézières En Ligne</div>
-        <div class="mstat">Assistante virtuelle de la mairie</div>
-      </div>
-      <button class="mcls" onclick="closeMel()">✕</button>
+<!-- ═══ OVERLAY MEL ═══ -->
+<div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
+  <div class="mel-panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:var(--gold);font-size:18px">👩‍💼</div>
+      <div class="panel-title">MEL — Mézières En Ligne</div>
+      <button class="panel-close" onclick="closeOv('mel')">✕</button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="sugs" id="sugs">
@@ -581,259 +330,491 @@ body {
       <button class="sug" onclick="sendSug(this)">🥾 Randonnées</button>
     </div>
     <div class="mbar">
-      <input class="minp" id="minp" placeholder="Votre question…"
-        onkeydown="if(event.key==='Enter')sendMel()">
+      <input class="minp" id="minp" placeholder="Votre question…" onkeydown="if(event.key==='Enter')sendMel()">
       <button class="msnd" onclick="sendMel()">➤</button>
     </div>
   </div>
 </div>
 
+<!-- ═══ OVERLAY SIGNALEMENT ═══ -->
+<div class="ov" id="ov-signal" onclick="ovClick('signal',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fde8e8">🚨</div>
+      <div class="panel-title">Signalement citoyen</div>
+      <button class="panel-close" onclick="closeOv('signal')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="signal-form">
+        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
+        <div class="form-group">
+          <label class="form-label">Catégorie</label>
+          <div class="form-cats" id="signal-cats">
+            <button class="cat-btn" onclick="selCat(this,'🛣️ Voirie')">🛣️ Voirie</button>
+            <button class="cat-btn" onclick="selCat(this,'💡 Éclairage')">💡 Éclairage</button>
+            <button class="cat-btn" onclick="selCat(this,'🗑️ Propreté')">🗑️ Propreté</button>
+            <button class="cat-btn" onclick="selCat(this,'⚠️ Signalisation')">⚠️ Signalisation</button>
+            <button class="cat-btn" onclick="selCat(this,'🌿 Espaces verts')">🌿 Espaces verts</button>
+            <button class="cat-btn" onclick="selCat(this,'🏛️ Bâtiment')">🏛️ Bâtiment</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description (facultatif)</label>
+          <textarea class="form-textarea" id="signal-desc" placeholder="Décrivez le problème en quelques mots…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Photo (facultatif)</label>
+          <input type="file" id="signal-photo-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto()">
+          <button class="photo-btn" onclick="document.getElementById('signal-photo-input').click()">📷 Prendre une photo ou choisir une image</button>
+          <img id="signal-photo-preview" class="photo-preview">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Localisation (facultatif)</label>
+          <button class="cat-btn" id="loc-btn" onclick="getLocation()" style="width:100%;text-align:center">📍 Utiliser ma position GPS</button>
+          <div id="loc-status" style="font-size:0.68rem;color:var(--muted);margin-top:4px"></div>
+        </div>
+        <button class="submit-btn" onclick="submitSignal()">📤 Envoyer le signalement</button>
+      </div>
+      <div class="success-msg" id="signal-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Signalement envoyé !</div>
+        <div class="s-sub">La mairie a bien reçu votre signalement.<br>Merci de votre contribution !</div>
+        <button class="submit-btn" style="margin-top:16px" onclick="resetSignal()">Faire un autre signalement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY BOÎTE À IDÉES ═══ -->
+<div class="ov" id="ov-idees" onclick="ovClick('idees',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fffbe8">💡</div>
+      <div class="panel-title">Vos idées pour Mézières</div>
+      <button class="panel-close" onclick="closeOv('idees')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="idea-form">
+        <textarea class="idea-input" id="idea-input" placeholder="Proposez une idée pour améliorer la vie dans la commune…"></textarea>
+        <div class="idea-cats">
+          <button class="idea-cat" onclick="selIdeaCat(this,'🛣️ Voirie')">🛣️ Voirie</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🌿 Environnement')">🌿 Environnement</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🎉 Animations')">🎉 Animations</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🏫 Services')">🏫 Services</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'💡 Autre')">💡 Autre</button>
+        </div>
+        <button class="idea-submit" onclick="submitIdee()">💡 Soumettre mon idée</button>
+      </div>
+      <div id="ideas-list" class="ideas-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY NOTIFICATIONS ═══ -->
+<div class="ov" id="ov-notifs" onclick="ovClick('notifs',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f0fc">🔔</div>
+      <div class="panel-title">Actualités Radio Mézières</div>
+      <button class="panel-close" onclick="closeOv('notifs')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="notif-banner" id="push-banner">
+        <div class="notif-ico">🔔</div>
+        <div class="notif-text">
+          <div class="notif-title">Recevoir les notifications</div>
+          <div class="notif-sub">Soyez alerté des nouvelles publications</div>
+        </div>
+        <button class="notif-btn" id="push-btn" onclick="togglePush()">Activer</button>
+      </div>
+      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY RGPD ═══ -->
+<div class="ov" id="ov-rgpd" onclick="ovClick('rgpd',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f0f0f0">🔒</div>
+      <div class="panel-title">Données personnelles &amp; RGPD</div>
+      <button class="panel-close" onclick="closeOv('rgpd')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="rgpd-section">
+        <div class="rgpd-title">📋 Principe général</div>
+        <div class="rgpd-text">L'application MAT est conçue selon le principe de <strong>minimisation des données</strong> : nous collectons uniquement ce qui est strictement nécessaire au fonctionnement des services, conformément au Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679).</div>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
+        <table class="rgpd-table">
+          <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
+          <tr><td>MEL (chatbot)</td><td>Questions posées, non stockées</td><td>Session uniquement</td></tr>
+          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Email transmis, non stocké</td></tr>
+          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
+          <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
+          <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
+          <tr><td>Météo</td><td>Position GPS (si autorisée)</td><td>Non stockée</td></tr>
+        </table>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">🍪 Cookies et stockage local</div>
+        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées) et votre préférence d'installation. Aucun cookie de traçage ou publicitaire n'est utilisé.</div>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">🤝 Sous-traitants</div>
+        <div class="rgpd-text">Les services suivants sont utilisés :</div>
+        <table class="rgpd-table">
+          <tr><th>Service</th><th>Usage</th><th>Localisation</th></tr>
+          <tr><td>Anthropic (Claude)</td><td>IA — réponses MEL</td><td>États-Unis</td></tr>
+          <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
+          <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
+          <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
+        </table>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">✉️ Exercer vos droits</div>
+        <div class="rgpd-contact">
+          Vous pouvez exercer vos droits d'accès, de rectification et de suppression en contactant la mairie :<br><br>
+          <strong>Mairie de Mézières-lez-Cléry</strong><br>
+          36 rue du bourg — 45370<br>
+          📞 02 38 45 61 76<br>
+          ✉️ mairie@mezieres-lez-clery.fr
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY MÉTÉO DÉTAIL ═══ -->
+<div class="ov" id="ov-meteo" onclick="ovClick('meteo',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f4f8">🌤️</div>
+      <div class="panel-title">Météo — Mézières-lez-Cléry</div>
+      <button class="panel-close" onclick="closeOv('meteo')">✕</button>
+    </div>
+    <div class="panel-body" id="meteo-detail">
+      <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+    </div>
+  </div>
+</div>
+
 <script>
-// VERSION 2.1
-const MEL_PROXY = 'https://chatbot-mairie-mezieres.onrender.com/mel';
-const INSTALL_DISMISSED_KEY = 'mezieres_install_dismissed_until';
+// ════════════════════════════════════════
+// MAT v3.0 — Mézières Avec Toi
+// ════════════════════════════════════════
+const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
+const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
+const ACTU_URL   = 'https://chatbot-mairie-mezieres.onrender.com/actus';
+const ICAL_URL   = 'https://calendar.google.com/calendar/ical/1d48f14b59e12907917ff669d0437e29a06a7578a68d14d761e669750e7776b4%40group.calendar.google.com/private-ee29dc4f9f6a7c36809edf58f64a6469/basic.ics';
+const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
+const INSTALL_KEY = 'mat_installed_v3';
 
-// ── Bannière installation ──────────────────────────────
+// ── Installation PWA ──────────────────
 let dp = null;
-
-function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (localStorage.getItem(INSTALL_KEY)) document.getElementById('install-banner').classList.add('hidden');
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; });
+window.addEventListener('appinstalled', () => { localStorage.setItem(INSTALL_KEY,'1'); document.getElementById('install-banner').classList.add('hidden'); });
+function installApp(){
+  if(dp){ dp.prompt(); dp.userChoice.then(r=>{ if(r.outcome==='accepted'){localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');} dp=null; }); }
+  else alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
 }
+function hideBanner(e){ e.stopPropagation(); document.getElementById('install-banner').classList.add('hidden'); localStorage.setItem(INSTALL_KEY,'dismissed'); }
 
-function getPlatform() {
-  const ua = navigator.userAgent || navigator.vendor || '';
-  if (/android/i.test(ua)) return 'android';
-  if (/iphone|ipad|ipod/i.test(ua)) return 'ios';
-  return 'other';
+// ── Overlays ──────────────────────────
+function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, votre assistante virtuelle.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} setTimeout(()=>document.getElementById('minp').focus(),300);}
+function openSignal(){openOv('signal');}
+function openIdees(){openOv('idees'); loadIdees();}
+function openNotifs(){openOv('notifs'); loadActus();}
+function openRgpd(){openOv('rgpd');}
+function openMeteo(){openOv('meteo'); loadMeteoDetail();}
+
+function openOv(id){ document.getElementById('ov-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeOv(id){ document.getElementById('ov-'+id).classList.remove('open'); document.body.style.overflow=''; }
+function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
+
+// ── MEL ───────────────────────────────
+let melInited=false, melBusy=false;
+const hist=[];
+function addMsg(role,text){
+  const c=document.getElementById('msgs');
+  const d=document.createElement('div'); d.className='msg '+role;
+  d.innerHTML='<div class="mav">'+(role==='bot'?'\ud83d\udc69\u200d\ud83d\udcbc':'\ud83d\udc64')+'</div><div class="bub">'+text.replace(/\n/g,'<br>')+'</div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
-
-function isChromeLikeAndroid() {
-  const ua = navigator.userAgent || '';
-  return /android/i.test(ua) && /chrome|crios|edg|opr/i.test(ua);
+function showTyping(){
+  const c=document.getElementById('msgs');
+  const d=document.createElement('div'); d.className='msg bot'; d.id='typ';
+  d.innerHTML='<div class="mav">\ud83d\udc69\u200d\ud83d\udcbc</div><div class="bub"><div class="typ"><span></span><span></span><span></span></div></div>';
+  c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
-
-function dismissedRecently() {
-  const until = Number(localStorage.getItem(INSTALL_DISMISSED_KEY) || 0);
-  return until && Date.now() < until;
+async function sendMel(){
+  const inp=document.getElementById('minp');
+  const txt=inp.value.trim(); if(!txt||melBusy)return;
+  inp.value=''; document.getElementById('sugs').style.display='none';
+  addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
+  try{
+    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-6)})});
+    const d=await r.json();
+    const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
+    document.getElementById('typ')?.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
+  }catch(e){ document.getElementById('typ')?.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
+  melBusy=false;
 }
+function sendSug(btn){ document.getElementById('minp').value=btn.textContent.trim(); sendMel(); }
 
-function setBannerCopy() {
-  const platform = getPlatform();
-  const title = document.getElementById('install-title');
-  const sub = document.getElementById('install-sub');
-  const btn = document.getElementById('install-btn');
-  const ico = document.getElementById('install-ico');
+// ── Météo ─────────────────────────────
+const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
+const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
 
-  if (platform === 'ios') {
-    ico.textContent = '🍎';
-  title.textContent = "Installer sur iPhone";
-  subtitle.textContent = "Touchez le bouton partager puis « Sur l’écran d’accueil »";
-  btn.textContent = "Ajouter à l’écran d’accueil";
-} else if (platform === 'android') {
-    ico.textContent = '🤖';
-    title.textContent = "Installer sur Android";
-    sub.textContent = dp ? "Bouton d'installation disponible" : "Si rien ne s'affiche, utilisez le menu ⋮";
-    btn.textContent = dp ? "Installer" : "Voir comment";
-  } else {
-    ico.textContent = '💻';
-    title.textContent = "Installer l'application";
-    sub.textContent = dp ? "Accès rapide depuis votre appareil" : "Consultez les étapes selon votre navigateur";
-    btn.textContent = dp ? "Installer" : "Voir comment";
-  }
-}
-
-function syncInstallUI() {
-  const banner = document.getElementById('install-banner');
-  if (isStandalone()) {
-    banner.classList.add('hidden');
-    return;
-  }
-  setBannerCopy();
-  if (!dismissedRecently()) banner.classList.remove('hidden');
-}
-
-function getInstallHelpContent() {
-  const platform = getPlatform();
-  if (platform === 'ios') {
-    return {
-      icon: '🍎',
-      title: 'Installer sur iPhone',
-      sub: 'Depuis Safari, en 3 étapes',
-      steps: [
-        'Ouvrez cette page dans Safari.',
-        'Touchez le bouton Partager en bas de l’écran.',
-        'Choisissez « Sur l’écran d’accueil », puis validez.'
-      ],
-      tip: "Sur iPhone, Apple n'affiche pas toujours de bouton « Installer ». C’est normal."
-    };
-  }
-  if (platform === 'android') {
-    return {
-      icon: '🤖',
-      title: 'Installer sur Android',
-      sub: dp ? 'Le bouton peut être affiché automatiquement' : 'Le navigateur ne propose pas encore le raccourci automatique',
-      steps: dp ? [
-        'Touchez « Réessayer ».',
-        'Si une fenêtre apparaît, choisissez « Installer ».',
-        'L’icône sera ajoutée sur l’écran d’accueil.'
-      ] : [
-        'Touchez le menu du navigateur (⋮ en haut à droite).',
-        'Choisissez « Ajouter à l’écran d’accueil » ou « Installer l’application ».',
-        'Validez pour créer l’icône sur le téléphone.'
-      ],
-      tip: "Sur Android, Chrome n'affiche pas toujours le bouton d'installation au premier passage. Il faut parfois visiter la page, toucher un ou deux liens, puis revenir."
-    };
-  }
-  return {
-    icon: '📲',
-    title: "Installer l'application",
-    sub: 'Suivez les options de votre navigateur',
-    steps: [
-      "Cherchez « Installer », « Ajouter à l'écran d'accueil » ou une option équivalente dans le menu du navigateur.",
-      "Si vous ne voyez rien, revenez sur cette page après quelques secondes d'utilisation.",
-      "Vous pouvez aussi essayer depuis Chrome sur Android ou Safari sur iPhone."
-    ],
-    tip: "L'installation dépend du navigateur et de l'appareil."
-  };
-}
-
-function openInstallHelp() {
-  const data = getInstallHelpContent();
-  document.getElementById('help-icon').textContent = data.icon;
-  document.getElementById('help-title').textContent = data.title;
-  document.getElementById('help-sub').textContent = data.sub;
-  document.getElementById('help-tip').textContent = data.tip;
-  const steps = document.getElementById('help-steps');
-  steps.innerHTML = data.steps.map(step => `<li>${step}</li>`).join('');
-  document.getElementById('install-help').classList.remove('hidden');
-  document.getElementById('install-help').setAttribute('aria-hidden', 'false');
-}
-
-function closeInstallHelp(e) {
-  if (e) e.stopPropagation();
-  document.getElementById('install-help').classList.add('hidden');
-  document.getElementById('install-help').setAttribute('aria-hidden', 'true');
-}
-
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  dp = e;
-  syncInstallUI();
-});
-
-window.addEventListener('appinstalled', () => {
-  dp = null;
-  closeInstallHelp();
-  document.getElementById('install-banner').classList.add('hidden');
-});
-
-window.addEventListener('DOMContentLoaded', syncInstallUI);
-
-function retryInstall() {
-  closeInstallHelp();
-  installApp();
-}
-
-async function installApp() {
-  if (dp) {
-    dp.prompt();
-    const choice = await dp.userChoice;
-    if (choice.outcome === 'accepted') {
-      document.getElementById('install-banner').classList.add('hidden');
-      closeInstallHelp();
-    } else {
-      openInstallHelp();
-    }
-    dp = null;
-    syncInstallUI();
-  } else {
-    openInstallHelp();
-  }
-}
-
-function hideBanner(e) {
-  e.stopPropagation();
-  document.getElementById('install-banner').classList.add('hidden');
-  const oneDay = 24 * 60 * 60 * 1000;
-  localStorage.setItem(INSTALL_DISMISSED_KEY, String(Date.now() + oneDay));
-}
-
-// ── MEL ───────────────────────────────────────────────
-let inited = false, busy = false;
-const hist = [];
-
-function openMel() {
-  document.getElementById('ov').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  if (!inited) {
-    inited = true;
-    addMsg('bot', 'Bonjour ! Je suis MEL, votre assistante virtuelle.\n\nComment puis-je vous aider ? 😊');
-  }
-  setTimeout(() => document.getElementById('minp').focus(), 350);
-}
-function closeMel() {
-  document.getElementById('ov').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function ovClick(e) { if (e.target === document.getElementById('ov')) closeMel(); }
-
-function addMsg(role, text) {
-  const c = document.getElementById('msgs');
-  const d = document.createElement('div');
-  d.className = 'msg ' + role;
-  d.innerHTML = '<div class="mav2">' + (role==='bot'?'👩\u200d💼':'👤') + '</div>'
-    + '<div class="bub">' + text.replace(/\n/g,'<br>') + '</div>';
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
-}
-
-function showTyping() {
-  const c = document.getElementById('msgs');
-  const d = document.createElement('div');
-  d.className = 'msg bot'; d.id = 'typ';
-  d.innerHTML = '<div class="mav2">👩\u200d💼</div><div class="bub"><div class="typ"><span></span><span></span><span></span></div></div>';
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
-}
-
-async function sendMel() {
-  const inp = document.getElementById('minp');
-  const txt = inp.value.trim();
-  if (!txt || busy) return;
-  inp.value = '';
-  document.getElementById('sugs').style.display = 'none';
-  addMsg('user', txt);
-  hist.push({ role: 'user', content: txt });
-  busy = true;
-  showTyping();
-  try {
-    const r = await fetch(MEL_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: hist.slice(-6) })
-    });
+async function loadMeteo(){
+  try{
+    // API Open-Meteo (gratuite, pas de clé requise) centrée sur Mézières-lez-Cléry
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.82&longitude=1.807&current=temperature_2m,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FParis&forecast_days=3');
     const d = await r.json();
-    const rep = (d.reply || 'Erreur technique. Contactez la mairie au 02 38 45 61 76.')
-      .replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
-    document.getElementById('typ')?.remove();
-    hist.push({ role: 'assistant', content: rep });
-    addMsg('bot', rep);
-  } catch(e) {
-    document.getElementById('typ')?.remove();
-    addMsg('bot', 'Je ne peux pas répondre pour le moment.\nContactez la mairie : 02 38 45 61 76 😊');
+    const cur = d.current;
+    const code = cur.weathercode;
+    const temp = Math.round(cur.temperature_2m);
+    const ico = METEO_ICONS[code] || '🌡️';
+    const desc = METEO_DESC[code] || '';
+    document.getElementById('meteo-ico').textContent = ico;
+    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+ temp +'°C</strong>';
+    document.getElementById('meteo-desc').textContent = desc + ' · Vent ' + Math.round(cur.windspeed_10m) + ' km/h';
+    // Alerte si code >= 80
+    if(code >= 80){ document.getElementById('meteo-alerte').textContent = '⚠️ Alerte météo'; document.getElementById('meteo-alerte').style.display='block'; }
+    // Stocker pour le détail
+    window._meteoData = d;
+  }catch(e){
+    document.getElementById('meteo-temp').innerHTML = '<span style="font-size:0.72rem;color:rgba(255,255,255,0.5)">Météo indisponible</span>';
   }
-  busy = false;
 }
 
-function sendSug(btn) {
-  document.getElementById('minp').value = btn.textContent.trim();
-  sendMel();
+function loadMeteoDetail(){
+  const d = window._meteoData;
+  const el = document.getElementById('meteo-detail');
+  if(!d){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>'; return; }
+  const days = d.daily;
+  const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
+  for(let i=0;i<3;i++){
+    const dt = new Date(days.time[i]); const jour = i===0?'Aujourd\'hui':i===1?'Demain':JOURS[dt.getDay()];
+    const ico = METEO_ICONS[days.weathercode[i]]||'🌡️';
+    const desc = METEO_DESC[days.weathercode[i]]||'';
+    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
+      +'<div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">'+jour+'</div>'
+      +'<div style="font-size:1.8rem">'+ico+'</div>'
+      +'<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</div>'
+      +'<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">'+desc+'</div>'
+      +'<div style="font-size:0.62rem;color:#3b82f6;margin-top:2px">💧 '+days.precipitation_probability_max[i]+'%</div>'
+      +'</div>';
+  }
+  html += '</div>';
+  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source : Open-Meteo · Mézières-lez-Cléry (47.82°N, 1.807°E)</div>';
+  el.innerHTML = html;
 }
 
-// ── Service Worker ─────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+// ── Événements iCal ───────────────────
+const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+async function loadEvents(){
+  try{
+    const r = await fetch(ICAL_URL);
+    const txt = await r.text();
+    const evts = parseIcalEvents(txt, 2);
+    const strip = document.getElementById('events-strip');
+    if(!evts.length){ strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>'; return; }
+    strip.innerHTML = evts.map(e=>{
+      const dt = e.date;
+      const diff = Math.ceil((dt-new Date())/(1000*60*60*24));
+      const diffTxt = diff===0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
+      return '<div class="event-chip">'
+        +'<div class="event-date">'+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</div>'
+        +'<div class="event-name">'+e.summary+'</div>'
+        +'<div class="event-days">'+diffTxt+'</div>'
+        +'</div>';
+    }).join('');
+  }catch(e){
+    document.getElementById('events-strip').innerHTML='<div class="event-loading">Calendrier indisponible</div>';
+  }
 }
+
+function parseIcalEvents(txt, max){
+  const evts=[], now=new Date(), limit=new Date(now.getTime()+180*864e5);
+  txt.split('BEGIN:VEVENT').slice(1).forEach(b=>{
+    const get=k=>{const m=b.match(new RegExp(k+'[^:]*:([^\r\n]+)'));return m?m[1].trim():'';};
+    const summary=get('SUMMARY'), dtstart=get('DTSTART');
+    if(!summary||!dtstart)return;
+    const raw=dtstart.replace(/T.*/,'');
+    const d=new Date(raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6,8));
+    if(d>=now&&d<=limit)evts.push({summary,date:d});
+  });
+  return evts.sort((a,b)=>a.date-b.date).slice(0,max);
+}
+
+// ── Signalement ───────────────────────
+let sigCat='', sigLat='', sigLon='';
+function selCat(btn, cat){
+  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); sigCat = cat;
+}
+function previewPhoto(){
+  const file = document.getElementById('signal-photo-input').files[0];
+  if(!file)return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('signal-photo-preview');
+    prev.src = e.target.result; prev.style.display='block';
+    document.querySelector('.photo-btn').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+function getLocation(){
+  if(!navigator.geolocation){ document.getElementById('loc-status').textContent='GPS non disponible'; return; }
+  document.getElementById('loc-btn').textContent='📍 Localisation en cours…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    sigLat = pos.coords.latitude.toFixed(5); sigLon = pos.coords.longitude.toFixed(5);
+    document.getElementById('loc-btn').textContent='✅ Position obtenue ('+sigLat+', '+sigLon+')';
+    document.getElementById('loc-btn').classList.add('on');
+    document.getElementById('loc-status').textContent='';
+  }, ()=>{ document.getElementById('loc-btn').textContent='❌ Position refusée'; document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres'; });
+}
+async function submitSignal(){
+  const desc = document.getElementById('signal-desc').value.trim();
+  const photoEl = document.getElementById('signal-photo-preview');
+  const photoB64 = photoEl.style.display!=='none' ? photoEl.src : '';
+  const body = { cat: sigCat||'Non précisé', desc, lat: sigLat, lon: sigLon, photoB64: photoB64.substring(0,50000) };
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+  try{
+    await fetch(SIGNAL_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    document.getElementById('signal-form').style.display='none';
+    document.getElementById('signal-success').style.display='block';
+  }catch(e){
+    alert('Erreur d\'envoi. Vérifiez votre connexion.');
+    btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
+  }
+}
+function resetSignal(){
+  document.getElementById('signal-form').style.display='block';
+  document.getElementById('signal-success').style.display='none';
+  document.getElementById('signal-desc').value='';
+  document.getElementById('signal-photo-preview').style.display='none';
+  document.querySelector('.photo-btn').style.display='block';
+  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
+  sigCat=''; sigLat=''; sigLon='';
+  document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
+  document.getElementById('loc-btn').classList.remove('on');
+}
+
+// ── Boîte à idées ─────────────────────
+const IDEAS_KEY = 'mat_ideas_v3';
+const VOTES_KEY = 'mat_votes_v3';
+let ideaCat = '';
+
+function selIdeaCat(btn, cat){
+  document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); ideaCat = cat;
+}
+
+function getIdeas(){ try{ return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]'); }catch(e){return[];} }
+function getVotes(){ try{ return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}'); }catch(e){return {};} }
+
+function submitIdee(){
+  const txt = document.getElementById('idea-input').value.trim();
+  if(!txt){ alert('Veuillez écrire votre idée !'); return; }
+  const ideas = getIdeas();
+  const idea = { id: Date.now(), text: txt, cat: ideaCat||'💡 Autre', votes: 0, date: new Date().toLocaleDateString('fr-FR') };
+  ideas.unshift(idea);
+  localStorage.setItem(IDEAS_KEY, JSON.stringify(ideas));
+  document.getElementById('idea-input').value='';
+  ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  loadIdees();
+}
+
+function voteIdee(id){
+  const votes = getVotes();
+  const ideas = getIdeas();
+  if(votes[id]){ return; } // déjà voté
+  const idx = ideas.findIndex(i=>i.id===id);
+  if(idx<0)return;
+  ideas[idx].votes = (ideas[idx].votes||0)+1;
+  votes[id] = 1;
+  localStorage.setItem(IDEAS_KEY, JSON.stringify(ideas));
+  localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+  loadIdees();
+}
+
+function loadIdees(){
+  const ideas = getIdeas();
+  const votes = getVotes();
+  const el = document.getElementById('ideas-list');
+  if(!ideas.length){ el.innerHTML='<div class="no-ideas">Aucune idée pour l\'instant.<br>Soyez le premier à proposer\u00a0!</div>'; return; }
+  const sorted = [...ideas].sort((a,b)=>b.votes-a.votes);
+  el.innerHTML = sorted.map(idea=>`
+    <div class="idea-card">
+      <div class="idea-votes">
+        <button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button>
+        <div class="vote-count">${idea.votes||0}</div>
+      </div>
+      <div class="idea-content">
+        <div class="idea-cat-badge">${idea.cat}</div>
+        <div class="idea-text">${idea.text}</div>
+        <div class="idea-date">${idea.date}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Actualités (publications Radio Mézières) ──
+async function loadActus(){
+  const el = document.getElementById('actu-list');
+  try{
+    const r = await fetch(ACTU_URL);
+    const d = await r.json();
+    if(!d.actus||!d.actus.length){ el.innerHTML='<div class="actu-empty">Aucune publication récente.<br>Publiez sur Facebook avec #app-mezieres</div>'; return; }
+    el.innerHTML = d.actus.map(a=>`
+      <div class="actu-item">
+        <div class="actu-dot"></div>
+        <div>
+          <div class="actu-title">${a.title}</div>
+          <div class="actu-date">${a.date}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    el.innerHTML='<div class="actu-empty">Actualités indisponibles.<br>Consultez <a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Radio Mézières</a></div>';
+  }
+}
+
+// ── Notifications Push ────────────────
+let pushRegistered = false;
+async function togglePush(){
+  const btn = document.getElementById('push-btn');
+  if(pushRegistered){ btn.textContent='Activer'; btn.classList.add('off'); pushRegistered=false; return; }
+  if(!('Notification' in window)){ alert('Notifications non supportées sur ce navigateur.'); return; }
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ alert('Notifications refusées. Modifiez les paramètres de votre navigateur.'); return; }
+  if('serviceWorker' in navigator){
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(VAPID_PUB) });
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
+      btn.textContent='Désactiver'; btn.classList.remove('off'); pushRegistered=true;
+      alert('✅ Notifications activées\u00a0! Vous serez alerté des nouvelles publications Radio Mézières.');
+    }catch(e){ alert('Erreur lors de l\'activation des notifications.'); }
+  }
+}
+
+function urlBase64ToUint8Array(b64){
+  const pad = '='.repeat((4-b64.length%4)%4);
+  const raw = atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
+  return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+
+// ── Service Worker ────────────────────
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('./service-worker.js').catch(()=>{}); }
+
+// ── Init ──────────────────────────────
+loadMeteo();
+loadEvents();
 </script>
 </body>
 </html>
