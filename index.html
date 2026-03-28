@@ -217,8 +217,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 <div class="header">
   <div class="mat-hero">
     <div class="mat-text">
-      <div class="mat-badge">MAT — Mézières Avec Toi</div>
-      <div class="mat-title">Mézières-lez-Cléry</div>
+      <div class="mat-badge">Application officielle</div>
+      <div class="mat-title">MAT, Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
       <div class="mat-version">v3.2</div>
     </div>
@@ -319,9 +319,12 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="ico ico-rgpd">🔒</div>
       <div class="ct"><div class="ct-label">Données perso</div><div class="ct-sub">RGPD &amp; vie privée</div></div>
     </button>
-    <button class="card" onclick="installApp()">
-      <div class="ico" style="background:linear-gradient(135deg,#f0f8e8,#d4f0d4)">📲</div>
-      <div class="ct"><div class="ct-label">Installer MAT</div><div class="ct-sub">Écran d'accueil</div></div>
+    <button class="card" id="btn-install-or-bug" onclick="installOrBug()">
+      <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#f0f8e8,#d4f0d4)">📲</div>
+      <div class="ct">
+        <div class="ct-label" id="iob-label">Installer MAT</div>
+        <div class="ct-sub" id="iob-sub">Écran d'accueil</div>
+      </div>
     </button>
   </div>
 
@@ -446,6 +449,52 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <button class="notif-btn" id="push-btn" onclick="togglePush()">Activer</button>
       </div>
       <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY BUG ═══ -->
+<div class="ov" id="ov-bug" onclick="ovClick('bug',event)">
+  <div class="panel">
+    <div class="panel-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🐛</div>
+      <div class="panel-title">Signaler un bug</div>
+      <button class="panel-close" onclick="closeOv('bug')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="bug-form">
+        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Un service ne fonctionne pas correctement ? Signalez-le pour nous aider à l'améliorer.</p>
+        <div class="form-group">
+          <label class="form-label">Service concerné</label>
+          <div class="form-cats" id="bug-services">
+            <button class="cat-btn" onclick="selBugService(this,'MEL Assistante')">🤖 MEL</button>
+            <button class="cat-btn" onclick="selBugService(this,'Météo')">🌤️ Météo</button>
+            <button class="cat-btn" onclick="selBugService(this,'Carte randonnées')">🗺️ Carte</button>
+            <button class="cat-btn" onclick="selBugService(this,'Agenda')">📅 Agenda</button>
+            <button class="cat-btn" onclick="selBugService(this,'Signalement')">🚨 Signalement</button>
+            <button class="cat-btn" onclick="selBugService(this,'Application générale')">📱 Général</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Appareil</label>
+          <div class="form-cats" id="bug-devices">
+            <button class="cat-btn" onclick="selBugDevice(this,'iPhone/iPad (iOS)')">🍎 iPhone/iPad</button>
+            <button class="cat-btn" onclick="selBugDevice(this,'Android')">🤖 Android</button>
+            <button class="cat-btn" onclick="selBugDevice(this,'Ordinateur')">💻 Ordinateur</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description du problème</label>
+          <textarea class="form-textarea" id="bug-desc" placeholder="Décrivez ce qui ne fonctionne pas…"></textarea>
+        </div>
+        <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
+      </div>
+      <div class="success-msg" id="bug-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Rapport envoyé !</div>
+        <div class="s-sub">Merci de contribuer à améliorer MAT.</div>
+        <button class="submit-btn" style="margin-top:16px;background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="resetBug()">Fermer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -890,10 +939,105 @@ function loadDechets(){
   if(dIco) { dIco.textContent=dOuv?'\ud83d\udfe2':'\ud83d\udd34'; }
 }
 
+// ── Bouton install / bug ─────────────────────────────────────
+function updateInstallBtn() {
+  const installed = localStorage.getItem(INSTALL_KEY);
+  const btn   = document.getElementById('btn-install-or-bug');
+  const ico   = document.getElementById('iob-ico');
+  const label = document.getElementById('iob-label');
+  const sub   = document.getElementById('iob-sub');
+  if (!btn) return;
+  if (installed) {
+    ico.style.background = 'linear-gradient(135deg,#fde8f0,#f8d0e4)';
+    ico.textContent = '🐛';
+    label.textContent = 'Signaler un bug';
+    sub.textContent = 'Un service ne fonctionne pas ?';
+    btn.onclick = () => openOv('bug');
+  }
+}
+
+function installOrBug() {
+  if (localStorage.getItem(INSTALL_KEY)) { openOv('bug'); }
+  else { installApp(); }
+}
+
+// ── Bug report ────────────────────────────────────────────────
+let bugService = '', bugDevice = '';
+function selBugService(btn, val) {
+  document.querySelectorAll('#bug-services .cat-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); bugService = val;
+}
+function selBugDevice(btn, val) {
+  document.querySelectorAll('#bug-devices .cat-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); bugDevice = val;
+}
+async function submitBug() {
+  const desc = document.getElementById('bug-desc').value.trim();
+  const body = {
+    type: 'bug',
+    service: bugService || 'Non précisé',
+    device: bugDevice || 'Non précisé',
+    desc, date: new Date().toLocaleString('fr-FR', {timeZone:'Europe/Paris'})
+  };
+  const btn = document.querySelector('#bug-form .submit-btn');
+  btn.textContent = 'Envoi…'; btn.disabled = true;
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({cat: '🐛 Bug — '+body.service, desc: body.device+' · '+body.desc})
+    });
+    trackStat('bug');
+    document.getElementById('bug-form').style.display = 'none';
+    document.getElementById('bug-success').style.display = 'block';
+  } catch(e) {
+    alert('Erreur d’envoi. Réessayez plus tard.');
+    btn.textContent = '📤 Envoyer le rapport'; btn.disabled = false;
+  }
+}
+function resetBug() {
+  document.getElementById('bug-form').style.display = 'block';
+  document.getElementById('bug-success').style.display = 'none';
+  document.getElementById('bug-desc').value = '';
+  bugService=''; bugDevice='';
+  document.querySelectorAll('#bug-services .cat-btn, #bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));
+  closeOv('bug');
+}
+
+// ── Stats usage ───────────────────────────────────────────────
+async function trackStat(service) {
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({service})
+    });
+  } catch(e) { /* silencieux */ }
+}
+
+// Tracker les ouvertures de services
+const _origOpenMel    = openMel;
+const _origOpenSignal = openSignal;
+const _origOpenIdees  = openIdees;
+const _origOpenNotifs = openNotifs;
+const _origOpenMeteo  = openMeteo;
+window.openMel    = ()=>{ trackStat('mel');        _origOpenMel(); };
+window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
+window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
+window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
+window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
+
+// Tracker installation
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem(INSTALL_KEY, '1');
+  document.getElementById('install-banner').classList.add('hidden');
+  trackStat('installation');
+  updateInstallBtn();
+});
+
 // ── Init ─────────────────────────────────────────────────────
 loadMeteo();
 loadEvents();
 loadDechets();
+updateInstallBtn();
 // Rafraîchir les infos déchets toutes les minutes
 setInterval(loadDechets, 60000);
 
