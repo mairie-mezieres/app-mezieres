@@ -237,11 +237,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </div>
     <div class="dechets-strip" onclick="openDechets()" style="cursor:pointer">
       <div class="dechet-row" id="dechet-poubelle">
-        <span class="dechet-ico">🗑️</span>
-        <span id="om-text" style="font-size:0.65rem;color:rgba(216,243,220,0.9)">Chargement…</span>
+        <span id="om-text" style="font-size:0.65rem;color:rgba(216,243,220,0.85)">Chargement…</span>
       </div>
       <div class="dechet-row" id="dechet-dechetterie">
-        <span class="dechet-ico">🏭</span>
+        <span class="dechet-ico" id="dech-ico">🔴</span>
         <span id="dechetterie-text" style="font-size:0.65rem;color:rgba(216,243,220,0.9)">Chargement…</span>
       </div>
     </div>
@@ -814,39 +813,81 @@ async function loadIdees(){
 // ── Déchetterie & Bacs ───────────────────────────────────────
 function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 
+const FERIES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+// Fériés mobiles 2025-2026 (Pâques, Ascension, Pentecôte)
+const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+
+function isFerie(dateP, jour, moisP, annee){
+  const mmdd = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  if(FERIES.includes(mmdd)) return true;
+  const iso = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  return FERIES_DATES.includes(iso);
+}
+
 function loadDechets(){
-  const now=new Date();
-  const fmt=now.toLocaleString('fr-FR',{timeZone:'Europe/Paris',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
-  const [dp,tp]=fmt.split(', ');
-  const [jour,moisP,annee]=dp.split('/').map(Number);
-  const [hP,minP]=(tp||'0:0').split(':').map(Number);
-  const dateP=new Date(annee,moisP-1,jour);
-  const dowP=dateP.getDay();
-  const semPaire=getWeekNumber(dateP)%2===0;
+  // Extraction heure Paris robuste via Intl.DateTimeFormat
+  const now = new Date();
+  const tz  = { timeZone:'Europe/Paris' };
+  const hP    = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
+  const minP  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now));
+  const jour  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
+  const moisP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
+  const annee = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
+  const dateP = new Date(annee, moisP-1, jour);
+  const dowP  = dateP.getDay(); // 0=dim 1=lun 6=sam
+  const semPaire = getWeekNumber(dateP) % 2 === 0;
 
-  // Bacs
-  let bTxt='',bUrg=false;
-  if(dowP===0){bTxt='🗑️ Sortir le bac noir ce soir !';bUrg=true;}
-  else if(dowP===1&&hP<8){bTxt='🗑️ Bac noir : collecte ce matin';bUrg=true;}
-  else if(dowP===1&&semPaire){bTxt='♻️ Sortir le bac jaune ce soir !';bUrg=true;}
-  else if(dowP===2&&semPaire&&hP<8){bTxt='♻️ Bac jaune : collecte ce matin';bUrg=true;}
-  else{const j2lun=dowP===1?7:(8-dowP)%7||7;if(j2lun===1){bTxt='🗑️ Bac noir demain — sortir ce soir';bUrg=true;}else{bTxt='🗑️ Lundi · ♻️ Jaune mardi sem. paire';}}
-  const omEl=document.getElementById('om-text');
-  if(omEl){omEl.textContent=bTxt;omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)';}
+  // Jours fériés fixes + mobiles
+  const FERIES_FIXES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+  const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+  const mmdd  = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const iso   = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const ferie = FERIES_FIXES.includes(mmdd) || FERIES_DATES.includes(iso);
 
-  // Déchetterie
-  const isH=moisP>=10||moisP<=3;
-  const matO=isH?10:9, apF=isH?17:18;
-  const isOuv=dowP>=1&&dowP<=6;
-  let dTxt='',dOuv=false;
-  if(!isOuv){dTxt='Fermée (ouvre lundi à '+matO+'h)';}
-  else if(hP<matO){dTxt='Fermée — ouvre à '+matO+'h';}
-  else if(hP<12){dOuv=true;dTxt='Ouverte — ferme à 12h';}
-  else if(hP<14){dTxt='Fermée — ouvre à 14h';}
-  else if(hP<apF){dOuv=true;dTxt='Ouverte — ferme à '+apF+'h';}
-  else{dTxt='Fermée — ouvre '+(dowP<6?'demain':'lundi')+' à '+matO+'h';}
-  const dEl=document.getElementById('dechetterie-text');
-  if(dEl){dEl.textContent=dTxt;dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)';}
+  // ── Bac — un seul message ─────────────────────────────────
+  let bTxt='', bUrg=false;
+  if(dowP===0){
+    bTxt='🗑️ Sortir le bac noir ce soir !'; bUrg=true;
+  } else if(dowP===1 && hP<8){
+    bTxt='🗑️ Bac noir : collecte ce matin'; bUrg=true;
+  } else if(dowP===1 && semPaire && hP>=8){
+    bTxt='\u267b\ufe0f Sortir le bac jaune ce soir !'; bUrg=true;
+  } else if(dowP===2 && semPaire && hP<8){
+    bTxt='\u267b\ufe0f Bac jaune : collecte ce matin'; bUrg=true;
+  } else {
+    const j2lun = dowP===1 ? 7 : (8-dowP)%7||7;
+    if(j2lun===1){ bTxt='🗑️ Bac noir demain — sortir ce soir'; bUrg=true; }
+    else { bTxt='🗑️ Prochain bac noir : lundi matin'; }
+  }
+  const omEl = document.getElementById('om-text');
+  if(omEl){ omEl.innerHTML=bTxt; omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)'; }
+
+  // ── Déchetterie Cléry — lun-sam sauf fériés ──────────────
+  // Hiver (oct-mars) : 10h-12h / 14h-17h
+  // Été  (avr-sep)  :  9h-12h / 14h-18h
+  const isH   = moisP>=10 || moisP<=3;
+  const matO  = isH ? 10 : 9;
+  const apF   = isH ? 17 : 18;
+  const isJourOuv = dowP>=1 && dowP<=6 && !ferie;
+  let dTxt='', dOuv=false;
+  if(!isJourOuv){
+    if(ferie) dTxt='D\u00e9chetterie ferm\u00e9e (jour f\u00e9ri\u00e9)';
+    else dTxt='D\u00e9chetterie ferm\u00e9e (ouvre lundi \u00e0 '+matO+'h)';
+  } else if(hP<matO){
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 '+matO+'h';
+  } else if(hP<12){
+    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 12h';
+  } else if(hP<14){
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 14h';
+  } else if(hP<apF){
+    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 '+apF+'h';
+  } else {
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre '+(dowP<6?'demain':'lundi')+' \u00e0 '+matO+'h';
+  }
+  const dEl  = document.getElementById('dechetterie-text');
+  const dIco = document.getElementById('dech-ico');
+  if(dEl)  { dEl.textContent=dTxt; dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)'; }
+  if(dIco) { dIco.textContent=dOuv?'\ud83d\udfe2':'\ud83d\udd34'; }
 }
 
 // ── Init ─────────────────────────────────────────────────────
