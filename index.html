@@ -626,10 +626,10 @@ function setBannerCopy() {
 
   if (platform === 'ios') {
     ico.textContent = '🍎';
-    title.textContent = "Installer sur iPhone";
-    sub.textContent = "Touchez Partager puis « Sur l'écran d'accueil »";
-    btn.textContent = "Voir comment";
-  } else if (platform === 'android') {
+  title.textContent = "Installer sur iPhone";
+  subtitle.textContent = "Touchez le bouton partager puis « Sur l’écran d’accueil »";
+  btn.textContent = "Ajouter à l’écran d’accueil";
+} else if (platform === 'android') {
     ico.textContent = '🤖';
     title.textContent = "Installer sur Android";
     sub.textContent = dp ? "Bouton d'installation disponible" : "Si rien ne s'affiche, utilisez le menu ⋮";
