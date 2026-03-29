@@ -224,7 +224,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">MAT, Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.2</div>
+      <div class="mat-version">v3.3</div>
     </div>
     <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
   </div>
@@ -521,7 +521,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
           <tr><td>MEL (chatbot)</td><td>Questions posées, non stockées</td><td>Session uniquement</td></tr>
-          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Email transmis, non stocké</td></tr>
+          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Stocké côté serveur jusqu'à suppression</td></tr>
           <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
           <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
           <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
@@ -540,7 +540,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
           <tr><td>Anthropic (Claude)</td><td>IA — réponses MEL</td><td>États-Unis</td></tr>
           <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
           <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
-          <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
+          <tr><td>Open-Meteo</td><td>Prévisions météo</td><td>UE / Suisse</td></tr>
+          <tr><td>Météo-France</td><td>Vigilance météorologique</td><td>France</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -652,12 +653,20 @@ function sendSug(btn){ document.getElementById('minp').value=btn.textContent.tri
 // ── Météo ─────────────────────────────
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
 const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
+const VIGI_COLORS = {1:'Vert',2:'Jaune',3:'Orange',4:'Rouge'};
+const VIGI_BADGES = {1:'🟢',2:'🟡',3:'🟠',4:'🔴'};
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+function fmtMm(v){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '—' : (Math.round(Number(v)*10)/10).toString().replace('.',',') + ' mm'; }
+function fmtNum(v,u=''){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '—' : Math.round(Number(v)) + u; }
+function fmtDateTime(value){ if(!value) return ''; const d=new Date(value); if(Number.isNaN(d.getTime())) return value; return d.toLocaleString('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}); }
 
 async function loadMeteo(){
   try{
-    // API Open-Meteo (gratuite, pas de clé requise) centrée sur Mézières-lez-Cléry
-    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.82&longitude=1.807&current=temperature_2m,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FParis&forecast_days=3');
-    const d = await r.json();
+    const r = await fetch(API_BASE + '/meteo/commune');
+    const payload = await r.json();
+    const d = payload.forecast;
+    const vig = payload.vigilance || null;
     const cur = d.current;
     const code = cur.weathercode;
     const temp = Math.round(cur.temperature_2m);
@@ -665,25 +674,51 @@ async function loadMeteo(){
     const desc = METEO_DESC[code] || '';
     document.getElementById('meteo-ico').textContent = ico;
     document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+ temp +'°C</strong>';
-    document.getElementById('meteo-desc').textContent = desc + ' · Vent ' + Math.round(cur.windspeed_10m) + ' km/h';
-    // Alerte si code >= 80
-    if(code >= 80){ document.getElementById('meteo-alerte').textContent = '⚠️ Alerte météo'; document.getElementById('meteo-alerte').style.display='block'; }
-    // Stocker pour le détail
-    window._meteoData = d;
+    document.getElementById('meteo-desc').textContent = desc + ' · Vent ' + Math.round(cur.windspeed_10m || 0) + ' km/h';
+    const badge = document.getElementById('meteo-alerte');
+    if(vig && vig.color >= 2){
+      badge.textContent = (VIGI_BADGES[vig.color] || '⚠️') + ' Vigilance ' + (VIGI_COLORS[vig.color] || '');
+      badge.style.display='block';
+    } else {
+      badge.style.display='none';
+    }
+    window._meteoData = payload;
   }catch(e){
     document.getElementById('meteo-temp').innerHTML = '<span style="font-size:0.72rem;color:rgba(255,255,255,0.5)">Météo indisponible</span>';
   }
 }
 
 function loadMeteoDetail(){
-  const d = window._meteoData;
+  const payload = window._meteoData;
   const el = document.getElementById('meteo-detail');
-  if(!d){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>'; return; }
-  const days = d.daily;
+  if(!payload || !payload.forecast){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>'; return; }
+  const d = payload.forecast;
+  const vig = payload.vigilance || null;
+  const cur = d.current || {};
+  const days = d.daily || {};
   const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-  let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
+  let html = '';
+
+  if(vig && vig.color >= 2){
+    html += '<div style="background:white;border:1px solid var(--border);border-left:5px solid '+(vig.color===4?'#dc2626':vig.color===3?'#f97316':'#eab308')+';border-radius:14px;padding:14px;margin-bottom:14px">'
+      +'<div style="font-size:0.8rem;font-weight:900;color:var(--text)">'+(VIGI_BADGES[vig.color] || '⚠️')+' Vigilance '+(VIGI_COLORS[vig.color] || '')+' — '+escapeHtml(vig.risk || 'Phénomène météo')+'</div>'
+      +(vig.start ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:6px">Début estimé : '+escapeHtml(fmtDateTime(vig.start))+'</div>' : '')
+      +(vig.end ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:2px">Fin estimée : '+escapeHtml(fmtDateTime(vig.end))+'</div>' : '')
+      +'<div style="font-size:0.68rem;color:var(--muted);margin-top:8px">Source : Météo-France</div>'
+      +'</div>';
+  }
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+    +'<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted)">Pluie actuelle</div><div style="font-size:1rem;font-weight:900;color:var(--text);margin-top:4px">'+fmtMm(cur.precipitation)+'</div></div>'
+    +'<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted)">Humidité</div><div style="font-size:1rem;font-weight:900;color:var(--text);margin-top:4px">'+fmtNum(cur.relative_humidity_2m,'%')+'</div></div>'
+    +'<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted)">Pression</div><div style="font-size:1rem;font-weight:900;color:var(--text);margin-top:4px">'+fmtNum(cur.pressure_msl,' hPa')+'</div></div>'
+    +'<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted)">Rafales</div><div style="font-size:1rem;font-weight:900;color:var(--text);margin-top:4px">'+fmtNum(cur.windgusts_10m,' km/h')+'</div></div>'
+    +'</div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
   for(let i=0;i<3;i++){
-    const dt = new Date(days.time[i]); const jour = i===0?'Aujourd\'hui':i===1?'Demain':JOURS[dt.getDay()];
+    const dt = new Date(days.time[i]);
+    const jour = i===0?'Aujourd\'hui':i===1?'Demain':JOURS[dt.getDay()];
     const ico = METEO_ICONS[days.weathercode[i]]||'🌡️';
     const desc = METEO_DESC[days.weathercode[i]]||'';
     html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
@@ -691,11 +726,13 @@ function loadMeteoDetail(){
       +'<div style="font-size:1.8rem">'+ico+'</div>'
       +'<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</div>'
       +'<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">'+desc+'</div>'
-      +'<div style="font-size:0.62rem;color:#3b82f6;margin-top:2px">💧 '+days.precipitation_probability_max[i]+'%</div>'
+      +'<div style="font-size:0.62rem;color:#3b82f6;margin-top:2px">💧 '+fmtMm(days.precipitation_sum[i])+'</div>'
+      +'<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">Risque pluie '+fmtNum(days.precipitation_probability_max[i],'%')+'</div>'
+      +'<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">Rafales '+fmtNum(days.windgusts_10m_max[i],' km/h')+'</div>'
       +'</div>';
   }
   html += '</div>';
-  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source : Open-Meteo · Mézières-lez-Cléry (47.82°N, 1.807°E)</div>';
+  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France</div>';
   el.innerHTML = html;
 }
 
