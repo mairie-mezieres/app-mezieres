@@ -58,10 +58,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .meteo-loading{font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;}
 
 /* ── Prochains événements ── */
-.events-strip{display:flex;gap:8px;margin-top:10px;}
-.event-chip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 12px;flex:1;min-width:0;}
+.events-strip{display:flex;gap:8px;margin-top:10px;align-items:stretch;}
+.event-chip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 12px;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;}
 .event-date{font-size:0.6rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;}
-.event-name{font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.event-name{font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.3;margin-top:2px;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.6em;}
 .event-days{font-size:0.62rem;color:var(--sage);margin-top:2px;}
 .event-loading{font-size:0.68rem;color:rgba(255,255,255,0.3);font-style:italic;padding:8px 12px;}
 
@@ -188,8 +188,9 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .notif-text{flex:1;}
 .notif-title{font-size:0.85rem;font-weight:800;color:var(--text);}
 .notif-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
-.notif-btn{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
-.notif-btn.off{background:var(--warm);color:var(--muted);border:1px solid var(--border);}
+.notif-btn{color:white;border:none;border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
+.notif-btn.on{background:linear-gradient(135deg,#15803d,#16a34a);}
+.notif-btn.off{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;}
 .actu-item{background:white;border-radius:14px;margin-bottom:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .actu-img{width:100%;height:160px;object-fit:cover;display:block;background:var(--mist);}
 .actu-body{padding:12px 14px;}
@@ -199,6 +200,18 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .actu-date{font-size:0.65rem;color:var(--muted);}
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
+
+
+/* ── Contact mairie ── */
+.contact-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
+.contact-card{background:white;border-radius:14px;padding:14px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.contact-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--mist);}
+.contact-title{font-size:0.84rem;font-weight:800;color:var(--text);}
+.contact-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.5;}
+.contact-action{margin-left:auto;align-self:center;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+.contact-action.alt{background:linear-gradient(135deg,#1d4ed8,#3b82f6);}
+.contact-action.wa{background:linear-gradient(135deg,#15803d,#22c55e);}
+.contact-note{font-size:0.68rem;color:var(--muted);margin:6px 2px 14px;line-height:1.5;}
 
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
@@ -224,7 +237,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">MAT, Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.3</div>
+      <div class="mat-version">v3.2</div>
     </div>
     <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
   </div>
@@ -279,14 +292,14 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </a>
     <button class="card" onclick="openNotifs()">
       <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Actualités MAT</div><div class="ct-sub">Publications Radio</div></div>
+      <div class="ct"><div class="ct-label">Actualité Pocket</div><div class="ct-sub">Publications Communales</div></div>
     </button>
   </div>
   <div class="grid2" style="margin-top:9px">
-    <a class="card" href="https://www.facebook.com/" target="_blank" id="lien-communaute">
-      <div class="ico ico-hab">👥</div>
-      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Habitants</div></div>
-    </a>
+    <button class="card" onclick="openContact()">
+      <div class="ico ico-hab">💬</div>
+      <div class="ct"><div class="ct-label">Contacter Mairie</div><div class="ct-sub">Signalement, Messenger ou formulaire</div></div>
+    </button>
   </div>
 
   <div class="sec">Participez &amp; signalez</div>
@@ -440,22 +453,90 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#e8f0fc">🔔</div>
-      <div class="panel-title">Actualités Radio Mézières</div>
+      <div class="panel-title">Actualité Pocket</div>
       <button class="panel-close" onclick="closeOv('notifs')">✕</button>
     </div>
     <div class="panel-body">
-      <div class="notif-banner" id="push-banner">
+      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
+      <div class="notif-banner" id="push-banner" style="margin-top:12px">
         <div class="notif-ico">🔔</div>
         <div class="notif-text">
-          <div class="notif-title">Recevoir les notifications</div>
-          <div class="notif-sub">Soyez alerté des nouvelles publications</div>
+          <div class="notif-title">Notifications Actualité Pocket</div>
+          <div class="notif-sub" id="push-sub">Activez les notifications pour recevoir les nouvelles publications communales.</div>
         </div>
-        <button class="notif-btn" id="push-btn" onclick="togglePush()">Activer</button>
+        <button class="notif-btn on" id="push-btn" onclick="togglePush()">Activer les notifications</button>
       </div>
-      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
     </div>
   </div>
 </div>
+
+
+<!-- ═══ OVERLAY CONTACT ═══ -->
+<div class="ov" id="ov-contact" onclick="ovClick('contact',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#ede8f8">💬</div>
+      <div class="panel-title">Contacter la mairie</div>
+      <button class="panel-close" onclick="closeOv('contact')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-ico">🚨</div>
+          <div style="flex:1">
+            <div class="contact-title">Faire un signalement</div>
+            <div class="contact-sub">Voirie, éclairage, propreté, signalisation…</div>
+          </div>
+          <button class="contact-action" onclick="closeOv('contact'); openSignal();">Ouvrir</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">💬</div>
+          <div style="flex:1">
+            <div class="contact-title">Messenger de la page Facebook</div>
+            <div class="contact-sub">Contact direct via la page Radio Mézières.</div>
+          </div>
+          <button class="contact-action alt" onclick="contactViaMessenger()">Ouvrir</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">🟢</div>
+          <div style="flex:1">
+            <div class="contact-title">WhatsApp mairie</div>
+            <div class="contact-sub">Préparation en cours. Le canal sera branché plus tard.</div>
+          </div>
+          <button class="contact-action wa" onclick="contactViaWhatsApp()">Bientôt</button>
+        </div>
+      </div>
+
+      <div class="contact-note">
+        Vous n’avez ni Facebook ni WhatsApp ? Utilisez le formulaire ci-dessous. Pour l’instant, il est stocké comme demande de contact côté mairie.
+      </div>
+
+      <div id="contact-form">
+        <div class="form-group">
+          <label class="form-label">Votre nom ou prénom</label>
+          <input class="form-textarea" id="contact-name" style="height:auto" placeholder="Ex. Mme Martin">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Coordonnée de réponse</label>
+          <input class="form-textarea" id="contact-reply" style="height:auto" placeholder="Téléphone ou email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Votre message</label>
+          <textarea class="form-textarea" id="contact-msg" placeholder="Décrivez votre demande…"></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitContactForm()">📤 Envoyer ma demande</button>
+      </div>
+
+      <div class="success-msg" id="contact-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Demande envoyée !</div>
+        <div class="s-sub">La mairie a bien reçu votre message.<br>Merci pour votre retour.</div>
+        <button class="submit-btn" style="margin-top:16px" onclick="resetContact()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- ═══ OVERLAY BUG ═══ -->
 <div class="ov" id="ov-bug" onclick="ovClick('bug',event)">
@@ -521,7 +602,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
           <tr><td>MEL (chatbot)</td><td>Questions posées, non stockées</td><td>Session uniquement</td></tr>
-          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Stocké côté serveur jusqu'à suppression</td></tr>
+          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Email transmis, non stocké</td></tr>
           <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
           <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
           <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
@@ -540,8 +621,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
           <tr><td>Anthropic (Claude)</td><td>IA — réponses MEL</td><td>États-Unis</td></tr>
           <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
           <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
-          <tr><td>Open-Meteo</td><td>Prévisions météo</td><td>UE / Suisse</td></tr>
-          <tr><td>Météo-France</td><td>Vigilance météorologique</td><td>France</td></tr>
+          <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -586,7 +666,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════
 // MAT v3.0 — Mézières Avec Toi
 // ════════════════════════════════════════
@@ -594,6 +674,7 @@ const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
 const ACTU_URL   = 'https://chatbot-mairie-mezieres.onrender.com/actus';
 const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
+const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
 
@@ -615,6 +696,7 @@ function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
+function openContact(){openOv('contact');}
 
 function openOv(id){ document.getElementById('ov-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeOv(id){ document.getElementById('ov-'+id).classList.remove('open'); document.body.style.overflow=''; }
@@ -653,21 +735,13 @@ function sendSug(btn){ document.getElementById('minp').value=btn.textContent.tri
 // ── Météo ─────────────────────────────
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
 const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
-const VIGI_COLORS = {1:'Vert',2:'Jaune',3:'Orange',4:'Rouge'};
-const VIGI_BADGES = {1:'🟢',2:'🟡',3:'🟠',4:'🔴'};
 
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-function fmtMm(v){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '—' : (Math.round(Number(v)*10)/10).toString().replace('.',',') + ' mm'; }
-function fmtNum(v,u=''){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '—' : Math.round(Number(v)) + u; }
-function fmtDateTime(value){ if(!value) return ''; const d=new Date(value); if(Number.isNaN(d.getTime())) return value; return d.toLocaleString('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}); }
-
-async function loadMeteo(){
-  try{
-    const API_BASE = 'https://chatbot-mairie-mezieres.onrender.com';
-    const r = await fetch(`${API_BASE}/meteo/commune`);
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-
+async function loadMeteo() {
+  try {
+    const r = await fetch(METEO_URL);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
+
     const forecast = d.forecast || {};
     const cur = forecast.current || {};
     const vigilance = d.vigilance || null;
@@ -676,17 +750,14 @@ async function loadMeteo(){
     const temp = Math.round(cur.temperature_2m ?? 0);
     const vent = Math.round(cur.wind_speed_10m ?? 0);
 
-    const ico = METEO_ICONS[code] || '🌡️';
-    const desc = METEO_DESC[code] || 'Météo';
-
-    document.getElementById('meteo-ico').textContent = ico;
+    document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
     document.getElementById('meteo-temp').innerHTML =
       '<strong style="font-size:1.2rem;color:var(--cream)">' + temp + '°C</strong>';
     document.getElementById('meteo-desc').textContent =
-      desc + ' · Vent ' + vent + ' km/h';
+      (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
 
     const badge = document.getElementById('meteo-alerte');
-    if (vigilance && vigilance.level >= 3) {
+    if (vigilance && Number(vigilance.level || 0) >= 3) {
       badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || 'orange');
       badge.style.display = 'block';
     } else {
@@ -694,18 +765,19 @@ async function loadMeteo(){
     }
 
     window._meteoData = d;
-  }catch(e){
+  } catch (e) {
     console.error('Erreur météo:', e);
     document.getElementById('meteo-temp').innerHTML =
-      '<span style="font-size:0.72rem;color:rgba(255,255,255,0.5)">Météo indisponible</span>';
+      '<span class="meteo-loading">Météo indisponible</span>';
+    document.getElementById('meteo-desc').textContent = '';
+    document.getElementById('meteo-alerte').style.display = 'none';
   }
 }
 
-function loadMeteoDetail(){
+function loadMeteoDetail() {
   const d = window._meteoData;
   const el = document.getElementById('meteo-detail');
-
-  if(!d){
+  if (!d) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>';
     return;
   }
@@ -714,19 +786,14 @@ function loadMeteoDetail(){
   const cur = forecast.current || {};
   const days = forecast.daily || {};
   const vigilance = d.vigilance || null;
-
   const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 
   let html = '';
 
-  if (vigilance && vigilance.level >= 2) {
+  if (vigilance && Number(vigilance.level || 0) >= 2) {
     html += '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:14px;padding:12px;margin-bottom:14px">'
-      + '<div style="font-size:0.85rem;font-weight:900;color:#9a3412">⚠️ Vigilance '
-      + (vigilance.color_label || '')
-      + '</div>'
-      + '<div style="font-size:0.72rem;color:#7c2d12;margin-top:4px">'
-      + (vigilance.main_text || vigilance.title || 'Alerte météo en cours')
-      + '</div>'
+      + '<div style="font-size:0.85rem;font-weight:900;color:#9a3412">⚠️ Vigilance ' + (vigilance.color_label || '') + '</div>'
+      + '<div style="font-size:0.72rem;color:#7c2d12;margin-top:4px">' + (vigilance.main_text || vigilance.title || 'Alerte météo en cours') + '</div>'
       + '</div>';
   }
 
@@ -738,8 +805,7 @@ function loadMeteoDetail(){
     + '</div>';
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
-
-  for(let i=0;i<3;i++){
+  for (let i = 0; i < 3; i++) {
     const dt = new Date(days.time?.[i]);
     const jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
     const code = days.weather_code?.[i];
@@ -759,10 +825,8 @@ function loadMeteoDetail(){
       + '<div style="font-size:0.62rem;color:#ca8a04;margin-top:2px">🌞 UV ' + uv + '</div>'
       + '</div>';
   }
-
   html += '</div>';
   html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
-
   el.innerHTML = html;
 }
 
@@ -1032,6 +1096,53 @@ function installOrBug() {
   else { installApp(); }
 }
 
+
+// ── Contact mairie ───────────────────────────────────────────
+function contactViaMessenger() {
+  window.open('https://m.me/RadioMezieres', '_blank');
+}
+function contactViaWhatsApp() {
+  alert('Le contact WhatsApp sera branché prochainement.');
+}
+async function submitContactForm() {
+  const name = document.getElementById('contact-name').value.trim();
+  const reply = document.getElementById('contact-reply').value.trim();
+  const msg = document.getElementById('contact-msg').value.trim();
+  if (!msg) { alert('Merci de renseigner votre message.'); return; }
+
+  const btn = document.querySelector('#contact-form .submit-btn');
+  btn.textContent = 'Envoi…';
+  btn.disabled = true;
+
+  try {
+    await fetch(SIGNAL_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        cat: '💬 Contact mairie',
+        desc: 'Nom/prénom : ' + (name || 'Non précisé') + '\nRéponse : ' + (reply || 'Non précisée') + '\n\nMessage : ' + msg
+      })
+    });
+    trackStat('contact');
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('contact-success').style.display = 'block';
+  } catch(e) {
+    alert('Erreur d’envoi. Réessayez plus tard.');
+    btn.textContent = '📤 Envoyer ma demande';
+    btn.disabled = false;
+  }
+}
+function resetContact() {
+  document.getElementById('contact-form').style.display = 'block';
+  document.getElementById('contact-success').style.display = 'none';
+  document.getElementById('contact-name').value = '';
+  document.getElementById('contact-reply').value = '';
+  document.getElementById('contact-msg').value = '';
+  const btn = document.querySelector('#contact-form .submit-btn');
+  if (btn) { btn.textContent = '📤 Envoyer ma demande'; btn.disabled = false; }
+  closeOv('contact');
+}
+
 // ── Bug report ────────────────────────────────────────────────
 let bugService = '', bugDevice = '';
 function selBugService(btn, val) {
@@ -1090,11 +1201,13 @@ const _origOpenSignal = openSignal;
 const _origOpenIdees  = openIdees;
 const _origOpenNotifs = openNotifs;
 const _origOpenMeteo  = openMeteo;
-window.openMel    = ()=>{ trackStat('mel');        _origOpenMel(); };
+const _origOpenContact = openContact;
+window.openMel    = ()=>{ trackStat('mel');         _origOpenMel(); };
 window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
 window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
 window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
 window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
+window.openContact = ()=>{ trackStat('contact');    _origOpenContact(); };
 
 // Tracker installation
 window.addEventListener('appinstalled', () => {
@@ -1112,7 +1225,7 @@ async function loadActus(){
     const r = await fetch(ACTU_URL);
     const d = await r.json();
     if(!d.actus||!d.actus.length){
-      el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour que les publications apparaissent ici.</div>';
+      el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter les publications communales ici.</div>';
       return;
     }
     el.innerHTML = d.actus.map(a => {
@@ -1136,34 +1249,43 @@ async function loadActus(){
       </div>`;
     }).join('');
   }catch(e){
-    el.innerHTML='<div class="actu-empty">Actualités indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';
+    el.innerHTML='<div class="actu-empty">Actualité Pocket indisponible.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';
   }
 }
 
 // ── Notifications Push ────────────────
 let pushRegistered = false;
 async function checkPushStatus() {
-  // Vérifier si on est déjà abonné côté navigateur
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   try {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     const btn = document.getElementById('push-btn');
+    const subTxt = document.getElementById('push-sub');
     if (sub) {
-      // On a une subscription dans le navigateur — vérifier qu'elle est sur le serveur
       pushRegistered = true;
-      if (btn) { btn.textContent = 'Désactiver'; btn.classList.remove('off'); }
+      if (btn) {
+        btn.textContent = 'Désactiver les notifications';
+        btn.classList.remove('on');
+        btn.classList.add('off');
+      }
+      if (subTxt) subTxt.textContent = 'Notifications actives : vous recevrez les nouvelles publications communales.';
     } else {
       pushRegistered = false;
-      if (btn) { btn.textContent = 'Activer'; btn.classList.add('off'); }
+      if (btn) {
+        btn.textContent = 'Activer les notifications';
+        btn.classList.remove('off');
+        btn.classList.add('on');
+      }
+      if (subTxt) subTxt.textContent = 'Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';
     }
   } catch(e) { /* silencieux */ }
 }
 
 async function togglePush(){
   const btn = document.getElementById('push-btn');
+  const subTxt = document.getElementById('push-sub');
   if(pushRegistered){
-    // Désabonner
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
@@ -1175,7 +1297,13 @@ async function togglePush(){
         await sub.unsubscribe();
       }
     } catch(e) { /* silencieux */ }
-    btn.textContent='Activer'; btn.classList.add('off'); pushRegistered=false;
+    if (btn) {
+      btn.textContent='Activer les notifications';
+      btn.classList.remove('off');
+      btn.classList.add('on');
+    }
+    if (subTxt) subTxt.textContent = 'Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';
+    pushRegistered=false;
     return;
   }
   if(!('Notification' in window)){ alert('Notifications non supportées sur ce navigateur.'); return; }
@@ -1186,8 +1314,14 @@ async function togglePush(){
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(VAPID_PUB) });
       await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
-      btn.textContent='Désactiver'; btn.classList.remove('off'); pushRegistered=true;
-      alert('✅ Notifications activées ! Vous serez alerté des nouvelles publications Radio Mézières.');
+      if (btn) {
+        btn.textContent='Désactiver les notifications';
+        btn.classList.remove('on');
+        btn.classList.add('off');
+      }
+      if (subTxt) subTxt.textContent = 'Notifications actives : vous recevrez les nouvelles publications communales.';
+      pushRegistered=true;
+      alert('✅ Notifications activées ! Vous serez alerté des nouvelles publications communales.');
     }catch(e){ alert('Erreur lors de l’activation des notifications.'); }
   }
 }
