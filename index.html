@@ -738,9 +738,18 @@ const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partielleme
 
 async function loadMeteo() {
   try {
-    const r = await fetch(METEO_URL);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
+    let d = null;
+    try {
+      const r = await fetch(METEO_URL, { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      d = await r.json();
+    } catch (backendErr) {
+      console.warn('Backend météo indisponible, fallback Open-Meteo:', backendErr);
+      const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset&timezone=Europe%2FParis&forecast_days=3', { cache: 'no-store' });
+      if (!fr.ok) throw new Error('Fallback HTTP ' + fr.status);
+      const forecast = await fr.json();
+      d = { forecast, vigilance: null };
+    }
 
     const forecast = d.forecast || {};
     const cur = forecast.current || {};
@@ -778,7 +787,7 @@ function loadMeteoDetail() {
   const d = window._meteoData;
   const el = document.getElementById('meteo-detail');
   if (!d) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
     return;
   }
 
@@ -833,12 +842,16 @@ function loadMeteoDetail() {
 // ── Événements iCal ───────────────────
 const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 async function loadEvents(){
+  const strip = document.getElementById('events-strip');
   try{
-    const r = await fetch(ICAL_URL);
+    const r = await fetch(ICAL_URL, { cache:'no-store' });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
     const txt = await r.text();
     const evts = parseIcalEvents(txt, 2);
-    const strip = document.getElementById('events-strip');
-    if(!evts.length){ strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>'; return; }
+    if(!evts.length){
+      strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>';
+      return;
+    }
     strip.innerHTML = evts.map(e=>{
       const dt = e.date;
       const diff = Math.ceil((dt-new Date())/(1000*60*60*24));
@@ -850,7 +863,8 @@ async function loadEvents(){
         +'</div>';
     }).join('');
   }catch(e){
-    document.getElementById('events-strip').innerHTML='<div class="event-loading">Calendrier indisponible</div>';
+    console.error('Erreur calendrier:', e);
+    strip.innerHTML='<div class="event-loading">Calendrier indisponible</div>';
   }
 }
 
