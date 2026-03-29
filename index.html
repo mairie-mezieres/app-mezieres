@@ -661,7 +661,7 @@ function fmtMm(v){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '
 function fmtNum(v,u=''){ return (v===null||v===undefined||Number.isNaN(Number(v))) ? '—' : Math.round(Number(v)) + u; }
 function fmtDateTime(value){ if(!value) return ''; const d=new Date(value); if(Number.isNaN(d.getTime())) return value; return d.toLocaleString('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}); }
 
-aasync function loadMeteo(){
+async function loadMeteo(){
   try{
     const API_BASE = 'https://chatbot-mairie-mezieres.onrender.com';
     const r = await fetch(`${API_BASE}/meteo/commune`);
