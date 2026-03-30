@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>MAT — Mézières Avec Toi</title>
-<!-- VERSION 3.2 -->
+<!-- VERSION 3.3 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -44,26 +44,60 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
 .mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
 
-/* ── Météo strip ── */
-.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:0;}
-.meteo-strip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;}
-.dechets-strip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;justify-content:space-around;gap:4px;}
-.dechet-row{display:flex;align-items:center;gap:6px;font-size:0.68rem;font-weight:700;color:var(--cream);line-height:1.3;}
-.dechet-ico{font-size:1rem;flex-shrink:0;}
-.dechet-ok{color:#86efac;}.dechet-warn{color:#fcd34d;}.dechet-info{color:var(--cream);}
-.meteo-ico{font-size:1.4rem;flex-shrink:0;}
-.meteo-temp{font-size:1.1rem;font-weight:900;color:var(--cream);}
-.meteo-desc{font-size:0.68rem;color:rgba(216,243,220,0.8);flex:1;}
-.meteo-alerte{background:rgba(244,162,97,0.3);color:#ffe4c0;font-size:0.62rem;font-weight:800;padding:3px 8px;border-radius:8px;border:1px solid rgba(244,162,97,0.4);}
-.meteo-loading{font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;}
-
-/* ── Prochains événements ── */
-.events-strip{display:flex;gap:8px;margin-top:10px;align-items:stretch;}
-.event-chip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 12px;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;}
-.event-date{font-size:0.6rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;}
-.event-name{font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.3;margin-top:2px;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.6em;}
-.event-days{font-size:0.62rem;color:var(--sage);margin-top:2px;}
-.event-loading{font-size:0.68rem;color:rgba(255,255,255,0.3);font-style:italic;padding:8px 12px;}
+/* ── Encarts vivants ── */
+.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.live-card{border-radius:16px;padding:10px 11px;cursor:pointer;min-height:94px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 20px rgba(0,0,0,0.12);}
+.live-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.live-card-title{font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;opacity:0.9;}
+.live-card-main{font-size:0.98rem;font-weight:900;line-height:1.15;}
+.live-ico{font-size:1.2rem;flex-shrink:0;}
+.live-badge{display:inline-flex;align-items:center;gap:4px;width:max-content;padding:3px 8px;border-radius:999px;font-size:0.58rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;margin-top:5px;}
+.live-loading{font-size:0.72rem;opacity:0.75;font-style:italic;}
+.meteo-strip{background:linear-gradient(135deg,#0f4c81,#1d6fa5);color:#eff8ff;}
+.dechets-strip{background:linear-gradient(135deg,#2f5d3a,#4f8a54);color:#f3fff4;}
+.mairie-strip{background:linear-gradient(135deg,#7c3f17,#b45309);color:#fff7ed;}
+.event-strip{background:linear-gradient(135deg,#5b3b8a,#7c3aed);color:#f6f0ff;}
+.meteo-temp{font-size:1.15rem;font-weight:900;color:inherit;}
+.meteo-desc{font-size:0.68rem;color:inherit;opacity:0.92;}
+.meteo-alerte{background:rgba(255,255,255,0.18);color:inherit;font-size:0.58rem;font-weight:900;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);display:inline-flex;align-items:center;gap:4px;width:max-content;margin-top:5px;}
+.meteo-loading{font-size:0.72rem;opacity:0.72;font-style:italic;}
+.dechet-row{display:flex;align-items:center;gap:6px;font-size:0.67rem;font-weight:800;line-height:1.3;}
+.dechet-ico{font-size:0.95rem;flex-shrink:0;}
+.events-strip{margin-top:10px;}
+.event-chip{width:100%;min-width:0;}
+.event-date{font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;opacity:0.86;}
+.event-name{font-size:0.82rem;font-weight:800;line-height:1.3;margin-top:2px;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.6em;}
+.event-days{font-size:0.63rem;font-weight:700;margin-top:3px;opacity:0.95;}
+.event-loading{padding:10px 12px;}
+.mairie-state{font-size:0.95rem;font-weight:900;line-height:1.15;}
+.mairie-hours{font-size:0.68rem;line-height:1.35;opacity:0.95;}
+.mairie-badge{background:rgba(255,255,255,0.16);color:inherit;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.detail-card{background:white;border:1px solid var(--border);border-radius:14px;padding:12px;}
+.detail-label{font-size:0.66rem;font-weight:800;color:var(--muted);margin-bottom:4px;}
+.detail-value{font-size:0.95rem;font-weight:900;color:var(--text);line-height:1.3;}
+.agenda-tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.agenda-tab{background:white;border:1.5px solid var(--border);border-radius:999px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.agenda-tab.on{background:var(--forest);border-color:var(--forest);color:white;}
+.agenda-group{margin-bottom:16px;}
+.agenda-group-title{font-size:0.76rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
+.agenda-item{background:white;border:1px solid var(--border);border-radius:14px;padding:12px 13px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:8px;}
+.agenda-datebox{width:54px;flex-shrink:0;border-radius:12px;padding:8px 6px;background:var(--mist);text-align:center;}
+.agenda-day{font-size:1rem;font-weight:900;color:var(--forest);line-height:1;}
+.agenda-month{font-size:0.62rem;font-weight:800;color:var(--leaf);text-transform:uppercase;margin-top:3px;}
+.agenda-content{flex:1;min-width:0;}
+.agenda-title{font-size:0.84rem;font-weight:800;color:var(--text);line-height:1.35;}
+.agenda-meta{font-size:0.68rem;color:var(--muted);margin-top:3px;line-height:1.45;}
+.agenda-empty{text-align:center;padding:22px;color:var(--muted);font-size:0.82rem;}
+.event-detail-card{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.event-detail-title{font-size:1rem;font-weight:900;color:var(--forest);line-height:1.3;margin-bottom:8px;}
+.event-detail-meta{font-size:0.74rem;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+.event-detail-desc{font-size:0.8rem;color:var(--text);line-height:1.6;white-space:pre-line;}
+.event-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.event-btn{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:11px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;cursor:pointer;}
+.event-btn.alt{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}
+.event-btn.light{background:white;color:var(--forest);border:1px solid var(--border);}
+@media(max-width:380px){.header-bottom-grid{grid-template-columns:1fr;}.live-card{min-height:84px;}}
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
@@ -237,36 +271,71 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">MAT, Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.2</div>
+      <div class="mat-version">v3.3</div>
     </div>
     <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
   </div>
 
-  <!-- Météo + Déchets -->
+  <!-- Encarts vivants -->
   <div class="header-bottom-grid">
-    <div class="meteo-strip" onclick="openMeteo()">
-      <div class="meteo-ico" id="meteo-ico">🌤️</div>
-      <div style="flex:1;min-width:0">
-        <div class="meteo-temp" id="meteo-temp"><span class="meteo-loading">Météo…</span></div>
+    <div class="live-card meteo-strip" onclick="openMeteo()">
+      <div class="live-card-top">
+        <div>
+          <div class="live-card-title">Météo</div>
+          <div class="meteo-temp" id="meteo-temp"><span class="meteo-loading">Météo…</span></div>
+        </div>
+        <div class="live-ico" id="meteo-ico">🌤️</div>
+      </div>
+      <div>
         <div class="meteo-desc" id="meteo-desc"></div>
+        <div class="meteo-alerte" id="meteo-alerte">Chargement…</div>
       </div>
-      <div class="meteo-alerte" id="meteo-alerte" style="display:none"></div>
     </div>
-    <div class="dechets-strip" onclick="openDechets()" style="cursor:pointer">
-      <div class="dechet-row" id="dechet-poubelle">
-        <span id="om-text" style="font-size:0.65rem;color:rgba(216,243,220,0.85)">Chargement…</span>
+
+    <div class="live-card dechets-strip" onclick="openDechets()">
+      <div class="live-card-top">
+        <div>
+          <div class="live-card-title">Déchets</div>
+          <div class="live-card-main" id="dechets-main"><span class="live-loading">Chargement…</span></div>
+        </div>
+        <div class="live-ico">♻️</div>
       </div>
-      <div class="dechet-row" id="dechet-dechetterie">
-        <span class="dechet-ico" id="dech-ico">🔴</span>
-        <span id="dechetterie-text" style="font-size:0.65rem;color:rgba(216,243,220,0.9)">Chargement…</span>
+      <div>
+        <div class="dechet-row" id="dechet-poubelle"><span id="om-text">Chargement…</span></div>
+        <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
+      </div>
+    </div>
+
+    <div class="live-card mairie-strip" onclick="openMairie()">
+      <div class="live-card-top">
+        <div>
+          <div class="live-card-title">Mairie</div>
+          <div class="mairie-state" id="mairie-state"><span class="live-loading">Chargement…</span></div>
+        </div>
+        <div class="live-ico">🏛️</div>
+      </div>
+      <div>
+        <div class="mairie-hours" id="mairie-hours"></div>
+        <div class="live-badge mairie-badge" id="mairie-badge">Horaires du jour</div>
+      </div>
+    </div>
+
+    <div class="live-card event-strip" onclick="openAgenda(window._nextAgendaEventId)">
+      <div class="live-card-top">
+        <div>
+          <div class="live-card-title">Prochaine manifestation</div>
+          <div class="live-card-main" id="event-main"><span class="live-loading">Chargement…</span></div>
+        </div>
+        <div class="live-ico">📅</div>
+      </div>
+      <div>
+        <div class="event-date" id="event-date">Agenda MAT</div>
+        <div class="event-days" id="event-days"></div>
       </div>
     </div>
   </div>
 
-  <!-- Prochains événements -->
-  <div class="events-strip" id="events-strip">
-    <div class="event-loading">Chargement événements…</div>
-  </div>
+  <div class="events-strip" id="events-strip" style="display:none"></div>
 </div>
 
 <!-- Contenu principal -->
@@ -317,10 +386,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
   <div class="sec">Agenda &amp; sorties</div>
   <div class="grid2">
-    <a class="card" href="https://calendar.google.com/calendar/u/1?cid=MWQ0OGYxNGI1OWUxMjkwNzkxN2ZmNjY5ZDA0MzdlMjlhMDZhNzU3OGE2OGQxNGQ3NjFlNjY5NzUwZTc3NzZiNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank">
+    <button class="card" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Calendrier</div><div class="ct-sub">Événements</div></div>
-    </a>
+      <div class="ct"><div class="ct-label">Agenda MAT</div><div class="ct-sub">Aujourd’hui, semaine, mois</div></div>
+    </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
       <div class="ico ico-rando">🥾</div>
       <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">14 circuits</div></div>
@@ -652,6 +721,40 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   </div>
 </div>
 
+<!-- ═══ OVERLAY MAIRIE ═══ -->
+<div class="ov" id="ov-mairie" onclick="ovClick('mairie',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#ffedd5">🏛️</div>
+      <div class="panel-title">Mairie — horaires & informations</div>
+      <button class="panel-close" onclick="closeOv('mairie')">✕</button>
+    </div>
+    <div class="panel-body" id="mairie-detail">
+      <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY AGENDA ═══ -->
+<div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f3e8ff">📅</div>
+      <div class="panel-title">Agenda MAT</div>
+      <button class="panel-close" onclick="closeOv('agenda')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="agenda-tabs">
+        <button class="agenda-tab on" data-view="today" onclick="setAgendaView('today', this)">Aujourd’hui</button>
+        <button class="agenda-tab" data-view="week" onclick="setAgendaView('week', this)">Cette semaine</button>
+        <button class="agenda-tab" data-view="month" onclick="setAgendaView('month', this)">Ce mois-ci</button>
+      </div>
+      <div id="agenda-detail" style="display:none"></div>
+      <div id="agenda-list"><div class="agenda-empty">Chargement de l’agenda…</div></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ OVERLAY MÉTÉO DÉTAIL ═══ -->
 <div class="ov" id="ov-meteo" onclick="ovClick('meteo',event)">
   <div class="panel">
@@ -750,137 +853,77 @@ async function loadMeteo() {
       const forecast = await fr.json();
       d = { forecast, vigilance: null };
     }
-
     const forecast = d.forecast || {};
     const cur = forecast.current || {};
     const vigilance = d.vigilance || null;
-
     const code = cur.weather_code;
     const temp = Math.round(cur.temperature_2m ?? 0);
     const vent = Math.round(cur.wind_speed_10m ?? 0);
-
     document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
-    document.getElementById('meteo-temp').innerHTML =
-      '<strong style="font-size:1.2rem;color:var(--cream)">' + temp + '°C</strong>';
-    document.getElementById('meteo-desc').textContent =
-      (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
-
-    const badge = document.getElementById('meteo-alerte');
-    if (vigilance && Number(vigilance.level || 0) >= 3) {
-      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || 'orange');
-      badge.style.display = 'block';
-    } else {
-      badge.style.display = 'none';
-    }
-
+    document.getElementById('meteo-temp').innerHTML = '<strong>' + temp + '°C</strong>';
+    document.getElementById('meteo-desc').textContent = (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
+    document.getElementById('meteo-alerte').textContent = (vigilance && Number(vigilance.level || 0) >= 3) ? ('⚠️ Vigilance ' + (vigilance.color_label || 'orange')) : '✅ Pas d’alerte en cours';
     window._meteoData = d;
   } catch (e) {
     console.error('Erreur météo:', e);
-    document.getElementById('meteo-temp').innerHTML =
-      '<span class="meteo-loading">Météo indisponible</span>';
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">Météo indisponible</span>';
     document.getElementById('meteo-desc').textContent = '';
-    document.getElementById('meteo-alerte').style.display = 'none';
+    document.getElementById('meteo-alerte').textContent = 'Service indisponible';
   }
 }
-
 function loadMeteoDetail() {
   const d = window._meteoData;
   const el = document.getElementById('meteo-detail');
-  if (!d) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
-    return;
-  }
-
+  if (!d) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>'; return; }
   const forecast = d.forecast || {};
   const cur = forecast.current || {};
   const days = forecast.daily || {};
   const vigilance = d.vigilance || null;
   const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-
   let html = '';
+  html += '<div class="detail-grid"><div class="detail-card"><div class="detail-label">Température</div><div class="detail-value">' + Math.round(cur.temperature_2m ?? 0) + '°C</div></div><div class="detail-card"><div class="detail-label">Vent moyen</div><div class="detail-value">' + Math.round(cur.wind_speed_10m ?? 0) + ' km/h</div></div><div class="detail-card"><div class="detail-label">Humidité</div><div class="detail-value">' + (cur.relative_humidity_2m ?? 0) + '%</div></div><div class="detail-card"><div class="detail-label">Rafales</div><div class="detail-value">' + Math.round(cur.wind_gusts_10m ?? 0) + ' km/h</div></div></div>';
+  html += '<div class="event-detail-card" style="margin-bottom:14px"><div class="event-detail-title">Alerte météo</div><div class="event-detail-desc">' + ((vigilance && Number(vigilance.level || 0) >= 2) ? ('Vigilance ' + (vigilance.color_label || '') + ' — ' + (vigilance.phenomenon_label || 'phénomène météo') + '
 
-  if (vigilance && Number(vigilance.level || 0) >= 2) {
-    html += '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:14px;padding:12px;margin-bottom:14px">'
-      + '<div style="font-size:0.85rem;font-weight:900;color:#9a3412">⚠️ Vigilance ' + (vigilance.color_label || '') + '</div>'
-      + '<div style="font-size:0.72rem;color:#7c2d12;margin-top:4px">' + (vigilance.main_text || vigilance.title || 'Alerte météo en cours') + '</div>'
-      + '</div>';
-  }
-
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + (cur.precipitation ?? 0) + ' mm</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + (cur.relative_humidity_2m ?? 0) + '%</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(cur.pressure_msl ?? 0) + ' hPa</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(cur.wind_gusts_10m ?? 0) + ' km/h</div></div>'
-    + '</div>';
-
+' + (vigilance.main_text || vigilance.title || 'Alerte en cours.')) : 'Aucune alerte météo en cours pour le Loiret.') + '</div></div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < Math.min(3, (days.time || []).length); i++) {
     const dt = new Date(days.time?.[i]);
-    const jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
+    const jour = i===0 ? 'Aujourd’hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
     const code = days.weather_code?.[i];
     const ico = METEO_ICONS[code] || '🌡️';
     const desc = METEO_DESC[code] || '';
     const tmax = Math.round(days.temperature_2m_max?.[i] ?? 0);
     const tmin = Math.round(days.temperature_2m_min?.[i] ?? 0);
     const pluie = days.precipitation_sum?.[i] ?? 0;
-    const uv = days.uv_index_max?.[i] ?? '-';
-
-    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
-      + '<div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">' + jour + '</div>'
-      + '<div style="font-size:1.8rem">' + ico + '</div>'
-      + '<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">' + tmax + '° / ' + tmin + '°</div>'
-      + '<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">' + desc + '</div>'
-      + '<div style="font-size:0.62rem;color:#2563eb;margin-top:2px">🌧️ ' + pluie + ' mm</div>'
-      + '<div style="font-size:0.62rem;color:#ca8a04;margin-top:2px">🌞 UV ' + uv + '</div>'
-      + '</div>';
+    html += '<div class="detail-card" style="text-align:center"><div class="detail-label" style="margin-bottom:6px">' + jour + '</div><div style="font-size:1.8rem">' + ico + '</div><div class="detail-value" style="margin-top:6px">' + tmax + '° / ' + tmin + '°</div><div style="font-size:0.64rem;color:var(--muted);margin-top:4px">' + desc + '</div><div style="font-size:0.64rem;color:#2563eb;margin-top:4px">🌧️ ' + pluie + ' mm</div></div>';
   }
-  html += '</div>';
-  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
+  html += '</div><div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
   el.innerHTML = html;
 }
 
-// ── Événements iCal ───────────────────
+// ── Événements iCal / Agenda MAT ──────
 const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-async function loadEvents(){
-  const strip = document.getElementById('events-strip');
-  try{
-    const r = await fetch(ICAL_URL, { cache:'no-store' });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const txt = await r.text();
-    const evts = parseIcalEvents(txt, 2);
-    if(!evts.length){
-      strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>';
-      return;
-    }
-    strip.innerHTML = evts.map(e=>{
-      const dt = e.date;
-      const diff = Math.ceil((dt-new Date())/(1000*60*60*24));
-      const diffTxt = diff===0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
-      return '<div class="event-chip">'
-        +'<div class="event-date">'+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</div>'
-        +'<div class="event-name">'+e.summary+'</div>'
-        +'<div class="event-days">'+diffTxt+'</div>'
-        +'</div>';
-    }).join('');
-  }catch(e){
-    console.error('Erreur calendrier:', e);
-    strip.innerHTML='<div class="event-loading">Calendrier indisponible</div>';
-  }
-}
-
-function parseIcalEvents(txt, max){
-  const evts=[], now=new Date(), limit=new Date(now.getTime()+180*864e5);
-  txt.split('BEGIN:VEVENT').slice(1).forEach(b=>{
-    const get=k=>{const m=b.match(new RegExp(k+'[^:]*:([^\r\n]+)'));return m?m[1].trim():'';};
-    const summary=get('SUMMARY'), dtstart=get('DTSTART');
-    if(!summary||!dtstart)return;
-    const raw=dtstart.replace(/T.*/,'');
-    const d=new Date(raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6,8));
-    if(d>=now&&d<=limit)evts.push({summary,date:d});
-  });
-  return evts.sort((a,b)=>a.date-b.date).slice(0,max);
-}
-
+const WEEKDAYS_LONG = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+let agendaEvents = [];
+let agendaView = 'today';
+function normalizeIcalText(s){ return (s || '').replace(/\,/g, ',').replace(/\;/g, ';').replace(/\n/g, '
+').trim(); }
+function parseIcalDate(raw){ if(!raw) return null; const clean = raw.replace(/Z$/,''); const isDateOnly = !clean.includes('T'); if(isDateOnly){ return { date:new Date(Number(clean.slice(0,4)), Number(clean.slice(4,6))-1, Number(clean.slice(6,8)), 0, 0, 0), allDay:true }; } return { date:new Date(Number(clean.slice(0,4)), Number(clean.slice(4,6))-1, Number(clean.slice(6,8)), Number(clean.slice(9,11)||0), Number(clean.slice(11,13)||0), Number(clean.slice(13,15)||0)), allDay:false }; }
+function parseIcalEvents(txt){ const now = new Date(); const limit = new Date(now.getTime()+365*864e5); return txt.split('BEGIN:VEVENT').slice(1).map(block => { const get = k => { const m = block.match(new RegExp(k + '[^:]*:([^\r\n]+)')); return m ? normalizeIcalText(m[1]) : ''; }; const uid = get('UID') || String(Math.random()); const summary = get('SUMMARY'); const location = get('LOCATION'); const description = get('DESCRIPTION'); const startRaw = get('DTSTART'); const endRaw = get('DTEND'); if(!summary || !startRaw) return null; const parsedStart = parseIcalDate(startRaw); const parsedEnd = parseIcalDate(endRaw); if(!parsedStart?.date) return null; let start = parsedStart.date; let end = parsedEnd?.date || new Date(start.getTime() + (parsedStart.allDay ? 864e5 : 3600e3)); if(end < start) end = new Date(start.getTime() + 3600e3); if(end < now || start > limit) return null; return { id: uid.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40) || 'evt' + start.getTime(), summary, location, description, start, end, allDay: parsedStart.allDay, sortKey:start.getTime() }; }).filter(Boolean).sort((a,b)=>a.sortKey-b.sortKey); }
+function formatEventDateRange(evt){ const sameDay = evt.start.toDateString() === evt.end.toDateString(); const day = evt.start.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }); if(evt.allDay) return day; const startTime = evt.start.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }); const endTime = evt.end.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }); return sameDay ? (day + ' · ' + startTime + '–' + endTime) : (evt.start.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) + ' → ' + evt.end.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' })); }
+function getEventRange(view){ const now = new Date(); const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); const endToday = new Date(startToday.getTime() + 864e5); const day = (startToday.getDay() + 6) % 7; const weekStart = new Date(startToday); weekStart.setDate(startToday.getDate()-day); const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+7); const monthStart = new Date(now.getFullYear(), now.getMonth(), 1); const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1); return view === 'today' ? [startToday, endToday] : view === 'week' ? [weekStart, weekEnd] : [monthStart, monthEnd]; }
+function filterAgendaEvents(view){ const [start, end] = getEventRange(view); return agendaEvents.filter(evt => evt.end >= start && evt.start < end); }
+function groupEventsByDay(events){ const groups = {}; events.forEach(evt => { const key = evt.start.getFullYear() + '-' + String(evt.start.getMonth()+1).padStart(2,'0') + '-' + String(evt.start.getDate()).padStart(2,'0'); (groups[key] ||= []).push(evt); }); return Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0])); }
+async function loadEvents(){ const main = document.getElementById('event-main'); const dateEl = document.getElementById('event-date'); const daysEl = document.getElementById('event-days'); try { const r = await fetch(ICAL_URL, { cache:'no-store' }); if(!r.ok) throw new Error('HTTP ' + r.status); const txt = await r.text(); agendaEvents = parseIcalEvents(txt); const next = agendaEvents[0]; if(!next){ main.innerHTML = '<span class="live-loading">Aucun événement à venir</span>'; dateEl.textContent = 'Agenda MAT'; daysEl.textContent = 'Pas de manifestation programmée'; return; } const diff = Math.ceil((new Date(next.start.getFullYear(), next.start.getMonth(), next.start.getDate()) - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))/864e5); main.textContent = next.summary; dateEl.textContent = WEEKDAYS_LONG[next.start.getDay()] + ' ' + next.start.getDate() + ' ' + MONTHS[next.start.getMonth()]; daysEl.textContent = diff === 0 ? 'Aujourd’hui' : diff === 1 ? 'Demain' : 'Dans ' + diff + ' jours'; window._nextAgendaEventId = next.id; } catch (e) { console.error('Erreur calendrier:', e); main.innerHTML = '<span class="live-loading">Agenda indisponible</span>'; dateEl.textContent = 'Agenda MAT'; daysEl.textContent = 'Source calendrier inaccessible'; } }
+function setAgendaView(view, btn){ agendaView = view; document.querySelectorAll('.agenda-tab').forEach(b => b.classList.toggle('on', b === btn || b.dataset.view === view)); document.getElementById('agenda-detail').style.display = 'none'; renderAgenda(); }
+function renderAgenda(){ const list = document.getElementById('agenda-list'); const events = filterAgendaEvents(agendaView); if(!events.length){ list.innerHTML = '<div class="agenda-empty">Aucun événement sur cette période.</div>'; return; } const groups = groupEventsByDay(events); list.innerHTML = groups.map(([key, items]) => { const d = new Date(key + 'T00:00:00'); const title = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }); return '<div class="agenda-group"><div class="agenda-group-title">' + title + '</div>' + items.map(evt => '<div class="agenda-item" onclick="showAgendaDetail('' + evt.id + '')"><div class="agenda-datebox"><div class="agenda-day">' + evt.start.getDate() + '</div><div class="agenda-month">' + MONTHS[evt.start.getMonth()] + '</div></div><div class="agenda-content"><div class="agenda-title">' + evt.summary + '</div><div class="agenda-meta">⏰ ' + (evt.allDay ? 'Toute la journée' : evt.start.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})) + (evt.location ? ' · 📍 ' + evt.location : '') + '</div></div></div>').join('') + '</div>'; }).join(''); }
+function showAgendaDetail(eventId){ const evt = agendaEvents.find(e => e.id === eventId); if(!evt) return; const detail = document.getElementById('agenda-detail'); detail.style.display = 'block'; detail.innerHTML = '<div class="event-detail-card"><div class="event-detail-title">' + evt.summary + '</div><div class="event-detail-meta">🗓️ ' + formatEventDateRange(evt) + (evt.location ? '<br>📍 ' + evt.location : '') + '</div><div class="event-detail-desc">' + (evt.description || 'Aucune description disponible.') + '</div><div class="event-actions"><button class="event-btn" onclick="downloadEventIcs('' + evt.id + '')">Ajouter à mon agenda</button>' + (evt.location ? '<button class="event-btn light" onclick="openEventMap('' + encodeURIComponent(evt.location) + '')">Voir le lieu</button>' : '') + '<button class="event-btn alt" onclick="document.getElementById('agenda-detail').style.display='none'">Fermer la fiche</button></div></div>'; detail.scrollIntoView({behavior:'smooth', block:'start'}); }
+function escapeIcsText(s){ return (s || '').replace(/\/g, '\\').replace(/;/g, '\;').replace(/,/g, '\,').replace(/
+/g, '\n'); }
+function formatIcsDate(d, allDay){ const y = d.getFullYear(); const m = String(d.getMonth()+1).padStart(2,'0'); const day = String(d.getDate()).padStart(2,'0'); if(allDay) return y + m + day; const hh = String(d.getHours()).padStart(2,'0'); const mm = String(d.getMinutes()).padStart(2,'0'); const ss = String(d.getSeconds()).padStart(2,'0'); return y + m + day + 'T' + hh + mm + ss; }
+function downloadEventIcs(eventId){ const evt = agendaEvents.find(e => e.id === eventId); if(!evt) return; const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MAT//Agenda MAT//FR','BEGIN:VEVENT','UID:' + evt.id + '@mat','DTSTAMP:' + formatIcsDate(new Date(), false),(evt.allDay ? 'DTSTART;VALUE=DATE:' : 'DTSTART:') + formatIcsDate(evt.start, evt.allDay),(evt.allDay ? 'DTEND;VALUE=DATE:' : 'DTEND:') + formatIcsDate(evt.end, evt.allDay),'SUMMARY:' + escapeIcsText(evt.summary),'LOCATION:' + escapeIcsText(evt.location || ''),'DESCRIPTION:' + escapeIcsText(evt.description || ''),'END:VEVENT','END:VCALENDAR'].join('
+'); const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'agenda-mat.ics'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 1000); }
+function openEventMap(q){ window.open('https://www.google.com/maps/search/?api=1&query=' + q, '_blank'); }
 // ── Signalement ───────────────────────
 let sigCat='', sigLat='', sigLon='';
 function selCat(btn, cat){
@@ -1010,83 +1053,27 @@ async function loadIdees(){
 }
 // ── Déchetterie & Bacs ───────────────────────────────────────
 function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
-
 const FERIES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-// Fériés mobiles 2025-2026 (Pâques, Ascension, Pentecôte)
 const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+const MAIRIE_SCHEDULE = {1:[{start:'14:00',end:'17:30',label:'Accueil mairie'}],3:[{start:'08:30',end:'12:00',label:'Accueil sur rendez-vous'}],5:[{start:'08:30',end:'11:30',label:'Accueil mairie'}]};
+function isFerie(dateP, jour, moisP, annee){ const mmdd = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0'); if(FERIES.includes(mmdd)) return true; const iso = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0'); return FERIES_DATES.includes(iso); }
+function parseHourToMinutes(hhmm){ const [h,m] = hhmm.split(':').map(Number); return h*60+m; }
+function getParisNowParts(){ const now = new Date(); const tz = { timeZone:'Europe/Paris' }; const hP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now)); const minP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now)); const jour = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now)); const moisP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now)); const annee = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now)); const dateP = new Date(annee, moisP-1, jour); return { now, hP, minP, jour, moisP, annee, dateP, dowP: dateP.getDay() }; }
+function findNextMairieOpening(baseDate){ for(let i=0;i<8;i++){ const d = new Date(baseDate); d.setDate(baseDate.getDate()+i); const fer = isFerie(d, d.getDate(), d.getMonth()+1, d.getFullYear()); const slots = fer ? [] : (MAIRIE_SCHEDULE[d.getDay()] || []); if(slots.length){ return { date:d, slot:slots[0] }; } } return null; }
+function getMairieStatus(){ const { hP, minP, jour, moisP, annee, dateP, dowP } = getParisNowParts(); const ferie = isFerie(dateP, jour, moisP, annee); const todaySlots = ferie ? [] : (MAIRIE_SCHEDULE[dowP] || []); const currentMinutes = hP*60 + minP; const weekdayLabel = WEEKDAYS_LONG[dowP]; if(!todaySlots.length){ return { open:false, state:'Fermée', badge:'Pas de permanence aujourd’hui', detail:`${weekdayLabel[0].toUpperCase()+weekdayLabel.slice(1)} : pas de permanence${ferie ? ' (jour férié)' : ''}.`, next:findNextMairieOpening(dateP) }; } const current = todaySlots.find(slot => currentMinutes >= parseHourToMinutes(slot.start) && currentMinutes < parseHourToMinutes(slot.end)); if(current){ return { open:true, state:'Ouverte', badge:'Ferme à ' + current.end.replace(':','h'), detail:`${current.label} aujourd’hui jusqu’à ${current.end.replace(':','h')}.`, next:findNextMairieOpening(dateP) }; } const nextToday = todaySlots.find(slot => currentMinutes < parseHourToMinutes(slot.start)); if(nextToday){ return { open:false, state:'Fermée', badge:'Ouvre à ' + nextToday.start.replace(':','h'), detail:`Accueil mairie aujourd’hui de ${nextToday.start.replace(':','h')} à ${nextToday.end.replace(':','h')}.`, next:findNextMairieOpening(dateP) }; } return { open:false, state:'Fermée', badge:'Permanence terminée', detail:'La permanence du jour est terminée.', next:findNextMairieOpening(dateP) }; }
+function loadMairieStatus(){ const status = getMairieStatus(); document.getElementById('mairie-state').textContent = status.state; document.getElementById('mairie-hours').textContent = status.open ? status.detail : (status.next ? ('Prochaine ouverture : ' + WEEKDAYS_LONG[status.next.date.getDay()] + ' ' + status.next.date.getDate() + ' ' + MONTHS[status.next.date.getMonth()] + ' à ' + status.next.slot.start.replace(':','h')) : status.detail); document.getElementById('mairie-badge').textContent = status.badge; }
+function loadMairieDetail(){ const status = getMairieStatus(); const next = status.next; document.getElementById('mairie-detail').innerHTML = '<div class="detail-grid"><div class="detail-card"><div class="detail-label">État actuel</div><div class="detail-value">' + status.state + '</div></div><div class="detail-card"><div class="detail-label">Aujourd’hui</div><div class="detail-value">' + status.badge + '</div></div><div class="detail-card"><div class="detail-label">Téléphone</div><div class="detail-value">02 38 45 61 76</div></div><div class="detail-card"><div class="detail-label">Adresse</div><div class="detail-value">36 rue du bourg</div></div></div><div class="event-detail-card"><div class="event-detail-title">Horaires mairie</div><div class="event-detail-desc">Lundi : 14h00 – 17h30
+Mercredi : accueil sur rendez-vous
+Vendredi : 8h30 – 11h30
 
-function isFerie(dateP, jour, moisP, annee){
-  const mmdd = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  if(FERIES.includes(mmdd)) return true;
-  const iso = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  return FERIES_DATES.includes(iso);
-}
+' + (next ? ('Prochaine ouverture : ' + WEEKDAYS_LONG[next.date.getDay()] + ' ' + next.date.getDate() + ' ' + MONTHS[next.date.getMonth()] + ' à ' + next.slot.start.replace(':','h') + '.') : 'Aucune prochaine ouverture trouvée.') + '</div><div class="event-actions"><button class="event-btn" onclick="window.open('tel:0238456176', '_self')">Appeler</button><button class="event-btn light" onclick="window.open('https://www.google.com/maps/search/?api=1&query=Mairie+de+Mézières-lez-Cléry', '_blank')">Voir sur la carte</button></div></div>'; }
+function loadDechets(){ const { hP, jour, moisP, annee, dateP, dowP } = getParisNowParts(); const semPaire = getWeekNumber(dateP) % 2 === 0; const ferie = isFerie(dateP, jour, moisP, annee); let bTxt='', bMain='Collectes'; if(dowP===0){ bTxt='🗑️ Sortir le bac noir ce soir'; bMain='Bac noir'; } else if(dowP===1 && hP<8){ bTxt='🗑️ Collecte du bac noir ce matin'; bMain='Bac noir'; } else if(dowP===1 && semPaire && hP>=8){ bTxt='♻️ Sortir le bac jaune ce soir'; bMain='Bac jaune'; } else if(dowP===2 && semPaire && hP<8){ bTxt='♻️ Collecte du bac jaune ce matin'; bMain='Bac jaune'; } else { const j2lun = dowP===1 ? 7 : (8-dowP)%7||7; bTxt = j2lun===1 ? '🗑️ Bac noir demain — sortir ce soir' : '🗑️ Prochain bac noir : lundi matin'; } document.getElementById('dechets-main').textContent = bMain; document.getElementById('om-text').innerHTML = bTxt; const isH = moisP>=10 || moisP<=3; const matO = isH ? 10 : 9; const apF = isH ? 17 : 18; const isJourOuv = dowP>=1 && dowP<=6 && !ferie; let dTxt='', dOuv=false; if(!isJourOuv){ dTxt = ferie ? 'Déchetterie fermée (jour férié)' : 'Déchetterie fermée'; } else if(hP<matO){ dTxt='Ouvre à ' + matO + 'h'; } else if(hP<12){ dOuv=true; dTxt='Ouverte — ferme à 12h'; } else if(hP<14){ dTxt='Réouverture à 14h'; } else if(hP<apF){ dOuv=true; dTxt='Ouverte — ferme à ' + apF + 'h'; } else { dTxt='Fermée pour la journée'; } document.getElementById('dechetterie-text').textContent=dTxt; document.getElementById('dech-ico').textContent=dOuv?'🟢':'🔴'; }
+function loadDechetsDetail(){ const { jour, moisP, annee, dateP, dowP } = getParisNowParts(); const ferie = isFerie(dateP, jour, moisP, annee); const isH = moisP>=10 || moisP<=3; const horaires = isH ? '10h–12h · 14h–17h' : '9h–12h · 14h–18h'; document.getElementById('dechets-content').innerHTML = '<div class="detail-grid"><div class="detail-card"><div class="detail-label">Collecte bac noir</div><div class="detail-value">Chaque lundi matin</div></div><div class="detail-card"><div class="detail-label">Collecte bac jaune</div><div class="detail-value">Mardi matin des semaines paires</div></div><div class="detail-card"><div class="detail-label">Déchetterie Cléry</div><div class="detail-value">' + horaires + '</div></div><div class="detail-card"><div class="detail-label">État du jour</div><div class="detail-value">' + (ferie ? 'Jour férié' : (dowP===0 ? 'Dimanche' : 'Jour ouvré')) + '</div></div></div><div class="event-detail-card"><div class="event-detail-title">Détail déchets & déchetterie</div><div class="event-detail-desc">Bac noir : sortie le dimanche soir pour collecte le lundi matin.
+Bac jaune : sortie le lundi soir des semaines paires pour collecte le mardi matin.
 
-function loadDechets(){
-  // Extraction heure Paris robuste via Intl.DateTimeFormat
-  const now = new Date();
-  const tz  = { timeZone:'Europe/Paris' };
-  const hP    = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
-  const minP  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now));
-  const jour  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
-  const moisP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
-  const annee = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
-  const dateP = new Date(annee, moisP-1, jour);
-  const dowP  = dateP.getDay(); // 0=dim 1=lun 6=sam
-  const semPaire = getWeekNumber(dateP) % 2 === 0;
+Déchetterie de Cléry-Saint-André : ' + horaires + ' du lundi au samedi, hors jours fériés.
 
-  // Jours fériés fixes + mobiles
-  const FERIES_FIXES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-  const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
-  const mmdd  = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const iso   = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const ferie = FERIES_FIXES.includes(mmdd) || FERIES_DATES.includes(iso);
-
-  // ── Bac — un seul message ─────────────────────────────────
-  let bTxt='', bUrg=false;
-  if(dowP===0){
-    bTxt='🗑️ Sortir le bac noir ce soir !'; bUrg=true;
-  } else if(dowP===1 && hP<8){
-    bTxt='🗑️ Bac noir : collecte ce matin'; bUrg=true;
-  } else if(dowP===1 && semPaire && hP>=8){
-    bTxt='\u267b\ufe0f Sortir le bac jaune ce soir !'; bUrg=true;
-  } else if(dowP===2 && semPaire && hP<8){
-    bTxt='\u267b\ufe0f Bac jaune : collecte ce matin'; bUrg=true;
-  } else {
-    const j2lun = dowP===1 ? 7 : (8-dowP)%7||7;
-    if(j2lun===1){ bTxt='🗑️ Bac noir demain — sortir ce soir'; bUrg=true; }
-    else { bTxt='🗑️ Prochain bac noir : lundi matin'; }
-  }
-  const omEl = document.getElementById('om-text');
-  if(omEl){ omEl.innerHTML=bTxt; omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)'; }
-
-  // ── Déchetterie Cléry — lun-sam sauf fériés ──────────────
-  // Hiver (oct-mars) : 10h-12h / 14h-17h
-  // Été  (avr-sep)  :  9h-12h / 14h-18h
-  const isH   = moisP>=10 || moisP<=3;
-  const matO  = isH ? 10 : 9;
-  const apF   = isH ? 17 : 18;
-  const isJourOuv = dowP>=1 && dowP<=6 && !ferie;
-  let dTxt='', dOuv=false;
-  if(!isJourOuv){
-    if(ferie) dTxt='D\u00e9chetterie ferm\u00e9e (jour f\u00e9ri\u00e9)';
-    else dTxt='D\u00e9chetterie ferm\u00e9e (ouvre lundi \u00e0 '+matO+'h)';
-  } else if(hP<matO){
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 '+matO+'h';
-  } else if(hP<12){
-    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 12h';
-  } else if(hP<14){
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 14h';
-  } else if(hP<apF){
-    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 '+apF+'h';
-  } else {
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre '+(dowP<6?'demain':'lundi')+' \u00e0 '+matO+'h';
-  }
-  const dEl  = document.getElementById('dechetterie-text');
-  const dIco = document.getElementById('dech-ico');
-  if(dEl)  { dEl.textContent=dTxt; dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)'; }
-  if(dIco) { dIco.textContent=dOuv?'\ud83d\udfe2':'\ud83d\udd34'; }
-}
+Aujourd’hui : ' + (ferie ? 'fermé pour jour férié.' : 'consultez l’encart d’accueil pour l’état en direct.') + '</div></div>'; }
 
 // ── Bouton install / bug ─────────────────────────────────────
 function updateInstallBtn() {
@@ -1210,18 +1197,24 @@ async function trackStat(service) {
 }
 
 // Tracker les ouvertures de services
-const _origOpenMel    = openMel;
+const _origOpenMel = openMel;
 const _origOpenSignal = openSignal;
-const _origOpenIdees  = openIdees;
+const _origOpenIdees = openIdees;
 const _origOpenNotifs = openNotifs;
-const _origOpenMeteo  = openMeteo;
+const _origOpenMeteo = openMeteo;
+const _origOpenDechets = openDechets;
+const _origOpenMairie = openMairie;
+const _origOpenAgenda = openAgenda;
 const _origOpenContact = openContact;
-window.openMel    = ()=>{ trackStat('mel');         _origOpenMel(); };
+window.openMel = ()=>{ trackStat('mel'); _origOpenMel(); };
 window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
-window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
-window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
-window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
-window.openContact = ()=>{ trackStat('contact');    _origOpenContact(); };
+window.openIdees = ()=>{ trackStat('idees'); _origOpenIdees(); };
+window.openNotifs = ()=>{ trackStat('actualites'); _origOpenNotifs(); };
+window.openMeteo = ()=>{ trackStat('meteo'); _origOpenMeteo(); };
+window.openDechets = ()=>{ trackStat('dechets'); _origOpenDechets(); };
+window.openMairie = ()=>{ trackStat('mairie'); _origOpenMairie(); };
+window.openAgenda = (eventId)=>{ trackStat('agenda'); _origOpenAgenda(eventId); };
+window.openContact = ()=>{ trackStat('contact'); _origOpenContact(); };
 
 // Tracker installation
 window.addEventListener('appinstalled', () => {
@@ -1352,9 +1345,10 @@ function urlBase64ToUint8Array(b64){
 loadMeteo();
 loadEvents();
 loadDechets();
+loadMairieStatus();
 updateInstallBtn();
 // Rafraîchir les infos déchets toutes les minutes
-setInterval(loadDechets, 60000);
+setInterval(() => { loadDechets(); loadMairieStatus(); }, 60000);
 
 // ── Service Worker ────────────────────────────────────────────
 if('serviceWorker' in navigator){
