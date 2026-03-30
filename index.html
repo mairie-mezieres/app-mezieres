@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
+.mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
+
+/* ── Météo strip ── */
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -9,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>MAT — Mézières Avec Toi</title>
-<!-- VERSION 3.4 -->
+<!-- VERSION 3.2 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -42,35 +45,29 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
-.mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
-
-/* ── Encarts accueil ── */
-.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
-.info-card{border-radius:14px;padding:10px 11px;cursor:pointer;min-height:92px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);}
-.info-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.info-label{font-size:0.58rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.82);}
-.info-icon{font-size:1.15rem;flex-shrink:0}
-.info-main{font-size:0.94rem;font-weight:900;color:var(--cream);line-height:1.15;}
-.info-sub{font-size:0.68rem;color:rgba(255,255,255,0.84);line-height:1.35;margin-top:3px;}
-.info-foot{font-size:0.62rem;font-weight:800;color:rgba(255,255,255,0.78);margin-top:6px;}
-.card-meteo{background:linear-gradient(135deg,#2563eb,#38bdf8);}
-.card-dechets{background:linear-gradient(135deg,#15803d,#22c55e);}
-.card-mairie{background:linear-gradient(135deg,#7c3aed,#a855f7);}
-.card-event{background:linear-gradient(135deg,#b45309,#f59e0b);}
-.meteo-alerte{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.18);color:#fff7ed;font-size:0.6rem;font-weight:900;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);}
-.meteo-loading{font-size:0.72rem;color:rgba(255,255,255,0.75);font-style:italic;}
-
-/* ── Prochaine manifestation ── */
-.events-strip{margin-top:10px;}
-.event-card{background:rgba(255,255,255,0.10);border-radius:14px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
-.event-date-pill{background:rgba(255,255,255,0.16);border-radius:12px;padding:8px 10px;min-width:66px;text-align:center;flex-shrink:0;}
-.event-day{font-size:1rem;font-weight:900;color:var(--cream);line-height:1;}
-.event-month{font-size:0.62rem;font-weight:900;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;}
-.event-meta{flex:1;min-width:0;}
-.event-kicker{font-size:0.58rem;font-weight:900;color:rgba(255,255,255,0.72);text-transform:uppercase;letter-spacing:0.08em;}
-.event-name{font-size:0.82rem;font-weight:800;color:var(--cream);line-height:1.35;margin-top:2px;}
-.event-days{font-size:0.65rem;color:var(--mist);margin-top:4px;}
-.event-loading{font-size:0.68rem;color:rgba(255,255,255,0.72);font-style:italic;padding:8px 12px;}
+.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
+.top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+.top-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);}
+.top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
+.top-sub{font-size:.63rem;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:2px 6px;border-radius:999px;font-size:.58rem;font-weight:900;background:rgba(255,255,255,.16);color:#fff;}
+.top-meteo{background:linear-gradient(135deg,#2563eb,#38bdf8);}
+.top-dechets{background:linear-gradient(135deg,#15803d,#22c55e);}
+.top-mairie{background:linear-gradient(135deg,#7c3aed,#a855f7);}
+.top-event{background:linear-gradient(135deg,#d97706,#f59e0b);}
+.meteo-strip,.dechets-strip,.mairie-strip,.event-strip{position:relative;}
+.dechet-row{display:flex;align-items:center;gap:6px;font-size:.63rem;font-weight:700;color:var(--cream);line-height:1.2;}
+.dechet-ico{font-size:.92rem;flex-shrink:0;}
+.dechet-ok{color:#bbf7d0;}.dechet-warn{color:#fde68a;}.dechet-info{color:var(--cream);}
+.meteo-ico{font-size:1.2rem;flex-shrink:0;}
+.meteo-temp{font-size:.96rem;font-weight:900;color:var(--cream);}
+.meteo-desc{font-size:.62rem;color:rgba(255,255,255,.88);flex:1;}
+.meteo-alerte{background:rgba(255,255,255,.18);color:#fff;font-size:.56rem;font-weight:900;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,.18);}
+.meteo-loading{font-size:.68rem;color:rgba(255,255,255,.72);font-style:italic;}
+.event-date{font-size:.58rem;font-weight:800;color:#fff7d6;text-transform:uppercase;letter-spacing:.06em;}
+.event-name{font-size:.72rem;font-weight:800;color:var(--cream);line-height:1.2;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.event-days{font-size:.6rem;color:#fff2c7;margin-top:2px;}
+.event-loading{font-size:.66rem;color:rgba(255,255,255,.8);font-style:italic;}
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
@@ -220,6 +217,35 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .contact-action.wa{background:linear-gradient(135deg,#15803d,#22c55e);}
 .contact-note{font-size:0.68rem;color:var(--muted);margin:6px 2px 14px;line-height:1.5;}
 
+
+/* ── Agenda MAT ── */
+.agenda-tabs{display:flex;gap:8px;margin-bottom:12px;}
+.agenda-tab{flex:1;background:white;border:1px solid var(--border);border-radius:12px;padding:10px 8px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;color:var(--muted);cursor:pointer;}
+.agenda-tab.on{background:var(--forest);color:white;border-color:var(--forest);}
+.agenda-list{display:flex;flex-direction:column;gap:10px;}
+.agenda-empty{text-align:center;padding:28px 12px;color:var(--muted);font-size:.82rem;}
+.agenda-item{background:white;border-radius:14px;padding:13px;border:1px solid var(--border);cursor:pointer;}
+.agenda-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.agenda-date-badge{background:var(--mist);color:var(--leaf);border-radius:10px;padding:7px 9px;min-width:64px;text-align:center;flex-shrink:0;}
+.agenda-date-day{font-size:.62rem;font-weight:900;text-transform:uppercase;}
+.agenda-date-num{font-size:1rem;font-weight:900;line-height:1.1;}
+.agenda-title{font-size:.86rem;font-weight:900;color:var(--text);line-height:1.25;}
+.agenda-meta{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.45;}
+.agenda-desc{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.agenda-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;}
+.agenda-month-head,.agenda-month-day{background:white;border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;font-size:.72rem;}
+.agenda-month-head{font-weight:900;color:var(--muted);background:var(--warm);}
+.agenda-month-day.has-event{background:var(--mist);border-color:var(--sage);color:var(--leaf);font-weight:900;}
+.agenda-month-day.today{outline:2px solid var(--gold);}
+.event-detail-card{background:white;border-radius:16px;padding:14px;border:1px solid var(--border);}
+.event-detail-title{font-size:1rem;font-weight:900;color:var(--forest);line-height:1.3;}
+.event-detail-meta{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.6;}
+.event-detail-desc{font-size:.78rem;color:var(--text);margin-top:10px;line-height:1.65;white-space:pre-line;}
+.event-detail-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.event-btn{border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;}
+.event-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;}
+.event-btn.secondary{background:var(--mist);color:var(--leaf);}
+
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
 </style>
@@ -244,71 +270,54 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">MAT, Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.4</div>
+      <div class="mat-version">v3.2</div>
     </div>
     <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
   </div>
 
-  <!-- Encarts vivants -->
+  <!-- Encarts accueil -->
   <div class="header-bottom-grid">
-    <div class="info-card card-meteo" onclick="openMeteo()">
-      <div class="info-top">
-        <div class="info-label">Météo</div>
-        <div class="info-icon" id="meteo-ico">🌤️</div>
-      </div>
-      <div>
-        <div class="info-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
-        <div class="info-sub" id="meteo-desc"></div>
-      </div>
-      <div class="info-foot" id="meteo-alert-line">Aucune alerte en cours</div>
+    <div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
+      <div class="top-title">Météo</div>
+      <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
+      <div class="top-sub" id="meteo-desc"></div>
+      <div class="top-badge" id="meteo-alerte">Aucune alerte</div>
+      <div id="meteo-ico" style="position:absolute;right:10px;top:8px;font-size:1.15rem">🌤️</div>
     </div>
-
-    <div class="info-card card-dechets" onclick="openDechets()">
-      <div class="info-top">
-        <div class="info-label">Déchets</div>
-        <div class="info-icon" id="dech-ico">🗑️</div>
-      </div>
-      <div>
-        <div class="info-main" id="om-text">Chargement…</div>
-        <div class="info-sub" id="dechetterie-text"></div>
-      </div>
-      <div class="info-foot">Voir détail collecte & déchetterie</div>
+    <div class="top-card top-dechets dechets-strip" onclick="openDechets()">
+      <div class="top-title">Déchets</div>
+      <div class="dechet-row" id="dechet-poubelle"><span id="om-text">Chargement…</span></div>
+      <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
     </div>
-
-    <div class="info-card card-mairie" onclick="openMairie()">
-      <div class="info-top">
-        <div class="info-label">Mairie</div>
-        <div class="info-icon" id="mairie-ico">🏛️</div>
-      </div>
-      <div>
-        <div class="info-main" id="mairie-status">Chargement…</div>
-        <div class="info-sub" id="mairie-desc"></div>
-      </div>
-      <div class="info-foot">Horaires détaillés</div>
+    <div class="top-card top-mairie mairie-strip" onclick="openContact()">
+      <div class="top-title">Mairie</div>
+      <div class="top-main" id="mairie-status">Chargement…</div>
+      <div class="top-sub" id="mairie-desc"></div>
+      <div class="top-badge" id="mairie-badge">Horaires</div>
     </div>
-
-    <div class="info-card card-event" onclick="openAgenda()">
-      <div class="info-top">
-        <div class="info-label">Prochaine manifestation</div>
-        <div class="info-icon">📅</div>
-      </div>
-      <div>
-        <div class="info-main" id="next-event-title">Chargement…</div>
-        <div class="info-sub" id="next-event-desc"></div>
-      </div>
-      <div class="info-foot">Ouvrir l’agenda MAT</div>
+    <div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
+      <div class="top-title">Prochaine manifestation</div>
+      <div class="event-date" id="next-event-date">Chargement…</div>
+      <div class="event-name" id="next-event-name"></div>
+      <div class="event-days" id="next-event-days"></div>
     </div>
   </div>
-
-  <!-- Prochaine manifestation -->
-  <div class="events-strip" id="events-strip">
-    <div class="event-loading">Chargement manifestation…</div>
-  </div>
-</div>
 </div>
 
 <!-- Contenu principal -->
 <div class="content">
+
+    <div class="sec">Réseaux et actualités</div>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <button class="card" onclick="openNotifs()">
+      <div class="ico ico-notif">🔔</div>
+      <div class="ct"><div class="ct-label">Actualités Pocket</div><div class="ct-sub">Publications communales</div></div>
+    </button>
+  </div>
 
   <div class="sec">Services municipaux</div>
   <div class="grid2">
@@ -322,36 +331,23 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </a>
   </div>
 
-  <div class="sec">Réseaux sociaux</div>
-  <div class="grid2">
-    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
-      <div class="ico ico-radio">📻</div>
-      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
-    </a>
-    <button class="card" onclick="openNotifs()">
-      <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Actualité Pocket</div><div class="ct-sub">Publications Communales</div></div>
-    </button>
-  </div>
-  <div class="grid2" style="margin-top:9px">
-    <button class="card" onclick="openContact()">
-      <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter Mairie</div><div class="ct-sub">Signalement, Messenger ou formulaire</div></div>
-    </button>
-  </div>
-
   <div class="sec">Participez &amp; signalez</div>
   <div class="grid2">
     <button class="card" onclick="openSignal()">
       <div class="ico ico-signal">🚨</div>
       <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Problème voirie…</div></div>
     </button>
+    <button class="card" onclick="openContact()">
+      <div class="ico ico-hab">💬</div>
+      <div class="ct"><div class="ct-label">Contacter mairie</div><div class="ct-sub">Choisissez votre canal</div></div>
+    </button>
+  </div>
+  <div class="grid2" style="margin-top:9px">
     <button class="card" onclick="openIdees()">
       <div class="ico ico-ideas">💡</div>
       <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
     </button>
   </div>
-
 
   <div class="sec">Agenda &amp; sorties</div>
   <div class="grid2">
@@ -366,9 +362,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   </div>
 
 
-
-
-  <div class="sec">Informations</div>
+<div class="sec">Informations</div>
   <div class="grid2">
     <button class="card" onclick="openRgpd()">
       <div class="ico ico-rgpd">🔒</div>
@@ -576,6 +570,39 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 </div>
 
 
+<!-- ═══ OVERLAY AGENDA MAT ═══ -->
+<div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fef3e0">📅</div>
+      <div class="panel-title">Agenda MAT</div>
+      <button class="panel-close" onclick="closeOv('agenda')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="agenda-tabs">
+        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd'hui</button>
+        <button class="agenda-tab" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
+        <button class="agenda-tab" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
+      </div>
+      <div id="agenda-content"><div class="agenda-empty">Chargement de l'agenda…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY FICHE ÉVÉNEMENT ═══ -->
+<div class="ov" id="ov-event" onclick="ovClick('event',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fff7ed">🎉</div>
+      <div class="panel-title">Fiche événement</div>
+      <button class="panel-close" onclick="closeOv('event')">✕</button>
+    </div>
+    <div class="panel-body" id="event-detail-body">
+      <div class="agenda-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ OVERLAY BUG ═══ -->
 <div class="ov" id="ov-bug" onclick="ovClick('bug',event)">
   <div class="panel">
@@ -704,39 +731,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   </div>
 </div>
 
-
-<!-- ═══ OVERLAY MAIRIE ═══ -->
-<div class="ov" id="ov-mairie" onclick="ovClick('mairie',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#ede9fe">🏛️</div>
-      <div class="panel-title">Mairie — Horaires & contact</div>
-      <button class="panel-close" onclick="closeOv('mairie')">✕</button>
-    </div>
-    <div class="panel-body" id="mairie-detail"></div>
-  </div>
-</div>
-
-<!-- ═══ OVERLAY AGENDA MAT ═══ -->
-<div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#fef3c7">📅</div>
-      <div class="panel-title">Agenda MAT</div>
-      <button class="panel-close" onclick="closeOv('agenda')">✕</button>
-    </div>
-    <div class="panel-body">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="idea-cat on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd’hui</button>
-        <button class="idea-cat" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
-        <button class="idea-cat" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
-      </div>
-      <div id="agenda-list"></div>
-      <div id="agenda-event-detail" style="display:none;margin-top:14px"></div>
-    </div>
-  </div>
-</div>
-
 <script>
 // ════════════════════════════════════════
 // MAT v3.0 — Mézières Avec Toi
@@ -768,6 +762,8 @@ function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
 function openContact(){openOv('contact');}
+function openAgenda(){openOv('agenda'); loadAgenda();}
+function openAgendaFromTopEvent(){openAgenda(); setTimeout(function(){ if(window._agendaEvents && window._agendaEvents.length){ openEventDetail(window._agendaEvents[0].uid); } }, 250); }
 
 function openOv(id){ document.getElementById('ov-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeOv(id){ document.getElementById('ov-'+id).classList.remove('open'); document.body.style.overflow=''; }
@@ -797,8 +793,8 @@ async function sendMel(){
     const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-6)})});
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
-    document.getElementById('typ')?.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
-  }catch(e){ document.getElementById('typ')?.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
+    var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
+  }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
   melBusy=false;
 }
 function sendSug(btn){ document.getElementById('minp').value=btn.textContent.trim(); sendMel(); }
@@ -827,8 +823,8 @@ async function loadMeteo() {
     const vigilance = d.vigilance || null;
 
     const code = cur.weather_code;
-    const temp = Math.round(cur.temperature_2m ?? 0);
-    const vent = Math.round(cur.wind_speed_10m ?? 0);
+    const temp = Math.round((cur.temperature_2m != null) ? cur.temperature_2m : 0);
+    const vent = Math.round((cur.wind_speed_10m != null) ? cur.wind_speed_10m : 0);
 
     document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
     document.getElementById('meteo-temp').innerHTML =
@@ -837,12 +833,12 @@ async function loadMeteo() {
       (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
 
     const badge = document.getElementById('meteo-alerte');
-    if (vigilance && Number(vigilance.level || 0) >= 3) {
-      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || 'orange');
-      badge.style.display = 'block';
+    if (vigilance && Number(vigilance.level || 0) >= 2) {
+      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || '');
     } else {
-      badge.style.display = 'none';
+      badge.textContent = '✅ Pas d\'alerte';
     }
+    badge.style.display = 'inline-flex';
 
     window._meteoData = d;
   } catch (e) {
@@ -855,46 +851,52 @@ async function loadMeteo() {
 }
 
 function loadMeteoDetail() {
-  const d = window._meteoData;
-  const el = document.getElementById('meteo-detail');
+  var d = window._meteoData;
+  var el = document.getElementById('meteo-detail');
   if (!d) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
     return;
   }
 
-  const forecast = d.forecast || {};
-  const cur = forecast.current || {};
-  const days = forecast.daily || {};
-  const vigilance = d.vigilance || null;
-  const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var forecast = d.forecast || {};
+  var cur = forecast.current || {};
+  var days = forecast.daily || {};
+  var vigilance = d.vigilance || null;
+  var JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var html = '';
 
-  let html = '';
+  html += '<div style="background:white;border-radius:14px;padding:12px;margin-bottom:14px;border:1px solid var(--border)">'
+    + '<div style="font-size:0.82rem;font-weight:900;color:var(--text)">'
+    + ((vigilance && Number(vigilance.level || 0) >= 2) ? '⚠️ Alerte en cours : vigilance ' + (vigilance.color_label || '') : '✅ Aucune alerte météo en cours')
+    + '</div>'
+    + '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
+    + ((vigilance && vigilance.main_text) ? vigilance.main_text : 'Situation météo normale sur la commune.')
+    + '</div></div>';
 
-  if (vigilance && Number(vigilance.level || 0) >= 2) {
-    html += '<div style="background:#fff7ed;border:1px solid #fdba74;border-radius:14px;padding:12px;margin-bottom:14px">'
-      + '<div style="font-size:0.85rem;font-weight:900;color:#9a3412">⚠️ Vigilance ' + (vigilance.color_label || '') + '</div>'
-      + '<div style="font-size:0.72rem;color:#7c2d12;margin-top:4px">' + (vigilance.main_text || vigilance.title || 'Alerte météo en cours') + '</div>'
-      + '</div>';
-  }
+  var pluieActuelle = (cur.precipitation != null) ? cur.precipitation : 0;
+  var humiditeActuelle = (cur.relative_humidity_2m != null) ? cur.relative_humidity_2m : 0;
+  var pressionActuelle = (cur.pressure_msl != null) ? cur.pressure_msl : 0;
+  var rafalesActuelles = (cur.wind_gusts_10m != null) ? cur.wind_gusts_10m : 0;
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + (cur.precipitation ?? 0) + ' mm</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + (cur.relative_humidity_2m ?? 0) + '%</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(cur.pressure_msl ?? 0) + ' hPa</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(cur.wind_gusts_10m ?? 0) + ' km/h</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + pluieActuelle + ' mm</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + humiditeActuelle + '%</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(pressionActuelle) + ' hPa</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(rafalesActuelles) + ' km/h</div></div>'
     + '</div>';
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
-  for (let i = 0; i < 3; i++) {
-    const dt = new Date(days.time?.[i]);
-    const jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
-    const code = days.weather_code?.[i];
-    const ico = METEO_ICONS[code] || '🌡️';
-    const desc = METEO_DESC[code] || '';
-    const tmax = Math.round(days.temperature_2m_max?.[i] ?? 0);
-    const tmin = Math.round(days.temperature_2m_min?.[i] ?? 0);
-    const pluie = days.precipitation_sum?.[i] ?? 0;
-    const uv = days.uv_index_max?.[i] ?? '-';
+  for (var i = 0; i < 3; i++) {
+    var timeValue = (days.time && days.time[i]) ? days.time[i] : null;
+    var dt = timeValue ? new Date(timeValue) : new Date();
+    var jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
+    var code = (days.weather_code && days.weather_code[i] != null) ? days.weather_code[i] : 0;
+    var ico = METEO_ICONS[code] || '🌡️';
+    var desc = METEO_DESC[code] || '';
+    var tmax = Math.round((days.temperature_2m_max && days.temperature_2m_max[i] != null) ? days.temperature_2m_max[i] : 0);
+    var tmin = Math.round((days.temperature_2m_min && days.temperature_2m_min[i] != null) ? days.temperature_2m_min[i] : 0);
+    var pluie = (days.precipitation_sum && days.precipitation_sum[i] != null) ? days.precipitation_sum[i] : 0;
+    var uv = (days.uv_index_max && days.uv_index_max[i] != null) ? days.uv_index_max[i] : '-';
 
     html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
       + '<div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">' + jour + '</div>'
@@ -910,49 +912,198 @@ function loadMeteoDetail() {
   el.innerHTML = html;
 }
 
-// ── Événements iCal ───────────────────
+// ── Événements iCal / Agenda MAT ───────────────────
 const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-async function loadEvents(){
-  const strip = document.getElementById('events-strip');
-  try{
-    const r = await fetch(ICAL_URL, { cache:'no-store' });
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    const txt = await r.text();
-    const evts = parseIcalEvents(txt, 2);
-    if(!evts.length){
-      strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>';
+const MONTHS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+var agendaView = 'today';
+
+function decodeIcalText(v) {
+  return (v || '').replace(/\\n/g, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').trim();
+}
+function parseIcalDateLine(line) {
+  if (!line) return null;
+  var value = line.split(':').pop().trim();
+  if (/^\d{8}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T00:00:00');
+  if (/^\d{8}T\d{6}Z$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15)+'Z');
+  if (/^\d{8}T\d{6}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15));
+  return new Date(value);
+}
+function parseIcalDetailed(txt) {
+  var blocks = txt.replace(/\r/g,'').replace(/\n[ \t]/g,'').split('BEGIN:VEVENT').slice(1);
+  var now = new Date();
+  var limit = new Date(now.getTime() + 365 * 86400000);
+  var startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var evts = [];
+  blocks.forEach(function(b, idx) {
+    function getLine(name) {
+      var re = new RegExp('^' + name + '[^:]*:(.+)$', 'm');
+      var m = b.match(re);
+      return m ? decodeIcalText(m[1]) : '';
+    }
+    var summary = getLine('SUMMARY');
+    var location = getLine('LOCATION');
+    var description = getLine('DESCRIPTION');
+    var uid = getLine('UID') || ('evt-' + idx);
+    var startLine = b.match(/^DTSTART[^:]*:.+$/m);
+    var endLine = b.match(/^DTEND[^:]*:.+$/m);
+    var start = startLine ? parseIcalDateLine(startLine[0]) : null;
+    var end = endLine ? parseIcalDateLine(endLine[0]) : null;
+    if (!summary || !start || isNaN(start.getTime())) return;
+    if (start < startToday || start > limit) return;
+    evts.push({ uid: uid, summary: summary, location: location, description: description, start: start, end: end });
+  });
+  evts.sort(function(a,b){ return a.start - b.start; });
+  return evts;
+}
+function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function startOfWeek(d){ var x=new Date(d); var day=x.getDay(); var diff=day===0?-6:1-day; x.setHours(0,0,0,0); x.setDate(x.getDate()+diff); return x; }
+function endOfWeek(d){ var x=startOfWeek(d); x.setDate(x.getDate()+6); x.setHours(23,59,59,999); return x; }
+function formatEventMeta(evt) {
+  var dateTxt = evt.start.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  var timeTxt = evt.start.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  var endTxt = evt.end ? evt.end.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '';
+  var meta = '🕒 ' + timeTxt + (endTxt ? ' → ' + endTxt : '') + ' · ' + dateTxt;
+  if (evt.location) meta += '<br>📍 ' + evt.location;
+  return meta;
+}
+function buildIcsForEvent(evt) {
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function fmt(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; }
+  var end = evt.end || new Date(evt.start.getTime()+3600000);
+  return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:' + evt.summary.replace(/\n/g,' ') + '\nDTSTART:' + fmt(evt.start) + '\nDTEND:' + fmt(end) + '\nLOCATION:' + (evt.location || '').replace(/\n/g,' ') + '\nDESCRIPTION:' + (evt.description || '').replace(/\n/g,' ') + '\nEND:VEVENT\nEND:VCALENDAR';
+}
+async function ensureAgendaEvents() {
+  if (window._agendaEvents) return window._agendaEvents;
+  var r = await fetch(ICAL_URL, { cache:'no-store' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  var txt = await r.text();
+  window._agendaEvents = parseIcalDetailed(txt);
+  return window._agendaEvents;
+}
+async function loadAgenda() {
+  var content = document.getElementById('agenda-content');
+  content.innerHTML = '<div class="agenda-empty">Chargement de l\'agenda…</div>';
+  try {
+    await ensureAgendaEvents();
+    renderAgenda();
+  } catch (e) {
+    console.error('Erreur agenda:', e);
+    content.innerHTML = '<div class="agenda-empty">Agenda indisponible.</div>';
+  }
+}
+function setAgendaView(view) {
+  agendaView = view;
+  ['today','week','month'].forEach(function(v){
+    var el = document.getElementById('agenda-tab-' + v);
+    if (el) el.classList.toggle('on', v === view);
+  });
+  renderAgenda();
+}
+function renderAgenda() {
+  var content = document.getElementById('agenda-content');
+  var evts = window._agendaEvents || [];
+  var now = new Date();
+  var list = [];
+  if (agendaView === 'today') {
+    list = evts.filter(function(e){ return sameDay(e.start, now); });
+    if (!list.length) {
+      var nxt = evts.length ? evts[0] : null;
+      content.innerHTML = nxt ? '<div class="agenda-empty">Aucun événement aujourd\'hui.<br><br>Prochain : <strong>' + nxt.summary + '</strong> le ' + nxt.start.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }) + '.</div>' : '<div class="agenda-empty">Aucun événement à venir.</div>';
       return;
     }
-    strip.innerHTML = evts.map(e=>{
-      const dt = e.date;
-      const diff = Math.ceil((dt-new Date())/(1000*60*60*24));
-      const diffTxt = diff===0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
-      return '<div class="event-chip">'
-        +'<div class="event-date">'+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</div>'
-        +'<div class="event-name">'+e.summary+'</div>'
-        +'<div class="event-days">'+diffTxt+'</div>'
-        +'</div>';
-    }).join('');
-  }catch(e){
+  } else if (agendaView === 'week') {
+    var sw = startOfWeek(now), ew = endOfWeek(now);
+    list = evts.filter(function(e){ return e.start >= sw && e.start <= ew; });
+  } else {
+    var year = now.getFullYear(), month = now.getMonth();
+    list = evts.filter(function(e){ return e.start.getFullYear()===year && e.start.getMonth()===month; });
+  }
+  if (agendaView === 'month') {
+    var first = new Date(now.getFullYear(), now.getMonth(), 1);
+    var last = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    var startPad = first.getDay()===0 ? 6 : first.getDay()-1;
+    var html = '<div style="font-size:.82rem;font-weight:900;color:var(--forest);margin-bottom:8px;text-transform:capitalize">' + MONTHS_LONG[now.getMonth()] + ' ' + now.getFullYear() + '</div>';
+    html += '<div class="agenda-month-grid">';
+    ['L','M','M','J','V','S','D'].forEach(function(h){ html += '<div class="agenda-month-head">' + h + '</div>'; });
+    for (var p=0; p<startPad; p++) html += '<div class="agenda-month-day" style="visibility:hidden"></div>';
+    for (var d=1; d<=last.getDate(); d++) {
+      var current = new Date(now.getFullYear(), now.getMonth(), d);
+      var hasEvent = list.some(function(e){ return sameDay(e.start, current); });
+      var cls = 'agenda-month-day' + (hasEvent ? ' has-event' : '') + (sameDay(current, now) ? ' today' : '');
+      html += '<div class="' + cls + '">' + d + '</div>';
+    }
+    html += '</div>';
+    html += '<div class="agenda-list" style="margin-top:14px">' + (list.length ? list.map(renderAgendaItem).join('') : '<div class="agenda-empty">Aucun événement ce mois-ci.</div>') + '</div>';
+    content.innerHTML = html;
+    return;
+  }
+  content.innerHTML = list.length ? '<div class="agenda-list">' + list.map(renderAgendaItem).join('') + '</div>' : '<div class="agenda-empty">Aucun événement sur cette période.</div>';
+}
+function renderAgendaItem(evt) {
+  var dayName = evt.start.toLocaleDateString('fr-FR', { weekday:'short' });
+  return '<div class="agenda-item" onclick="openEventDetail(\'' + evt.uid.replace(/'/g, "\\'") + '\')">'
+    + '<div class="agenda-item-head">'
+    + '<div class="agenda-date-badge"><div class="agenda-date-day">' + dayName + '</div><div class="agenda-date-num">' + evt.start.getDate() + '</div></div>'
+    + '<div style="flex:1;min-width:0"><div class="agenda-title">' + evt.summary + '</div><div class="agenda-meta">' + formatEventMeta(evt) + '</div>'
+    + (evt.description ? '<div class="agenda-desc">' + evt.description + '</div>' : '')
+    + '</div></div></div>';
+}
+function openEventDetail(uid) {
+  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
+  if (!evt) return;
+  var body = document.getElementById('event-detail-body');
+  body.innerHTML = '<div class="event-detail-card">'
+    + '<div class="event-detail-title">' + evt.summary + '</div>'
+    + '<div class="event-detail-meta">' + formatEventMeta(evt) + '</div>'
+    + '<div class="event-detail-desc">' + (evt.description || 'Aucune description.') + '</div>'
+    + '<div class="event-detail-actions">'
+    + '<button class="event-btn primary" onclick="downloadEventIcs(\'' + evt.uid.replace(/'/g, "\\'") + '\')">Ajouter à mon agenda</button>'
+    + (evt.location ? '<button class="event-btn secondary" onclick="openEventMap(\'' + evt.uid.replace(/'/g, "\\'") + '\')">Voir le lieu</button>' : '')
+    + '</div></div>';
+  openOv('event');
+}
+function downloadEventIcs(uid) {
+  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
+  if (!evt) return;
+  var blob = new Blob([buildIcsForEvent(evt)], { type:'text/calendar;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'evenement-mat.ics';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+function openEventMap(uid) {
+  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
+  if (!evt || !evt.location) return;
+  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(evt.location), '_blank');
+}
+async function loadEvents() {
+  try {
+    var evts = await ensureAgendaEvents();
+    var first = evts.length ? evts[0] : null;
+    if (!first) {
+      document.getElementById('next-event-date').textContent = 'Aucune date';
+      document.getElementById('next-event-name').textContent = 'Aucune manifestation à venir';
+      document.getElementById('next-event-days').textContent = 'Ouvrir l’agenda';
+      return;
+    }
+    var diff = Math.ceil((first.start - new Date()) / (1000*60*60*24));
+    var diffTxt = diff <= 0 ? 'Aujourd\'hui' : diff === 1 ? 'Demain' : 'Dans ' + diff + ' j.';
+    document.getElementById('next-event-date').textContent = first.start.getDate() + ' ' + MONTHS[first.start.getMonth()];
+    document.getElementById('next-event-name').textContent = first.summary;
+    document.getElementById('next-event-days').textContent = diffTxt;
+  } catch (e) {
     console.error('Erreur calendrier:', e);
-    strip.innerHTML='<div class="event-loading">Calendrier indisponible</div>';
+    document.getElementById('next-event-date').textContent = 'Indisponible';
+    document.getElementById('next-event-name').textContent = 'Agenda MAT';
+    document.getElementById('next-event-days').textContent = 'Réessayez plus tard';
   }
 }
 
-function parseIcalEvents(txt, max){
-  const evts=[], now=new Date(), limit=new Date(now.getTime()+180*864e5);
-  txt.split('BEGIN:VEVENT').slice(1).forEach(b=>{
-    const get=k=>{const m=b.match(new RegExp(k+'[^:]*:([^\r\n]+)'));return m?m[1].trim():'';};
-    const summary=get('SUMMARY'), dtstart=get('DTSTART');
-    if(!summary||!dtstart)return;
-    const raw=dtstart.replace(/T.*/,'');
-    const d=new Date(raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6,8));
-    if(d>=now&&d<=limit)evts.push({summary,date:d});
-  });
-  return evts.sort((a,b)=>a.date-b.date).slice(0,max);
-}
-
-// ── Signalement ───────────────────────
+// ── Signalement// ── Signalement ───────────────────────
 let sigCat='', sigLat='', sigLon='';
 function selCat(btn, cat){
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
@@ -1079,7 +1230,42 @@ async function loadIdees(){
       </div>
     </div>`).join('');
 }
+// ── Mairie ─────────────────────────────────────────────
+function loadMairieStatus(){
+  var nowParis = new Date(new Date().toLocaleString('en-US', { timeZone:'Europe/Paris' }));
+  var day = nowParis.getDay(); // 0 dim, 1 lun, 3 mer, 5 ven
+  var mins = nowParis.getHours() * 60 + nowParis.getMinutes();
+
+  function setStatus(main, sub, badge){
+    document.getElementById('mairie-status').textContent = main;
+    document.getElementById('mairie-desc').textContent = sub;
+    document.getElementById('mairie-badge').textContent = badge;
+  }
+
+  if (day === 1) {
+    if (mins >= 14*60 && mins < 17*60 + 30) return setStatus('Ouverte', 'Accueil ouvert jusqu\'à 17h30', 'Lundi');
+    if (mins < 14*60) return setStatus('Fermée', 'Ouvre aujourd\'hui à 14h', 'Lundi');
+  }
+  if (day === 5) {
+    if (mins >= 8*60 + 30 && mins < 11*60 + 30) return setStatus('Ouverte', 'Accueil ouvert jusqu\'à 11h30', 'Vendredi');
+    if (mins < 8*60 + 30) return setStatus('Fermée', 'Ouvre aujourd\'hui à 8h30', 'Vendredi');
+  }
+  if (day === 3) {
+    return setStatus('Sur RDV', 'Mercredi uniquement sur rendez-vous', 'Mercredi');
+  }
+
+  if (day === 0 || day === 6) return setStatus('Fermée', 'Prochaine ouverture lundi à 14h', 'Week-end');
+  if (day === 1 && mins >= 17*60 + 30) return setStatus('Fermée', 'Prochaine ouverture mercredi sur RDV', 'Mairie');
+  if (day === 2) return setStatus('Fermée', 'Prochaine ouverture mercredi sur RDV', 'Mairie');
+  if (day === 3) return setStatus('Sur RDV', 'Puis vendredi de 8h30 à 11h30', 'Mairie');
+  if (day === 4) return setStatus('Fermée', 'Prochaine ouverture vendredi à 8h30', 'Mairie');
+  if (day === 5 && mins >= 11*60 + 30) return setStatus('Fermée', 'Prochaine ouverture lundi à 14h', 'Mairie');
+
+  setStatus('Fermée', 'Horaires : lun 14h-17h30 · mer sur RDV · ven 8h30-11h30', 'Horaires');
+}
+
 // ── Déchetterie & Bacs ───────────────────────────────────────
+
 function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 
 const FERIES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
@@ -1287,16 +1473,12 @@ const _origOpenIdees  = openIdees;
 const _origOpenNotifs = openNotifs;
 const _origOpenMeteo  = openMeteo;
 const _origOpenContact = openContact;
-const _origOpenAgenda = openAgenda;
-const _origOpenMairie = openMairie;
 window.openMel    = ()=>{ trackStat('mel');         _origOpenMel(); };
 window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
 window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
 window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
 window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
 window.openContact = ()=>{ trackStat('contact');    _origOpenContact(); };
-window.openAgenda = ()=>{ trackStat('agenda');      _origOpenAgenda(); };
-window.openMairie = ()=>{ trackStat('mairie');      _origOpenMairie(); };
 
 // Tracker installation
 window.addEventListener('appinstalled', () => {
@@ -1423,242 +1605,11 @@ function urlBase64ToUint8Array(b64){
 }
 
 
-
-// ── Mairie ────────────────────────────
-const MAIRIE_HOURS = {
-  1: [{start:'14:00', end:'17:30'}],
-  2: [],
-  3: [{start:'09:00', end:'12:00'}],
-  4: [],
-  5: [{start:'08:30', end:'11:30'}],
-  6: [],
-  0: []
-};
-
-function formatHour(h){ return h.replace(':','h'); }
-function getParisNowParts() {
-  const now = new Date();
-  const tz = { timeZone:'Europe/Paris' };
-  const day = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
-  const month = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
-  const year = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
-  const hour = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
-  const minute = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now));
-  const d = new Date(year, month-1, day);
-  return { hour, minute, dow: d.getDay() };
-}
-
-function getMairieStatus() {
-  const { dow, hour, minute } = getParisNowParts();
-  const slots = MAIRIE_HOURS[dow] || [];
-  const currentMinutes = hour * 60 + minute;
-
-  for (const slot of slots) {
-    const [sh, sm] = slot.start.split(':').map(Number);
-    const [eh, em] = slot.end.split(':').map(Number);
-    const start = sh * 60 + sm;
-    const end = eh * 60 + em;
-    if (currentMinutes >= start && currentMinutes < end) {
-      return { open:true, text:'Ouverte maintenant', desc:'Ferme à ' + formatHour(slot.end) };
-    }
-  }
-
-  for (const slot of slots) {
-    const [sh, sm] = slot.start.split(':').map(Number);
-    const start = sh * 60 + sm;
-    if (currentMinutes < start) {
-      return { open:false, text:'Fermée actuellement', desc:'Ouvre à ' + formatHour(slot.start) };
-    }
-  }
-
-  const names = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  for (let i = 1; i <= 7; i++) {
-    const nextDay = (dow + i) % 7;
-    const nextSlots = MAIRIE_HOURS[nextDay] || [];
-    if (nextSlots.length) {
-      return { open:false, text:'Fermée actuellement', desc:'Prochaine ouverture : ' + names[nextDay] + ' à ' + formatHour(nextSlots[0].start) };
-    }
-  }
-  return { open:false, text:'Fermée', desc:'Horaires indisponibles' };
-}
-
-function loadMairieCard() {
-  const s = getMairieStatus();
-  document.getElementById('mairie-status').textContent = s.text;
-  document.getElementById('mairie-desc').textContent = s.desc;
-  document.getElementById('mairie-ico').textContent = s.open ? '🟢' : '🏛️';
-}
-
-function openMairie(){ openOv('mairie'); loadMairieDetail(); }
-function loadMairieDetail() {
-  const s = getMairieStatus();
-  const rows = [['Lundi','14h00 – 17h30'],['Mercredi','Sur rendez-vous'],['Vendredi','8h30 – 11h30']];
-  document.getElementById('mairie-detail').innerHTML = `
-    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">
-      <div style="font-size:0.9rem;font-weight:900;color:var(--text)">${s.text}</div>
-      <div style="font-size:0.76rem;color:var(--muted);margin-top:4px">${s.desc}</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">
-      <div style="font-size:0.76rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Horaires</div>
-      ${rows.map(r=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-weight:800;color:var(--text)">${r[0]}</div><div style="color:var(--muted)">${r[1]}</div></div>`).join('')}
-      <div style="padding-top:10px;font-size:0.72rem;color:var(--muted)">36 rue du bourg · 45370 Mézières-lez-Cléry<br>02 38 45 61 76</div>
-    </div>`;
-}
-
-// ── Agenda MAT ────────────────────────
-let agendaEvents = [];
-let agendaView = 'today';
-
-function parseIcalEventsFull(txt){
-  const evts=[];
-  txt.split('BEGIN:VEVENT').slice(1).forEach(block=>{
-    const get=(k)=>{const m=block.match(new RegExp(k+'[^:]*:([^\r\n]+)')); return m?m[1].trim():'';};
-    const summary=get('SUMMARY');
-    const location=get('LOCATION');
-    const description=get('DESCRIPTION').replace(/\\n/g,' ');
-    const dtstart=get('DTSTART');
-    const dtend=get('DTEND');
-    if(!summary||!dtstart)return;
-    const parseDate = (val)=>{
-      const y=val.slice(0,4), mo=val.slice(4,6), d=val.slice(6,8);
-      if(val.includes('T')){
-        const h=val.slice(9,11)||'00', m=val.slice(11,13)||'00';
-        return new Date(`${y}-${mo}-${d}T${h}:${m}:00`);
-      }
-      return new Date(`${y}-${mo}-${d}T00:00:00`);
-    };
-    const start=parseDate(dtstart);
-    const end=parseDate(dtend)||start;
-    if(start && !isNaN(start)) evts.push({summary, location, description, start, end});
-  });
-  return evts.sort((a,b)=>a.start-b.start);
-}
-
-async function ensureAgendaEvents(){
-  if(agendaEvents.length) return agendaEvents;
-  const r = await fetch(ICAL_URL, { cache:'no-store' });
-  const txt = await r.text();
-  agendaEvents = parseIcalEventsFull(txt).filter(e => e.start >= new Date(new Date().setHours(0,0,0,0)));
-  return agendaEvents;
-}
-
-function openAgenda(){ openOv('agenda'); renderAgenda(); }
-function setAgendaView(view){
-  agendaView=view;
-  ['today','week','month'].forEach(v=>document.getElementById('agenda-tab-'+v)?.classList.toggle('on', v===view));
-  renderAgenda();
-}
-function fmtEventDate(d){ return d.toLocaleDateString('fr-FR',{weekday:'long', day:'numeric', month:'long'}); }
-function fmtEventTime(d){ return d.toLocaleTimeString('fr-FR',{hour:'2-digit', minute:'2-digit'}); }
-
-function getFilteredAgendaEvents(){
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const tomorrow = new Date(todayStart); tomorrow.setDate(tomorrow.getDate()+1);
-  const weekEnd = new Date(todayStart); weekEnd.setDate(weekEnd.getDate()+7);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1);
-  if(agendaView==='today') return agendaEvents.filter(e=>e.start < tomorrow && e.end >= todayStart);
-  if(agendaView==='week') return agendaEvents.filter(e=>e.start < weekEnd && e.end >= todayStart);
-  return agendaEvents.filter(e=>e.start < monthEnd && e.end >= todayStart);
-}
-
-async function renderAgenda(){
-  const list = document.getElementById('agenda-list');
-  const detail = document.getElementById('agenda-event-detail');
-  detail.style.display='none';
-  detail.innerHTML='';
-  list.innerHTML='<div class="actu-empty">Chargement agenda…</div>';
-  try{
-    await ensureAgendaEvents();
-    const filtered = getFilteredAgendaEvents();
-    window._agendaFiltered = filtered;
-    if(!filtered.length){ list.innerHTML='<div class="actu-empty">Aucun événement pour cette période.</div>'; return; }
-    list.innerHTML = filtered.map((e,idx)=>`
-      <div class="actu-item" onclick="showAgendaEvent(${idx})" style="cursor:pointer">
-        <div class="actu-body">
-          <div class="actu-date">📅 ${fmtEventDate(e.start)} · ${fmtEventTime(e.start)}</div>
-          <div class="actu-title">${e.summary}</div>
-          <div class="actu-text">${e.location || 'Lieu à préciser'}</div>
-        </div>
-      </div>`).join('');
-  }catch(e){
-    console.error('Agenda MAT:', e);
-    list.innerHTML='<div class="actu-empty">Agenda indisponible.</div>';
-  }
-}
-
-function showAgendaEvent(idx){
-  const e = (window._agendaFiltered||[])[idx];
-  if(!e) return;
-  const detail = document.getElementById('agenda-event-detail');
-  const gcalStart = e.start.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-  const gcalEnd = e.end.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-  const addUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-    + '&text=' + encodeURIComponent(e.summary)
-    + '&dates=' + encodeURIComponent(gcalStart + '/' + gcalEnd)
-    + '&location=' + encodeURIComponent(e.location || '')
-    + '&details=' + encodeURIComponent(e.description || '');
-  detail.style.display='block';
-  detail.innerHTML = `
-    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border)">
-      <div style="font-size:0.92rem;font-weight:900;color:var(--text)">${e.summary}</div>
-      <div style="font-size:0.74rem;color:var(--muted);margin-top:6px">📅 ${fmtEventDate(e.start)} · ${fmtEventTime(e.start)}</div>
-      <div style="font-size:0.74rem;color:var(--muted);margin-top:4px">📍 ${e.location || 'Lieu à préciser'}</div>
-      <div style="font-size:0.76rem;color:var(--text);margin-top:10px;line-height:1.6">${e.description || 'Aucune description disponible.'}</div>
-      <div style="margin-top:12px"><a class="card" style="padding:12px" href="${addUrl}" target="_blank"><div class="ico ico-cal">➕</div><div class="ct"><div class="ct-label">Ajouter à mon agenda</div><div class="ct-sub">Google / mobile</div></div></a></div>
-    </div>`;
-}
-
-function openDechets(){ openOv('dechets'); loadDechetsDetail(); }
-function loadDechetsDetail(){
-  document.getElementById('dechets-content').innerHTML = `
-    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">
-      <div style="font-size:0.9rem;font-weight:900;color:var(--text)">Collectes</div>
-      <div style="font-size:0.76rem;color:var(--muted);margin-top:8px">🗑️ Bac noir : lundi matin<br>♻️ Bac jaune : mardi matin en semaine paire</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border)">
-      <div style="font-size:0.9rem;font-weight:900;color:var(--text)">Déchetterie de Cléry-Saint-André</div>
-      <div style="font-size:0.76rem;color:var(--muted);margin-top:8px">Horaires hiver : 10h-12h / 14h-17h<br>Horaires été : 9h-12h / 14h-18h<br>Fermée le dimanche et les jours fériés.</div>
-    </div>`;
-}
-
-const _oldLoadMeteo = loadMeteo;
-loadMeteo = async function(){
-  await _oldLoadMeteo();
-  const vig = window._meteoData?.vigilance;
-  const line = document.getElementById('meteo-alert-line');
-  if(line) line.textContent = (vig && Number(vig.level||0) >= 2) ? ('Alerte : vigilance ' + (vig.color_label || 'en cours')) : 'Aucune alerte en cours';
-};
-
-async function loadEvents(){
-  const strip = document.getElementById('events-strip');
-  try{
-    const events = await ensureAgendaEvents();
-    const next = events[0];
-    if(!next){
-      document.getElementById('next-event-title').textContent='Aucune manifestation';
-      document.getElementById('next-event-desc').textContent='Rien de programmé';
-      strip.innerHTML='<div class="event-loading">Aucune manifestation à venir</div>';
-      return;
-    }
-    const diff = Math.ceil((next.start-new Date())/86400000);
-    const diffTxt = diff<=0 ? 'Aujourd’hui' : diff===1 ? 'Demain' : 'Dans ' + diff + ' jours';
-    document.getElementById('next-event-title').textContent=next.summary;
-    document.getElementById('next-event-desc').textContent=(next.location || 'Lieu à préciser') + ' · ' + fmtEventDate(next.start);
-    strip.innerHTML = `<div class="event-card" onclick="openAgenda()"><div class="event-date-pill"><div class="event-day">${next.start.getDate()}</div><div class="event-month">${MONTHS[next.start.getMonth()]}</div></div><div class="event-meta"><div class="event-kicker">Manifestation à venir</div><div class="event-name">${next.summary}</div><div class="event-days">${diffTxt}${next.location ? ' · ' + next.location : ''}</div></div></div>`;
-  }catch(e){
-    console.error('Erreur calendrier:', e);
-    document.getElementById('next-event-title').textContent='Agenda indisponible';
-    document.getElementById('next-event-desc').textContent='Vérifiez le flux calendrier';
-    strip.innerHTML='<div class="event-loading">Calendrier indisponible</div>';
-  }
-}
-
 // ── Init ─────────────────────────────────────────────────────
 loadMeteo();
 loadEvents();
 loadDechets();
-loadMairieCard();
+loadMairieStatus();
 updateInstallBtn();
 // Rafraîchir les infos déchets toutes les minutes
 setInterval(loadDechets, 60000);
@@ -1668,7 +1619,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
   // Écouter les messages du SW (clic sur notification → ouvrir actualités)
   navigator.serviceWorker.addEventListener('message', e => {
-    if(e.data?.action === 'openNotifs') openNotifs();
+    if(e.data && e.data.action === 'openNotifs') openNotifs();
   });
 }
 // Si l'app est lancée depuis une notification
