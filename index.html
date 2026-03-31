@@ -255,16 +255,13 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus Rémi strip ── */
-.bus-strip{padding:7px 0 0;width:100%;}
+.bus-strip{padding:6px 0 0;width:100%;}
 .bus-strip-head{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
 .bus-strip-ico{font-size:.9rem;}
 .bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);}
 .bus-strip-periode{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);margin-left:auto;}
-.bus-stop-row{display:flex;align-items:baseline;gap:6px;width:100%;font-size:.65rem;color:rgba(255,255,255,.85);line-height:1.6;overflow:hidden;}
-.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.6);font-weight:800;flex-shrink:0;width:52px;}
-.bus-stop-times{flex:1;display:flex;gap:8px;flex-wrap:nowrap;overflow:hidden;}
-.bus-dir{display:flex;align-items:center;gap:3px;white-space:nowrap;}
-.bus-dir-label{font-size:.58rem;color:rgba(255,255,255,.5);}
+.bus-stop-row{display:block;font-size:.65rem;color:rgba(255,255,255,.85);line-height:1.65;white-space:nowrap;}
+.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.6);font-weight:800;margin-right:4px;}
 .bus-next{font-weight:900;color:#bfdbfe;}
 .bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
 
@@ -1824,28 +1821,24 @@ function getNextBus(times) {
 }
 
 function loadBusRemi() {
-  var el = document.getElementById('bus-strip-stops');
+  var el  = document.getElementById('bus-strip-stops');
+  var pel = document.getElementById('bus-periode');
   if (!el) return;
 
   var vac = isVacancesScolaires();
-  var H = BUS_HORAIRES;
+  var H   = BUS_HORAIRES;
+  if (pel) pel.textContent = '';
 
-  // Période
+  var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
+  var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
 
+  var html = '';
+  if (mOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Mairie</span> → Orléans <span class="bus-next">' + mOrl.label + '</span></span>';
+  if (bOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Le Bréau</span> → Orléans <span class="bus-next">' + bOrl.label + '</span></span>';
+  if (!html) html = '<span class="bus-loading">Plus de bus vers Orléans aujourd'hui</span>';
 
-  // Prochains bus pour chaque arrêt : 1 ligne = Orléans + Nouan
-  function renderStop(nom, orl, nou) {
-    var nOrl = getNextBus(orl);
-    var nNou = getNextBus(nou);
-    if (!nOrl && !nNou) return '';
-    return '<div class="bus-stop-row">'
-      + '<span class="bus-stop-name">' + nom + '</span>'
-      + '<span class="bus-stop-times">'
-      + (nOrl ? '<span class="bus-dir"><span class="bus-dir-label">→ Orléans</span> <span class="bus-next">' + nOrl.label + '</span></span>' : '')
-      + (nNou ? '<span class="bus-dir"><span class="bus-dir-label">→ Nouan</span> <span class="bus-next">' + nNou.label + '</span></span>' : '')
-      + '</span>'
-      + '</div>';
-  }
+  el.innerHTML = html;
+}
 
   var mOrl = vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire;
   var mNou = vac ? H.mairie.nouan_vacances   : H.mairie.nouan_scolaire;
