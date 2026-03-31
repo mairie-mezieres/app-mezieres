@@ -1,6 +1,6 @@
-// SERVICE WORKER v3.1 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.4.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-const CACHE = 'mat-v3.4';
+const CACHE = 'mat-v3.4.1';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -24,10 +24,10 @@ self.addEventListener('fetch', e => {
       url.includes('panneaupocket') || url.includes('github.io')) return;
 
   e.respondWith(
-    fetch(e.request.clone())       // ← clone la requête (pas la réponse)
+    fetch(e.request.clone())
       .then(res => {
         if (res && res.ok && e.request.method === 'GET') {
-          const resClone = res.clone();  // ← clone la réponse AVANT de la consommer
+          const resClone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, resClone));
         }
         return res;
@@ -57,14 +57,11 @@ self.addEventListener('notificationclick', e => {
   const url = e.notification.data?.url || './';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cls => {
-      // Chercher une fenêtre MAT déjà ouverte
       const existing = cls.find(c => c.url.includes('mairie-mezieres'));
       if (existing) {
         existing.focus();
-        // Envoyer un message pour naviguer vers les actualités
         existing.postMessage({ action: 'openNotifs' });
       } else {
-        // Ouvrir l'app sur l'onglet actualités
         clients.openWindow(url + '#notifs');
       }
     })
