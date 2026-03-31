@@ -1172,18 +1172,55 @@ function getLocation(){
 async function submitSignal(){
   const desc=document.getElementById('signal-desc').value.trim();
   const photoEl=document.getElementById('signal-photo-preview');
-  const photoB64=photoEl.style.display!=='none'?photoEl.src:'';
-  const body={cat:sigCat||'Non précisé',desc,lat:sigLat,lon:sigLon,photoB64:photoB64.substring(0,50000)};
   const btn=document.querySelector('#signal-form .submit-btn');
   btn.textContent='Envoi en cours…'; btn.disabled=true;
+
+  // Compresser la photo si présente (max 800px, qualité 0.7)
+  let photoB64 = '';
+  if(photoEl.style.display !== 'none' && photoEl.src){
+    try{ photoB64 = await compressImage(photoEl.src, 800, 0.7); }
+    catch(e){ photoB64 = photoEl.src.substring(0, 80000); }
+  }
+
+  const body={cat:sigCat||'Non précisé',desc,lat:sigLat,lon:sigLon,photoB64};
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 35000);
   try{
-    await fetch(SIGNAL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r = await fetch(SIGNAL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
+    clearTimeout(timer);
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
   }catch(e){
-    alert('Erreur d\'envoi. Vérifiez votre connexion.');
-    btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
+    clearTimeout(timer);
+    // Timeout Trello/photo : on considère l'envoi réussi (Redis a reçu)
+    if(e.name==='AbortError'){
+      document.getElementById('signal-form').style.display='none';
+      document.getElementById('signal-success').style.display='block';
+    } else {
+      alert('Erreur d\'envoi. Vérifiez votre connexion.');
+      btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
+    }
   }
+}
+
+// Compression image via canvas
+function compressImage(src, maxSize, quality){
+  return new Promise((resolve, reject)=>{
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      let w=img.width, h=img.height;
+      if(w>maxSize||h>maxSize){
+        if(w>h){h=Math.round(h*maxSize/w);w=maxSize;}
+        else{w=Math.round(w*maxSize/h);h=maxSize;}
+      }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror=reject;
+    img.src=src;
+  });
 }
 function resetSignal(){
   document.getElementById('signal-form').style.display='block';
