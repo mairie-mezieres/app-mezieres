@@ -37,9 +37,9 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
 .mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.mat-img{height:90px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));margin-top:2px;cursor:pointer;}
+.mat-img{height:100%;max-height:110px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;}
 .mat-text{flex:2;padding-bottom:8px;min-width:0;}
-.mat-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
+.mat-actions{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
@@ -256,15 +256,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus Rémi strip ── */
-.bus-strip{background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:14px;padding:8px 12px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:10px;}
-.bus-strip-ico{font-size:1.3rem;flex-shrink:0;}
-.bus-strip-content{flex:1;min-width:0;}
-.bus-strip-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.75);}
-.bus-strip-stops{display:flex;gap:12px;margin-top:3px;flex-wrap:wrap;}
-.bus-stop{font-size:.68rem;font-weight:800;color:white;line-height:1.4;}
-.bus-stop-name{font-size:.58rem;color:rgba(255,255,255,.7);font-weight:700;}
-.bus-next{font-size:.78rem;font-weight:900;color:#bfdbfe;}
-.bus-loading{font-size:.68rem;color:rgba(255,255,255,.7);font-style:italic;}
+.bus-strip{padding:7px 0 0;display:flex;align-items:center;gap:8px;width:100%;}
+.bus-strip-ico{font-size:1rem;flex-shrink:0;}
+.bus-strip-content{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);white-space:nowrap;}
+.bus-strip-stops{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.bus-stop{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.9);line-height:1.3;}
+.bus-stop-name{font-size:.56rem;color:rgba(255,255,255,.6);font-weight:700;}
+.bus-next{font-weight:900;color:#bfdbfe;}
+.bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
 
 /* ── Text-to-Speech ── */
 .tts-btn{background:none;border:1.5px solid var(--sage);border-radius:999px;padding:4px 10px;font-size:0.7rem;font-weight:800;color:var(--leaf);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-family:'Nunito',sans-serif;}
@@ -316,7 +316,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.18);border:none;border-radius:12px;padding:8px 14px;color:white;font-size:0.78rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;width:100%;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:5px 10px;color:rgba(255,255,255,0.85);font-size:0.62rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -357,12 +357,12 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.3</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:3px">v3.3</div>
     </div>
     <!-- Droite : icône MAT + bouton Aa dessous -->
     <div class="mat-actions">
       <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
-      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Aa</button>
+      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Accessibilité</button>
     </div>
   </div>
 
@@ -392,16 +392,13 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="event-name" id="next-event-name"></div>
       <div class="event-days" id="next-event-days"></div>
     </div>
-    <!-- Encart bus Rémi -->
-    <div class="bus-strip" onclick="openMel(); setTimeout(()=>{document.getElementById('minp').value='Prochains bus ligne 8';sendMel();},400)">
+    <!-- Ligne bus Rémi pleine largeur -->
+    <div class="bus-strip">
       <div class="bus-strip-ico">🚌</div>
-      <div class="bus-strip-content">
-        <div class="bus-strip-title">Prochain bus — Ligne 8 Rémi</div>
-        <div class="bus-strip-stops" id="bus-strip-stops">
-          <span class="bus-loading">Chargement…</span>
-        </div>
+      <div class="bus-strip-title">Ligne 8 Rémi</div>
+      <div class="bus-strip-stops" id="bus-strip-stops">
+        <span class="bus-loading">Chargement…</span>
       </div>
-      <div style="font-size:.7rem;color:rgba(255,255,255,.5)">›</div>
     </div>
   </div>
 </div>
@@ -453,15 +450,15 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </button>
     <button class="card" onclick="openContact()">
       <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter la mairie</div><div class="ct-sub">Choisissez votre canal</div></div>
+      <div class="ct"><div class="ct-label">Contacter la mairie</div><div class="ct-sub">En direct ou non</div></div>
     </button>
   </div>
 
-  <div class="sec">Agenda MAT</div>
+  <div class="sec">Agenda</div>
   <div class="grid2">
     <button class="card" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Rendez-vous à ne pas rater</div></div>
+      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Vos rendez-vous</div></div>
     </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
       <div class="ico ico-rando">🥾</div>
@@ -572,7 +569,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 </div>
 
 <div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px;">
-  <div>MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
+  <div>MAT · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
   <button onclick="clearCacheAndReload()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(216,243,220,0.7);font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:700;padding:5px 12px;cursor:pointer;">
     🗑️ Vider le cache et recharger
   </button>
@@ -784,12 +781,12 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#fef3e0">📅</div>
-      <div class="panel-title">Agenda MAT</div>
+      <div class="panel-title">Agenda</div>
       <button class="panel-close" onclick="closeOv('agenda')">✕</button>
     </div>
     <div class="panel-body">
       <div class="agenda-tabs">
-        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd\'hui</button>
+        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd'hui</button>
         <button class="agenda-tab" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
         <button class="agenda-tab" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
       </div>
@@ -817,7 +814,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   <div class="panel">
     <div class="panel-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
       <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🐞</div>
-      <div class="panel-title">Signaler un bug</div>
+      <div class="panel-title">Un bug ?</div>
       <button class="panel-close" onclick="closeOv('bug')">✕</button>
     </div>
     <div class="panel-body">
@@ -1327,7 +1324,7 @@ async function loadEvents(){
     document.getElementById('next-event-days').textContent=diffTxt;
   }catch(e){
     document.getElementById('next-event-date').textContent='Indisponible';
-    document.getElementById('next-event-name').textContent='Agenda MAT';
+    document.getElementById('next-event-name').textContent='Agenda';
     document.getElementById('next-event-days').textContent='Réessayez plus tard';
   }
 }
@@ -1548,7 +1545,7 @@ function updateInstallBtn(){
   if(!btn) return;
   if(installed){
     ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Signaler un bug'; sub.textContent='Un service ne fonctionne pas ?';
+    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='Un service ne fonctionne pas ?';
     btn.onclick=()=>openOv('bug');
   }
 }
@@ -1759,74 +1756,89 @@ async function togglePush(){
   if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
   const perm=await Notification.requestPermission();
   if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
-  // ── Bus Rémi ─────────────────────────
-// Horaires codés en dur (mis à jour manuellement si besoin)
-// Format : { arr: 'NOM', dir: 'Direction', times: ['HH:MM', ...] }
+// ── Bus Rémi ─────────────────────────
+// Horaires réels Ligne 8 Rémi — Mézières-lez-Cléry
+// Source : PDF REMI_45_LIGNE_8
+
+// Vacances scolaires zone B 2025-2026
+const VACANCES_SCOLAIRES = [
+  ['2025-10-18','2025-11-03'],
+  ['2025-12-20','2026-01-05'],
+  ['2026-02-07','2026-02-23'],
+  ['2026-04-04','2026-04-20'],
+  ['2026-07-04','2026-08-31'],
+];
+
+function isVacancesScolaires() {
+  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
+  const iso = now.toISOString().slice(0,10);
+  return VACANCES_SCOLAIRES.some(function(p){ return iso >= p[0] && iso <= p[1]; });
+}
+
 const BUS_HORAIRES = {
   mairie: {
-    orleans: ['06:23','07:23','08:23','09:23','10:23','11:23','12:23','13:23','14:23','15:23','16:23','17:23','18:23','19:23'],
-    nouan:   ['07:05','08:05','09:05','10:05','11:05','12:05','13:05','14:05','15:05','16:05','17:05','18:05','19:05']
+    orleans_scolaire: ['06:44','14:20'],
+    orleans_vacances: ['06:52','14:13'],
+    nouan_scolaire:   ['12:57','18:08'],
+    nouan_vacances:   ['18:06','18:31','19:05']
   },
   breau: {
-    orleans: ['06:25','07:25','08:25','09:25','10:25','11:25','12:25','13:25','14:25','15:25','16:25','17:25','18:25','19:25'],
-    nouan:   ['07:03','08:03','09:03','10:03','11:03','12:03','13:03','14:03','15:03','16:03','17:03','18:03','19:03']
+    orleans_scolaire: ['06:46','07:35','09:26'],
+    orleans_vacances: ['06:54','09:26'],
+    nouan_scolaire:   ['18:06','18:31','19:05'],
+    nouan_vacances:   ['18:06','18:31','19:05']
   }
 };
 
 function getNextBus(times) {
-  const now = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Paris'}));
-  const nowMins = now.getHours() * 60 + now.getMinutes();
-  for (const t of times) {
-    const [h, m] = t.split(':').map(Number);
-    const busMins = h * 60 + m;
+  if (!times || !times.length) return null;
+  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
+  const nowMins = now.getHours()*60 + now.getMinutes();
+  for (var i=0; i<times.length; i++) {
+    var parts = times[i].split(':');
+    var busMins = parseInt(parts[0])*60 + parseInt(parts[1]);
     if (busMins > nowMins) {
-      const diff = busMins - nowMins;
-      if (diff <= 30) return { time: t, label: 'dans ' + diff + ' min' };
-      return { time: t, label: t };
+      var diff = busMins - nowMins;
+      if (diff <= 30) return { time: times[i], label: 'dans ' + diff + ' min' };
+      return { time: times[i], label: times[i] };
     }
   }
-  return null; // plus de bus aujourd\'hui
+  return null;
 }
 
-async function loadBusRemi() {
-  const el = document.getElementById('bus-strip-stops');
+function loadBusRemi() {
+  var el = document.getElementById('bus-strip-stops');
   if (!el) return;
-  try {
-    // Essayer de récupérer les vrais horaires depuis le backend
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/bus', { cache: 'no-store' });
-    const d = await r.json();
-    // Si le backend a des horaires parsés, on les utilise
-    // Sinon on utilise les horaires codés en dur
-  } catch(e) { /* fallback horaires locaux */ }
 
-  const nextMairie = getNextBus(BUS_HORAIRES.mairie.orleans) || getNextBus(BUS_HORAIRES.mairie.nouan);
-  const nextBreau  = getNextBus(BUS_HORAIRES.breau.orleans)  || getNextBus(BUS_HORAIRES.breau.nouan);
+  var vac = isVacancesScolaires();
+  var H = BUS_HORAIRES;
+  var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
+  var mNou = getNextBus(vac ? H.mairie.nouan_vacances   : H.mairie.nouan_scolaire);
+  var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
+  var bNou = getNextBus(vac ? H.breau.nouan_vacances    : H.breau.nouan_scolaire);
 
-  const nextMairieOrl = getNextBus(BUS_HORAIRES.mairie.orleans);
-  const nextMairieNou = getNextBus(BUS_HORAIRES.mairie.nouan);
-  const nextBreauOrl  = getNextBus(BUS_HORAIRES.breau.orleans);
-  const nextBreauNou  = getNextBus(BUS_HORAIRES.breau.nouan);
+  var periode = vac ? '🏖️ vacances' : '📚 scolaire';
+  var html = '<span class="bus-stop-name" style="margin-right:6px">' + periode + '</span>';
 
-  let html = '';
-  if (nextMairieOrl || nextMairieNou) {
-    html += '<div class="bus-stop">'
-      + '<div class="bus-stop-name">📍 Mairie</div>'
-      + (nextMairieOrl ? '<div>→ Orléans <span class="bus-next">' + nextMairieOrl.label + '</span></div>' : '')
-      + (nextMairieNou ? '<div>→ Nouan <span class="bus-next">' + nextMairieNou.label + '</span></div>' : '')
+  if (mOrl || mNou) {
+    html += '<div class="bus-stop"><span class="bus-stop-name">Mairie :</span> '
+      + (mOrl ? '→ Orléans <span class="bus-next">' + mOrl.label + '</span> ' : '')
+      + (mNou ? '→ Nouan <span class="bus-next">' + mNou.label + '</span>' : '')
       + '</div>';
   }
-  if (nextBreauOrl || nextBreauNou) {
-    html += '<div class="bus-stop">'
-      + '<div class="bus-stop-name">📍 Le Bréau</div>'
-      + (nextBreauOrl ? '<div>→ Orléans <span class="bus-next">' + nextBreauOrl.label + '</span></div>' : '')
-      + (nextBreauNou ? '<div>→ Nouan <span class="bus-next">' + nextBreauNou.label + '</span></div>' : '')
+  if (bOrl || bNou) {
+    html += '<div class="bus-stop"><span class="bus-stop-name">Le Bréau :</span> '
+      + (bOrl ? '→ Orléans <span class="bus-next">' + bOrl.label + '</span> ' : '')
+      + (bNou ? '→ Nouan <span class="bus-next">' + bNou.label + '</span>' : '')
       + '</div>';
   }
-  if (!html) html = '<span style="font-size:.7rem;color:rgba(255,255,255,.7)">Plus de bus aujourd\'hui</span>';
+  if (!mOrl && !mNou && !bOrl && !bNou) {
+    html = '<span style="font-size:.65rem;color:rgba(255,255,255,.65)">Plus de bus aujourd\'hui</span>';
+  }
   el.innerHTML = html;
 }
 
-// Rafraîchir le bus toutes les minutes
+// Rafraîchir toutes les minutes
 setInterval(loadBusRemi, 60000);
 
 // ── Vider cache ──────────────────────
