@@ -1696,7 +1696,7 @@ async function trackStat(service){
   try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){}
 }
 const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
-window.openMel=()=>{trackStat('mel');_origOpenMel();};
+window.openMel=()=>{_origOpenMel();}; // trackStat mel desactive : gere cote serveur dans trackMelStats
 window.openSignal=()=>{trackStat('signalement');_origOpenSignal();};
 window.openIdees=()=>{trackStat('idees');_origOpenIdees();};
 window.openNotifs=()=>{trackStat('actualites');_origOpenNotifs();};
