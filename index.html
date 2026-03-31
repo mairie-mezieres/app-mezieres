@@ -1756,6 +1756,19 @@ async function togglePush(){
   if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
   const perm=await Notification.requestPermission();
   if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
+  if('serviceWorker' in navigator){
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
+      if(subTxt)subTxt.textContent='Notifications actives.';
+      pushRegistered=true;
+      alert('✅ Notifications activées !');
+    }catch(e){alert('Erreur lors de l\'activation des notifications.');}
+  }
+}
+
 // ── Bus Rémi ─────────────────────────
 // Horaires réels Ligne 8 Rémi — Mézières-lez-Cléry
 // Source : PDF REMI_45_LIGNE_8
