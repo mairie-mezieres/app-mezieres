@@ -46,7 +46,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
 
 /* ── Météo strip ── */
-.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
+.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.top-card{min-width:0;width:100%;}
 .top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
 .top-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);}
 .top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
@@ -319,7 +320,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:7px 13px;color:rgba(255,255,255,0.9);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:14px 13px;color:rgba(255,255,255,0.9);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;width:100%;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -359,7 +360,6 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     <div class="mat-text">
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
       <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:3px">v3.4</div>
     </div>
     <!-- Droite : icône MAT + bouton Aa dessous -->
@@ -400,7 +400,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="bus-strip-head">
         <span class="bus-strip-ico">🚌</span>
         <span class="bus-strip-title">Ligne 8 Rémi</span>
-        <span class="bus-strip-periode" id="bus-periode"></span>
+
       </div>
       <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
     </div>
@@ -1826,14 +1826,13 @@ function getNextBus(times) {
 
 function loadBusRemi() {
   var el = document.getElementById('bus-strip-stops');
-  var pel = document.getElementById('bus-periode');
   if (!el) return;
 
   var vac = isVacancesScolaires();
   var H = BUS_HORAIRES;
 
   // Période
-  if (pel) pel.textContent = vac ? '🏖️ vacances' : '📚 scolaire';
+
 
   // Prochains bus pour chaque arrêt : 1 ligne = Orléans + Nouan
   function renderStop(nom, orl, nou) {
