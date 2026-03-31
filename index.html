@@ -642,20 +642,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <div class="form-group">
           <label class="form-label">Service concerné</label>
           <div class="form-cats" id="bug-services">
-            <button class="cat-btn" onclick="selBugService(this,'MEL Assistante')">🤖 MEL</button>
+            <button class="cat-btn" onclick="selBugService(this,'MEL — Assistante IA')">🤖 MEL</button>
             <button class="cat-btn" onclick="selBugService(this,'Météo')">🌤️ Météo</button>
-            <button class="cat-btn" onclick="selBugService(this,'Carte randonnées')">🗺️ Carte</button>
             <button class="cat-btn" onclick="selBugService(this,'Agenda')">📅 Agenda</button>
-            <button class="cat-btn" onclick="selBugService(this,'Signalement')">🚨 Signalement</button>
+            <button class="cat-btn" onclick="selBugService(this,'Signalement citoyen')">🚨 Signalement</button>
+            <button class="cat-btn" onclick="selBugService(this,'Actualités Pocket')">🔔 Actualités</button>
+            <button class="cat-btn" onclick="selBugService(this,'Notifications push')">📲 Notifications</button>
+            <button class="cat-btn" onclick="selBugService(this,'Boîte à idées')">💡 Idées</button>
+            <button class="cat-btn" onclick="selBugService(this,'Contact mairie')">💬 Contact</button>
             <button class="cat-btn" onclick="selBugService(this,'Application générale')">📱 Général</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Appareil</label>
-          <div class="form-cats" id="bug-devices">
-            <button class="cat-btn" onclick="selBugDevice(this,'iPhone/iPad (iOS)')">🍎 iPhone/iPad</button>
-            <button class="cat-btn" onclick="selBugDevice(this,'Android')">🤖 Android</button>
-            <button class="cat-btn" onclick="selBugDevice(this,'Ordinateur')">💻 Ordinateur</button>
           </div>
         </div>
         <div class="form-group">
@@ -1188,7 +1183,9 @@ async function submitSignal(){
     catch(e){ photoB64 = photoEl.src.substring(0, 80000); }
   }
 
-  const body={cat:sigCat||'Non précisé',desc,lat:sigLat,lon:sigLon,photoB64};
+  const _dev = detectDevice();
+  const descWithDevice = desc + (desc ? '\n\n' : '') + '📱 ' + _dev.type + ' · ' + _dev.os + ' · ' + _dev.browser + ' · ' + _dev.pwa;
+  const body={cat:sigCat||'Non précisé',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64};
   const controller = new AbortController();
   const timer = setTimeout(()=>controller.abort(), 35000);
   try{
@@ -1407,9 +1404,9 @@ function resetContact(){
 }
 
 // ── Bug report ────────────────────────
-let bugService='',bugDevice='';
+let bugService='';
 function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugService=val;}
-function selBugDevice(btn,val){document.querySelectorAll('#bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugDevice=val;}
+
 async function submitBug(){
   const desc=document.getElementById('bug-desc').value.trim();
   const btn=document.querySelector('#bug-form .submit-btn');
@@ -1417,7 +1414,18 @@ async function submitBug(){
   try{
     await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:'Appareil : '+(bugDevice||'Non précisé')+'\n\n'+desc,type:'bug'})
+      body:(()=>{
+        const dev = detectDevice();
+        const descFull = 'Appareil : '+dev.type
+          +'\nModèle : '+dev.model
+          +'\nOS : '+dev.os
+          +'\nNavigateur : '+dev.browser
+          +'\nÉcran : '+dev.screen
+          +'\nPWA : '+dev.pwa
+          +'\nMAT : '+dev.matVersion
+          +'\n\nDescription :\n'+desc;
+        return JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug'});
+      })()
     });
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
@@ -1431,9 +1439,83 @@ function resetBug(){
   document.getElementById('bug-form').style.display='block';
   document.getElementById('bug-success').style.display='none';
   document.getElementById('bug-desc').value='';
-  bugService=''; bugDevice='';
-  document.querySelectorAll('#bug-services .cat-btn, #bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));
+  bugService='';
+  document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));
   closeOv('bug');
+}
+
+// ── Détection appareil ───────────────
+function detectDevice() {
+  const ua = navigator.userAgent;
+  const p  = navigator.platform || '';
+
+  // OS
+  let os = 'Inconnu', osVersion = '';
+  if (/iPhone|iPad|iPod/.test(ua)) {
+    os = /iPad/.test(ua) ? 'iPadOS' : 'iOS';
+    const m = ua.match(/OS ([\d_]+)/);
+    osVersion = m ? m[1].replace(/_/g, '.') : '';
+  } else if (/Android/.test(ua)) {
+    os = 'Android';
+    const m = ua.match(/Android ([\d.]+)/);
+    osVersion = m ? m[1] : '';
+  } else if (/Windows/.test(ua)) {
+    os = 'Windows';
+    const m = ua.match(/Windows NT ([\d.]+)/);
+    const versions = {'10.0':'10/11','6.3':'8.1','6.2':'8','6.1':'7'};
+    osVersion = m ? (versions[m[1]] || m[1]) : '';
+  } else if (/Mac OS X/.test(ua)) {
+    os = 'macOS';
+    const m = ua.match(/Mac OS X ([\d_]+)/);
+    osVersion = m ? m[1].replace(/_/g, '.') : '';
+  } else if (/Linux/.test(ua)) {
+    os = 'Linux';
+  }
+
+  // Navigateur
+  let browser = 'Inconnu', browserVersion = '';
+  if (/CriOS/.test(ua))       { browser = 'Chrome iOS';  const m = ua.match(/CriOS\/([\d.]+)/);  browserVersion = m?m[1]:''; }
+  else if (/FxiOS/.test(ua))  { browser = 'Firefox iOS'; const m = ua.match(/FxiOS\/([\d.]+)/);  browserVersion = m?m[1]:''; }
+  else if (/EdgA/.test(ua))   { browser = 'Edge Android';const m = ua.match(/EdgA\/([\d.]+)/);   browserVersion = m?m[1]:''; }
+  else if (/Edg\//.test(ua))  { browser = 'Edge';        const m = ua.match(/Edg\/([\d.]+)/);    browserVersion = m?m[1]:''; }
+  else if (/OPR/.test(ua))    { browser = 'Opera';       const m = ua.match(/OPR\/([\d.]+)/);    browserVersion = m?m[1]:''; }
+  else if (/Chrome/.test(ua)) { browser = 'Chrome';      const m = ua.match(/Chrome\/([\d.]+)/); browserVersion = m?m[1]:''; }
+  else if (/Firefox/.test(ua)){ browser = 'Firefox';     const m = ua.match(/Firefox\/([\d.]+)/);browserVersion = m?m[1]:''; }
+  else if (/Safari/.test(ua)) { browser = 'Safari';      const m = ua.match(/Version\/([\d.]+)/);browserVersion = m?m[1]:''; }
+
+  // Type appareil
+  let deviceType = 'Desktop';
+  if (/iPhone|iPod/.test(ua)) deviceType = 'iPhone';
+  else if (/iPad/.test(ua) || (os==='iPadOS')) deviceType = 'iPad';
+  else if (/Android/.test(ua) && /Mobile/.test(ua)) deviceType = 'Android Mobile';
+  else if (/Android/.test(ua)) deviceType = 'Android Tablet';
+
+  // Modèle (best effort)
+  let model = '';
+  const mSamsung = ua.match(/Samsung|SM-[A-Z0-9]+/i);
+  const mPixel   = ua.match(/Pixel \d+[a-z]*/i);
+  const mHuawei  = ua.match(/Huawei|HW-/i);
+  const mXiaomi  = ua.match(/Xiaomi|Redmi|MIUI/i);
+  if (/iPhone/.test(ua)) model = 'iPhone';
+  else if (/iPad/.test(ua)) model = 'iPad';
+  else if (mPixel)   model = mPixel[0];
+  else if (mSamsung) { const s = ua.match(/SM-[A-Z0-9]+/i); model = s ? s[0] : 'Samsung'; }
+  else if (mHuawei)  model = 'Huawei';
+  else if (mXiaomi)  model = 'Xiaomi/Redmi';
+
+  // PWA installée ?
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches
+             || window.navigator.standalone === true;
+
+  return {
+    type:      deviceType,
+    model:     model || deviceType,
+    os:        os + (osVersion ? ' ' + osVersion : ''),
+    browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
+    screen:    screen.width + 'x' + screen.height,
+    pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
+    matVersion:'v3.3'
+  };
 }
 
 // ── Stats ─────────────────────────────
