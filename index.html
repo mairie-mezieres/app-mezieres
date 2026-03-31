@@ -36,10 +36,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
-.mat-hero{display:flex;align-items:stretch;justify-content:space-between;gap:8px;min-height:90px;}
-.mat-img{height:auto;width:auto;max-height:120px;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;align-self:flex-start;}
-.mat-text{flex:1;padding-bottom:4px;min-width:0;}
-.mat-left{display:flex;flex-direction:column;justify-content:space-between;gap:6px;flex:1;min-width:0;}
+.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-height:100px;}
+.mat-img{height:auto;width:auto;max-height:130px;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;}
+.mat-text{min-width:0;}
+.mat-left{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
@@ -319,7 +319,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:6px 12px;color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;align-self:flex-start;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:7px 13px;color:rgba(255,255,255,0.9);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -1861,18 +1861,6 @@ function loadBusRemi() {
   }
   el.innerHTML = html;
 }
-  if (bOrl || bNou) {
-    html += '<div class="bus-stop"><span class="bus-stop-name">Le Bréau :</span> '
-      + (bOrl ? '→ Orléans <span class="bus-next">' + bOrl.label + '</span> ' : '')
-      + (bNou ? '→ Nouan <span class="bus-next">' + bNou.label + '</span>' : '')
-      + '</div>';
-  }
-  if (!mOrl && !mNou && !bOrl && !bNou) {
-    html = '<span style="font-size:.65rem;color:rgba(255,255,255,.65)">Plus de bus aujourd\'hui</span>';
-  }
-  el.innerHTML = html;
-}
-
 // Rafraîchir toutes les minutes
 setInterval(loadBusRemi, 60000);
 
