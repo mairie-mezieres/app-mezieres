@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAT — Administration</title>
+<link rel="manifest" href="manifest-admin.webmanifest">
+<meta name="theme-color" content="#1a3d2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MAT Admin">
+<link rel="apple-touch-icon" href="icon-admin.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
@@ -106,6 +113,17 @@ tr:hover td{background:#f9fafb;}
 </style>
 </head>
 <body>
+
+<!-- ── Bannière install admin ── -->
+<div id="admin-install-banner" style="display:none;background:linear-gradient(135deg,#1a3d2b,#2d6a4f);padding:12px 16px;align-items:center;gap:10px;position:fixed;bottom:0;left:0;right:0;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+  <div style="width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔐</div>
+  <div style="flex:1">
+    <div style="font-size:0.8rem;font-weight:900;color:white">Installer MAT Admin</div>
+    <div style="font-size:0.65rem;color:rgba(255,255,255,0.7)">Accès rapide au tableau de bord</div>
+  </div>
+  <button onclick="installAdmin()" style="background:var(--gold);color:#3d2000;border:none;border-radius:10px;padding:8px 14px;font-size:0.76rem;font-weight:900;cursor:pointer;flex-shrink:0">Installer</button>
+  <button onclick="document.getElementById('admin-install-banner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
+</div>
 
 <!-- ── LOGIN ── -->
 <div id="login-screen">
@@ -797,6 +815,46 @@ init();
 
 // Rafraîchir toutes les 5 minutes
 setInterval(loadAll, 5 * 60 * 1000);
+
+// ── Install PWA Admin ─────────────────
+let _dpAdmin = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _dpAdmin = e;
+  // Afficher la bannière seulement si pas encore installé
+  if (!localStorage.getItem('mat_admin_installed')) {
+    document.getElementById('admin-install-banner').style.display = 'flex';
+  }
+});
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem('mat_admin_installed', '1');
+  document.getElementById('admin-install-banner').style.display = 'none';
+});
+
+function installAdmin() {
+  if (_dpAdmin) {
+    _dpAdmin.prompt();
+    _dpAdmin.userChoice.then(r => {
+      if (r.outcome === 'accepted') {
+        localStorage.setItem('mat_admin_installed', '1');
+        document.getElementById('admin-install-banner').style.display = 'none';
+      }
+      _dpAdmin = null;
+    });
+  } else {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      alert('Pour installer MAT Admin :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
+    } else {
+      alert('Pour installer MAT Admin sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');
+    }
+  }
+}
+
+// Enregistrer un service worker minimal pour la PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw-admin.js').catch(() => {});
+}
 </script>
 </body>
 </html>
