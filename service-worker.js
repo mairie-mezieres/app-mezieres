@@ -1,6 +1,6 @@
 // SERVICE WORKER v3.4.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-const CACHE = 'mat-v3.4.3';
+const CACHE = 'mat-v3.4.5';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
