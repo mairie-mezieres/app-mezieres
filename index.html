@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.4.6 -->
+<!-- VERSION 3.4 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -315,7 +315,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:8px 14px;color:rgba(255,255,255,0.85);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin:2px 0 0;align-self:flex-start;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:8px 14px;color:rgba(255,255,255,0.85);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -355,16 +355,11 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     <div class="mat-text">
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.4.6</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.4.7</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
   </div>
-  <!-- Bouton accessibilité compact entre hero et encarts -->
-  <div style="display:flex;margin:2px 0 0;">
-    <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Accessibilité</button>
-  </div>
-
   <!-- Encarts accueil -->
   <div class="header-bottom-grid">
     <div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
@@ -391,14 +386,16 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="event-name" id="next-event-name"></div>
       <div class="event-days" id="next-event-days"></div>
     </div>
-    <!-- Ligne bus Rémi pleine largeur -->
-    <div class="bus-strip">
-      <div class="bus-strip-head">
-        <span class="bus-strip-ico">🚌</span>
-        <span class="bus-strip-title">Ligne 8 Rémi</span>
-
+    <!-- Ligne bus Rémi + bouton accessibilité à droite -->
+    <div class="bus-strip" style="display:flex;align-items:center;gap:8px;padding-top:6px;">
+      <div style="flex:1;min-width:0;">
+        <div class="bus-strip-head">
+          <span class="bus-strip-ico">🚌</span>
+          <span class="bus-strip-title">Ligne 8 Rémi</span>
+        </div>
+        <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
       </div>
-      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
+      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité" style="flex-shrink:0;margin:0;">♿ Accessibilité</button>
     </div>
   </div>
 </div>
