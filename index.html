@@ -143,8 +143,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 /* ── Signalement ── */
 .form-group{margin-bottom:14px;}
 .form-label{font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:6px;display:block;}
-.form-cats{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.cat-btn{background:white;border:2px solid var(--border);border-radius:12px;padding:10px 8px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;}
+.form-cats{display:flex;flex-wrap:wrap;gap:7px;}
+.cat-btn{background:white;border:2px solid var(--border);border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;white-space:nowrap;}
 .cat-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
 .form-textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;resize:none;height:80px;}
 .form-textarea:focus{border-color:var(--sage);}
@@ -153,7 +153,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .photo-preview{width:100%;height:150px;object-fit:cover;border-radius:12px;display:none;}
 .submit-btn{width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:14px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;cursor:pointer;margin-top:6px;}
 .submit-btn:active{opacity:0.9;}
-.success-msg{text-align:center;padding:20px;display:none;}
+.success-msg{text-alignRcenter;padding:20px;display:none;}
 .success-msg .s-ico{font-size:2.5rem;margin-bottom:8px;}
 .success-msg .s-title{font-size:1rem;font-weight:800;color:var(--leaf);}
 .success-msg .s-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
@@ -163,7 +163,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .idea-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;resize:none;height:70px;}
 .idea-input:focus{border-color:var(--gold);}
 .idea-cats{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap;}
-.idea-cat{background:var(--warm);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;}
+.idea-cat{background:var(--warm);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;}
 .idea-cat.on{background:#fffbe8;border-color:var(--gold);color:#8a6200;}
 .idea-submit{background:linear-gradient(135deg,var(--gold),var(--amber));color:#3d2000;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;width:100%;margin-top:6px;}
 .ideas-list{display:flex;flex-direction:column;gap:9px;}
@@ -781,10 +781,10 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <button class="panel-close" onclick="closeOv('agenda')">✕</button>
     </div>
     <div class="panel-body">
-      <div class="agenda-tabs">
-        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd\'hui</button>
-        <button class="agenda-tab" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
-        <button class="agenda-tab" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+        <button onclick="agendaNavMonth(-1)" style="background:var(--forest);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;">← Préc.</button>
+        <div id="agenda-month-label" style="font-size:0.9rem;font-weight:900;color:var(--forest);text-align:center;text-transform:capitalize;flex:1"></div>
+        <button onclick="agendaNavMonth(1)" style="background:var(--forest);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Suiv. →</button>
       </div>
       <div id="agenda-content"><div class="agenda-empty">Chargement de l'agenda…</div></div>
     </div>
@@ -1014,30 +1014,35 @@ function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
 function openContact(){openOv('contact');}
-function openAgenda(){openOv('agenda'); loadAgenda();}
+function openAgenda(){
+  openOv('agenda');
+  _agendaYear=new Date().getFullYear();
+  _agendaMonth=new Date().getMonth();
+  loadAgenda();
+}
 function openDechets(){openOv('dechets'); loadDechetsDetail();}
 
 function openAgendaFromTopEvent(){
-  // Ouvrir l'agenda sur le mois de l'événement puis afficher la fiche
   openOv('agenda');
   ensureAgendaEvents().then(function(evts){
-    if(!evts || !evts.length) return;
-    var first = evts[0];
-    var now = new Date();
-    // Si l'événement est dans un autre mois, basculer sur "mois"
-    if(first.start.getMonth() !== now.getMonth() || first.start.getFullYear() !== now.getFullYear()){
-      agendaView = 'month';
-      // Pointer le calendrier sur le mois de l'événement
-      _agendaTargetMonth = { y: first.start.getFullYear(), m: first.start.getMonth() };
-    }
+    if(!evts||!evts.length)return;
+    var first=evts[0];
+    _agendaYear=first.start.getFullYear();
+    _agendaMonth=first.start.getMonth();
     renderAgenda();
-    setTimeout(function(){ openEventDetail(first.uid); }, 200);
-  }).catch(function(){
-    loadAgenda();
-  });
+    setTimeout(function(){openEventDetail(first.uid);},200);
+  }).catch(function(){loadAgenda();});
 }
 
 // ── MEL ───────────────────────────────
+var _agendaYear  = new Date().getFullYear();
+var _agendaMonth = new Date().getMonth();
+function agendaNavMonth(delta){
+  _agendaMonth+=delta;
+  if(_agendaMonth>11){_agendaMonth=0;_agendaYear++;}
+  if(_agendaMonth<0){_agendaMonth=11;_agendaYear--;}
+  renderAgenda();
+}
 let melInited=false, melBusy=false;
 const hist=[];
 function addMsg(role,text){
@@ -1074,7 +1079,8 @@ const MEL_THEME_SUGGESTIONS = {
   urbanisme: ["Faut-il une déclaration préalable pour une clôture ?","Ai-je besoin d'un permis pour une extension ?","Comment consulter le PLU de la commune ?","Quelles règles pour un abri de jardin ?"],
   enfance:   ["Comment fonctionne la cantine ?","Quels sont les services périscolaires ?","Comment s'inscrire au centre de loisirs ?","Quelles infos sur la crèche familiale ?"],
   demarches: ["Comment demander un acte de naissance ?","Où faire une carte d'identité ?","Comment obtenir un passeport ?","Quelles démarches pour un mariage ?"],
-  fibre:     ["Suis-je éligible à la fibre ?","Qui contacter pour le raccordement fibre ?","Que faire si la fibre n'est pas disponible ?","Où trouver les infos numériques utiles ?"]
+  fibre:     ["Suis-je éligible à la fibre ?","Qui contacter pour le raccordement fibre ?","Que faire si la fibre n'est pas disponible ?","Où trouver les infos numériques utiles ?"],
+  cctvl: ["Comment m'inscrire à la déchetterie de Cléry ?","Quelle maison de santé est proche de Mézières ?","Comment bénéficier de l'OPAH pour rénover mon logement ?","Ma fosse septique doit-elle être contrôlée ?"]
 };
 function renderMelThemes(){
   const sugs = document.getElementById('sugs');
@@ -1083,7 +1089,8 @@ function renderMelThemes(){
   sugs.innerHTML = '<button class="sug" onclick="showMelThemeQuestions(\'urbanisme\')">🏗️ Urbanisme</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'enfance\')">🧒 Enfance</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'demarches\')">📄 Démarches</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre</button>';
+    + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre</button>'
+    + '<button class="sug" onclick="showMelThemeQuestions(\'cctvl\')">🏛️ CCTVL</button>';
 }
 function showMelThemeQuestions(theme){
   const sugs = document.getElementById('sugs');
@@ -1239,44 +1246,25 @@ function renderAgenda(){
   var content=document.getElementById('agenda-content');
   var evts=window._agendaEvents||[];
   var now=new Date();
-  var list=[];
-
-  // Mois cible (pour navigation depuis l'encart)
-  var targetY = _agendaTargetMonth ? _agendaTargetMonth.y : now.getFullYear();
-  var targetM = _agendaTargetMonth ? _agendaTargetMonth.m : now.getMonth();
-
-  if(agendaView==='today'){
-    list=evts.filter(function(e){return sameDay(e.start,now);});
-    if(!list.length){
-      var nxt=evts.length?evts[0]:null;
-      content.innerHTML=nxt?'<div class="agenda-empty">Aucun événement aujourd\'hui.<br><br>Prochain : <strong>'+nxt.summary+'</strong> le '+nxt.start.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+'.</div>':'<div class="agenda-empty">Aucun événement à venir.</div>';
-      return;
-    }
-  } else if(agendaView==='week'){
-    var sw=startOfWeek(now),ew=endOfWeek(now);
-    list=evts.filter(function(e){return e.start>=sw&&e.start<=ew;});
-  } else {
-    list=evts.filter(function(e){return e.start.getFullYear()===targetY&&e.start.getMonth()===targetM;});
+  var label=document.getElementById('agenda-month-label');
+  if(label)label.textContent=MONTHS_LONG[_agendaMonth]+' '+_agendaYear;
+  var list=evts.filter(function(e){return e.start.getFullYear()===_agendaYear&&e.start.getMonth()===_agendaMonth;});
+  var first=new Date(_agendaYear,_agendaMonth,1);
+  var last=new Date(_agendaYear,_agendaMonth+1,0);
+  var startPad=first.getDay()===0?6:first.getDay()-1;
+  var html='<div class="agenda-month-grid">';
+  ['L','M','M','J','V','S','D'].forEach(function(h){html+='<div class="agenda-month-head">'+h+'</div>';});
+  for(var p=0;p<startPad;p++)html+='<div class="agenda-month-day" style="visibility:hidden"></div>';
+  for(var d=1;d<=last.getDate();d++){
+    var cur=new Date(_agendaYear,_agendaMonth,d);
+    var hasEvt=list.some(function(e){return sameDay(e.start,cur);});
+    var cls='agenda-month-day'+(hasEvt?' has-event':'')+(sameDay(cur,now)?' today':'');
+    if(hasEvt){var dayEvts=list.filter(function(e){return sameDay(e.start,cur);});html+='<div class="'+cls+'" onclick="openEventDetail(\''+dayEvts[0].uid.replace(/'/g,"\\'")+'\')" >'+d+'</div>';}
+    else html+='<div class="'+cls+'">'+d+'</div>';
   }
-  if(agendaView==='month'){
-    var first=new Date(targetY,targetM,1);
-    var last=new Date(targetY,targetM+1,0);
-    var startPad=first.getDay()===0?6:first.getDay()-1;
-    var html='<div style="font-size:.82rem;font-weight:900;color:var(--forest);margin-bottom:8px;text-transform:capitalize">'+MONTHS_LONG[targetM]+' '+targetY+'</div>';
-    html+='<div class="agenda-month-grid">';
-    ['L','M','M','J','V','S','D'].forEach(function(h){html+='<div class="agenda-month-head">'+h+'</div>';});
-    for(var p=0;p<startPad;p++) html+='<div class="agenda-month-day" style="visibility:hidden"></div>';
-    for(var d=1;d<=last.getDate();d++){
-      var current=new Date(targetY,targetM,d);
-      var hasEvent=list.some(function(e){return sameDay(e.start,current);});
-      var cls='agenda-month-day'+(hasEvent?' has-event':'')+(sameDay(current,now)?' today':'');
-      html+='<div class="'+cls+'">'+d+'</div>';
-    }
-    html+='</div><div class="agenda-list" style="margin-top:14px">'+(list.length?list.map(renderAgendaItem).join(''):'<div class="agenda-empty">Aucun événement ce mois-ci.</div>')+'</div>';
-    content.innerHTML=html;
-    return;
-  }
-  content.innerHTML=list.length?'<div class="agenda-list">'+list.map(renderAgendaItem).join('')+'</div>':'<div class="agenda-empty">Aucun événement sur cette période.</div>';
+  html+='</div>';
+  html+=list.length?'<div class="agenda-list" style="margin-top:14px">'+list.map(renderAgendaItem).join('')+'</div>':'<div class="agenda-empty" style="margin-top:14px">Aucun événement ce mois-ci.</div>';
+  content.innerHTML=html;
 }
 function renderAgendaItem(evt){
   var dayName=evt.start.toLocaleDateString('fr-FR',{weekday:'short'});
