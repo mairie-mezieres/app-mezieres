@@ -36,19 +36,17 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
-.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-height:100px;}
-.mat-img{height:auto;width:auto;max-height:130px;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;}
-.mat-text{min-width:0;}
-.mat-left{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;}
+.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.mat-img{width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;max-height:110px;}
+.mat-text{flex:1;min-width:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
 .mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
 
 /* ── Météo strip ── */
-.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
-.top-card{min-width:0;width:100%;}
-.top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);}
+.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);min-width:0;width:100%;overflow:hidden;}
 .top-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);}
 .top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
 .top-sub{font-size:.63rem;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -320,7 +318,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:14px 13px;color:rgba(255,255,255,0.9);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;width:100%;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:8px 14px;color:rgba(255,255,255,0.85);font-size:0.72rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin:6px 0 0;align-self:flex-start;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -362,11 +360,12 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:3px">v3.4</div>
     </div>
-    <!-- Droite : icône MAT + bouton Aa dessous -->
-    <div class="mat-actions">
-      <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
-      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Accessibilité</button>
-    </div>
+    <!-- Droite : icône MAT -->
+    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
+  </div>
+  <!-- Bouton accessibilité compact entre hero et encarts -->
+  <div style="display:flex;margin:4px 0 0;">
+    <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Accessibilité</button>
   </div>
 
   <!-- Encarts accueil -->
