@@ -379,15 +379,44 @@ function renderServiceBadges(services) {
 
 // ── IA & COÛTS ────────────────────────
 let iaView = 'daily';
+
+function getTopKeysFromMap(mapObj, limit = 5) {
+  return Object.entries(mapObj || {}).sort((a,b) => (b[1]||0) - (a[1]||0)).slice(0, limit).map(([k]) => k);
+}
+
+function buildSeriesFromDailyMap(parJour, categories) {
+  const periods = Object.keys(parJour || {}).sort().slice(-30);
+  return {
+    periods,
+    datasets: categories.map((cat, i) => ({
+      label: cat,
+      data: periods.map(p => parJour?.[p]?.[cat] || 0),
+      color: ['#2563eb','#16a34a','#f59e0b','#8b5cf6','#dc2626','#0ea5e9','#d4a843'][i % 7]
+    }))
+  };
+}
+
+function buildSeriesFromMonthlyMap(parMois, categories) {
+  const periods = Object.keys(parMois || {}).sort().slice(-12);
+  return {
+    periods,
+    datasets: categories.map((cat, i) => ({
+      label: cat,
+      data: periods.map(p => parMois?.[p]?.[cat] || 0),
+      color: ['#2563eb','#16a34a','#f59e0b','#8b5cf6','#dc2626','#0ea5e9','#d4a843'][i % 7]
+    }))
+  };
+}
+
 function renderIa() {
   const { dash } = _data;
   const ia = dash.ia || {};
+  const iaCats = dash.iaCategories || { total:{}, parJour:{}, parMois:{}, sources:{}, trends:[] };
   const daily   = ia.daily   || {};
   const monthly = ia.monthly || {};
   const claudeInfo  = ia.claude  || {};
   const mistralInfo = ia.mistral || {};
 
-  // Préparer données chart
   const source = iaView === 'daily' ? daily : monthly;
   const periods = Object.keys(source).sort().slice(-30);
 
@@ -396,11 +425,17 @@ function renderIa() {
   const mistralCalls = periods.map(p => source[p]?.mistral?.calls   || 0);
   const claudeCalls  = periods.map(p => source[p]?.claude?.calls    || 0);
 
-  // Totaux mois courant
   const month = new Date().toISOString().slice(0, 7);
   const mData = monthly[month] || {};
   const mMistral = mData.mistral || { in:0, out:0, calls:0, costEur:0 };
   const mClaude  = mData.claude  || { in:0, out:0, calls:0, costEur:0 };
+
+  const topMonthCats = getTopKeysFromMap(iaCats.parMois?.[month] || iaCats.total || {}, 5);
+  const topDaily = buildSeriesFromDailyMap(iaCats.parJour || {}, topMonthCats);
+  const topMonthly = buildSeriesFromMonthlyMap(iaCats.parMois || {}, topMonthCats);
+  const topMonthEntries = Object.entries(iaCats.parMois?.[month] || {}).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const trends = (iaCats.trends || []).filter(t => t.current > 0 || t.previous > 0).slice(0,8);
+  const sourceEntries = Object.entries(iaCats.sources || {}).sort((a,b) => Object.values(b[1]||{}).reduce((s,v)=>s+v,0) - Object.values(a[1]||{}).reduce((s,v)=>s+v,0));
 
   document.getElementById('ia-content').innerHTML = `
     <div class="section-title">Coûts IA — ${month}</div>
@@ -422,6 +457,11 @@ function renderIa() {
         <div class="stat-card-val">${fmtEurBig((mMistral.costEur||0)+(mClaude.costEur||0))}</div>
         <div class="stat-card-label">Total IA ce mois</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🏷️</div>
+        <div class="stat-card-val">${fmt(Object.values(iaCats.parMois?.[month] || {}).reduce((a,b)=>a+b,0))}</div>
+        <div class="stat-card-label">Questions catégorisées ce mois</div>
+      </div>
     </div>
 
     <div class="chart-wrap">
@@ -440,11 +480,64 @@ function renderIa() {
       <canvas id="chart-ia-calls"></canvas>
     </div>
 
+    <div class="section-title">Catégories de questions MEL</div>
+    <div class="cards-grid">
+      ${topMonthEntries.length ? topMonthEntries.slice(0,4).map(([cat, count]) => `<div class="stat-card"><div class="stat-card-ico">📚</div><div class="stat-card-val">${fmt(count)}</div><div class="stat-card-label">${cat}</div><div class="stat-card-sub">Top du mois</div></div>`).join('') : `<div class="stat-card"><div class="stat-card-val">0</div><div class="stat-card-label">Aucune donnée</div></div>`}
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Évolution par jour — 30 derniers jours</div>
+      <canvas id="chart-ia-categories-daily"></canvas>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Évolution par mois — 12 derniers mois</div>
+      <canvas id="chart-ia-categories-monthly"></canvas>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">🔥 Catégories qui montent</span></div>
+      <table>
+        <tr><th>Catégorie</th><th>7 derniers jours</th><th>7 jours précédents</th><th>Écart</th><th>Tendance</th></tr>
+        ${trends.length ? trends.map(t => `<tr>
+          <td><strong>${t.cat}</strong></td>
+          <td>${fmt(t.current)}</td>
+          <td>${fmt(t.previous)}</td>
+          <td>${t.diff>0?'+':''}${fmt(t.diff)}</td>
+          <td><span class="badge ${t.diff>0?'badge-green':t.diff<0?'badge-red':'badge-blue'}">${t.pct>0?'+':''}${t.pct}%</span></td>
+        </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Pas assez de recul pour calculer une tendance.</td></tr>'}
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Répartition des catégories — mois en cours</span></div>
+      <table>
+        <tr><th>Catégorie</th><th>Volume</th><th>Part</th></tr>
+        ${topMonthEntries.length ? topMonthEntries.map(([cat, count]) => {
+          const total = Object.values(iaCats.parMois?.[month] || {}).reduce((a,b)=>a+b,0) || 1;
+          const part = ((count / total) * 100).toFixed(1);
+          return `<tr><td>${cat}</td><td>${fmt(count)}</td><td>${part}%</td></tr>`;
+        }).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:20px">Aucune question catégorisée ce mois.</td></tr>'}
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Origine des questions catégorisées</span></div>
+      <table>
+        <tr><th>Source</th><th>Total</th><th>Détail principal</th></tr>
+        ${sourceEntries.length ? sourceEntries.map(([sourceName, cats]) => {
+          const total = Object.values(cats || {}).reduce((a,b)=>a+b,0);
+          const top = Object.entries(cats || {}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v]) => `${k} (${v})`).join(', ');
+          return `<tr><td>${sourceName}</td><td>${fmt(total)}</td><td>${top || '—'}</td></tr>`;
+        }).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:20px">Aucune source enregistrée.</td></tr>'}
+      </table>
+    </div>
+
     <div class="section-title">Tarifs appliqués</div>
     <div class="table-wrap">
       <table>
         <tr><th>Modèle</th><th>Input (€/1M tokens)</th><th>Output (€/1M tokens)</th></tr>
-        <tr><td>🟠 Mistral Small</td><td>${claudeInfo.priceIn||0.10}</td><td>${claudeInfo.priceOut||0.30}</td></tr>
+        <tr><td>🟠 Mistral Small</td><td>${mistralInfo.priceIn||0.10}</td><td>${mistralInfo.priceOut||0.30}</td></tr>
         <tr><td>🟣 Claude Haiku 4.5</td><td>${(claudeInfo.priceIn||0.80)} $/1M → €</td><td>${(claudeInfo.priceOut||4.00)} $/1M → €</td></tr>
       </table>
     </div>
@@ -468,7 +561,6 @@ function renderIa() {
     </div>
   `;
 
-  // Charts
   drawChart('chart-ia-cost', periods, [
     { label: 'Mistral (€)', data: mistralCosts, color: '#f97316' },
     { label: 'Claude (€)',  data: claudeCosts,  color: '#8b5cf6' }
@@ -478,6 +570,9 @@ function renderIa() {
     { label: 'Mistral appels', data: mistralCalls, color: '#f97316' },
     { label: 'Claude appels',  data: claudeCalls,  color: '#8b5cf6' }
   ], 'bar');
+
+  drawChart('chart-ia-categories-daily', topDaily.periods, topDaily.datasets, 'line');
+  drawChart('chart-ia-categories-monthly', topMonthly.periods, topMonthly.datasets, 'bar');
 }
 
 function setIaView(v) { iaView = v; renderIa(); }
