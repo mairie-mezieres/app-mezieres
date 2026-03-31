@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.3 -->
+<!-- VERSION 3.4 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -36,10 +36,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
-.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.mat-img{height:100%;max-height:110px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;}
-.mat-text{flex:2;padding-bottom:8px;min-width:0;}
-.mat-actions{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.mat-hero{display:flex;align-items:stretch;justify-content:space-between;gap:8px;min-height:90px;}
+.mat-img{height:auto;width:auto;max-height:120px;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;align-self:flex-start;}
+.mat-text{flex:1;padding-bottom:4px;min-width:0;}
+.mat-left{display:flex;flex-direction:column;justify-content:space-between;gap:6px;flex:1;min-width:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
@@ -256,13 +256,16 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus Rémi strip ── */
-.bus-strip{padding:7px 0 0;display:flex;align-items:center;gap:8px;width:100%;}
-.bus-strip-ico{font-size:1rem;flex-shrink:0;}
-.bus-strip-content{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);white-space:nowrap;}
-.bus-strip-stops{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-.bus-stop{font-size:.65rem;font-weight:700;color:rgba(255,255,255,.9);line-height:1.3;}
-.bus-stop-name{font-size:.56rem;color:rgba(255,255,255,.6);font-weight:700;}
+.bus-strip{padding:7px 0 0;width:100%;}
+.bus-strip-head{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.bus-strip-ico{font-size:.9rem;}
+.bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);}
+.bus-strip-periode{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);margin-left:auto;}
+.bus-stop-row{display:flex;align-items:baseline;gap:6px;width:100%;font-size:.65rem;color:rgba(255,255,255,.85);line-height:1.6;overflow:hidden;}
+.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.6);font-weight:800;flex-shrink:0;width:52px;}
+.bus-stop-times{flex:1;display:flex;gap:8px;flex-wrap:nowrap;overflow:hidden;}
+.bus-dir{display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.bus-dir-label{font-size:.58rem;color:rgba(255,255,255,.5);}
 .bus-next{font-weight:900;color:#bfdbfe;}
 .bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
 
@@ -316,7 +319,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:5px 10px;color:rgba(255,255,255,0.85);font-size:0.62rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:6px 12px;color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;align-self:flex-start;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -357,7 +360,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:3px">v3.3</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:3px">v3.4</div>
     </div>
     <!-- Droite : icône MAT + bouton Aa dessous -->
     <div class="mat-actions">
@@ -394,11 +397,12 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </div>
     <!-- Ligne bus Rémi pleine largeur -->
     <div class="bus-strip">
-      <div class="bus-strip-ico">🚌</div>
-      <div class="bus-strip-title">Ligne 8 Rémi</div>
-      <div class="bus-strip-stops" id="bus-strip-stops">
-        <span class="bus-loading">Chargement…</span>
+      <div class="bus-strip-head">
+        <span class="bus-strip-ico">🚌</span>
+        <span class="bus-strip-title">Ligne 8 Rémi</span>
+        <span class="bus-strip-periode" id="bus-periode"></span>
       </div>
+      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
     </div>
   </div>
 </div>
@@ -942,7 +946,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.3 — Mézières Avec Toi
+// MAT v3.4 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1700,7 +1704,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.3'
+    matVersion:'v3.4'
   };
 }
 
@@ -1822,24 +1826,41 @@ function getNextBus(times) {
 
 function loadBusRemi() {
   var el = document.getElementById('bus-strip-stops');
+  var pel = document.getElementById('bus-periode');
   if (!el) return;
 
   var vac = isVacancesScolaires();
   var H = BUS_HORAIRES;
-  var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
-  var mNou = getNextBus(vac ? H.mairie.nouan_vacances   : H.mairie.nouan_scolaire);
-  var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
-  var bNou = getNextBus(vac ? H.breau.nouan_vacances    : H.breau.nouan_scolaire);
 
-  var periode = vac ? '🏖️ vacances' : '📚 scolaire';
-  var html = '<span class="bus-stop-name" style="margin-right:6px">' + periode + '</span>';
+  // Période
+  if (pel) pel.textContent = vac ? '🏖️ vacances' : '📚 scolaire';
 
-  if (mOrl || mNou) {
-    html += '<div class="bus-stop"><span class="bus-stop-name">Mairie :</span> '
-      + (mOrl ? '→ Orléans <span class="bus-next">' + mOrl.label + '</span> ' : '')
-      + (mNou ? '→ Nouan <span class="bus-next">' + mNou.label + '</span>' : '')
+  // Prochains bus pour chaque arrêt : 1 ligne = Orléans + Nouan
+  function renderStop(nom, orl, nou) {
+    var nOrl = getNextBus(orl);
+    var nNou = getNextBus(nou);
+    if (!nOrl && !nNou) return '';
+    return '<div class="bus-stop-row">'
+      + '<span class="bus-stop-name">' + nom + '</span>'
+      + '<span class="bus-stop-times">'
+      + (nOrl ? '<span class="bus-dir"><span class="bus-dir-label">→ Orléans</span> <span class="bus-next">' + nOrl.label + '</span></span>' : '')
+      + (nNou ? '<span class="bus-dir"><span class="bus-dir-label">→ Nouan</span> <span class="bus-next">' + nNou.label + '</span></span>' : '')
+      + '</span>'
       + '</div>';
   }
+
+  var mOrl = vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire;
+  var mNou = vac ? H.mairie.nouan_vacances   : H.mairie.nouan_scolaire;
+  var bOrl = vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire;
+  var bNou = vac ? H.breau.nouan_vacances    : H.breau.nouan_scolaire;
+
+  var html = renderStop('Mairie', mOrl, mNou) + renderStop('Le Bréau', bOrl, bNou);
+
+  if (!html) {
+    html = '<span style="font-size:.65rem;color:rgba(255,255,255,.55)">Plus de bus aujourd\'hui</span>';
+  }
+  el.innerHTML = html;
+}
   if (bOrl || bNou) {
     html += '<div class="bus-stop"><span class="bus-stop-name">Le Bréau :</span> '
       + (bOrl ? '→ Orléans <span class="bus-next">' + bOrl.label + '</span> ' : '')
