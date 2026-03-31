@@ -1768,6 +1768,7 @@ async function togglePush(){
     }catch(e){alert('Erreur lors de l\'activation des notifications.');}
   }
 }
+  
 
 // ── Bus Rémi ─────────────────────────
 // Horaires réels Ligne 8 Rémi — Mézières-lez-Cléry
@@ -1872,18 +1873,6 @@ async function clearCacheAndReload() {
   window.location.reload(true);
 }
 
-if('serviceWorker' in navigator){
-    try{
-      const reg=await navigator.serviceWorker.ready;
-      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
-      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
-      if(subTxt)subTxt.textContent='Notifications actives.';
-      pushRegistered=true;
-      alert('✅ Notifications activées !');
-    }catch(e){alert('Erreur lors de l\'activation des notifications.');}
-  }
-}
 function urlBase64ToUint8Array(b64){
   const pad='='.repeat((4-b64.length%4)%4);
   const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
