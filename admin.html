@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAT — Administration</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
+  --gold:#d4a843;--amber:#f4a261;--cream:#faf7f2;--warm:#f4f0ea;
+  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.08);
+  --red:#dc2626;--orange:#d97706;--blue:#2563eb;--purple:#7c3aed;
+  --shadow:0 2px 12px rgba(26,61,43,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);min-height:100vh;}
+
+/* ── Login ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--forest),var(--leaf));}
+.login-box{background:white;border-radius:20px;padding:36px 32px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;}
+.login-logo{font-size:2.5rem;margin-bottom:8px;}
+.login-title{font-size:1.2rem;font-weight:900;color:var(--forest);margin-bottom:4px;}
+.login-sub{font-size:0.78rem;color:var(--muted);margin-bottom:24px;}
+.login-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:0.9rem;outline:none;margin-bottom:12px;}
+.login-input:focus{border-color:var(--sage);}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:800;cursor:pointer;}
+.login-err{color:var(--red);font-size:0.78rem;margin-top:8px;display:none;}
+
+/* ── Layout admin ── */
+#admin-screen{display:none;min-height:100vh;}
+.admin-header{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.admin-header-title{font-size:1rem;font-weight:900;color:var(--cream);display:flex;align-items:center;gap:10px;}
+.admin-header-sub{font-size:0.7rem;color:rgba(255,255,255,0.6);}
+.logout-btn{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 12px;font-size:0.76rem;font-weight:700;cursor:pointer;}
+
+.admin-nav{background:white;border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;padding:0 16px;}
+.nav-tab{padding:12px 18px;font-size:0.8rem;font-weight:800;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
+.nav-tab.on{color:var(--forest);border-bottom-color:var(--forest);}
+
+.admin-body{padding:20px;max-width:1200px;margin:0 auto;}
+
+/* ── Cards ── */
+.section-title{font-size:0.7rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:20px 0 12px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.stat-card-ico{font-size:1.4rem;margin-bottom:6px;}
+.stat-card-val{font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;}
+.stat-card-label{font-size:0.68rem;color:var(--muted);margin-top:4px;font-weight:600;}
+.stat-card-sub{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+.stat-card.warn .stat-card-val{color:var(--orange);}
+.stat-card.danger .stat-card-val{color:var(--red);}
+.stat-card.ok .stat-card-val{color:var(--leaf);}
+
+/* ── Progress bar ── */
+.progress-wrap{background:white;border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px;}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.progress-label{font-size:0.8rem;font-weight:800;color:var(--text);}
+.progress-val{font-size:0.8rem;font-weight:900;color:var(--muted);}
+.progress-bar{height:10px;background:var(--mist);border-radius:999px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:999px;transition:width 0.5s;}
+.progress-fill.ok{background:linear-gradient(90deg,var(--sage),var(--leaf));}
+.progress-fill.warn{background:linear-gradient(90deg,#fbbf24,#f59e0b);}
+.progress-fill.danger{background:linear-gradient(90deg,#f87171,var(--red));}
+
+/* ── Charts ── */
+.chart-wrap{background:white;border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px;}
+.chart-title{font-size:0.82rem;font-weight:900;color:var(--text);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.chart-period-btn{background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:0.7rem;font-weight:700;color:var(--muted);cursor:pointer;}
+.chart-period-btn.on{background:var(--forest);color:white;border-color:var(--forest);}
+canvas{max-height:280px;}
+
+/* ── Tables ── */
+.table-wrap{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
+.table-header{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:var(--warm);}
+.table-title{font-size:0.82rem;font-weight:900;color:var(--text);}
+table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+th{background:var(--warm);padding:8px 12px;text-align:left;font-weight:800;color:var(--muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;}
+td{padding:8px 12px;border-top:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:hover td{background:#f9fafb;}
+.del-btn{background:none;border:1.5px solid #fca5a5;color:var(--red);border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:800;cursor:pointer;}
+.del-btn:hover{background:#fee2e2;}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:0.65rem;font-weight:800;}
+.badge-green{background:var(--mist);color:var(--leaf);}
+.badge-blue{background:#dbeafe;color:var(--blue);}
+.badge-orange{background:#fef3c7;color:var(--orange);}
+.badge-red{background:#fee2e2;color:var(--red);}
+
+/* ── Tabs panels ── */
+.tab-panel{display:none;}
+.tab-panel.on{display:block;}
+
+/* ── Loading ── */
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:0.84rem;}
+.loading-spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--mist);border-top-color:var(--sage);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Coût badge ── */
+.cost{font-weight:900;color:var(--leaf);}
+.cost.high{color:var(--orange);}
+
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:1fr 1fr;}
+  .admin-body{padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🌲</div>
+    <div class="login-title">MAT — Administration</div>
+    <div class="login-sub">Mézières-lez-Cléry · Accès restreint</div>
+    <input class="login-input" type="password" id="pwd-input" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Accéder au tableau de bord</button>
+    <div class="login-err" id="login-err">Mot de passe incorrect.</div>
+  </div>
+</div>
+
+<!-- ── ADMIN ── -->
+<div id="admin-screen">
+  <div class="admin-header">
+    <div>
+      <div class="admin-header-title">🌲 MAT — Tableau de bord</div>
+      <div class="admin-header-sub">Mézières-lez-Cléry · <span id="last-refresh">—</span></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <div class="admin-nav">
+    <button class="nav-tab on" onclick="showTab('overview')">📊 Vue générale</button>
+    <button class="nav-tab" onclick="showTab('ia')">🤖 IA & Coûts</button>
+    <button class="nav-tab" onclick="showTab('redis')">🗄️ Redis</button>
+    <button class="nav-tab" onclick="showTab('app')">📱 Usage app</button>
+    <button class="nav-tab" onclick="showTab('ideas')">💡 Idées</button>
+    <button class="nav-tab" onclick="showTab('actus')">🔔 Actualités</button>
+    <button class="nav-tab" onclick="showTab('signals')">🚨 Signalements</button>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- VUE GÉNÉRALE -->
+    <div class="tab-panel on" id="tab-overview">
+      <div id="overview-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- IA & COÛTS -->
+    <div class="tab-panel" id="tab-ia">
+      <div id="ia-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- REDIS -->
+    <div class="tab-panel" id="tab-redis">
+      <div id="redis-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- USAGE APP -->
+    <div class="tab-panel" id="tab-app">
+      <div id="app-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- IDÉES -->
+    <div class="tab-panel" id="tab-ideas">
+      <div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- ACTUALITÉS -->
+    <div class="tab-panel" id="tab-actus">
+      <div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- SIGNALEMENTS -->
+    <div class="tab-panel" id="tab-signals">
+      <div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API = 'https://chatbot-mairie-mezieres.onrender.com';
+let TOKEN = localStorage.getItem('mat_admin_token') || '';
+let _data = null;
+let _charts = {};
+
+// ── Auth ──────────────────────────────
+async function doLogin() {
+  const pwd = document.getElementById('pwd-input').value;
+  try {
+    const r = await fetch(`${API}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      TOKEN = d.token;
+      localStorage.setItem('mat_admin_token', TOKEN);
+      showAdmin();
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+    }
+  } catch(e) {
+    document.getElementById('login-err').textContent = 'Erreur de connexion au serveur.';
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('mat_admin_token');
+  TOKEN = '';
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function showAdmin() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  await loadAll();
+}
+
+// ── Chargement données ────────────────
+async function apiGet(path) {
+  const r = await fetch(`${API}${path}`, { headers: { 'x-admin-token': TOKEN } });
+  if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
+  return r.json();
+}
+
+async function apiDelete(path) {
+  const r = await fetch(`${API}${path}`, { method: 'DELETE', headers: { 'x-admin-token': TOKEN } });
+  return r.json();
+}
+
+async function loadAll() {
+  try {
+    const [dash, ideas, actus, signals] = await Promise.all([
+      apiGet('/admin/dashboard'),
+      apiGet('/admin/ideas'),
+      apiGet('/admin/actus'),
+      apiGet('/admin/signals')
+    ]);
+    _data = { dash, ideas: ideas.ideas || [], actus: actus.actus || [], signals: signals.signals || [] };
+    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
+    renderAll();
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function renderAll() {
+  renderOverview();
+  renderIa();
+  renderRedis();
+  renderApp();
+  renderIdeas();
+  renderActus();
+  renderSignals();
+}
+
+// ── Tabs ──────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  event.target.classList.add('on');
+}
+
+// ── Helpers ───────────────────────────
+function fmt(n) { return (n || 0).toLocaleString('fr-FR'); }
+function fmtEur(n) { return '€' + (n || 0).toFixed(4); }
+function fmtEurBig(n) { return '€' + (n || 0).toFixed(2); }
+function fmtBytes(b) {
+  if (!b) return '—';
+  if (b > 1024*1024) return (b/1024/1024).toFixed(1) + ' Mo';
+  if (b > 1024) return (b/1024).toFixed(0) + ' Ko';
+  return b + ' o';
+}
+function progressClass(pct) {
+  if (pct >= 80) return 'danger';
+  if (pct >= 60) return 'warn';
+  return 'ok';
+}
+
+// ── VUE GÉNÉRALE ─────────────────────
+function renderOverview() {
+  const { dash } = _data;
+  const redis = dash.redis || {};
+  const app = dash.app || {};
+  const ia = dash.ia || {};
+
+  // Coût total mois courant
+  const month = new Date().toISOString().slice(0, 7);
+  const monthIa = ia.monthly?.[month] || {};
+  let totalEurMonth = 0;
+  for (const [prov, d] of Object.entries(monthIa)) {
+    if (prov !== '_total') totalEurMonth += d.costEur || 0;
+  }
+
+  // Coût total aujourd'hui
+  const today = new Date().toISOString().slice(0, 10);
+  const todayIa = ia.daily?.[today] || {};
+  let totalEurDay = 0;
+  for (const [prov, d] of Object.entries(todayIa)) {
+    if (prov !== '_total') totalEurDay += d.costEur || 0;
+  }
+
+  const redisPct = redis.pct || 0;
+  const redisClass = progressClass(redisPct);
+
+  document.getElementById('overview-content').innerHTML = `
+    <div class="section-title">Tableau de bord — Résumé</div>
+    <div class="cards-grid">
+      <div class="stat-card ${redisClass}">
+        <div class="stat-card-ico">🗄️</div>
+        <div class="stat-card-val">${redis.pct || 0}%</div>
+        <div class="stat-card-label">Redis utilisé</div>
+        <div class="stat-card-sub">${fmtBytes(redis.usedBytes)} / 256 Mo</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📱</div>
+        <div class="stat-card-val">${fmt(app.totalInstalls)}</div>
+        <div class="stat-card-label">Installations</div>
+        <div class="stat-card-sub">${fmt(app.totalAcces)} accès total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🤖</div>
+        <div class="stat-card-val">${fmtEurBig(totalEurMonth)}</div>
+        <div class="stat-card-label">Coût IA ce mois</div>
+        <div class="stat-card-sub">${fmtEur(totalEurDay)} aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🔔</div>
+        <div class="stat-card-val">${_data.dash.redis?.keys?.subs || 0}</div>
+        <div class="stat-card-label">Abonnés push</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">💡</div>
+        <div class="stat-card-val">${_data.ideas.length}</div>
+        <div class="stat-card-label">Idées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🚨</div>
+        <div class="stat-card-val">${_data.signals.length}</div>
+        <div class="stat-card-label">Signalements</div>
+      </div>
+    </div>
+
+    <div class="section-title">Utilisation Redis</div>
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Mémoire Upstash (limite 256 Mo gratuit)</span>
+        <span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${redisClass}" style="width:${Math.min(redisPct,100)}%"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Usage app aujourd'hui</div>
+    ${renderServiceBadges(app.parJour?.[today] || {})}
+  `;
+}
+
+function renderServiceBadges(services) {
+  const icons = { mel:'🤖', signalement:'🚨', actualites:'🔔', meteo:'🌤️', contact:'💬', idees:'💡', installation:'📲', bug:'🐞' };
+  const entries = Object.entries(services).filter(([k]) => k !== 'installation').sort((a,b) => b[1]-a[1]);
+  if (!entries.length) return '<div style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucun accès aujourd\'hui.</div>';
+  return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' +
+    entries.map(([k,v]) => `<div class="stat-card" style="min-width:110px;padding:10px 14px">
+      <div style="font-size:1.2rem">${icons[k]||'📌'}</div>
+      <div style="font-size:1.3rem;font-weight:900;color:var(--text)">${v}</div>
+      <div style="font-size:0.65rem;color:var(--muted)">${k}</div>
+    </div>`).join('') + '</div>';
+}
+
+// ── IA & COÛTS ────────────────────────
+let iaView = 'daily';
+function renderIa() {
+  const { dash } = _data;
+  const ia = dash.ia || {};
+  const daily   = ia.daily   || {};
+  const monthly = ia.monthly || {};
+  const claudeInfo  = ia.claude  || {};
+  const mistralInfo = ia.mistral || {};
+
+  // Préparer données chart
+  const source = iaView === 'daily' ? daily : monthly;
+  const periods = Object.keys(source).sort().slice(-30);
+
+  const mistralCosts = periods.map(p => source[p]?.mistral?.costEur || 0);
+  const claudeCosts  = periods.map(p => source[p]?.claude?.costEur  || 0);
+  const mistralCalls = periods.map(p => source[p]?.mistral?.calls   || 0);
+  const claudeCalls  = periods.map(p => source[p]?.claude?.calls    || 0);
+
+  // Totaux mois courant
+  const month = new Date().toISOString().slice(0, 7);
+  const mData = monthly[month] || {};
+  const mMistral = mData.mistral || { in:0, out:0, calls:0, costEur:0 };
+  const mClaude  = mData.claude  || { in:0, out:0, calls:0, costEur:0 };
+
+  document.getElementById('ia-content').innerHTML = `
+    <div class="section-title">Coûts IA — ${month}</div>
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-card-ico">🟠</div>
+        <div class="stat-card-val">${fmtEurBig(mMistral.costEur)}</div>
+        <div class="stat-card-label">Mistral ce mois</div>
+        <div class="stat-card-sub">${fmt(mMistral.calls)} appels · ${fmt(mMistral.in+mMistral.out)} tokens</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🟣</div>
+        <div class="stat-card-val">${fmtEurBig(mClaude.costEur)}</div>
+        <div class="stat-card-label">Claude ce mois</div>
+        <div class="stat-card-sub">${fmt(mClaude.calls)} appels · ${fmt(mClaude.in+mClaude.out)} tokens</div>
+      </div>
+      <div class="stat-card ok">
+        <div class="stat-card-ico">💶</div>
+        <div class="stat-card-val">${fmtEurBig((mMistral.costEur||0)+(mClaude.costEur||0))}</div>
+        <div class="stat-card-label">Total IA ce mois</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">
+        Coûts IA (€)
+        <div style="display:flex;gap:6px">
+          <button class="chart-period-btn ${iaView==='daily'?'on':''}" onclick="setIaView('daily')">Jours</button>
+          <button class="chart-period-btn ${iaView==='monthly'?'on':''}" onclick="setIaView('monthly')">Mois</button>
+        </div>
+      </div>
+      <canvas id="chart-ia-cost"></canvas>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Appels IA</div>
+      <canvas id="chart-ia-calls"></canvas>
+    </div>
+
+    <div class="section-title">Tarifs appliqués</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Modèle</th><th>Input (€/1M tokens)</th><th>Output (€/1M tokens)</th></tr>
+        <tr><td>🟠 Mistral Small</td><td>${claudeInfo.priceIn||0.10}</td><td>${claudeInfo.priceOut||0.30}</td></tr>
+        <tr><td>🟣 Claude Haiku 4.5</td><td>${(claudeInfo.priceIn||0.80)} $/1M → €</td><td>${(claudeInfo.priceOut||4.00)} $/1M → €</td></tr>
+      </table>
+    </div>
+
+    <div class="section-title">Historique mensuel détaillé</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Mois</th><th>Mistral appels</th><th>Mistral €</th><th>Claude appels</th><th>Claude €</th><th>Total €</th></tr>
+        ${Object.keys(monthly).sort().reverse().map(m => {
+          const mm = monthly[m].mistral || {calls:0,costEur:0};
+          const mc = monthly[m].claude  || {calls:0,costEur:0};
+          const tot = (mm.costEur||0)+(mc.costEur||0);
+          return `<tr>
+            <td><strong>${m}</strong></td>
+            <td>${fmt(mm.calls)}</td><td class="cost">${fmtEur(mm.costEur)}</td>
+            <td>${fmt(mc.calls)}</td><td class="cost">${fmtEur(mc.costEur)}</td>
+            <td><strong class="cost ${tot>0.5?'high':''}">${fmtEurBig(tot)}</strong></td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+  `;
+
+  // Charts
+  drawChart('chart-ia-cost', periods, [
+    { label: 'Mistral (€)', data: mistralCosts, color: '#f97316' },
+    { label: 'Claude (€)',  data: claudeCosts,  color: '#8b5cf6' }
+  ], 'line');
+
+  drawChart('chart-ia-calls', periods, [
+    { label: 'Mistral appels', data: mistralCalls, color: '#f97316' },
+    { label: 'Claude appels',  data: claudeCalls,  color: '#8b5cf6' }
+  ], 'bar');
+}
+
+function setIaView(v) { iaView = v; renderIa(); }
+
+// ── REDIS ─────────────────────────────
+function renderRedis() {
+  const redis = _data.dash.redis || {};
+  const pct = redis.pct || 0;
+  const cls = progressClass(pct);
+
+  document.getElementById('redis-content').innerHTML = `
+    <div class="section-title">Utilisation Upstash Redis (limite gratuite : 256 Mo)</div>
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Mémoire utilisée</span>
+        <span class="progress-val ${cls==='danger'?'':''}">
+          ${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)
+        </span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Clés stockées</div>
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-card-ico">🔔</div>
+        <div class="stat-card-val">${redis.keys?.subs||0}</div>
+        <div class="stat-card-label">Abonnés push</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📰</div>
+        <div class="stat-card-val">${redis.keys?.actus||0}</div>
+        <div class="stat-card-label">Actualités</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">💡</div>
+        <div class="stat-card-val">${redis.keys?.ideas||0}</div>
+        <div class="stat-card-label">Idées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🚨</div>
+        <div class="stat-card-val">${redis.keys?.signals||0}</div>
+        <div class="stat-card-label">Signalements</div>
+      </div>
+    </div>
+
+    ${pct >= 80 ? `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
+      ⚠️ Attention : ${pct}% de la mémoire Redis utilisée. Pensez à purger les anciennes entrées ou upgrader votre plan Upstash.
+    </div>` : ''}
+
+    ${pct >= 60 && pct < 80 ? `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;color:var(--orange);font-size:0.82rem;font-weight:700;margin-top:8px">
+      ⚡ ${pct}% utilisé. Surveillance recommandée.
+    </div>` : ''}
+  `;
+}
+
+// ── USAGE APP ─────────────────────────
+let appView = 'daily';
+function renderApp() {
+  const app = _data.dash.app || {};
+  const parJour = app.parJour || {};
+  const today   = new Date().toISOString().slice(0, 10);
+  const month   = new Date().toISOString().slice(0, 7);
+
+  // Agréger par mois
+  const parMois = {};
+  for (const [day, svcs] of Object.entries(parJour)) {
+    const m = day.slice(0,7);
+    if (!parMois[m]) parMois[m] = {};
+    for (const [svc, cnt] of Object.entries(svcs)) {
+      parMois[m][svc] = (parMois[m][svc]||0) + cnt;
+    }
+  }
+
+  const source = appView === 'daily' ? parJour : parMois;
+  const periods = Object.keys(source).sort().slice(-30);
+  const services = ['mel','signalement','actualites','meteo','contact','idees','installation'];
+  const colors   = ['#2563eb','#dc2626','#f59e0b','#38bdf8','#8b5cf6','#d4a843','#16a34a'];
+
+  const datasets = services.map((svc,i) => ({
+    label: svc,
+    data: periods.map(p => source[p]?.[svc] || 0),
+    color: colors[i]
+  }));
+
+  // Stats aujourd'hui
+  const todaySvcs = parJour[today] || {};
+  const monthSvcs = parMois[month] || {};
+
+  document.getElementById('app-content').innerHTML = `
+    <div class="section-title">Usage global</div>
+    <div class="cards-grid">
+      <div class="stat-card ok">
+        <div class="stat-card-ico">📲</div>
+        <div class="stat-card-val">${fmt(app.totalInstalls)}</div>
+        <div class="stat-card-label">Installations totales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">👁️</div>
+        <div class="stat-card-val">${fmt(app.totalAcces)}</div>
+        <div class="stat-card-label">Accès total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🗓️</div>
+        <div class="stat-card-val">${fmt(Object.values(todaySvcs).reduce((a,b)=>a+b,0))}</div>
+        <div class="stat-card-label">Accès aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📅</div>
+        <div class="stat-card-val">${fmt(Object.values(monthSvcs).reduce((a,b)=>a+b,0))}</div>
+        <div class="stat-card-label">Accès ce mois</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">
+        Accès par fonctionnalité
+        <div style="display:flex;gap:6px">
+          <button class="chart-period-btn ${appView==='daily'?'on':''}" onclick="setAppView('daily')">Jours</button>
+          <button class="chart-period-btn ${appView==='monthly'?'on':''}" onclick="setAppView('monthly')">Mois</button>
+        </div>
+      </div>
+      <canvas id="chart-app"></canvas>
+    </div>
+
+    <div class="section-title">Détail par service — ce mois</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Service</th><th>Ce mois</th><th>Total</th></tr>
+        ${services.map(svc => `<tr>
+          <td>${svc}</td>
+          <td>${fmt(monthSvcs[svc]||0)}</td>
+          <td>${fmt(app.parService?.[svc]||0)}</td>
+        </tr>`).join('')}
+      </table>
+    </div>
+  `;
+
+  drawChart('chart-app', periods, datasets, 'bar');
+}
+
+function setAppView(v) { appView = v; renderApp(); }
+
+// ── IDÉES ────────────────────────────
+function renderIdeas() {
+  const ideas = [..._data.ideas].sort((a,b) => (b.votes||0)-(a.votes||0));
+  document.getElementById('ideas-content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">💡 Idées (${ideas.length})</span>
+      </div>
+      <table>
+        <tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th></th></tr>
+        ${ideas.length ? ideas.map(i => `<tr>
+          <td style="max-width:300px">${i.text}</td>
+          <td><span class="badge badge-orange">${i.cat}</span></td>
+          <td><strong>${i.votes||0}</strong></td>
+          <td>${i.date}</td>
+          <td><button class="del-btn" onclick="deleteIdea(${i.id})">🗑️ Supprimer</button></td>
+        </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
+      </table>
+    </div>
+  `;
+}
+
+async function deleteIdea(id) {
+  if (!confirm('Supprimer cette idée ?')) return;
+  await apiDelete(`/admin/ideas/${id}`);
+  _data.ideas = _data.ideas.filter(i => i.id !== id);
+  renderIdeas();
+}
+
+// ── ACTUALITÉS ────────────────────────
+function renderActus() {
+  const actus = _data.actus;
+  document.getElementById('actus-content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">🔔 Actualités (${actus.length})</span>
+      </div>
+      <table>
+        <tr><th>Titre</th><th>Date</th><th>Photo</th><th></th></tr>
+        ${actus.length ? actus.map(a => `<tr>
+          <td style="max-width:320px">${a.title||'—'}</td>
+          <td>${a.date}</td>
+          <td>${a.photo ? '<span class="badge badge-green">✓ Oui</span>' : '<span class="badge">Non</span>'}</td>
+          <td><button class="del-btn" onclick="deleteActu(${a.id})">🗑️ Supprimer</button></td>
+        </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Aucune actualité</td></tr>'}
+      </table>
+    </div>
+  `;
+}
+
+async function deleteActu(id) {
+  if (!confirm('Supprimer cette actualité ?')) return;
+  await apiDelete(`/admin/actus/${id}`);
+  _data.actus = _data.actus.filter(a => a.id !== id);
+  renderActus();
+}
+
+// ── SIGNALEMENTS ─────────────────────
+function renderSignals() {
+  const signals = _data.signals;
+  document.getElementById('signals-content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">🚨 Signalements (${signals.length})</span>
+      </div>
+      <table>
+        <tr><th>Catégorie</th><th>Description</th><th>GPS</th><th>Photo</th><th>Date</th><th></th></tr>
+        ${signals.length ? signals.map(s => `<tr>
+          <td><span class="badge badge-red">${s.cat||'—'}</span></td>
+          <td style="max-width:220px;font-size:0.74rem">${(s.desc||'—').substring(0,80)}</td>
+          <td>${s.mapsLink ? `<a href="${s.mapsLink}" target="_blank" style="color:var(--blue);font-size:0.72rem">📍 Voir</a>` : '—'}</td>
+          <td>${s.hasPhoto ? '<span class="badge badge-green">✓</span>' : '—'}</td>
+          <td style="font-size:0.72rem">${s.date}</td>
+          <td><button class="del-btn" onclick="deleteSignal(${s.id})">🗑️</button></td>
+        </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucun signalement</td></tr>'}
+      </table>
+    </div>
+  `;
+}
+
+async function deleteSignal(id) {
+  if (!confirm('Supprimer ce signalement ?')) return;
+  await apiDelete(`/admin/signals/${id}`);
+  _data.signals = _data.signals.filter(s => s.id !== id);
+  renderSignals();
+}
+
+// ── Charts ────────────────────────────
+function drawChart(id, labels, datasets, type) {
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  if (_charts[id]) { _charts[id].destroy(); }
+
+  _charts[id] = new Chart(ctx, {
+    type,
+    data: {
+      labels,
+      datasets: datasets.map(d => ({
+        label: d.label,
+        data: d.data,
+        backgroundColor: d.color + (type === 'line' ? '33' : 'bb'),
+        borderColor: d.color,
+        borderWidth: type === 'line' ? 2 : 1,
+        tension: 0.4,
+        fill: type === 'line',
+        pointRadius: type === 'line' ? 2 : 0,
+      }))
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { font: { size: 10 }, maxRotation: 45 } },
+        y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+// ── Init ──────────────────────────────
+if (TOKEN) {
+  showAdmin();
+} else {
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// Rafraîchir toutes les 5 minutes
+setInterval(loadAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
