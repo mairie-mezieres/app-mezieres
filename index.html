@@ -786,7 +786,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </div>
     <div class="panel-body">
       <div class="agenda-tabs">
-        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd\'hui</button>
+        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd'hui</button>
         <button class="agenda-tab" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
         <button class="agenda-tab" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
       </div>
@@ -1835,23 +1835,11 @@ function loadBusRemi() {
   var html = '';
   if (mOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Mairie</span> → Orléans <span class="bus-next">' + mOrl.label + '</span></span>';
   if (bOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Le Bréau</span> → Orléans <span class="bus-next">' + bOrl.label + '</span></span>';
-  if (!html) html = '<span class="bus-loading">Plus de bus vers Orléans aujourd\'hui</span>';
+  if (!html) html = '<span class="bus-loading">Plus de bus vers Orléans aujourd'hui</span>';
 
   el.innerHTML = html;
 }
 
-  var mOrl = vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire;
-  var mNou = vac ? H.mairie.nouan_vacances   : H.mairie.nouan_scolaire;
-  var bOrl = vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire;
-  var bNou = vac ? H.breau.nouan_vacances    : H.breau.nouan_scolaire;
-
-  var html = renderStop('Mairie', mOrl, mNou) + renderStop('Le Bréau', bOrl, bNou);
-
-  if (!html) {
-    html = '<span style="font-size:.65rem;color:rgba(255,255,255,.55)">Plus de bus aujourd\'hui</span>';
-  }
-  el.innerHTML = html;
-}
 // Rafraîchir toutes les minutes
 setInterval(loadBusRemi, 60000);
 
