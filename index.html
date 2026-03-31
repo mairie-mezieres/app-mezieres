@@ -36,9 +36,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
-.mat-hero{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:8px 0 4px;}
-.mat-img{height:80px;width:auto;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;justify-self:center;}
-.mat-text{padding-bottom:4px;min-width:0;}
+.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.mat-img{height:90px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));margin-top:2px;cursor:pointer;}
+.mat-text{flex:2;padding-bottom:8px;min-width:0;}
+.mat-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
@@ -254,6 +255,17 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .majordome-text{font-size:0.84rem;color:var(--muted);line-height:1.7;text-align:left;background:white;border-radius:16px;padding:16px;border:1px solid var(--border);}
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
+/* ── Bus Rémi strip ── */
+.bus-strip{background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:14px;padding:8px 12px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+.bus-strip-ico{font-size:1.3rem;flex-shrink:0;}
+.bus-strip-content{flex:1;min-width:0;}
+.bus-strip-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.75);}
+.bus-strip-stops{display:flex;gap:12px;margin-top:3px;flex-wrap:wrap;}
+.bus-stop{font-size:.68rem;font-weight:800;color:white;line-height:1.4;}
+.bus-stop-name{font-size:.58rem;color:rgba(255,255,255,.7);font-weight:700;}
+.bus-next{font-size:.78rem;font-weight:900;color:#bfdbfe;}
+.bus-loading{font-size:.68rem;color:rgba(255,255,255,.7);font-style:italic;}
+
 /* ── Text-to-Speech ── */
 .tts-btn{background:none;border:1.5px solid var(--sage);border-radius:999px;padding:4px 10px;font-size:0.7rem;font-weight:800;color:var(--leaf);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-family:'Nunito',sans-serif;}
 .tts-btn:active{background:var(--mist);}
@@ -304,7 +316,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:12px;padding:10px 14px;color:white;font-size:0.82rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;justify-self:end;align-self:center;min-width:64px;}
+.acc-btn{background:rgba(255,255,255,0.18);border:none;border-radius:12px;padding:8px 14px;color:white;font-size:0.78rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;width:100%;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -340,19 +352,18 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 <!-- Header MAT -->
 <div class="header">
   <div class="mat-hero">
-    <!-- Colonne gauche : texte -->
+    <!-- Gauche : texte -->
     <div class="mat-text">
       <div class="mat-badge">Application officielle</div>
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
       <div class="mat-version">v3.3</div>
     </div>
-    <!-- Colonne centre : icône MAT -->
-    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
-    <!-- Colonne droite : bouton accessibilité -->
-    <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">
-      ♿<span>Aa</span>
-    </button>
+    <!-- Droite : icône MAT + bouton Aa dessous -->
+    <div class="mat-actions">
+      <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
+      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Aa</button>
+    </div>
   </div>
 
   <!-- Encarts accueil -->
@@ -380,6 +391,17 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
       <div class="event-date" id="next-event-date">Chargement…</div>
       <div class="event-name" id="next-event-name"></div>
       <div class="event-days" id="next-event-days"></div>
+    </div>
+    <!-- Encart bus Rémi -->
+    <div class="bus-strip" onclick="openMel(); setTimeout(()=>{document.getElementById('minp').value='Prochains bus ligne 8';sendMel();},400)">
+      <div class="bus-strip-ico">🚌</div>
+      <div class="bus-strip-content">
+        <div class="bus-strip-title">Prochain bus — Ligne 8 Rémi</div>
+        <div class="bus-strip-stops" id="bus-strip-stops">
+          <span class="bus-loading">Chargement…</span>
+        </div>
+      </div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.5)">›</div>
     </div>
   </div>
 </div>
@@ -549,7 +571,12 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter">⏹</button>
 </div>
 
-<div class="footer">MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
+<div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px;">
+  <div>MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
+  <button onclick="clearCacheAndReload()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(216,243,220,0.7);font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:700;padding:5px 12px;cursor:pointer;">
+    🗑️ Vider le cache et recharger
+  </button>
+</div>
 
 <!-- ═══ OVERLAY MAJORDOME ═══ -->
 <div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
@@ -1732,7 +1759,95 @@ async function togglePush(){
   if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
   const perm=await Notification.requestPermission();
   if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
-  if('serviceWorker' in navigator){
+  // ── Bus Rémi ─────────────────────────
+// Horaires codés en dur (mis à jour manuellement si besoin)
+// Format : { arr: 'NOM', dir: 'Direction', times: ['HH:MM', ...] }
+const BUS_HORAIRES = {
+  mairie: {
+    orleans: ['06:23','07:23','08:23','09:23','10:23','11:23','12:23','13:23','14:23','15:23','16:23','17:23','18:23','19:23'],
+    nouan:   ['07:05','08:05','09:05','10:05','11:05','12:05','13:05','14:05','15:05','16:05','17:05','18:05','19:05']
+  },
+  breau: {
+    orleans: ['06:25','07:25','08:25','09:25','10:25','11:25','12:25','13:25','14:25','15:25','16:25','17:25','18:25','19:25'],
+    nouan:   ['07:03','08:03','09:03','10:03','11:03','12:03','13:03','14:03','15:03','16:03','17:03','18:03','19:03']
+  }
+};
+
+function getNextBus(times) {
+  const now = new Date(new Date().toLocaleString('en-US', {timeZone:'Europe/Paris'}));
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  for (const t of times) {
+    const [h, m] = t.split(':').map(Number);
+    const busMins = h * 60 + m;
+    if (busMins > nowMins) {
+      const diff = busMins - nowMins;
+      if (diff <= 30) return { time: t, label: 'dans ' + diff + ' min' };
+      return { time: t, label: t };
+    }
+  }
+  return null; // plus de bus aujourd'hui
+}
+
+async function loadBusRemi() {
+  const el = document.getElementById('bus-strip-stops');
+  if (!el) return;
+  try {
+    // Essayer de récupérer les vrais horaires depuis le backend
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/bus', { cache: 'no-store' });
+    const d = await r.json();
+    // Si le backend a des horaires parsés, on les utilise
+    // Sinon on utilise les horaires codés en dur
+  } catch(e) { /* fallback horaires locaux */ }
+
+  const nextMairie = getNextBus(BUS_HORAIRES.mairie.orleans) || getNextBus(BUS_HORAIRES.mairie.nouan);
+  const nextBreau  = getNextBus(BUS_HORAIRES.breau.orleans)  || getNextBus(BUS_HORAIRES.breau.nouan);
+
+  const nextMairieOrl = getNextBus(BUS_HORAIRES.mairie.orleans);
+  const nextMairieNou = getNextBus(BUS_HORAIRES.mairie.nouan);
+  const nextBreauOrl  = getNextBus(BUS_HORAIRES.breau.orleans);
+  const nextBreauNou  = getNextBus(BUS_HORAIRES.breau.nouan);
+
+  let html = '';
+  if (nextMairieOrl || nextMairieNou) {
+    html += '<div class="bus-stop">'
+      + '<div class="bus-stop-name">📍 Mairie</div>'
+      + (nextMairieOrl ? '<div>→ Orléans <span class="bus-next">' + nextMairieOrl.label + '</span></div>' : '')
+      + (nextMairieNou ? '<div>→ Nouan <span class="bus-next">' + nextMairieNou.label + '</span></div>' : '')
+      + '</div>';
+  }
+  if (nextBreauOrl || nextBreauNou) {
+    html += '<div class="bus-stop">'
+      + '<div class="bus-stop-name">📍 Le Bréau</div>'
+      + (nextBreauOrl ? '<div>→ Orléans <span class="bus-next">' + nextBreauOrl.label + '</span></div>' : '')
+      + (nextBreauNou ? '<div>→ Nouan <span class="bus-next">' + nextBreauNou.label + '</span></div>' : '')
+      + '</div>';
+  }
+  if (!html) html = '<span style="font-size:.7rem;color:rgba(255,255,255,.7)">Plus de bus aujourd'hui</span>';
+  el.innerHTML = html;
+}
+
+// Rafraîchir le bus toutes les minutes
+setInterval(loadBusRemi, 60000);
+
+// ── Vider cache ──────────────────────
+async function clearCacheAndReload() {
+  if (!confirm('Vider le cache et recharger l\'application ?\n\nLe bouton Installer réapparaîtra si l\'app n\'est pas installée.')) return;
+  // Supprimer la clé d'installation pour faire réapparaître la bannière
+  localStorage.removeItem(INSTALL_KEY);
+  // Vider tous les caches Service Worker
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+  }
+  // Désenregistrer le SW puis recharger
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r => r.unregister()));
+  }
+  window.location.reload(true);
+}
+
+if('serviceWorker' in navigator){
     try{
       const reg=await navigator.serviceWorker.ready;
       const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
@@ -1927,7 +2042,7 @@ function resetAccessibilite() {
 }
 
 // ── Init ─────────────────────────────────
-loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn();
+loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
