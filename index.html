@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
-<title>MAT — Mézières Avec Toi</title>
-<!-- VERSION 3.2 -->
+<title>Mézières Avec Toi</title>
+<!-- VERSION 3.3 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -37,7 +37,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
 .mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.mat-img{height:90px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));margin-top:2px;}
+.mat-img{height:90px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));margin-top:2px;cursor:pointer;}
 .mat-text{flex:2;padding-bottom:8px;min-width:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
@@ -98,6 +98,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .ico-ideas{background:linear-gradient(135deg,#fffbe8,#fff3c0);}
 .ico-rgpd{background:linear-gradient(135deg,#f0f0f0,#e0e0e0);}
 .ico-notif{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
+.ico-communaute{background:linear-gradient(135deg,#fde8f0,#ffd6e8);}
 
 /* ── Overlay générique ── */
 .ov{display:none;position:fixed;inset:0;background:rgba(26,61,43,0.6);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;}
@@ -206,7 +207,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
 
-
 /* ── Contact mairie ── */
 .contact-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
 .contact-card{background:white;border-radius:14px;padding:14px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
@@ -215,9 +215,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .contact-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.5;}
 .contact-action{margin-left:auto;align-self:center;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;cursor:pointer;white-space:nowrap;}
 .contact-action.alt{background:linear-gradient(135deg,#1d4ed8,#3b82f6);}
-.contact-action.wa{background:linear-gradient(135deg,#15803d,#22c55e);}
 .contact-note{font-size:0.68rem;color:var(--muted);margin:6px 2px 14px;line-height:1.5;}
-
 
 /* ── Agenda MAT ── */
 .agenda-tabs{display:flex;gap:8px;margin-bottom:12px;}
@@ -247,6 +245,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .event-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;}
 .event-btn.secondary{background:var(--mist);color:var(--leaf);}
 
+/* ── Overlay Majordome MAT ── */
+.majordome-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+.majordome-body{padding:24px 20px;overflow-y:auto;text-align:center;}
+.majordome-img{width:110px;height:110px;object-fit:contain;margin:0 auto 12px;display:block;filter:drop-shadow(0 6px 16px rgba(26,61,43,0.25));}
+.majordome-name{font-family:'Grape Nuts',cursive;font-size:2rem;color:var(--forest);margin-bottom:6px;}
+.majordome-tagline{font-size:0.78rem;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;}
+.majordome-text{font-size:0.84rem;color:var(--muted);line-height:1.7;text-align:left;background:white;border-radius:16px;padding:16px;border:1px solid var(--border);}
+.majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
+
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
 </style>
@@ -257,8 +264,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 <div id="install-banner" onclick="installApp()">
   <div class="ib-ico">📲</div>
   <div class="ib-t">
-    <div class="ib-title">Installez MAT sur votre téléphone !</div>
-    <div class="ib-sub">Accès rapide · Fonctionne hors ligne</div>
+    <div class="ib-title" id="ib-title-txt">Installez MAT sur votre téléphone !</div>
+    <div class="ib-sub" id="ib-sub-txt">Accès rapide · Fonctionne hors ligne</div>
   </div>
   <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
   <button class="ib-x" onclick="hideBanner(event)">✕</button>
@@ -269,11 +276,11 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   <div class="mat-hero">
     <div class="mat-text">
       <div class="mat-badge">Application officielle</div>
-      <div class="mat-title">MAT, Mézières Avec Toi</div>
+      <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
-      <div class="mat-version">v3.2</div>
+      <div class="mat-version">v3.3</div>
     </div>
-    <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
+    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" style="align-self:flex-start" title="Qui suis-je ?">
   </div>
 
   <!-- Encarts accueil -->
@@ -308,18 +315,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 <!-- Contenu principal -->
 <div class="content">
 
-    <div class="sec">Réseaux et actualités</div>
-  <div class="grid2">
-    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
-      <div class="ico ico-radio">📻</div>
-      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
-    </a>
-    <button class="card" onclick="openNotifs()">
-      <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Actualités Pocket</div><div class="ct-sub">Publications communales</div></div>
-    </button>
-  </div>
-
   <div class="sec">Services municipaux</div>
   <div class="grid2">
     <button class="card" onclick="openMel()">
@@ -332,7 +327,31 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </a>
   </div>
 
-  <div class="sec">Participez &amp; signalez</div>
+  <div class="sec">Réseaux et actualités</div>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <button class="card" onclick="openNotifs()">
+      <div class="ico ico-notif">🔔</div>
+      <div class="ct"><div class="ct-label">Actualités Pocket</div><div class="ct-sub">Publications communales</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Participez</div>
+  <div class="grid2">
+    <button class="card" onclick="openIdees()">
+      <div class="ico ico-ideas">💡</div>
+      <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
+    </button>
+    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
+      <div class="ico ico-communaute">🏘️</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+    </a>
+  </div>
+
+  <div class="sec">Signalements &amp; contacts</div>
   <div class="grid2">
     <button class="card" onclick="openSignal()">
       <div class="ico ico-signal">🚨</div>
@@ -340,21 +359,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </button>
     <button class="card" onclick="openContact()">
       <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter mairie</div><div class="ct-sub">Choisissez votre canal</div></div>
-    </button>
-  </div>
-  <div class="grid2" style="margin-top:9px">
-    <button class="card" onclick="openIdees()">
-      <div class="ico ico-ideas">💡</div>
-      <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
+      <div class="ct"><div class="ct-label">Contacter la mairie</div><div class="ct-sub">Choisissez votre canal</div></div>
     </button>
   </div>
 
-  <div class="sec">Agenda &amp; sorties</div>
+  <div class="sec">Agenda MAT</div>
   <div class="grid2">
     <button class="card" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda MAT</div><div class="ct-sub">Aujourd’hui, semaine, mois</div></div>
+      <div class="ct"><div class="ct-label">Agenda MAT</div><div class="ct-sub">Aujourd'hui, semaine, mois</div></div>
     </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
       <div class="ico ico-rando">🥾</div>
@@ -362,8 +375,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </a>
   </div>
 
-
-<div class="sec">Informations</div>
+  <div class="sec">Informations</div>
   <div class="grid2">
     <button class="card" onclick="openRgpd()">
       <div class="ico ico-rgpd">🔒</div>
@@ -378,11 +390,34 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </button>
   </div>
 
-
-
 </div>
 
 <div class="footer">MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
+
+<!-- ═══ OVERLAY MAJORDOME ═══ -->
+<div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
+  <div class="majordome-panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:var(--gold);font-size:22px">🎩</div>
+      <div class="panel-title">Le Majordome de Mézières</div>
+      <button class="panel-close" onclick="closeOv('majordome')">✕</button>
+    </div>
+    <div class="majordome-body">
+      <img src="mat-header.png" alt="MAT" class="majordome-img" onerror="this.style.display='none'">
+      <div class="majordome-name">Bonjour, je suis MAT !</div>
+      <div class="majordome-tagline">Votre majordome numérique communal</div>
+      <div class="majordome-text">
+        🎩 <strong>Permettez-moi de me présenter.</strong><br><br>
+        Je suis <strong>MAT — Mézières Avec Toi</strong>, le majordome numérique officiel de la commune de Mézières-lez-Cléry.<br><br>
+        Tel un majordome digne de ce nom, je veille sur tout : la météo du village, l'état de vos poubelles (oui oui, même ça), les événements à venir, et même les horaires de la mairie — au cas où vous auriez envie de déposer une doléance en bonne et due forme. 🧐<br><br>
+        Mon assistante <strong>MEL</strong> répond à toutes vos questions communales avec le sourire. Elle connaît le PLU, les démarches administratives, la cantine et la fibre mieux que quiconque dans ce village.<br><br>
+        Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire capricieux — je transmets votre signalement à qui de droit, avec la discrétion qui s'impose.<br><br>
+        🌲 <em>Mézières-lez-Cléry mérite le meilleur service. C'est mon devoir.</em>
+      </div>
+      <button class="majordome-btn" onclick="closeOv('majordome')">À votre service !</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ OVERLAY MEL ═══ -->
 <div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
@@ -502,7 +537,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
   </div>
 </div>
 
-
 <!-- ═══ OVERLAY CONTACT ═══ -->
 <div class="ov" id="ov-contact" onclick="ovClick('contact',event)">
   <div class="panel">
@@ -524,23 +558,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <div class="contact-card">
           <div class="contact-ico">💬</div>
           <div style="flex:1">
-            <div class="contact-title">Messenger de la page Facebook</div>
+            <div class="contact-title">Contacter vos élus par Messenger</div>
             <div class="contact-sub">Contact direct via la page Radio Mézières.</div>
           </div>
           <button class="contact-action alt" onclick="contactViaMessenger()">Ouvrir</button>
         </div>
-        <div class="contact-card">
-          <div class="contact-ico">🟢</div>
-          <div style="flex:1">
-            <div class="contact-title">WhatsApp mairie</div>
-            <div class="contact-sub">Préparation en cours. Le canal sera branché plus tard.</div>
-          </div>
-          <button class="contact-action wa" onclick="contactViaWhatsApp()">Bientôt</button>
-        </div>
       </div>
 
       <div class="contact-note">
-        Vous n’avez ni Facebook ni WhatsApp ? Utilisez le formulaire ci-dessous. Pour l’instant, il est stocké comme demande de contact côté mairie.
+        Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre demande directement à la mairie.
       </div>
 
       <div id="contact-form">
@@ -568,7 +594,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </div>
   </div>
 </div>
-
 
 <!-- ═══ OVERLAY AGENDA MAT ═══ -->
 <div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
@@ -667,7 +692,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
           <tr><td>MEL (chatbot)</td><td>Questions posées, non stockées</td><td>Session uniquement</td></tr>
-          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Email transmis, non stocké</td></tr>
+          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Transmis à Trello, non conservé</td></tr>
           <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
           <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
           <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
@@ -683,10 +708,12 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <div class="rgpd-text">Les services suivants sont utilisés :</div>
         <table class="rgpd-table">
           <tr><th>Service</th><th>Usage</th><th>Localisation</th></tr>
-          <tr><td>Anthropic (Claude)</td><td>IA — réponses MEL</td><td>États-Unis</td></tr>
+          <tr><td>Mistral AI</td><td>IA — réponses MEL</td><td>France (UE)</td></tr>
+          <tr><td>Anthropic (Claude)</td><td>IA — secours MEL</td><td>États-Unis</td></tr>
           <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
           <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
           <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
+          <tr><td>Trello (Atlassian)</td><td>Gestion signalements &amp; demandes</td><td>États-Unis</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -696,7 +723,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
           <strong>Mairie de Mézières-lez-Cléry</strong><br>
           36 rue du bourg — 45370<br>
           📞 02 38 45 61 76<br>
-          ✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="513c3038233834113c342b38342334227c3d342b7c323d3423287f3723">[email&#160;protected]</a>
+          ✉️ mairie@mezieres-lez-clery.fr
         </div>
       </div>
     </div>
@@ -733,7 +760,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.0 — Mézières Avec Toi
+// MAT v3.3 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -748,14 +775,61 @@ let dp = null;
 if (localStorage.getItem(INSTALL_KEY)) document.getElementById('install-banner').classList.add('hidden');
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; });
 window.addEventListener('appinstalled', () => { localStorage.setItem(INSTALL_KEY,'1'); document.getElementById('install-banner').classList.add('hidden'); });
+
+function updateInstallBanner() {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const titleEl = document.getElementById('ib-title-txt');
+  const subEl   = document.getElementById('ib-sub-txt');
+  if (!isMobile) {
+    if (titleEl) titleEl.textContent = 'Installez MAT sur votre ordinateur !';
+    if (subEl)   subEl.textContent   = 'Chrome/Edge : cliquez l\'icône ⊕ dans la barre d\'adresse · Firefox : non supporté';
+  }
+}
+updateInstallBanner();
+
 function installApp(){
   if(dp){ dp.prompt(); dp.userChoice.then(r=>{ if(r.outcome==='accepted'){localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');} dp=null; }); }
-  else alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
+  else {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
+    } else {
+      alert('Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse (à droite)\n\nSi elle n\'apparaît pas, ouvrez le menu du navigateur → "Installer l\'application"');
+    }
+  }
 }
 function hideBanner(e){ e.stopPropagation(); document.getElementById('install-banner').classList.add('hidden'); localStorage.setItem(INSTALL_KEY,'dismissed'); }
 
-// ── Overlays ──────────────────────────
-function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l’aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
+// ── Overlays + gestion bouton retour ─────────────────────────
+const _ovStack = [];
+
+function openOv(id){
+  document.getElementById('ov-'+id).classList.add('open');
+  document.body.style.overflow='hidden';
+  _ovStack.push(id);
+}
+function closeOv(id){
+  document.getElementById('ov-'+id).classList.remove('open');
+  const idx = _ovStack.lastIndexOf(id);
+  if(idx !== -1) _ovStack.splice(idx,1);
+  if(_ovStack.length === 0) document.body.style.overflow='';
+}
+function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
+
+// Bouton retour navigateur ferme le dernier overlay ouvert
+window.addEventListener('popstate', function(){
+  if(_ovStack.length > 0){
+    const last = _ovStack[_ovStack.length-1];
+    closeOv(last);
+    // Repousser un état pour le prochain appui
+    history.pushState({mat:'overlay'}, '');
+  }
+});
+// Pousser un état initial au chargement
+history.pushState({mat:'overlay'}, '');
+
+function openMajordome(){ openOv('majordome'); }
+function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
 function openSignal(){openOv('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
@@ -763,11 +837,27 @@ function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
 function openContact(){openOv('contact');}
 function openAgenda(){openOv('agenda'); loadAgenda();}
-function openAgendaFromTopEvent(){openAgenda(); setTimeout(function(){ if(window._agendaEvents && window._agendaEvents.length){ openEventDetail(window._agendaEvents[0].uid); } }, 250); }
+function openDechets(){openOv('dechets'); loadDechetsDetail();}
 
-function openOv(id){ document.getElementById('ov-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeOv(id){ document.getElementById('ov-'+id).classList.remove('open'); document.body.style.overflow=''; }
-function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
+function openAgendaFromTopEvent(){
+  // Ouvrir l'agenda sur le mois de l'événement puis afficher la fiche
+  openOv('agenda');
+  ensureAgendaEvents().then(function(evts){
+    if(!evts || !evts.length) return;
+    var first = evts[0];
+    var now = new Date();
+    // Si l'événement est dans un autre mois, basculer sur "mois"
+    if(first.start.getMonth() !== now.getMonth() || first.start.getFullYear() !== now.getFullYear()){
+      agendaView = 'month';
+      // Pointer le calendrier sur le mois de l'événement
+      _agendaTargetMonth = { y: first.start.getFullYear(), m: first.start.getMonth() };
+    }
+    renderAgenda();
+    setTimeout(function(){ openEventDetail(first.uid); }, 200);
+  }).catch(function(){
+    loadAgenda();
+  });
+}
 
 // ── MEL ───────────────────────────────
 let melInited=false, melBusy=false;
@@ -790,7 +880,7 @@ async function sendMel(){
   inp.value=''; document.getElementById('sugs').style.display='none';
   addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
   try{
-    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-6)})});
+    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8)})});
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
     var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
@@ -798,42 +888,20 @@ async function sendMel(){
   melBusy=false;
 }
 const MEL_THEME_SUGGESTIONS = {
-  urbanisme: [
-    "Faut-il une déclaration préalable pour une clôture ?",
-    "Ai-je besoin d’un permis pour une extension ?",
-    "Comment consulter le PLU de la commune ?",
-    "Quelles règles pour un abri de jardin ?"
-  ],
-  enfance: [
-    "Comment fonctionne la cantine ?",
-    "Quels sont les services périscolaires ?",
-    "Comment s’inscrire au centre de loisirs ?",
-    "Quelles infos sur la crèche familiale ?"
-  ],
-  demarches: [
-    "Comment demander un acte de naissance ?",
-    "Où faire une carte d’identité ?",
-    "Comment obtenir un passeport ?",
-    "Quelles démarches pour un mariage ?"
-  ],
-  fibre: [
-    "Suis-je éligible à la fibre ?",
-    "Qui contacter pour le raccordement fibre ?",
-    "Que faire si la fibre n’est pas disponible ?",
-    "Où trouver les infos numériques utiles ?"
-  ]
+  urbanisme: ["Faut-il une déclaration préalable pour une clôture ?","Ai-je besoin d'un permis pour une extension ?","Comment consulter le PLU de la commune ?","Quelles règles pour un abri de jardin ?"],
+  enfance:   ["Comment fonctionne la cantine ?","Quels sont les services périscolaires ?","Comment s'inscrire au centre de loisirs ?","Quelles infos sur la crèche familiale ?"],
+  demarches: ["Comment demander un acte de naissance ?","Où faire une carte d'identité ?","Comment obtenir un passeport ?","Quelles démarches pour un mariage ?"],
+  fibre:     ["Suis-je éligible à la fibre ?","Qui contacter pour le raccordement fibre ?","Que faire si la fibre n'est pas disponible ?","Où trouver les infos numériques utiles ?"]
 };
-
 function renderMelThemes(){
   const sugs = document.getElementById('sugs');
   if(!sugs) return;
-  sugs.innerHTML = ''
-    + '<button class="sug" onclick="showMelThemeQuestions(\'urbanisme\')">🏗️ Urbanisme</button>'
+  sugs.style.display='';
+  sugs.innerHTML = '<button class="sug" onclick="showMelThemeQuestions(\'urbanisme\')">🏗️ Urbanisme</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'enfance\')">🧒 Enfance</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'demarches\')">📄 Démarches</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre</button>';
 }
-
 function showMelThemeQuestions(theme){
   const sugs = document.getElementById('sugs');
   const qs = MEL_THEME_SUGGESTIONS[theme] || [];
@@ -841,17 +909,15 @@ function showMelThemeQuestions(theme){
   sugs.innerHTML = '<button class="sug" onclick="renderMelThemes()">← Thèmes</button>'
     + qs.map(q => '<button class="sug" onclick="askMelSuggestedQuestion(this)">'+q+'</button>').join('');
 }
-
 function askMelSuggestedQuestion(btn){
   document.getElementById('minp').value = btn.textContent.trim();
   sendMel();
 }
-
 function sendSug(btn){ document.getElementById('minp').value=btn.textContent.trim(); sendMel(); }
 
 // ── Météo ─────────────────────────────
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
-const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
+const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
 
 async function loadMeteo() {
   try {
@@ -861,41 +927,24 @@ async function loadMeteo() {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       d = await r.json();
     } catch (backendErr) {
-      console.warn('Backend météo indisponible, fallback Open-Meteo:', backendErr);
       const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset&timezone=Europe%2FParis&forecast_days=3', { cache: 'no-store' });
       if (!fr.ok) throw new Error('Fallback HTTP ' + fr.status);
-      const forecast = await fr.json();
-      d = { forecast, vigilance: null };
+      d = { forecast: await fr.json(), vigilance: null };
     }
-
-    const forecast = d.forecast || {};
-    const cur = forecast.current || {};
+    const cur = (d.forecast || {}).current || {};
     const vigilance = d.vigilance || null;
-
     const code = cur.weather_code;
-    const temp = Math.round((cur.temperature_2m != null) ? cur.temperature_2m : 0);
-    const vent = Math.round((cur.wind_speed_10m != null) ? cur.wind_speed_10m : 0);
-
+    const temp = Math.round(cur.temperature_2m != null ? cur.temperature_2m : 0);
+    const vent = Math.round(cur.wind_speed_10m != null ? cur.wind_speed_10m : 0);
     document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
-    document.getElementById('meteo-temp').innerHTML =
-      '<strong style="font-size:1.2rem;color:var(--cream)">' + temp + '°C</strong>';
-    document.getElementById('meteo-desc').textContent =
-      (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
-
+    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+temp+'°C</strong>';
+    document.getElementById('meteo-desc').textContent = (METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h';
     const badge = document.getElementById('meteo-alerte');
-    if (vigilance && Number(vigilance.level || 0) >= 2) {
-      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || '');
-    } else {
-      badge.textContent = '✅ Pas d\'alerte';
-    }
+    badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : '✅ Pas d\'alerte';
     badge.style.display = 'inline-flex';
-
     window._meteoData = d;
   } catch (e) {
-    console.error('Erreur météo:', e);
-    document.getElementById('meteo-temp').innerHTML =
-      '<span class="meteo-loading">Météo indisponible</span>';
-    document.getElementById('meteo-desc').textContent = '';
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">Météo indisponible</span>';
     document.getElementById('meteo-alerte').style.display = 'none';
   }
 }
@@ -903,292 +952,232 @@ async function loadMeteo() {
 function loadMeteoDetail() {
   var d = window._meteoData;
   var el = document.getElementById('meteo-detail');
-  if (!d) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
-    return;
-  }
-
-  var forecast = d.forecast || {};
-  var cur = forecast.current || {};
-  var days = forecast.daily || {};
-  var vigilance = d.vigilance || null;
+  if (!d) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>'; return; }
+  var forecast = d.forecast || {}, cur = forecast.current || {}, days = forecast.daily || {}, vigilance = d.vigilance || null;
   var JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-  var html = '';
-
-  html += '<div style="background:white;border-radius:14px;padding:12px;margin-bottom:14px;border:1px solid var(--border)">'
-    + '<div style="font-size:0.82rem;font-weight:900;color:var(--text)">'
-    + ((vigilance && Number(vigilance.level || 0) >= 2) ? '⚠️ Alerte en cours : vigilance ' + (vigilance.color_label || '') : '✅ Aucune alerte météo en cours')
-    + '</div>'
-    + '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
+  var html = '<div style="background:white;border-radius:14px;padding:12px;margin-bottom:14px;border:1px solid var(--border)"><div style="font-size:0.82rem;font-weight:900;color:var(--text)">'
+    + ((vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Alerte en cours : vigilance '+(vigilance.color_label||'') : '✅ Aucune alerte météo en cours')
+    + '</div><div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
     + ((vigilance && vigilance.main_text) ? vigilance.main_text : 'Situation météo normale sur la commune.')
     + '</div></div>';
-
-  var pluieActuelle = (cur.precipitation != null) ? cur.precipitation : 0;
-  var humiditeActuelle = (cur.relative_humidity_2m != null) ? cur.relative_humidity_2m : 0;
-  var pressionActuelle = (cur.pressure_msl != null) ? cur.pressure_msl : 0;
-  var rafalesActuelles = (cur.wind_gusts_10m != null) ? cur.wind_gusts_10m : 0;
-
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + pluieActuelle + ' mm</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + humiditeActuelle + '%</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(pressionActuelle) + ' hPa</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">' + Math.round(rafalesActuelles) + ' km/h</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.precipitation||0)+' mm</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.relative_humidity_2m||0)+'%</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.pressure_msl||0)+' hPa</div></div>'
+    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.wind_gusts_10m||0)+' km/h</div></div>'
     + '</div>';
-
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
   for (var i = 0; i < 3; i++) {
-    var timeValue = (days.time && days.time[i]) ? days.time[i] : null;
-    var dt = timeValue ? new Date(timeValue) : new Date();
+    var dt = days.time && days.time[i] ? new Date(days.time[i]) : new Date();
     var jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
-    var code = (days.weather_code && days.weather_code[i] != null) ? days.weather_code[i] : 0;
-    var ico = METEO_ICONS[code] || '🌡️';
-    var desc = METEO_DESC[code] || '';
-    var tmax = Math.round((days.temperature_2m_max && days.temperature_2m_max[i] != null) ? days.temperature_2m_max[i] : 0);
-    var tmin = Math.round((days.temperature_2m_min && days.temperature_2m_min[i] != null) ? days.temperature_2m_min[i] : 0);
-    var pluie = (days.precipitation_sum && days.precipitation_sum[i] != null) ? days.precipitation_sum[i] : 0;
-    var uv = (days.uv_index_max && days.uv_index_max[i] != null) ? days.uv_index_max[i] : '-';
-
-    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
-      + '<div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">' + jour + '</div>'
-      + '<div style="font-size:1.8rem">' + ico + '</div>'
-      + '<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">' + tmax + '° / ' + tmin + '°</div>'
-      + '<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">' + desc + '</div>'
-      + '<div style="font-size:0.62rem;color:#2563eb;margin-top:2px">🌧️ ' + pluie + ' mm</div>'
-      + '<div style="font-size:0.62rem;color:#ca8a04;margin-top:2px">🌞 UV ' + uv + '</div>'
-      + '</div>';
+    var code = days.weather_code && days.weather_code[i] != null ? days.weather_code[i] : 0;
+    var tmax = Math.round(days.temperature_2m_max && days.temperature_2m_max[i] != null ? days.temperature_2m_max[i] : 0);
+    var tmin = Math.round(days.temperature_2m_min && days.temperature_2m_min[i] != null ? days.temperature_2m_min[i] : 0);
+    var pluie = days.precipitation_sum && days.precipitation_sum[i] != null ? days.precipitation_sum[i] : 0;
+    var uv = days.uv_index_max && days.uv_index_max[i] != null ? days.uv_index_max[i] : '-';
+    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">'+jour+'</div><div style="font-size:1.8rem">'+(METEO_ICONS[code]||'🌡️')+'</div><div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+tmax+'° / '+tmin+'°</div><div style="font-size:0.62rem;color:var(--muted);margin-top:2px">'+(METEO_DESC[code]||'')+'</div><div style="font-size:0.62rem;color:#2563eb;margin-top:2px">🌧️ '+pluie+' mm</div><div style="font-size:0.62rem;color:#ca8a04;margin-top:2px">🌞 UV '+uv+'</div></div>';
   }
-  html += '</div>';
-  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
+  html += '</div><div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
   el.innerHTML = html;
 }
 
-// ── Événements iCal / Agenda MAT ───────────────────
-const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+// ── Agenda / Calendrier ───────────────
+const MONTHS      = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 const MONTHS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 var agendaView = 'today';
+var _agendaTargetMonth = null; // { y, m } pour navigation mois
 
-function decodeIcalText(v) {
-  return (v || '').replace(/\\n/g, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').trim();
-}
-function parseIcalDateLine(line) {
-  if (!line) return null;
+function decodeIcalText(v){ return (v||'').replace(/\\n/g,'\n').replace(/\\,/g,',').replace(/\\;/g,';').trim(); }
+function parseIcalDateLine(line){
+  if(!line) return null;
   var value = line.split(':').pop().trim();
-  if (/^\d{8}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T00:00:00');
-  if (/^\d{8}T\d{6}Z$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15)+'Z');
-  if (/^\d{8}T\d{6}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15));
+  if(/^\d{8}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T00:00:00');
+  if(/^\d{8}T\d{6}Z$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15)+'Z');
+  if(/^\d{8}T\d{6}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15));
   return new Date(value);
 }
-function parseIcalDetailed(txt) {
+function parseIcalDetailed(txt){
   var blocks = txt.replace(/\r/g,'').replace(/\n[ \t]/g,'').split('BEGIN:VEVENT').slice(1);
-  var now = new Date();
-  var limit = new Date(now.getTime() + 365 * 86400000);
-  var startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var now = new Date(), limit = new Date(now.getTime()+365*86400000);
+  var startToday = new Date(now.getFullYear(),now.getMonth(),now.getDate());
   var evts = [];
-  blocks.forEach(function(b, idx) {
-    function getLine(name) {
-      var re = new RegExp('^' + name + '[^:]*:(.+)$', 'm');
-      var m = b.match(re);
-      return m ? decodeIcalText(m[1]) : '';
-    }
-    var summary = getLine('SUMMARY');
-    var location = getLine('LOCATION');
-    var description = getLine('DESCRIPTION');
-    var uid = getLine('UID') || ('evt-' + idx);
-    var startLine = b.match(/^DTSTART[^:]*:.+$/m);
-    var endLine = b.match(/^DTEND[^:]*:.+$/m);
-    var start = startLine ? parseIcalDateLine(startLine[0]) : null;
-    var end = endLine ? parseIcalDateLine(endLine[0]) : null;
-    if (!summary || !start || isNaN(start.getTime())) return;
-    if (start < startToday || start > limit) return;
-    evts.push({ uid: uid, summary: summary, location: location, description: description, start: start, end: end });
+  blocks.forEach(function(b,idx){
+    function getLine(name){ var re=new RegExp('^'+name+'[^:]*:(.+)$','m'); var m=b.match(re); return m?decodeIcalText(m[1]):''; }
+    var summary=getLine('SUMMARY'), location=getLine('LOCATION'), description=getLine('DESCRIPTION'), uid=getLine('UID')||('evt-'+idx);
+    var startLine=b.match(/^DTSTART[^:]*:.+$/m), endLine=b.match(/^DTEND[^:]*:.+$/m);
+    var start=startLine?parseIcalDateLine(startLine[0]):null, end=endLine?parseIcalDateLine(endLine[0]):null;
+    if(!summary||!start||isNaN(start.getTime())) return;
+    if(start<startToday||start>limit) return;
+    evts.push({uid,summary,location,description,start,end});
   });
-  evts.sort(function(a,b){ return a.start - b.start; });
+  evts.sort(function(a,b){return a.start-b.start;});
   return evts;
 }
-function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-function startOfWeek(d){ var x=new Date(d); var day=x.getDay(); var diff=day===0?-6:1-day; x.setHours(0,0,0,0); x.setDate(x.getDate()+diff); return x; }
-function endOfWeek(d){ var x=startOfWeek(d); x.setDate(x.getDate()+6); x.setHours(23,59,59,999); return x; }
-function formatEventMeta(evt) {
-  var dateTxt = evt.start.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-  var timeTxt = evt.start.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-  var endTxt = evt.end ? evt.end.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '';
-  var meta = '🕒 ' + timeTxt + (endTxt ? ' → ' + endTxt : '') + ' · ' + dateTxt;
-  if (evt.location) meta += '<br>📍 ' + evt.location;
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function startOfWeek(d){var x=new Date(d);var day=x.getDay();var diff=day===0?-6:1-day;x.setHours(0,0,0,0);x.setDate(x.getDate()+diff);return x;}
+function endOfWeek(d){var x=startOfWeek(d);x.setDate(x.getDate()+6);x.setHours(23,59,59,999);return x;}
+function formatEventMeta(evt){
+  var dateTxt=evt.start.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  var timeTxt=evt.start.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  var endTxt=evt.end?evt.end.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+  var meta='🕒 '+timeTxt+(endTxt?' → '+endTxt:'')+' · '+dateTxt;
+  if(evt.location) meta+='<br>📍 '+evt.location;
   return meta;
 }
-function buildIcsForEvent(evt) {
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function fmt(d){ return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00'; }
-  var end = evt.end || new Date(evt.start.getTime()+3600000);
-  return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:' + evt.summary.replace(/\n/g,' ') + '\nDTSTART:' + fmt(evt.start) + '\nDTEND:' + fmt(end) + '\nLOCATION:' + (evt.location || '').replace(/\n/g,' ') + '\nDESCRIPTION:' + (evt.description || '').replace(/\n/g,' ') + '\nEND:VEVENT\nEND:VCALENDAR';
+function buildIcsForEvent(evt){
+  function pad(n){return String(n).padStart(2,'0');}
+  function fmt(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';}
+  var end=evt.end||new Date(evt.start.getTime()+3600000);
+  return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:'+evt.summary.replace(/\n/g,' ')+'\nDTSTART:'+fmt(evt.start)+'\nDTEND:'+fmt(end)+'\nLOCATION:'+(evt.location||'').replace(/\n/g,' ')+'\nDESCRIPTION:'+(evt.description||'').replace(/\n/g,' ')+'\nEND:VEVENT\nEND:VCALENDAR';
 }
-async function ensureAgendaEvents() {
-  if (window._agendaEvents) return window._agendaEvents;
-  var r = await fetch(ICAL_URL, { cache:'no-store' });
-  if (!r.ok) throw new Error('HTTP ' + r.status);
-  var txt = await r.text();
-  window._agendaEvents = parseIcalDetailed(txt);
+async function ensureAgendaEvents(){
+  if(window._agendaEvents) return window._agendaEvents;
+  var r=await fetch(ICAL_URL,{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  window._agendaEvents=parseIcalDetailed(await r.text());
   return window._agendaEvents;
 }
-async function loadAgenda() {
-  var content = document.getElementById('agenda-content');
-  content.innerHTML = '<div class="agenda-empty">Chargement de l\'agenda…</div>';
-  try {
-    await ensureAgendaEvents();
-    renderAgenda();
-  } catch (e) {
-    console.error('Erreur agenda:', e);
-    content.innerHTML = '<div class="agenda-empty">Agenda indisponible.</div>';
-  }
+async function loadAgenda(){
+  var content=document.getElementById('agenda-content');
+  content.innerHTML='<div class="agenda-empty">Chargement de l\'agenda…</div>';
+  try{ await ensureAgendaEvents(); renderAgenda(); }
+  catch(e){ content.innerHTML='<div class="agenda-empty">Agenda indisponible.</div>'; }
 }
-function setAgendaView(view) {
-  agendaView = view;
+function setAgendaView(view){
+  agendaView=view;
+  _agendaTargetMonth=null;
   ['today','week','month'].forEach(function(v){
-    var el = document.getElementById('agenda-tab-' + v);
-    if (el) el.classList.toggle('on', v === view);
+    var el=document.getElementById('agenda-tab-'+v);
+    if(el) el.classList.toggle('on',v===view);
   });
   renderAgenda();
 }
-function renderAgenda() {
-  var content = document.getElementById('agenda-content');
-  var evts = window._agendaEvents || [];
-  var now = new Date();
-  var list = [];
-  if (agendaView === 'today') {
-    list = evts.filter(function(e){ return sameDay(e.start, now); });
-    if (!list.length) {
-      var nxt = evts.length ? evts[0] : null;
-      content.innerHTML = nxt ? '<div class="agenda-empty">Aucun événement aujourd\'hui.<br><br>Prochain : <strong>' + nxt.summary + '</strong> le ' + nxt.start.toLocaleDateString('fr-FR', { day:'numeric', month:'long' }) + '.</div>' : '<div class="agenda-empty">Aucun événement à venir.</div>';
+function renderAgenda(){
+  var content=document.getElementById('agenda-content');
+  var evts=window._agendaEvents||[];
+  var now=new Date();
+  var list=[];
+
+  // Mois cible (pour navigation depuis l'encart)
+  var targetY = _agendaTargetMonth ? _agendaTargetMonth.y : now.getFullYear();
+  var targetM = _agendaTargetMonth ? _agendaTargetMonth.m : now.getMonth();
+
+  if(agendaView==='today'){
+    list=evts.filter(function(e){return sameDay(e.start,now);});
+    if(!list.length){
+      var nxt=evts.length?evts[0]:null;
+      content.innerHTML=nxt?'<div class="agenda-empty">Aucun événement aujourd\'hui.<br><br>Prochain : <strong>'+nxt.summary+'</strong> le '+nxt.start.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+'.</div>':'<div class="agenda-empty">Aucun événement à venir.</div>';
       return;
     }
-  } else if (agendaView === 'week') {
-    var sw = startOfWeek(now), ew = endOfWeek(now);
-    list = evts.filter(function(e){ return e.start >= sw && e.start <= ew; });
+  } else if(agendaView==='week'){
+    var sw=startOfWeek(now),ew=endOfWeek(now);
+    list=evts.filter(function(e){return e.start>=sw&&e.start<=ew;});
   } else {
-    var year = now.getFullYear(), month = now.getMonth();
-    list = evts.filter(function(e){ return e.start.getFullYear()===year && e.start.getMonth()===month; });
+    list=evts.filter(function(e){return e.start.getFullYear()===targetY&&e.start.getMonth()===targetM;});
   }
-  if (agendaView === 'month') {
-    var first = new Date(now.getFullYear(), now.getMonth(), 1);
-    var last = new Date(now.getFullYear(), now.getMonth()+1, 0);
-    var startPad = first.getDay()===0 ? 6 : first.getDay()-1;
-    var html = '<div style="font-size:.82rem;font-weight:900;color:var(--forest);margin-bottom:8px;text-transform:capitalize">' + MONTHS_LONG[now.getMonth()] + ' ' + now.getFullYear() + '</div>';
-    html += '<div class="agenda-month-grid">';
-    ['L','M','M','J','V','S','D'].forEach(function(h){ html += '<div class="agenda-month-head">' + h + '</div>'; });
-    for (var p=0; p<startPad; p++) html += '<div class="agenda-month-day" style="visibility:hidden"></div>';
-    for (var d=1; d<=last.getDate(); d++) {
-      var current = new Date(now.getFullYear(), now.getMonth(), d);
-      var hasEvent = list.some(function(e){ return sameDay(e.start, current); });
-      var cls = 'agenda-month-day' + (hasEvent ? ' has-event' : '') + (sameDay(current, now) ? ' today' : '');
-      html += '<div class="' + cls + '">' + d + '</div>';
+  if(agendaView==='month'){
+    var first=new Date(targetY,targetM,1);
+    var last=new Date(targetY,targetM+1,0);
+    var startPad=first.getDay()===0?6:first.getDay()-1;
+    var html='<div style="font-size:.82rem;font-weight:900;color:var(--forest);margin-bottom:8px;text-transform:capitalize">'+MONTHS_LONG[targetM]+' '+targetY+'</div>';
+    html+='<div class="agenda-month-grid">';
+    ['L','M','M','J','V','S','D'].forEach(function(h){html+='<div class="agenda-month-head">'+h+'</div>';});
+    for(var p=0;p<startPad;p++) html+='<div class="agenda-month-day" style="visibility:hidden"></div>';
+    for(var d=1;d<=last.getDate();d++){
+      var current=new Date(targetY,targetM,d);
+      var hasEvent=list.some(function(e){return sameDay(e.start,current);});
+      var cls='agenda-month-day'+(hasEvent?' has-event':'')+(sameDay(current,now)?' today':'');
+      html+='<div class="'+cls+'">'+d+'</div>';
     }
-    html += '</div>';
-    html += '<div class="agenda-list" style="margin-top:14px">' + (list.length ? list.map(renderAgendaItem).join('') : '<div class="agenda-empty">Aucun événement ce mois-ci.</div>') + '</div>';
-    content.innerHTML = html;
+    html+='</div><div class="agenda-list" style="margin-top:14px">'+(list.length?list.map(renderAgendaItem).join(''):'<div class="agenda-empty">Aucun événement ce mois-ci.</div>')+'</div>';
+    content.innerHTML=html;
     return;
   }
-  content.innerHTML = list.length ? '<div class="agenda-list">' + list.map(renderAgendaItem).join('') + '</div>' : '<div class="agenda-empty">Aucun événement sur cette période.</div>';
+  content.innerHTML=list.length?'<div class="agenda-list">'+list.map(renderAgendaItem).join('')+'</div>':'<div class="agenda-empty">Aucun événement sur cette période.</div>';
 }
-function renderAgendaItem(evt) {
-  var dayName = evt.start.toLocaleDateString('fr-FR', { weekday:'short' });
-  return '<div class="agenda-item" onclick="openEventDetail(\'' + evt.uid.replace(/'/g, "\\'") + '\')">'
-    + '<div class="agenda-item-head">'
-    + '<div class="agenda-date-badge"><div class="agenda-date-day">' + dayName + '</div><div class="agenda-date-num">' + evt.start.getDate() + '</div></div>'
-    + '<div style="flex:1;min-width:0"><div class="agenda-title">' + evt.summary + '</div><div class="agenda-meta">' + formatEventMeta(evt) + '</div>'
-    + (evt.description ? '<div class="agenda-desc">' + evt.description + '</div>' : '')
-    + '</div></div></div>';
+function renderAgendaItem(evt){
+  var dayName=evt.start.toLocaleDateString('fr-FR',{weekday:'short'});
+  return '<div class="agenda-item" onclick="openEventDetail(\''+evt.uid.replace(/'/g,"\\'")+'\')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+evt.summary+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+evt.description+'</div>':'')+'</div></div></div>';
 }
-function openEventDetail(uid) {
-  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
-  if (!evt) return;
-  var body = document.getElementById('event-detail-body');
-  body.innerHTML = '<div class="event-detail-card">'
-    + '<div class="event-detail-title">' + evt.summary + '</div>'
-    + '<div class="event-detail-meta">' + formatEventMeta(evt) + '</div>'
-    + '<div class="event-detail-desc">' + (evt.description || 'Aucune description.') + '</div>'
-    + '<div class="event-detail-actions">'
-    + '<button class="event-btn primary" onclick="downloadEventIcs(\'' + evt.uid.replace(/'/g, "\\'") + '\')">Ajouter à mon agenda</button>'
-    + (evt.location ? '<button class="event-btn secondary" onclick="openEventMap(\'' + evt.uid.replace(/'/g, "\\'") + '\')">Voir le lieu</button>' : '')
-    + '</div></div>';
+function openEventDetail(uid){
+  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
+  if(!evt) return;
+  var body=document.getElementById('event-detail-body');
+  body.innerHTML='<div class="event-detail-card"><div class="event-detail-title">'+evt.summary+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description||'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
   openOv('event');
 }
-function downloadEventIcs(uid) {
-  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
-  if (!evt) return;
-  var blob = new Blob([buildIcsForEvent(evt)], { type:'text/calendar;charset=utf-8' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'evenement-mat.ics';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+function downloadEventIcs(uid){
+  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
+  if(!evt) return;
+  var blob=new Blob([buildIcsForEvent(evt)],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='evenement-mat.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
 }
-function openEventMap(uid) {
-  var evt = (window._agendaEvents || []).find(function(e){ return e.uid === uid; });
-  if (!evt || !evt.location) return;
-  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(evt.location), '_blank');
+function openEventMap(uid){
+  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
+  if(!evt||!evt.location) return;
+  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(evt.location),'_blank');
 }
-async function loadEvents() {
-  try {
-    var evts = await ensureAgendaEvents();
-    var first = evts.length ? evts[0] : null;
-    if (!first) {
-      document.getElementById('next-event-date').textContent = 'Aucune date';
-      document.getElementById('next-event-name').textContent = 'Aucune manifestation à venir';
-      document.getElementById('next-event-days').textContent = 'Ouvrir l’agenda';
+async function loadEvents(){
+  try{
+    var evts=await ensureAgendaEvents();
+    var first=evts.length?evts[0]:null;
+    if(!first){
+      document.getElementById('next-event-date').textContent='Aucune date';
+      document.getElementById('next-event-name').textContent='Aucune manifestation à venir';
+      document.getElementById('next-event-days').textContent='Ouvrir l\'agenda';
       return;
     }
-    var diff = Math.ceil((first.start - new Date()) / (1000*60*60*24));
-    var diffTxt = diff <= 0 ? 'Aujourd\'hui' : diff === 1 ? 'Demain' : 'Dans ' + diff + ' j.';
-    document.getElementById('next-event-date').textContent = first.start.getDate() + ' ' + MONTHS[first.start.getMonth()];
-    document.getElementById('next-event-name').textContent = first.summary;
-    document.getElementById('next-event-days').textContent = diffTxt;
-  } catch (e) {
-    console.error('Erreur calendrier:', e);
-    document.getElementById('next-event-date').textContent = 'Indisponible';
-    document.getElementById('next-event-name').textContent = 'Agenda MAT';
-    document.getElementById('next-event-days').textContent = 'Réessayez plus tard';
+    var diff=Math.ceil((first.start-new Date())/(1000*60*60*24));
+    var diffTxt=diff<=0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
+    document.getElementById('next-event-date').textContent=first.start.getDate()+' '+MONTHS[first.start.getMonth()];
+    document.getElementById('next-event-name').textContent=first.summary;
+    document.getElementById('next-event-days').textContent=diffTxt;
+  }catch(e){
+    document.getElementById('next-event-date').textContent='Indisponible';
+    document.getElementById('next-event-name').textContent='Agenda MAT';
+    document.getElementById('next-event-days').textContent='Réessayez plus tard';
   }
 }
 
-// ── Signalement// ── Signalement ───────────────────────
-let sigCat='', sigLat='', sigLon='';
-function selCat(btn, cat){
+// ── Signalement → Trello ─────────────
+let sigCat='',sigLat='',sigLon='';
+function selCat(btn,cat){
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); sigCat = cat;
+  btn.classList.add('on'); sigCat=cat;
 }
 function previewPhoto(){
-  const file = document.getElementById('signal-photo-input').files[0];
-  if(!file)return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('signal-photo-preview');
-    prev.src = e.target.result; prev.style.display='block';
+  const file=document.getElementById('signal-photo-input').files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const prev=document.getElementById('signal-photo-preview');
+    prev.src=e.target.result; prev.style.display='block';
     document.querySelector('.photo-btn').style.display='none';
   };
   reader.readAsDataURL(file);
 }
 function getLocation(){
-  if(!navigator.geolocation){ document.getElementById('loc-status').textContent='GPS non disponible'; return; }
+  if(!navigator.geolocation){document.getElementById('loc-status').textContent='GPS non disponible';return;}
   document.getElementById('loc-btn').textContent='📍 Localisation en cours…';
   navigator.geolocation.getCurrentPosition(pos=>{
-    sigLat = pos.coords.latitude.toFixed(5); sigLon = pos.coords.longitude.toFixed(5);
+    sigLat=pos.coords.latitude.toFixed(5); sigLon=pos.coords.longitude.toFixed(5);
     document.getElementById('loc-btn').textContent='✅ Position obtenue ('+sigLat+', '+sigLon+')';
     document.getElementById('loc-btn').classList.add('on');
     document.getElementById('loc-status').textContent='';
-  }, ()=>{ document.getElementById('loc-btn').textContent='❌ Position refusée'; document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres'; });
+  },()=>{document.getElementById('loc-btn').textContent='❌ Position refusée';document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres';});
 }
 async function submitSignal(){
-  const desc = document.getElementById('signal-desc').value.trim();
-  const photoEl = document.getElementById('signal-photo-preview');
-  const photoB64 = photoEl.style.display!=='none' ? photoEl.src : '';
-  const body = { cat: sigCat||'Non précisé', desc, lat: sigLat, lon: sigLon, photoB64: photoB64.substring(0,50000) };
-  const btn = document.querySelector('.submit-btn');
-  btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+  const desc=document.getElementById('signal-desc').value.trim();
+  const photoEl=document.getElementById('signal-photo-preview');
+  const photoB64=photoEl.style.display!=='none'?photoEl.src:'';
+  const body={cat:sigCat||'Non précisé',desc,lat:sigLat,lon:sigLon,photoB64:photoB64.substring(0,50000)};
+  const btn=document.querySelector('#signal-form .submit-btn');
+  btn.textContent='Envoi en cours…'; btn.disabled=true;
   try{
-    await fetch(SIGNAL_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    await fetch(SIGNAL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
   }catch(e){
@@ -1203,478 +1192,288 @@ function resetSignal(){
   document.getElementById('signal-photo-preview').style.display='none';
   document.querySelector('.photo-btn').style.display='block';
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
-  sigCat=''; sigLat=''; sigLon='';
+  sigCat='';sigLat='';sigLon='';
   document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
   document.getElementById('loc-btn').classList.remove('on');
 }
 
 // ── Boîte à idées ─────────────────────
-const IDEAS_KEY = 'mat_ideas_v3';
-const VOTES_KEY = 'mat_votes_v3';
-let ideaCat = '';
-
-function selIdeaCat(btn, cat){
-  document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); ideaCat = cat;
-}
-
-function getIdeas(){ try{ return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]'); }catch(e){return[];} }
-function getVotes(){ try{ return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}'); }catch(e){return {};} }
-
+const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3';
+let ideaCat='';
+function selIdeaCat(btn,cat){document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));btn.classList.add('on');ideaCat=cat;}
+function getIdeas(){try{return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]');}catch(e){return[];}}
+function getVotes(){try{return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}');}catch(e){return {};}}
 async function submitIdee(){
-  const txt = document.getElementById('idea-input').value.trim();
-  if(!txt){ alert('Veuillez écrire votre idée !'); return; }
-  const idea = { id: Date.now(), text: txt, cat: ideaCat||'💡 Autre', votes: 0, date: new Date().toLocaleDateString('fr-FR') };
-  // Stocker localement
-  const ideas = getIdeas();
-  ideas.unshift(idea);
-  localStorage.setItem(IDEAS_KEY, JSON.stringify(ideas));
-  // Envoyer au serveur pour partage
-  try {
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/idee', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(idea)
-    });
-  } catch(e) { /* si hors ligne, stocké localement seulement */ }
-  document.getElementById('idea-input').value='';
-  ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  const txt=document.getElementById('idea-input').value.trim();
+  if(!txt){alert('Veuillez écrire votre idée !');return;}
+  const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR')};
+  const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
+  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
+  document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
   loadIdees();
 }
-
 async function voteIdee(id){
-  const votes = getVotes();
-  if(votes[id]) return; // déjà voté
-  votes[id] = 1;
-  localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
-  try {
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote', { method:'POST' });
-  } catch(e) { /* hors ligne */ }
+  const votes=getVotes(); if(votes[id]) return;
+  votes[id]=1; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
+  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote',{method:'POST'});}catch(e){}
   loadIdees();
 }
-
 async function loadIdees(){
-  const votes = getVotes();
-  const el = document.getElementById('ideas-list');
+  const votes=getVotes(); const el=document.getElementById('ideas-list');
   el.innerHTML='<div class="no-ideas">Chargement…</div>';
-  let ideas = [];
-  try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/idees');
-    const d = await r.json();
-    ideas = d.idees || [];
-    const local = getIdeas().filter(li => !ideas.find(si => si.id === li.id));
-    ideas = [...local, ...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
-  } catch(e) {
-    ideas = getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));
-  }
-  if(!ideas.length){ el.innerHTML='<div class="no-ideas">Aucune idée pour l’instant.<br>Soyez le premier à proposer !</div>'; return; }
-  el.innerHTML = ideas.map(idea=>`
-    <div class="idea-card">
-      <div class="idea-votes">
-        <button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button>
-        <div class="vote-count">${idea.votes||0}</div>
-      </div>
-      <div class="idea-content">
-        <div class="idea-cat-badge">${idea.cat}</div>
-        <div class="idea-text">${idea.text}</div>
-        <div class="idea-date">${idea.date}</div>
-      </div>
-    </div>`).join('');
+  let ideas=[];
+  try{
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees');
+    const d=await r.json(); ideas=d.idees||[];
+    const local=getIdeas().filter(li=>!ideas.find(si=>si.id===li.id));
+    ideas=[...local,...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
+  }catch(e){ideas=getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));}
+  if(!ideas.length){el.innerHTML='<div class="no-ideas">Aucune idée pour l\'instant.<br>Soyez le premier à proposer !</div>';return;}
+  el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${idea.cat}</div><div class="idea-text">${idea.text}</div><div class="idea-date">${idea.date}</div></div></div>`).join('');
 }
-// ── Mairie ─────────────────────────────────────────────
+
+// ── Mairie ────────────────────────────
 function loadMairieStatus(){
-  var nowParis = new Date(new Date().toLocaleString('en-US', { timeZone:'Europe/Paris' }));
-  var day = nowParis.getDay(); // 0 dim, 1 lun, 3 mer, 5 ven
-  var mins = nowParis.getHours() * 60 + nowParis.getMinutes();
-
-  function setStatus(main, sub, badge){
-    document.getElementById('mairie-status').textContent = main;
-    document.getElementById('mairie-desc').textContent = sub;
-    document.getElementById('mairie-badge').textContent = badge;
+  var nowParis=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
+  var day=nowParis.getDay(), mins=nowParis.getHours()*60+nowParis.getMinutes();
+  function setStatus(main,sub,badge){
+    document.getElementById('mairie-status').textContent=main;
+    document.getElementById('mairie-desc').textContent=sub;
+    document.getElementById('mairie-badge').textContent=badge;
   }
-
-  if (day === 1) {
-    if (mins >= 14*60 && mins < 17*60 + 30) return setStatus('Ouverte', 'Accueil ouvert jusqu\'à 17h30', 'Lundi');
-    if (mins < 14*60) return setStatus('Fermée', 'Ouvre aujourd\'hui à 14h', 'Lundi');
+  if(day===1){
+    if(mins>=14*60&&mins<17*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 17h30','Lundi');
+    if(mins<14*60) return setStatus('Fermée','Ouvre aujourd\'hui à 14h','Lundi');
   }
-  if (day === 5) {
-    if (mins >= 8*60 + 30 && mins < 11*60 + 30) return setStatus('Ouverte', 'Accueil ouvert jusqu\'à 11h30', 'Vendredi');
-    if (mins < 8*60 + 30) return setStatus('Fermée', 'Ouvre aujourd\'hui à 8h30', 'Vendredi');
+  if(day===5){
+    if(mins>=8*60+30&&mins<11*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 11h30','Vendredi');
+    if(mins<8*60+30) return setStatus('Fermée','Ouvre aujourd\'hui à 8h30','Vendredi');
   }
-  if (day === 3) {
-    return setStatus('Sur RDV', 'Mercredi uniquement sur rendez-vous', 'Mercredi');
-  }
-
-  if (day === 0 || day === 6) return setStatus('Fermée', 'Prochaine ouverture lundi à 14h', 'Week-end');
-  if (day === 1 && mins >= 17*60 + 30) return setStatus('Fermée', 'Prochaine ouverture mercredi sur RDV', 'Mairie');
-  if (day === 2) return setStatus('Fermée', 'Prochaine ouverture mercredi sur RDV', 'Mairie');
-  if (day === 3) return setStatus('Sur RDV', 'Puis vendredi de 8h30 à 11h30', 'Mairie');
-  if (day === 4) return setStatus('Fermée', 'Prochaine ouverture vendredi à 8h30', 'Mairie');
-  if (day === 5 && mins >= 11*60 + 30) return setStatus('Fermée', 'Prochaine ouverture lundi à 14h', 'Mairie');
-
-  setStatus('Fermée', 'Horaires : lun 14h-17h30 · mer sur RDV · ven 8h30-11h30', 'Horaires');
+  if(day===3) return setStatus('Sur RDV','Mercredi uniquement sur rendez-vous','Mercredi');
+  if(day===0||day===6) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Week-end');
+  if(day===1&&mins>=17*60+30) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
+  if(day===2) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
+  if(day===4) return setStatus('Fermée','Prochaine ouverture vendredi à 8h30','Mairie');
+  if(day===5&&mins>=11*60+30) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Mairie');
+  setStatus('Fermée','Horaires : lun 14h-17h30 · mer sur RDV · ven 8h30-11h30','Horaires');
 }
 
-// ── Déchetterie & Bacs ───────────────────────────────────────
-
+// ── Déchets ───────────────────────────
 function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
-
-const FERIES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-// Fériés mobiles 2025-2026 (Pâques, Ascension, Pentecôte)
-const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
-
-function isFerie(dateP, jour, moisP, annee){
-  const mmdd = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  if(FERIES.includes(mmdd)) return true;
-  const iso = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  return FERIES_DATES.includes(iso);
-}
-
 function loadDechets(){
-  // Extraction heure Paris robuste via Intl.DateTimeFormat
-  const now = new Date();
-  const tz  = { timeZone:'Europe/Paris' };
-  const hP    = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
-  const minP  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now));
-  const jour  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
-  const moisP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
-  const annee = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
-  const dateP = new Date(annee, moisP-1, jour);
-  const dowP  = dateP.getDay(); // 0=dim 1=lun 6=sam
-  const semPaire = getWeekNumber(dateP) % 2 === 0;
-
-  // Jours fériés fixes + mobiles
-  const FERIES_FIXES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-  const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
-  const mmdd  = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const iso   = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const ferie = FERIES_FIXES.includes(mmdd) || FERIES_DATES.includes(iso);
-
-  // ── Bac — un seul message ─────────────────────────────────
-  let bTxt='', bUrg=false;
-  if(dowP===0){
-    bTxt='🗑️ Sortir le bac noir ce soir !'; bUrg=true;
-  } else if(dowP===1 && hP<8){
-    bTxt='🗑️ Bac noir : collecte ce matin'; bUrg=true;
-  } else if(dowP===1 && semPaire && hP>=8){
-    bTxt='\u267b\ufe0f Sortir le bac jaune ce soir !'; bUrg=true;
-  } else if(dowP===2 && semPaire && hP<8){
-    bTxt='\u267b\ufe0f Bac jaune : collecte ce matin'; bUrg=true;
-  } else {
-    const j2lun = dowP===1 ? 7 : (8-dowP)%7||7;
-    if(j2lun===1){ bTxt='🗑️ Bac noir demain — sortir ce soir'; bUrg=true; }
-    else { bTxt='🗑️ Prochain bac noir : lundi matin'; }
-  }
-  const omEl = document.getElementById('om-text');
-  if(omEl){ omEl.innerHTML=bTxt; omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)'; }
-
-  // ── Déchetterie Cléry — lun-sam sauf fériés ──────────────
-  // Hiver (oct-mars) : 10h-12h / 14h-17h
-  // Été  (avr-sep)  :  9h-12h / 14h-18h
-  const isH   = moisP>=10 || moisP<=3;
-  const matO  = isH ? 10 : 9;
-  const apF   = isH ? 17 : 18;
-  const isJourOuv = dowP>=1 && dowP<=6 && !ferie;
-  let dTxt='', dOuv=false;
-  if(!isJourOuv){
-    if(ferie) dTxt='D\u00e9chetterie ferm\u00e9e (jour f\u00e9ri\u00e9)';
-    else dTxt='D\u00e9chetterie ferm\u00e9e (ouvre lundi \u00e0 '+matO+'h)';
-  } else if(hP<matO){
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 '+matO+'h';
-  } else if(hP<12){
-    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 12h';
-  } else if(hP<14){
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 14h';
-  } else if(hP<apF){
-    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 '+apF+'h';
-  } else {
-    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre '+(dowP<6?'demain':'lundi')+' \u00e0 '+matO+'h';
-  }
-  const dEl  = document.getElementById('dechetterie-text');
-  const dIco = document.getElementById('dech-ico');
-  if(dEl)  { dEl.textContent=dTxt; dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)'; }
-  if(dIco) { dIco.textContent=dOuv?'\ud83d\udfe2':'\ud83d\udd34'; }
+  const now=new Date(), tz={timeZone:'Europe/Paris'};
+  const hP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
+  const jour=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
+  const moisP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
+  const annee=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
+  const dateP=new Date(annee,moisP-1,jour), dowP=dateP.getDay(), semPaire=getWeekNumber(dateP)%2===0;
+  const FERIES_FIXES=['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+  const FERIES_DATES=['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+  const mmdd=String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const iso=annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const ferie=FERIES_FIXES.includes(mmdd)||FERIES_DATES.includes(iso);
+  let bTxt='',bUrg=false;
+  if(dowP===0){bTxt='🗑️ Sortir le bac noir ce soir !';bUrg=true;}
+  else if(dowP===1&&hP<8){bTxt='🗑️ Bac noir : collecte ce matin';bUrg=true;}
+  else if(dowP===1&&semPaire&&hP>=8){bTxt='♻️ Sortir le bac jaune ce soir !';bUrg=true;}
+  else if(dowP===2&&semPaire&&hP<8){bTxt='♻️ Bac jaune : collecte ce matin';bUrg=true;}
+  else{const j2lun=dowP===1?7:(8-dowP)%7||7;if(j2lun===1){bTxt='🗑️ Bac noir demain — sortir ce soir';bUrg=true;}else{bTxt='🗑️ Prochain bac noir : lundi matin';}}
+  const omEl=document.getElementById('om-text');
+  if(omEl){omEl.innerHTML=bTxt;omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)';}
+  const isH=moisP>=10||moisP<=3, matO=isH?10:9, apF=isH?17:18;
+  const isJourOuv=dowP>=1&&dowP<=6&&!ferie;
+  let dTxt='',dOuv=false;
+  if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée (ouvre lundi à '+matO+'h)';}
+  else if(hP<matO){dTxt='Déchetterie fermée — ouvre à '+matO+'h';}
+  else if(hP<12){dOuv=true;dTxt='Déchetterie ouverte — ferme à 12h';}
+  else if(hP<14){dTxt='Déchetterie fermée — ouvre à 14h';}
+  else if(hP<apF){dOuv=true;dTxt='Déchetterie ouverte — ferme à '+apF+'h';}
+  else{dTxt='Déchetterie fermée — ouvre '+(dowP<6?'demain':'lundi')+' à '+matO+'h';}
+  const dEl=document.getElementById('dechetterie-text'), dIco=document.getElementById('dech-ico');
+  if(dEl){dEl.textContent=dTxt;dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)';}
+  if(dIco){dIco.textContent=dOuv?'🟢':'🔴';}
 }
 
-// ── Bouton install / bug ─────────────────────────────────────
-function updateInstallBtn() {
-  const installed = localStorage.getItem(INSTALL_KEY);
-  const btn   = document.getElementById('btn-install-or-bug');
-  const ico   = document.getElementById('iob-ico');
-  const label = document.getElementById('iob-label');
-  const sub   = document.getElementById('iob-sub');
-  if (!btn) return;
-  if (installed) {
-    ico.style.background = 'linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent = '🐞';
-    label.textContent = 'Signaler un bug';
-    sub.textContent = 'Un service ne fonctionne pas ?';
-    btn.onclick = () => openOv('bug');
+function loadDechetsDetail(){
+  var el=document.getElementById('dechets-content');
+  el.innerHTML='<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+    +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🗑️ Collecte des ordures</div>'
+    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Bac noir (ordures ménagères) : chaque <strong>lundi matin</strong>. Sortez-le le dimanche soir.<br>'
+    +'Bac jaune (recyclables) : un <strong>lundi sur deux</strong> (semaines paires). Sortez-le le lundi soir précédent.</div>'
+    +'</div>'
+    +'<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+    +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🏭 Réseau des déchetteries</div>'
+    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
+    +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
+    +'🕐 <strong>Été (avr-sep)</strong> : 9h-12h et 14h-18h</div>'
+    +'<a href="https://www.ccterresduvaldeloire.fr/dechets/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--mist);color:var(--leaf);border-radius:10px;padding:8px 12px;font-size:0.76rem;font-weight:800;text-decoration:none">🌐 Réseau des déchetteries →</a>'
+    +'</div>';
+}
+
+// ── Bouton install / bug ──────────────
+function updateInstallBtn(){
+  const installed=localStorage.getItem(INSTALL_KEY);
+  const btn=document.getElementById('btn-install-or-bug');
+  const ico=document.getElementById('iob-ico');
+  const label=document.getElementById('iob-label');
+  const sub=document.getElementById('iob-sub');
+  if(!btn) return;
+  if(installed){
+    ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
+    ico.textContent='🐞'; label.textContent='Signaler un bug'; sub.textContent='Un service ne fonctionne pas ?';
+    btn.onclick=()=>openOv('bug');
   }
 }
-
-function installOrBug() {
-  if (localStorage.getItem(INSTALL_KEY)) { openOv('bug'); }
-  else { installApp(); }
+function installOrBug(){
+  if(localStorage.getItem(INSTALL_KEY)){openOv('bug');}
+  else{installApp();}
 }
 
+// ── Contact mairie → Trello ───────────
+function contactViaMessenger(){window.open('https://m.me/RadioMezieres','_blank');}
 
-// ── Contact mairie ───────────────────────────────────────────
-function contactViaMessenger() {
-  window.open('https://m.me/RadioMezieres', '_blank');
-}
-function contactViaWhatsApp() {
-  alert('Le contact WhatsApp sera branché prochainement.');
-}
-async function submitContactForm() {
-  const name = document.getElementById('contact-name').value.trim();
-  const reply = document.getElementById('contact-reply').value.trim();
-  const msg = document.getElementById('contact-msg').value.trim();
-  if (!msg) { alert('Merci de renseigner votre message.'); return; }
-
-  const btn = document.querySelector('#contact-form .submit-btn');
-  btn.textContent = 'Envoi…';
-  btn.disabled = true;
-
-  try {
-    await fetch(SIGNAL_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        cat: '💬 Contact mairie',
-        desc: 'Nom/prénom : ' + (name || 'Non précisé') + '\nRéponse : ' + (reply || 'Non précisée') + '\n\nMessage : ' + msg
+async function submitContactForm(){
+  const name=document.getElementById('contact-name').value.trim();
+  const reply=document.getElementById('contact-reply').value.trim();
+  const msg=document.getElementById('contact-msg').value.trim();
+  if(!msg){alert('Merci de renseigner votre message.');return;}
+  const btn=document.querySelector('#contact-form .submit-btn');
+  btn.textContent='Envoi…'; btn.disabled=true;
+  try{
+    await fetch(SIGNAL_URL,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        cat:'[Demande] Contact mairie',
+        desc:'Nom/prénom : '+(name||'Non précisé')+'\nRéponse : '+(reply||'Non précisée')+'\n\nMessage : '+msg
       })
     });
     trackStat('contact');
-    document.getElementById('contact-form').style.display = 'none';
-    document.getElementById('contact-success').style.display = 'block';
-  } catch(e) {
-    alert('Erreur d’envoi. Réessayez plus tard.');
-    btn.textContent = '📤 Envoyer ma demande';
-    btn.disabled = false;
+    document.getElementById('contact-form').style.display='none';
+    document.getElementById('contact-success').style.display='block';
+  }catch(e){
+    alert('Erreur d\'envoi. Réessayez plus tard.');
+    btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
   }
 }
-function resetContact() {
-  document.getElementById('contact-form').style.display = 'block';
-  document.getElementById('contact-success').style.display = 'none';
-  document.getElementById('contact-name').value = '';
-  document.getElementById('contact-reply').value = '';
-  document.getElementById('contact-msg').value = '';
-  const btn = document.querySelector('#contact-form .submit-btn');
-  if (btn) { btn.textContent = '📤 Envoyer ma demande'; btn.disabled = false; }
+function resetContact(){
+  document.getElementById('contact-form').style.display='block';
+  document.getElementById('contact-success').style.display='none';
+  ['contact-name','contact-reply','contact-msg'].forEach(id=>{document.getElementById(id).value='';});
+  const btn=document.querySelector('#contact-form .submit-btn');
+  if(btn){btn.textContent='📤 Envoyer ma demande';btn.disabled=false;}
   closeOv('contact');
 }
 
-// ── Bug report ────────────────────────────────────────────────
-let bugService = '', bugDevice = '';
-function selBugService(btn, val) {
-  document.querySelectorAll('#bug-services .cat-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on'); bugService = val;
-}
-function selBugDevice(btn, val) {
-  document.querySelectorAll('#bug-devices .cat-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on'); bugDevice = val;
-}
-async function submitBug() {
-  const desc = document.getElementById('bug-desc').value.trim();
-  const body = {
-    type: 'bug',
-    service: bugService || 'Non précisé',
-    device: bugDevice || 'Non précisé',
-    desc, date: new Date().toLocaleString('fr-FR', {timeZone:'Europe/Paris'})
-  };
-  const btn = document.querySelector('#bug-form .submit-btn');
-  btn.textContent = 'Envoi…'; btn.disabled = true;
-  try {
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({cat: '🐞 Bug — '+body.service, desc: body.device+' · '+body.desc})
+// ── Bug report ────────────────────────
+let bugService='',bugDevice='';
+function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugService=val;}
+function selBugDevice(btn,val){document.querySelectorAll('#bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugDevice=val;}
+async function submitBug(){
+  const desc=document.getElementById('bug-desc').value.trim();
+  const btn=document.querySelector('#bug-form .submit-btn');
+  btn.textContent='Envoi…'; btn.disabled=true;
+  try{
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({cat:'🐞 Bug — '+(bugService||'Non précisé'),desc:(bugDevice||'Non précisé')+' · '+desc})
     });
     trackStat('bug');
-    document.getElementById('bug-form').style.display = 'none';
-    document.getElementById('bug-success').style.display = 'block';
-  } catch(e) {
-    alert('Erreur d’envoi. Réessayez plus tard.');
-    btn.textContent = '📤 Envoyer le rapport'; btn.disabled = false;
+    document.getElementById('bug-form').style.display='none';
+    document.getElementById('bug-success').style.display='block';
+  }catch(e){
+    alert('Erreur d\'envoi. Réessayez plus tard.');
+    btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
   }
 }
-function resetBug() {
-  document.getElementById('bug-form').style.display = 'block';
-  document.getElementById('bug-success').style.display = 'none';
-  document.getElementById('bug-desc').value = '';
+function resetBug(){
+  document.getElementById('bug-form').style.display='block';
+  document.getElementById('bug-success').style.display='none';
+  document.getElementById('bug-desc').value='';
   bugService=''; bugDevice='';
   document.querySelectorAll('#bug-services .cat-btn, #bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));
   closeOv('bug');
 }
 
-// ── Stats usage ───────────────────────────────────────────────
-async function trackStat(service) {
-  try {
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({service})
-    });
-  } catch(e) { /* silencieux */ }
+// ── Stats ─────────────────────────────
+async function trackStat(service){
+  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){}
 }
+const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
+window.openMel=()=>{trackStat('mel');_origOpenMel();};
+window.openSignal=()=>{trackStat('signalement');_origOpenSignal();};
+window.openIdees=()=>{trackStat('idees');_origOpenIdees();};
+window.openNotifs=()=>{trackStat('actualites');_origOpenNotifs();};
+window.openMeteo=()=>{trackStat('meteo');_origOpenMeteo();};
+window.openContact=()=>{trackStat('contact');_origOpenContact();};
+window.addEventListener('appinstalled',()=>{localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');trackStat('installation');updateInstallBtn();});
 
-// Tracker les ouvertures de services
-const _origOpenMel    = openMel;
-const _origOpenSignal = openSignal;
-const _origOpenIdees  = openIdees;
-const _origOpenNotifs = openNotifs;
-const _origOpenMeteo  = openMeteo;
-const _origOpenContact = openContact;
-window.openMel    = ()=>{ trackStat('mel');         _origOpenMel(); };
-window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
-window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
-window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
-window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
-window.openContact = ()=>{ trackStat('contact');    _origOpenContact(); };
-
-// Tracker installation
-window.addEventListener('appinstalled', () => {
-  localStorage.setItem(INSTALL_KEY, '1');
-  document.getElementById('install-banner').classList.add('hidden');
-  trackStat('installation');
-  updateInstallBtn();
-});
-
-// ── Actualités (publications Radio Mézières) ──
+// ── Actualités ────────────────────────
 async function loadActus(){
-  const el = document.getElementById('actu-list');
-  el.innerHTML = '<div class="actu-empty">Chargement…</div>';
+  const el=document.getElementById('actu-list');
+  el.innerHTML='<div class="actu-empty">Chargement…</div>';
   try{
-    const r = await fetch(ACTU_URL);
-    const d = await r.json();
-    if(!d.actus||!d.actus.length){
-      el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter les publications communales ici.</div>';
-      return;
-    }
-    el.innerHTML = d.actus.map(a => {
-      const imgHTML = a.photo
-        ? `<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`
-        : '';
-      // Nettoyer le titre : retirer #app-mezieres et tronquer
-      const texte = (a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const titre = texte.length > 80 ? texte.substring(0,80)+'...' : texte;
-      const texteComplet = texte.length > 80 ? texte : '';
-      return `<div class="actu-item">
-        ${imgHTML}
-        <div class="actu-body">
-          <div class="actu-title">${titre}</div>
-          ${texteComplet ? `<div class="actu-text">${texteComplet}</div>` : ''}
-          <div class="actu-date">📅 ${a.date}</div>
-          <a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">
-            📘 Voir sur Facebook
-          </a>
-        </div>
-      </div>`;
+    const r=await fetch(ACTU_URL), d=await r.json();
+    if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter les publications communales ici.</div>';return;}
+    el.innerHTML=d.actus.map(a=>{
+      const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`:'';
+      const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
+      const titre=texte.length>80?texte.substring(0,80)+'...':texte;
+      const texteComplet=texte.length>80?texte:'';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${a.date}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
-  }catch(e){
-    el.innerHTML='<div class="actu-empty">Actualité Pocket indisponible.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';
-  }
+  }catch(e){el.innerHTML='<div class="actu-empty">Actualité Pocket indisponible.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
 }
 
 // ── Notifications Push ────────────────
-let pushRegistered = false;
-async function checkPushStatus() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  try {
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.getSubscription();
-    const btn = document.getElementById('push-btn');
-    const subTxt = document.getElementById('push-sub');
-    if (sub) {
-      pushRegistered = true;
-      if (btn) {
-        btn.textContent = 'Désactiver les notifications';
-        btn.classList.remove('on');
-        btn.classList.add('off');
-      }
-      if (subTxt) subTxt.textContent = 'Notifications actives : vous recevrez les nouvelles publications communales.';
-    } else {
-      pushRegistered = false;
-      if (btn) {
-        btn.textContent = 'Activer les notifications';
-        btn.classList.remove('off');
-        btn.classList.add('on');
-      }
-      if (subTxt) subTxt.textContent = 'Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';
-    }
-  } catch(e) { /* silencieux */ }
+let pushRegistered=false;
+async function checkPushStatus(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)) return;
+  try{
+    const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
+    const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
+    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';}
+    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';}
+  }catch(e){}
 }
-
 async function togglePush(){
-  const btn = document.getElementById('push-btn');
-  const subTxt = document.getElementById('push-sub');
+  const btn=document.getElementById('push-btn'),subTxt=document.getElementById('push-sub');
   if(pushRegistered){
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ endpoint: sub.endpoint })
-        });
-        await sub.unsubscribe();
-      }
-    } catch(e) { /* silencieux */ }
-    if (btn) {
-      btn.textContent='Activer les notifications';
-      btn.classList.remove('off');
-      btn.classList.add('on');
-    }
-    if (subTxt) subTxt.textContent = 'Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';
-    pushRegistered=false;
-    return;
+    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});await sub.unsubscribe();}}catch(e){}
+    if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}
+    if(subTxt)subTxt.textContent='Notifications désactivées.';
+    pushRegistered=false; return;
   }
-  if(!('Notification' in window)){ alert('Notifications non supportées sur ce navigateur.'); return; }
-  const perm = await Notification.requestPermission();
-  if(perm !== 'granted'){ alert('Notifications refusées. Modifiez les paramètres de votre navigateur.'); return; }
+  if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
   if('serviceWorker' in navigator){
     try{
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(VAPID_PUB) });
-      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
-      if (btn) {
-        btn.textContent='Désactiver les notifications';
-        btn.classList.remove('on');
-        btn.classList.add('off');
-      }
-      if (subTxt) subTxt.textContent = 'Notifications actives : vous recevrez les nouvelles publications communales.';
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
+      if(subTxt)subTxt.textContent='Notifications actives.';
       pushRegistered=true;
-      alert('✅ Notifications activées ! Vous serez alerté des nouvelles publications communales.');
-    }catch(e){ alert('Erreur lors de l’activation des notifications.'); }
+      alert('✅ Notifications activées !');
+    }catch(e){alert('Erreur lors de l\'activation des notifications.');}
   }
 }
-
-
 function urlBase64ToUint8Array(b64){
-  const pad = '='.repeat((4-b64.length%4)%4);
-  const raw = atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
+  const pad='='.repeat((4-b64.length%4)%4);
+  const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
 
+// ── Init ─────────────────────────────
+loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn();
+setInterval(loadDechets,60000);
 
-// ── Init ─────────────────────────────────────────────────────
-loadMeteo();
-loadEvents();
-loadDechets();
-loadMairieStatus();
-updateInstallBtn();
-// Rafraîchir les infos déchets toutes les minutes
-setInterval(loadDechets, 60000);
-
-// ── Service Worker ────────────────────────────────────────────
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-  // Écouter les messages du SW (clic sur notification → ouvrir actualités)
-  navigator.serviceWorker.addEventListener('message', e => {
-    if(e.data && e.data.action === 'openNotifs') openNotifs();
-  });
+  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.action==='openNotifs')openNotifs();});
 }
-// Si l'app est lancée depuis une notification
-if(location.hash === '#notifs') { setTimeout(()=>openNotifs(), 600); }
-
+if(location.hash==='#notifs'){setTimeout(()=>openNotifs(),600);}
+if(location.hash==='#mel'){setTimeout(()=>openMel(),600);}
 </script>
 </body>
 </html>
