@@ -256,6 +256,62 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
+
+/* ══ ACCESSIBILITÉ ══════════════════════════════════════════════
+   Tout fonctionne via des multiplicateurs sur font-size de base.
+   Les rem étant relatifs au html, ajuster html font-size suffit.
+   ══════════════════════════════════════════════════════════════ */
+html.font-large  { font-size: 19px !important; }
+html.font-xl     { font-size: 22px !important; }
+
+/* Contraste élevé */
+html.high-contrast {
+  --text:   #000000;
+  --muted:  #1a1a1a;
+  --card:   #ffffff;
+  --warm:   #f0f0f0;
+  --border: rgba(0,0,0,0.25);
+  --forest: #003319;
+  --leaf:   #004d26;
+  --mist:   #b8f5cc;
+  --shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+html.high-contrast .header { background: linear-gradient(160deg,#003319,#004d26); }
+html.high-contrast .card   { border: 2px solid #000 !important; }
+html.high-contrast .ct-label { color: #000 !important; font-weight: 900 !important; }
+
+/* Grands boutons tactiles */
+html.large-touch .card { padding: 18px 14px !important; min-height: 72px; }
+html.large-touch .ico  { width: 52px !important; height: 52px !important; font-size: 26px !important; }
+html.large-touch .cat-btn { padding: 14px 10px !important; font-size: 0.88rem !important; }
+html.large-touch .sug { min-height: 52px !important; font-size: 0.88rem !important; }
+
+/* Espacement lignes augmenté */
+html.line-spacing .bub,
+html.line-spacing .ct-sub,
+html.line-spacing .ct-label,
+html.line-spacing p,
+html.line-spacing .rgpd-text,
+html.line-spacing .contact-sub { line-height: 1.9 !important; }
+
+/* Bouton accessibilité dans le header */
+.acc-btn{background:rgba(255,255,255,0.15);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:0.75rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.acc-btn:hover{background:rgba(255,255,255,0.25);}
+
+/* Overlay accessibilité */
+.acc-option{background:white;border-radius:14px;padding:14px 16px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.acc-option-label{font-size:0.84rem;font-weight:800;color:var(--text);}
+.acc-option-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.acc-toggle{display:flex;gap:6px;}
+.acc-size-btn{background:var(--warm);border:2px solid var(--border);border-radius:10px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.acc-size-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
+.acc-switch{position:relative;width:48px;height:28px;cursor:pointer;}
+.acc-switch input{opacity:0;width:0;height:0;}
+.acc-slider{position:absolute;inset:0;background:#ccc;border-radius:999px;transition:0.3s;}
+.acc-slider:before{content:'';position:absolute;width:20px;height:20px;left:4px;top:4px;background:white;border-radius:50%;transition:0.3s;}
+.acc-switch input:checked + .acc-slider{background:var(--sage);}
+.acc-switch input:checked + .acc-slider:before{transform:translateX(20px);}
+.acc-preview{background:var(--mist);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.84rem;line-height:1.6;color:var(--forest);}
 </style>
 </head>
 <body>
@@ -280,7 +336,10 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
       <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
       <div class="mat-version">v3.3</div>
     </div>
-    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" style="align-self:flex-start" title="Qui suis-je ?">
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+      <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" style="align-self:flex-start" title="Qui suis-je ?">
+      <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Aa</button>
+    </div>
   </div>
 
   <!-- Encarts accueil -->
@@ -390,6 +449,72 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     </button>
   </div>
 
+</div>
+
+<!-- ═══ OVERLAY ACCESSIBILITÉ ═══ -->
+<div class="ov" id="ov-accessibilite" onclick="ovClick('accessibilite',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f0fc">♿</div>
+      <div class="panel-title">Accessibilité</div>
+      <button class="panel-close" onclick="closeOv('accessibilite')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="acc-preview" id="acc-preview">
+        Exemple de texte — <strong>Mézières-lez-Cléry</strong><br>
+        Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">📏 Taille du texte</div>
+          <div class="acc-option-sub">Choisissez la taille la plus confortable</div>
+        </div>
+        <div class="acc-toggle">
+          <button class="acc-size-btn" id="acc-normal" onclick="setFontSize('normal')">A</button>
+          <button class="acc-size-btn" id="acc-large"  onclick="setFontSize('large')">A+</button>
+          <button class="acc-size-btn" id="acc-xl"     onclick="setFontSize('xl')">A++</button>
+        </div>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🔆 Contraste élevé</div>
+          <div class="acc-option-sub">Texte plus sombre, couleurs plus nettes</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-contrast-toggle" onchange="toggleContrast(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">👆 Boutons plus grands</div>
+          <div class="acc-option-sub">Zones tactiles agrandies, plus faciles à appuyer</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-touch-toggle" onchange="toggleTouch(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">↕️ Espacement des lignes</div>
+          <div class="acc-option-sub">Texte plus aéré, plus facile à lire</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-spacing-toggle" onchange="toggleSpacing(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
+        ↺ Réinitialiser les paramètres
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="footer">MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
@@ -1588,8 +1713,95 @@ function urlBase64ToUint8Array(b64){
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
 
-// ── Init ─────────────────────────────
-loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn();
+// ── Accessibilité ────────────────────
+const ACC_KEY = 'mat_accessibility';
+
+function loadAccessibilite() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
+    if (saved.fontSize)  applyFontSize(saved.fontSize, false);
+    if (saved.contrast)  applyContrast(true, false);
+    if (saved.touch)     applyTouch(true, false);
+    if (saved.spacing)   applySpacing(true, false);
+  } catch(e) {}
+}
+
+function saveAccessibilite() {
+  const html = document.documentElement;
+  localStorage.setItem(ACC_KEY, JSON.stringify({
+    fontSize: html.classList.contains('font-xl') ? 'xl' : html.classList.contains('font-large') ? 'large' : 'normal',
+    contrast: html.classList.contains('high-contrast'),
+    touch:    html.classList.contains('large-touch'),
+    spacing:  html.classList.contains('line-spacing'),
+  }));
+}
+
+function applyFontSize(size, save=true) {
+  const html = document.documentElement;
+  html.classList.remove('font-large', 'font-xl');
+  if (size === 'large') html.classList.add('font-large');
+  if (size === 'xl')    html.classList.add('font-xl');
+  ['normal','large','xl'].forEach(s => {
+    const btn = document.getElementById('acc-' + s);
+    if (btn) btn.classList.toggle('on', s === size);
+  });
+  if (save) saveAccessibilite();
+}
+
+function applyContrast(on, save=true) {
+  document.documentElement.classList.toggle('high-contrast', on);
+  const el = document.getElementById('acc-contrast-toggle');
+  if (el) el.checked = on;
+  if (save) saveAccessibilite();
+}
+
+function applyTouch(on, save=true) {
+  document.documentElement.classList.toggle('large-touch', on);
+  const el = document.getElementById('acc-touch-toggle');
+  if (el) el.checked = on;
+  if (save) saveAccessibilite();
+}
+
+function applySpacing(on, save=true) {
+  document.documentElement.classList.toggle('line-spacing', on);
+  const el = document.getElementById('acc-spacing-toggle');
+  if (el) el.checked = on;
+  if (save) saveAccessibilite();
+}
+
+function setFontSize(size)       { applyFontSize(size); }
+function toggleContrast(checked) { applyContrast(checked); }
+function toggleTouch(checked)    { applyTouch(checked); }
+function toggleSpacing(checked)  { applySpacing(checked); }
+
+function openAccessibilite() {
+  openOv('accessibilite');
+  // Sync état boutons avec état actuel
+  const html = document.documentElement;
+  const size = html.classList.contains('font-xl') ? 'xl' : html.classList.contains('font-large') ? 'large' : 'normal';
+  ['normal','large','xl'].forEach(s => {
+    const btn = document.getElementById('acc-' + s);
+    if (btn) btn.classList.toggle('on', s === size);
+  });
+  const ct = document.getElementById('acc-contrast-toggle');
+  const tt = document.getElementById('acc-touch-toggle');
+  const st = document.getElementById('acc-spacing-toggle');
+  if (ct) ct.checked = html.classList.contains('high-contrast');
+  if (tt) tt.checked = html.classList.contains('large-touch');
+  if (st) st.checked = html.classList.contains('line-spacing');
+}
+
+function resetAccessibilite() {
+  applyFontSize('normal', false);
+  applyContrast(false, false);
+  applyTouch(false, false);
+  applySpacing(false, false);
+  localStorage.removeItem(ACC_KEY);
+  openAccessibilite(); // resync l'UI
+}
+
+// ── Init ─────────────────────────────────
+loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
