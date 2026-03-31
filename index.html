@@ -129,15 +129,16 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .typ span{width:6px;height:6px;background:var(--sage);border-radius:50%;animation:bo 1.2s infinite;}
 .typ span:nth-child(2){animation-delay:0.2s;}.typ span:nth-child(3){animation-delay:0.4s;}
 @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-.sugs{padding:6px 14px 4px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;}
+.sugs{padding:6px 14px 8px;display:grid;grid-template-columns:1fr 1fr;gap:7px;overflow:visible;flex-shrink:0;}
 .sugs::-webkit-scrollbar{display:none;}
-.sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.8rem;font-weight:700;padding:6px 12px;border-radius:18px;white-space:nowrap;cursor:pointer;font-family:'Nunito',sans-serif;}
+.sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.78rem;font-weight:700;padding:8px 10px;border-radius:16px;white-space:normal;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;line-height:1.25;min-height:42px;display:flex;align-items:center;justify-content:flex-start;}
 .sug:active{background:var(--mist);}
 .mbar{padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));background:white;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
 .minp{flex:1;border:1.5px solid rgba(0,0,0,0.12);border-radius:22px;padding:9px 14px;font-size:0.9rem;font-family:'Nunito',sans-serif;outline:none;background:var(--warm);}
 .minp:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(82,183,136,0.15);}
 .msnd{width:40px;height:40px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 
+@media (max-width:380px){.sugs{grid-template-columns:1fr;}}
 /* ── Signalement ── */
 .form-group{margin-bottom:14px;}
 .form-label{font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:6px;display:block;}
@@ -394,9 +395,9 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
     <div class="msgs" id="msgs"></div>
     <div class="sugs" id="sugs">
       <button class="sug" onclick="showMelThemeQuestions('urbanisme')">🏗️ Urbanisme</button>
-      <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Service à l’enfance</button>
+      <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Enfance</button>
       <button class="sug" onclick="showMelThemeQuestions('demarches')">📄 Démarches</button>
-      <button class="sug" onclick="showMelThemeQuestions('fibre')">🌐 Fibre & numérique</button>
+      <button class="sug" onclick="showMelThemeQuestions('fibre')">🌐 Fibre</button>
     </div>
     <div class="mbar">
       <input class="minp" id="minp" placeholder="Votre question…" onkeydown="if(event.key==='Enter')sendMel()">
@@ -828,9 +829,9 @@ function renderMelThemes(){
   if(!sugs) return;
   sugs.innerHTML = ''
     + '<button class="sug" onclick="showMelThemeQuestions(\'urbanisme\')">🏗️ Urbanisme</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'enfance\')">🧒 Service à l’enfance</button>'
+    + '<button class="sug" onclick="showMelThemeQuestions(\'enfance\')">🧒 Enfance</button>'
     + '<button class="sug" onclick="showMelThemeQuestions(\'demarches\')">📄 Démarches</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre & numérique</button>';
+    + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre</button>';
 }
 
 function showMelThemeQuestions(theme){
