@@ -691,29 +691,35 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
         <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
-          <tr><td>MEL (chatbot)</td><td>Questions posées, non stockées</td><td>Session uniquement</td></tr>
-          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Transmis à Trello, non conservé</td></tr>
-          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
+          <tr><td>MEL (chatbot IA)</td><td>Questions posées (non stockées)</td><td>Session uniquement</td></tr>
+          <tr><td>Signalement citoyen</td><td>Catégorie, description, photo, GPS (tous optionnels)</td><td>Transmis à Trello + Redis, anonyme</td></tr>
+          <tr><td>Rapport de bug</td><td>Service concerné, appareil, description</td><td>Transmis à Trello + Redis, anonyme</td></tr>
+          <tr><td>Demande de contact</td><td>Nom (optionnel), coordonnée (optionnel), message</td><td>Transmis à Trello + Redis</td></tr>
+          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression par l'admin</td></tr>
           <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
-          <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
-          <tr><td>Météo</td><td>Position GPS (si autorisée)</td><td>Non stockée</td></tr>
+          <tr><td>Notifications push</td><td>Token d'appareil anonyme</td><td>Jusqu'à désactivation</td></tr>
+          <tr><td>Météo</td><td>Position GPS si autorisée (non stockée)</td><td>Non conservée</td></tr>
+          <tr><td>Statistiques d'usage</td><td>Compteurs anonymes par fonctionnalité</td><td>Historique 13 mois glissants</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
         <div class="rgpd-title">🍪 Cookies et stockage local</div>
-        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées) et votre préférence d'installation. Aucun cookie de traçage ou publicitaire n'est utilisé.</div>
+        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées), votre préférence d'installation et votre session de navigation. Aucun cookie de traçage ou publicitaire n'est utilisé. Aucune donnée n'est vendue à des tiers.</div>
       </div>
       <div class="rgpd-section">
-        <div class="rgpd-title">🤝 Sous-traitants</div>
-        <div class="rgpd-text">Les services suivants sont utilisés :</div>
+        <div class="rgpd-title">🤝 Sous-traitants et services tiers</div>
+        <div class="rgpd-text">Les services suivants sont utilisés dans le cadre du fonctionnement de l'application :</div>
         <table class="rgpd-table">
           <tr><th>Service</th><th>Usage</th><th>Localisation</th></tr>
-          <tr><td>Mistral AI</td><td>IA — réponses MEL</td><td>France (UE)</td></tr>
-          <tr><td>Anthropic (Claude)</td><td>IA — secours MEL</td><td>États-Unis</td></tr>
-          <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
-          <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
-          <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
-          <tr><td>Trello (Atlassian)</td><td>Gestion signalements &amp; demandes</td><td>États-Unis</td></tr>
+          <tr><td>Mistral AI</td><td>IA principale — réponses MEL</td><td>France (UE)</td></tr>
+          <tr><td>Anthropic (Claude)</td><td>IA de secours — réponses MEL</td><td>États-Unis</td></tr>
+          <tr><td>Render.com</td><td>Serveur applicatif backend</td><td>UE (Frankfurt)</td></tr>
+          <tr><td>GitHub Pages</td><td>Hébergement de l'application</td><td>États-Unis</td></tr>
+          <tr><td>Upstash Redis</td><td>Stockage données (idées, actus, stats)</td><td>UE</td></tr>
+          <tr><td>Météo-France / Open-Meteo</td><td>Données météorologiques</td><td>France / UE</td></tr>
+          <tr><td>Trello (Atlassian)</td><td>Gestion signalements, bugs et demandes</td><td>États-Unis</td></tr>
+          <tr><td>Facebook (Meta)</td><td>Actualités Radio Mézières (lecture seule)</td><td>États-Unis</td></tr>
+          <tr><td>Google Calendar</td><td>Agenda communal (lecture seule)</td><td>États-Unis</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -1343,7 +1349,6 @@ function loadDechetsDetail(){
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
     +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
     +'🕐 <strong>Été (avr-sep)</strong> : 9h-12h et 14h-18h</div>'
-    +'<a href="https://www.ccterresduvaldeloire.fr/dechets/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:var(--mist);color:var(--leaf);border-radius:10px;padding:8px 12px;font-size:0.76rem;font-weight:800;text-decoration:none">🌐 Réseau des déchetteries →</a>'
     +'</div>';
 }
 
@@ -1412,7 +1417,7 @@ async function submitBug(){
   try{
     await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({cat:'🐞 Bug — '+(bugService||'Non précisé'),desc:(bugDevice||'Non précisé')+' · '+desc})
+      body:JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:'Appareil : '+(bugDevice||'Non précisé')+'\n\n'+desc,type:'bug'})
     });
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
