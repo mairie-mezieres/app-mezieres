@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
-<title>Mézières Avec Toi</title>
-<!-- VERSION 3.4 -->
+<title>MAT — Mézières Avec Toi</title>
+<!-- VERSION 3.2 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -36,38 +36,34 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
-.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.mat-img{width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;max-height:130px;}
-.mat-text{flex:1;min-width:0;}
+.mat-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.mat-img{height:90px;width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));margin-top:2px;}
+.mat-text{flex:2;padding-bottom:8px;min-width:0;}
 .mat-badge{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--sage);margin-bottom:5px;}
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
 .mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
 
 /* ── Météo strip ── */
-.header-bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:4px;width:100%;}
-.top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box;}
-.top-title{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);}
-.top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
-.top-sub{font-size:.63rem;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:2px 6px;border-radius:999px;font-size:.58rem;font-weight:900;background:rgba(255,255,255,.16);color:#fff;}
-.top-meteo{background:linear-gradient(135deg,#2563eb,#38bdf8);}
-.top-dechets{background:linear-gradient(135deg,#15803d,#22c55e);}
-.top-mairie{background:linear-gradient(135deg,#7c3aed,#a855f7);}
-.top-event{background:linear-gradient(135deg,#d97706,#f59e0b);}
-.meteo-strip,.dechets-strip,.mairie-strip,.event-strip{position:relative;}
-.dechet-row{display:flex;align-items:center;gap:6px;font-size:.63rem;font-weight:700;color:var(--cream);line-height:1.2;}
-.dechet-ico{font-size:.92rem;flex-shrink:0;}
-.dechet-ok{color:#bbf7d0;}.dechet-warn{color:#fde68a;}.dechet-info{color:var(--cream);}
-.meteo-ico{font-size:1.2rem;flex-shrink:0;}
-.meteo-temp{font-size:.96rem;font-weight:900;color:var(--cream);}
-.meteo-desc{font-size:.62rem;color:rgba(255,255,255,.88);flex:1;}
-.meteo-alerte{background:rgba(255,255,255,.18);color:#fff;font-size:.56rem;font-weight:900;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,.18);}
-.meteo-loading{font-size:.68rem;color:rgba(255,255,255,.72);font-style:italic;}
-.event-date{font-size:.58rem;font-weight:800;color:#fff7d6;text-transform:uppercase;letter-spacing:.06em;}
-.event-name{font-size:.72rem;font-weight:800;color:var(--cream);line-height:1.2;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.event-days{font-size:.6rem;color:#fff2c7;margin-top:2px;}
-.event-loading{font-size:.66rem;color:rgba(255,255,255,.8);font-style:italic;}
+.header-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:0;}
+.meteo-strip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.dechets-strip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;justify-content:space-around;gap:4px;}
+.dechet-row{display:flex;align-items:center;gap:6px;font-size:0.68rem;font-weight:700;color:var(--cream);line-height:1.3;}
+.dechet-ico{font-size:1rem;flex-shrink:0;}
+.dechet-ok{color:#86efac;}.dechet-warn{color:#fcd34d;}.dechet-info{color:var(--cream);}
+.meteo-ico{font-size:1.4rem;flex-shrink:0;}
+.meteo-temp{font-size:1.1rem;font-weight:900;color:var(--cream);}
+.meteo-desc{font-size:0.68rem;color:rgba(216,243,220,0.8);flex:1;}
+.meteo-alerte{background:rgba(244,162,97,0.3);color:#ffe4c0;font-size:0.62rem;font-weight:800;padding:3px 8px;border-radius:8px;border:1px solid rgba(244,162,97,0.4);}
+.meteo-loading{font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;}
+
+/* ── Prochains événements ── */
+.events-strip{display:flex;gap:8px;margin-top:10px;}
+.event-chip{background:rgba(255,255,255,0.10);border-radius:12px;padding:8px 12px;flex:1;min-width:0;}
+.event-date{font-size:0.6rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;}
+.event-name{font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.event-days{font-size:0.62rem;color:var(--sage);margin-top:2px;}
+.event-loading{font-size:0.68rem;color:rgba(255,255,255,0.3);font-style:italic;padding:8px 12px;}
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
@@ -98,7 +94,6 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .ico-ideas{background:linear-gradient(135deg,#fffbe8,#fff3c0);}
 .ico-rgpd{background:linear-gradient(135deg,#f0f0f0,#e0e0e0);}
 .ico-notif{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
-.ico-communaute{background:linear-gradient(135deg,#fde8f0,#ffd6e8);}
 
 /* ── Overlay générique ── */
 .ov{display:none;position:fixed;inset:0;background:rgba(26,61,43,0.6);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;}
@@ -130,16 +125,15 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .typ span{width:6px;height:6px;background:var(--sage);border-radius:50%;animation:bo 1.2s infinite;}
 .typ span:nth-child(2){animation-delay:0.2s;}.typ span:nth-child(3){animation-delay:0.4s;}
 @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-.sugs{padding:6px 14px 8px;display:grid;grid-template-columns:1fr 1fr;gap:7px;overflow:visible;flex-shrink:0;}
+.sugs{padding:6px 14px 4px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;}
 .sugs::-webkit-scrollbar{display:none;}
-.sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.78rem;font-weight:700;padding:8px 10px;border-radius:16px;white-space:normal;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;line-height:1.25;min-height:42px;display:flex;align-items:center;justify-content:flex-start;}
+.sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.8rem;font-weight:700;padding:6px 12px;border-radius:18px;white-space:nowrap;cursor:pointer;font-family:'Nunito',sans-serif;}
 .sug:active{background:var(--mist);}
 .mbar{padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));background:white;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
 .minp{flex:1;border:1.5px solid rgba(0,0,0,0.12);border-radius:22px;padding:9px 14px;font-size:0.9rem;font-family:'Nunito',sans-serif;outline:none;background:var(--warm);}
 .minp:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(82,183,136,0.15);}
 .msnd{width:40px;height:40px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 
-@media (max-width:380px){.sugs{grid-template-columns:1fr;}}
 /* ── Signalement ── */
 .form-group{margin-bottom:14px;}
 .form-label{font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:6px;display:block;}
@@ -194,9 +188,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .notif-text{flex:1;}
 .notif-title{font-size:0.85rem;font-weight:800;color:var(--text);}
 .notif-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
-.notif-btn{color:white;border:none;border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
-.notif-btn.on{background:linear-gradient(135deg,#15803d,#16a34a);}
-.notif-btn.off{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;}
+.notif-btn{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
+.notif-btn.off{background:var(--warm);color:var(--muted);border:1px solid var(--border);}
 .actu-item{background:white;border-radius:14px;margin-bottom:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .actu-img{width:100%;height:160px;object-fit:cover;display:block;background:var(--mist);}
 .actu-body{padding:12px 14px;}
@@ -207,132 +200,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
 
-/* ── Contact mairie ── */
-.contact-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
-.contact-card{background:white;border-radius:14px;padding:14px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
-.contact-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--mist);}
-.contact-title{font-size:0.84rem;font-weight:800;color:var(--text);}
-.contact-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.5;}
-.contact-action{margin-left:auto;align-self:center;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;cursor:pointer;white-space:nowrap;}
-.contact-action.alt{background:linear-gradient(135deg,#1d4ed8,#3b82f6);}
-.contact-note{font-size:0.68rem;color:var(--muted);margin:6px 2px 14px;line-height:1.5;}
-
-/* ── Agenda MAT ── */
-.agenda-tabs{display:flex;gap:8px;margin-bottom:12px;}
-.agenda-tab{flex:1;background:white;border:1px solid var(--border);border-radius:12px;padding:10px 8px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;color:var(--muted);cursor:pointer;}
-.agenda-tab.on{background:var(--forest);color:white;border-color:var(--forest);}
-.agenda-list{display:flex;flex-direction:column;gap:10px;}
-.agenda-empty{text-align:center;padding:28px 12px;color:var(--muted);font-size:.82rem;}
-.agenda-item{background:white;border-radius:14px;padding:13px;border:1px solid var(--border);cursor:pointer;}
-.agenda-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.agenda-date-badge{background:var(--mist);color:var(--leaf);border-radius:10px;padding:7px 9px;min-width:64px;text-align:center;flex-shrink:0;}
-.agenda-date-day{font-size:.62rem;font-weight:900;text-transform:uppercase;}
-.agenda-date-num{font-size:1rem;font-weight:900;line-height:1.1;}
-.agenda-title{font-size:.86rem;font-weight:900;color:var(--text);line-height:1.25;}
-.agenda-meta{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.45;}
-.agenda-desc{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.agenda-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;}
-.agenda-month-head,.agenda-month-day{background:white;border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;font-size:.72rem;}
-.agenda-month-head{font-weight:900;color:var(--muted);background:var(--warm);}
-.agenda-month-day.has-event{background:var(--mist);border-color:var(--sage);color:var(--leaf);font-weight:900;}
-.agenda-month-day.today{outline:2px solid var(--gold);}
-.event-detail-card{background:white;border-radius:16px;padding:14px;border:1px solid var(--border);}
-.event-detail-title{font-size:1rem;font-weight:900;color:var(--forest);line-height:1.3;}
-.event-detail-meta{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.6;}
-.event-detail-desc{font-size:.78rem;color:var(--text);margin-top:10px;line-height:1.65;white-space:pre-line;}
-.event-detail-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
-.event-btn{border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;}
-.event-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;}
-.event-btn.secondary{background:var(--mist);color:var(--leaf);}
-
-/* ── Overlay Majordome MAT ── */
-.majordome-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
-.majordome-body{padding:24px 20px;overflow-y:auto;text-align:center;}
-.majordome-img{width:110px;height:110px;object-fit:contain;margin:0 auto 12px;display:block;filter:drop-shadow(0 6px 16px rgba(26,61,43,0.25));}
-.majordome-name{font-family:'Grape Nuts',cursive;font-size:2rem;color:var(--forest);margin-bottom:6px;}
-.majordome-tagline{font-size:0.78rem;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;}
-.majordome-text{font-size:0.84rem;color:var(--muted);line-height:1.7;text-align:left;background:white;border-radius:16px;padding:16px;border:1px solid var(--border);}
-.majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
-
-/* ── Bus Rémi strip ── */
-.bus-strip{padding:6px 0 0;width:100%;}
-.bus-strip-head{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
-.bus-strip-ico{font-size:.9rem;}
-.bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);}
-.bus-strip-periode{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);margin-left:auto;}
-.bus-stop-row{display:block;font-size:.65rem;color:rgba(255,255,255,.85);line-height:1.65;white-space:nowrap;}
-.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.6);font-weight:800;margin-right:4px;}
-.bus-next{font-weight:900;color:#bfdbfe;}
-.bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
-
-/* ── Text-to-Speech ── */
-.tts-btn{background:none;border:1.5px solid var(--sage);border-radius:999px;padding:4px 10px;font-size:0.7rem;font-weight:800;color:var(--leaf);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-family:'Nunito',sans-serif;}
-.tts-btn:active{background:var(--mist);}
-.tts-btn.playing{background:var(--mist);border-color:var(--leaf);}
-.tts-bar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--forest),var(--leaf));padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:10px;z-index:500;box-shadow:0 -4px 20px rgba(0,0,0,0.3);}
-.tts-bar.visible{display:flex;}
-.tts-bar-text{flex:1;font-size:0.78rem;color:white;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tts-bar-btn{background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:36px;height:36px;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
-
-/* ══ ACCESSIBILITÉ ══════════════════════════════════════════════
-   Tout fonctionne via des multiplicateurs sur font-size de base.
-   Les rem étant relatifs au html, ajuster html font-size suffit.
-   ══════════════════════════════════════════════════════════════ */
-html.font-large  { font-size: 19px !important; }
-html.font-xl     { font-size: 22px !important; }
-
-/* Contraste élevé */
-html.high-contrast {
-  --text:   #000000;
-  --muted:  #1a1a1a;
-  --card:   #ffffff;
-  --warm:   #f0f0f0;
-  --border: rgba(0,0,0,0.25);
-  --forest: #003319;
-  --leaf:   #004d26;
-  --mist:   #b8f5cc;
-  --shadow: 0 2px 8px rgba(0,0,0,0.25);
-}
-html.high-contrast .header { background: linear-gradient(160deg,#003319,#004d26); }
-html.high-contrast .card   { border: 2px solid #000 !important; }
-html.high-contrast .ct-label { color: #000 !important; font-weight: 900 !important; }
-
-/* Grands boutons tactiles */
-html.large-touch .card { padding: 18px 14px !important; min-height: 72px; }
-html.large-touch .ico  { width: 52px !important; height: 52px !important; font-size: 26px !important; }
-html.large-touch .cat-btn { padding: 14px 10px !important; font-size: 0.88rem !important; }
-html.large-touch .sug { min-height: 52px !important; font-size: 0.88rem !important; }
-
-/* Espacement lignes augmenté */
-html.line-spacing .bub,
-html.line-spacing .ct-sub,
-html.line-spacing .ct-label,
-html.line-spacing p,
-html.line-spacing .rgpd-text,
-html.line-spacing .contact-sub { line-height: 1.9 !important; }
-
-/* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 16px;color:white;font-size:0.78rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:6px;position:absolute;right:16px;bottom:16px;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
-.acc-btn:hover{background:rgba(255,255,255,0.28);}
-.acc-btn:active{transform:scale(0.95);}
-
-/* Overlay accessibilité */
-.acc-option{background:white;border-radius:14px;padding:14px 16px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
-.acc-option-label{font-size:0.84rem;font-weight:800;color:var(--text);}
-.acc-option-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
-.acc-toggle{display:flex;gap:6px;}
-.acc-size-btn{background:var(--warm);border:2px solid var(--border);border-radius:10px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all 0.15s;}
-.acc-size-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
-.acc-switch{position:relative;width:48px;height:28px;cursor:pointer;}
-.acc-switch input{opacity:0;width:0;height:0;}
-.acc-slider{position:absolute;inset:0;background:#ccc;border-radius:999px;transition:0.3s;}
-.acc-slider:before{content:'';position:absolute;width:20px;height:20px;left:4px;top:4px;background:white;border-radius:50%;transition:0.3s;}
-.acc-switch input:checked + .acc-slider{background:var(--sage);}
-.acc-switch input:checked + .acc-slider:before{transform:translateX(20px);}
-.acc-preview{background:var(--mist);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.84rem;line-height:1.6;color:var(--forest);}
 </style>
 </head>
 <body>
@@ -341,8 +210,8 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 <div id="install-banner" onclick="installApp()">
   <div class="ib-ico">📲</div>
   <div class="ib-t">
-    <div class="ib-title" id="ib-title-txt">Installez MAT sur votre téléphone !</div>
-    <div class="ib-sub" id="ib-sub-txt">Accès rapide · Fonctionne hors ligne</div>
+    <div class="ib-title">Installez MAT sur votre téléphone !</div>
+    <div class="ib-sub">Accès rapide · Fonctionne hors ligne</div>
   </div>
   <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
   <button class="ib-x" onclick="hideBanner(event)">✕</button>
@@ -351,52 +220,40 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 <!-- Header MAT -->
 <div class="header">
   <div class="mat-hero">
-    <!-- Gauche : texte -->
     <div class="mat-text">
       <div class="mat-badge">Application officielle</div>
-      <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.4.8</div>
+      <div class="mat-title">MAT, Mézières Avec Toi</div>
+      <div class="mat-sub">Commune de Mézières-lez-Cléry</div>
+      <div class="mat-version">v3.2</div>
     </div>
-    <!-- Droite : icône MAT -->
-    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
+    <img src="mat-header.png" alt="MAT" class="mat-img" onerror="this.style.display='none'" style="align-self:flex-start">
   </div>
-  <!-- Encarts accueil -->
+
+  <!-- Météo + Déchets -->
   <div class="header-bottom-grid">
-    <div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
-      <div class="top-title">Météo</div>
-      <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
-      <div class="top-sub" id="meteo-desc"></div>
-      <div class="top-badge" id="meteo-alerte">Aucune alerte</div>
-      <div id="meteo-ico" style="position:absolute;right:10px;top:8px;font-size:1.15rem">🌤️</div>
-    </div>
-    <div class="top-card top-dechets dechets-strip" onclick="openDechets()">
-      <div class="top-title">Déchets</div>
-      <div class="dechet-row" id="dechet-poubelle"><span id="om-text">Chargement…</span></div>
-      <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
-    </div>
-    <div class="top-card top-mairie mairie-strip" onclick="openContact()">
-      <div class="top-title">Mairie</div>
-      <div class="top-main" id="mairie-status">Chargement…</div>
-      <div class="top-sub" id="mairie-desc"></div>
-      <div class="top-badge" id="mairie-badge">Horaires</div>
-    </div>
-    <div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
-      <div class="top-title">Prochaine manifestation</div>
-      <div class="event-date" id="next-event-date">Chargement…</div>
-      <div class="event-name" id="next-event-name"></div>
-      <div class="event-days" id="next-event-days"></div>
-    </div>
-    <!-- Ligne bus Rémi pleine largeur -->
-    <div class="bus-strip">
-      <div class="bus-strip-head">
-        <span class="bus-strip-ico">🚌</span>
-        <span class="bus-strip-title">Ligne 8 Rémi</span>
+    <div class="meteo-strip" onclick="openMeteo()">
+      <div class="meteo-ico" id="meteo-ico">🌤️</div>
+      <div style="flex:1;min-width:0">
+        <div class="meteo-temp" id="meteo-temp"><span class="meteo-loading">Météo…</span></div>
+        <div class="meteo-desc" id="meteo-desc"></div>
       </div>
-      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
+      <div class="meteo-alerte" id="meteo-alerte" style="display:none"></div>
+    </div>
+    <div class="dechets-strip" onclick="openDechets()" style="cursor:pointer">
+      <div class="dechet-row" id="dechet-poubelle">
+        <span id="om-text" style="font-size:0.65rem;color:rgba(216,243,220,0.85)">Chargement…</span>
+      </div>
+      <div class="dechet-row" id="dechet-dechetterie">
+        <span class="dechet-ico" id="dech-ico">🔴</span>
+        <span id="dechetterie-text" style="font-size:0.65rem;color:rgba(216,243,220,0.9)">Chargement…</span>
+      </div>
     </div>
   </div>
-  <!-- Bouton accessibilité positionné en bas à droite du header -->
-  <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité">♿ Accessibilité</button>
+
+  <!-- Prochains événements -->
+  <div class="events-strip" id="events-strip">
+    <div class="event-loading">Chargement événements…</div>
+  </div>
 </div>
 
 <!-- Contenu principal -->
@@ -414,7 +271,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </a>
   </div>
 
-  <div class="sec">Réseaux et actualités</div>
+  <div class="sec">Réseaux sociaux</div>
   <div class="grid2">
     <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
       <div class="ico ico-radio">📻</div>
@@ -422,45 +279,43 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </a>
     <button class="card" onclick="openNotifs()">
       <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Actualités Pocket</div><div class="ct-sub">Publications communales</div></div>
+      <div class="ct"><div class="ct-label">Actualités MAT</div><div class="ct-sub">Publications Radio</div></div>
     </button>
   </div>
+  <div class="grid2" style="margin-top:9px">
+    <a class="card" href="https://www.facebook.com/" target="_blank" id="lien-communaute">
+      <div class="ico ico-hab">👥</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Habitants</div></div>
+    </a>
+  </div>
 
-  <div class="sec">Participez</div>
+  <div class="sec">Participez &amp; signalez</div>
   <div class="grid2">
+    <button class="card" onclick="openSignal()">
+      <div class="ico ico-signal">🚨</div>
+      <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Problème voirie…</div></div>
+    </button>
     <button class="card" onclick="openIdees()">
       <div class="ico ico-ideas">💡</div>
       <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
     </button>
-    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
-      <div class="ico ico-communaute">🏘️</div>
-      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
-    </a>
   </div>
 
-  <div class="sec">Signalements &amp; contacts</div>
-  <div class="grid2">
-    <button class="card" onclick="openSignal()">
-      <div class="ico ico-signal">🚨</div>
-      <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Voirie, éclairage, …</div></div>
-    </button>
-    <button class="card" onclick="openContact()">
-      <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter la mairie</div><div class="ct-sub">En direct ou non</div></div>
-    </button>
-  </div>
 
-  <div class="sec">Agenda</div>
+  <div class="sec">Agenda &amp; sorties</div>
   <div class="grid2">
-    <button class="card" onclick="openAgenda()">
+    <a class="card" href="https://calendar.google.com/calendar/u/1?cid=MWQ0OGYxNGI1OWUxMjkwNzkxN2ZmNjY5ZDA0MzdlMjlhMDZhNzU3OGE2OGQxNGQ3NjFlNjY5NzUwZTc3NzZiNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Vos rendez-vous</div></div>
-    </button>
+      <div class="ct"><div class="ct-label">Calendrier</div><div class="ct-sub">Événements</div></div>
+    </a>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
       <div class="ico ico-rando">🥾</div>
       <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">14 circuits</div></div>
     </a>
   </div>
+
+
+
 
   <div class="sec">Informations</div>
   <div class="grid2">
@@ -477,139 +332,27 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
     </button>
   </div>
 
+
+
 </div>
 
-<!-- ═══ OVERLAY ACCESSIBILITÉ ═══ -->
-<div class="ov" id="ov-accessibilite" onclick="ovClick('accessibilite',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#e8f0fc">♿</div>
-      <div class="panel-title">Accessibilité</div>
-      <button class="panel-close" onclick="closeOv('accessibilite')">✕</button>
-    </div>
-    <div class="panel-body">
-      <div class="acc-preview" id="acc-preview">
-        Exemple de texte — <strong>Mézières-lez-Cléry</strong><br>
-        Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
-      </div>
-
-      <div class="acc-option">
-        <div>
-          <div class="acc-option-label">📏 Taille du texte</div>
-          <div class="acc-option-sub">Choisissez la taille la plus confortable</div>
-        </div>
-        <div class="acc-toggle">
-          <button class="acc-size-btn" id="acc-normal" onclick="setFontSize('normal')">A</button>
-          <button class="acc-size-btn" id="acc-large"  onclick="setFontSize('large')">A+</button>
-          <button class="acc-size-btn" id="acc-xl"     onclick="setFontSize('xl')">A++</button>
-        </div>
-      </div>
-
-      <div class="acc-option">
-        <div>
-          <div class="acc-option-label">🔆 Contraste élevé</div>
-          <div class="acc-option-sub">Texte plus sombre, couleurs plus nettes</div>
-        </div>
-        <label class="acc-switch">
-          <input type="checkbox" id="acc-contrast-toggle" onchange="toggleContrast(this.checked)">
-          <span class="acc-slider"></span>
-        </label>
-      </div>
-
-      <div class="acc-option">
-        <div>
-          <div class="acc-option-label">👆 Boutons plus grands</div>
-          <div class="acc-option-sub">Zones tactiles agrandies, plus faciles à appuyer</div>
-        </div>
-        <label class="acc-switch">
-          <input type="checkbox" id="acc-touch-toggle" onchange="toggleTouch(this.checked)">
-          <span class="acc-slider"></span>
-        </label>
-      </div>
-
-      <div class="acc-option">
-        <div>
-          <div class="acc-option-label">↕️ Espacement des lignes</div>
-          <div class="acc-option-sub">Texte plus aéré, plus facile à lire</div>
-        </div>
-        <label class="acc-switch">
-          <input type="checkbox" id="acc-spacing-toggle" onchange="toggleSpacing(this.checked)">
-          <span class="acc-slider"></span>
-        </label>
-      </div>
-
-      <div class="acc-option">
-        <div>
-          <div class="acc-option-label">🔊 Lecture vocale</div>
-          <div class="acc-option-sub">Lit les actualités et réponses MEL à voix haute</div>
-        </div>
-        <label class="acc-switch">
-          <input type="checkbox" id="acc-tts-toggle" onchange="toggleTTS(this.checked)">
-          <span class="acc-slider"></span>
-        </label>
-      </div>
-
-      <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
-        ↺ Réinitialiser les paramètres
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Barre TTS -->
-<div class="tts-bar" id="tts-bar">
-  <span style="font-size:1.2rem">🔊</span>
-  <span class="tts-bar-text" id="tts-bar-text">Lecture en cours…</span>
-  <button class="tts-bar-btn" onclick="ttsPause()" id="tts-pause-btn" title="Pause">⏸</button>
-  <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter">⏹</button>
-</div>
-
-<div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px;">
-  <div>MAT · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
-  <button onclick="clearCacheAndReload()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(216,243,220,0.7);font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:700;padding:5px 12px;cursor:pointer;">
-    🗑️ Vider le cache et recharger
-  </button>
-</div>
-
-<!-- ═══ OVERLAY MAJORDOME ═══ -->
-<div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
-  <div class="majordome-panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:var(--gold);font-size:22px">🎩</div>
-      <div class="panel-title">Le Majordome de Mézières</div>
-      <button class="panel-close" onclick="closeOv('majordome')">✕</button>
-    </div>
-    <div class="majordome-body">
-      <img src="mat-header.png" alt="MAT" class="majordome-img" onerror="this.style.display='none'">
-      <div class="majordome-name">Bonjour, je suis MAT !</div>
-      <div class="majordome-tagline">Votre majordome numérique communal</div>
-      <div class="majordome-text">
-        🎩 <strong>Permettez-moi de me présenter.</strong><br><br>
-        Je suis <strong>MAT — Mézières Avec Toi</strong>, le majordome numérique officiel de la commune de Mézières-lez-Cléry.<br><br>
-        Tel un majordome digne de ce nom, je veille sur tout : la météo du village, l'état de vos poubelles (oui oui, même ça), les événements à venir, et même les horaires de la mairie — au cas où vous auriez envie de déposer une doléance en bonne et due forme. 🧐<br><br>
-        Mon assistante <strong>MEL</strong> répond à toutes vos questions communales avec le sourire. Elle connaît le PLU, les démarches administratives, la cantine et la fibre mieux que quiconque dans ce village.<br><br>
-        Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire capricieux — je transmets votre signalement à qui de droit, avec la discrétion qui s'impose.<br><br>
-        🌲 <em>Mézières-lez-Cléry mérite le meilleur service. C'est mon devoir.</em>
-      </div>
-      <button class="majordome-btn" onclick="closeOv('majordome')">À votre service !</button>
-    </div>
-  </div>
-</div>
+<div class="footer">MAT · Mézières Avec Toi · Application officielle · Mairie de Mézières-lez-Cléry · 45370</div>
 
 <!-- ═══ OVERLAY MEL ═══ -->
 <div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
   <div class="mel-panel">
     <div class="panel-hdr">
-      <div class="panel-ico" style="background:var(--gold);font-size:22px">👩</div>
-      <div class="panel-title">MEL — Aide communale</div>
+      <div class="panel-ico" style="background:var(--gold);font-size:18px">👩‍💼</div>
+      <div class="panel-title">MEL — Mézières En Ligne</div>
       <button class="panel-close" onclick="closeOv('mel')">✕</button>
     </div>
     <div class="msgs" id="msgs"></div>
     <div class="sugs" id="sugs">
-      <button class="sug" onclick="showMelThemeQuestions('urbanisme')">🏗️ Urbanisme</button>
-      <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Enfance</button>
-      <button class="sug" onclick="showMelThemeQuestions('demarches')">📄 Démarches</button>
-      <button class="sug" onclick="showMelThemeQuestions('fibre')">🌐 Fibre</button>
+      <button class="sug" onclick="sendSug(this)">🕐 Horaires</button>
+      <button class="sug" onclick="sendSug(this)">🚌 Bus ligne 8</button>
+      <button class="sug" onclick="sendSug(this)">♻️ Déchets</button>
+      <button class="sug" onclick="sendSug(this)">🏗️ Permis</button>
+      <button class="sug" onclick="sendSug(this)">🥾 Randonnées</button>
     </div>
     <div class="mbar">
       <input class="minp" id="minp" placeholder="Votre question…" onkeydown="if(event.key==='Enter')sendMel()">
@@ -697,110 +440,19 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#e8f0fc">🔔</div>
-      <div class="panel-title">Actualité Pocket</div>
+      <div class="panel-title">Actualités Radio Mézières</div>
       <button class="panel-close" onclick="closeOv('notifs')">✕</button>
     </div>
     <div class="panel-body">
-      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
-      <div class="notif-banner" id="push-banner" style="margin-top:12px">
+      <div class="notif-banner" id="push-banner">
         <div class="notif-ico">🔔</div>
         <div class="notif-text">
-          <div class="notif-title">Notifications Actualité Pocket</div>
-          <div class="notif-sub" id="push-sub">Activez les notifications pour recevoir les nouvelles publications communales.</div>
+          <div class="notif-title">Recevoir les notifications</div>
+          <div class="notif-sub">Soyez alerté des nouvelles publications</div>
         </div>
-        <button class="notif-btn on" id="push-btn" onclick="togglePush()">Activer les notifications</button>
+        <button class="notif-btn" id="push-btn" onclick="togglePush()">Activer</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ OVERLAY CONTACT ═══ -->
-<div class="ov" id="ov-contact" onclick="ovClick('contact',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#ede8f8">💬</div>
-      <div class="panel-title">Contacter la mairie</div>
-      <button class="panel-close" onclick="closeOv('contact')">✕</button>
-    </div>
-    <div class="panel-body">
-      <div class="contact-grid">
-        <div class="contact-card">
-          <div class="contact-ico">🚨</div>
-          <div style="flex:1">
-            <div class="contact-title">Faire un signalement</div>
-            <div class="contact-sub">Voirie, éclairage, propreté, signalisation…</div>
-          </div>
-          <button class="contact-action" onclick="closeOv('contact'); openSignal();">Ouvrir</button>
-        </div>
-        <div class="contact-card">
-          <div class="contact-ico">💬</div>
-          <div style="flex:1">
-            <div class="contact-title">Contacter vos élus par Messenger</div>
-            <div class="contact-sub">Contact direct via la page Radio Mézières.</div>
-          </div>
-          <button class="contact-action alt" onclick="contactViaMessenger()">Ouvrir</button>
-        </div>
-      </div>
-
-      <div class="contact-note">
-        Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre demande directement à la mairie.
-      </div>
-
-      <div id="contact-form">
-        <div class="form-group">
-          <label class="form-label">Votre nom ou prénom</label>
-          <input class="form-textarea" id="contact-name" style="height:auto" placeholder="Ex. Mme Martin">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Coordonnée de réponse</label>
-          <input class="form-textarea" id="contact-reply" style="height:auto" placeholder="Téléphone ou email">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Votre message</label>
-          <textarea class="form-textarea" id="contact-msg" placeholder="Décrivez votre demande…"></textarea>
-        </div>
-        <button class="submit-btn" onclick="submitContactForm()">📤 Envoyer ma demande</button>
-      </div>
-
-      <div class="success-msg" id="contact-success">
-        <div class="s-ico">✅</div>
-        <div class="s-title">Demande envoyée !</div>
-        <div class="s-sub">La mairie a bien reçu votre message.<br>Merci pour votre retour.</div>
-        <button class="submit-btn" style="margin-top:16px" onclick="resetContact()">Fermer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ OVERLAY AGENDA MAT ═══ -->
-<div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#fef3e0">📅</div>
-      <div class="panel-title">Agenda</div>
-      <button class="panel-close" onclick="closeOv('agenda')">✕</button>
-    </div>
-    <div class="panel-body">
-      <div class="agenda-tabs">
-        <button class="agenda-tab on" id="agenda-tab-today" onclick="setAgendaView('today')">Aujourd\'hui</button>
-        <button class="agenda-tab" id="agenda-tab-week" onclick="setAgendaView('week')">Cette semaine</button>
-        <button class="agenda-tab" id="agenda-tab-month" onclick="setAgendaView('month')">Ce mois-ci</button>
-      </div>
-      <div id="agenda-content"><div class="agenda-empty">Chargement de l'agenda…</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ OVERLAY FICHE ÉVÉNEMENT ═══ -->
-<div class="ov" id="ov-event" onclick="ovClick('event',event)">
-  <div class="panel">
-    <div class="panel-hdr">
-      <div class="panel-ico" style="background:#fff7ed">🎉</div>
-      <div class="panel-title">Fiche événement</div>
-      <button class="panel-close" onclick="closeOv('event')">✕</button>
-    </div>
-    <div class="panel-body" id="event-detail-body">
-      <div class="agenda-empty">Chargement…</div>
+      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
     </div>
   </div>
 </div>
@@ -810,7 +462,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   <div class="panel">
     <div class="panel-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
       <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🐞</div>
-      <div class="panel-title">Un bug ?</div>
+      <div class="panel-title">Signaler un bug</div>
       <button class="panel-close" onclick="closeOv('bug')">✕</button>
     </div>
     <div class="panel-body">
@@ -819,15 +471,20 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
         <div class="form-group">
           <label class="form-label">Service concerné</label>
           <div class="form-cats" id="bug-services">
-            <button class="cat-btn" onclick="selBugService(this,'MEL — Assistante IA')">🤖 MEL</button>
+            <button class="cat-btn" onclick="selBugService(this,'MEL Assistante')">🤖 MEL</button>
             <button class="cat-btn" onclick="selBugService(this,'Météo')">🌤️ Météo</button>
+            <button class="cat-btn" onclick="selBugService(this,'Carte randonnées')">🗺️ Carte</button>
             <button class="cat-btn" onclick="selBugService(this,'Agenda')">📅 Agenda</button>
-            <button class="cat-btn" onclick="selBugService(this,'Signalement citoyen')">🚨 Signalement</button>
-            <button class="cat-btn" onclick="selBugService(this,'Actualités Pocket')">🔔 Actualités</button>
-            <button class="cat-btn" onclick="selBugService(this,'Notifications push')">📲 Notifications</button>
-            <button class="cat-btn" onclick="selBugService(this,'Boîte à idées')">💡 Idées</button>
-            <button class="cat-btn" onclick="selBugService(this,'Contact mairie')">💬 Contact</button>
+            <button class="cat-btn" onclick="selBugService(this,'Signalement')">🚨 Signalement</button>
             <button class="cat-btn" onclick="selBugService(this,'Application générale')">📱 Général</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Appareil</label>
+          <div class="form-cats" id="bug-devices">
+            <button class="cat-btn" onclick="selBugDevice(this,'iPhone/iPad (iOS)')">🍎 iPhone/iPad</button>
+            <button class="cat-btn" onclick="selBugDevice(this,'Android')">🤖 Android</button>
+            <button class="cat-btn" onclick="selBugDevice(this,'Ordinateur')">💻 Ordinateur</button>
           </div>
         </div>
         <div class="form-group">
@@ -863,35 +520,28 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
         <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
-          <tr><td>MEL (chatbot IA)</td><td>Questions posées (non stockées)</td><td>Session uniquement</td></tr>
-          <tr><td>Signalement citoyen</td><td>Catégorie, description, photo, GPS (tous optionnels)</td><td>Transmis à Trello + Redis, anonyme</td></tr>
-          <tr><td>Rapport de bug</td><td>Service concerné, appareil, description</td><td>Transmis à Trello + Redis, anonyme</td></tr>
-          <tr><td>Demande de contact</td><td>Nom (optionnel), coordonnée (optionnel), message</td><td>Transmis à Trello + Redis</td></tr>
-          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression par l'admin</td></tr>
+          <tr><td>MEL (chatbot)</td><td>Questions non conservées + catégories statistiques anonymisées</td><td>Session pour le texte · historique statistique pour les catégories</td></tr>
+          <tr><td>Signalement</td><td>Catégorie, description, photo, GPS (optionnels)</td><td>Email transmis, non stocké</td></tr>
+          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression</td></tr>
           <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
-          <tr><td>Notifications push</td><td>Token d'appareil anonyme</td><td>Jusqu'à désactivation</td></tr>
-          <tr><td>Météo</td><td>Position GPS si autorisée (non stockée)</td><td>Non conservée</td></tr>
-          <tr><td>Statistiques d'usage</td><td>Compteurs anonymes par fonctionnalité</td><td>Historique 13 mois glissants</td></tr>
+          <tr><td>Notifications push</td><td>Token d'appareil (anonyme)</td><td>Jusqu'à désactivation</td></tr>
+          <tr><td>Statistiques MEL</td><td>Catégories anonymisées des questions (sans texte brut)</td><td>Historique statistique</td></tr>
+          <tr><td>Météo</td><td>Position GPS (si autorisée)</td><td>Non stockée</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
         <div class="rgpd-title">🍪 Cookies et stockage local</div>
-        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées), votre préférence d'installation et votre session de navigation. Aucun cookie de traçage ou publicitaire n'est utilisé. Aucune donnée n'est vendue à des tiers.</div>
+        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées) et votre préférence d'installation. Aucun cookie de traçage ou publicitaire n'est utilisé.</div>
       </div>
       <div class="rgpd-section">
-        <div class="rgpd-title">🤝 Sous-traitants et services tiers</div>
-        <div class="rgpd-text">Les services suivants sont utilisés dans le cadre du fonctionnement de l'application :</div>
+        <div class="rgpd-title">🤝 Sous-traitants</div>
+        <div class="rgpd-text">Les services suivants sont utilisés :</div>
         <table class="rgpd-table">
           <tr><th>Service</th><th>Usage</th><th>Localisation</th></tr>
-          <tr><td>Mistral AI</td><td>IA principale — réponses MEL</td><td>France (UE)</td></tr>
-          <tr><td>Anthropic (Claude)</td><td>IA de secours — réponses MEL</td><td>États-Unis</td></tr>
-          <tr><td>Render.com</td><td>Serveur applicatif backend</td><td>UE (Frankfurt)</td></tr>
-          <tr><td>GitHub Pages</td><td>Hébergement de l'application</td><td>États-Unis</td></tr>
-          <tr><td>Upstash Redis</td><td>Stockage données (idées, actus, stats)</td><td>UE</td></tr>
-          <tr><td>Météo-France / Open-Meteo</td><td>Données météorologiques</td><td>France / UE</td></tr>
-          <tr><td>Trello (Atlassian)</td><td>Gestion signalements, bugs et demandes</td><td>États-Unis</td></tr>
-          <tr><td>Facebook (Meta)</td><td>Actualités Radio Mézières (lecture seule)</td><td>États-Unis</td></tr>
-          <tr><td>Google Calendar</td><td>Agenda communal (lecture seule)</td><td>États-Unis</td></tr>
+          <tr><td>Anthropic (Claude)</td><td>IA — réponses MEL</td><td>États-Unis</td></tr>
+          <tr><td>Render.com</td><td>Serveur applicatif</td><td>UE (Frankfurt)</td></tr>
+          <tr><td>GitHub Pages</td><td>Hébergement PWA</td><td>États-Unis</td></tr>
+          <tr><td>Météo-France</td><td>Données météo</td><td>France</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -901,7 +551,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
           <strong>Mairie de Mézières-lez-Cléry</strong><br>
           36 rue du bourg — 45370<br>
           📞 02 38 45 61 76<br>
-          ✉️ mairie@mezieres-lez-clery.fr
+          ✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="513c3038233834113c342b38342334227c3d342b7c323d3423287f3723">[email&#160;protected]</a>
         </div>
       </div>
     </div>
@@ -936,15 +586,14 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ════════════════════════════════════════
-// MAT v3.4 — Mézières Avec Toi
+// MAT v3.0 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
 const ACTU_URL   = 'https://chatbot-mairie-mezieres.onrender.com/actus';
 const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
-const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
 
@@ -953,89 +602,23 @@ let dp = null;
 if (localStorage.getItem(INSTALL_KEY)) document.getElementById('install-banner').classList.add('hidden');
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; });
 window.addEventListener('appinstalled', () => { localStorage.setItem(INSTALL_KEY,'1'); document.getElementById('install-banner').classList.add('hidden'); });
-
-function updateInstallBanner() {
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const titleEl = document.getElementById('ib-title-txt');
-  const subEl   = document.getElementById('ib-sub-txt');
-  if (!isMobile) {
-    if (titleEl) titleEl.textContent = 'Installez MAT sur votre ordinateur !';
-    if (subEl)   subEl.textContent   = 'Chrome/Edge : cliquez l\'icône ⊕ dans la barre d\'adresse · Firefox : non supporté';
-  }
-}
-updateInstallBanner();
-
 function installApp(){
   if(dp){ dp.prompt(); dp.userChoice.then(r=>{ if(r.outcome==='accepted'){localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');} dp=null; }); }
-  else {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
-    } else {
-      alert('Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse (à droite)\n\nSi elle n\'apparaît pas, ouvrez le menu du navigateur → "Installer l\'application"');
-    }
-  }
+  else alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
 }
 function hideBanner(e){ e.stopPropagation(); document.getElementById('install-banner').classList.add('hidden'); localStorage.setItem(INSTALL_KEY,'dismissed'); }
 
-// ── Overlays + gestion bouton retour ─────────────────────────
-const _ovStack = [];
-
-function openOv(id){
-  document.getElementById('ov-'+id).classList.add('open');
-  document.body.style.overflow='hidden';
-  _ovStack.push(id);
-}
-function closeOv(id){
-  document.getElementById('ov-'+id).classList.remove('open');
-  const idx = _ovStack.lastIndexOf(id);
-  if(idx !== -1) _ovStack.splice(idx,1);
-  if(_ovStack.length === 0) document.body.style.overflow='';
-}
-function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
-
-// Bouton retour navigateur ferme le dernier overlay ouvert
-window.addEventListener('popstate', function(){
-  if(_ovStack.length > 0){
-    const last = _ovStack[_ovStack.length-1];
-    closeOv(last);
-    // Repousser un état pour le prochain appui
-    history.pushState({mat:'overlay'}, '');
-  }
-});
-// Pousser un état initial au chargement
-history.pushState({mat:'overlay'}, '');
-
-function openMajordome(){ openOv('majordome'); }
-function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
+// ── Overlays ──────────────────────────
+function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, votre assistante virtuelle.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} setTimeout(()=>document.getElementById('minp').focus(),300);}
 function openSignal(){openOv('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
-function openContact(){openOv('contact');}
-function openAgenda(){openOv('agenda'); loadAgenda();}
-function openDechets(){openOv('dechets'); loadDechetsDetail();}
 
-function openAgendaFromTopEvent(){
-  // Ouvrir l'agenda sur le mois de l'événement puis afficher la fiche
-  openOv('agenda');
-  ensureAgendaEvents().then(function(evts){
-    if(!evts || !evts.length) return;
-    var first = evts[0];
-    var now = new Date();
-    // Si l'événement est dans un autre mois, basculer sur "mois"
-    if(first.start.getMonth() !== now.getMonth() || first.start.getFullYear() !== now.getFullYear()){
-      agendaView = 'month';
-      // Pointer le calendrier sur le mois de l'événement
-      _agendaTargetMonth = { y: first.start.getFullYear(), m: first.start.getMonth() };
-    }
-    renderAgenda();
-    setTimeout(function(){ openEventDetail(first.uid); }, 200);
-  }).catch(function(){
-    loadAgenda();
-  });
-}
+function openOv(id){ document.getElementById('ov-'+id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeOv(id){ document.getElementById('ov-'+id).classList.remove('open'); document.body.style.overflow=''; }
+function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
 
 // ── MEL ───────────────────────────────
 let melInited=false, melBusy=false;
@@ -1043,18 +626,13 @@ const hist=[];
 function addMsg(role,text){
   const c=document.getElementById('msgs');
   const d=document.createElement('div'); d.className='msg '+role;
-  const ttsBtn = (role==='bot' && _ttsEnabled)
-    ? '<button class="tts-btn" onclick="ttsRead(\''+text.replace(/'/g,"\\'").replace(/\n/g,' ')+'\',\'MEL\')">🔊 Écouter</button>'
-    : '';
-  d.innerHTML='<div class="mav">'+(role==='bot'?'\ud83d\udc69':'\ud83d\udc64')+'</div><div class="bub">'+text.replace(/\n/g,'<br>')+ttsBtn+'</div>';
+  d.innerHTML='<div class="mav">'+(role==='bot'?'\ud83d\udc69\u200d\ud83d\udcbc':'\ud83d\udc64')+'</div><div class="bub">'+text.replace(/\n/g,'<br>')+'</div>';
   c.appendChild(d); c.scrollTop=c.scrollHeight;
-  // Lire automatiquement si TTS actif
-  if(role==='bot' && _ttsEnabled) ttsSpeak(text, 'MEL');
 }
 function showTyping(){
   const c=document.getElementById('msgs');
   const d=document.createElement('div'); d.className='msg bot'; d.id='typ';
-  d.innerHTML='<div class="mav">\ud83d\udc69</div><div class="bub"><div class="typ"><span></span><span></span><span></span></div></div>';
+  d.innerHTML='<div class="mav">\ud83d\udc69\u200d\ud83d\udcbc</div><div class="bub"><div class="typ"><span></span><span></span><span></span></div></div>';
   c.appendChild(d); c.scrollTop=c.scrollHeight;
 }
 async function sendMel(){
@@ -1063,349 +641,144 @@ async function sendMel(){
   inp.value=''; document.getElementById('sugs').style.display='none';
   addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
   try{
-    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8)})});
+    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-6)})});
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
-    var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
-  }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
+    document.getElementById('typ')?.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
+  }catch(e){ document.getElementById('typ')?.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
   melBusy=false;
-}
-const MEL_THEME_SUGGESTIONS = {
-  urbanisme: ["Faut-il une déclaration préalable pour une clôture ?","Ai-je besoin d'un permis pour une extension ?","Comment consulter le PLU de la commune ?","Quelles règles pour un abri de jardin ?"],
-  enfance:   ["Comment fonctionne la cantine ?","Quels sont les services périscolaires ?","Comment s'inscrire au centre de loisirs ?","Quelles infos sur la crèche familiale ?"],
-  demarches: ["Comment demander un acte de naissance ?","Où faire une carte d'identité ?","Comment obtenir un passeport ?","Quelles démarches pour un mariage ?"],
-  fibre:     ["Suis-je éligible à la fibre ?","Qui contacter pour le raccordement fibre ?","Que faire si la fibre n'est pas disponible ?","Où trouver les infos numériques utiles ?"]
-};
-function renderMelThemes(){
-  const sugs = document.getElementById('sugs');
-  if(!sugs) return;
-  sugs.style.display='';
-  sugs.innerHTML = '<button class="sug" onclick="showMelThemeQuestions(\'urbanisme\')">🏗️ Urbanisme</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'enfance\')">🧒 Enfance</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'demarches\')">📄 Démarches</button>'
-    + '<button class="sug" onclick="showMelThemeQuestions(\'fibre\')">🌐 Fibre</button>';
-}
-function showMelThemeQuestions(theme){
-  const sugs = document.getElementById('sugs');
-  const qs = MEL_THEME_SUGGESTIONS[theme] || [];
-  if(!sugs) return;
-  sugs.innerHTML = '<button class="sug" onclick="renderMelThemes()">← Thèmes</button>'
-    + qs.map(q => '<button class="sug" onclick="askMelSuggestedQuestion(this)">'+q+'</button>').join('');
-}
-function askMelSuggestedQuestion(btn){
-  document.getElementById('minp').value = btn.textContent.trim();
-  sendMel();
 }
 function sendSug(btn){ document.getElementById('minp').value=btn.textContent.trim(); sendMel(); }
 
 // ── Météo ─────────────────────────────
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
-const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
+const METEO_DESC = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
 
-async function loadMeteo() {
-  try {
-    let d = null;
-    try {
-      const r = await fetch(METEO_URL, { cache: 'no-store' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      d = await r.json();
-    } catch (backendErr) {
-      const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset&timezone=Europe%2FParis&forecast_days=3', { cache: 'no-store' });
-      if (!fr.ok) throw new Error('Fallback HTTP ' + fr.status);
-      d = { forecast: await fr.json(), vigilance: null };
-    }
-    const cur = (d.forecast || {}).current || {};
-    const vigilance = d.vigilance || null;
-    const code = cur.weather_code;
-    const temp = Math.round(cur.temperature_2m != null ? cur.temperature_2m : 0);
-    const vent = Math.round(cur.wind_speed_10m != null ? cur.wind_speed_10m : 0);
-    document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
-    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+temp+'°C</strong>';
-    document.getElementById('meteo-desc').textContent = (METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h';
-    const badge = document.getElementById('meteo-alerte');
-    badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : '✅ Pas d\'alerte';
-    badge.style.display = 'inline-flex';
+async function loadMeteo(){
+  try{
+    // API Open-Meteo (gratuite, pas de clé requise) centrée sur Mézières-lez-Cléry
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.82&longitude=1.807&current=temperature_2m,weathercode,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FParis&forecast_days=3');
+    const d = await r.json();
+    const cur = d.current;
+    const code = cur.weathercode;
+    const temp = Math.round(cur.temperature_2m);
+    const ico = METEO_ICONS[code] || '🌡️';
+    const desc = METEO_DESC[code] || '';
+    document.getElementById('meteo-ico').textContent = ico;
+    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+ temp +'°C</strong>';
+    document.getElementById('meteo-desc').textContent = desc + ' · Vent ' + Math.round(cur.windspeed_10m) + ' km/h';
+    // Alerte si code >= 80
+    if(code >= 80){ document.getElementById('meteo-alerte').textContent = '⚠️ Alerte météo'; document.getElementById('meteo-alerte').style.display='block'; }
+    // Stocker pour le détail
     window._meteoData = d;
-  } catch (e) {
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">Météo indisponible</span>';
-    document.getElementById('meteo-alerte').style.display = 'none';
+  }catch(e){
+    document.getElementById('meteo-temp').innerHTML = '<span style="font-size:0.72rem;color:rgba(255,255,255,0.5)">Météo indisponible</span>';
   }
 }
 
-function loadMeteoDetail() {
-  var d = window._meteoData;
-  var el = document.getElementById('meteo-detail');
-  if (!d) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>'; return; }
-  var forecast = d.forecast || {}, cur = forecast.current || {}, days = forecast.daily || {}, vigilance = d.vigilance || null;
-  var JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-  var html = '<div style="background:white;border-radius:14px;padding:12px;margin-bottom:14px;border:1px solid var(--border)"><div style="font-size:0.82rem;font-weight:900;color:var(--text)">'
-    + ((vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Alerte en cours : vigilance '+(vigilance.color_label||'') : '✅ Aucune alerte météo en cours')
-    + '</div><div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
-    + ((vigilance && vigilance.main_text) ? vigilance.main_text : 'Situation météo normale sur la commune.')
-    + '</div></div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.precipitation||0)+' mm</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.relative_humidity_2m||0)+'%</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.pressure_msl||0)+' hPa</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.wind_gusts_10m||0)+' km/h</div></div>'
-    + '</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
-  for (var i = 0; i < 3; i++) {
-    var dt = days.time && days.time[i] ? new Date(days.time[i]) : new Date();
-    var jour = i===0 ? 'Aujourd\'hui' : i===1 ? 'Demain' : JOURS[dt.getDay()];
-    var code = days.weather_code && days.weather_code[i] != null ? days.weather_code[i] : 0;
-    var tmax = Math.round(days.temperature_2m_max && days.temperature_2m_max[i] != null ? days.temperature_2m_max[i] : 0);
-    var tmin = Math.round(days.temperature_2m_min && days.temperature_2m_min[i] != null ? days.temperature_2m_min[i] : 0);
-    var pluie = days.precipitation_sum && days.precipitation_sum[i] != null ? days.precipitation_sum[i] : 0;
-    var uv = days.uv_index_max && days.uv_index_max[i] != null ? days.uv_index_max[i] : '-';
-    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)"><div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">'+jour+'</div><div style="font-size:1.8rem">'+(METEO_ICONS[code]||'🌡️')+'</div><div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+tmax+'° / '+tmin+'°</div><div style="font-size:0.62rem;color:var(--muted);margin-top:2px">'+(METEO_DESC[code]||'')+'</div><div style="font-size:0.62rem;color:#2563eb;margin-top:2px">🌧️ '+pluie+' mm</div><div style="font-size:0.62rem;color:#ca8a04;margin-top:2px">🌞 UV '+uv+'</div></div>';
+function loadMeteoDetail(){
+  const d = window._meteoData;
+  const el = document.getElementById('meteo-detail');
+  if(!d){ el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">Données non disponibles.</div>'; return; }
+  const days = d.daily;
+  const JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">';
+  for(let i=0;i<3;i++){
+    const dt = new Date(days.time[i]); const jour = i===0?'Aujourd\'hui':i===1?'Demain':JOURS[dt.getDay()];
+    const ico = METEO_ICONS[days.weathercode[i]]||'🌡️';
+    const desc = METEO_DESC[days.weathercode[i]]||'';
+    html += '<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border)">'
+      +'<div style="font-size:0.68rem;font-weight:800;color:var(--muted);margin-bottom:4px">'+jour+'</div>'
+      +'<div style="font-size:1.8rem">'+ico+'</div>'
+      +'<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+Math.round(days.temperature_2m_max[i])+'° / '+Math.round(days.temperature_2m_min[i])+'°</div>'
+      +'<div style="font-size:0.62rem;color:var(--muted);margin-top:2px">'+desc+'</div>'
+      +'<div style="font-size:0.62rem;color:#3b82f6;margin-top:2px">💧 '+days.precipitation_probability_max[i]+'%</div>'
+      +'</div>';
   }
-  html += '</div><div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
+  html += '</div>';
+  html += '<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source : Open-Meteo · Mézières-lez-Cléry (47.82°N, 1.807°E)</div>';
   el.innerHTML = html;
 }
 
-// ── Agenda / Calendrier ───────────────
-const MONTHS      = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
-const MONTHS_LONG = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-var agendaView = 'today';
-var _agendaTargetMonth = null; // { y, m } pour navigation mois
-
-function decodeIcalText(v){ return (v||'').replace(/\\n/g,'\n').replace(/\\,/g,',').replace(/\\;/g,';').trim(); }
-function parseIcalDateLine(line){
-  if(!line) return null;
-  var value = line.split(':').pop().trim();
-  if(/^\d{8}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T00:00:00');
-  if(/^\d{8}T\d{6}Z$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15)+'Z');
-  if(/^\d{8}T\d{6}$/.test(value)) return new Date(value.slice(0,4)+'-'+value.slice(4,6)+'-'+value.slice(6,8)+'T'+value.slice(9,11)+':'+value.slice(11,13)+':'+value.slice(13,15));
-  return new Date(value);
-}
-function parseIcalDetailed(txt){
-  var blocks = txt.replace(/\r/g,'').replace(/\n[ \t]/g,'').split('BEGIN:VEVENT').slice(1);
-  var now = new Date(), limit = new Date(now.getTime()+365*86400000);
-  var startToday = new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  var evts = [];
-  blocks.forEach(function(b,idx){
-    function getLine(name){ var re=new RegExp('^'+name+'[^:]*:(.+)$','m'); var m=b.match(re); return m?decodeIcalText(m[1]):''; }
-    var summary=getLine('SUMMARY'), location=getLine('LOCATION'), description=getLine('DESCRIPTION'), uid=getLine('UID')||('evt-'+idx);
-    var startLine=b.match(/^DTSTART[^:]*:.+$/m), endLine=b.match(/^DTEND[^:]*:.+$/m);
-    var start=startLine?parseIcalDateLine(startLine[0]):null, end=endLine?parseIcalDateLine(endLine[0]):null;
-    if(!summary||!start||isNaN(start.getTime())) return;
-    if(start<startToday||start>limit) return;
-    evts.push({uid,summary,location,description,start,end});
-  });
-  evts.sort(function(a,b){return a.start-b.start;});
-  return evts;
-}
-function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
-function startOfWeek(d){var x=new Date(d);var day=x.getDay();var diff=day===0?-6:1-day;x.setHours(0,0,0,0);x.setDate(x.getDate()+diff);return x;}
-function endOfWeek(d){var x=startOfWeek(d);x.setDate(x.getDate()+6);x.setHours(23,59,59,999);return x;}
-function formatEventMeta(evt){
-  var dateTxt=evt.start.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-  var timeTxt=evt.start.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  var endTxt=evt.end?evt.end.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
-  var meta='🕒 '+timeTxt+(endTxt?' → '+endTxt:'')+' · '+dateTxt;
-  if(evt.location) meta+='<br>📍 '+evt.location;
-  return meta;
-}
-function buildIcsForEvent(evt){
-  function pad(n){return String(n).padStart(2,'0');}
-  function fmt(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';}
-  var end=evt.end||new Date(evt.start.getTime()+3600000);
-  return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:'+evt.summary.replace(/\n/g,' ')+'\nDTSTART:'+fmt(evt.start)+'\nDTEND:'+fmt(end)+'\nLOCATION:'+(evt.location||'').replace(/\n/g,' ')+'\nDESCRIPTION:'+(evt.description||'').replace(/\n/g,' ')+'\nEND:VEVENT\nEND:VCALENDAR';
-}
-async function ensureAgendaEvents(){
-  if(window._agendaEvents) return window._agendaEvents;
-  var r=await fetch(ICAL_URL,{cache:'no-store'});
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  window._agendaEvents=parseIcalDetailed(await r.text());
-  return window._agendaEvents;
-}
-async function loadAgenda(){
-  var content=document.getElementById('agenda-content');
-  content.innerHTML='<div class="agenda-empty">Chargement de l\'agenda…</div>';
-  try{ await ensureAgendaEvents(); renderAgenda(); }
-  catch(e){ content.innerHTML='<div class="agenda-empty">Agenda indisponible.</div>'; }
-}
-function setAgendaView(view){
-  agendaView=view;
-  _agendaTargetMonth=null;
-  ['today','week','month'].forEach(function(v){
-    var el=document.getElementById('agenda-tab-'+v);
-    if(el) el.classList.toggle('on',v===view);
-  });
-  renderAgenda();
-}
-function renderAgenda(){
-  var content=document.getElementById('agenda-content');
-  var evts=window._agendaEvents||[];
-  var now=new Date();
-  var list=[];
-
-  // Mois cible (pour navigation depuis l'encart)
-  var targetY = _agendaTargetMonth ? _agendaTargetMonth.y : now.getFullYear();
-  var targetM = _agendaTargetMonth ? _agendaTargetMonth.m : now.getMonth();
-
-  if(agendaView==='today'){
-    list=evts.filter(function(e){return sameDay(e.start,now);});
-    if(!list.length){
-      var nxt=evts.length?evts[0]:null;
-      content.innerHTML=nxt?'<div class="agenda-empty">Aucun événement aujourd\'hui.<br><br>Prochain : <strong>'+nxt.summary+'</strong> le '+nxt.start.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+'.</div>':'<div class="agenda-empty">Aucun événement à venir.</div>';
-      return;
-    }
-  } else if(agendaView==='week'){
-    var sw=startOfWeek(now),ew=endOfWeek(now);
-    list=evts.filter(function(e){return e.start>=sw&&e.start<=ew;});
-  } else {
-    list=evts.filter(function(e){return e.start.getFullYear()===targetY&&e.start.getMonth()===targetM;});
-  }
-  if(agendaView==='month'){
-    var first=new Date(targetY,targetM,1);
-    var last=new Date(targetY,targetM+1,0);
-    var startPad=first.getDay()===0?6:first.getDay()-1;
-    var html='<div style="font-size:.82rem;font-weight:900;color:var(--forest);margin-bottom:8px;text-transform:capitalize">'+MONTHS_LONG[targetM]+' '+targetY+'</div>';
-    html+='<div class="agenda-month-grid">';
-    ['L','M','M','J','V','S','D'].forEach(function(h){html+='<div class="agenda-month-head">'+h+'</div>';});
-    for(var p=0;p<startPad;p++) html+='<div class="agenda-month-day" style="visibility:hidden"></div>';
-    for(var d=1;d<=last.getDate();d++){
-      var current=new Date(targetY,targetM,d);
-      var hasEvent=list.some(function(e){return sameDay(e.start,current);});
-      var cls='agenda-month-day'+(hasEvent?' has-event':'')+(sameDay(current,now)?' today':'');
-      html+='<div class="'+cls+'">'+d+'</div>';
-    }
-    html+='</div><div class="agenda-list" style="margin-top:14px">'+(list.length?list.map(renderAgendaItem).join(''):'<div class="agenda-empty">Aucun événement ce mois-ci.</div>')+'</div>';
-    content.innerHTML=html;
-    return;
-  }
-  content.innerHTML=list.length?'<div class="agenda-list">'+list.map(renderAgendaItem).join('')+'</div>':'<div class="agenda-empty">Aucun événement sur cette période.</div>';
-}
-function renderAgendaItem(evt){
-  var dayName=evt.start.toLocaleDateString('fr-FR',{weekday:'short'});
-  return '<div class="agenda-item" onclick="openEventDetail(\''+evt.uid.replace(/'/g,"\\'")+'\')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+evt.summary+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+evt.description+'</div>':'')+'</div></div></div>';
-}
-function openEventDetail(uid){
-  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
-  if(!evt) return;
-  var body=document.getElementById('event-detail-body');
-  body.innerHTML='<div class="event-detail-card"><div class="event-detail-title">'+evt.summary+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description||'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
-  openOv('event');
-}
-function downloadEventIcs(uid){
-  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
-  if(!evt) return;
-  var blob=new Blob([buildIcsForEvent(evt)],{type:'text/calendar;charset=utf-8'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a'); a.href=url; a.download='evenement-mat.ics';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(function(){URL.revokeObjectURL(url);},1000);
-}
-function openEventMap(uid){
-  var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
-  if(!evt||!evt.location) return;
-  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(evt.location),'_blank');
-}
+// ── Événements iCal ───────────────────
+const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 async function loadEvents(){
   try{
-    var evts=await ensureAgendaEvents();
-    var first=evts.length?evts[0]:null;
-    if(!first){
-      document.getElementById('next-event-date').textContent='Aucune date';
-      document.getElementById('next-event-name').textContent='Aucune manifestation à venir';
-      document.getElementById('next-event-days').textContent='Ouvrir l\'agenda';
-      return;
-    }
-    var diff=Math.ceil((first.start-new Date())/(1000*60*60*24));
-    var diffTxt=diff<=0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
-    document.getElementById('next-event-date').textContent=first.start.getDate()+' '+MONTHS[first.start.getMonth()];
-    document.getElementById('next-event-name').textContent=first.summary;
-    document.getElementById('next-event-days').textContent=diffTxt;
+    const r = await fetch(ICAL_URL);
+    const txt = await r.text();
+    const evts = parseIcalEvents(txt, 2);
+    const strip = document.getElementById('events-strip');
+    if(!evts.length){ strip.innerHTML='<div class="event-loading">Aucun événement à venir</div>'; return; }
+    strip.innerHTML = evts.map(e=>{
+      const dt = e.date;
+      const diff = Math.ceil((dt-new Date())/(1000*60*60*24));
+      const diffTxt = diff===0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
+      return '<div class="event-chip">'
+        +'<div class="event-date">'+dt.getDate()+' '+MONTHS[dt.getMonth()]+'</div>'
+        +'<div class="event-name">'+e.summary+'</div>'
+        +'<div class="event-days">'+diffTxt+'</div>'
+        +'</div>';
+    }).join('');
   }catch(e){
-    document.getElementById('next-event-date').textContent='Indisponible';
-    document.getElementById('next-event-name').textContent='Agenda';
-    document.getElementById('next-event-days').textContent='Réessayez plus tard';
+    document.getElementById('events-strip').innerHTML='<div class="event-loading">Calendrier indisponible</div>';
   }
 }
 
-// ── Signalement → Trello ─────────────
-let sigCat='',sigLat='',sigLon='';
-function selCat(btn,cat){
+function parseIcalEvents(txt, max){
+  const evts=[], now=new Date(), limit=new Date(now.getTime()+180*864e5);
+  txt.split('BEGIN:VEVENT').slice(1).forEach(b=>{
+    const get=k=>{const m=b.match(new RegExp(k+'[^:]*:([^\r\n]+)'));return m?m[1].trim():'';};
+    const summary=get('SUMMARY'), dtstart=get('DTSTART');
+    if(!summary||!dtstart)return;
+    const raw=dtstart.replace(/T.*/,'');
+    const d=new Date(raw.slice(0,4)+'-'+raw.slice(4,6)+'-'+raw.slice(6,8));
+    if(d>=now&&d<=limit)evts.push({summary,date:d});
+  });
+  return evts.sort((a,b)=>a.date-b.date).slice(0,max);
+}
+
+// ── Signalement ───────────────────────
+let sigCat='', sigLat='', sigLon='';
+function selCat(btn, cat){
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); sigCat=cat;
+  btn.classList.add('on'); sigCat = cat;
 }
 function previewPhoto(){
-  const file=document.getElementById('signal-photo-input').files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const prev=document.getElementById('signal-photo-preview');
-    prev.src=e.target.result; prev.style.display='block';
+  const file = document.getElementById('signal-photo-input').files[0];
+  if(!file)return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('signal-photo-preview');
+    prev.src = e.target.result; prev.style.display='block';
     document.querySelector('.photo-btn').style.display='none';
   };
   reader.readAsDataURL(file);
 }
 function getLocation(){
-  if(!navigator.geolocation){document.getElementById('loc-status').textContent='GPS non disponible';return;}
+  if(!navigator.geolocation){ document.getElementById('loc-status').textContent='GPS non disponible'; return; }
   document.getElementById('loc-btn').textContent='📍 Localisation en cours…';
   navigator.geolocation.getCurrentPosition(pos=>{
-    sigLat=pos.coords.latitude.toFixed(5); sigLon=pos.coords.longitude.toFixed(5);
+    sigLat = pos.coords.latitude.toFixed(5); sigLon = pos.coords.longitude.toFixed(5);
     document.getElementById('loc-btn').textContent='✅ Position obtenue ('+sigLat+', '+sigLon+')';
     document.getElementById('loc-btn').classList.add('on');
     document.getElementById('loc-status').textContent='';
-  },()=>{document.getElementById('loc-btn').textContent='❌ Position refusée';document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres';});
+  }, ()=>{ document.getElementById('loc-btn').textContent='❌ Position refusée'; document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres'; });
 }
 async function submitSignal(){
-  const desc=document.getElementById('signal-desc').value.trim();
-  const photoEl=document.getElementById('signal-photo-preview');
-  const btn=document.querySelector('#signal-form .submit-btn');
-  btn.textContent='Envoi en cours…'; btn.disabled=true;
-
-  // Compresser la photo si présente (max 800px, qualité 0.7)
-  let photoB64 = '';
-  if(photoEl.style.display !== 'none' && photoEl.src){
-    try{ photoB64 = await compressImage(photoEl.src, 800, 0.7); }
-    catch(e){ photoB64 = photoEl.src.substring(0, 80000); }
-  }
-
-  const _dev = detectDevice();
-  const descWithDevice = desc + (desc ? '\n\n' : '') + '📱 ' + _dev.type + ' · ' + _dev.os + ' · ' + _dev.browser + ' · ' + _dev.pwa;
-  const body={cat:sigCat||'Non précisé',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64};
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), 35000);
+  const desc = document.getElementById('signal-desc').value.trim();
+  const photoEl = document.getElementById('signal-photo-preview');
+  const photoB64 = photoEl.style.display!=='none' ? photoEl.src : '';
+  const body = { cat: sigCat||'Non précisé', desc, lat: sigLat, lon: sigLon, photoB64: photoB64.substring(0,50000) };
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Envoi en cours…'; btn.disabled = true;
   try{
-    const r = await fetch(SIGNAL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
-    clearTimeout(timer);
+    await fetch(SIGNAL_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
   }catch(e){
-    clearTimeout(timer);
-    // Timeout Trello/photo : on considère l'envoi réussi (Redis a reçu)
-    if(e.name==='AbortError'){
-      document.getElementById('signal-form').style.display='none';
-      document.getElementById('signal-success').style.display='block';
-    } else {
-      alert('Erreur d\'envoi. Vérifiez votre connexion.');
-      btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
-    }
+    alert('Erreur d\'envoi. Vérifiez votre connexion.');
+    btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
   }
-}
-
-// Compression image via canvas
-function compressImage(src, maxSize, quality){
-  return new Promise((resolve, reject)=>{
-    const img=new Image();
-    img.onload=function(){
-      const canvas=document.createElement('canvas');
-      let w=img.width, h=img.height;
-      if(w>maxSize||h>maxSize){
-        if(w>h){h=Math.round(h*maxSize/w);w=maxSize;}
-        else{w=Math.round(w*maxSize/h);h=maxSize;}
-      }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.onerror=reject;
-    img.src=src;
-  });
 }
 function resetSignal(){
   document.getElementById('signal-form').style.display='block';
@@ -1414,641 +787,372 @@ function resetSignal(){
   document.getElementById('signal-photo-preview').style.display='none';
   document.querySelector('.photo-btn').style.display='block';
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
-  sigCat='';sigLat='';sigLon='';
+  sigCat=''; sigLat=''; sigLon='';
   document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
   document.getElementById('loc-btn').classList.remove('on');
 }
 
 // ── Boîte à idées ─────────────────────
-const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3';
-let ideaCat='';
-function selIdeaCat(btn,cat){document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));btn.classList.add('on');ideaCat=cat;}
-function getIdeas(){try{return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]');}catch(e){return[];}}
-function getVotes(){try{return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}');}catch(e){return {};}}
+const IDEAS_KEY = 'mat_ideas_v3';
+const VOTES_KEY = 'mat_votes_v3';
+let ideaCat = '';
+
+function selIdeaCat(btn, cat){
+  document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); ideaCat = cat;
+}
+
+function getIdeas(){ try{ return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]'); }catch(e){return[];} }
+function getVotes(){ try{ return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}'); }catch(e){return {};} }
+
 async function submitIdee(){
-  const txt=document.getElementById('idea-input').value.trim();
-  if(!txt){alert('Veuillez écrire votre idée !');return;}
-  const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR')};
-  const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
-  document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
-  loadIdees();
-}
-async function voteIdee(id){
-  const votes=getVotes(); if(votes[id]) return;
-  votes[id]=1; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote',{method:'POST'});}catch(e){}
-  loadIdees();
-}
-async function loadIdees(){
-  const votes=getVotes(); const el=document.getElementById('ideas-list');
-  el.innerHTML='<div class="no-ideas">Chargement…</div>';
-  let ideas=[];
-  try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees');
-    const d=await r.json(); ideas=d.idees||[];
-    const local=getIdeas().filter(li=>!ideas.find(si=>si.id===li.id));
-    ideas=[...local,...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
-  }catch(e){ideas=getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));}
-  if(!ideas.length){el.innerHTML='<div class="no-ideas">Aucune idée pour l\'instant.<br>Soyez le premier à proposer !</div>';return;}
-  el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${idea.cat}</div><div class="idea-text">${idea.text}</div><div class="idea-date">${idea.date}</div></div></div>`).join('');
-}
-
-// ── Mairie ────────────────────────────
-function loadMairieStatus(){
-  var nowParis=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
-  var day=nowParis.getDay(), mins=nowParis.getHours()*60+nowParis.getMinutes();
-  function setStatus(main,sub,badge){
-    document.getElementById('mairie-status').textContent=main;
-    document.getElementById('mairie-desc').textContent=sub;
-    document.getElementById('mairie-badge').textContent=badge;
-  }
-  if(day===1){
-    if(mins>=14*60&&mins<17*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 17h30','Lundi');
-    if(mins<14*60) return setStatus('Fermée','Ouvre aujourd\'hui à 14h','Lundi');
-  }
-  if(day===5){
-    if(mins>=8*60+30&&mins<11*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 11h30','Vendredi');
-    if(mins<8*60+30) return setStatus('Fermée','Ouvre aujourd\'hui à 8h30','Vendredi');
-  }
-  if(day===3) return setStatus('Sur RDV','Mercredi uniquement sur rendez-vous','Mercredi');
-  if(day===0||day===6) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Week-end');
-  if(day===1&&mins>=17*60+30) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
-  if(day===2) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
-  if(day===4) return setStatus('Fermée','Prochaine ouverture vendredi à 8h30','Mairie');
-  if(day===5&&mins>=11*60+30) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Mairie');
-  setStatus('Fermée','Horaires : lun 14h-17h30 · mer sur RDV · ven 8h30-11h30','Horaires');
-}
-
-// ── Déchets ───────────────────────────
-function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
-function loadDechets(){
-  const now=new Date(), tz={timeZone:'Europe/Paris'};
-  const hP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
-  const jour=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
-  const moisP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
-  const annee=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
-  const dateP=new Date(annee,moisP-1,jour), dowP=dateP.getDay(), semPaire=getWeekNumber(dateP)%2===0;
-  const FERIES_FIXES=['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-  const FERIES_DATES=['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
-  const mmdd=String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const iso=annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
-  const ferie=FERIES_FIXES.includes(mmdd)||FERIES_DATES.includes(iso);
-  let bTxt='',bUrg=false;
-  if(dowP===0){bTxt='🗑️ Sortir le bac noir ce soir !';bUrg=true;}
-  else if(dowP===1&&hP<8){bTxt='🗑️ Bac noir : collecte ce matin';bUrg=true;}
-  else if(dowP===1&&semPaire&&hP>=8){bTxt='♻️ Sortir le bac jaune ce soir !';bUrg=true;}
-  else if(dowP===2&&semPaire&&hP<8){bTxt='♻️ Bac jaune : collecte ce matin';bUrg=true;}
-  else{const j2lun=dowP===1?7:(8-dowP)%7||7;if(j2lun===1){bTxt='🗑️ Bac noir demain — sortir ce soir';bUrg=true;}else{bTxt='🗑️ Prochain bac noir : lundi matin';}}
-  const omEl=document.getElementById('om-text');
-  if(omEl){omEl.innerHTML=bTxt;omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)';}
-  const isH=moisP>=10||moisP<=3, matO=isH?10:9, apF=isH?17:18;
-  const isJourOuv=dowP>=1&&dowP<=6&&!ferie;
-  let dTxt='',dOuv=false;
-  if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée (ouvre lundi à '+matO+'h)';}
-  else if(hP<matO){dTxt='Déchetterie fermée — ouvre à '+matO+'h';}
-  else if(hP<12){dOuv=true;dTxt='Déchetterie ouverte — ferme à 12h';}
-  else if(hP<14){dTxt='Déchetterie fermée — ouvre à 14h';}
-  else if(hP<apF){dOuv=true;dTxt='Déchetterie ouverte — ferme à '+apF+'h';}
-  else{dTxt='Déchetterie fermée — ouvre '+(dowP<6?'demain':'lundi')+' à '+matO+'h';}
-  const dEl=document.getElementById('dechetterie-text'), dIco=document.getElementById('dech-ico');
-  if(dEl){dEl.textContent=dTxt;dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)';}
-  if(dIco){dIco.textContent=dOuv?'🟢':'🔴';}
-}
-
-function loadDechetsDetail(){
-  var el=document.getElementById('dechets-content');
-  el.innerHTML='<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
-    +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🗑️ Collecte des ordures</div>'
-    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Bac noir (ordures ménagères) : chaque <strong>lundi matin</strong>. Sortez-le le dimanche soir.<br>'
-    +'Bac jaune (recyclables) : un <strong>lundi sur deux</strong> (semaines paires). Sortez-le le lundi soir précédent.</div>'
-    +'</div>'
-    +'<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
-    +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🏭 Réseau des déchetteries</div>'
-    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
-    +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
-    +'🕐 <strong>Été (avr-sep)</strong> : 9h-12h et 14h-18h</div>'
-    +'</div>';
-}
-
-// ── Bouton install / bug ──────────────
-function updateInstallBtn(){
-  const installed=localStorage.getItem(INSTALL_KEY);
-  const btn=document.getElementById('btn-install-or-bug');
-  const ico=document.getElementById('iob-ico');
-  const label=document.getElementById('iob-label');
-  const sub=document.getElementById('iob-sub');
-  if(!btn) return;
-  if(installed){
-    ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='Un service ne fonctionne pas ?';
-    btn.onclick=()=>openOv('bug');
-  }
-}
-function installOrBug(){
-  if(localStorage.getItem(INSTALL_KEY)){openOv('bug');}
-  else{installApp();}
-}
-
-// ── Contact mairie → Trello ───────────
-function contactViaMessenger(){window.open('https://m.me/RadioMezieres','_blank');}
-
-async function submitContactForm(){
-  const name=document.getElementById('contact-name').value.trim();
-  const reply=document.getElementById('contact-reply').value.trim();
-  const msg=document.getElementById('contact-msg').value.trim();
-  if(!msg){alert('Merci de renseigner votre message.');return;}
-  const btn=document.querySelector('#contact-form .submit-btn');
-  btn.textContent='Envoi…'; btn.disabled=true;
-  try{
-    await fetch(SIGNAL_URL,{
+  const txt = document.getElementById('idea-input').value.trim();
+  if(!txt){ alert('Veuillez écrire votre idée !'); return; }
+  const idea = { id: Date.now(), text: txt, cat: ideaCat||'💡 Autre', votes: 0, date: new Date().toLocaleDateString('fr-FR') };
+  // Stocker localement
+  const ideas = getIdeas();
+  ideas.unshift(idea);
+  localStorage.setItem(IDEAS_KEY, JSON.stringify(ideas));
+  // Envoyer au serveur pour partage
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/idee', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        cat:'[Demande] Contact mairie',
-        desc:'Nom/prénom : '+(name||'Non précisé')+'\nRéponse : '+(reply||'Non précisée')+'\n\nMessage : '+msg
-      })
+      body:JSON.stringify(idea)
     });
-    trackStat('contact');
-    document.getElementById('contact-form').style.display='none';
-    document.getElementById('contact-success').style.display='block';
-  }catch(e){
-    alert('Erreur d\'envoi. Réessayez plus tard.');
-    btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
+  } catch(e) { /* si hors ligne, stocké localement seulement */ }
+  document.getElementById('idea-input').value='';
+  ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  loadIdees();
+}
+
+async function voteIdee(id){
+  const votes = getVotes();
+  if(votes[id]) return; // déjà voté
+  votes[id] = 1;
+  localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote', { method:'POST' });
+  } catch(e) { /* hors ligne */ }
+  loadIdees();
+}
+
+async function loadIdees(){
+  const votes = getVotes();
+  const el = document.getElementById('ideas-list');
+  el.innerHTML='<div class="no-ideas">Chargement…</div>';
+  let ideas = [];
+  try {
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/idees');
+    const d = await r.json();
+    ideas = d.idees || [];
+    const local = getIdeas().filter(li => !ideas.find(si => si.id === li.id));
+    ideas = [...local, ...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
+  } catch(e) {
+    ideas = getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));
+  }
+  if(!ideas.length){ el.innerHTML='<div class="no-ideas">Aucune idée pour l’instant.<br>Soyez le premier à proposer !</div>'; return; }
+  el.innerHTML = ideas.map(idea=>`
+    <div class="idea-card">
+      <div class="idea-votes">
+        <button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button>
+        <div class="vote-count">${idea.votes||0}</div>
+      </div>
+      <div class="idea-content">
+        <div class="idea-cat-badge">${idea.cat}</div>
+        <div class="idea-text">${idea.text}</div>
+        <div class="idea-date">${idea.date}</div>
+      </div>
+    </div>`).join('');
+}
+// ── Déchetterie & Bacs ───────────────────────────────────────
+function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
+
+const FERIES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+// Fériés mobiles 2025-2026 (Pâques, Ascension, Pentecôte)
+const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+
+function isFerie(dateP, jour, moisP, annee){
+  const mmdd = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  if(FERIES.includes(mmdd)) return true;
+  const iso = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  return FERIES_DATES.includes(iso);
+}
+
+function loadDechets(){
+  // Extraction heure Paris robuste via Intl.DateTimeFormat
+  const now = new Date();
+  const tz  = { timeZone:'Europe/Paris' };
+  const hP    = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
+  const minP  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now));
+  const jour  = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
+  const moisP = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
+  const annee = parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
+  const dateP = new Date(annee, moisP-1, jour);
+  const dowP  = dateP.getDay(); // 0=dim 1=lun 6=sam
+  const semPaire = getWeekNumber(dateP) % 2 === 0;
+
+  // Jours fériés fixes + mobiles
+  const FERIES_FIXES = ['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+  const FERIES_DATES = ['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
+  const mmdd  = String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const iso   = annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
+  const ferie = FERIES_FIXES.includes(mmdd) || FERIES_DATES.includes(iso);
+
+  // ── Bac — un seul message ─────────────────────────────────
+  let bTxt='', bUrg=false;
+  if(dowP===0){
+    bTxt='🗑️ Sortir le bac noir ce soir !'; bUrg=true;
+  } else if(dowP===1 && hP<8){
+    bTxt='🗑️ Bac noir : collecte ce matin'; bUrg=true;
+  } else if(dowP===1 && semPaire && hP>=8){
+    bTxt='\u267b\ufe0f Sortir le bac jaune ce soir !'; bUrg=true;
+  } else if(dowP===2 && semPaire && hP<8){
+    bTxt='\u267b\ufe0f Bac jaune : collecte ce matin'; bUrg=true;
+  } else {
+    const j2lun = dowP===1 ? 7 : (8-dowP)%7||7;
+    if(j2lun===1){ bTxt='🗑️ Bac noir demain — sortir ce soir'; bUrg=true; }
+    else { bTxt='🗑️ Prochain bac noir : lundi matin'; }
+  }
+  const omEl = document.getElementById('om-text');
+  if(omEl){ omEl.innerHTML=bTxt; omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)'; }
+
+  // ── Déchetterie Cléry — lun-sam sauf fériés ──────────────
+  // Hiver (oct-mars) : 10h-12h / 14h-17h
+  // Été  (avr-sep)  :  9h-12h / 14h-18h
+  const isH   = moisP>=10 || moisP<=3;
+  const matO  = isH ? 10 : 9;
+  const apF   = isH ? 17 : 18;
+  const isJourOuv = dowP>=1 && dowP<=6 && !ferie;
+  let dTxt='', dOuv=false;
+  if(!isJourOuv){
+    if(ferie) dTxt='D\u00e9chetterie ferm\u00e9e (jour f\u00e9ri\u00e9)';
+    else dTxt='D\u00e9chetterie ferm\u00e9e (ouvre lundi \u00e0 '+matO+'h)';
+  } else if(hP<matO){
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 '+matO+'h';
+  } else if(hP<12){
+    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 12h';
+  } else if(hP<14){
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre \u00e0 14h';
+  } else if(hP<apF){
+    dOuv=true; dTxt='D\u00e9chetterie ouverte — ferme \u00e0 '+apF+'h';
+  } else {
+    dTxt='D\u00e9chetterie ferm\u00e9e — ouvre '+(dowP<6?'demain':'lundi')+' \u00e0 '+matO+'h';
+  }
+  const dEl  = document.getElementById('dechetterie-text');
+  const dIco = document.getElementById('dech-ico');
+  if(dEl)  { dEl.textContent=dTxt; dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)'; }
+  if(dIco) { dIco.textContent=dOuv?'\ud83d\udfe2':'\ud83d\udd34'; }
+}
+
+// ── Bouton install / bug ─────────────────────────────────────
+function updateInstallBtn() {
+  const installed = localStorage.getItem(INSTALL_KEY);
+  const btn   = document.getElementById('btn-install-or-bug');
+  const ico   = document.getElementById('iob-ico');
+  const label = document.getElementById('iob-label');
+  const sub   = document.getElementById('iob-sub');
+  if (!btn) return;
+  if (installed) {
+    ico.style.background = 'linear-gradient(135deg,#fde8f0,#f8d0e4)';
+    ico.textContent = '🐞';
+    label.textContent = 'Signaler un bug';
+    sub.textContent = 'Un service ne fonctionne pas ?';
+    btn.onclick = () => openOv('bug');
   }
 }
-function resetContact(){
-  document.getElementById('contact-form').style.display='block';
-  document.getElementById('contact-success').style.display='none';
-  ['contact-name','contact-reply','contact-msg'].forEach(id=>{document.getElementById(id).value='';});
-  const btn=document.querySelector('#contact-form .submit-btn');
-  if(btn){btn.textContent='📤 Envoyer ma demande';btn.disabled=false;}
-  closeOv('contact');
+
+function installOrBug() {
+  if (localStorage.getItem(INSTALL_KEY)) { openOv('bug'); }
+  else { installApp(); }
 }
 
-// ── Bug report ────────────────────────
-let bugService='';
-function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugService=val;}
-
-async function submitBug(){
-  const desc=document.getElementById('bug-desc').value.trim();
-  const btn=document.querySelector('#bug-form .submit-btn');
-  btn.textContent='Envoi…'; btn.disabled=true;
-  try{
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:(()=>{
-        const dev = detectDevice();
-        const descFull = 'Appareil : '+dev.type
-          +'\nModèle : '+dev.model
-          +'\nOS : '+dev.os
-          +'\nNavigateur : '+dev.browser
-          +'\nÉcran : '+dev.screen
-          +'\nPWA : '+dev.pwa
-          +'\nMAT : '+dev.matVersion
-          +'\n\nDescription :\n'+desc;
-        return JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug'});
-      })()
+// ── Bug report ────────────────────────────────────────────────
+let bugService = '', bugDevice = '';
+function selBugService(btn, val) {
+  document.querySelectorAll('#bug-services .cat-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); bugService = val;
+}
+function selBugDevice(btn, val) {
+  document.querySelectorAll('#bug-devices .cat-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); bugDevice = val;
+}
+async function submitBug() {
+  const desc = document.getElementById('bug-desc').value.trim();
+  const body = {
+    type: 'bug',
+    service: bugService || 'Non précisé',
+    device: bugDevice || 'Non précisé',
+    desc, date: new Date().toLocaleString('fr-FR', {timeZone:'Europe/Paris'})
+  };
+  const btn = document.querySelector('#bug-form .submit-btn');
+  btn.textContent = 'Envoi…'; btn.disabled = true;
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({cat: '🐞 Bug — '+body.service, desc: body.device+' · '+body.desc})
     });
     trackStat('bug');
-    document.getElementById('bug-form').style.display='none';
-    document.getElementById('bug-success').style.display='block';
-  }catch(e){
-    alert('Erreur d\'envoi. Réessayez plus tard.');
-    btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
+    document.getElementById('bug-form').style.display = 'none';
+    document.getElementById('bug-success').style.display = 'block';
+  } catch(e) {
+    alert('Erreur d’envoi. Réessayez plus tard.');
+    btn.textContent = '📤 Envoyer le rapport'; btn.disabled = false;
   }
 }
-function resetBug(){
-  document.getElementById('bug-form').style.display='block';
-  document.getElementById('bug-success').style.display='none';
-  document.getElementById('bug-desc').value='';
-  bugService='';
-  document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));
+function resetBug() {
+  document.getElementById('bug-form').style.display = 'block';
+  document.getElementById('bug-success').style.display = 'none';
+  document.getElementById('bug-desc').value = '';
+  bugService=''; bugDevice='';
+  document.querySelectorAll('#bug-services .cat-btn, #bug-devices .cat-btn').forEach(b=>b.classList.remove('on'));
   closeOv('bug');
 }
 
-// ── Détection appareil ───────────────
-function detectDevice() {
-  const ua = navigator.userAgent;
-  const p  = navigator.platform || '';
-
-  // OS
-  let os = 'Inconnu', osVersion = '';
-  if (/iPhone|iPad|iPod/.test(ua)) {
-    os = /iPad/.test(ua) ? 'iPadOS' : 'iOS';
-    const m = ua.match(/OS ([\d_]+)/);
-    osVersion = m ? m[1].replace(/_/g, '.') : '';
-  } else if (/Android/.test(ua)) {
-    os = 'Android';
-    const m = ua.match(/Android ([\d.]+)/);
-    osVersion = m ? m[1] : '';
-  } else if (/Windows/.test(ua)) {
-    os = 'Windows';
-    const m = ua.match(/Windows NT ([\d.]+)/);
-    const versions = {'10.0':'10/11','6.3':'8.1','6.2':'8','6.1':'7'};
-    osVersion = m ? (versions[m[1]] || m[1]) : '';
-  } else if (/Mac OS X/.test(ua)) {
-    os = 'macOS';
-    const m = ua.match(/Mac OS X ([\d_]+)/);
-    osVersion = m ? m[1].replace(/_/g, '.') : '';
-  } else if (/Linux/.test(ua)) {
-    os = 'Linux';
-  }
-
-  // Navigateur
-  let browser = 'Inconnu', browserVersion = '';
-  if (/CriOS/.test(ua))       { browser = 'Chrome iOS';  const m = ua.match(/CriOS\/([\d.]+)/);  browserVersion = m?m[1]:''; }
-  else if (/FxiOS/.test(ua))  { browser = 'Firefox iOS'; const m = ua.match(/FxiOS\/([\d.]+)/);  browserVersion = m?m[1]:''; }
-  else if (/EdgA/.test(ua))   { browser = 'Edge Android';const m = ua.match(/EdgA\/([\d.]+)/);   browserVersion = m?m[1]:''; }
-  else if (/Edg\//.test(ua))  { browser = 'Edge';        const m = ua.match(/Edg\/([\d.]+)/);    browserVersion = m?m[1]:''; }
-  else if (/OPR/.test(ua))    { browser = 'Opera';       const m = ua.match(/OPR\/([\d.]+)/);    browserVersion = m?m[1]:''; }
-  else if (/Chrome/.test(ua)) { browser = 'Chrome';      const m = ua.match(/Chrome\/([\d.]+)/); browserVersion = m?m[1]:''; }
-  else if (/Firefox/.test(ua)){ browser = 'Firefox';     const m = ua.match(/Firefox\/([\d.]+)/);browserVersion = m?m[1]:''; }
-  else if (/Safari/.test(ua)) { browser = 'Safari';      const m = ua.match(/Version\/([\d.]+)/);browserVersion = m?m[1]:''; }
-
-  // Type appareil
-  let deviceType = 'Desktop';
-  if (/iPhone|iPod/.test(ua)) deviceType = 'iPhone';
-  else if (/iPad/.test(ua) || (os==='iPadOS')) deviceType = 'iPad';
-  else if (/Android/.test(ua) && /Mobile/.test(ua)) deviceType = 'Android Mobile';
-  else if (/Android/.test(ua)) deviceType = 'Android Tablet';
-
-  // Modèle (best effort)
-  let model = '';
-  const mSamsung = ua.match(/Samsung|SM-[A-Z0-9]+/i);
-  const mPixel   = ua.match(/Pixel \d+[a-z]*/i);
-  const mHuawei  = ua.match(/Huawei|HW-/i);
-  const mXiaomi  = ua.match(/Xiaomi|Redmi|MIUI/i);
-  if (/iPhone/.test(ua)) model = 'iPhone';
-  else if (/iPad/.test(ua)) model = 'iPad';
-  else if (mPixel)   model = mPixel[0];
-  else if (mSamsung) { const s = ua.match(/SM-[A-Z0-9]+/i); model = s ? s[0] : 'Samsung'; }
-  else if (mHuawei)  model = 'Huawei';
-  else if (mXiaomi)  model = 'Xiaomi/Redmi';
-
-  // PWA installée ?
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches
-             || window.navigator.standalone === true;
-
-  return {
-    type:      deviceType,
-    model:     model || deviceType,
-    os:        os + (osVersion ? ' ' + osVersion : ''),
-    browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
-    screen:    screen.width + 'x' + screen.height,
-    pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.4'
-  };
+// ── Stats usage ───────────────────────────────────────────────
+async function trackStat(service) {
+  try {
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({service})
+    });
+  } catch(e) { /* silencieux */ }
 }
 
-// ── Stats ─────────────────────────────
-async function trackStat(service){
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){}
-}
-const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
-window.openMel=()=>{trackStat('mel');_origOpenMel();};
-window.openSignal=()=>{trackStat('signalement');_origOpenSignal();};
-window.openIdees=()=>{trackStat('idees');_origOpenIdees();};
-window.openNotifs=()=>{trackStat('actualites');_origOpenNotifs();};
-window.openMeteo=()=>{trackStat('meteo');_origOpenMeteo();};
-window.openContact=()=>{trackStat('contact');_origOpenContact();};
-window.addEventListener('appinstalled',()=>{localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');trackStat('installation');updateInstallBtn();});
+// Tracker les ouvertures de services
+const _origOpenMel    = openMel;
+const _origOpenSignal = openSignal;
+const _origOpenIdees  = openIdees;
+const _origOpenNotifs = openNotifs;
+const _origOpenMeteo  = openMeteo;
+window.openMel    = ()=>{ trackStat('mel');        _origOpenMel(); };
+window.openSignal = ()=>{ trackStat('signalement'); _origOpenSignal(); };
+window.openIdees  = ()=>{ trackStat('idees');       _origOpenIdees(); };
+window.openNotifs = ()=>{ trackStat('actualites');  _origOpenNotifs(); };
+window.openMeteo  = ()=>{ trackStat('meteo');       _origOpenMeteo(); };
 
-// ── Actualités ────────────────────────
+// Tracker installation
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem(INSTALL_KEY, '1');
+  document.getElementById('install-banner').classList.add('hidden');
+  trackStat('installation');
+  updateInstallBtn();
+});
+
+// ── Actualités (publications Radio Mézières) ──
 async function loadActus(){
-  const el=document.getElementById('actu-list');
-  el.innerHTML='<div class="actu-empty">Chargement…</div>';
+  const el = document.getElementById('actu-list');
+  el.innerHTML = '<div class="actu-empty">Chargement…</div>';
   try{
-    const r=await fetch(ACTU_URL), d=await r.json();
-    if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter les publications communales ici.</div>';return;}
-    el.innerHTML=d.actus.map(a=>{
-      const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`:'';
-      const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const titre=texte.length>80?texte.substring(0,80)+'...':texte;
-      const texteComplet=texte.length>80?texte:'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${a.date}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+    const r = await fetch(ACTU_URL);
+    const d = await r.json();
+    if(!d.actus||!d.actus.length){
+      el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour que les publications apparaissent ici.</div>';
+      return;
+    }
+    el.innerHTML = d.actus.map(a => {
+      const imgHTML = a.photo
+        ? `<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`
+        : '';
+      // Nettoyer le titre : retirer #app-mezieres et tronquer
+      const texte = (a.title||'').replace(/#app-mezieres/gi,'').trim();
+      const titre = texte.length > 80 ? texte.substring(0,80)+'...' : texte;
+      const texteComplet = texte.length > 80 ? texte : '';
+      return `<div class="actu-item">
+        ${imgHTML}
+        <div class="actu-body">
+          <div class="actu-title">${titre}</div>
+          ${texteComplet ? `<div class="actu-text">${texteComplet}</div>` : ''}
+          <div class="actu-date">📅 ${a.date}</div>
+          <a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">
+            📘 Voir sur Facebook
+          </a>
+        </div>
+      </div>`;
     }).join('');
-  }catch(e){el.innerHTML='<div class="actu-empty">Actualité Pocket indisponible.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
+  }catch(e){
+    el.innerHTML='<div class="actu-empty">Actualités indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';
+  }
 }
 
 // ── Notifications Push ────────────────
-let pushRegistered=false;
-async function checkPushStatus(){
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)) return;
-  try{
-    const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
-    const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
-    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';}
-    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';}
-  }catch(e){}
+let pushRegistered = false;
+async function checkPushStatus() {
+  // Vérifier si on est déjà abonné côté navigateur
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    const btn = document.getElementById('push-btn');
+    if (sub) {
+      // On a une subscription dans le navigateur — vérifier qu'elle est sur le serveur
+      pushRegistered = true;
+      if (btn) { btn.textContent = 'Désactiver'; btn.classList.remove('off'); }
+    } else {
+      pushRegistered = false;
+      if (btn) { btn.textContent = 'Activer'; btn.classList.add('off'); }
+    }
+  } catch(e) { /* silencieux */ }
 }
+
 async function togglePush(){
-  const btn=document.getElementById('push-btn'),subTxt=document.getElementById('push-sub');
+  const btn = document.getElementById('push-btn');
   if(pushRegistered){
-    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});await sub.unsubscribe();}}catch(e){}
-    if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}
-    if(subTxt)subTxt.textContent='Notifications désactivées.';
-    pushRegistered=false; return;
+    // Désabonner
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ endpoint: sub.endpoint })
+        });
+        await sub.unsubscribe();
+      }
+    } catch(e) { /* silencieux */ }
+    btn.textContent='Activer'; btn.classList.add('off'); pushRegistered=false;
+    return;
   }
-  if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
-  const perm=await Notification.requestPermission();
-  if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
+  if(!('Notification' in window)){ alert('Notifications non supportées sur ce navigateur.'); return; }
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ alert('Notifications refusées. Modifiez les paramètres de votre navigateur.'); return; }
   if('serviceWorker' in navigator){
     try{
-      const reg=await navigator.serviceWorker.ready;
-      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
-      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
-      if(subTxt)subTxt.textContent='Notifications actives.';
-      pushRegistered=true;
-      alert('✅ Notifications activées !');
-    }catch(e){alert('Erreur lors de l\'activation des notifications.');}
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlBase64ToUint8Array(VAPID_PUB) });
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(sub) });
+      btn.textContent='Désactiver'; btn.classList.remove('off'); pushRegistered=true;
+      alert('✅ Notifications activées ! Vous serez alerté des nouvelles publications Radio Mézières.');
+    }catch(e){ alert('Erreur lors de l’activation des notifications.'); }
   }
 }
-  
 
-// ── Bus Rémi ─────────────────────────
-// Horaires réels Ligne 8 Rémi — Mézières-lez-Cléry
-// Source : PDF REMI_45_LIGNE_8
-
-// Vacances scolaires zone B 2025-2026
-const VACANCES_SCOLAIRES = [
-  ['2025-10-18','2025-11-03'],
-  ['2025-12-20','2026-01-05'],
-  ['2026-02-07','2026-02-23'],
-  ['2026-04-04','2026-04-20'],
-  ['2026-07-04','2026-08-31'],
-];
-
-function isVacancesScolaires() {
-  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
-  const iso = now.toISOString().slice(0,10);
-  return VACANCES_SCOLAIRES.some(function(p){ return iso >= p[0] && iso <= p[1]; });
-}
-
-const BUS_HORAIRES = {
-  mairie: {
-    orleans_scolaire: ['06:44','14:20'],
-    orleans_vacances: ['06:52','14:13'],
-    nouan_scolaire:   ['12:57','18:08'],
-    nouan_vacances:   ['18:06','18:31','19:05']
-  },
-  breau: {
-    orleans_scolaire: ['06:46','07:35','09:26'],
-    orleans_vacances: ['06:54','09:26'],
-    nouan_scolaire:   ['18:06','18:31','19:05'],
-    nouan_vacances:   ['18:06','18:31','19:05']
-  }
-};
-
-function getNextBus(times) {
-  if (!times || !times.length) return null;
-  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
-  const nowMins = now.getHours()*60 + now.getMinutes();
-  for (var i=0; i<times.length; i++) {
-    var parts = times[i].split(':');
-    var busMins = parseInt(parts[0])*60 + parseInt(parts[1]);
-    if (busMins > nowMins) {
-      var diff = busMins - nowMins;
-      if (diff <= 30) return { time: times[i], label: 'dans ' + diff + ' min' };
-      return { time: times[i], label: times[i] };
-    }
-  }
-  return null;
-}
-
-function loadBusRemi() {
-  var el  = document.getElementById('bus-strip-stops');
-  var pel = document.getElementById('bus-periode');
-  if (!el) return;
-
-  var vac = isVacancesScolaires();
-  var H   = BUS_HORAIRES;
-  if (pel) pel.textContent = '';
-
-  var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
-  var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
-
-  var html = '';
-  if (mOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Mairie</span> → Orléans <span class="bus-next">' + mOrl.label + '</span></span>';
-  if (bOrl) html += '<span class="bus-stop-row"><span class="bus-stop-name">Le Bréau</span> → Orléans <span class="bus-next">' + bOrl.label + '</span></span>';
-  if (!html) html = '<span class="bus-loading">Plus de bus vers Orléans aujourd\'hui</span>';
-
-  el.innerHTML = html;
-}
-
-// Rafraîchir toutes les minutes
-setInterval(loadBusRemi, 60000);
-
-// ── Vider cache ──────────────────────
-async function clearCacheAndReload() {
-  if (!confirm('Vider le cache et recharger l\'application ?\n\nLe bouton Installer réapparaîtra si l\'app n\'est pas installée.')) return;
-  // Supprimer la clé d'installation pour faire réapparaître la bannière
-  localStorage.removeItem(INSTALL_KEY);
-  // Vider tous les caches Service Worker
-  if ('caches' in window) {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => caches.delete(k)));
-  }
-  // Désenregistrer le SW puis recharger
-  if ('serviceWorker' in navigator) {
-    const regs = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(regs.map(r => r.unregister()));
-  }
-  window.location.reload(true);
-}
 
 function urlBase64ToUint8Array(b64){
-  const pad='='.repeat((4-b64.length%4)%4);
-  const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
+  const pad = '='.repeat((4-b64.length%4)%4);
+  const raw = atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
 }
 
-// ── Text-to-Speech ───────────────────
-let _ttsEnabled = false;
-let _ttsUtterance = null;
-let _ttsPaused = false;
 
-function ttsSpeak(text, label) {
-  if (!_ttsEnabled || !('speechSynthesis' in window)) return;
-  ttsStop();
-  const clean = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  _ttsUtterance = new SpeechSynthesisUtterance(clean);
-  _ttsUtterance.lang = 'fr-FR';
-  _ttsUtterance.rate = 0.92;
-  _ttsUtterance.pitch = 1.0;
+// ── Init ─────────────────────────────────────────────────────
+loadMeteo();
+loadEvents();
+loadDechets();
+updateInstallBtn();
+// Rafraîchir les infos déchets toutes les minutes
+setInterval(loadDechets, 60000);
 
-  // Choisir voix française si disponible
-  const voices = speechSynthesis.getVoices();
-  const frVoice = voices.find(v => v.lang.startsWith('fr') && !v.name.includes('Compact'))
-               || voices.find(v => v.lang.startsWith('fr'));
-  if (frVoice) _ttsUtterance.voice = frVoice;
-
-  _ttsUtterance.onstart = () => {
-    const bar = document.getElementById('tts-bar');
-    const txt = document.getElementById('tts-bar-text');
-    if (bar) bar.classList.add('visible');
-    if (txt) txt.textContent = label || 'Lecture en cours…';
-    _ttsPaused = false;
-    updateTtsPauseBtn();
-  };
-  _ttsUtterance.onend = () => {
-    const bar = document.getElementById('tts-bar');
-    if (bar) bar.classList.remove('visible');
-    _ttsPaused = false;
-  };
-  _ttsUtterance.onerror = () => {
-    const bar = document.getElementById('tts-bar');
-    if (bar) bar.classList.remove('visible');
-  };
-
-  speechSynthesis.speak(_ttsUtterance);
-}
-
-function ttsPause() {
-  if (!('speechSynthesis' in window)) return;
-  if (_ttsPaused) {
-    speechSynthesis.resume();
-    _ttsPaused = false;
-  } else {
-    speechSynthesis.pause();
-    _ttsPaused = true;
-  }
-  updateTtsPauseBtn();
-}
-
-function ttsStop() {
-  if (!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  _ttsPaused = false;
-  const bar = document.getElementById('tts-bar');
-  if (bar) bar.classList.remove('visible');
-}
-
-function updateTtsPauseBtn() {
-  const btn = document.getElementById('tts-pause-btn');
-  if (btn) btn.textContent = _ttsPaused ? '▶' : '⏸';
-}
-
-function toggleTTS(on) {
-  _ttsEnabled = on;
-  if (!on) ttsStop();
-  saveAccessibilite();
-  // Pré-charger les voix
-  if (on && 'speechSynthesis' in window) speechSynthesis.getVoices();
-}
-
-// Bouton écouter sur un texte quelconque
-function ttsRead(text, label) {
-  if (!('speechSynthesis' in window)) {
-    alert('La lecture vocale n\'est pas disponible sur ce navigateur.');
-    return;
-  }
-  ttsSpeak(text, label);
-}
-
-// ── Accessibilité ────────────────────
-const ACC_KEY = 'mat_accessibility';
-
-function loadAccessibilite() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
-    if (saved.fontSize)  applyFontSize(saved.fontSize, false);
-    if (saved.contrast)  applyContrast(true, false);
-    if (saved.touch)     applyTouch(true, false);
-    if (saved.spacing)   applySpacing(true, false);
-    if (saved.tts)       { _ttsEnabled = true; }
-  } catch(e) {}
-}
-
-function saveAccessibilite() {
-  const html = document.documentElement;
-  localStorage.setItem(ACC_KEY, JSON.stringify({
-    fontSize: html.classList.contains('font-xl') ? 'xl' : html.classList.contains('font-large') ? 'large' : 'normal',
-    contrast: html.classList.contains('high-contrast'),
-    touch:    html.classList.contains('large-touch'),
-    spacing:  html.classList.contains('line-spacing'),
-    tts:      _ttsEnabled,
-  }));
-}
-
-function applyFontSize(size, save=true) {
-  const html = document.documentElement;
-  html.classList.remove('font-large', 'font-xl');
-  if (size === 'large') html.classList.add('font-large');
-  if (size === 'xl')    html.classList.add('font-xl');
-  ['normal','large','xl'].forEach(s => {
-    const btn = document.getElementById('acc-' + s);
-    if (btn) btn.classList.toggle('on', s === size);
-  });
-  if (save) saveAccessibilite();
-}
-
-function applyContrast(on, save=true) {
-  document.documentElement.classList.toggle('high-contrast', on);
-  const el = document.getElementById('acc-contrast-toggle');
-  if (el) el.checked = on;
-  if (save) saveAccessibilite();
-}
-
-function applyTouch(on, save=true) {
-  document.documentElement.classList.toggle('large-touch', on);
-  const el = document.getElementById('acc-touch-toggle');
-  if (el) el.checked = on;
-  if (save) saveAccessibilite();
-}
-
-function applySpacing(on, save=true) {
-  document.documentElement.classList.toggle('line-spacing', on);
-  const el = document.getElementById('acc-spacing-toggle');
-  if (el) el.checked = on;
-  if (save) saveAccessibilite();
-}
-
-function setFontSize(size)       { applyFontSize(size); }
-function toggleContrast(checked) { applyContrast(checked); }
-function toggleTouch(checked)    { applyTouch(checked); }
-function toggleSpacing(checked)  { applySpacing(checked); }
-
-function openAccessibilite() {
-  openOv('accessibilite');
-  // Sync état boutons avec état actuel
-  const html = document.documentElement;
-  const size = html.classList.contains('font-xl') ? 'xl' : html.classList.contains('font-large') ? 'large' : 'normal';
-  ['normal','large','xl'].forEach(s => {
-    const btn = document.getElementById('acc-' + s);
-    if (btn) btn.classList.toggle('on', s === size);
-  });
-  const ct = document.getElementById('acc-contrast-toggle');
-  const tt = document.getElementById('acc-touch-toggle');
-  const st = document.getElementById('acc-spacing-toggle');
-  if (ct) ct.checked = html.classList.contains('high-contrast');
-  if (tt) tt.checked = html.classList.contains('large-touch');
-  if (st) st.checked = html.classList.contains('line-spacing');
-  const ttsEl = document.getElementById('acc-tts-toggle');
-  if (ttsEl) ttsEl.checked = _ttsEnabled;
-}
-
-function resetAccessibilite() {
-  applyFontSize('normal', false);
-  applyContrast(false, false);
-  applyTouch(false, false);
-  applySpacing(false, false);
-  _ttsEnabled = false;
-  ttsStop();
-  localStorage.removeItem(ACC_KEY);
-  openAccessibilite(); // resync l'UI
-}
-
-// ── Init ─────────────────────────────────
-loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi();
-setInterval(loadDechets,60000);
-
+// ── Service Worker ────────────────────────────────────────────
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.action==='openNotifs')openNotifs();});
+  // Écouter les messages du SW (clic sur notification → ouvrir actualités)
+  navigator.serviceWorker.addEventListener('message', e => {
+    if(e.data?.action === 'openNotifs') openNotifs();
+  });
 }
-if(location.hash==='#notifs'){setTimeout(()=>openNotifs(),600);}
-if(location.hash==='#mel'){setTimeout(()=>openMel(),600);}
+// Si l'app est lancée depuis une notification
+if(location.hash === '#notifs') { setTimeout(()=>openNotifs(), 600); }
+
 </script>
 </body>
 </html>
