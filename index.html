@@ -12,6 +12,24 @@
 <!-- VERSION 3.5.1 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
+<script>
+(function(){
+  try{
+    var saved = JSON.parse(localStorage.getItem('mat_accessibility') || '{}');
+    var cls = document.documentElement.classList;
+    if(saved.theme === 'bleu') cls.add('theme-bleu');
+    if(saved.theme === 'sombre') cls.add('theme-sombre');
+    if(saved.contrast) cls.add('high-contrast');
+    if(saved.daltonien) cls.add('colorblind-mode');
+    var bg = '#f4f0ea';
+    if(cls.contains('theme-sombre')) bg = '#0f172a';
+    else if(cls.contains('theme-bleu')) bg = '#dbeafe';
+    else if(cls.contains('colorblind-mode')) bg = '#eaf2ff';
+    else if(cls.contains('high-contrast')) bg = '#f0f0f0';
+    document.documentElement.style.background = bg;
+  }catch(e){}
+})();
+</script>
 <style>
 :root{
   --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
@@ -22,7 +40,13 @@
   --r:18px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}\nbody.preload > :not(#app-splash){visibility:hidden !important;}\nbody.preload{overflow:hidden;background:var(--warm);}\nbody.preload #app-splash{opacity:1;visibility:visible;}
+html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}
+html{background:var(--warm);}
+body{opacity:0;visibility:hidden;transition:opacity .18s ease;}
+body.preload,body.app-ready{opacity:1;visibility:visible;}
+body.preload > :not(#app-splash){visibility:hidden !important;}
+body.preload{overflow:hidden;background:var(--warm);}
+body.preload #app-splash{opacity:1;visibility:visible;}
 
 /* ── Splash d'ouverture ── */
 .app-splash{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--forest),var(--leaf));color:var(--cream);opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease;}\nhtml.theme-bleu .app-splash{background:linear-gradient(160deg,#1a3a5c,#2563eb);}\nhtml.theme-sombre .app-splash{background:linear-gradient(160deg,#111827,#1f2937);}\nhtml.high-contrast .app-splash{background:linear-gradient(160deg,#003319,#004d26);}\nhtml.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563eb);}
@@ -55,6 +79,14 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.66rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
 .mat-version{font-size:0.5rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
+
+.ico-notif-wrap{position:relative;}
+.notif-badge{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#dc2626;color:#fff;font-size:.65rem;font-weight:900;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.notif-badge.show{display:flex;}
+.mat-img{max-height:138px;}
+.splash-logo{width:112px;height:112px;}
+.majordome-img{width:132px;height:132px;}
+
 
 /* ── Météo strip ── */
 .header-bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:4px;width:100%;}
@@ -493,7 +525,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 <body class="preload">
 <div id="app-splash" class="app-splash" aria-hidden="true">
   <div class="splash-card">
-    <img src="mat-header.png" alt="MAT" class="splash-logo" onerror="this.style.display='none'">
+    <img src="MAT et MEL.png" alt="MAT et MEL" class="splash-logo" onerror="this.onerror=null;this.src='mat-header.png'">
     <div class="splash-title">Mézières Avec Toi</div>
     <div class="splash-sub">Ouverture de l'application</div>
     <div class="splash-dot-wrap"><span class="splash-dot"></span><span class="splash-dot"></span><span class="splash-dot"></span></div>
@@ -518,10 +550,10 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.1</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.2</div>
     </div>
     <!-- Droite : icône MAT -->
-    <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
+    <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
   </div>
   <!-- Encarts accueil -->
   <div class="header-bottom-grid">
@@ -635,11 +667,11 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
       <div class="ico ico-rgpd">🔒</div>
       <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
     </button>
-    <button class="card" id="btn-install-or-bug" onclick="installOrBug()">
-      <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#f0f8e8,#d4f0d4)">📲</div>
+    <button class="card" id="btn-install-or-bug" onclick="openOv('bug')">
+      <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
       <div class="ct">
-        <div class="ct-label" id="iob-label">Installer MAT</div>
-        <div class="ct-sub" id="iob-sub">Écran d'accueil</div>
+        <div class="ct-label" id="iob-label">Signaler un bug</div>
+        <div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
       </div>
     </button>
   </div>
@@ -816,7 +848,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
       <button class="panel-close" onclick="closeOv('majordome')">✕</button>
     </div>
     <div class="majordome-body">
-      <img src="mat-header.png" alt="MAT" class="majordome-img" onerror="this.style.display='none'">
+      <img src="MAT et MEL.png" alt="MAT et MEL" class="majordome-img" onerror="this.onerror=null;this.src='mat-header.png'">
       <div class="majordome-name">Bonjour, je suis MAT !</div>
       <div class="majordome-tagline">Votre majordome numérique communal</div>
       <div class="majordome-text">
@@ -1308,7 +1340,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.1 — Mézières Avec Toi
+// MAT v3.5.2 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1968,22 +2000,16 @@ function loadDechetsDetail(){
 
 // ── Bouton install / bug ──────────────
 function updateInstallBtn(){
-  const installed=localStorage.getItem(INSTALL_KEY);
-  const btn=document.getElementById('btn-install-or-bug');
   const ico=document.getElementById('iob-ico');
   const label=document.getElementById('iob-label');
   const sub=document.getElementById('iob-sub');
-  if(!btn) return;
-  if(installed){
-    ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent="On s'en occupe !";
-    btn.onclick=()=>openOv('bug');
-  }
+  const btn=document.getElementById('btn-install-or-bug');
+  if(btn) btn.onclick=()=>openOv('bug');
+  if(ico) ico.textContent='🐞';
+  if(label) label.textContent='Signaler un bug';
+  if(sub) sub.textContent="On s'en occupe !";
 }
-function installOrBug(){
-  if(localStorage.getItem(INSTALL_KEY)){openOv('bug');}
-  else{installApp();}
-}
+function installOrBug(){ openOv('bug'); }
 
 // ── Contact mairie → Trello ───────────
 function contactViaMessenger(){window.open('https://m.me/RadioMezieres','_blank');}
@@ -2131,7 +2157,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.1'
+    matVersion:'v3.5.2'
   };
 }
 
@@ -2149,6 +2175,37 @@ window.openContact=()=>{trackStat('contact');_origOpenContact();};
 window.addEventListener('appinstalled',()=>{localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');trackStat('installation');updateInstallBtn();});
 
 // ── Actualités ────────────────────────
+const ACTUS_SEEN_KEY='mat_actus_seen_v1';
+function getActuKey(a){
+  return [a.date||'',a.title||'',a.photo||''].join('||');
+}
+function updateActuBadge(count){
+  const el=document.getElementById('notif-unread-badge');
+  if(!el) return;
+  const n=Number(count)||0;
+  el.textContent=n>99?'99+':String(n);
+  el.classList.toggle('show', n>0);
+}
+function markActusAsSeen(actus){
+  try{
+    const keys=(actus||[]).map(getActuKey);
+    localStorage.setItem(ACTUS_SEEN_KEY, JSON.stringify(keys));
+    updateActuBadge(0);
+  }catch(e){}
+}
+async function refreshActusBadge(){
+  try{
+    const r=await fetch(ACTU_URL,{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const actus=d.actus||[];
+    const seen=JSON.parse(localStorage.getItem(ACTUS_SEEN_KEY)||'[]');
+    const unseen=actus.filter(a=>!seen.includes(getActuKey(a))).length;
+    updateActuBadge(unseen);
+  }catch(e){
+    updateActuBadge(0);
+  }
+}
 async function loadActus(){
   const el=document.getElementById('actu-list');
   el.innerHTML='<div class="actu-empty">Chargement…</div>';
@@ -2156,12 +2213,13 @@ async function loadActus(){
     const r=await fetch(ACTU_URL), d=await r.json();
     if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
-      const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`:'';
+      const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
       const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
       const titre=esc(texte.length>80?texte.substring(0,80)+'...':texte);
       const texteComplet=texte.length>80?esc(texte):'';
       return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
+    markActusAsSeen(d.actus||[]);
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
 }
 
@@ -2290,7 +2348,6 @@ async function clearCacheAndReload() {
 
   // Réinitialiser les paramètres de personnalisation (PAS les notifs)
   localStorage.removeItem(ACC_KEY);
-  localStorage.removeItem(INSTALL_KEY);
   const html = document.documentElement;
   html.classList.remove('font-large','font-xl','high-contrast','large-touch','line-spacing','theme-bleu','theme-sombre','no-header','no-widgets','colorblind-mode','simplified-mode');
 
@@ -2638,7 +2695,7 @@ function hideSplash(forceDelay){
   if(!splash) return;
   const elapsed=Date.now()-_splashShownAt;
   const wait=Math.max(forceDelay||0, 1000-elapsed);
-  setTimeout(function(){ document.body.classList.remove('preload'); splash.classList.add('hide'); }, wait);
+  setTimeout(function(){ document.body.classList.remove('preload'); document.body.classList.add('app-ready'); splash.classList.add('hide'); }, wait);
 }
 window.addEventListener('load', function(){ hideSplash(0); });
 
