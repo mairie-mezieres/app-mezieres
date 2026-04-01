@@ -404,6 +404,39 @@ html.theme-sombre .panel-body .acc-size-btn { background:#374151;color:#e2e8f0;b
 html.theme-sombre .idea-submit { background:linear-gradient(135deg,#92400e,#b45309);color:white; }
 html.theme-sombre .s-title { color:#6ee7b7; }
 html.theme-sombre .s-sub { color:#94a3b8; }
+/* Règles génériques pour tous les overlays avec style inline blanc */
+html.theme-sombre .panel-body div[style*="background:white"],
+html.theme-sombre .panel-body div[style*="background: white"] {
+  background:#2d3748 !important;
+  border-color:#374151 !important;
+}
+html.theme-sombre .panel-body [style*="color:var(--text)"] { color:#f1f5f9 !important; }
+html.theme-sombre .panel-body [style*="color:var(--muted)"] { color:#94a3b8 !important; }
+html.theme-sombre .panel-body [style*="color:var(--leaf)"] { color:#6ee7b7 !important; }
+html.theme-sombre .panel-body [style*="color:var(--forest)"] { color:#6ee7b7 !important; }
+html.theme-sombre .panel-body [style*="color:var(--sage)"] { color:#6ee7b7 !important; }
+html.theme-sombre .panel-body p { color:#94a3b8; }
+/* Overlay météo */
+html.theme-sombre #meteo-detail > div[style] { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre #meteo-detail [style*="font-weight:800;color:var(--text)"] { color:#f1f5f9 !important; }
+/* Overlay numéros utiles */
+html.theme-sombre #ov-nums .panel-body > div > div { background:#2d3748 !important;border-color:#374151 !important; }
+/* Overlay conseil municipal */
+html.theme-sombre #ov-conseil .panel-body > div[style] { background:#2d3748 !important;border-color:#374151 !important; }
+/* Randonnées (lien externe) — non impacté par thème PWA */
+/* Overlay notifs */
+html.theme-sombre .actu-item { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .actu-title { color:#f1f5f9 !important; }
+html.theme-sombre .actu-text { color:#94a3b8 !important; }
+html.theme-sombre .actu-date { color:#6b7280 !important; }
+html.theme-sombre .actu-empty { color:#94a3b8; }
+html.theme-sombre .panel-body .chart-wrap { background:#2d3748;border-color:#374151; }
+html.theme-sombre .panel-body .actu-fb-link { color:#60a5fa !important; }
+/* Textes génériques dans panel-body */
+html.theme-sombre .panel-body strong { color:#f1f5f9; }
+html.theme-sombre .majordome-text { background:#2d3748;border-color:#374151;color:#94a3b8; }
+html.theme-sombre .majordome-name { color:#6ee7b7; }
+html.theme-sombre .majordome-tagline { color:#6ee7b7; }
 
 /* ── Mode sans en-tête ── */
 html.no-header .header { display: none !important; }
@@ -1312,15 +1345,48 @@ function urlToLabel(url) {
     return '🔗 ' + host;
   } catch(e) { return '🔗 Voir le lien'; }
 }
+// Domaines connus à transformer en liens même sans http://
+const KNOWN_DOMAINS = [
+  'mezieres-lez-clery.fr','ccterresduvaldeloire.fr','portail-usagers.ccterresduvaldeloire.fr',
+  'valdeloire-fibre.fr','service-public.fr','doctolib.fr','remi-centrevaldeloire.fr',
+  'mairie-clery-saint-andre.fr','mairie-mezieres.github.io'
+];
+
 function formatMelText(text) {
-  // Remplacer les URLs brutes par des liens cliquables
-  const urlRegex = /(https?:\/\/[^\s<>"]+|(?:www\.)[^\s<>"]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi;
-  const withLinks = text.replace(urlRegex, (url) => {
-    const href = url.startsWith('http') ? url : 'https://' + url;
+  // 1. URLs complètes (avec http/https)
+  let result = text.replace(/(https?:\/\/[^\s<>"\)]+)/gi, (url) => {
+    const label = urlToLabel(url);
+    return `<a href="${url}" target="_blank" style="color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);">${label}</a>`;
+  });
+  // 2. www.xxx.xxx sans http
+  result = result.replace(/(?<!["\/])(www\.[a-zA-Z0-9-]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi, (url) => {
+    const href = 'https://' + url;
     const label = urlToLabel(href);
     return `<a href="${href}" target="_blank" style="color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);">${label}</a>`;
   });
-  return withLinks.replace(/\n/g,'<br>');
+  // 3. Domaines connus sans http ni www (ex: valdeloire-fibre.fr)
+  for (const domain of KNOWN_DOMAINS) {
+    const escaped = domain.replace('.', '\\.');
+    const re = new RegExp('(?<!["\/\.\w])(' + escaped + '(?:\/[^\s<>"]*)?)', 'gi');
+    result = result.replace(re, (url) => {
+      // Ne pas double-linkifier si déjà dans un <a>
+      const href = 'https://' + url;
+      const label = urlToLabel(href);
+      return `<a href="${href}" target="_blank" style="color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);">${label}</a>`;
+    });
+  }
+  return result.replace(/\n/g,'<br>');
+}
+
+// ── Échappement HTML (sécurité caractères spéciaux) ─────────
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 let melInited=false, melBusy=false;
@@ -1549,13 +1615,13 @@ function renderAgenda(){
 }
 function renderAgendaItem(evt){
   var dayName=evt.start.toLocaleDateString('fr-FR',{weekday:'short'});
-  return '<div class="agenda-item" onclick="openEventDetail(\''+evt.uid.replace(/'/g,"\\'")+'\')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+evt.summary+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+evt.description+'</div>':'')+'</div></div></div>';
+  return '<div class="agenda-item" onclick="openEventDetail(\''+evt.uid.replace(/'/g,"\\'")+'\')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+esc(evt.summary)+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+esc(evt.description)+'</div>':'')+'</div></div></div>';
 }
 function openEventDetail(uid){
   var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
   if(!evt) return;
   var body=document.getElementById('event-detail-body');
-  body.innerHTML='<div class="event-detail-card"><div class="event-detail-title">'+evt.summary+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description||'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
+  body.innerHTML='<div class="event-detail-card"><div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
   openOv('event');
 }
 function downloadEventIcs(uid){
@@ -1720,7 +1786,7 @@ async function loadIdees(){
     ideas=[...local,...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
   }catch(e){ideas=getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));}
   if(!ideas.length){el.innerHTML='<div class="no-ideas">Aucune idée pour l\'instant.<br>Soyez le premier à proposer !</div>';return;}
-  el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${idea.cat}</div><div class="idea-text">${idea.text}</div><div class="idea-date">${idea.date}</div></div></div>`).join('');
+  el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${esc(idea.cat)}</div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(idea.date)}</div></div></div>`).join('');
 }
 
 // ── Mairie ────────────────────────────
@@ -1992,9 +2058,9 @@ async function loadActus(){
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`:'';
       const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const titre=texte.length>80?texte.substring(0,80)+'...':texte;
-      const texteComplet=texte.length>80?texte:'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${a.date}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+      const titre=esc(texte.length>80?texte.substring(0,80)+'...':texte);
+      const texteComplet=texte.length>80?esc(texte):'';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
 }
@@ -2365,54 +2431,42 @@ function resetAccessibilite() {
 
 // ── Date du jour + saint dans le header ──
 const SAINTS = [
-  // Janvier
-  ['Marie','Basile','Geneviève','Odilon','Édouard','Melchior','Raymond','Lucien','Alix','Guillaume',
-   'Paulin','Tatiana','Yvette','Nina','Rémi','Marcel','Roseline','Prisca','Marius','Sébastien',
-   'Agnès','Vincent','Barnard','François','Conv.Paul','Timothée','Angèle','Thomas d'Aquin','Gildas','Martine','Marcelle'],
-  // Février
-  ['Ella','Présentation','Blaise','Véronique','Agathe','Gaston','Eugénie','Jacqueline','Apolline','Arnaud',
-   'N.-D.Lourdes','Félix','Béatrice','Valentin','Claude','Julienne','Alexis','Bernadette','Gabin','Aimée',
-   'Damien','Isabelle','Lazare','Modeste','Roméo','Nestor','Honorine','Romain','Auguste','--','--'],
-  // Mars
-  ['Aubin','Charles','Guénolé','Casimir','Olive','Colette','Félicité','Jean de Dieu','Françoise','Vivien',
-   'Rosine','Justine','Rodrigue','Mathilde','Louise','Bénédicte','Patrick','Cyrille','Joseph','Herbert',
-   'Clémence','Léa','Victorien','Cath.de Suède','Annonciation','Larissa','Habib','Gontran','Gwladys','Amédée','Benjamin'],
-  // Avril
-  ['Hugues','Sandrine','Richard','Isidore','Irène','Marcellin','J.-B.de la Salle','Julie','Gautier','Fulbert',
-   'Stanislas','Jules','Ida','Maxime','Paterne','Benoît-Joseph','Anicet','Parfait','Emma','Odette',
-   'Anselme','Alexandre','Georges','Fidèle','Marc','Alida','Zita','Valérie','Catherine','Robert','--'],
-  // Mai
-  ['Fête du Travail','Boris','Phil.&Jacques','Sylvain','Judith','Prudence','Gisèle','Victoire','Pacôme','Isidore',
-   'Estelle','Achille','Rolande','Matthias','Denise','Honoré','Pascal','Éric','Yves','Bernardin',
-   'Constantin','Rita','Didier','Donatien','Sophie','Bérenger','Augustin','Germain','Aymar','Ferdinand','Pétronille'],
-  // Juin
-  ['Justin','Blandine','Kévin','Clotilde','Igor','Norbert','Gilbert','Médard','Diane','Landry',
-   'Barnabé','Guy','Antoine','Élisée','Germaine','J.-F.Régis','Hervé','Léonce','Romuald','Silvère',
-   'Rodolphe','Alban','Audrey','Jean-Baptiste','Prosper','Anthelme','Fernand','Irénée','Pierre&Paul','Martial','--'],
-  // Juillet
-  ['Thierry','Martinien','Thomas','Florent','Antoine','Mariette','Raoul','Thibaut','Amandine','Ulrich',
-   'Benoît','Olivier','Henri','Camille','Bonaventure','N.-D.Carmel','Charlotte','Frédéric','Arsène','Marina',
-   'Victor','Marie-Madeleine','Brigitte','Christine','Jacques','Anne','Nathalie','Samson','Marthe','Juliette','Ignace'],
-  // Août
-  ['Alphonse','Julien Eymard','Lydie','Jean-Marie Vianney','Abel','Transfiguration','Gaétan','Dominique','Amour','Laurent',
-   'Claire','Clarisse','Hippolyte','Evrard','Assomption','Armel','Hyacinthe','Hélène','Jean-Claude','Bernard',
-   'Christophe','Fabrice','Rose','Barthélemy','Louis','Natacha','Monique','Augustin','Sabine','Fiacre','Aristide'],
-  // Septembre
-  ['Gilles','Ingrid','Grégoire','Rosalie','Raïssa','Bertrand','Reine','Nativité','Alain','Inès',
-   'Adelphe','Apollinaire','Aimé','La Sainte-Croix','Roland','Édith','Lambert','Nadège','Émilie','Davy',
-   'Matthieu','Maurice','Constance','Thècle','Hermann','Côme&Damien','Vinc.de Paul','Venceslas','Michel','Jérôme','--'],
-  // Octobre
-  ['Thérèse','Léger','Gérard','François','Fleur','Bruno','Serge','Pélagie','Denis','Ghislain',
-   'Firmin','Wilfrid','Géraud','Juste','Thérèse d'Avila','Edwige','Baudouin','Luc','René','Adeline',
-   'Céline','Élodie','Jean de Capistran','Florentin','Crépin','Dimitri','Émeline','Simon&Jude','Narcisse','Bienvenu','Quentin'],
-  // Novembre
-  ['Toussaint','Défunts','Hubert','Charles','Sylvie','Bertille','Carine','Geoffrey','Théodore','Léon',
-   'Martin','Christian','Brice','Sidoine','Albert','Marguerite','Élisabeth','Aude','Tanguy','Edmond',
-   'Prés.Marie','Cécile','Clément','Flora','Catherine','Delphine','Sévrin','Jacques','Saturnin','André','--'],
-  // Décembre
-  ['Florence','Viviane','François-Xavier','Barbara','Gérald','Nicolas','Ambroise','Immac.Conception','Pierre Fourier','Romaric',
-   'Daniel','Jeanne de Chantal','Lucie','Odile','Ninon','Alice','Gaël','Gatien','Urbain','Abraham',
-   'Pierre Canisius','Françoise-Xavière','Armand','Adèle','Noël','Étienne','Jean','Innocents','David','Roger','Sylvestre']
+  ["Marie","Basile","Geneviève","Odilon","Édouard","Melchior","Raymond","Lucien","Alix","Guillaume",
+   "Paulin","Tatiana","Yvette","Nina","Rémi","Marcel","Roseline","Prisca","Marius","Sébastien",
+   "Agnès","Vincent","Barnard","François","Conv.Paul","Timothée","Angèle","Thomas Aquin","Gildas","Martine","Marcelle"],
+  ["Ella","Présentation","Blaise","Véronique","Agathe","Gaston","Eugénie","Jacqueline","Apolline","Arnaud",
+   "N.-D.Lourdes","Félix","Béatrice","Valentin","Claude","Julienne","Alexis","Bernadette","Gabin","Aimée",
+   "Damien","Isabelle","Lazare","Modeste","Roméo","Nestor","Honorine","Romain","Auguste","--","--"],
+  ["Aubin","Charles","Guénolé","Casimir","Olive","Colette","Félicité","Jean de Dieu","Françoise","Vivien",
+   "Rosine","Justine","Rodrigue","Mathilde","Louise","Bénédicte","Patrick","Cyrille","Joseph","Herbert",
+   "Clémence","Léa","Victorien","Cath.de Suède","Annonciation","Larissa","Habib","Gontran","Gwladys","Amédée","Benjamin"],
+  ["Hugues","Sandrine","Richard","Isidore","Irène","Marcellin","J-B.de la Salle","Julie","Gautier","Fulbert",
+   "Stanislas","Jules","Ida","Maxime","Paterne","Benoît-Joseph","Anicet","Parfait","Emma","Odette",
+   "Anselme","Alexandre","Georges","Fidèle","Marc","Alida","Zita","Valérie","Catherine","Robert","--"],
+  ["Fête du Travail","Boris","Phil.et Jacques","Sylvain","Judith","Prudence","Gisèle","Victoire","Pacôme","Isidore",
+   "Estelle","Achille","Rolande","Matthias","Denise","Honoré","Pascal","Éric","Yves","Bernardin",
+   "Constantin","Rita","Didier","Donatien","Sophie","Bérenger","Augustin","Germain","Aymar","Ferdinand","Pétronille"],
+  ["Justin","Blandine","Kévin","Clotilde","Igor","Norbert","Gilbert","Médard","Diane","Landry",
+   "Barnabé","Guy","Antoine","Élisée","Germaine","J-F.Régis","Hervé","Léonce","Romuald","Silvère",
+   "Rodolphe","Alban","Audrey","Jean-Baptiste","Prosper","Anthelme","Fernand","Irénée","Pierre et Paul","Martial","--"],
+  ["Thierry","Martinien","Thomas","Florent","Antoine","Mariette","Raoul","Thibaut","Amandine","Ulrich",
+   "Benoît","Olivier","Henri","Camille","Bonaventure","N.-D.Carmel","Charlotte","Frédéric","Arsène","Marina",
+   "Victor","Marie-Madeleine","Brigitte","Christine","Jacques","Anne","Nathalie","Samson","Marthe","Juliette","Ignace"],
+  ["Alphonse","Julien Eymard","Lydie","Jean-Marie Vianney","Abel","Transfiguration","Gaétan","Dominique","Amour","Laurent",
+   "Claire","Clarisse","Hippolyte","Evrard","Assomption","Armel","Hyacinthe","Hélène","Jean-Claude","Bernard",
+   "Christophe","Fabrice","Rose","Barthélemy","Louis","Natacha","Monique","Augustin","Sabine","Fiacre","Aristide"],
+  ["Gilles","Ingrid","Grégoire","Rosalie","Raïssa","Bertrand","Reine","Nativité","Alain","Inès",
+   "Adelphe","Apollinaire","Aimé","La Sainte-Croix","Roland","Édith","Lambert","Nadège","Émilie","Davy",
+   "Matthieu","Maurice","Constance","Thècle","Hermann","Côme et Damien","Vinc.de Paul","Venceslas","Michel","Jérôme","--"],
+  ["Thérèse","Léger","Gérard","François","Fleur","Bruno","Serge","Pélagie","Denis","Ghislain",
+   "Firmin","Wilfrid","Géraud","Juste","Thérèse Avila","Edwige","Baudouin","Luc","René","Adeline",
+   "Céline","Élodie","Jean de Capistran","Florentin","Crépin","Dimitri","Émeline","Simon et Jude","Narcisse","Bienvenu","Quentin"],
+  ["Toussaint","Défunts","Hubert","Charles","Sylvie","Bertille","Carine","Geoffrey","Théodore","Léon",
+   "Martin","Christian","Brice","Sidoine","Albert","Marguerite","Élisabeth","Aude","Tanguy","Edmond",
+   "Prés.Marie","Cécile","Clément","Flora","Catherine","Delphine","Sévrin","Jacques","Saturnin","André","--"],
+  ["Florence","Viviane","François-Xavier","Barbara","Gérald","Nicolas","Ambroise","Immac.Conception","Pierre Fourier","Romaric",
+   "Daniel","Jeanne de Chantal","Lucie","Odile","Ninon","Alice","Gaël","Gatien","Urbain","Abraham",
+   "Pierre Canisius","Françoise-Xavière","Armand","Adèle","Noël","Étienne","Jean","Innocents","David","Roger","Sylvestre"]
 ];
 
 function loadDateBadge() {
