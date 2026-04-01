@@ -461,7 +461,7 @@ html.no-widgets .header { padding-bottom: 48px; }
     </a>
     <button class="card" onclick="openNotifs()">
       <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Actualités Pocket</div><div class="ct-sub">Publications communales</div></div>
+      <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub">Actualités communales</div></div>
     </button>
   </div>
 
@@ -759,7 +759,7 @@ html.no-widgets .header { padding-bottom: 48px; }
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#e8f0fc">🔔</div>
-      <div class="panel-title">Actualité Pocket</div>
+      <div class="panel-title">Actualités communales</div>
       <button class="panel-close" onclick="closeOv('notifs')">✕</button>
     </div>
     <div class="panel-body">
@@ -767,7 +767,7 @@ html.no-widgets .header { padding-bottom: 48px; }
       <div class="notif-banner" id="push-banner" style="margin-top:12px">
         <div class="notif-ico">🔔</div>
         <div class="notif-text">
-          <div class="notif-title">Notifications Actualité Pocket</div>
+          <div class="notif-title">Notifications — Actualités communales</div>
           <div class="notif-sub" id="push-sub">Activez les notifications pour recevoir les nouvelles publications communales.</div>
         </div>
         <button class="notif-btn on" id="push-btn" onclick="togglePush()">Activer les notifications</button>
@@ -1904,7 +1904,7 @@ async function loadActus(){
   el.innerHTML='<div class="actu-empty">Chargement…</div>';
   try{
     const r=await fetch(ACTU_URL), d=await r.json();
-    if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune publication récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter les publications communales ici.</div>';return;}
+    if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.style.display='none'">`:'';
       const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
@@ -1912,7 +1912,7 @@ async function loadActus(){
       const texteComplet=texte.length>80?texte:'';
       return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${a.date}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
-  }catch(e){el.innerHTML='<div class="actu-empty">Actualité Pocket indisponible.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
+  }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
 }
 
 // ── Notifications Push ────────────────
@@ -2026,9 +2026,14 @@ setInterval(loadBusRemi, 60000);
 
 // ── Vider cache ──────────────────────
 async function clearCacheAndReload() {
-  if (!confirm('Vider le cache et recharger l\'application ?\n\nLe bouton Installer réapparaîtra si l\'app n\'est pas installée.')) return;
-  // Supprimer la clé d'installation pour faire réapparaître la bannière
+  if (!confirm('Vider le cache et réinitialiser les paramètres de personnalisation ?\n\n• Thème, en-tête, accessibilité remis à zéro\n• Cache et service worker vidés\n• Bannière d\'installation réaffichée')) return;
+
+  // Réinitialiser les paramètres de personnalisation
+  localStorage.removeItem(ACC_KEY);
   localStorage.removeItem(INSTALL_KEY);
+  const html = document.documentElement;
+  html.classList.remove('font-large','font-xl','high-contrast','large-touch','line-spacing','theme-bleu','theme-sombre','no-header','no-widgets');
+
   // Vider tous les caches Service Worker
   if ('caches' in window) {
     const keys = await caches.keys();
