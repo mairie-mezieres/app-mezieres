@@ -520,6 +520,25 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 
 /* ── Mode simplifié ── */
 .notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\nhtml.simplified-mode .content{display:flex;flex-direction:column;gap:10px;}\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}\nhtml.simplified-mode .grid2{display:grid !important;grid-template-columns:1fr !important;gap:10px;}\nhtml.simplified-mode .grid2 > :not(.simple-card){display:none !important;}\nhtml.simplified-mode .simple-card{display:flex !important;align-items:center !important;gap:11px !important;min-height:74px;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:44px !important;height:44px !important;font-size:22px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0;flex:1;}
+
+/* ── Modale MAT ── */
+.mat-modal{position:fixed;inset:0;z-index:4000;background:rgba(26,61,43,.58);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;}
+.mat-modal.open{display:flex;animation:fadeOv .18s ease;}
+.mat-modal-card{width:min(100%,420px);background:var(--warm);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden;border:1px solid var(--border);}
+.mat-modal-head{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.mat-modal-ico{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;}
+.mat-modal-title{font-size:.92rem;font-weight:900;color:#fff;flex:1;}
+.mat-modal-close{border:none;background:rgba(255,255,255,.16);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;}
+.mat-modal-body{padding:16px;}
+.mat-modal-text{font-size:.84rem;color:var(--text);line-height:1.65;white-space:pre-line;}
+.mat-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+.mat-modal-btn{border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:900;cursor:pointer;}
+.mat-modal-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
+.mat-modal-btn.secondary{background:var(--mist);color:var(--leaf);}
+html.theme-sombre .mat-modal-card{background:#1e293b;border-color:#374151;}
+html.theme-sombre .mat-modal-text{color:#e2e8f0;}
+html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
+
 </style>
 </head>
 
@@ -1337,6 +1356,26 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
   </div>
 </div>
 
+
+<!-- ═══ MODALE MAT ═══ -->
+<div class="mat-modal" id="mat-modal" onclick="matModalBackdrop(event)">
+  <div class="mat-modal-card" role="dialog" aria-modal="true" aria-labelledby="mat-modal-title">
+    <div class="mat-modal-head">
+      <div class="mat-modal-ico" id="mat-modal-ico">ℹ️</div>
+      <div class="mat-modal-title" id="mat-modal-title">MAT</div>
+      <button class="mat-modal-close" type="button" onclick="closeMatModal(false)">✕</button>
+    </div>
+    <div class="mat-modal-body">
+      <div class="mat-modal-text" id="mat-modal-text"></div>
+      <div class="mat-modal-actions" id="mat-modal-actions">
+        <button class="mat-modal-btn secondary" type="button" id="mat-modal-cancel" onclick="closeMatModal(false)">Annuler</button>
+        <button class="mat-modal-btn primary" type="button" id="mat-modal-ok" onclick="closeMatModal(true)">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
 // ════════════════════════════════════════
 // MAT v3.5.4 — Mézières Avec Toi
@@ -1348,6 +1387,41 @@ const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy'
 const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
+
+let _matModalResolver = null;
+function openMatModal(opts){
+  opts = opts || {};
+  const modal = document.getElementById('mat-modal');
+  const title = document.getElementById('mat-modal-title');
+  const text = document.getElementById('mat-modal-text');
+  const ico = document.getElementById('mat-modal-ico');
+  const ok = document.getElementById('mat-modal-ok');
+  const cancel = document.getElementById('mat-modal-cancel');
+  if(!modal || !title || !text || !ico || !ok || !cancel) return Promise.resolve(false);
+  title.textContent = opts.title || 'MAT';
+  text.textContent = opts.message || '';
+  ico.textContent = opts.icon || 'ℹ️';
+  ok.textContent = opts.okText || 'OK';
+  cancel.textContent = opts.cancelText || 'Annuler';
+  cancel.style.display = opts.type === 'alert' ? 'none' : '';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+  return new Promise(resolve => { _matModalResolver = resolve; });
+}
+function closeMatModal(value){
+  const modal = document.getElementById('mat-modal');
+  if(modal) modal.classList.remove('open');
+  if(_ovStack.length === 0) document.body.style.overflow='';
+  if(_matModalResolver){ const fn = _matModalResolver; _matModalResolver = null; fn(!!value); }
+}
+function matModalBackdrop(e){ if(e.target === document.getElementById('mat-modal')) closeMatModal(false); }
+function alertMAT(message, title, icon, okText){
+  return openMatModal({type:'alert', message, title:title||'MAT', icon:icon||'ℹ️', okText:okText||'OK'});
+}
+function confirmMAT(message, title, icon, okText, cancelText){
+  return openMatModal({type:'confirm', message, title:title||'MAT', icon:icon||'❓', okText:okText||'Confirmer', cancelText:cancelText||'Annuler'});
+}
+
 
 // ── Installation PWA ──────────────────
 let dp = null;
@@ -1371,9 +1445,9 @@ function installApp(){
   else {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile) {
-      alert('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
+      alertMAT('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"','Installer MAT','📲');
     } else {
-      alert('Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse (à droite)\n\nSi elle n\'apparaît pas, ouvrez le menu du navigateur → "Installer l\'application"');
+      alertMAT('Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse (à droite)\n\nSi elle n\'apparaît pas, ouvrez le menu du navigateur → "Installer l\'application"','Installer MAT','📲');
     }
   }
 }
@@ -1848,7 +1922,7 @@ async function submitSignal(){
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
     } else {
-      alert('Erreur d\'envoi. Vérifiez votre connexion.');
+      alertMAT('Erreur d\'envoi. Vérifiez votre connexion.','Signalement','⚠️');
       btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
     }
   }
@@ -1893,7 +1967,7 @@ function getIdeas(){try{return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]')
 function getVotes(){try{return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}');}catch(e){return {};}}
 async function submitIdee(){
   const txt=document.getElementById('idea-input').value.trim();
-  if(!txt){alert('Veuillez écrire votre idée !');return;}
+  if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR')};
   const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
   try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
@@ -2017,7 +2091,7 @@ async function submitContactForm(){
   const name=document.getElementById('contact-name').value.trim();
   const reply=document.getElementById('contact-reply').value.trim();
   const msg=document.getElementById('contact-msg').value.trim();
-  if(!msg){alert('Merci de renseigner votre message.');return;}
+  if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi…'; btn.disabled=true;
   try{
@@ -2032,7 +2106,7 @@ async function submitContactForm(){
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
   }catch(e){
-    alert('Erreur d\'envoi. Réessayez plus tard.');
+    alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
     btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
   }
 }
@@ -2073,7 +2147,7 @@ async function submitBug(){
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
   }catch(e){
-    alert('Erreur d\'envoi. Réessayez plus tard.');
+    alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
     btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
   }
 }
@@ -2270,9 +2344,9 @@ async function togglePush(){
     updateNotifCardStatus(false);
     pushRegistered=false; return;
   }
-  if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
+  if(!('Notification' in window)){await alertMAT('Notifications non supportées sur ce navigateur.','Notifications','🔔');return;}
   const perm=await Notification.requestPermission();
-  if(perm!=='granted'){alert('Notifications refusées. Modifiez les paramètres de votre navigateur.');return;}
+  if(perm!=='granted'){await alertMAT('Notifications refusées. Modifiez les paramètres de votre navigateur.','Notifications','🔔');return;}
   if('serviceWorker' in navigator){
     try{
       const reg=await navigator.serviceWorker.ready;
@@ -2282,8 +2356,8 @@ async function togglePush(){
       
       updateNotifCardStatus(true);
       pushRegistered=true;
-      alert('✅ Notifications activées !');
-    }catch(e){alert('Erreur lors de l\'activation des notifications.');}
+      await alertMAT('Notifications activées !','Notifications','✅');
+    }catch(e){await alertMAT('Erreur lors de l\'activation des notifications.','Notifications','⚠️');}
   }
 }
   
@@ -2363,7 +2437,7 @@ setInterval(loadBusRemi, 60000);
 
 // ── Vider cache ──────────────────────
 async function clearCacheAndReload() {
-  if (!confirm('Vider le cache et réinitialiser les paramètres de personnalisation ?\n\n• Thème, en-tête, accessibilité remis à zéro\n• Cache vidé, application rechargée\n• Abonnements aux notifications conservés')) return;
+  if (!await confirmMAT('Vider le cache et réinitialiser les paramètres de personnalisation ?\n\n• Thème, en-tête, accessibilité remis à zéro\n• Cache vidé, application rechargée\n• Abonnements aux notifications conservés','Réinitialiser MAT','🗑️','Réinitialiser','Annuler')) return;
 
   // Réinitialiser les paramètres de personnalisation (PAS les notifs)
   localStorage.removeItem(ACC_KEY);
@@ -2459,9 +2533,9 @@ function toggleTTS(on) {
 }
 
 // Bouton écouter sur un texte quelconque
-function ttsRead(text, label) {
+async function ttsRead(text, label) {
   if (!('speechSynthesis' in window)) {
-    alert('La lecture vocale n\'est pas disponible sur ce navigateur.');
+    await alertMAT('La lecture vocale n\'est pas disponible sur ce navigateur.','Lecture vocale','🔊');
     return;
   }
   ttsSpeak(text, label);
