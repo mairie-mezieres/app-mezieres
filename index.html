@@ -24,6 +24,18 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}
 
+/* ── Splash d'ouverture ── */
+.app-splash{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--forest),var(--leaf));color:var(--cream);opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease;}
+.app-splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-card{text-align:center;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.splash-logo{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,.25));}
+.splash-title{font-family:'Grape Nuts',cursive;font-size:2rem;line-height:1.1;}
+.splash-sub{font-size:.78rem;font-weight:800;letter-spacing:.06em;color:rgba(255,255,255,.88);text-transform:uppercase;}
+.splash-dot-wrap{display:flex;gap:6px;margin-top:4px;}
+.splash-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.7);animation:splashPulse 1s infinite ease-in-out;}
+.splash-dot:nth-child(2){animation-delay:.15s;}.splash-dot:nth-child(3){animation-delay:.3s;}
+@keyframes splashPulse{0%,80%,100%{transform:scale(.8);opacity:.45}40%{transform:scale(1);opacity:1}}
+
 /* ── Bannière install ── */
 #install-banner{background:linear-gradient(135deg,var(--gold),var(--amber));padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;cursor:pointer;}
 #install-banner.hidden{display:none;}
@@ -84,8 +96,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .ct{flex:1;min-width:0;}
 .ct-label{font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
 .ct-sub{font-size:0.62rem;color:var(--muted);font-weight:600;margin-top:1px;}
-.notif-status-on{color:#15803d !important;font-weight:900 !important;}
-.notif-status-off{color:#b91c1c !important;font-weight:900 !important;}
+.notif-status-on{color:#16a34a !important;font-weight:900 !important;}
+.notif-status-off{color:#dc2626 !important;font-weight:900 !important;}
 .arr{color:#ccc;font-size:1rem;flex-shrink:0;}
 
 /* Couleurs icônes */
@@ -317,12 +329,13 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Boutons utilitaires dans le header */
-.header-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;}
-.header-tool-btn,.acc-btn{background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.28);border-radius:12px;padding:8px 12px;color:white;font-size:0.72rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.16);font-family:'Nunito',sans-serif;}
-.acc-btn{position:static;margin-left:auto;}
-.header-tool-btn:hover,.acc-btn:hover{background:rgba(255,255,255,0.26);}
+.header-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.header-tool-btn,.acc-btn{border:1.5px solid rgba(255,255,255,0.28);border-radius:12px;padding:10px 12px;color:white;font-size:0.72rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.16);font-family:'Nunito',sans-serif;white-space:nowrap;}
+.header-tool-btn{background:linear-gradient(135deg,#b91c1c,#dc2626);border-color:rgba(255,255,255,0.18);}
+.acc-btn{background:rgba(255,255,255,0.18);position:static;margin-left:0;}
+.header-tool-btn:hover,.acc-btn:hover{filter:brightness(1.04);}
 .header-tool-btn:active,.acc-btn:active{transform:scale(0.98);}
-@media (max-width:380px){.header-tool-btn,.acc-btn{font-size:0.66rem;padding:8px 10px;gap:4px;}}
+@media (max-width:380px){.header-tool-btn,.acc-btn{font-size:0.63rem;padding:9px 8px;gap:4px;}}
 
 /* Mode daltonien */
 html.colorblind-mode{
@@ -335,7 +348,10 @@ html.colorblind-mode .top-dechets{background:linear-gradient(135deg,#0f766e,#089
 html.colorblind-mode .top-mairie{background:linear-gradient(135deg,#7c2d12,#ea580c);}
 
 /* Overlay accessibilité */
-.acc-option{background:white;border-radius:14px;padding:14px 16px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.acc-option{background:white;border-radius:14px;padding:14px 16px;border:1px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-bottom:10px;}
+.acc-option > div:first-child{min-width:0;}
+.acc-switch{justify-self:end;}
+@media (max-width:390px){.acc-option{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:13px 14px;}}
 .acc-option-label{font-size:0.84rem;font-weight:800;color:var(--text);}
 .acc-option-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
 .acc-toggle{display:flex;gap:6px;}
@@ -460,6 +476,15 @@ html.no-header .header { display: none !important; }
 html.no-widgets .header-bottom-grid { display: none !important; }
 html.no-widgets .header { padding-bottom: 48px; }
 
+
+/* ── Aide contextuelle ── */
+.ctx-help{display:none;background:var(--mist);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px 14px;margin-bottom:14px;color:var(--forest);}
+.ctx-help.show{display:block;}
+.ctx-title{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.ctx-text{font-size:.76rem;line-height:1.6;color:var(--leaf);}
+html.theme-sombre .ctx-help{background:#374151;border-color:#4b5563;color:#e2e8f0;}
+html.theme-sombre .ctx-text{color:#cbd5e1;}
+
 /* ── Mode simplifié ── */
 html.simplified-mode .sec,
 html.simplified-mode .grid2{display:none !important;}
@@ -468,7 +493,16 @@ html.simplified-mode .content .simple-card{display:flex !important;}
 html.simplified-mode .content .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}
 </style>
 </head>
+
 <body>
+<div id="app-splash" class="app-splash" aria-hidden="true">
+  <div class="splash-card">
+    <img src="mat-header.png" alt="MAT" class="splash-logo" onerror="this.style.display='none'">
+    <div class="splash-title">Mézières Avec Toi</div>
+    <div class="splash-sub">Ouverture de l'application</div>
+    <div class="splash-dot-wrap"><span class="splash-dot"></span><span class="splash-dot"></span><span class="splash-dot"></span></div>
+  </div>
+</div>
 
 <!-- Bannière install -->
 <div id="install-banner" onclick="installApp()">
@@ -687,6 +721,18 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
       </div>
 
 
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">💡 Aide contextuelle</div>
+          <div class="acc-option-sub">Conseils utiles dans MEL, signalement et contact</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-ctx-toggle" onchange="toggleContextHelp(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
       <!-- ── Personnalisation ── -->
       <div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:16px 0 8px">🎨 Personnalisation</div>
 
@@ -786,7 +832,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
       <div class="panel-title">MEL — Aide communale</div>
       <button class="panel-close" onclick="closeOv('mel')">✕</button>
     </div>
-    <div class="msgs" id="msgs"></div>
+    <div class="ctx-help" id="ctx-mel"></div><div class="msgs" id="msgs"></div>
     <div class="sugs" id="sugs">
       <button class="sug" onclick="showMelThemeQuestions('urbanisme')">🏗️ Urbanisme</button>
       <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Enfance</button>
@@ -810,6 +856,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
     </div>
     <div class="panel-body">
       <div id="signal-form">
+        <div class="ctx-help" id="ctx-signal"></div>
         <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
         <div class="form-group">
           <label class="form-label">Catégorie</label>
@@ -905,6 +952,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
       <button class="panel-close" onclick="closeOv('contact')">✕</button>
     </div>
     <div class="panel-body">
+      <div class="ctx-help" id="ctx-contact"></div>
       <div class="contact-grid">
         <div class="contact-card">
           <div class="contact-ico">🚨</div>
@@ -913,6 +961,22 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
             <div class="contact-sub">Voirie, éclairage, propreté, signalisation…</div>
           </div>
           <button class="contact-action" onclick="closeOv('contact'); openSignal();">Ouvrir</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">📞</div>
+          <div style="flex:1">
+            <div class="contact-title">Appeler la mairie</div>
+            <div class="contact-sub">02 38 45 61 76 · Lun 14h-17h30 · Mer sur RDV · Ven 8h30-11h30</div>
+          </div>
+          <a class="contact-action" href="tel:0238456176" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">🏘️</div>
+          <div style="flex:1">
+            <div class="contact-title">Services intercommunaux</div>
+            <div class="contact-sub">CCTVL · Déchets, assainissement, santé, transports…</div>
+          </div>
+          <a class="contact-action" href="tel:0238445935" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
         </div>
         <div class="contact-card">
           <div class="contact-ico">💬</div>
@@ -1127,17 +1191,6 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
           <a href="https://mezieres-lez-clery.fr/2018/11/04/le-conseil-municipal/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--mist);color:var(--leaf);border-radius:10px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;align-self:flex-start">🌐 Voir le conseil municipal →</a>
         </div>
       </div>
-
-      <!-- Contact -->
-      <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);">
-        <div style="font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:8px">📬 Contacter un élu</div>
-        <div style="font-size:0.72rem;color:var(--muted);line-height:1.6;margin-bottom:10px">Pour toute question ou demande adressée aux élus, passez par la mairie ou via Facebook Messenger.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <a href="tel:0238456176" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:9px 14px;font-size:0.78rem;font-weight:900;text-decoration:none">📞 Mairie</a>
-          <button onclick="contactViaMessenger();closeOv('conseil')" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border:none;border-radius:10px;padding:9px 14px;font-size:0.78rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">💬 Messenger</button>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>
@@ -1153,34 +1206,9 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
     <div class="panel-body">
 
       <div style="display:flex;flex-direction:column;gap:8px;">
-
-        <!-- Mairie -->
-        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏛️ Mairie de Mézières-lez-Cléry</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:0.84rem;font-weight:800;color:var(--text)">Accueil mairie</div>
-              <div style="font-size:0.7rem;color:var(--muted)">Lun 14h-17h30 · Mer RDV · Ven 8h30-11h30</div>
-            </div>
-            <a href="tel:0238456176" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:12px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
-          </div>
-        </div>
-
-        <!-- CCTVL -->
-        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏘️ CCTVL — Communauté de communes</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:0.84rem;font-weight:800;color:var(--text)">Services intercommunaux</div>
-              <div style="font-size:0.7rem;color:var(--muted)">Déchets, assainissement, santé, transports…</div>
-            </div>
-            <a href="tel:0238445935" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:12px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
-          </div>
-        </div>
-
         <!-- Urgences -->
-        <div style="background:#fee2e2;border-radius:14px;padding:12px 14px;border:1px solid #fca5a5">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#dc2626;margin-bottom:8px">🚨 Urgences</div>
+        <div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px rgba(127,29,29,0.22)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#fee2e2;margin-bottom:10px">🚨 Urgences</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <a href="tel:15" style="background:#dc2626;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🚑 SAMU<br><span style="font-size:1rem">15</span></a>
             <a href="tel:17" style="background:#1d4ed8;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">👮 Police<br><span style="font-size:1rem">17</span></a>
@@ -1341,13 +1369,13 @@ window.addEventListener('popstate', function(){
 history.pushState({mat:'overlay'}, '');
 
 function openMajordome(){ openOv('majordome'); }
-function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
-function openSignal(){openOv('signal');}
+function openMel(){openOv('mel'); renderContextHelp('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
+function openSignal(){openOv('signal'); renderContextHelp('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
-function openContact(){openOv('contact');}
+function openContact(){openOv('contact'); renderContextHelp('contact');}
 function openAgenda(){
   openOv('agenda');
   _agendaYear=new Date().getFullYear();
@@ -1940,7 +1968,7 @@ function updateInstallBtn(){
   if(!btn) return;
   if(installed){
     ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='Un service ne fonctionne pas ?';
+    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='On s'en occupe !';
     btn.onclick=()=>openOv('bug');
   }
 }
@@ -2397,6 +2425,7 @@ function loadAccessibilite() {
     if (saved.touch)     applyTouch(true, false);
     if (saved.spacing)   applySpacing(true, false);
     if (saved.tts)       { _ttsEnabled = true; }
+    if (saved.contextHelp === false) toggleContextHelp(false, false); else toggleContextHelp(true, false);
     if (saved.theme)     setTheme(saved.theme);
     if (saved.noHeader)  toggleNoHeader(true);
     if (saved.noWidgets) toggleNoWidgets(true);
@@ -2414,6 +2443,7 @@ function saveAccessibilite() {
     touch:    html.classList.contains('large-touch'),
     spacing:  html.classList.contains('line-spacing'),
     tts:      _ttsEnabled,
+    contextHelp: _ctxEnabled,
     theme,
     noHeader:   html.classList.contains('no-header'),
     noWidgets:  html.classList.contains('no-widgets'),
@@ -2492,6 +2522,8 @@ function openAccessibilite() {
   if (st) st.checked = html.classList.contains('line-spacing');
   const ttsEl = document.getElementById('acc-tts-toggle');
   if (ttsEl) ttsEl.checked = _ttsEnabled;
+  const ctxEl = document.getElementById('acc-ctx-toggle');
+  if (ctxEl) ctxEl.checked = _ctxEnabled;
   // Sync personnalisation
   const html2 = document.documentElement;
   const theme = html2.classList.contains('theme-sombre') ? 'sombre' : html2.classList.contains('theme-bleu') ? 'bleu' : 'vert';
@@ -2512,6 +2544,7 @@ function resetAccessibilite() {
   applyTouch(false, false);
   applySpacing(false, false);
   _ttsEnabled = false;
+  _ctxEnabled = true;
   ttsStop();
   setTheme('vert');
   toggleNoHeader(false);
@@ -2588,6 +2621,42 @@ function loadDateBadge() {
   link.href = 'mailto:' + email;
   link.textContent = email;
 })();
+
+
+// ── Splash d'ouverture ─────────────────
+let _splashShownAt = Date.now();
+function hideSplash(forceDelay){
+  const splash=document.getElementById('app-splash');
+  if(!splash) return;
+  const elapsed=Date.now()-_splashShownAt;
+  const wait=Math.max(forceDelay||0, 1000-elapsed);
+  setTimeout(function(){ splash.classList.add('hide'); }, wait);
+}
+window.addEventListener('load', function(){ hideSplash(0); });
+
+// ── Aide contextuelle ─────────────────
+let _ctxEnabled = true;
+const CTX_TEXTS = {
+  mel: {title:'Aide rapide', text:'Posez votre question comme si vous parliez à la mairie. Exemple : horaires, clôture, déchets, fibre ou agenda.'},
+  signal: {title:'Conseil utile', text:'Choisissez une catégorie, ajoutez une photo si besoin, puis envoyez. La description et la position GPS restent facultatives.'},
+  contact: {title:'Besoin d'aide ?', text:'Pour une urgence communale, utilisez Signalement. Pour une demande générale, appelez la mairie ou laissez un message.'}
+};
+function renderContextHelp(key){
+  const el=document.getElementById('ctx-'+key);
+  if(!el) return;
+  const data=CTX_TEXTS[key];
+  if(!_ctxEnabled || !data){el.classList.remove('show'); el.innerHTML=''; return;}
+  el.innerHTML='<div class="ctx-title">'+data.title+'</div><div class="ctx-text">'+data.text+'</div>';
+  el.classList.add('show');
+}
+function refreshAllContextHelp(){ ['mel','signal','contact'].forEach(renderContextHelp); }
+function toggleContextHelp(on, save=true){
+  _ctxEnabled = on;
+  const el=document.getElementById('acc-ctx-toggle');
+  if(el) el.checked = on;
+  refreshAllContextHelp();
+  if(save) saveAccessibilite();
+}
 
 // ── Init ─────────────────────────────────
 loadAccessibilite(); updateNotifCardStatus(false); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
