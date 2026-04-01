@@ -88,7 +88,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 
 /* Couleurs icônes */
 .ico-mel{background:linear-gradient(135deg,#e8f8f0,#d0f0e0);}
-.ico-site{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
+.ico-site{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);font-size:1.2rem;}
 .ico-radio{background:linear-gradient(135deg,#fde8f0,#f8d0e4);}
 .ico-hab{background:linear-gradient(135deg,#ede8f8,#ddd0f0);}
 .ico-cal{background:linear-gradient(135deg,#fef3e0,#fce8c0);}
@@ -314,6 +314,30 @@ html.line-spacing p,
 html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
+/* ── Mode daltonien (protanopie/deutéranopie — rouge-vert) ── */
+html.daltonien { filter: none; }
+html.daltonien .header { background: linear-gradient(160deg,#1a3a5c,#2563a8) !important; }
+html.daltonien .card .ico { filter: hue-rotate(200deg); }
+html.daltonien .ct-label { color: var(--text) !important; }
+html.daltonien .submit-btn,
+html.daltonien .contact-action,
+html.daltonien .majordome-btn { background: linear-gradient(135deg,#1d4ed8,#3b82f6) !important; }
+html.daltonien .ico-mel  { background: linear-gradient(135deg,#1d4ed8,#60a5fa) !important; }
+html.daltonien .ico-notif{ background: linear-gradient(135deg,#d97706,#fbbf24) !important; }
+html.daltonien .ico-signal{background: linear-gradient(135deg,#7c3aed,#a78bfa) !important; }
+html.daltonien .card.on  { background: rgba(37,99,168,.15) !important; }
+html.daltonien .cat-btn.on { background:#dbeafe !important;border-color:#3b82f6 !important;color:#1d4ed8 !important; }
+html.daltonien a[href="https://mezieres-lez-clery.fr/"] .ico { filter: hue-rotate(200deg); }
+
+/* ── Mode simplifié (5 boutons max) ── */
+html.mode-simple .sec { display: none !important; }
+html.mode-simple .header-bottom-grid { display: none !important; }
+html.mode-simple .header { padding-bottom: 16px !important; }
+html.mode-simple .card { display: none !important; }
+html.mode-simple .card.simple-keep { display: flex !important; }
+html.mode-simple .simple-only { display: flex !important; }
+.simple-only { display: none; }
+
 /* Bouton accessibilité dans le header */
 .acc-btn{background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 16px;color:white;font-size:0.78rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:6px;position:absolute;right:16px;bottom:16px;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
@@ -444,6 +468,32 @@ html.no-header .header { display: none !important; }
 /* ── Mode sans widgets ── */
 html.no-widgets .header-bottom-grid { display: none !important; }
 html.no-widgets .header { padding-bottom: 48px; }
+
+/* ── Aide contextuelle intelligente ── */
+.ctx-hint {
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:white;border:1.5px solid var(--border);border-radius:14px;
+  padding:10px 14px;min-width:200px;max-width:280px;
+  box-shadow:0 4px 20px rgba(26,61,43,.15);z-index:400;
+  font-size:0.75rem;color:var(--text);line-height:1.5;
+  animation:ctxFadeIn .25s ease;pointer-events:none;
+}
+.ctx-hint::after {
+  content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+  border:8px solid transparent;border-top-color:var(--border);
+}
+.ctx-bar {
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--mist),#e8f5e9);
+  border:1px solid var(--border);border-radius:12px;
+  padding:9px 13px;margin:8px 0;font-size:0.76rem;color:var(--text);
+  line-height:1.4;animation:ctxFadeIn .3s ease;
+}
+.ctx-bar-ico { font-size:1.1rem;flex-shrink:0; }
+.ctx-bar-close { margin-left:auto;background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted);padding:0 4px;flex-shrink:0; }
+@keyframes ctxFadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+html.theme-sombre .ctx-bar { background:#2d3748;border-color:#374151;color:#f1f5f9; }
+html.theme-sombre .ctx-hint { background:#1e293b;border-color:#374151;color:#f1f5f9; }
 </style>
 </head>
 <body>
@@ -510,7 +560,7 @@ html.no-widgets .header { padding-bottom: 48px; }
 
   <!-- Numéros utiles discrets dans le header -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
-    <button onclick="openNums()" style="background:rgba(255,255,255,0.12);border:none;border-radius:10px;padding:6px 12px;color:rgba(255,255,255,0.85);font-family:'Nunito',sans-serif;font-size:0.68rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;">📞 Numéros utiles</button>
+    <button onclick="openNums()" style="background:rgba(220,38,38,0.85);border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:8px 14px;color:white;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(220,38,38,0.4);">🚨 Urgences</button>
   </div>
   <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
 </div>
@@ -520,13 +570,13 @@ html.no-widgets .header { padding-bottom: 48px; }
 
   <div class="sec">Services municipaux</div>
   <div class="grid2">
-    <button class="card" onclick="openMel()">
+    <button class="card simple-keep" onclick="openMel()">
       <div class="ico ico-mel">👩‍💼</div>
       <div class="ct"><div class="ct-label">MEL</div><div class="ct-sub">Assistante IA</div></div>
     </button>
     <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
-      <div class="ico ico-site">🌐</div>
-      <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">Commune</div></div>
+      <div class="ico ico-site">🏡</div>
+      <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">mezieres-lez-clery.fr</div></div>
     </a>
   </div>
 
@@ -538,7 +588,7 @@ html.no-widgets .header { padding-bottom: 48px; }
     </a>
     <button class="card" onclick="openNotifs()">
       <div class="ico ico-notif">🔔</div>
-      <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub" id="notif-card-status">Vérification…</div></div>
+      <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub" id="notif-card-status" style="font-weight:700">Vérification…</div></div>
     </button>
   </div>
 
@@ -556,21 +606,21 @@ html.no-widgets .header { padding-bottom: 48px; }
 
   <div class="sec">Signalements &amp; contacts</div>
   <div class="grid2">
-    <button class="card" onclick="openSignal()">
+    <button class="card simple-keep" onclick="openSignal()">
       <div class="ico ico-signal">🚨</div>
       <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Voirie, déchets…</div></div>
     </button>
-    <button class="card" onclick="openContact()">
+    <button class="card simple-keep" onclick="openContact()">
       <div class="ico ico-hab">💬</div>
       <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
     </button>
   </div>
 
-  <div class="sec">Agenda</div>
+  <div class="sec">Agenda &amp; Sorties</div>
   <div class="grid2">
-    <button class="card" onclick="openAgenda()">
+    <button class="card simple-keep" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Vos RDV</div></div>
+      <div class="ct"><div class="ct-label">Agenda &amp; Sorties</div><div class="ct-sub">Vos RDV</div></div>
     </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/" target="_blank">
       <div class="ico ico-rando">🥾</div>
@@ -889,6 +939,24 @@ html.no-widgets .header { padding-bottom: 48px; }
         </div>
       </div>
 
+      <!-- Appel direct mairie & CCTVL -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+        <div style="background:white;border-radius:14px;padding:11px 14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:0.82rem;font-weight:800;color:var(--text)">🏛️ Accueil mairie</div>
+            <div style="font-size:0.68rem;color:var(--muted)">Lun 14h-17h30 · Mer RDV · Ven 8h30-11h30</div>
+          </div>
+          <a href="tel:0238456176" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:8px 13px;font-size:0.78rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
+        </div>
+        <div style="background:white;border-radius:14px;padding:11px 14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:0.82rem;font-weight:800;color:var(--text)">🏘️ CCTVL — Communauté de communes</div>
+            <div style="font-size:0.68rem;color:var(--muted)">Déchets, assainissement, santé, transports…</div>
+          </div>
+          <a href="tel:0238445935" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:8px 13px;font-size:0.78rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
+        </div>
+      </div>
+
       <div class="contact-note">
         Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre demande directement à la mairie.
       </div>
@@ -962,7 +1030,7 @@ html.no-widgets .header { padding-bottom: 48px; }
     </div>
     <div class="panel-body">
       <div id="bug-form">
-        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Un service ne fonctionne pas correctement ? Signalez-le pour nous aider à l'améliorer.</p>
+        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">On s'en occupe ! Signalez-nous tout dysfonctionnement pour que nous puissions l'améliorer au plus vite.</p>
         <div class="form-group">
           <label class="form-label">Service concerné</label>
           <div class="form-cats" id="bug-services">
@@ -1104,36 +1172,12 @@ html.no-widgets .header { padding-bottom: 48px; }
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:rgba(255,255,255,0.2)">📞</div>
-      <div class="panel-title">Numéros utiles</div>
+      <div class="panel-title">Numéros d'urgence</div>
       <button class="panel-close" onclick="closeOv('nums')">✕</button>
     </div>
     <div class="panel-body">
 
       <div style="display:flex;flex-direction:column;gap:8px;">
-
-        <!-- Mairie -->
-        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏛️ Mairie de Mézières-lez-Cléry</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:0.84rem;font-weight:800;color:var(--text)">Accueil mairie</div>
-              <div style="font-size:0.7rem;color:var(--muted)">Lun 14h-17h30 · Mer RDV · Ven 8h30-11h30</div>
-            </div>
-            <a href="tel:0238456176" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:12px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
-          </div>
-        </div>
-
-        <!-- CCTVL -->
-        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏘️ CCTVL — Communauté de communes</div>
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:0.84rem;font-weight:800;color:var(--text)">Services intercommunaux</div>
-              <div style="font-size:0.7rem;color:var(--muted)">Déchets, assainissement, santé, transports…</div>
-            </div>
-            <a href="tel:0238445935" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:12px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
-          </div>
-        </div>
 
         <!-- Urgences -->
         <div style="background:#fee2e2;border-radius:14px;padding:12px 14px;border:1px solid #fca5a5">
@@ -1638,6 +1682,7 @@ function renderAgenda(){
     else html+='<div class="'+cls+'">'+d+'</div>';
   }
   html+='</div>';
+  if(typeof ctxAgenda==='function') ctxAgenda(list.length>0);
   html+=list.length?'<div class="agenda-list" style="margin-top:14px">'+list.map(renderAgendaItem).join('')+'</div>':'<div class="agenda-empty" style="margin-top:14px">Aucun événement ce mois-ci.</div>';
   content.innerHTML=html;
 }
@@ -1904,7 +1949,7 @@ function updateInstallBtn(){
   if(!btn) return;
   if(installed){
     ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='Un service ne fonctionne pas ?';
+    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='On s\'en occupe !';
     btn.onclick=()=>openOv('bug');
   }
 }
@@ -2100,8 +2145,18 @@ async function checkPushStatus(){
   try{
     const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
     const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
-    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';}
-    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';}
+    const cardSt=document.getElementById('notif-card-status');
+    if(sub){
+      pushRegistered=true;
+      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
+      if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';
+      if(cardSt)cardSt.innerHTML='<strong style="color:#16a34a;font-weight:900">✅ ACTIVÉES</strong>';
+    } else {
+      pushRegistered=false;
+      if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}
+      if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';
+      if(cardSt)cardSt.innerHTML='<strong style="color:#dc2626;font-weight:900">❌ DÉSACTIVÉES</strong>';
+    }
   }catch(e){}
 }
 async function togglePush(){
@@ -2210,7 +2265,7 @@ async function clearCacheAndReload() {
   localStorage.removeItem(ACC_KEY);
   localStorage.removeItem(INSTALL_KEY);
   const html = document.documentElement;
-  html.classList.remove('font-large','font-xl','high-contrast','large-touch','line-spacing','theme-bleu','theme-sombre','no-header','no-widgets');
+  html.classList.remove('font-large','font-xl','high-contrast','large-touch','line-spacing','theme-bleu','theme-sombre','no-header','no-widgets','daltonien','mode-simple');
 
   // Vider les caches SW SANS désenregistrer (conserve les push)
   if ('caches' in window) {
@@ -2224,6 +2279,19 @@ function urlBase64ToUint8Array(b64){
   const pad='='.repeat((4-b64.length%4)%4);
   const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));
   return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+
+
+// ── Mode daltonien ─────────────────────────────────────────
+function toggleDaltonien(on) {
+  document.documentElement.classList.toggle('daltonien', on);
+  saveAccessibilite();
+}
+
+// ── Mode simplifié ──────────────────────────────────────────
+function toggleModeSimple(on) {
+  document.documentElement.classList.toggle('mode-simple', on);
+  saveAccessibilite();
 }
 
 // ── Text-to-Speech ───────────────────
@@ -2369,6 +2437,8 @@ function saveAccessibilite() {
     theme,
     noHeader:   html.classList.contains('no-header'),
     noWidgets:  html.classList.contains('no-widgets'),
+    daltonien:  html.classList.contains('daltonien'),
+    modeSimple: html.classList.contains('mode-simple'),
   }));
 }
 
@@ -2434,6 +2504,10 @@ function openAccessibilite() {
   const nh = document.getElementById('acc-noheader-toggle');
   const nw = document.getElementById('acc-nowidgets-toggle');
   if (nh) nh.checked = html2.classList.contains('no-header');
+  const dal = document.getElementById('acc-daltonien');
+  const sim = document.getElementById('acc-simple');
+  if (saved.daltonien)  { html2.classList.add('daltonien');   if(dal) dal.checked=true; }
+  if (saved.modeSimple) { html2.classList.add('mode-simple'); if(sim) sim.checked=true; }
   if (nw) nw.checked = html2.classList.contains('no-widgets');
 }
 
@@ -2517,6 +2591,167 @@ function loadDateBadge() {
   link.href = 'mailto:' + email;
   link.textContent = email;
 })();
+
+
+// ══════════════════════════════════════════════════════════════
+// AIDE CONTEXTUELLE INTELLIGENTE — MAT v3.5
+// Système discret : bonne aide, bon moment, bon écran
+// ══════════════════════════════════════════════════════════════
+const CTX = {
+  _bar: null,
+  _timers: [],
+  _dismissed: new Set(),
+
+  // Affiche une barre d'aide discrète sous le contenu actif
+  show(id, ico, msg, persistent=false) {
+    if (this._dismissed.has(id)) return;
+    this.hide(); // une seule aide à la fois
+    const bar = document.createElement('div');
+    bar.className = 'ctx-bar';
+    bar.id = 'ctx-' + id;
+    bar.innerHTML = `<span class="ctx-bar-ico">${ico}</span><span>${msg}</span>` +
+      (persistent ? '' : `<button class="ctx-bar-close" onclick="CTX.dismiss('${id}')">✕</button>`);
+    this._bar = bar;
+    return bar;
+  },
+
+  // Injecte dans un conteneur donné
+  injectIn(containerId, id, ico, msg) {
+    if (this._dismissed.has(id)) return;
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    // Supprimer si déjà présent
+    const old = container.querySelector('.ctx-bar');
+    if (old) old.remove();
+    const bar = this.show(id, ico, msg);
+    if (!bar) return;
+    container.prepend(bar);
+  },
+
+  // Ajoute après un élément cible
+  injectAfter(targetSelector, id, ico, msg) {
+    if (this._dismissed.has(id)) return;
+    const target = document.querySelector(targetSelector);
+    if (!target || target.parentNode.querySelector('.ctx-bar')) return;
+    const bar = this.show(id, ico, msg);
+    if (!bar) return;
+    target.insertAdjacentElement('afterend', bar);
+  },
+
+  hide() {
+    const existing = document.querySelectorAll('.ctx-bar');
+    existing.forEach(b => b.remove());
+  },
+
+  dismiss(id) {
+    this._dismissed.add(id);
+    const el = document.getElementById('ctx-' + id);
+    if (el) el.remove();
+  },
+
+  timer(fn, delay) {
+    const t = setTimeout(fn, delay);
+    this._timers.push(t);
+    return t;
+  },
+
+  clearTimers() {
+    this._timers.forEach(clearTimeout);
+    this._timers = [];
+  }
+};
+
+// ── Aide : overlay Signal ────────────────────────────────────
+function ctxSignal() {
+  CTX.clearTimers();
+  // Après 10s d'inactivité sur l'écran signalement
+  CTX.timer(() => {
+    const cat = document.querySelector('.cat-btn.on');
+    const desc = document.getElementById('signal-desc');
+    if (!cat && (!desc || !desc.value.trim())) {
+      CTX.injectAfter('#signal-cats', 'signal-idle',
+        '💡', 'Choisissez d'abord une catégorie, puis décrivez le problème en quelques mots.');
+    }
+  }, 10000);
+
+  // Si description vide au moment de l'envoi : message inline
+  const descEl = document.getElementById('signal-desc');
+  if (descEl && !descEl.dataset.ctxBound) {
+    descEl.dataset.ctxBound = '1';
+    descEl.addEventListener('focus', () => {
+      CTX.timer(() => {
+        if (!descEl.value.trim()) {
+          CTX.injectAfter('#signal-desc', 'signal-desc-tip',
+            '✏️', 'La description est facultative. Une photo suffit !');
+        }
+      }, 5000);
+    });
+  }
+}
+
+// ── Aide : overlay MEL ───────────────────────────────────────
+function ctxMel(userText) {
+  if (!userText || userText.trim().length < 3) return;
+  const t = userText.toLowerCase();
+  const isVague = t.split(' ').length <= 2;
+  if (isVague) {
+    CTX.injectAfter('.mel-panel .minp', 'mel-vague',
+      '🤔', 'Je peux vous aider sur : horaires, bus, déchets, urbanisme, événements…');
+  }
+}
+
+// ── Aide : overlay Agenda ────────────────────────────────────
+function ctxAgenda(hasEvents) {
+  CTX.clearTimers();
+  if (!hasEvents) {
+    CTX.timer(() => {
+      CTX.injectIn('agenda-panel-body', 'agenda-empty',
+        '🔔', 'Aucun événement à venir. Activez les notifications pour ne rien rater !');
+    }, 1500);
+  }
+}
+
+// ── Aide : installation PWA ──────────────────────────────────
+function ctxInstall() {
+  const ua = navigator.userAgent.toLowerCase();
+  let msg = '';
+  if (/iphone|ipad|ipod/.test(ua)) {
+    msg = 'Sur iPhone : appuyez sur <strong>Partager</strong> puis <strong>Sur l'écran d'accueil</strong>';
+  } else if (/android/.test(ua)) {
+    msg = 'Sur Android : ouvrez le <strong>menu ⋮</strong> puis <strong>Installer l'application</strong>';
+  } else {
+    msg = 'Cliquez sur l'icône d'installation dans la barre d'adresse de votre navigateur';
+  }
+  return msg;
+}
+
+// ── Aide : overlay Contact ───────────────────────────────────
+function ctxContact() {
+  CTX.clearTimers();
+  CTX.timer(() => {
+    const name = document.getElementById('contact-name');
+    if (name && !name.value.trim()) {
+      CTX.injectAfter('#contact-name', 'contact-anon',
+        '👤', 'Vous pouvez rester anonyme en laissant ce champ vide.');
+    }
+  }, 8000);
+}
+
+// ── Accrochage automatique sur ouverture des overlays ────────
+const _origOpenOv = typeof openOv === 'function' ? openOv : null;
+function openOvCtx(id) {
+  CTX.clearTimers();
+  CTX.hide();
+  if (id === 'signal')  setTimeout(ctxSignal, 500);
+  if (id === 'contact') setTimeout(ctxContact, 500);
+  if (id === 'agenda')  { /* ctxAgenda appelé après loadAgenda */ }
+  if (typeof window._openOvOrig === 'function') window._openOvOrig(id);
+}
+// Patch openOv pour intercepter
+if (typeof openOv === 'function') {
+  window._openOvOrig = openOv;
+  window.openOv = function(id) { window._openOvOrig(id); openOvCtx(id); };
+}
 
 // ── Init ─────────────────────────────────
 loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
