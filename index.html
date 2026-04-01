@@ -2873,7 +2873,7 @@ function renderContextHelp(key){
   if(!el) return;
   const data=CTX_TEXTS[key];
   if(!_ctxEnabled || !data || _ctxDismissed[key]){el.classList.remove('show'); el.innerHTML=''; return;}
-  el.innerHTML='<div class="ctx-head"><span class="ctx-ico">💡</span><div class="ctx-title">'+data.title+'</div><button type="button" class="ctx-close" aria-label="Fermer l'aide" onclick="dismissContextHelp(\''+key+'\')">✕</button></div><div class="ctx-text">'+data.text+'</div>';
+  el.innerHTML=`<div class="ctx-head"><span class="ctx-ico">💡</span><div class="ctx-title">${data.title}</div><button type="button" class="ctx-close" aria-label="Fermer l'aide" onclick="dismissContextHelp('${key}')">✕</button></div><div class="ctx-text">${data.text}</div>`;
   el.classList.add('show');
 }
 function refreshAllContextHelp(){ ['mel','signal','contact'].forEach(function(key){ _ctxDismissed[key]=false; renderContextHelp(key); }); }
