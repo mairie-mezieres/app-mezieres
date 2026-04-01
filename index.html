@@ -1048,7 +1048,8 @@ html.no-widgets .header { padding-bottom: 48px; }
           <strong>Mairie de Mézières-lez-Cléry</strong><br>
           36 rue du bourg — 45370<br>
           📞 02 38 45 61 76<br>
-          ✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e489858d968d81a489819e8d81968197c988819ec9878881969dca8296">[email&#160;protected]</a>
+          ✉️ <a id="mairie-mail-link" href="#" onclick="this.href='mail'+'to:'+atob('bWFpcmllQG1lemllcmVzLWxlei1jbGVyeS5mcg==');return true;" style="color:var(--leaf);font-weight:800;">Voir l'adresse email →</a>
+          <span id="mairie-mail-txt" style="display:none;color:var(--leaf);font-weight:800;"></span>
         </div>
       </div>
     </div>
@@ -2516,6 +2517,17 @@ function loadDateBadge() {
   el.innerHTML = j + ' ' + d + suf + ' ' + MOIS[m]
     + (saint ? '<br><span style="font-style:italic;font-weight:400;font-size:0.52rem;opacity:0.8">Ste/St ' + saint + '</span>' : '');
 }
+
+
+// ── Déprotection email mairie ─────────
+(function(){
+  const link = document.getElementById('mairie-mail-link');
+  if (!link) return;
+  // atob decode base64 : mairie@mezieres-lez-clery.fr
+  const email = atob('bWFpcmllQG1lemllcmVzLWxlei1jbGVyeS5mcg==');
+  link.href = 'mailto:' + email;
+  link.textContent = email;
+})();
 
 // ── Init ─────────────────────────────────
 loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
