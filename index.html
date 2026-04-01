@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.5 -->
+<!-- VERSION 3.5.1 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -22,10 +22,10 @@
   --r:18px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}
+html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}\nbody.preload > :not(#app-splash){visibility:hidden !important;}\nbody.preload{overflow:hidden;background:var(--warm);}\nbody.preload #app-splash{opacity:1;visibility:visible;}
 
 /* ── Splash d'ouverture ── */
-.app-splash{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--forest),var(--leaf));color:var(--cream);opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease;}
+.app-splash{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--forest),var(--leaf));color:var(--cream);opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease;}\nhtml.theme-bleu .app-splash{background:linear-gradient(160deg,#1a3a5c,#2563eb);}\nhtml.theme-sombre .app-splash{background:linear-gradient(160deg,#111827,#1f2937);}\nhtml.high-contrast .app-splash{background:linear-gradient(160deg,#003319,#004d26);}\nhtml.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563eb);}
 .app-splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
 .splash-card{text-align:center;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .splash-logo{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 8px 22px rgba(0,0,0,.25));}
@@ -329,7 +329,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Boutons utilitaires dans le header */
-.header-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.header-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}\n.header-tool-btn{border:none;border-radius:12px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;}\n.header-tool-btn.urgent{background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;box-shadow:0 4px 14px rgba(185,28,28,.25);}\n.header-tool-btn.urgent:active{transform:scale(.98);}\n.acc-btn{position:static !important;justify-content:center;min-height:44px;}
 .header-tool-btn,.acc-btn{border:1.5px solid rgba(255,255,255,0.28);border-radius:12px;padding:10px 12px;color:white;font-size:0.72rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.16);font-family:'Nunito',sans-serif;white-space:nowrap;}
 .header-tool-btn{background:linear-gradient(135deg,#b91c1c,#dc2626);border-color:rgba(255,255,255,0.18);}
 .acc-btn{background:rgba(255,255,255,0.18);position:static;margin-left:0;}
@@ -486,15 +486,11 @@ html.theme-sombre .ctx-help{background:#374151;border-color:#4b5563;color:#e2e8f
 html.theme-sombre .ctx-text{color:#cbd5e1;}
 
 /* ── Mode simplifié ── */
-html.simplified-mode .sec,
-html.simplified-mode .grid2{display:none !important;}
-html.simplified-mode .content{display:grid;grid-template-columns:1fr;gap:10px;}
-html.simplified-mode .content .simple-card{display:flex !important;}
-html.simplified-mode .content .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}
+.notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\nhtml.simplified-mode .content{display:flex;flex-direction:column;gap:10px;}\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}\nhtml.simplified-mode .grid2{display:grid !important;grid-template-columns:1fr !important;gap:10px;}\nhtml.simplified-mode .grid2 > :not(.simple-card){display:none !important;}\nhtml.simplified-mode .simple-card{display:flex !important;align-items:center !important;gap:11px !important;min-height:74px;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:44px !important;height:44px !important;font-size:22px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0;flex:1;}
 </style>
 </head>
 
-<body>
+<body class="preload">
 <div id="app-splash" class="app-splash" aria-hidden="true">
   <div class="splash-card">
     <img src="mat-header.png" alt="MAT" class="splash-logo" onerror="this.style.display='none'">
@@ -522,7 +518,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.1</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="mat-header.png" alt="MAT" class="mat-img" onclick="openMajordome()" onerror="this.style.display='none'" title="Qui suis-je ?">
@@ -565,7 +561,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
   <!-- Bouton accessibilité positionné en bas à droite du header -->
 
   <div class="header-tools">
-    <button class="header-tool-btn" onclick="openNums()">📞 Numéros urgence</button>
+    <button class="header-tool-btn urgent" onclick="openNums()">🚨 Numéros urgence</button>
     <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
   </div>
 </div>
@@ -671,8 +667,8 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
         </div>
         <div class="acc-toggle">
           <button class="acc-size-btn" id="acc-normal" onclick="setFontSize('normal')">A</button>
-          <button class="acc-size-btn" id="acc-large"  onclick="setFontSize('large')">A+</button>
-          <button class="acc-size-btn" id="acc-xl"     onclick="setFontSize('xl')">A++</button>
+          <button class="acc-size-btn" id="acc-large" onclick="setFontSize('large')">A+</button>
+          <button class="acc-size-btn" id="acc-xl" onclick="setFontSize('xl')">A++</button>
         </div>
       </div>
 
@@ -683,6 +679,17 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
         </div>
         <label class="acc-switch">
           <input type="checkbox" id="acc-contrast-toggle" onchange="toggleContrast(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🌈 Mode daltonien</div>
+          <div class="acc-option-sub">Palette plus différenciée, moins dépendante du rouge et du vert</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-colorblind-toggle" onchange="toggleColorblind(this.checked)">
           <span class="acc-slider"></span>
         </label>
       </div>
@@ -720,8 +727,6 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
         </label>
       </div>
 
-
-
       <div class="acc-option">
         <div>
           <div class="acc-option-label">💡 Aide contextuelle</div>
@@ -733,11 +738,13 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
         </label>
       </div>
 
-      <!-- ── Personnalisation ── -->
       <div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:16px 0 8px">🎨 Personnalisation</div>
 
       <div class="acc-option">
-        <div><div class="acc-option-label">🎨 Thème de couleur</div><div class="acc-option-sub">Apparence générale de l'application</div></div>
+        <div>
+          <div class="acc-option-label">🎨 Thème de couleur</div>
+          <div class="acc-option-sub">Apparence générale de l'application</div>
+        </div>
         <div class="acc-toggle">
           <button class="acc-size-btn" id="theme-vert" onclick="setTheme('vert')">🌿</button>
           <button class="acc-size-btn" id="theme-bleu" onclick="setTheme('bleu')">🌊</button>
@@ -746,22 +753,23 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
       </div>
 
       <div class="acc-option">
-        <div><div class="acc-option-label">📐 Masquer l'en-tête</div><div class="acc-option-sub">Condense l'affichage, plus d'espace pour les boutons</div></div>
-        <label class="acc-switch"><input type="checkbox" id="acc-noheader-toggle" onchange="toggleNoHeader(this.checked)"><span class="acc-slider"></span></label>
-      </div>
-
-      <div class="acc-option">
-        <div><div class="acc-option-label">🗺️ Masquer la météo &amp; transports</div><div class="acc-option-sub">Retire les encarts du header</div></div>
-        <label class="acc-switch"><input type="checkbox" id="acc-nowidgets-toggle" onchange="toggleNoWidgets(this.checked)"><span class="acc-slider"></span></label>
+        <div>
+          <div class="acc-option-label">📐 Masquer l'en-tête</div>
+          <div class="acc-option-sub">Condense l'affichage, plus d'espace pour les boutons</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-noheader-toggle" onchange="toggleNoHeader(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
       </div>
 
       <div class="acc-option">
         <div>
-          <div class="acc-option-label">🌈 Mode daltonien</div>
-          <div class="acc-option-sub">Palette plus différenciée, moins dépendante du rouge et du vert</div>
+          <div class="acc-option-label">🗺️ Masquer la météo &amp; transports</div>
+          <div class="acc-option-sub">Retire les encarts du header</div>
         </div>
         <label class="acc-switch">
-          <input type="checkbox" id="acc-colorblind-toggle" onchange="toggleColorblind(this.checked)">
+          <input type="checkbox" id="acc-nowidgets-toggle" onchange="toggleNoWidgets(this.checked)">
           <span class="acc-slider"></span>
         </label>
       </div>
@@ -1234,7 +1242,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
 
         <!-- Numéros nationaux spécialisés -->
         <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🆘 Lignes d\'aide spécialisées</div>
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🆘 Lignes d'aide spécialisées</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
             <a href="tel:3114" style="background:#7c3aed;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">🧠 Prévention suicide<br><span style="font-size:1rem">3114</span></a>
             <a href="tel:3919" style="background:#be185d;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">💜 Violences femmes<br><span style="font-size:1rem">3919</span></a>
@@ -1300,7 +1308,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5 — Mézières Avec Toi
+// MAT v3.5.1 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1968,7 +1976,7 @@ function updateInstallBtn(){
   if(!btn) return;
   if(installed){
     ico.style.background='linear-gradient(135deg,#fde8f0,#f8d0e4)';
-    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent='On s\'en occupe !';
+    ico.textContent='🐞'; label.textContent='Un bug ?'; sub.textContent="On s'en occupe !";
     btn.onclick=()=>openOv('bug');
   }
 }
@@ -2123,7 +2131,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5'
+    matVersion:'v3.5.1'
   };
 }
 
@@ -2174,7 +2182,7 @@ async function checkPushStatus(){
     const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
     if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';updateNotifCardStatus(true);}
     else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';updateNotifCardStatus(false);}
-  }catch(e){}
+  }catch(e){updateNotifCardStatus(false);}
 }
 async function togglePush(){
   const btn=document.getElementById('push-btn'),subTxt=document.getElementById('push-sub');
@@ -2607,8 +2615,8 @@ function loadDateBadge() {
   const m = now.getMonth();
   const suf = d === 1 ? 'er' : '';
   const saint = (SAINTS[m] && SAINTS[m][d-1] && SAINTS[m][d-1] !== '--') ? SAINTS[m][d-1] : null;
-  el.innerHTML = j + ' ' + d + suf + ' ' + MOIS[m]
-    + (saint ? '<br><span style="font-style:italic;font-weight:400;font-size:0.52rem;opacity:0.8">Ste/St ' + saint + '</span>' : '');
+  el.innerHTML = esc(j) + ' ' + d + suf + ' ' + esc(MOIS[m])
+    + (saint ? '<br><span style="font-style:italic;font-weight:400;font-size:0.52rem;opacity:0.8">Ste/St ' + esc(saint) + '</span>' : '');
 }
 
 
@@ -2630,16 +2638,16 @@ function hideSplash(forceDelay){
   if(!splash) return;
   const elapsed=Date.now()-_splashShownAt;
   const wait=Math.max(forceDelay||0, 1000-elapsed);
-  setTimeout(function(){ splash.classList.add('hide'); }, wait);
+  setTimeout(function(){ document.body.classList.remove('preload'); splash.classList.add('hide'); }, wait);
 }
 window.addEventListener('load', function(){ hideSplash(0); });
 
 // ── Aide contextuelle ─────────────────
 let _ctxEnabled = true;
 const CTX_TEXTS = {
-  mel: {title:'Aide rapide', text:'Posez votre question comme si vous parliez à la mairie. Exemple : horaires, clôture, déchets, fibre ou agenda.'},
-  signal: {title:'Conseil utile', text:'Choisissez une catégorie, ajoutez une photo si besoin, puis envoyez. La description et la position GPS restent facultatives.'},
-  contact: {title:'Besoin d\'aide ?', text:'Pour une urgence communale, utilisez Signalement. Pour une demande générale, appelez la mairie ou laissez un message.'}
+  mel: {title:"Aide rapide", text:"Posez votre question comme si vous parliez à la mairie. Exemple : horaires, clôture, déchets, fibre ou agenda."},
+  signal: {title:"Conseil utile", text:"Choisissez une catégorie, ajoutez une photo si besoin, puis envoyez. La description et la position GPS restent facultatives."},
+  contact: {title:"Besoin d'aide ?", text:"Pour une urgence communale, utilisez Signalement. Pour une demande générale, appelez la mairie ou laissez un message."}
 };
 function renderContextHelp(key){
   const el=document.getElementById('ctx-'+key);
@@ -2659,7 +2667,7 @@ function toggleContextHelp(on, save=true){
 }
 
 // ── Init ─────────────────────────────────
-loadAccessibilite(); updateNotifCardStatus(false); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
+loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(false); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
