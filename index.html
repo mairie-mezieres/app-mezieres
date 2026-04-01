@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.5.4 -->
+<!-- VERSION 3.5.6 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
@@ -42,6 +42,48 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.5;color:var(--text);-webkit-text-size-adjust:100%;}
 html{background:var(--warm);}
+
+/* ── Fix iPhone clavier / zoom champs ── */
+input,
+textarea,
+select,
+.minp,
+.form-textarea,
+.idea-input {
+  font-size:16px !important;
+}
+
+html,body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+body,
+.header,
+.content,
+.panel,
+.mel-panel,
+.panel-body,
+.msgs,
+.mbar,
+.grid2,
+.card,
+.top-card,
+.header-bottom-grid,
+.header-tools,
+.ov,
+.mat-modal,
+.actu-item,
+.contact-card,
+.idea-card,
+.idea-form,
+.notif-banner {
+  max-width:100%;
+}
+
+img,svg,canvas,video{max-width:100%;height:auto;}
+
 body{opacity:0;visibility:hidden;transition:opacity .18s ease;}
 body.preload,body.app-ready{opacity:1;visibility:visible;}
 body.preload > :not(#app-splash){visibility:hidden !important;}
@@ -570,7 +612,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.4</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.6</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -1378,7 +1420,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.4 — Mézières Avec Toi
+// MAT v3.5.6 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -2230,7 +2272,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.4'
+    matVersion:'v3.5.6'
   };
 }
 
@@ -2815,6 +2857,42 @@ function toggleContextHelp(on, save=true){
   refreshAllContextHelp();
   if(save) saveAccessibilite();
 }
+
+
+
+// ── Fix iPhone clavier / viewport ─────────────────
+function fixIOSViewportAfterKeyboard(){
+  try{
+    document.documentElement.style.width='100%';
+    document.body.style.width='100%';
+    document.documentElement.style.overflowX='hidden';
+    document.body.style.overflowX='hidden';
+    window.scrollTo(0, window.scrollY || 0);
+  }catch(e){}
+}
+
+document.addEventListener('focusin', function(e){
+  var t=e.target;
+  if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)){
+    fixIOSViewportAfterKeyboard();
+    setTimeout(fixIOSViewportAfterKeyboard, 120);
+    setTimeout(fixIOSViewportAfterKeyboard, 350);
+  }
+});
+
+document.addEventListener('focusout', function(e){
+  var t=e.target;
+  if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)){
+    setTimeout(function(){
+      fixIOSViewportAfterKeyboard();
+      window.scrollTo(0,0);
+    }, 180);
+  }
+});
+
+window.addEventListener('resize', function(){
+  fixIOSViewportAfterKeyboard();
+});
 
 // ── Init ─────────────────────────────────
 loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
