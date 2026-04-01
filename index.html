@@ -550,7 +550,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.2</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.3</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -971,13 +971,11 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
     </div>
     <div class="panel-body">
       <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
-      <div class="notif-banner" id="push-banner" style="margin-top:12px">
+      <div class="notif-banner" id="push-banner" style="margin-top:4px">
         <div class="notif-ico">🔔</div>
         <div class="notif-text">
-          <div class="notif-title">Notifications — Actualités communales</div>
-          <div class="notif-sub" id="push-sub">Activez les notifications pour recevoir les nouvelles publications communales.</div>
         </div>
-        <button class="notif-btn on" id="push-btn" onclick="togglePush()">Activer les notifications</button>
+        <button class="notif-btn on" id="push-btn" onclick="togglePush()">Être alerté</button>
       </div>
     </div>
   </div>
@@ -1340,7 +1338,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.2 — Mézières Avec Toi
+// MAT v3.5.3 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -2157,7 +2155,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.2'
+    matVersion:'v3.5.3'
   };
 }
 
@@ -2237,17 +2235,17 @@ async function checkPushStatus(){
   if(!('serviceWorker' in navigator)||!('PushManager' in window)){updateNotifCardStatus(false); return;}
   try{
     const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
-    const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
-    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';updateNotifCardStatus(true);}
-    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';updateNotifCardStatus(false);}
+    const btn=document.getElementById('push-btn');
+    if(sub){pushRegistered=true;if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}updateNotifCardStatus(true);}
+    else{pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);}
   }catch(e){updateNotifCardStatus(false);}
 }
 async function togglePush(){
-  const btn=document.getElementById('push-btn'),subTxt=document.getElementById('push-sub');
+  const btn=document.getElementById('push-btn');
   if(pushRegistered){
     try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});await sub.unsubscribe();}}catch(e){}
-    if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}
-    if(subTxt)subTxt.textContent='Notifications désactivées.';
+    if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
+    
     updateNotifCardStatus(false);
     pushRegistered=false; return;
   }
@@ -2259,8 +2257,8 @@ async function togglePush(){
       const reg=await navigator.serviceWorker.ready;
       const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
       await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-      if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
-      if(subTxt)subTxt.textContent='Notifications actives.';
+      if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
+      
       updateNotifCardStatus(true);
       pushRegistered=true;
       alert('✅ Notifications activées !');
