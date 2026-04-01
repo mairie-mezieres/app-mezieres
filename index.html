@@ -2363,7 +2363,58 @@ function resetAccessibilite() {
 }
 
 
-// ── Date du jour dans le header ───────
+// ── Date du jour + saint dans le header ──
+const SAINTS = [
+  // Janvier
+  ['Marie','Basile','Geneviève','Odilon','Édouard','Melchior','Raymond','Lucien','Alix','Guillaume',
+   'Paulin','Tatiana','Yvette','Nina','Rémi','Marcel','Roseline','Prisca','Marius','Sébastien',
+   'Agnès','Vincent','Barnard','François','Conv.Paul','Timothée','Angèle','Thomas d'Aquin','Gildas','Martine','Marcelle'],
+  // Février
+  ['Ella','Présentation','Blaise','Véronique','Agathe','Gaston','Eugénie','Jacqueline','Apolline','Arnaud',
+   'N.-D.Lourdes','Félix','Béatrice','Valentin','Claude','Julienne','Alexis','Bernadette','Gabin','Aimée',
+   'Damien','Isabelle','Lazare','Modeste','Roméo','Nestor','Honorine','Romain','Auguste','--','--'],
+  // Mars
+  ['Aubin','Charles','Guénolé','Casimir','Olive','Colette','Félicité','Jean de Dieu','Françoise','Vivien',
+   'Rosine','Justine','Rodrigue','Mathilde','Louise','Bénédicte','Patrick','Cyrille','Joseph','Herbert',
+   'Clémence','Léa','Victorien','Cath.de Suède','Annonciation','Larissa','Habib','Gontran','Gwladys','Amédée','Benjamin'],
+  // Avril
+  ['Hugues','Sandrine','Richard','Isidore','Irène','Marcellin','J.-B.de la Salle','Julie','Gautier','Fulbert',
+   'Stanislas','Jules','Ida','Maxime','Paterne','Benoît-Joseph','Anicet','Parfait','Emma','Odette',
+   'Anselme','Alexandre','Georges','Fidèle','Marc','Alida','Zita','Valérie','Catherine','Robert','--'],
+  // Mai
+  ['Fête du Travail','Boris','Phil.&Jacques','Sylvain','Judith','Prudence','Gisèle','Victoire','Pacôme','Isidore',
+   'Estelle','Achille','Rolande','Matthias','Denise','Honoré','Pascal','Éric','Yves','Bernardin',
+   'Constantin','Rita','Didier','Donatien','Sophie','Bérenger','Augustin','Germain','Aymar','Ferdinand','Pétronille'],
+  // Juin
+  ['Justin','Blandine','Kévin','Clotilde','Igor','Norbert','Gilbert','Médard','Diane','Landry',
+   'Barnabé','Guy','Antoine','Élisée','Germaine','J.-F.Régis','Hervé','Léonce','Romuald','Silvère',
+   'Rodolphe','Alban','Audrey','Jean-Baptiste','Prosper','Anthelme','Fernand','Irénée','Pierre&Paul','Martial','--'],
+  // Juillet
+  ['Thierry','Martinien','Thomas','Florent','Antoine','Mariette','Raoul','Thibaut','Amandine','Ulrich',
+   'Benoît','Olivier','Henri','Camille','Bonaventure','N.-D.Carmel','Charlotte','Frédéric','Arsène','Marina',
+   'Victor','Marie-Madeleine','Brigitte','Christine','Jacques','Anne','Nathalie','Samson','Marthe','Juliette','Ignace'],
+  // Août
+  ['Alphonse','Julien Eymard','Lydie','Jean-Marie Vianney','Abel','Transfiguration','Gaétan','Dominique','Amour','Laurent',
+   'Claire','Clarisse','Hippolyte','Evrard','Assomption','Armel','Hyacinthe','Hélène','Jean-Claude','Bernard',
+   'Christophe','Fabrice','Rose','Barthélemy','Louis','Natacha','Monique','Augustin','Sabine','Fiacre','Aristide'],
+  // Septembre
+  ['Gilles','Ingrid','Grégoire','Rosalie','Raïssa','Bertrand','Reine','Nativité','Alain','Inès',
+   'Adelphe','Apollinaire','Aimé','La Sainte-Croix','Roland','Édith','Lambert','Nadège','Émilie','Davy',
+   'Matthieu','Maurice','Constance','Thècle','Hermann','Côme&Damien','Vinc.de Paul','Venceslas','Michel','Jérôme','--'],
+  // Octobre
+  ['Thérèse','Léger','Gérard','François','Fleur','Bruno','Serge','Pélagie','Denis','Ghislain',
+   'Firmin','Wilfrid','Géraud','Juste','Thérèse d'Avila','Edwige','Baudouin','Luc','René','Adeline',
+   'Céline','Élodie','Jean de Capistran','Florentin','Crépin','Dimitri','Émeline','Simon&Jude','Narcisse','Bienvenu','Quentin'],
+  // Novembre
+  ['Toussaint','Défunts','Hubert','Charles','Sylvie','Bertille','Carine','Geoffrey','Théodore','Léon',
+   'Martin','Christian','Brice','Sidoine','Albert','Marguerite','Élisabeth','Aude','Tanguy','Edmond',
+   'Prés.Marie','Cécile','Clément','Flora','Catherine','Delphine','Sévrin','Jacques','Saturnin','André','--'],
+  // Décembre
+  ['Florence','Viviane','François-Xavier','Barbara','Gérald','Nicolas','Ambroise','Immac.Conception','Pierre Fourier','Romaric',
+   'Daniel','Jeanne de Chantal','Lucie','Odile','Ninon','Alice','Gaël','Gatien','Urbain','Abraham',
+   'Pierre Canisius','Françoise-Xavière','Armand','Adèle','Noël','Étienne','Jean','Innocents','David','Roger','Sylvestre']
+];
+
 function loadDateBadge() {
   const el = document.getElementById('mat-date-badge');
   if (!el) return;
@@ -2372,10 +2423,11 @@ function loadDateBadge() {
   const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const j = JOURS[now.getDay()];
   const d = now.getDate();
-  const m = MOIS[now.getMonth()];
-  // Suffixe ordinal : 1er, 2, 3...
+  const m = now.getMonth();
   const suf = d === 1 ? 'er' : '';
-  el.textContent = j + ' ' + d + suf + ' ' + m;
+  const saint = (SAINTS[m] && SAINTS[m][d-1] && SAINTS[m][d-1] !== '--') ? SAINTS[m][d-1] : null;
+  el.innerHTML = j + ' ' + d + suf + ' ' + MOIS[m]
+    + (saint ? '<br><span style="font-style:italic;font-weight:400;font-size:0.52rem;opacity:0.8">Ste/St ' + saint + '</span>' : '');
 }
 
 // ── Init ─────────────────────────────────
