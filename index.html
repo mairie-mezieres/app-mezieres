@@ -585,6 +585,19 @@ html.theme-sombre .mat-modal-card{background:#1e293b;border-color:#374151;}
 html.theme-sombre .mat-modal-text{color:#e2e8f0;}
 html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 
+
+/* ── Trombinoscope ── */
+.trombi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:4px;}
+.trombi-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.trombi-photo-wrap{position:relative;width:100%;padding-bottom:100%;border-radius:14px;overflow:hidden;background:var(--mist);box-shadow:0 3px 10px rgba(0,0,0,0.12);transition:transform 0.18s ease,box-shadow 0.18s ease;}
+.trombi-item:active .trombi-photo-wrap{transform:scale(0.93);}
+.trombi-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;}
+.trombi-badge{position:absolute;bottom:0;left:0;right:0;padding:4px 5px;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);font-size:0.48rem;font-weight:900;color:white;text-align:center;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
+.trombi-badge.is-adjoint{background:linear-gradient(to top,rgba(26,61,43,0.85),transparent);}
+.trombi-badge.is-maire{background:linear-gradient(135deg,rgba(180,130,0,0.9),rgba(26,61,43,0.85));}
+.trombi-name{font-size:0.6rem;font-weight:800;color:var(--text);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
+html.theme-sombre .trombi-name{color:#f1f5f9;}
+html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 </style>
 </head>
 
@@ -659,7 +672,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
   <!-- Bouton accessibilité positionné en bas à droite du header -->
 
   <div class="header-tools">
-    <button class="header-tool-btn urgent" onclick="openNums()">📢 Numéros urgence</button>
+    <button class="header-tool-btn urgent" onclick="openNums()">🚨 Numéros urgence</button>
     <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
   </div>
 </div>
@@ -674,7 +687,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
       <div class="ct"><div class="ct-label">MEL</div><div class="ct-sub">Assistante IA</div></div>
     </button>
     <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
-      <div class="ico ico-site">🏛️</div>
+      <div class="ico ico-site">🌐</div>
       <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">Commune</div></div>
     </a>
   </div>
@@ -1278,22 +1291,29 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
       <button class="panel-close" onclick="closeOv('conseil')">✕</button>
     </div>
     <div class="panel-body">
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--mist);border-radius:10px">👆 Cliquez sur une photo pour voir le détail</div>
+      <div class="trombi-grid" id="trombi-grid"></div>
+    </div>
+  </div>
+</div>
 
-      <p style="font-size:0.74rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
-        Le conseil municipal de Mézières-lez-Cléry est composé d'élus bénévoles au service des habitants. Contactez-les via la mairie.
-      </p>
-
-
-
-      <!-- Adjoints & conseillers -->
-      <div style="background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
-        <div style="padding:10px 14px;background:var(--mist);font-size:0.7rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.08em">Adjoints au maire & conseillers délégués</div>
-        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">
-            Les membres du conseil municipal et leurs délégations sont disponibles sur le site officiel de la commune.
-          </div>
-          <a href="https://mezieres-lez-clery.fr/2018/11/04/le-conseil-municipal/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--mist);color:var(--leaf);border-radius:10px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;align-self:flex-start">🌐 Voir le conseil municipal →</a>
-        </div>
+<!-- ═══ MODALE TROMBI ═══ -->
+<div id="trombi-modal" style="display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px" onclick="closeTrombi(event)">
+  <div id="trombi-card" style="background:var(--warm);border-radius:24px;overflow:hidden;width:min(100%,340px);box-shadow:0 24px 60px rgba(0,0,0,0.4);position:relative;transform:scale(0.8);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease">
+    <div id="trombi-img-wrap" style="position:relative;height:220px;overflow:hidden;background:var(--mist)">
+      <img id="trombi-big-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;object-position:top;filter:brightness(0.92)">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.6) 100%)"></div>
+      <div id="trombi-role-badge" style="position:absolute;top:12px;left:12px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;font-size:0.6rem;font-weight:900;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.08em"></div>
+      <button onclick="closeTrombiBtn()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:16px 18px 20px">
+      <div id="trombi-nom" style="font-size:1rem;font-weight:900;color:var(--forest);margin-bottom:2px"></div>
+      <div id="trombi-pole" style="font-size:0.68rem;font-weight:700;color:var(--leaf);margin-bottom:10px"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">🎂</span><span id="trombi-age"></span></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">💼</span><span id="trombi-prof"></span></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">🗳️</span><span id="trombi-mandats"></span></div>
+        <div id="trombi-hameau-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">📍</span><span id="trombi-hameau"></span></div>
       </div>
     </div>
   </div>
@@ -1528,6 +1548,7 @@ window.addEventListener('popstate', function(){
 history.pushState({mat:'overlay'}, '');
 
 function openMajordome(){ openOv('majordome'); }
+function openConseil(){ openOv('conseil'); buildTrombi(); }
 function openMel(){openOv('mel'); renderContextHelp('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
 function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
@@ -1681,7 +1702,17 @@ async function sendMel(){
   melBusy=false;
 }
 const MEL_THEME_SUGGESTIONS = {
-  urbanisme: ["Faut-il une déclaration préalable pour une clôture ?","Ai-je besoin d'un permis pour une extension ?","Comment consulter le PLU de la commune ?","Quelles règles pour un abri de jardin ?"],
+  urbanisme: [
+    "Faut-il une déclaration préalable pour une clôture ?",
+    "Ai-je besoin d'un permis pour une extension ?",
+    "Comment trouver ma zone PLU sur le Géoportail ?",
+    "Quelles règles pour un abri de jardin en zone Ub ?",
+    "Quelle hauteur maximale pour construire en zone Ua ?",
+    "Puis-je construire une piscine sans permis ?",
+    "Quelles règles pour une véranda ou une terrasse ?",
+    "Qu'est-ce que la zone A agricole ?",
+    "Quelles sont les zones constructibles à Mézières ?",
+  ],
   enfance:   ["Comment fonctionne la cantine ?","Quels sont les services périscolaires ?","Comment s'inscrire au centre de loisirs ?","Quelles infos sur la crèche familiale ?"],
   demarches: ["Comment demander un acte de naissance ?","Où faire une carte d'identité ?","Comment obtenir un passeport ?","Quelles démarches pour un mariage ?"],
   fibre:     ["Suis-je éligible à la fibre ?","Qui contacter pour le raccordement fibre ?","Que faire si la fibre n'est pas disponible ?","Où trouver les infos numériques utiles ?"],
@@ -1701,8 +1732,13 @@ function showMelThemeQuestions(theme){
   const sugs = document.getElementById('sugs');
   const qs = MEL_THEME_SUGGESTIONS[theme] || [];
   if(!sugs) return;
+  let extra = '';
+  if(theme === 'urbanisme'){
+    extra = '<a class="sug" href="https://www.geoportail-urbanisme.gouv.fr/map/#tile=1&lon=1.8048256197128292&lat=47.81814028325263&zoom=15&mlon=1.805022&mlat=47.818434" target="_blank" style="text-decoration:none">🗺️ Voir le PLU sur Géoportail →</a>';
+  }
   sugs.innerHTML = '<button class="sug" onclick="renderMelThemes()">← Thèmes</button>'
-    + qs.map(q => '<button class="sug" onclick="askMelSuggestedQuestion(this)">'+q+'</button>').join('');
+    + qs.map(q => '<button class="sug" onclick="askMelSuggestedQuestion(this)">'+q+'</button>').join('')
+    + extra;
 }
 function askMelSuggestedQuestion(btn){
   document.getElementById('minp').value = btn.textContent.trim();
@@ -2351,12 +2387,10 @@ async function loadActus(){
     if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
-      const texteRaw=(a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const lignes=texteRaw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
-      const titre=esc(lignes[0]||'');
-      const corps=lignes.slice(1).join('\n').trim();
-      const corpsHTML=corps?`<div class="actu-text">${esc(corps)}</div>`:'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${corpsHTML}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+      const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
+      const titre=esc(texte.length>80?texte.substring(0,80)+'...':texte);
+      const texteComplet=texte.length>80?esc(texte):'';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
     markActusAsSeen(d.actus||[]);
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
@@ -2610,7 +2644,7 @@ async function ttsRead(text, label) {
 
 // ── Numéros utiles ────────────────────
 function openNums(){ openOv('nums'); }
-function openConseil(){ openOv('conseil'); }
+// openConseil défini plus haut
 
 // ── Thèmes de personnalisation ────────
 function setTheme(theme) {
@@ -2728,6 +2762,90 @@ function toggleSimplified(on, save=true) {
   if (save) saveAccessibilite();
 }
 
+
+
+// ── Trombinoscope ─────────────────────────────────────
+const ELUS = [
+  {nom:"Romuald GENTY",age:43,prof:"Officier Sapeur-Pompier Professionnel",mandats:"2 Mandats",hameau:"Le Bourg",role:"Maire",pole:"Pôle Finances",img:"Romuald GENTY 43 ans - 2 Mandats - Officier Sapeur-Pompier Professionnel - Le Bourg.jpg"},
+  {nom:"Sandra BARET",age:50,prof:"Directrice d'établissements sociaux et médico-sociaux",mandats:"2 Mandats",hameau:"Manthelon",role:"1ère adjointe",pole:"Pôle Social et Environnement",img:"Sandra BARET 50 ans - 2 Mandats - Directrice d'établissements sociaux et m\u00e9dico sociaux - Manthelon.jpg"},
+  {nom:"Damien BOUGRÉ",age:49,prof:"Chef de service Jeunesse, Réussite et Parentalité",mandats:"2 Mandats",hameau:"Mézières",role:"2ème adjoint",pole:"Pôle Vie Scolaire",img:"Damien BOUGR\u00c9 49 ans - 2 Mandats - Chef de service Jeunesse, R\u00e9ussite et Parentalit\u00e9\u201a - M\u00e9zi\u00e8res.jpg"},
+  {nom:"Stéphanie GREUIN",age:43,prof:"Hypnothérapeute",mandats:"2 Mandats",hameau:"",role:"3ème adjointe",pole:"Pôle Relation Entreprise",img:"St\u00e9phanie GREUIN-Hypnoth\u00e9ratpeute-43-2 Mandats.jpg"},
+  {nom:"Stéphane MAROIS",age:55,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"La Grange",role:"4ème adjoint",pole:"Pôle Voirie et Sécurité",img:"St\u00e9phane MAROIS 55 ans - 3 Mandats - Officier Sapeur-Pompier Professionnel - La grange.jpg"},
+  {nom:"Fabrice AUFFRET",age:47,prof:"Responsable Informatique",mandats:"3 Mandats",hameau:"Le Bourg",role:"Conseiller municipal",pole:"",img:"Fabrice AUFFRET 47 ans - 3 Mandats - Responsable Informatique - Le Bourg.jpg"},
+  {nom:"Katia COURTOIS",age:53,prof:"Greffier",mandats:"3 Mandats",hameau:"Manthelon",role:"Conseillère municipale",pole:"",img:"Katia COURTOIS 53 ans - 3 Mandats - Greffier - Manthelon.jpg"},
+  {nom:"Christophe DESCHAMPS",age:59,prof:"Agent de maîtrise",mandats:"5 Mandats",hameau:"Rolland",role:"Conseiller municipal",pole:"",img:"Christophe DESCHAMPS 59 ans - 5 Mandats - Agent de ma\u00eetrise - Rolland.jpg"},
+  {nom:"Amandine BUREAU",age:42,prof:"Vigneronne",mandats:"1 Mandat",hameau:"Le Buisson",role:"Conseillère municipale",pole:"",img:"Amandine BUREAU 42 ans - Vigneronne - 1 Mandat - Le Buisson.jpg"},
+  {nom:"Bruno MAILLARY",age:65,prof:"Retraité",mandats:"2 Mandats",hameau:"Rolland",role:"Conseiller municipal",pole:"",img:"Bruno MAILLARY 65 ans - 2 Mandat - Retrait\u00e9 - Rolland.jpg"},
+  {nom:"Caroline BAILLIOT-LEROY",age:46,prof:"Assistante de direction, Secteur Assurance",mandats:"1 Mandat",hameau:"",role:"Conseillère municipale",pole:"",img:"Caroline BAILLIOT-LEROY - 46 ans - 1 Mandat - Assistante de direction Secteur Assurance Nuisance.jpg"},
+  {nom:"Elodie FRANCOIS",age:39,prof:"Ingénieur Paysage et Environnement",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"Elodie FRANCOIS 39 ans - Ing\u00e9nieur Paysage et Environnement - 1 Mandat - Le Br\u00e9au.jpg"},
+  {nom:"Léane FARINA-JAVOY",age:24,prof:"Exploitante Agricole",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"L\u00e9ane FARINA-JAVOY 24 ans - Exploitante Agricole - 1 Mandat - Le Br\u00e9au.jpg"},
+  {nom:"Romain LOTHE",age:37,prof:"Chef d'équipe Gros Œuvre",mandats:"1 Mandat",hameau:"Manthelon",role:"Conseiller municipal",pole:"",img:"Romain LOTHE 37 ans - Chef d'\u00e9quipe Gros Ouvre - 1 Mandat - Manthelon.jpg"},
+  {nom:"Sarah MARECHAL",age:49,prof:"Officiante de cérémonie laïque",mandats:"2 Mandats",hameau:"Rolland",role:"Conseillère municipale",pole:"",img:"Sarah MARECHAL 49 ans - 2 Mandats - Officiante de c\u00e9r\u00e9monie la\u00efque - Rolland.jpg"},
+];
+
+function buildTrombi(){
+  const grid = document.getElementById('trombi-grid');
+  if(!grid) return;
+  grid.innerHTML = ELUS.map((e,i) => {
+    const isMaire = e.role === 'Maire';
+    const isAdjoint = e.role.includes('adjoint');
+    const badgeClass = isMaire ? 'trombi-badge is-maire' : isAdjoint ? 'trombi-badge is-adjoint' : 'trombi-badge';
+    const badgeLabel = isMaire ? '⭐ Maire' : isAdjoint ? e.role : 'Conseiller·e';
+    const prenomNom = e.nom.split(' ');
+    const prenom = prenomNom[0];
+    const nomCourt = prenomNom.slice(1).join(' ');
+    return `<div class="trombi-item" onclick="openTrombi(${i})" role="button" tabindex="0">
+      <div class="trombi-photo-wrap">
+        <img class="trombi-photo" src="${encodeURIComponent(e.img).replace(/%20/g,' ')}" alt="${e.nom}" onerror="this.onerror=null;this.src='mat-header.png'">
+        <div class="${badgeClass}">${badgeLabel}</div>
+      </div>
+      <div class="trombi-name" title="${e.nom}">${prenom}<br><span style="font-weight:700;color:var(--muted)">${nomCourt}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function openTrombi(idx){
+  const e = ELUS[idx];
+  const modal = document.getElementById('trombi-modal');
+  const card = document.getElementById('trombi-card');
+  document.getElementById('trombi-big-img').src = e.img;
+  document.getElementById('trombi-nom').textContent = e.nom;
+  document.getElementById('trombi-role-badge').textContent = e.role;
+  document.getElementById('trombi-pole').textContent = e.pole ? '🏷️ ' + e.pole : '';
+  document.getElementById('trombi-age').textContent = e.age + ' ans';
+  document.getElementById('trombi-prof').textContent = e.prof;
+  document.getElementById('trombi-mandats').textContent = e.mandats;
+  const hWrap = document.getElementById('trombi-hameau-wrap');
+  if(e.hameau){ document.getElementById('trombi-hameau').textContent = e.hameau; hWrap.style.display='flex'; }
+  else { hWrap.style.display='none'; }
+  modal.style.display='flex';
+  // Animation wahou : spring scale + shimmer
+  card.style.transform='scale(0.7) rotate(-2deg)';
+  card.style.opacity='0';
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      card.style.transform='scale(1) rotate(0deg)';
+      card.style.opacity='1';
+    });
+  });
+  // Shimmer sur l'image
+  const img = document.getElementById('trombi-big-img');
+  img.style.filter='brightness(1.15) saturate(1.3)';
+  setTimeout(()=>{ img.style.transition='filter 0.6s ease'; img.style.filter='brightness(0.92) saturate(1)'; },200);
+}
+
+function closeTrombi(e){
+  if(e.target === document.getElementById('trombi-modal')) closeTrombiBtn();
+}
+function closeTrombiBtn(){
+  const card = document.getElementById('trombi-card');
+  card.style.transform='scale(0.8)';
+  card.style.opacity='0';
+  setTimeout(()=>{ document.getElementById('trombi-modal').style.display='none'; },250);
+}
+
+// Init trombi au chargement
+document.addEventListener('DOMContentLoaded', buildTrombi);
 
 function openAccessibilite() {
   openOv('accessibilite');
