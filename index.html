@@ -153,7 +153,7 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .photo-preview{width:100%;height:150px;object-fit:cover;border-radius:12px;display:none;}
 .submit-btn{width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:14px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;cursor:pointer;margin-top:6px;}
 .submit-btn:active{opacity:0.9;}
-.success-msg{text-alignRcenter;padding:20px;display:none;}
+.success-msg{text-align:center;padding:20px;display:none;}
 .success-msg .s-ico{font-size:2.5rem;margin-bottom:8px;}
 .success-msg .s-title{font-size:1rem;font-weight:800;color:var(--leaf);}
 .success-msg .s-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
@@ -315,7 +315,7 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Bouton accessibilité dans le header */
-.acc-btn{background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 16px;color:white;font-size:0.78rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:6px;position:absolute;right:16px;bottom:16px;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
+.acc-btn{background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:8px 14px;color:white;font-size:0.74rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:6px;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-family:'Nunito',sans-serif;}
 .acc-btn:hover{background:rgba(255,255,255,0.28);}
 .acc-btn:active{transform:scale(0.95);}
 
@@ -348,6 +348,9 @@ html.mode-simple .card.simple-keep{display:flex!important}
 .ctx-bar-ico{font-size:1.1rem;flex-shrink:0}
 .ctx-bar-close{margin-left:auto;background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted,#6b8c6b);padding:0 4px;flex-shrink:0}
 @keyframes ctxFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:8px;}
+.header-actions .urgent-btn{background:rgba(220,38,38,0.9);border:2px solid rgba(255,255,255,0.25);border-radius:12px;padding:8px 13px;color:white;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(220,38,38,0.35);}
+.header-actions .urgent-btn:active{transform:scale(0.95);}
 </style>
 </head>
 <body>
@@ -411,8 +414,8 @@ html.mode-simple .card.simple-keep{display:flex!important}
     </div>
   </div>
   <!-- Bouton accessibilité positionné en bas à droite du header -->
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:6px;">
-    <button onclick="openNums()" style="background:rgba(220,38,38,0.85);border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:7px 13px;color:white;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 8px rgba(220,38,38,0.4);">🚨 Urgences</button>
+  <div class="header-actions">
+    <button class="urgent-btn" onclick="openNums()">🚨 Urgences</button>
     <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
   </div>
 </div>
@@ -558,6 +561,28 @@ html.mode-simple .card.simple-keep{display:flex!important}
 
       <div class="acc-option">
         <div>
+          <div class="acc-option-label">🎨 Mode daltonien</div>
+          <div class="acc-option-sub">Palette plus lisible, moins dépendante du rouge et du vert</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-daltonien-toggle" onchange="toggleDaltonien(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🧭 Mode simplifié</div>
+          <div class="acc-option-sub">Affiche seulement 5 accès essentiels : MEL, signalement, contact, agenda et urgences</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-simple-toggle" onchange="toggleModeSimple(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
           <div class="acc-option-label">🔊 Lecture vocale</div>
           <div class="acc-option-sub">Lit les actualités et réponses MEL à voix haute</div>
         </div>
@@ -646,6 +671,7 @@ html.mode-simple .card.simple-keep{display:flex!important}
     </div>
     <div class="panel-body">
       <div id="signal-form">
+        <div id="signal-ctx-zone"></div>
         <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
         <div class="form-group">
           <label class="form-label">Catégorie</label>
@@ -784,6 +810,8 @@ html.mode-simple .card.simple-keep{display:flex!important}
         Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre demande directement à la mairie.
       </div>
 
+      <div id="contact-ctx-zone"></div>
+
       <div id="contact-form">
         <div class="form-group">
           <label class="form-label">Votre nom ou prénom</label>
@@ -818,7 +846,7 @@ html.mode-simple .card.simple-keep{display:flex!important}
       <div class="panel-title">Agenda</div>
       <button class="panel-close" onclick="closeOv('agenda')">✕</button>
     </div>
-    <div class="panel-body">
+    <div class="panel-body" id="agenda-panel-body">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
         <button onclick="agendaNavMonth(-1)" style="background:var(--forest);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;">← Préc.</button>
         <div id="agenda-month-label" style="font-size:0.9rem;font-weight:900;color:var(--forest);text-align:center;text-transform:capitalize;flex:1"></div>
@@ -1128,12 +1156,12 @@ history.pushState({mat:'overlay'}, '');
 
 function openMajordome(){ openOv('majordome'); }
 function openMel(){openOv('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
-function openSignal(){openOv('signal');}
+function openSignal(){openOv('signal'); setTimeout(ctxSignal,300);}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
-function openContact(){openOv('contact');}
+function openContact(){openOv('contact'); setTimeout(ctxContact,300);}
 function openAgenda(){
   openOv('agenda');
   _agendaYear=new Date().getFullYear();
@@ -1997,8 +2025,8 @@ function urlBase64ToUint8Array(b64){
 }
 
 
-function toggleDaltonien(on){document.documentElement.classList.toggle('daltonien',on);saveAccessibilite();}
-function toggleModeSimple(on){document.documentElement.classList.toggle('mode-simple',on);saveAccessibilite();}
+function toggleDaltonien(on, save=true){document.documentElement.classList.toggle('daltonien',on);const el=document.getElementById('acc-daltonien-toggle'); if(el) el.checked=on; if(save) saveAccessibilite();}
+function toggleModeSimple(on, save=true){document.documentElement.classList.toggle('mode-simple',on);const el=document.getElementById('acc-simple-toggle'); if(el) el.checked=on; if(save) saveAccessibilite();}
 
 // ══ AIDE CONTEXTUELLE ════════════════════════════
 const CTX={
@@ -2025,10 +2053,10 @@ const CTX={
   timer(fn,d){const t=setTimeout(fn,d);this._timers.push(t);return t;},
   clearTimers(){this._timers.forEach(clearTimeout);this._timers=[];}
 };
-function ctxSignal(){CTX.clearTimers();CTX.timer(()=>{const cat=document.querySelector('.cat-btn.on'),desc=document.getElementById('signal-desc');if(!cat&&(!desc||!desc.value.trim()))CTX.injectAfter('#signal-cats','signal-idle','💡','Choisissez une catégorie, puis décrivez le problème.');},10000);}
+function ctxSignal(){CTX.clearTimers();CTX.injectIn('signal-ctx-zone','signal-start','💡','Choisissez une catégorie puis envoyez, même sans photo ni GPS.');CTX.timer(()=>{const cat=document.querySelector('.cat-btn.on'),desc=document.getElementById('signal-desc');if(!cat&&(!desc||!desc.value.trim()))CTX.injectAfter('#signal-cats','signal-idle','🛠️','Exemple : nid-de-poule = Voirie, lampadaire = Éclairage.');},10000);}
 function ctxMel(t){if(t&&t.split(' ').length<=2)CTX.injectAfter('.mel-panel .minp','mel-vague','🤔','Je peux vous aider sur : horaires, bus, déchets, urbanisme, événements…');}
-function ctxAgenda(has){CTX.clearTimers();if(!has)CTX.timer(()=>CTX.injectIn('agenda-panel-body','agenda-empty','🔔','Aucun événement. Activez les notifications pour ne rien rater !'),1500);}
-function ctxContact(){CTX.clearTimers();CTX.timer(()=>{const n=document.getElementById('contact-name');if(n&&!n.value.trim())CTX.injectAfter('#contact-name','contact-anon','👤','Vous pouvez rester anonyme.');},8000);}
+function ctxAgenda(has){CTX.clearTimers();if(!has)CTX.timer(()=>CTX.injectIn('agenda-panel-body','agenda-empty','🔔','Aucun événement ce mois-ci. Vous pouvez activer les notifications pour être prévenu.'),1500);}
+function ctxContact(){CTX.clearTimers();CTX.injectIn('contact-ctx-zone','contact-start','👤','Votre nom et votre coordonnée sont facultatifs, sauf si vous souhaitez une réponse.');CTX.timer(()=>{const n=document.getElementById('contact-name');if(n&&!n.value.trim())CTX.injectAfter('#contact-name','contact-anon','✉️','Vous pouvez envoyer un message anonyme, mais sans coordonnée la mairie ne pourra pas vous répondre.');},8000);}
 if(typeof openOv==='function'){
   window._openOvOrig=openOv;
   window.openOv=function(id){window._openOvOrig(id);CTX.clearTimers();CTX.hide();if(id==='signal')setTimeout(ctxSignal,500);if(id==='contact')setTimeout(ctxContact,500);};
@@ -2129,6 +2157,8 @@ function loadAccessibilite() {
     if (saved.contrast)  applyContrast(true, false);
     if (saved.touch)     applyTouch(true, false);
     if (saved.spacing)   applySpacing(true, false);
+    if (saved.daltonien) toggleDaltonien(true, false);
+    if (saved.simple)    toggleModeSimple(true, false);
     if (saved.tts)       { _ttsEnabled = true; }
   } catch(e) {}
 }
@@ -2140,6 +2170,8 @@ function saveAccessibilite() {
     contrast: html.classList.contains('high-contrast'),
     touch:    html.classList.contains('large-touch'),
     spacing:  html.classList.contains('line-spacing'),
+    daltonien: html.classList.contains('daltonien'),
+    simple: html.classList.contains('mode-simple'),
     tts:      _ttsEnabled,
   }));
 }
@@ -2194,9 +2226,13 @@ function openAccessibilite() {
   const ct = document.getElementById('acc-contrast-toggle');
   const tt = document.getElementById('acc-touch-toggle');
   const st = document.getElementById('acc-spacing-toggle');
+  const dt = document.getElementById('acc-daltonien-toggle');
+  const sm = document.getElementById('acc-simple-toggle');
   if (ct) ct.checked = html.classList.contains('high-contrast');
   if (tt) tt.checked = html.classList.contains('large-touch');
   if (st) st.checked = html.classList.contains('line-spacing');
+  if (dt) dt.checked = html.classList.contains('daltonien');
+  if (sm) sm.checked = html.classList.contains('mode-simple');
   const ttsEl = document.getElementById('acc-tts-toggle');
   if (ttsEl) ttsEl.checked = _ttsEnabled;
 }
@@ -2206,6 +2242,8 @@ function resetAccessibilite() {
   applyContrast(false, false);
   applyTouch(false, false);
   applySpacing(false, false);
+  toggleDaltonien(false, false);
+  toggleModeSimple(false, false);
   _ttsEnabled = false;
   ttsStop();
   localStorage.removeItem(ACC_KEY);
@@ -2223,12 +2261,13 @@ function loadDateBadge(){
 }
 
 // ── Init ─────────────────────────────────
+document.addEventListener('input', function(e){ if(e.target&&e.target.id==='minp') ctxMel(e.target.value.trim()); });
 loadAccessibilite(); loadMeteo(); loadDateBadge(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-  navigator.serviceWorker.adEventListener('updatefound', () => {
+  navigator.serviceWorker.addEventListener('updatefound', () => {
     const newWorker = navigator.serviceWorker.installing;
     if (newWorker) {
       newWorker.addEventListener('statechange', () => {
