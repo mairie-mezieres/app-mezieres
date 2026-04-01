@@ -407,7 +407,8 @@ function renderServiceBadges(services) {
 // ── IA & COÛTS ────────────────────────
 let iaView = 'daily';
 function renderIa() {
-  const { dash, iaCategories = {} } = _data;
+  const { dash } = _data;
+  const iaCategories = dash.iaCategories || {};
   const ia = dash.ia || {};
   const daily   = ia.daily   || {};
   const monthly = ia.monthly || {};
