@@ -939,7 +939,7 @@ html.mode-simple .card.simple-keep{display:flex!important}
           <strong>Mairie de Mézières-lez-Cléry</strong><br>
           36 rue du bourg — 45370<br>
           📞 02 38 45 61 76<br>
-          ✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="026f636b706b67426f67786b677067712f6e67782f616e67707b2c6470">[email&#160;protected]</a>
+          ✉️ <a id="mairie-mail-link" href="#" onclick="var e=atob('bWFpcmllQG1lemllcmVzLWxlei1jbGVyeS5mcg==');this.href='mailto:'+e;this.textContent=e;return true;">Voir l'adresse email</a>
         </div>
       </div>
     </div>
@@ -1056,7 +1056,7 @@ html.mode-simple .card.simple-keep{display:flex!important}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════
 // MAT v3.4 — Mézières Avec Toi
 // ════════════════════════════════════════
@@ -2006,7 +2006,7 @@ const CTX={
   show(id,ico,msg){
     if(this._dismissed.has(id))return null;
     const b=document.createElement('div');b.className='ctx-bar';b.id='ctx-'+id;
-    b.innerHTML='<span class="ctx-bar-ico">'+ico+'</span><span>'+msg+'</span><button class="ctx-bar-close" onclick="CTX.dismiss(''+id+'')">✕</button>';
+    b.innerHTML='<span class="ctx-bar-ico">'+ico+'</span><span>'+msg+'</span><button class="ctx-bar-close" data-cid="'+id+'" onclick="CTX.dismiss(this.dataset.cid)">✕</button>';
     return b;
   },
   injectAfter(sel,id,ico,msg){
