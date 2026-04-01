@@ -84,6 +84,8 @@ html,body{min-height:100%;background:var(--warm);font-family:'Nunito',sans-serif
 .ct{flex:1;min-width:0;}
 .ct-label{font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
 .ct-sub{font-size:0.62rem;color:var(--muted);font-weight:600;margin-top:1px;}
+.notif-status-on{color:#15803d !important;font-weight:900 !important;}
+.notif-status-off{color:#b91c1c !important;font-weight:900 !important;}
 .arr{color:#ccc;font-size:1rem;flex-shrink:0;}
 
 /* Couleurs icônes */
@@ -320,7 +322,7 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 .acc-btn{position:static;margin-left:auto;}
 .header-tool-btn:hover,.acc-btn:hover{background:rgba(255,255,255,0.26);}
 .header-tool-btn:active,.acc-btn:active{transform:scale(0.98);}
-@media (max-width:380px){.header-tools{flex-direction:column;align-items:stretch}.acc-btn,.header-tool-btn{justify-content:center;width:100%;margin-left:0;}}
+@media (max-width:380px){.header-tool-btn,.acc-btn{font-size:0.66rem;padding:8px 10px;gap:4px;}}
 
 /* Mode daltonien */
 html.colorblind-mode{
@@ -529,7 +531,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
   <!-- Bouton accessibilité positionné en bas à droite du header -->
 
   <div class="header-tools">
-    <button class="header-tool-btn" onclick="openNums()">📞 Numéros utiles</button>
+    <button class="header-tool-btn" onclick="openNums()">📞 Numéros urgence</button>
     <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
   </div>
 </div>
@@ -1145,7 +1147,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:rgba(255,255,255,0.2)">📞</div>
-      <div class="panel-title">Numéros utiles</div>
+      <div class="panel-title">Numéros urgence</div>
       <button class="panel-close" onclick="closeOv('nums')">✕</button>
     </div>
     <div class="panel-body">
@@ -1268,7 +1270,7 @@ html.simplified-mode .content .simple-title{display:block !important;font-size:0
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ════════════════════════════════════════
 // MAT v3.5 — Mézières Avec Toi
 // ════════════════════════════════════════
@@ -1539,7 +1541,7 @@ async function loadMeteo() {
     document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+temp+'°C</strong>';
     document.getElementById('meteo-desc').textContent = (METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h';
     const badge = document.getElementById('meteo-alerte');
-    badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : '✅ Pas d'alerte';
+    badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : "✅ Pas d'alerte";
     badge.style.display = 'inline-flex';
     window._meteoData = d;
   } catch (e) {
@@ -2099,7 +2101,7 @@ function detectDevice() {
 
 // ── Stats ─────────────────────────────
 async function trackStat(service){
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){}
+  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){updateNotifCardStatus(false);}
 }
 const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
 window.openMel=()=>{trackStat('mel');_origOpenMel();};
@@ -2129,13 +2131,21 @@ async function loadActus(){
 
 // ── Notifications Push ────────────────
 let pushRegistered=false;
+function updateNotifCardStatus(enabled){
+  const el=document.getElementById('notif-card-status');
+  if(!el) return;
+  el.textContent=enabled ? 'ACTIVÉ' : 'DÉSACTIVÉ';
+  el.classList.remove('notif-status-on','notif-status-off');
+  el.classList.add(enabled ? 'notif-status-on' : 'notif-status-off');
+}
+
 async function checkPushStatus(){
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)) return;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){updateNotifCardStatus(false); return;}
   try{
     const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
     const btn=document.getElementById('push-btn'), subTxt=document.getElementById('push-sub');
-    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';}
-    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';}
+    if(sub){pushRegistered=true;if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}if(subTxt)subTxt.textContent='Notifications actives : vous recevrez les nouvelles publications communales.';updateNotifCardStatus(true);}
+    else{pushRegistered=false;if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}if(subTxt)subTxt.textContent='Notifications désactivées : activez-les pour être alerté des nouvelles publications communales.';updateNotifCardStatus(false);}
   }catch(e){}
 }
 async function togglePush(){
@@ -2144,6 +2154,7 @@ async function togglePush(){
     try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Activer les notifications';btn.classList.remove('off');btn.classList.add('on');}
     if(subTxt)subTxt.textContent='Notifications désactivées.';
+    updateNotifCardStatus(false);
     pushRegistered=false; return;
   }
   if(!('Notification' in window)){alert('Notifications non supportées sur ce navigateur.');return;}
@@ -2156,6 +2167,7 @@ async function togglePush(){
       await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
       if(btn){btn.textContent='Désactiver les notifications';btn.classList.remove('on');btn.classList.add('off');}
       if(subTxt)subTxt.textContent='Notifications actives.';
+      updateNotifCardStatus(true);
       pushRegistered=true;
       alert('✅ Notifications activées !');
     }catch(e){alert('Erreur lors de l\'activation des notifications.');}
@@ -2578,7 +2590,7 @@ function loadDateBadge() {
 })();
 
 // ── Init ─────────────────────────────────
-loadAccessibilite(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
+loadAccessibilite(); updateNotifCardStatus(false); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
