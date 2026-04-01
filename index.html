@@ -616,7 +616,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.7</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.8</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -659,7 +659,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
   <!-- Bouton accessibilité positionné en bas à droite du header -->
 
   <div class="header-tools">
-    <button class="header-tool-btn urgent" onclick="openNums()">🚨 Numéros urgence</button>
+    <button class="header-tool-btn urgent" onclick="openNums()">📢 Numéros urgence</button>
     <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
   </div>
 </div>
@@ -674,7 +674,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
       <div class="ct"><div class="ct-label">MEL</div><div class="ct-sub">Assistante IA</div></div>
     </button>
     <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
-      <div class="ico ico-site">🌐</div>
+      <div class="ico ico-site">🏛️</div>
       <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">Commune</div></div>
     </a>
   </div>
@@ -1424,7 +1424,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.7 — Mézières Avec Toi
+// MAT v3.5.8 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -2294,7 +2294,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.7'
+    matVersion:'v3.5.8'
   };
 }
 
@@ -2351,10 +2351,12 @@ async function loadActus(){
     if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
-      const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const titre=esc(texte.length>80?texte.substring(0,80)+'...':texte);
-      const texteComplet=texte.length>80?esc(texte):'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+      const texteRaw=(a.title||'').replace(/#app-mezieres/gi,'').trim();
+      const lignes=texteRaw.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+      const titre=esc(lignes[0]||'');
+      const corps=lignes.slice(1).join('\n').trim();
+      const corpsHTML=corps?`<div class="actu-text">${esc(corps)}</div>`:'';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${corpsHTML}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
     markActusAsSeen(d.actus||[]);
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
