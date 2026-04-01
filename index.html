@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.5.6 -->
+<!-- VERSION 3.5.7 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
@@ -193,16 +193,16 @@ body.preload #app-splash{opacity:1;visibility:visible;}
 .ov{display:none;position:fixed;inset:0;background:rgba(26,61,43,0.6);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;}
 .ov.open{display:flex;animation:fadeOv 0.2s ease;}
 @keyframes fadeOv{from{opacity:0}to{opacity:1}}
-.panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+.panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:min(92vh,calc(var(--vvh,100dvh) - env(safe-area-inset-top,0px) - 8px));display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
 @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
-.panel-hdr{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.panel-hdr{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .panel-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .panel-title{font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--cream);font-weight:900;flex:1;letter-spacing:0.01em;}
 .panel-close{background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:rgba(255,255,255,0.8);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .panel-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
 
 /* ── MEL Chat ── */
-.mel-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+.mel-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;height:min(90vh,calc(var(--vvh,100dvh) - env(safe-area-inset-top,0px) - 8px));display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
 .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
 .msgs::-webkit-scrollbar{width:3px;}
 .msgs::-webkit-scrollbar-thumb{background:var(--mist);border-radius:2px;}
@@ -335,7 +335,7 @@ body.preload #app-splash{opacity:1;visibility:visible;}
 .event-btn.secondary{background:var(--mist);color:var(--leaf);}
 
 /* ── Overlay Majordome MAT ── */
-.majordome-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+.majordome-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:min(85vh,calc(var(--vvh,100dvh) - env(safe-area-inset-top,0px) - 8px));display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
 .majordome-body{padding:24px 20px;overflow-y:auto;text-align:center;}
 .majordome-img{width:110px;height:110px;object-fit:contain;margin:0 auto 12px;display:block;filter:drop-shadow(0 6px 16px rgba(26,61,43,0.25));}
 .majordome-name{font-family:'Grape Nuts',cursive;font-size:2rem;color:var(--forest);margin-bottom:6px;}
@@ -555,10 +555,14 @@ html.no-widgets .header { padding-bottom: 48px; }
 /* ── Aide contextuelle ── */
 .ctx-help{display:none;background:var(--mist);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:12px 14px;margin-bottom:14px;color:var(--forest);}
 .ctx-help.show{display:block;}
-.ctx-title{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.ctx-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.ctx-ico{font-size:1rem;line-height:1;}
+.ctx-title{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;flex:1;}
+.ctx-close{border:none;background:rgba(0,0,0,.06);color:var(--leaf);width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;cursor:pointer;flex-shrink:0;}
 .ctx-text{font-size:.76rem;line-height:1.6;color:var(--leaf);}
 html.theme-sombre .ctx-help{background:#374151;border-color:#4b5563;color:#e2e8f0;}
 html.theme-sombre .ctx-text{color:#cbd5e1;}
+html.theme-sombre .ctx-close{background:rgba(255,255,255,.08);color:#e2e8f0;}
 
 /* ── Mode simplifié ── */
 .notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\nhtml.simplified-mode .content{display:flex;flex-direction:column;gap:10px;}\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}\nhtml.simplified-mode .grid2{display:grid !important;grid-template-columns:1fr !important;gap:10px;}\nhtml.simplified-mode .grid2 > :not(.simple-card){display:none !important;}\nhtml.simplified-mode .simple-card{display:flex !important;align-items:center !important;gap:11px !important;min-height:74px;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:44px !important;height:44px !important;font-size:22px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0;flex:1;}
@@ -612,7 +616,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
     <div class="mat-text">
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.6</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.7</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -729,7 +733,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
       <div class="ico ico-rgpd">🔒</div>
       <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
     </button>
-    <button class="card" id="btn-install-or-bug" onclick="openOv('bug')">
+    <button class="card" id="btn-install-or-bug" onclick="openBug()">
       <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
       <div class="ct">
         <div class="ct-label" id="iob-label">Signaler un bug</div>
@@ -1420,7 +1424,7 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.6 — Mézières Avec Toi
+// MAT v3.5.7 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1525,12 +1529,12 @@ history.pushState({mat:'overlay'}, '');
 
 function openMajordome(){ openOv('majordome'); }
 function openMel(){openOv('mel'); renderContextHelp('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
-function openSignal(){openOv('signal'); renderContextHelp('signal');}
+function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
-function openContact(){openOv('contact'); renderContextHelp('contact');}
+function openContact(){openOv('contact'); restoreContactFormState(); renderContextHelp('contact');}
 function openAgenda(){
   openOv('agenda');
   _agendaYear=new Date().getFullYear();
@@ -1989,6 +1993,11 @@ function compressImage(src, maxSize, quality){
     img.src=src;
   });
 }
+function restoreSignalFormState(){
+  const btn=document.querySelector('#signal-form .submit-btn');
+  if(btn){btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;}
+}
+
 function resetSignal(){
   document.getElementById('signal-form').style.display='block';
   document.getElementById('signal-success').style.display='none';
@@ -1999,6 +2008,7 @@ function resetSignal(){
   sigCat='';sigLat='';sigLon='';
   document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
   document.getElementById('loc-btn').classList.remove('on');
+  restoreSignalFormState();
 }
 
 // ── Boîte à idées ─────────────────────
@@ -2124,7 +2134,8 @@ function updateInstallBtn(){
   if(label) label.textContent='Signaler un bug';
   if(sub) sub.textContent="On s'en occupe !";
 }
-function installOrBug(){ openOv('bug'); }
+function installOrBug(){ openBug(); }
+function openBug(){ openOv('bug'); restoreBugFormState(); }
 
 // ── Contact mairie → Trello ───────────
 function contactViaMessenger(){window.open('https://m.me/RadioMezieres','_blank');}
@@ -2152,6 +2163,11 @@ async function submitContactForm(){
     btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
   }
 }
+function restoreContactFormState(){
+  const btn=document.querySelector('#contact-form .submit-btn');
+  if(btn){btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;}
+}
+
 function resetContact(){
   document.getElementById('contact-form').style.display='block';
   document.getElementById('contact-success').style.display='none';
@@ -2193,12 +2209,18 @@ async function submitBug(){
     btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
   }
 }
+function restoreBugFormState(){
+  const btn=document.querySelector('#bug-form .submit-btn');
+  if(btn){btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;}
+}
+
 function resetBug(){
   document.getElementById('bug-form').style.display='block';
   document.getElementById('bug-success').style.display='none';
   document.getElementById('bug-desc').value='';
   bugService='';
   document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));
+  restoreBugFormState();
   closeOv('bug');
 }
 
@@ -2272,7 +2294,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.6'
+    matVersion:'v3.5.7'
   };
 }
 
@@ -2841,19 +2863,25 @@ const CTX_TEXTS = {
   signal: {title:"Conseil utile", text:"Choisissez une catégorie, ajoutez une photo si besoin, puis envoyez. La description et la position GPS restent facultatives."},
   contact: {title:"Besoin d'aide ?", text:"Pour une urgence communale, utilisez Signalement. Pour une demande générale, appelez la mairie ou laissez un message."}
 };
+let _ctxDismissed = {};
+function dismissContextHelp(key){
+  _ctxDismissed[key] = true;
+  renderContextHelp(key);
+}
 function renderContextHelp(key){
   const el=document.getElementById('ctx-'+key);
   if(!el) return;
   const data=CTX_TEXTS[key];
-  if(!_ctxEnabled || !data){el.classList.remove('show'); el.innerHTML=''; return;}
-  el.innerHTML='<div class="ctx-title">'+data.title+'</div><div class="ctx-text">'+data.text+'</div>';
+  if(!_ctxEnabled || !data || _ctxDismissed[key]){el.classList.remove('show'); el.innerHTML=''; return;}
+  el.innerHTML='<div class="ctx-head"><span class="ctx-ico">💡</span><div class="ctx-title">'+data.title+'</div><button type="button" class="ctx-close" aria-label="Fermer l'aide" onclick="dismissContextHelp(\''+key+'\')">✕</button></div><div class="ctx-text">'+data.text+'</div>';
   el.classList.add('show');
 }
-function refreshAllContextHelp(){ ['mel','signal','contact'].forEach(renderContextHelp); }
+function refreshAllContextHelp(){ ['mel','signal','contact'].forEach(function(key){ _ctxDismissed[key]=false; renderContextHelp(key); }); }
 function toggleContextHelp(on, save=true){
   _ctxEnabled = on;
   const el=document.getElementById('acc-ctx-toggle');
   if(el) el.checked = on;
+  if(on){ _ctxDismissed = {}; }
   refreshAllContextHelp();
   if(save) saveAccessibilite();
 }
@@ -2867,7 +2895,8 @@ function fixIOSViewportAfterKeyboard(){
     document.body.style.width='100%';
     document.documentElement.style.overflowX='hidden';
     document.body.style.overflowX='hidden';
-    window.scrollTo(0, window.scrollY || 0);
+    var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.documentElement.style.setProperty('--vvh', vh + 'px');
   }catch(e){}
 }
 
@@ -2885,7 +2914,6 @@ document.addEventListener('focusout', function(e){
   if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)){
     setTimeout(function(){
       fixIOSViewportAfterKeyboard();
-      window.scrollTo(0,0);
     }, 180);
   }
 });
@@ -2893,9 +2921,13 @@ document.addEventListener('focusout', function(e){
 window.addEventListener('resize', function(){
   fixIOSViewportAfterKeyboard();
 });
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', fixIOSViewportAfterKeyboard);
+  window.visualViewport.addEventListener('scroll', fixIOSViewportAfterKeyboard);
+}
 
 // ── Init ─────────────────────────────────
-loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge();
+loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge(); fixIOSViewportAfterKeyboard(); restoreSignalFormState(); restoreContactFormState(); restoreBugFormState();
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
