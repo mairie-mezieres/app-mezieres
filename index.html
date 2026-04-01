@@ -629,7 +629,7 @@ html.no-widgets .header { padding-bottom: 48px; }
 <div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px;">
   <div>MAT · Application officielle · Mairie de Mézières-lez-Cléry</div>
   <button onclick="clearCacheAndReload()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(216,243,220,0.7);font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:700;padding:5px 12px;cursor:pointer;">
-    🗑️ Vider le cache et recharger
+    🗑️ Vider le cache &amp; réinitialiser
   </button>
 </div>
 
@@ -970,6 +970,54 @@ html.no-widgets .header { padding-bottom: 48px; }
   </div>
 </div>
 
+
+
+<!-- ═══ OVERLAY CONSEIL MUNICIPAL ═══ -->
+<div class="ov" id="ov-conseil" onclick="ovClick('conseil',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🏛️</div>
+      <div class="panel-title">Conseil municipal</div>
+      <button class="panel-close" onclick="closeOv('conseil')">✕</button>
+    </div>
+    <div class="panel-body">
+
+      <p style="font-size:0.74rem;color:var(--muted);margin-bottom:14px;line-height:1.6">
+        Le conseil municipal de Mézières-lez-Cléry est composé d'élus bénévoles au service des habitants. Contactez-les via la mairie.
+      </p>
+
+      <!-- Maire -->
+      <div style="background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:14px;padding:14px;margin-bottom:10px;">
+        <div style="font-size:0.58rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.7);margin-bottom:4px">Maire</div>
+        <div style="font-size:0.92rem;font-weight:900;color:white">À renseigner</div>
+        <div style="font-size:0.7rem;color:rgba(255,255,255,0.8);margin-top:2px">Contactez la mairie pour obtenir les coordonnées</div>
+        <a href="tel:0238456176" style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:rgba(255,255,255,0.2);color:white;border-radius:10px;padding:7px 12px;font-size:0.76rem;font-weight:900;text-decoration:none">📞 02 38 45 61 76</a>
+      </div>
+
+      <!-- Adjoints & conseillers -->
+      <div style="background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:10px;">
+        <div style="padding:10px 14px;background:var(--mist);font-size:0.7rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.08em">Adjoints au maire & conseillers délégués</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.6">
+            Les membres du conseil municipal et leurs délégations sont disponibles sur le site officiel de la commune.
+          </div>
+          <a href="https://mezieres-lez-clery.fr/2018/11/04/le-conseil-municipal/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--mist);color:var(--leaf);border-radius:10px;padding:9px 14px;font-size:0.8rem;font-weight:900;text-decoration:none;align-self:flex-start">🌐 Voir le conseil municipal →</a>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);">
+        <div style="font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:8px">📬 Contacter un élu</div>
+        <div style="font-size:0.72rem;color:var(--muted);line-height:1.6;margin-bottom:10px">Pour toute question ou demande adressée aux élus, passez par la mairie ou via Facebook Messenger.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="tel:0238456176" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:9px 14px;font-size:0.78rem;font-weight:900;text-decoration:none">📞 Mairie</a>
+          <button onclick="contactViaMessenger();closeOv('conseil')" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border:none;border-radius:10px;padding:9px 14px;font-size:0.78rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif">💬 Messenger</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- ═══ OVERLAY NUMÉROS UTILES ═══ -->
 <div class="ov" id="ov-nums" onclick="ovClick('nums',event)">
@@ -2086,6 +2134,7 @@ function ttsRead(text, label) {
 
 // ── Numéros utiles ────────────────────
 function openNums(){ openOv('nums'); }
+function openConseil(){ openOv('conseil'); }
 
 // ── Thèmes de personnalisation ────────
 function setTheme(theme) {
