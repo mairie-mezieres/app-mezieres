@@ -565,12 +565,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 html.theme-sombre .ctx-close{background:rgba(255,255,255,.08);color:#e2e8f0;}
 
 /* ── Mode simplifié ── */
-.notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\nhtml.simplified-mode .content{display:flex !important;flex-direction:column !important;gap:12px !important;}\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .grid2{display:none !important;}\nhtml.simplified-mode .simple-title{display:block !important;font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:4px 2px 2px;}\nhtml.simplified-mode .simple-cards-wrapper{display:flex !important;flex-direction:column !important;gap:12px !important;width:100% !important;}\nhtml.simplified-mode .simple-card{display:flex !important;align-items:center !important;gap:14px !important;min-height:80px !important;width:100% !important;box-sizing:border-box !important;padding:14px 18px !important;border-radius:18px !important;background:white !important;border:2px solid var(--border) !important;cursor:pointer;font-family:'Nunito',sans-serif;text-align:left;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:50px !important;height:50px !important;font-size:26px !important;align-items:center !important;justify-content:center !important;border-radius:14px !important;}\nhtml.simplified-mode .simple-card .card-label{font-size:1.05rem !important;font-weight:900 !important;color:var(--text) !important;line-height:1.3 !important;}\nhtml.simplified-mode .simple-card .card-sub{font-size:0.78rem !important;color:var(--muted) !important;margin-top:3px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0;flex:1;}
-
-/* ── Mode simplifié V3.5.10 — styles cartes ── */
-.simple-cards-wrapper{display:none;}
-.card-label{font-size:1.05rem;font-weight:900;color:var(--text);line-height:1.3;}
-.card-sub{font-size:0.78rem;color:var(--muted);margin-top:3px;}
+.notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\nhtml.simplified-mode .content{display:flex !important;flex-direction:column !important;gap:0 !important;}\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .simple-title{display:none !important;}\n/* Mode simplifié V3.5.10 — 1 colonne pleine largeur */\nhtml.simplified-mode .grid2{display:flex !important;flex-direction:column !important;gap:10px !important;margin-bottom:10px !important;}\nhtml.simplified-mode .grid2 > *{display:none !important;}\nhtml.simplified-mode .grid2 > .simple-card{display:flex !important;}\nhtml.simplified-mode .simple-card{align-items:center !important;gap:14px !important;min-height:72px !important;width:100% !important;box-sizing:border-box !important;padding:14px 16px !important;border-radius:16px !important;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:48px !important;height:48px !important;font-size:24px !important;align-items:center !important;justify-content:center !important;border-radius:12px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0;flex:1;}\nhtml.simplified-mode .simple-card .ct-label{font-size:1rem !important;font-weight:900 !important;color:var(--text) !important;}\nhtml.simplified-mode .simple-card .ct-sub{font-size:0.76rem !important;color:var(--muted) !important;margin-top:2px !important;}
 
 /* ── Modale MAT ── */
 .mat-modal{position:fixed;inset:0;z-index:4000;background:rgba(26,61,43,.58);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;}
@@ -632,7 +627,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
   <div class="mat-hero">
     <!-- Gauche : texte -->
     <div class="mat-text">
-      <div style="height:2em"></div>
+      <div style="height:1.8em"></div>
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.10</div>
@@ -685,30 +680,6 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 
 <!-- Contenu principal -->
 <div class="content">
-
-  <!-- ── 5 CARTES MODE SIMPLIFIÉ V3.5.10 ── -->
-  <div class="simple-cards-wrapper">
-    <button class="simple-card" onclick="openMel()">
-      <div class="ico" style="background:#e8f8ec">🤖</div>
-      <div><div class="card-label">MEL — Assistante</div><div class="card-sub">Posez votre question à la mairie</div></div>
-    </button>
-    <button class="simple-card" onclick="openNotifs()">
-      <div class="ico" style="background:#e8f0fc">🔔</div>
-      <div><div class="card-label">Actualités &amp; alertes</div><div class="card-sub">Dernières nouvelles communales</div></div>
-    </button>
-    <button class="simple-card" onclick="openSignal()">
-      <div class="ico" style="background:#fff0e0">🚨</div>
-      <div><div class="card-label">Signalement</div><div class="card-sub">Voirie, éclairage, propreté…</div></div>
-    </button>
-    <button class="simple-card" onclick="openContact()">
-      <div class="ico" style="background:#ede8f8">💬</div>
-      <div><div class="card-label">Contacter la mairie</div><div class="card-sub">Formulaire ou appel direct</div></div>
-    </button>
-    <button class="simple-card" onclick="openAgenda()">
-      <div class="ico" style="background:#fef3e0">📅</div>
-      <div><div class="card-label">Agenda</div><div class="card-sub">Événements et manifestations</div></div>
-    </button>
-  </div>
 
   <div class="sec">Services municipaux</div><div class="simple-title" style="display:none">Essentiel</div>
   <div class="grid2">
@@ -1102,7 +1073,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
     <div class="panel-body">
       <div class="ctx-help" id="ctx-contact"></div>
       <div class="contact-grid">
-        <!-- V3.5.10 — Ordre : conseil, élus, signalement, appel, CCTVL -->
+        <!-- V3.5.10 — 1.Conseil 2.Élus 3.Signalement 4.Formulaire — puis appel+CCTVL après formulaire -->
         <div class="contact-card">
           <div class="contact-ico">🏛️</div>
           <div style="flex:1">
@@ -1127,22 +1098,6 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
           </div>
           <button class="contact-action" onclick="closeOv('contact'); openSignal();">Ouvrir</button>
         </div>
-        <div class="contact-card">
-          <div class="contact-ico">📞</div>
-          <div style="flex:1">
-            <div class="contact-title">Appeler la mairie</div>
-            <div class="contact-sub">02 38 45 61 76 · Lun 14h-17h30 · Mer sur RDV · Ven 8h30-11h30</div>
-          </div>
-          <a class="contact-action" href="tel:0238456176" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
-        </div>
-        <div class="contact-card">
-          <div class="contact-ico">🏘️</div>
-          <div style="flex:1">
-            <div class="contact-title">Services intercommunaux</div>
-            <div class="contact-sub">CCTVL · Déchets, assainissement, santé, transports…</div>
-          </div>
-          <a class="contact-action" href="tel:0238445935" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
-        </div>
       </div>
 
       <div class="contact-note">
@@ -1163,6 +1118,26 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
           <textarea class="form-textarea" id="contact-msg" placeholder="Décrivez votre demande…"></textarea>
         </div>
         <button class="submit-btn" onclick="submitContactForm()">📤 Envoyer ma demande</button>
+      </div>
+
+      <!-- V3.5.10 — Appel mairie + CCTVL après formulaire -->
+      <div class="contact-grid" style="margin-top:12px">
+        <div class="contact-card">
+          <div class="contact-ico">📞</div>
+          <div style="flex:1">
+            <div class="contact-title">Appeler la mairie</div>
+            <div class="contact-sub">02 38 45 61 76 · Lun 14h-17h30 · Mer sur RDV · Ven 8h30-11h30</div>
+          </div>
+          <a class="contact-action" href="tel:0238456176" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">🏘️</div>
+          <div style="flex:1">
+            <div class="contact-title">Services intercommunaux</div>
+            <div class="contact-sub">CCTVL · Déchets, assainissement, santé, transports…</div>
+          </div>
+          <a class="contact-action" href="tel:0238445935" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
+        </div>
       </div>
 
       <div class="success-msg" id="contact-success">
@@ -1400,6 +1375,21 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
             <a href="tel:3114" style="background:#dc2626;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">❤️ Urgences psy<br><span style="font-size:1rem">3114</span></a>
           </div>
           <div style="font-size:0.62rem;color:var(--muted);margin-top:8px;text-align:center">Tous ces numéros sont gratuits 24h/24</div>
+        </div>
+
+        <!-- École et périscolaire V3.5.10 -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🏫 École &amp; Périscolaire</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">École de la Forêt</div><div style="font-size:0.68rem;color:var(--muted)">Mézières-lez-Cléry</div></div>
+              <a href="tel:0238456500" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 02 38 45 65 00</a>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">Service périscolaire</div><div style="font-size:0.68rem;color:var(--muted)">Garderie matin/soir</div></div>
+              <a href="tel:0967280120" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 09 67 28 01 20</a>
+            </div>
+          </div>
         </div>
 
         <!-- Services publics -->
@@ -1784,7 +1774,7 @@ const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellem
 
 async function loadMeteo() {
   try {
-    const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m,apparent_temperature&hourly=precipitation_probability,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max,sunrise,sunset,apparent_temperature_max,apparent_temperature_min,wind_direction_10m_dominant&timezone=Europe%2FParis&forecast_days=10', { cache: 'no-store' });
+    const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,uv_index_max,sunrise,sunset,wind_direction_10m_dominant,wind_gusts_10m_max,precipitation_hours&past_days=1&timezone=Europe%2FParis&forecast_days=10', { cache: 'no-store' });
     if (!fr.ok) throw new Error('HTTP ' + fr.status);
     const d = { forecast: await fr.json(), vigilance: null };
     const cur = (d.forecast || {}).current || {};
@@ -1794,14 +1784,7 @@ async function loadMeteo() {
     const vent = Math.round(cur.wind_speed_10m != null ? cur.wind_speed_10m : 0);
     document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
     document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+temp+'°C</strong>';
-    // V3.5.10 pluie dans l'heure
-    const hourly=(d.forecast||{}).hourly||{};
-    const nowH=new Date();
-    const hTimes=(hourly.time||[]),hPrec=(hourly.precipitation||[]),hProb=(hourly.precipitation_probability||[]);
-    let rainNextHour=null;
-    for(let hi=0;hi<hTimes.length;hi++){const t=new Date(hTimes[hi]);const diff=(t-nowH)/60000;if(diff>=-30&&diff<=60){if((hPrec[hi]||0)>0.1||(hProb[hi]||0)>=40){rainNextHour={prob:hProb[hi]||0};break;}}}
-    const rainSfx=rainNextHour?' · 🌧️ Pluie dans l\'heure ('+rainNextHour.prob+'%)':'';
-    document.getElementById('meteo-desc').textContent=(METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h'+rainSfx;
+    document.getElementById('meteo-desc').textContent = (METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h';
     const badge = document.getElementById('meteo-alerte');
     badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : "✅ Pas d'alerte";
     badge.style.display = 'inline-flex';
@@ -1823,40 +1806,75 @@ function loadMeteoDetail() {
     + '</div><div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
     + ((vigilance && vigilance.main_text) ? vigilance.main_text : 'Situation météo normale sur la commune.')
     + '</div></div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌧️ Pluie actuelle</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.precipitation||0)+' mm</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+(cur.relative_humidity_2m||0)+'%</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.pressure_msl||0)+' hPa</div></div>'
-    + '<div style="background:white;border-radius:14px;padding:12px;border:1px solid var(--border)"><div style="font-size:0.65rem;color:var(--muted)">🌬️ Rafales</div><div style="font-size:1rem;font-weight:800;color:var(--text)">'+Math.round(cur.wind_gusts_10m||0)+' km/h</div></div>'
+  // V3.5.10 — Encarts météo enrichis
+  var NORM_MAX=[5,7,12,16,20,24,26,26,22,17,10,6];
+  var NORM_MIN=[0,1,3,6,10,13,15,15,11,8,4,1];
+  var mois=new Date().getMonth();
+  function windDir(deg){if(deg==null)return '';var d=['N','NE','E','SE','S','SO','O','NO'];return d[Math.round(deg/45)%8];}
+  // Cumul pluie 24h (jour passé = index 0 avec past_days=1)
+  var pluie24h=days.precipitation_sum&&days.precipitation_sum[0]!=null?parseFloat(days.precipitation_sum[0]).toFixed(1):'–';
+  // Rafale max 24h
+  var rafaleMax24=days.wind_gusts_10m_max&&days.wind_gusts_10m_max[0]!=null?Math.round(days.wind_gusts_10m_max[0]):'–';
+  // Direction vent dominante du jour
+  var ventDir=windDir(cur.wind_direction_10m);
+  // Temp ressentie
+  var ressenti=cur.apparent_temperature!=null?Math.round(cur.apparent_temperature):'–';
+  // Écarts vs normales aujourd'hui (index 1 = aujourd'hui avec past_days=1)
+  var tAujMax=days.temperature_2m_max&&days.temperature_2m_max[1]!=null?Math.round(days.temperature_2m_max[1]):null;
+  var tAujMin=days.temperature_2m_min&&days.temperature_2m_min[1]!=null?Math.round(days.temperature_2m_min[1]):null;
+  var ecartMax=tAujMax!=null?tAujMax-NORM_MAX[mois]:null;
+  var ecartMin=tAujMin!=null?tAujMin-NORM_MIN[mois]:null;
+  function fmtEcart(e){if(e==null)return '';return (e>=0?'+':'')+e+'° vs normale';}
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+    // Pluie 24h
+    + '<div style="background:white;border-radius:14px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.6rem;color:var(--muted);font-weight:700">🌧️ Pluie 24h</div><div style="font-size:1rem;font-weight:800;color:var(--text);margin-top:2px">'+pluie24h+' mm</div></div>'
+    // Humidité (compact)
+    + '<div style="background:white;border-radius:14px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.6rem;color:var(--muted);font-weight:700">💧 Humidité</div><div style="font-size:1rem;font-weight:800;color:var(--text);margin-top:2px">'+(cur.relative_humidity_2m||0)+'%</div></div>'
+    // Rafales 24h + direction
+    + '<div style="background:white;border-radius:14px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.6rem;color:var(--muted);font-weight:700">🌪️ Rafale max 24h</div><div style="font-size:1rem;font-weight:800;color:var(--text);margin-top:2px">'+rafaleMax24+' km/h '+ventDir+'</div></div>'
+    // Pression
+    + '<div style="background:white;border-radius:14px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.6rem;color:var(--muted);font-weight:700">📊 Pression</div><div style="font-size:1rem;font-weight:800;color:var(--text);margin-top:2px">'+Math.round(cur.pressure_msl||0)+' hPa</div></div>'
     + '</div>';
-  // V3.5.10 — 10 jours scrollable + ressentie + direction vent
-  function windDirLabel(deg){if(deg==null)return '–';var dirs=['N','NE','E','SE','S','SO','O','NO'];return dirs[Math.round(deg/45)%8];}
-  html+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px"><div style="display:flex;gap:10px;min-width:max-content;padding-bottom:6px">';
-  var nDays=Math.min((days.time||[]).length,10);
-  for(var i=0;i<nDays;i++){
-    var dt=days.time&&days.time[i]?new Date(days.time[i]):new Date();
-    var jour=i===0?'Auj.':i===1?'Demain':JOURS[dt.getDay()]+' '+dt.getDate();
-    var code=(days.weather_code||[])[i]||0;
-    var tmax=Math.round((days.temperature_2m_max||[])[i]||0);
-    var tmin=Math.round((days.temperature_2m_min||[])[i]||0);
-    var rmax=Math.round((days.apparent_temperature_max||[])[i]!=null?(days.apparent_temperature_max||[])[i]:tmax);
-    var rmin=Math.round((days.apparent_temperature_min||[])[i]!=null?(days.apparent_temperature_min||[])[i]:tmin);
-    var pluie=parseFloat((days.precipitation_sum||[])[i]||0).toFixed(1);
+  // Température ressentie + écarts vs normales
+  html += '<div style="background:white;border-radius:14px;padding:10px 14px;margin-bottom:14px;border:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap">'
+    + '<div><div style="font-size:0.6rem;color:var(--muted);font-weight:700">Ressenti actuel</div><div style="font-size:0.95rem;font-weight:900;color:var(--text)">'+ressenti+'°C</div></div>'
+    + (ecartMax!=null?'<div><div style="font-size:0.6rem;color:var(--muted);font-weight:700">Écart max</div><div style="font-size:0.95rem;font-weight:900;color:'+(ecartMax>=0?'#dc2626':'#2563eb')+'">'+fmtEcart(ecartMax)+'</div></div>':'')
+    + (ecartMin!=null?'<div><div style="font-size:0.6rem;color:var(--muted);font-weight:700">Écart min</div><div style="font-size:0.95rem;font-weight:900;color:'+(ecartMin>=0?'#dc2626':'#2563eb')+'">'+fmtEcart(ecartMin)+'</div></div>':'')
+    + '</div>';
+  // V3.5.10 — 10 jours scrollable (index 1..10 avec past_days=1, index 0=hier)
+  function wDir(deg){if(deg==null)return '';var d=['N','NE','E','SE','S','SO','O','NO'];return d[Math.round(deg/45)%8];}
+  html+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px"><div style="display:flex;gap:8px;min-width:max-content;padding-bottom:4px">';
+  var nD=Math.min((days.time||[]).length,11);
+  for(var i=1;i<nD;i++){
+    var dt=days.time[i]?new Date(days.time[i]):new Date();
+    var jr=i===1?'Auj.':i===2?'Dem.':JOURS[dt.getDay()]+' '+dt.getDate();
+    var co=(days.weather_code||[])[i]||0;
+    var tx=Math.round((days.temperature_2m_max||[])[i]||0);
+    var tn=Math.round((days.temperature_2m_min||[])[i]||0);
+    var rx=Math.round((days.apparent_temperature_max||[])[i]!=null?(days.apparent_temperature_max||[])[i]:tx);
+    var rn=Math.round((days.apparent_temperature_min||[])[i]!=null?(days.apparent_temperature_min||[])[i]:tn);
+    var pl=parseFloat((days.precipitation_sum||[])[i]||0).toFixed(1);
     var uv=(days.uv_index_max||[])[i]!=null?(days.uv_index_max||[])[i]:'-';
-    var windDir=windDirLabel((days.wind_direction_10m_dominant||[])[i]);
-    html+='<div style="background:white;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--border);min-width:90px">'
-      +'<div style="font-size:0.65rem;font-weight:900;color:var(--muted);margin-bottom:4px">'+jour+'</div>'
-      +'<div style="font-size:1.8rem">'+(METEO_ICONS[code]||'🌡️')+'</div>'
-      +'<div style="font-size:0.8rem;font-weight:800;color:var(--text);margin-top:4px">'+tmax+'° / '+tmin+'°</div>'
-      +'<div style="font-size:0.6rem;color:#6b7280;margin-top:1px">Ressenti '+rmax+'°/'+rmin+'°</div>'
-      +'<div style="font-size:0.6rem;color:var(--muted);margin-top:2px">'+(METEO_DESC[code]||'')+'</div>'
-      +'<div style="font-size:0.6rem;color:#2563eb;margin-top:2px">🌧️ '+pluie+' mm</div>'
-      +'<div style="font-size:0.6rem;color:#ca8a04;margin-top:1px">🌞 UV '+uv+'</div>'
-      +'<div style="font-size:0.6rem;color:#6b7280;margin-top:1px">💨 '+windDir+'</div>'
+    var wd=wDir((days.wind_direction_10m_dominant||[])[i]);
+    var gust=(days.wind_gusts_10m_max||[])[i]!=null?Math.round((days.wind_gusts_10m_max||[])[i]):'–';
+    // Écart vs normale
+    var nm=new Date(); nm.setDate(nm.getDate()+(i-1)); var nmois=nm.getMonth();
+    var em=NORM_MAX[nmois]!=null?tx-NORM_MAX[nmois]:null;
+    var emTxt=em!=null?'<div style="font-size:0.55rem;color:'+(em>=0?'#dc2626':'#2563eb')+'">'+(em>=0?'+':'')+em+'° norm.</div>':'';
+    html+='<div style="background:white;border-radius:12px;padding:10px 8px;text-align:center;border:1px solid var(--border);min-width:82px">'
+      +'<div style="font-size:0.6rem;font-weight:900;color:var(--muted);margin-bottom:3px">'+jr+'</div>'
+      +'<div style="font-size:1.6rem">'+(METEO_ICONS[co]||'🌡️')+'</div>'
+      +'<div style="font-size:0.78rem;font-weight:800;color:var(--text);margin-top:3px">'+tx+'° / '+tn+'°</div>'
+      +'<div style="font-size:0.58rem;color:#6b7280">Res. '+rx+'°/'+rn+'°</div>'
+      +emTxt
+      +'<div style="font-size:0.58rem;color:var(--muted);margin-top:2px">'+(METEO_DESC[co]||'')+'</div>'
+      +'<div style="font-size:0.58rem;color:#2563eb;margin-top:2px">🌧️ '+pl+' mm</div>'
+      +'<div style="font-size:0.58rem;color:#ca8a04">🌞 UV '+uv+'</div>'
+      +'<div style="font-size:0.58rem;color:#6b7280">💨 '+gust+' '+wd+'</div>'
       +'</div>';
   }
   html+='</div></div>';
-  html+='<div style="font-size:0.65rem;color:var(--muted);text-align:center">Source prévisions : Open-Meteo · Vigilance : Météo-France via votre serveur</div>';
+  html+='<div style="font-size:0.62rem;color:var(--muted);text-align:center">Source : Open-Meteo · Vigilance : Météo-France</div>';
   el.innerHTML = html;
 }
 
@@ -2467,7 +2485,7 @@ function updateNotifCardStatus(enabled){
   el.classList.add(enabled ? 'notif-status-on' : 'notif-status-off');
 }
 
-// ── Détection iOS / standalone V3.5.10
+// ── Détection iOS V3.5.10
 function _getIOSVersion(){const ua=navigator.userAgent;if(!/iPhone|iPad|iPod/.test(ua))return null;const m=ua.match(/OS (\d+)[_\d]*/);return m?parseInt(m[1],10):null;}
 function _isIOS(){return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
 function _isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
@@ -2480,48 +2498,17 @@ async function checkPushStatus(){
   if(btn){btn.textContent='Chargement…';btn.disabled=true;btn.classList.remove('on');btn.classList.add('off');}
   _setNotifHelp('');
   const ios=_isIOS(),iosVer=_getIOSVersion(),standalone=_isStandalone();
-  if(ios&&(iosVer===null||iosVer<16)){
-    updateNotifCardStatus(false);
-    if(btn){btn.disabled=true;btn.textContent='Non disponible';btn.className='notif-btn off';}
-    _setNotifHelp('📵 Notifications indisponibles sur iOS '+(iosVer||'?')+'. Requiert iOS 16.4+.');
-    return;
-  }
-  if(ios&&iosVer>=16&&!standalone){
-    updateNotifCardStatus(false);
-    if(btn){btn.disabled=true;btn.textContent='Installation requise';btn.className='notif-btn off';}
-    _setNotifHelp("📲 Pour activer les notifications sur iPhone, installez MAT sur votre écran d'accueil :<br><strong>Bouton Partager → \"Sur l'écran d'accueil\"</strong>, puis rouvrez l'app.");
-    return;
-  }
-  if(!_isPushCapable()){
-    updateNotifCardStatus(false);
-    if(btn){btn.disabled=true;btn.textContent='Non supporté';btn.className='notif-btn off';}
-    _setNotifHelp('⚠️ Votre navigateur ne supporte pas les notifications push.');
-    return;
-  }
-  if('Notification' in window&&Notification.permission==='denied'){
-    updateNotifCardStatus(false);
-    if(btn){btn.disabled=true;btn.textContent='Bloquées';btn.className='notif-btn off';}
-    _setNotifHelp('🚫 Notifications bloquées. Autorisez-les dans les réglages de votre navigateur, puis rechargez.');
-    return;
-  }
+  if(ios&&(iosVer===null||iosVer<16)){updateNotifCardStatus(false);if(btn){btn.disabled=true;btn.textContent='Non disponible';btn.className='notif-btn off';}_setNotifHelp('📵 Notifications indisponibles sur iOS '+(iosVer||'?')+'. Requiert iOS 16.4+.');return;}
+  if(ios&&iosVer>=16&&!standalone){updateNotifCardStatus(false);if(btn){btn.disabled=true;btn.textContent='Installation requise';btn.className='notif-btn off';}_setNotifHelp("📲 Sur iPhone, installez MAT sur l'écran d'accueil : Bouton Partager → \"Sur l'écran d'accueil\", puis rouvrez.");return;}
+  if(!_isPushCapable()){updateNotifCardStatus(false);if(btn){btn.disabled=true;btn.textContent='Non supporté';btn.className='notif-btn off';}_setNotifHelp('⚠️ Notifications non supportées sur ce navigateur.');return;}
+  if('Notification' in window&&Notification.permission==='denied'){updateNotifCardStatus(false);if(btn){btn.disabled=true;btn.textContent='Bloquées';btn.className='notif-btn off';}_setNotifHelp('🚫 Notifications bloquées dans les réglages de votre navigateur.');return;}
   if(btn)btn.disabled=false;
   try{
     const reg=await navigator.serviceWorker.ready;
     const sub=await reg.pushManager.getSubscription();
-    if(sub){
-      pushRegistered=true;
-      if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
-      updateNotifCardStatus(true);
-    } else {
-      pushRegistered=false;
-      if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
-      updateNotifCardStatus(false);
-    }
-  }catch(e){
-    pushRegistered=false;
-    if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
-    updateNotifCardStatus(false);
-  }
+    if(sub){pushRegistered=true;if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}updateNotifCardStatus(true);}
+    else{pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);}
+  }catch(e){pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);}
 }
 async function togglePush(){
   const btn=document.getElementById('push-btn');
@@ -2771,7 +2758,8 @@ function loadAccessibilite() {
     if (saved.touch)     applyTouch(true, false);
     if (saved.spacing)   applySpacing(true, false);
     if (saved.tts)       { _ttsEnabled = true; }
-    if (saved.contextHelp === false) toggleContextHelp(false, false); else toggleContextHelp(true, false);
+    // V3.5.10 — contextHelp désactivé par défaut, activé seulement si explicitement true
+    if (saved.contextHelp === true) toggleContextHelp(true, false); else toggleContextHelp(false, false);
     if (saved.theme)     setTheme(saved.theme);
     if (saved.noHeader)  toggleNoHeader(true);
     if (saved.noWidgets) toggleNoWidgets(true);
@@ -2974,7 +2962,7 @@ function resetAccessibilite() {
   applyTouch(false, false);
   applySpacing(false, false);
   _ttsEnabled = false;
-  _ctxEnabled = false;
+  _ctxEnabled = false; // V3.5.10
   ttsStop();
   setTheme('vert');
   toggleNoHeader(false);
