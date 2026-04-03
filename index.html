@@ -1735,6 +1735,18 @@ async function sendMel(){
         +'</div>';
       c.appendChild(sug); c.scrollTop=99999;
     }
+    if(d.showUrbanisme){
+      const c=document.getElementById('msgs');
+      const sug=document.createElement('div'); sug.className='msg bot';
+      sug.innerHTML='<div class="mav">👩</div><div class="bub" style="background:var(--mist);border:1px solid rgba(0,0,0,0.06);padding:10px 12px;">'
+        +'<div style="font-size:0.72rem;font-weight:900;color:var(--forest);margin-bottom:6px">🏗️ Schéma des autorisations d\'urbanisme</div>'
+        +'<img src="https://raw.githubusercontent.com/mairie-mezieres/mairie-mezieres.github.io/main/autorisation-urbanisme.jpg" '
+        +'alt="Autorisations urbanisme" style="width:100%;border-radius:8px;display:block;margin-bottom:6px;" '
+        +'onerror="this.style.display=\'none\'">'
+        +'<div style="font-size:0.67rem;color:var(--muted);line-height:1.5">DP = Déclaration Préalable · PC = Permis de Construire · SP = Surface Plancher</div>'
+        +'</div>';
+      c.appendChild(sug); c.scrollTop=99999;
+    }
   }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
   melBusy=false;
 }
@@ -2726,6 +2738,10 @@ async function clearCacheAndReload() {
   const html = document.documentElement;
   html.classList.remove('font-large','font-xl','high-contrast','large-touch','line-spacing','theme-bleu','theme-sombre','no-header','no-widgets','colorblind-mode','simplified-mode');
 
+  // Supprimer le dismiss de la bannière pour qu'elle réapparaisse
+  const bannerKeys = Object.keys(localStorage).filter(k => k.startsWith('mat_banner_dismissed'));
+  bannerKeys.forEach(k => localStorage.removeItem(k));
+
   // Vider les caches SW SANS désenregistrer (conserve les push)
   if ('caches' in window) {
     const keys = await caches.keys();
@@ -3291,16 +3307,19 @@ function showMatInfoBanner(ico, title, text, type, closeable, dismissKey) {
       + '</div>'
       + '<button id="mat-info-close" onclick="dismissMatInfoBanner()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.8rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;">✕</button>'
       + '</div>';
-    // Insérer dans le header, avant les encarts météo/déchets/bus
-    // Chercher le conteneur du header ou le body en fallback
-    const headerEl = document.querySelector('.header') || document.body;
-    // Chercher avant le bus-strip ou avant les encarts top-card
-    const refEl = document.querySelector('.bus-strip') || document.querySelector('.top-meteo') || document.querySelector('.header-bottom-grid');
-    if (refEl && refEl.parentNode && headerEl.contains(refEl)) {
-      refEl.parentNode.insertBefore(b, refEl);
+    // Insérer AVANT header-bottom-grid pour s'afficher sur toute la largeur
+    // au-dessus des encarts Mairie et Météo
+    const grid = document.querySelector('.header-bottom-grid');
+    if (grid && grid.parentNode) {
+      // Style pleine largeur
+      b.style.margin = '0 0 6px 0';
+      grid.parentNode.insertBefore(b, grid);
     } else {
-      // Fallback : append dans le header
-      headerEl.appendChild(b);
+      // Fallback : avant mat-hero ou dans le header
+      const hero = document.querySelector('.mat-hero');
+      const headerEl = document.querySelector('.header') || document.body;
+      if (hero && hero.parentNode) hero.parentNode.insertBefore(b, hero.nextSibling);
+      else headerEl.appendChild(b);
     }
   }
   document.getElementById('mat-info-ico').textContent = ico;
@@ -3490,8 +3509,12 @@ async function showObFeature(idx) {
     const isInHeader = el.closest('.header') !== null;
     if (f.scrollTop) {
       // Scroller en haut de page (ex: bouton Personnalisation en bas)
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      await new Promise(resolve => setTimeout(resolve, 380));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Sur mobile, attendre que le viewport se stabilise
+      await new Promise(resolve => setTimeout(resolve, 250));
+      // Forcer un second scroll pour garantir le top
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      await new Promise(resolve => setTimeout(resolve, 150));
     } else if (!isInHeader) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
       await new Promise(resolve => setTimeout(resolve, 420));
