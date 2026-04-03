@@ -156,6 +156,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('actus')">🔔 Actualités</button>
     <button class="nav-tab" onclick="showTab('signals')">🚨 Signalements</button>
     <button class="nav-tab" onclick="showTab('banner')">📢 Info/Alerte</button>
+    <button class="nav-tab" onclick="showTab('purge')">🗑️ Purge</button>
   </div>
 
   <div class="admin-body">
@@ -198,6 +199,11 @@ tr:hover td{background:#f9fafb;}
     <!-- INFO/ALERTE -->
     <div class="tab-panel" id="tab-banner">
       <div id="banner-content"></div>
+    </div>
+
+    <!-- PURGE -->
+    <div class="tab-panel" id="tab-purge">
+      <div id="purge-content"></div>
     </div>
 
   </div>
@@ -266,6 +272,122 @@ function renderAll() {
   renderActus();
   renderSignals();
   renderBanner();
+  renderPurge();
+}
+
+// ── NUAGE DE MOTS ─────────────────────
+function drawWordCloud(canvasId, parJour) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  // Agréger sur 30 jours
+  const days = Object.keys(parJour).sort().slice(-30);
+  const totals = {};
+  days.forEach(d => {
+    Object.entries(parJour[d] || {}).forEach(([cat, val]) => {
+      totals[cat] = (totals[cat] || 0) + Number(val || 0);
+    });
+  });
+  const entries = Object.entries(totals).sort((a,b) => b[1]-a[1]).slice(0, 20);
+  if (!entries.length) return;
+
+  const maxVal = entries[0][1] || 1;
+  const minVal = entries[entries.length-1][1] || 1;
+  const palette = ['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0891b2','#b45309','#0f766e'];
+
+  const W = canvas.parentElement?.offsetWidth || 480;
+  const H = 200;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  // Placer les mots en spirale simple
+  const placed = [];
+  entries.forEach(([cat, val], i) => {
+    const ratio = (val - minVal) / (maxVal - minVal + 1);
+    const fontSize = Math.round(11 + ratio * 26); // 11px à 37px
+    ctx.font = `${900} ${fontSize}px 'Segoe UI', sans-serif`;
+    const color = palette[i % palette.length];
+    const w = ctx.measureText(cat).width;
+    const h = fontSize;
+
+    // Essayer des positions en spirale
+    let placed_ok = false;
+    for (let r = 0; r < 120 && !placed_ok; r += 2) {
+      const angle = r * 0.4;
+      const cx = W/2 + r * Math.cos(angle) * 1.8;
+      const cy = H/2 + r * Math.sin(angle) * 0.9;
+      const x = cx - w/2;
+      const y = cy + h/3;
+      if (x < 2 || x + w > W - 2 || y - h < 2 || y > H - 2) continue;
+      const box = {x, y: y-h, w, h: h+2};
+      const overlap = placed.some(p => !(box.x > p.x+p.w || box.x+box.w < p.x || box.y > p.y+p.h || box.y+box.h < p.y));
+      if (!overlap) {
+        ctx.fillStyle = color;
+        ctx.fillText(cat, x, y);
+        placed.push(box);
+        placed_ok = true;
+      }
+    }
+  });
+}
+
+// ── PURGE DES DONNÉES ─────────────────
+function renderPurge() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('purge-content').innerHTML = `
+    <div class="section-title">🗑️ Purge des données par date</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+        Supprime les données antérieures à la date choisie.<br>
+        <strong style="color:var(--red);">⚠️ Action irréversible.</strong>
+      </p>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label style="font-size:0.8rem;font-weight:800;width:120px;flex-shrink:0;">Purger avant le</label>
+          <input type="date" id="purge-date" value="${today}" max="${today}" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${[
+            ['stats_parjour','📊 Stats usage par jour (parJour)'],
+            ['ia_stats_daily','🤖 Stats IA journalières (daily)'],
+            ['ia_categories_parjour','🏷️ Catégories MEL journalières'],
+            ['actus','📰 Actualités antérieures à la date'],
+            ['signals','🚨 Signalements antérieurs à la date'],
+          ].map(([type,label]) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--warm);border-radius:10px;padding:10px 14px;">
+            <span style="font-size:0.82rem;font-weight:600;">${label}</span>
+            <button onclick="doPurge('${type}')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Purger</button>
+          </div>`).join('')}
+        </div>
+        <div id="purge-msg" style="display:none;font-size:0.8rem;font-weight:800;"></div>
+      </div>
+    </div>
+  `;
+}
+
+async function doPurge(type) {
+  const dateEl = document.getElementById('purge-date');
+  const beforeDate = dateEl?.value;
+  if (!beforeDate) { alert('Date requise'); return; }
+  if (!confirm('Purger les données de type "' + type + '" antérieures au ' + beforeDate + ' ?')) return;
+  try {
+    const r = await fetch(API + '/admin/purge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+      body: JSON.stringify({ type, beforeDate })
+    });
+    const d = await r.json();
+    const msg = document.getElementById('purge-msg');
+    if (d.ok) {
+      if (msg) { msg.textContent = '✅ Purge effectuée : ' + d.deleted + ' entrée(s) supprimée(s).'; msg.style.color='var(--leaf)'; msg.style.display='block'; }
+      setTimeout(() => loadAll(), 1000);
+    } else {
+      if (msg) { msg.textContent = '❌ Erreur : ' + (d.error||'inconnue'); msg.style.color='var(--red)'; msg.style.display='block'; }
+    }
+  } catch(e) {
+    alert('Erreur réseau : ' + e.message);
+  }
 }
 
 // ── Tabs ──────────────────────────────
@@ -354,17 +476,17 @@ function renderOverview() {
         <div class="stat-card-label">Redis utilisé</div>
         <div class="stat-card-sub">${fmtBytes(redis.usedBytes)} / 256 Mo</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">📱</div>
-        <div class="stat-card-val">${fmt(app.totalInstalls)}</div>
-        <div class="stat-card-label">Installations</div>
-        <div class="stat-card-sub">${fmt(app.totalAcces)} accès total</div>
+      <div class="stat-card ok">
+        <div class="stat-card-ico">👥</div>
+        <div class="stat-card-val">${fmt(app.uniqueUsers?.total || 0)}</div>
+        <div class="stat-card-label">Visiteurs uniques</div>
+        <div class="stat-card-sub">${fmt(app.uniqueUsers?.today || 0)} aujourd'hui · ${fmt(app.uniqueUsers?.month || 0)} ce mois</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-ico">🤖</div>
-        <div class="stat-card-val">${fmtEurBig(totalEurMonth)}</div>
-        <div class="stat-card-label">Coût IA ce mois</div>
-        <div class="stat-card-sub">${fmtEur(totalEurDay)} aujourd'hui</div>
+        <div class="stat-card-ico">👁️</div>
+        <div class="stat-card-val">${fmt(app.totalAcces)}</div>
+        <div class="stat-card-label">Accès total</div>
+        <div class="stat-card-sub">${fmt(app.totalInstalls)} installations</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🔔</div>
@@ -400,8 +522,12 @@ function renderOverview() {
 }
 
 function renderServiceBadges(services) {
-  const icons = { mel:'🤖', signalement:'🚨', actualites:'🔔', meteo:'🌤️', contact:'💬', idees:'💡', installation:'📲', bug:'🐞' };
-  const entries = Object.entries(services).filter(([k]) => k !== 'installation').sort((a,b) => b[1]-a[1]);
+  const icons = { mel:'🤖', signalement:'🚨', actualites:'🔔', meteo:'🌤️', contact:'💬', idees:'💡', installation:'📲', bug:'🐞', agenda:'📅', transport:'🚌' };
+  // Exclure conseil_municipal de la vue générale + les clics élus individuels
+  const HIDDEN = ['installation','conseil_municipal'];
+  const entries = Object.entries(services)
+    .filter(([k]) => !HIDDEN.includes(k) && !k.startsWith('elu_'))
+    .sort((a,b) => b[1]-a[1]);
   if (!entries.length) return '<div style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucun accès aujourd\'hui.</div>';
   return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' +
     entries.map(([k,v]) => `<div class="stat-card" style="min-width:110px;padding:10px 14px">
@@ -457,11 +583,6 @@ function renderIa() {
         <div class="stat-card-label">Claude ce mois</div>
         <div class="stat-card-sub">${fmt(mClaude.calls)} appels · ${fmt(mClaude.in+mClaude.out)} tokens</div>
       </div>
-      <div class="stat-card ok">
-        <div class="stat-card-ico">💶</div>
-        <div class="stat-card-val">${fmtEurBig((mMistral.costEur||0)+(mClaude.costEur||0))}</div>
-        <div class="stat-card-label">Total IA ce mois</div>
-      </div>
     </div>
 
     <div class="chart-wrap">
@@ -483,6 +604,11 @@ function renderIa() {
     <div class="section-title">Catégories de questions MEL</div>
     <div class="cards-grid">
       ${topMonthCats.length ? topMonthCats.slice(0,4).map(([cat,val]) => `<div class="stat-card"><div class="stat-card-ico">🏷️</div><div class="stat-card-val">${fmt(val)}</div><div class="stat-card-label">${cat}</div><div class="stat-card-sub">Mois courant</div></div>`).join('') : `<div class="stat-card"><div class="stat-card-ico">🏷️</div><div class="stat-card-val">0</div><div class="stat-card-label">Aucune catégorie</div><div class="stat-card-sub">Pas encore de données</div></div>`}
+    </div>
+
+    <div class="chart-wrap" style="overflow:hidden;">
+      <div class="chart-title">☁️ Nuage de catégories MEL — 30 derniers jours</div>
+      <canvas id="chart-wordcloud" style="width:100%;height:200px;"></canvas>
     </div>
 
     <div class="chart-wrap">
@@ -559,6 +685,8 @@ function renderIa() {
 
   drawChart('chart-ia-categories-daily', daySeries.periods, daySeries.datasets, 'line');
   drawChart('chart-ia-categories-monthly', monthSeries.periods, monthSeries.datasets, 'bar');
+  // Nuage de mots des catégories sur 30 jours
+  drawWordCloud('chart-wordcloud', iaCategories.parJour || {});
 }
 
 function setIaView(v) { iaView = v; renderIa(); }
@@ -654,14 +782,16 @@ function renderApp() {
     <div class="section-title">Usage global</div>
     <div class="cards-grid">
       <div class="stat-card ok">
-        <div class="stat-card-ico">📲</div>
-        <div class="stat-card-val">${fmt(app.totalInstalls)}</div>
-        <div class="stat-card-label">Installations totales</div>
+        <div class="stat-card-ico">👥</div>
+        <div class="stat-card-val">${fmt(app.uniqueUsers?.total || 0)}</div>
+        <div class="stat-card-label">Visiteurs uniques (total)</div>
+        <div class="stat-card-sub">${fmt(app.uniqueUsers?.today || 0)} aujourd'hui · ${fmt(app.uniqueUsers?.month || 0)} ce mois</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">👁️</div>
         <div class="stat-card-val">${fmt(app.totalAcces)}</div>
         <div class="stat-card-label">Accès total</div>
+        <div class="stat-card-sub">${fmt(app.totalInstalls)} installations</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🗓️</div>
@@ -752,6 +882,22 @@ async function deleteIdea(id) {
 function renderActus() {
   const actus = _data.actus;
   document.getElementById('actus-content').innerHTML = `
+    <div class="section-title">➕ Ajouter une actualité</div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:16px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <label style="font-size:0.76rem;font-weight:800;color:var(--muted);display:block;margin-bottom:4px;">Titre de l'actualité</label>
+          <input id="new-actu-title" placeholder="Ex: Conseil municipal du 15 janvier…" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.84rem;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:0.76rem;font-weight:800;color:var(--muted);display:block;margin-bottom:4px;">URL photo (optionnel)</label>
+          <input id="new-actu-photo" placeholder="https://…/image.jpg" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.84rem;outline:none;">
+        </div>
+        <button onclick="addActu()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:10px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;align-self:flex-start;">📢 Publier l'actualité</button>
+        <div id="actu-add-msg" style="display:none;font-size:0.8rem;font-weight:800;color:var(--leaf);"></div>
+      </div>
+    </div>
+
     <div class="table-wrap">
       <div class="table-header">
         <span class="table-title">🔔 Actualités (${actus.length})</span>
@@ -767,6 +913,32 @@ function renderActus() {
       </table>
     </div>
   `;
+}
+
+async function addActu() {
+  const title = (document.getElementById('new-actu-title')?.value || '').trim();
+  const photo = (document.getElementById('new-actu-photo')?.value || '').trim();
+  if (!title) { alert('Titre requis'); return; }
+  try {
+    const r = await fetch(`${API}/admin/actus/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+      body: JSON.stringify({ title, photo: photo || null })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      const msg = document.getElementById('actu-add-msg');
+      if (msg) { msg.textContent = '✅ Actualité publiée !'; msg.style.display = 'block'; }
+      // Recharger les données
+      const actus = await apiGet('/admin/actus');
+      _data.actus = actus.actus || [];
+      setTimeout(() => renderActus(), 600);
+    } else {
+      alert('Erreur : ' + (d.error || 'inconnue'));
+    }
+  } catch(e) {
+    alert('Erreur réseau : ' + e.message);
+  }
 }
 
 async function deleteActu(id) {
