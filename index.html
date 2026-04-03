@@ -1035,6 +1035,8 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
           <button class="idea-cat" onclick="selIdeaCat(this,'🌿 Environnement')">🌿 Environnement</button>
           <button class="idea-cat" onclick="selIdeaCat(this,'🎉 Animations')">🎉 Animations</button>
           <button class="idea-cat" onclick="selIdeaCat(this,'🏫 Services')">🏫 Services</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🧒 Enfance')">🧒 Enfance</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'📱 MAT')">📱 MAT</button>
           <button class="idea-cat" onclick="selIdeaCat(this,'💡 Autre')">💡 Autre</button>
         </div>
         <button class="idea-submit" onclick="submitIdee()">💡 Soumettre mon idée</button>
@@ -3299,13 +3301,16 @@ function toggleBadgeNotif(on) {
 // ════════════════════════════════════════
 const OB_KEY = 'mat_onboarded_v3';
 const OB_FEATURES = [
-  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions sur la commune : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]' },
+  // Ordre strict = ordre d'apparition dans le DOM (header puis grille)
+  { ico:'🏛️', title:`Mairie & Contact`, desc:`Accédez aux coordonnées de la mairie, aux horaires d'ouverture et contactez vos élus directement.`, sel:'.top-mairie' },
+  { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo' },
+  { ico:'🚌', title:`Bus Ligne 8 Rémi`, desc:`Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.`, sel:'.bus-strip' },
+  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]' },
   { ico:'🔔', title:`Actualités communales`, desc:`Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.`, sel:'button[onclick="openNotifs()"]' },
+  { ico:'💡', title:`Vos idées`, desc:`Partagez vos idées pour améliorer la commune. Votez pour les propositions des habitants !`, sel:'button[onclick="openIdees()"]' },
   { ico:'🚨', title:`Signalement citoyen`, desc:`Voirie abîmée, lampadaire en panne ? Signalez-le en quelques secondes, anonymement.`, sel:'button[onclick="openSignal()"]' },
   { ico:'📅', title:`Agenda & Sorties`, desc:`Consultez tous les événements de la commune. Ne manquez plus aucune manifestation !`, sel:'button[onclick="openAgenda()"]' },
-  { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo' },
-  { ico:'🏛️', title:`Contact & Élus`, desc:`Coordonnées de la mairie, trombinoscope des élus et envoi de demandes directes.`, sel:'button[onclick="openContact()"]' },
-  { ico:'🚌', title:`Bus Ligne 8 Rémi`, desc:`Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.`, sel:'.bus-strip' },
+  { ico:'🏃', title:`Randonnées — Réseau & Parcours`, desc:`Explorez les circuits pédestres autour de Mézières et générez des parcours sur mesure sur le réseau de chemins.`, sel:'a[href*="rando.html"]' },
   { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]' },
 ];
 let _obStep = 0;
@@ -3417,8 +3422,8 @@ async function showObFeature(idx) {
         if (el) break;
       }
     }
+    // Normaliser : si c'est une icône/div, remonter au bouton ou lien parent
     if (el && el.tagName !== 'BUTTON' && el.tagName !== 'A') {
-      // Chercher un bouton parent
       const parentBtn = el.closest('button') || el.closest('a');
       if (parentBtn) el = parentBtn;
     }
