@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.5.10 -->
+<!-- VERSION 3.6.0 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
@@ -565,7 +565,7 @@ html.theme-sombre .ctx-text{color:#cbd5e1;}
 html.theme-sombre .ctx-close{background:rgba(255,255,255,.08);color:#e2e8f0;}
 
 /* ── Mode simplifié ── */
-.notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\n/* === MODE SIMPLIFIÉ V3.5.10 === */\n/* Masquer sections et grilles vides */\nhtml.simplified-mode .sec{display:none !important;}\nhtml.simplified-mode .simple-title{display:none !important;}\n/* Chaque grid2 devient une colonne */\nhtml.simplified-mode .grid2{display:flex !important;flex-direction:column !important;gap:0 !important;margin-bottom:0 !important;}\n/* Masquer TOUTES les cards sauf simple-card */\nhtml.simplified-mode .grid2 > .card:not(.simple-card){display:none !important;}\nhtml.simplified-mode .grid2 > a.card:not(.simple-card){display:none !important;}\n/* Masquer les grid2 qui ne contiennent aucune simple-card visible → via vide */\n/* Afficher les simple-card en pleine largeur */\nhtml.simplified-mode .simple-card{display:flex !important;align-items:center !important;gap:14px !important;min-height:72px !important;width:100% !important;box-sizing:border-box !important;margin-bottom:10px !important;border-radius:16px !important;padding:14px 16px !important;}\nhtml.simplified-mode .simple-card .ico{display:flex !important;flex-shrink:0 !important;width:48px !important;height:48px !important;font-size:24px !important;align-items:center !important;justify-content:center !important;border-radius:12px !important;}\nhtml.simplified-mode .simple-card .ct{min-width:0 !important;flex:1 !important;}\nhtml.simplified-mode .simple-card .ct-label{font-size:1rem !important;font-weight:900 !important;}\nhtml.simplified-mode .simple-card .ct-sub{font-size:0.76rem !important;}\n/* Masquer les grid2 entièrement vides après filtrage */\nhtml.simplified-mode .content{display:block !important;}
+.notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\n
 
 /* ── Modale MAT ── */
 .mat-modal{position:fixed;inset:0;z-index:4000;background:rgba(26,61,43,.58);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;}
@@ -630,13 +630,30 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
       <div style="height:1.8em"></div>
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.5.10</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.6.0</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
   </div>
+  <!-- Encart info/alerte MAT v3.6 -->
+  <div id="mat-info-banner" style="display:none;margin-bottom:6px;border-radius:14px;padding:10px 14px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);backdrop-filter:blur(4px);animation:fadeOv .3s ease;position:relative;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="mat-info-ico" style="font-size:1.4rem;flex-shrink:0;">ℹ️</span>
+      <div style="flex:1;min-width:0;">
+        <div id="mat-info-title" style="font-size:0.7rem;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:0.06em;"></div>
+        <div id="mat-info-text" style="font-size:0.76rem;color:rgba(255,255,255,0.92);line-height:1.4;margin-top:2px;"></div>
+      </div>
+      <button id="mat-info-close" onclick="dismissMatInfoBanner()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.8rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+  </div>
   <!-- Encarts accueil -->
   <div class="header-bottom-grid">
+    <div class="top-card top-mairie mairie-strip" onclick="openContact()">
+      <div class="top-title">Mairie</div>
+      <div class="top-main" id="mairie-status">Chargement…</div>
+      <div class="top-sub" id="mairie-desc"></div>
+      <div class="top-badge" id="mairie-badge">Horaires</div>
+    </div>
     <div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
       <div class="top-title">Météo</div>
       <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
@@ -648,12 +665,6 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
       <div class="top-title">Déchets</div>
       <div class="dechet-row" id="dechet-poubelle"><span id="om-text">Chargement…</span></div>
       <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
-    </div>
-    <div class="top-card top-mairie mairie-strip" onclick="openContact()">
-      <div class="top-title">Mairie</div>
-      <div class="top-main" id="mairie-status">Chargement…</div>
-      <div class="top-sub" id="mairie-desc"></div>
-      <div class="top-badge" id="mairie-badge">Horaires</div>
     </div>
     <div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
       <div class="top-title">Prochaine manifestation</div>
@@ -729,11 +740,11 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
     </button>
   </div>
 
-  <div class="sec">Agenda</div>
+  <div class="sec">Agenda &amp; Sorties</div>
   <div class="grid2">
     <button class="card simple-card" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Vos RDV</div></div>
+      <div class="ct"><div class="ct-label">Agenda &amp; Sorties</div><div class="ct-sub">Événements &amp; manifestations</div></div>
     </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
       <div class="ico ico-rando">🥾</div>
@@ -886,22 +897,18 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
         </label>
       </div>
 
-      <div class="acc-option">
+      <div class="acc-option" id="opt-badge-notif">
         <div>
-          <div class="acc-option-label">🧭 Mode simplifié</div>
-          <div class="acc-option-sub">Affiche 5 accès essentiels : MEL, notifications, signalement, contact et agenda</div>
+          <div class="acc-option-label">🔢 Badge sur l’icône</div>
+          <div class="acc-option-sub">Compteur sur l’icône de l’app (si supporté par le téléphone)</div>
         </div>
         <label class="acc-switch">
-          <input type="checkbox" id="acc-simple-toggle" onchange="toggleSimplified(this.checked)">
+          <input type="checkbox" id="acc-badge-toggle" checked onchange="toggleBadgeNotif(this.checked)">
           <span class="acc-slider"></span>
         </label>
       </div>
 
-      <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
-        ↺ Réinitialiser les paramètres
-      </button>
-    </div>
-  </div>
+      
 </div>
 
 <!-- Barre TTS -->
@@ -940,6 +947,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
         🌲 <em>Mézières-lez-Cléry mérite le meilleur service. C'est mon devoir.</em>
       </div>
       <button class="majordome-btn" onclick="closeOv('majordome')">À votre service !</button>
+      <button class="majordome-btn" onclick="closeOv('majordome');relancerOnboarding();" style="margin-top:8px;background:rgba(255,255,255,0.12);color:var(--sage);border:1px solid rgba(255,255,255,0.2);">🎬 Revoir la présentation</button>
     </div>
   </div>
 </div>
@@ -952,7 +960,9 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
       <div class="panel-title">MEL — Aide communale</div>
       <button class="panel-close" onclick="closeOv('mel')">✕</button>
     </div>
-    <div class="ctx-help" id="ctx-mel"></div><div class="msgs" id="msgs"></div>
+    <div class="ctx-help" id="ctx-mel"></div>
+    <div id="mel-disclaimer" style="font-size:0.59rem;color:var(--muted);text-align:center;padding:5px 14px 4px;line-height:1.4;border-bottom:1px solid var(--border);background:var(--warm);flex-shrink:0;">⚠️ MEL peut se tromper. Réponses à titre indicatif — sous la responsabilité du lecteur.</div>
+    <div class="msgs" id="msgs"></div>
     <div class="sugs" id="sugs">
       <button class="sug" onclick="showMelThemeQuestions('urbanisme')">🏗️ Urbanisme</button>
       <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Enfance</button>
@@ -1155,7 +1165,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#fef3e0">📅</div>
-      <div class="panel-title">Agenda</div>
+      <div class="panel-title">Agenda &amp; Sorties</div>
       <button class="panel-close" onclick="closeOv('agenda')">✕</button>
     </div>
     <div class="panel-body">
@@ -1466,7 +1476,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.5.10 — Mézières Avec Toi
+// MAT v3.6.0 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1720,6 +1730,16 @@ async function sendMel(){
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
     var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
+    if(d.showElus){
+      const c=document.getElementById('msgs');
+      const sug=document.createElement('div'); sug.className='msg bot';
+      sug.innerHTML='<div class="mav">👩</div><div class="bub" style="background:var(--mist);border:1px solid rgba(0,0,0,0.06);font-size:0.78rem;display:flex;align-items:center;gap:8px;padding:10px 12px;flex-wrap:wrap;">'
+        +'<span style="font-size:1.1rem;flex-shrink:0;">🏛️</span>'
+        +'<span style="flex:1;color:var(--forest);min-width:100px;">Consulter la fiche ou contacter un élu ?</span>'
+        +'<button onclick="closeOv(\'mel\');openConseil();" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:0.72rem;font-weight:900;cursor:pointer;flex-shrink:0;">🏛️ Voir les élus</button>'
+        +'</div>';
+      c.appendChild(sug); c.scrollTop=99999;
+    }
   }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
   melBusy=false;
 }
@@ -2448,7 +2468,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.5.10'
+    matVersion:'v3.6.0'
   };
 }
 
@@ -2806,7 +2826,6 @@ function loadAccessibilite() {
     if (saved.noHeader)  toggleNoHeader(true);
     if (saved.noWidgets) toggleNoWidgets(true);
     if (saved.colorblind) toggleColorblind(true, false);
-    if (saved.simplified) toggleSimplified(true, false);
   } catch(e) {}
 }
 
@@ -2824,7 +2843,6 @@ function saveAccessibilite() {
     noHeader:   html.classList.contains('no-header'),
     noWidgets:  html.classList.contains('no-widgets'),
     colorblind: html.classList.contains('colorblind-mode'),
-    simplified: html.classList.contains('simplified-mode'),
   }));
 }
 
@@ -2873,12 +2891,6 @@ function toggleColorblind(on, save=true) {
   if (save) saveAccessibilite();
 }
 
-function toggleSimplified(on, save=true) {
-  document.documentElement.classList.toggle('simplified-mode', on);
-  const el = document.getElementById('acc-simple-toggle');
-  if (el) el.checked = on;
-  if (save) saveAccessibilite();
-}
 
 
 
@@ -2924,6 +2936,7 @@ function buildTrombi(){
 
 function openTrombi(idx){
   const e = ELUS[idx];
+  try{const eluKey='elu_'+(e.nom||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').substring(0,25);fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:eluKey})});}catch(_){}
   const modal = document.getElementById('trombi-modal');
   const card = document.getElementById('trombi-card');
   document.getElementById('trombi-big-img').src = e.img;
@@ -2991,11 +3004,9 @@ function openAccessibilite() {
   const nh = document.getElementById('acc-noheader-toggle');
   const nw = document.getElementById('acc-nowidgets-toggle');
   const cb = document.getElementById('acc-colorblind-toggle');
-  const sm = document.getElementById('acc-simple-toggle');
   if (nh) nh.checked = html2.classList.contains('no-header');
   if (nw) nw.checked = html2.classList.contains('no-widgets');
   if (cb) cb.checked = html2.classList.contains('colorblind-mode');
-  if (sm) sm.checked = html2.classList.contains('simplified-mode');
 }
 
 function resetAccessibilite() {
@@ -3010,7 +3021,6 @@ function resetAccessibilite() {
   toggleNoHeader(false);
   toggleNoWidgets(false);
   toggleColorblind(false, false);
-  toggleSimplified(false, false);
   localStorage.removeItem(ACC_KEY);
   openAccessibilite(); // resync l'UI
 }
@@ -3165,7 +3175,7 @@ if(window.visualViewport){
 }
 
 // ── Init ─────────────────────────────────
-loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge(); fixIOSViewportAfterKeyboard(); restoreSignalFormState(); restoreContactFormState(); restoreBugFormState();
+loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge(); fixIOSViewportAfterKeyboard(); restoreSignalFormState(); restoreContactFormState(); restoreBugFormState(); loadMatInfoBanner(); setTimeout(initOnboarding, 800);
 setInterval(loadDechets,60000);
 
 if('serviceWorker' in navigator){
@@ -3190,6 +3200,236 @@ document.addEventListener('visibilitychange', function(){
   }
 });
 
+
+// ════════════════════════════════════════
+// MAT v3.6 — Encart info/alerte
+// ════════════════════════════════════════
+const MAT_BANNER_DISMISS_KEY = 'mat_banner_dismissed_v3_';
+
+async function loadMatInfoBanner() {
+  try {
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/vigilance');
+    if (r.ok) {
+      const d = await r.json();
+      const v = d.vigilance;
+      if (v && v.level >= 2) {
+        const icons = {1:'✅',2:'🟡',3:'🟠',4:'🔴'};
+        const ico = icons[v.level] || '⚠️';
+        const txt = v.phenomenon_label + (v.main_text ? ' — ' + v.main_text.substring(0,80) : '');
+        showMatInfoBanner(ico, 'Vigilance météo ' + (v.color_label || ''), txt, 'alert', false, null);
+        return;
+      }
+    }
+  } catch(_) {}
+  try {
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/info-banner');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d.active || !d.text) return;
+    const dk = MAT_BANNER_DISMISS_KEY + (d.id || '');
+    if (localStorage.getItem(dk)) return;
+    showMatInfoBanner(d.icon || 'ℹ️', d.title || 'Information', d.text, 'info', true, dk);
+  } catch(_) {}
+}
+
+function showMatInfoBanner(ico, title, text, type, closeable, dismissKey) {
+  const b = document.getElementById('mat-info-banner');
+  if (!b) return;
+  document.getElementById('mat-info-ico').textContent = ico;
+  document.getElementById('mat-info-title').textContent = title;
+  document.getElementById('mat-info-text').textContent = text;
+  const cb = document.getElementById('mat-info-close');
+  if (cb) cb.style.display = closeable ? 'flex' : 'none';
+  b._dismissKey = dismissKey || null;
+  if (type === 'alert') {
+    b.style.background = 'rgba(220,38,38,0.75)';
+    b.style.borderColor = 'rgba(255,100,100,0.5)';
+  } else {
+    b.style.background = 'rgba(255,255,255,0.18)';
+    b.style.borderColor = 'rgba(255,255,255,0.3)';
+  }
+  b.style.display = '';
+}
+
+function dismissMatInfoBanner() {
+  const b = document.getElementById('mat-info-banner');
+  if (!b) return;
+  if (b._dismissKey) localStorage.setItem(b._dismissKey, '1');
+  b.style.opacity = '0';
+  b.style.transition = 'opacity 0.3s';
+  setTimeout(() => { b.style.display = 'none'; b.style.opacity = ''; b.style.transition = ''; }, 300);
+}
+
+// ════════════════════════════════════════
+// MAT v3.6 — Badge icône PWA
+// ════════════════════════════════════════
+function updateAppBadge(count) {
+  if (!('setAppBadge' in navigator)) return;
+  const saved = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
+  if (saved.badgeNotif === false) return;
+  if (count > 0) navigator.setAppBadge(count).catch(() => {});
+  else navigator.clearAppBadge().catch(() => {});
+}
+function toggleBadgeNotif(on) {
+  const saved = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
+  saved.badgeNotif = on;
+  localStorage.setItem(ACC_KEY, JSON.stringify(saved));
+  if (!on && 'clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {});
+}
+// Patcher updateActuBadge
+(function(){
+  const _orig = window.updateActuBadge;
+  window.updateActuBadge = function(count) {
+    if (_orig) _orig(count);
+    updateAppBadge(Number(count) || 0);
+  };
+})();
+
+// ════════════════════════════════════════
+// MAT v3.6 — Onboarding
+// ════════════════════════════════════════
+const OB_KEY = 'mat_onboarded_v3';
+const OB_FEATURES = [
+  { ico:'👩‍💼', title:'MEL — Assistante IA', desc:'Posez toutes vos questions sur la commune : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.', sel:'.ico-mel' },
+  { ico:'🔔', title:'Actualités communales', desc:'Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.', sel:'.ico-notif-wrap' },
+  { ico:'🚨', title:'Signalement citoyen', desc:'Voirie abîmée, lampadaire en panne ? Signalez-le en quelques secondes, anonymement.', sel:'.ico-signal' },
+  { ico:'📅', title:'Agenda & Sorties', desc:'Consultez tous les événements de la commune. Ne manquez plus aucune manifestation !', sel:'button[onclick="openAgenda()"]' },
+  { ico:'🌤️', title:'Météo locale', desc:'Météo en temps réel pour Mézières avec alertes Météo-France intégrées directement dans l'appli.', sel:'.top-meteo' },
+  { ico:'🏛️', title:'Contact & Élus', desc:'Coordonnées de la mairie, trombinoscope des élus et envoi de demandes directes.', sel:'button[onclick="openContact()"]' },
+  { ico:'🚌', title:'Bus Ligne 8 Rémi', desc:'Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.', sel:'.bus-strip' },
+  { ico:'⚙️', title:'Personnalisation', desc:'Thème sombre, taille de texte, contraste élevé… Adaptez l'appli à vos besoins depuis le bouton Personnalisation.', sel:'.acc-btn' },
+];
+let _obStep = 0;
+
+function initOnboarding() {
+  if (localStorage.getItem(OB_KEY)) return;
+  _obStep = 0;
+  buildOnboardingDOM();
+  document.getElementById('mat-onboarding').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function relancerOnboarding() {
+  localStorage.removeItem(OB_KEY);
+  _obStep = 0;
+  buildOnboardingDOM();
+  document.getElementById('mat-onboarding').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function buildOnboardingDOM() {
+  let ob = document.getElementById('mat-onboarding');
+  if (!ob) { ob = document.createElement('div'); ob.id = 'mat-onboarding'; document.body.appendChild(ob); }
+  const total = OB_FEATURES.length + 1;
+  const dots = Array.from({length:total},(_,i)=>`<div id="ob-dot-${i}" style="width:7px;height:7px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.35)'};transition:all 0.3s;flex-shrink:0;"></div>`).join('');
+  ob.innerHTML = `
+    <div id="ob-step-0" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:28px 24px;text-align:center;gap:18px;">
+      <img src="MAT-explique.png" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.png'">
+      <div style="color:#fff;font-family:'Grape Nuts',cursive;font-size:2.2rem;">Bienvenue !</div>
+      <div style="color:rgba(255,255,255,0.88);font-size:0.88rem;line-height:1.7;max-width:320px;">
+        Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.<br><br>
+        Votre application municipale : actualités, signalements, agenda, météo et bien plus.<br><br>
+        <em style="color:rgba(255,255,255,0.5);font-size:0.76rem;">Laissez-moi vous présenter l'application.</em>
+      </div>
+      <button onclick="obNext()" style="background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:16px;padding:15px 36px;font-family:'Nunito',sans-serif;font-size:0.94rem;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(22,163,74,0.4);">Découvrir l'appli →</button>
+    </div>
+    <div id="ob-feature-card" style="display:none;position:fixed;bottom:0;left:0;right:0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,rgba(13,43,26,0.97) 70%,transparent);z-index:10002;text-align:center;">
+      <div id="ob-feat-ico" style="font-size:2.8rem;margin-bottom:8px;"></div>
+      <div id="ob-feat-title" style="color:#fff;font-size:1.05rem;font-weight:900;font-family:'Nunito',sans-serif;margin-bottom:6px;"></div>
+      <div id="ob-feat-desc" style="color:rgba(255,255,255,0.8);font-size:0.82rem;line-height:1.6;margin-bottom:16px;max-width:340px;margin-left:auto;margin-right:auto;"></div>
+      <button id="ob-next-btn" onclick="obNext()" style="background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:14px;padding:13px 30px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,0.4);">Suivant →</button>
+    </div>
+    <div id="ob-overlay-dark" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:10001;">
+      <svg id="ob-svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;"></svg>
+      <div id="ob-finger" style="position:absolute;font-size:2rem;animation:obFinger 1s ease infinite;pointer-events:none;display:none;">👆</div>
+    </div>
+    <div id="ob-progress-bar-wrap" style="display:none;position:fixed;top:0;left:0;right:0;z-index:10003;padding:env(safe-area-inset-top,0px) 16px 0;pointer-events:none;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;pointer-events:all;">
+        <div style="flex:1;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;">
+          <div id="ob-progress-fill" style="height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:2px;transition:width 0.4s ease;width:0%"></div>
+        </div>
+        <button onclick="obSkip()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.75);border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:800;cursor:pointer;pointer-events:all;">Passer</button>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;padding-bottom:6px;" id="ob-dots">${dots}</div>
+    </div>
+  `;
+  ob.style.cssText = 'display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#0d2b1a 0%,#1a3d2b 100%);flex-direction:column;';
+}
+
+function obNext() {
+  _obStep++;
+  const total = OB_FEATURES.length + 1;
+  if (_obStep >= total) { obFinish(); return; }
+  showObFeature(_obStep - 1);
+  const pct = (_obStep / (total - 1)) * 100;
+  const fill = document.getElementById('ob-progress-fill');
+  if (fill) fill.style.width = pct + '%';
+  for (let i = 0; i < total; i++) {
+    const dot = document.getElementById('ob-dot-' + i);
+    if (dot) dot.style.background = i < _obStep ? '#22c55e' : i === _obStep ? '#fff' : 'rgba(255,255,255,0.35)';
+  }
+}
+
+function showObFeature(idx) {
+  const f = OB_FEATURES[idx];
+  if (!f) { obFinish(); return; }
+  document.getElementById('ob-step-0').style.display = 'none';
+  document.getElementById('ob-progress-bar-wrap').style.display = '';
+  const card = document.getElementById('ob-feature-card');
+  card.style.display = '';
+  document.getElementById('ob-feat-ico').textContent = f.ico;
+  document.getElementById('ob-feat-title').textContent = f.title;
+  document.getElementById('ob-feat-desc').textContent = f.desc;
+  const btn = document.getElementById('ob-next-btn');
+  if (btn) btn.textContent = idx < OB_FEATURES.length - 1 ? 'Suivant →' : 'Terminer ✓';
+  card.style.transform = 'translateY(28px)'; card.style.opacity = '0';
+  card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease';
+  requestAnimationFrame(() => requestAnimationFrame(() => { card.style.transform = 'translateY(0)'; card.style.opacity = '1'; }));
+  const ob = document.getElementById('mat-onboarding');
+  ob.style.background = 'transparent';
+  const darkOverlay = document.getElementById('ob-overlay-dark');
+  const svg = document.getElementById('ob-svg');
+  const finger = document.getElementById('ob-finger');
+  darkOverlay.style.display = '';
+  const el = f.sel ? document.querySelector(f.sel) : null;
+  if (el) {
+    const rect = el.getBoundingClientRect();
+    const pad = 10, r = 14;
+    const x = rect.left - pad, y = rect.top - pad;
+    const w = rect.width + pad*2, h = rect.height + pad*2;
+    const W = window.innerWidth, H = window.innerHeight;
+    svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
+    finger.style.display = '';
+    const fingerBelow = rect.bottom + 50 < window.innerHeight * 0.62;
+    finger.innerHTML = fingerBelow ? '👆' : '👇';
+    finger.style.left = (rect.left + rect.width / 2 - 16) + 'px';
+    finger.style.top = (fingerBelow ? rect.bottom + 6 : rect.top - 44) + 'px';
+  } else {
+    svg.innerHTML = `<rect width="${window.innerWidth}" height="${window.innerHeight}" fill="rgba(0,0,0,0.65)"/>`;
+    finger.style.display = 'none';
+  }
+}
+
+function obSkip() { obFinish(); }
+function obFinish() {
+  localStorage.setItem(OB_KEY, '1');
+  const ob = document.getElementById('mat-onboarding');
+  if (ob) { ob.style.transition = 'opacity 0.45s'; ob.style.opacity = '0'; setTimeout(() => { ob.style.display = 'none'; ob.style.opacity = ''; }, 460); }
+  document.body.style.overflow = '';
+}
+
+// Animations CSS onboarding
+(function(){
+  const s = document.createElement('style');
+  s.textContent = '@keyframes obBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}@keyframes obFinger{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}@keyframes obDash{to{stroke-dashoffset:-24}}';
+  document.head.appendChild(s);
+})();
+
+// Masquer option badge si non supporté
+if (!('setAppBadge' in navigator)) {
+  const el = document.getElementById('opt-badge-notif');
+  if (el) el.style.display = 'none';
+}
 </script>
 </body>
 </html>
