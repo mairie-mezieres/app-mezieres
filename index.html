@@ -1789,7 +1789,7 @@ const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellem
 
 async function loadMeteo() {
   try {
-    const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,uv_index_max,sunrise,sunset,wind_direction_10m_dominant,wind_gusts_10m_max&past_days=1&timezone=Europe%2FParis&forecast_days=10', { cache: 'no-store' });
+    const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,wind_gusts_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,uv_index_max,sunrise,sunset,wind_direction_10m_dominant,wind_gusts_10m_max&past_days=1&timezone=Europe%2FParis&forecast_days=10', { cache: 'no-store' });
     if (!fr.ok) throw new Error('HTTP ' + fr.status);
     const d = { forecast: await fr.json(), vigilance: null };
     const cur = (d.forecast || {}).current || {};
@@ -1885,17 +1885,66 @@ function loadMeteoDetail() {
   }
   html += '</div>';
 
-  // ── Bloc 2 : Grille 4 encarts ──
+  // ── Tendances : comparer avec 3h avant (données horaires)
+  // Chercher l'index horaire actuel et l'index -3h
+  var nowH3 = new Date(), idxNow = -1, idx3hBefore = -1;
+  for (var hi = 0; hi < hT2.length; hi++) {
+    var tH = new Date(hT2[hi]);
+    var diffMin = (tH - nowH3) / 60000;
+    if (diffMin >= -10 && diffMin <= 60 && idxNow === -1) idxNow = hi;
+    if (diffMin >= -200 && diffMin <= -160 && idx3hBefore === -1) idx3hBefore = hi;
+  }
+  // Données horaires étendues pour tendances
+  var hrlyHum  = (forecast.hourly||{}).relative_humidity_2m || [];
+  var hrlyPres = (forecast.hourly||{}).surface_pressure || (forecast.hourly||{}).pressure_msl || [];
+  var hrlyWGst = (forecast.hourly||{}).wind_gusts_10m || [];
+  var hrlyPrec = hP2; // precipitation horaire déjà chargée
+
+  function tendance(valNow, valBefore, seuilFort, seuilMod) {
+    if (valBefore == null || valNow == null) return {ico:'', lbl:'', col:'var(--muted)'};
+    var diff = valNow - valBefore;
+    var absDiff = Math.abs(diff);
+    if (absDiff < seuilMod * 0.3) return {ico:'→', lbl:'Stable', col:'#6b7280'};
+    if (diff > 0) {
+      if (absDiff >= seuilFort) return {ico:'↑↑', lbl:'Hausse importante', col:'#dc2626'};
+      return {ico:'↑', lbl:'Hausse modérée', col:'#f59e0b'};
+    } else {
+      if (absDiff >= seuilFort) return {ico:'↓↓', lbl:'Baisse forte', col:'#2563eb'};
+      return {ico:'↓', lbl:'Baisse modérée', col:'#60a5fa'};
+    }
+  }
+
+  // Calcul des tendances sur 3h
+  var pluieCur3h = idxNow !== -1 ? (hrlyPrec[idxNow] || 0) : null;
+  var pluieBef3h = idx3hBefore !== -1 ? (hrlyPrec[idx3hBefore] || 0) : null;
+  var rafCur   = idxNow !== -1 ? hrlyWGst[idxNow] : null;
+  var rafBef   = idx3hBefore !== -1 ? hrlyWGst[idx3hBefore] : null;
+  var presCur  = cur.pressure_msl || null;
+  var presBef  = idx3hBefore !== -1 ? hrlyPres[idx3hBefore] : null;
+  var humCur   = cur.relative_humidity_2m || null;
+  var humBef   = idx3hBefore !== -1 ? hrlyHum[idx3hBefore] : null;
+
+  var tPluie = tendance(pluieCur3h, pluieBef3h, 2, 0.5);
+  var tRaf   = tendance(rafCur, rafBef, 20, 5);
+  var tPres  = tendance(presCur, presBef, 5, 1.5);
+  var tHum   = tendance(humCur, humBef, 15, 5);
+
+  function tBadge(t) {
+    if (!t.ico) return '';
+    return '<span style="font-size:0.65rem;font-weight:900;color:'+t.col+';margin-left:4px" title="'+t.lbl+'">'+t.ico+'</span>'
+      + '<div style="font-size:0.52rem;color:'+t.col+';margin-top:1px">'+t.lbl+'</div>';
+  }
+
+  // ── Bloc 2 : Grille 4 encarts avec tendances ──
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
     // Cumul pluie 24h
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌧️ Cumul pluie 24h</div><div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+pluie24h+' mm</div></div>'
+    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌧️ Cumul pluie 24h</div>'    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+pluie24h+' mm'+tBadge(tPluie)+'</div></div>'
     // Rafale max 24h
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌪️ Rafale max 24h</div><div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+rafaleMax24+' km/h '+ventDirCur+'</div></div>'
+    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌪️ Rafale max 24h</div>'    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+rafaleMax24+' km/h '+ventDirCur+tBadge(tRaf)+'</div></div>'
     // Pression
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.58rem;color:var(--muted);font-weight:700">📊 Pression</div><div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+Math.round(cur.pressure_msl||0)+' hPa</div></div>'
+    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">📊 Pression</div>'    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+Math.round(cur.pressure_msl||0)+' hPa'+tBadge(tPres)+'</div></div>'
     // Humidité
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)"><div style="font-size:0.58rem;color:var(--muted);font-weight:700">💧 Humidité</div><div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+(cur.relative_humidity_2m||0)+'%</div></div>'
-    + '</div>';
+    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">💧 Humidité</div>'    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+(cur.relative_humidity_2m||0)+'%'+tBadge(tHum)+'</div></div>'    + '</div>';
 
   // ── Bloc 3 : Ressentie + écarts normales ──
   html += '<div style="background:white;border-radius:12px;padding:10px 14px;margin-bottom:14px;border:1px solid var(--border)">'
@@ -3242,9 +3291,17 @@ function showMatInfoBanner(ico, title, text, type, closeable, dismissKey) {
       + '</div>'
       + '<button id="mat-info-close" onclick="dismissMatInfoBanner()" style="background:rgba(255,255,255,0.2);border:none;color:white;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:0.8rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;">✕</button>'
       + '</div>';
-    // Insérer avant header-bottom-grid
-    const grid = document.querySelector('.header-bottom-grid');
-    if (grid && grid.parentNode) grid.parentNode.insertBefore(b, grid);
+    // Insérer dans le header, avant les encarts météo/déchets/bus
+    // Chercher le conteneur du header ou le body en fallback
+    const headerEl = document.querySelector('.header') || document.body;
+    // Chercher avant le bus-strip ou avant les encarts top-card
+    const refEl = document.querySelector('.bus-strip') || document.querySelector('.top-meteo') || document.querySelector('.header-bottom-grid');
+    if (refEl && refEl.parentNode && headerEl.contains(refEl)) {
+      refEl.parentNode.insertBefore(b, refEl);
+    } else {
+      // Fallback : append dans le header
+      headerEl.appendChild(b);
+    }
   }
   document.getElementById('mat-info-ico').textContent = ico;
   document.getElementById('mat-info-title').textContent = title;
@@ -3305,7 +3362,7 @@ const OB_FEATURES = [
   { ico:'🏛️', title:`Mairie & Contact`, desc:`Accédez aux coordonnées de la mairie, aux horaires d'ouverture et contactez vos élus directement.`, sel:'.top-mairie' },
   { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo' },
   { ico:'🚌', title:`Bus Ligne 8 Rémi`, desc:`Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.`, sel:'.bus-strip' },
-  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]', yOffset:-52 },
+  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]' },
   { ico:'🔔', title:`Actualités communales`, desc:`Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.`, sel:'button[onclick="openNotifs()"]' },
   { ico:'💡', title:`Vos idées`, desc:`Partagez vos idées pour améliorer la commune. Votez pour les propositions des habitants !`, sel:'button[onclick="openIdees()"]' },
   { ico:'🚨', title:`Signalement citoyen`, desc:`Voirie abîmée, lampadaire en panne ? Signalez-le en quelques secondes, anonymement.`, sel:'button[onclick="openSignal()"]' },
