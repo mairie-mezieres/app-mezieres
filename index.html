@@ -3305,13 +3305,13 @@ const OB_FEATURES = [
   { ico:'🏛️', title:`Mairie & Contact`, desc:`Accédez aux coordonnées de la mairie, aux horaires d'ouverture et contactez vos élus directement.`, sel:'.top-mairie' },
   { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo' },
   { ico:'🚌', title:`Bus Ligne 8 Rémi`, desc:`Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.`, sel:'.bus-strip' },
-  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]' },
+  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]', yOffset:-52 },
   { ico:'🔔', title:`Actualités communales`, desc:`Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.`, sel:'button[onclick="openNotifs()"]' },
   { ico:'💡', title:`Vos idées`, desc:`Partagez vos idées pour améliorer la commune. Votez pour les propositions des habitants !`, sel:'button[onclick="openIdees()"]' },
   { ico:'🚨', title:`Signalement citoyen`, desc:`Voirie abîmée, lampadaire en panne ? Signalez-le en quelques secondes, anonymement.`, sel:'button[onclick="openSignal()"]' },
   { ico:'📅', title:`Agenda & Sorties`, desc:`Consultez tous les événements de la commune. Ne manquez plus aucune manifestation !`, sel:'button[onclick="openAgenda()"]' },
   { ico:'🏃', title:`Randonnées — Réseau & Parcours`, desc:`Explorez les circuits pédestres autour de Mézières et générez des parcours sur mesure sur le réseau de chemins.`, sel:'a[href*="rando.html"]' },
-  { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]' },
+  { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]', scrollTop:true },
 ];
 let _obStep = 0;
 
@@ -3347,13 +3347,13 @@ function buildOnboardingDOM() {
         Votre application municipale : actualités, signalements, agenda, météo et bien plus.<br><br>
         <em style="color:rgba(255,255,255,0.5);font-size:0.76rem;">Laissez-moi vous présenter l'application.</em>
       </div>
-      <button onclick="obNext()" style="background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:16px;padding:15px 36px;font-family:'Nunito',sans-serif;font-size:0.94rem;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(22,163,74,0.4);">Découvrir l'appli →</button>
+      <button onclick="obNext()" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:16px;padding:15px 36px;font-family:'Nunito',sans-serif;font-size:0.94rem;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.3);">Découvrir l'appli →</button>
     </div>
     <div id="ob-feature-card" style="display:none;position:fixed;bottom:0;left:0;right:0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,rgba(13,43,26,0.97) 70%,transparent);z-index:10002;text-align:center;">
       <div id="ob-feat-ico" style="font-size:2.8rem;margin-bottom:8px;"></div>
       <div id="ob-feat-title" style="color:#fff;font-size:1.05rem;font-weight:900;font-family:'Nunito',sans-serif;margin-bottom:6px;"></div>
       <div id="ob-feat-desc" style="color:rgba(255,255,255,0.8);font-size:0.82rem;line-height:1.6;margin-bottom:16px;max-width:340px;margin-left:auto;margin-right:auto;"></div>
-      <button id="ob-next-btn" onclick="obNext()" style="background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;border:none;border-radius:14px;padding:13px 30px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,0.4);">Suivant →</button>
+      <button id="ob-next-btn" onclick="obNext()" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:14px;padding:13px 30px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.3);">Suivant →</button>
     </div>
     <div id="ob-overlay-dark" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:10001;">
       <svg id="ob-svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;"></svg>
@@ -3362,14 +3362,14 @@ function buildOnboardingDOM() {
     <div id="ob-progress-bar-wrap" style="display:none;position:fixed;top:0;left:0;right:0;z-index:10003;padding:env(safe-area-inset-top,0px) 16px 0;pointer-events:none;">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 0;pointer-events:all;">
         <div style="flex:1;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;">
-          <div id="ob-progress-fill" style="height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:2px;transition:width 0.4s ease;width:0%"></div>
+          <div id="ob-progress-fill" style="height:100%;background:linear-gradient(90deg,var(--leaf,#16a34a),var(--sage,#22c55e));border-radius:2px;transition:width 0.4s ease;width:0%"></div>
         </div>
         <button onclick="obSkip()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.75);border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:800;cursor:pointer;pointer-events:all;">Passer</button>
       </div>
       <div style="display:flex;gap:6px;justify-content:center;padding-bottom:6px;" id="ob-dots">${dots}</div>
     </div>
   `;
-  ob.style.cssText = 'display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#0d2b1a 0%,#1a3d2b 100%);flex-direction:column;';
+  ob.style.cssText = 'display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,var(--forest,#0d2b1a) 0%,var(--leaf,#1a3d2b) 100%);flex-direction:column;';
   ob.addEventListener('click', function(e){ if(e.target === ob) obFinish(); });
 }
 
@@ -3383,7 +3383,7 @@ async function obNext() {
   if (fill) fill.style.width = pct + '%';
   for (let i = 0; i < total; i++) {
     const dot = document.getElementById('ob-dot-' + i);
-    if (dot) dot.style.background = i < _obStep ? '#22c55e' : i === _obStep ? '#fff' : 'rgba(255,255,255,0.35)';
+    if (dot) dot.style.background = i < _obStep ? 'var(--sage,#22c55e)' : i === _obStep ? '#fff' : 'rgba(255,255,255,0.35)';
   }
 }
 
@@ -3431,7 +3431,11 @@ async function showObFeature(idx) {
   if (el) {
     // Pour les éléments dans le header (top-card, bus-strip), pas de scroll vertical
     const isInHeader = el.closest('.header') !== null;
-    if (!isInHeader) {
+    if (f.scrollTop) {
+      // Scroller en haut de page (ex: bouton Personnalisation en bas)
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      await new Promise(resolve => setTimeout(resolve, 380));
+    } else if (!isInHeader) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
       await new Promise(resolve => setTimeout(resolve, 420));
     } else {
@@ -3440,10 +3444,11 @@ async function showObFeature(idx) {
     }
     const rect = el.getBoundingClientRect();
     const pad = 10, r = 14;
-    const x = rect.left - pad, y = rect.top - pad;
+    const yOff = f.yOffset || 0;
+    const x = rect.left - pad, y = rect.top - pad + yOff;
     const w = rect.width + pad*2, h = rect.height + pad*2;
     const W = window.innerWidth, H = window.innerHeight;
-    svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
+    svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="var(--sage,#22c55e)" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
     finger.style.display = '';
     const fingerBelow = rect.bottom + 50 < window.innerHeight * 0.62;
     finger.innerHTML = fingerBelow ? '👆' : '👇';
