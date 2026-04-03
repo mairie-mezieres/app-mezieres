@@ -1,11 +1,11 @@
-// SERVICE WORKER v3.5.10 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.6.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-const CACHE = 'mat-v3.5.10';
+const CACHE = 'mat-v3.6.0';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(['./index.html', './mat-header.png', './icon-192.png']))
+    caches.open(CACHE).then(c => c.addAll(['./index.html', './mat-header.png', './icon-192.png', './autorisation-urbanisme.jpg']))
   );
 });
 
