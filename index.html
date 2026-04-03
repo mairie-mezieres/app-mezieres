@@ -3303,6 +3303,8 @@ let _obStep = 0;
 
 function initOnboarding() {
   if (localStorage.getItem(OB_KEY)) return;
+  // Ne pas afficher pour les utilisateurs existants (mat_accessibility présent = déjà utilisé)
+  if (localStorage.getItem('mat_accessibility')) { localStorage.setItem(OB_KEY, '1'); return; }
   _obStep = 0;
   buildOnboardingDOM();
   document.getElementById('mat-onboarding').style.display = 'flex';
@@ -3354,6 +3356,7 @@ function buildOnboardingDOM() {
     </div>
   `;
   ob.style.cssText = 'display:flex;position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#0d2b1a 0%,#1a3d2b 100%);flex-direction:column;';
+  ob.addEventListener('click', function(e){ if(e.target === ob) obFinish(); });
 }
 
 function obNext() {
@@ -3414,7 +3417,12 @@ function obSkip() { obFinish(); }
 function obFinish() {
   localStorage.setItem(OB_KEY, '1');
   const ob = document.getElementById('mat-onboarding');
-  if (ob) { ob.style.transition = 'opacity 0.45s'; ob.style.opacity = '0'; setTimeout(() => { ob.style.display = 'none'; ob.style.opacity = ''; }, 460); }
+  if (ob) {
+    ob.style.pointerEvents = 'none';
+    ob.style.transition = 'opacity 0.45s';
+    ob.style.opacity = '0';
+    setTimeout(() => { ob.style.display = 'none'; ob.style.opacity = ''; ob.style.pointerEvents = ''; }, 460);
+  }
   document.body.style.overflow = '';
 }
 
