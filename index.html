@@ -1447,26 +1447,6 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
   </div>
 </div>
 
-
-<!-- ═══ MODALE MAT ═══ -->
-<div class="mat-modal" id="mat-modal" onclick="matModalBackdrop(event)">
-  <div class="mat-modal-card" role="dialog" aria-modal="true" aria-labelledby="mat-modal-title">
-    <div class="mat-modal-head">
-      <div class="mat-modal-ico" id="mat-modal-ico">ℹ️</div>
-      <div class="mat-modal-title" id="mat-modal-title">MAT</div>
-      <button class="mat-modal-close" type="button" onclick="closeMatModal(false)">✕</button>
-    </div>
-    <div class="mat-modal-body">
-      <div class="mat-modal-text" id="mat-modal-text"></div>
-      <div class="mat-modal-actions" id="mat-modal-actions">
-        <button class="mat-modal-btn secondary" type="button" id="mat-modal-cancel" onclick="closeMatModal(false)">Annuler</button>
-        <button class="mat-modal-btn primary" type="button" id="mat-modal-ok" onclick="closeMatModal(true)">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 <script>
 // ════════════════════════════════════════
 // MAT v3.6.0 — Mézières Avec Toi
@@ -1482,13 +1462,33 @@ const INSTALL_KEY = 'mat_installed_v3';
 let _matModalResolver = null;
 function openMatModal(opts){
   opts = opts || {};
-  const modal = document.getElementById('mat-modal');
+  // Créer la modale dynamiquement si elle n'existe pas
+  let modal = document.getElementById('mat-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'mat-modal';
+    modal.className = 'mat-modal';
+    modal.setAttribute('onclick', 'matModalBackdrop(event)');
+    modal.innerHTML = '<div class="mat-modal-card" role="dialog" aria-modal="true" aria-labelledby="mat-modal-title">'
+      + '<div class="mat-modal-head">'
+      + '<div class="mat-modal-ico" id="mat-modal-ico"></div>'
+      + '<div class="mat-modal-title" id="mat-modal-title">MAT</div>'
+      + '<button class="mat-modal-close" type="button" onclick="closeMatModal(false)">✕</button>'
+      + '</div>'
+      + '<div class="mat-modal-body">'
+      + '<div class="mat-modal-text" id="mat-modal-text"></div>'
+      + '<div class="mat-modal-actions" id="mat-modal-actions">'
+      + '<button class="mat-modal-btn secondary" type="button" id="mat-modal-cancel" onclick="closeMatModal(false)">Annuler</button>'
+      + '<button class="mat-modal-btn primary" type="button" id="mat-modal-ok" onclick="closeMatModal(true)">OK</button>'
+      + '</div></div></div>';
+    document.body.appendChild(modal);
+  }
   const title = document.getElementById('mat-modal-title');
   const text = document.getElementById('mat-modal-text');
   const ico = document.getElementById('mat-modal-ico');
   const ok = document.getElementById('mat-modal-ok');
   const cancel = document.getElementById('mat-modal-cancel');
-  if(!modal || !title || !text || !ico || !ok || !cancel) return Promise.resolve(false);
+  if(!title || !text || !ico || !ok || !cancel) return Promise.resolve(false);
   title.textContent = opts.title || 'MAT';
   text.textContent = opts.message || '';
   ico.textContent = opts.icon || 'ℹ️';
