@@ -155,6 +155,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('ideas')">💡 Idées</button>
     <button class="nav-tab" onclick="showTab('actus')">🔔 Actualités</button>
     <button class="nav-tab" onclick="showTab('signals')">🚨 Signalements</button>
+    <button class="nav-tab" onclick="showTab('banner')">📢 Info/Alerte</button>
   </div>
 
   <div class="admin-body">
@@ -192,6 +193,11 @@ tr:hover td{background:#f9fafb;}
     <!-- SIGNALEMENTS -->
     <div class="tab-panel" id="tab-signals">
       <div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
+    </div>
+
+    <!-- INFO/ALERTE -->
+    <div class="tab-panel" id="tab-banner">
+      <div id="banner-content"></div>
     </div>
 
   </div>
@@ -259,6 +265,7 @@ function renderAll() {
   renderIdeas();
   renderActus();
   renderSignals();
+  renderBanner();
 }
 
 // ── Tabs ──────────────────────────────
@@ -693,6 +700,18 @@ function renderApp() {
         </tr>`).join('')}
       </table>
     </div>
+
+    <div class="section-title">Clics sur les fiches élus</div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Élu</th><th>Clics totaux</th></tr>
+        ${Object.entries(app.parService || {})
+          .filter(([k]) => k.startsWith('elu_'))
+          .sort((a,b) => b[1]-a[1])
+          .map(([k,v]) => `<tr><td>${k.replace('elu_','').replace(/_/g,' ')}</td><td><strong>${fmt(v)}</strong></td></tr>`)
+          .join('') || '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:16px">Aucun clic enregistré</td></tr>'}
+      </table>
+    </div>
   `;
 
   drawChart('chart-app', periods, datasets, 'bar');
@@ -810,13 +829,114 @@ function drawChart(id, labels, datasets, type) {
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 } },
+          onClick: function(e, legendItem, legend) {
+            const ci = legend.chart;
+            const dss = ci.data.datasets;
+            const idx = legendItem.datasetIndex;
+            // Compter les datasets visibles
+            const visibleCount = dss.filter((_, i) => !ci.getDatasetMeta(i).hidden).length;
+            if (visibleCount === 1 && !ci.getDatasetMeta(idx).hidden) {
+              // Déjà isolé → tout réafficher
+              dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = false; });
+            } else {
+              // Isoler la série cliquée
+              dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = i !== idx; });
+            }
+            ci.update();
+          }
+        }
+      },
       scales: {
         x: { ticks: { font: { size: 10 }, maxRotation: 45 } },
         y: { beginAtZero: true, ticks: { font: { size: 10 } } }
       }
     }
   });
+}
+
+// ── ENCART INFO/ALERTE ────────────────
+let _bannerData = { active: false, icon: 'ℹ️', title: '', text: '' };
+
+async function renderBanner() {
+  try {
+    const r = await fetch(`${API}/info-banner`);
+    if (r.ok) _bannerData = await r.json();
+  } catch(e) {}
+
+  document.getElementById('banner-content').innerHTML = `
+    <div class="section-title">📢 Encart d'information / alerte</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">
+        Cet encart s'affiche dans la PWA au-dessus des encarts Mairie et Météo.<br>
+        Les alertes météo Météo-France s'affichent automatiquement (priorité sur cet encart).<br>
+        Si inactif ou vide, l'encart est masqué.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Icône</label>
+          <input id="b-icon" value="${_bannerData.icon||'ℹ️'}" style="width:70px;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:1rem;text-align:center;">
+          <span style="font-size:0.72rem;color:var(--muted);">Ex: ℹ️ ⚠️ 🎉 🚧 📢</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Titre</label>
+          <input id="b-title" value="${_bannerData.title||''}" placeholder="Ex: Nouvelle fonctionnalité !" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;">
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;margin-top:6px;">Texte</label>
+          <textarea id="b-text" rows="3" placeholder="Message affiché dans l'encart…" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;resize:vertical;">${_bannerData.text||''}</textarea>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Activer</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="b-active" ${_bannerData.active?'checked':''} style="width:18px;height:18px;cursor:pointer;">
+            <span style="font-size:0.84rem;color:var(--text);">${_bannerData.active?'<span style="color:var(--leaf);font-weight:800;">✅ Encart actif</span>':'<span style="color:var(--muted);">Encart inactif</span>'}</span>
+          </label>
+        </div>
+        <button onclick="saveBanner()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:11px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;align-self:flex-start;">💾 Enregistrer</button>
+        <div id="banner-save-msg" style="display:none;color:var(--leaf);font-weight:800;font-size:0.8rem;"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Aperçu</div>
+    <div style="background:linear-gradient(160deg,#1a3d2b,#2d6a4f);border-radius:14px;padding:16px;margin-bottom:16px;">
+      ${_bannerData.active && _bannerData.text ? `
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 14px;">
+          <span style="font-size:1.4rem;">${_bannerData.icon||'ℹ️'}</span>
+          <div style="flex:1;">
+            <div style="font-size:0.72rem;font-weight:900;color:#fff;text-transform:uppercase;">${_bannerData.title||''}</div>
+            <div style="font-size:0.76rem;color:rgba(255,255,255,0.9);margin-top:2px;">${_bannerData.text}</div>
+          </div>
+        </div>` : '<div style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;padding:8px;">Encart inactif — non affiché dans la PWA</div>'}
+    </div>
+  `;
+}
+
+async function saveBanner() {
+  const icon = document.getElementById('b-icon').value.trim() || 'ℹ️';
+  const title = document.getElementById('b-title').value.trim();
+  const text = document.getElementById('b-text').value.trim();
+  const active = document.getElementById('b-active').checked;
+  try {
+    const r = await fetch(`${API}/admin/info-banner`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+      body: JSON.stringify({ active, icon, title, text })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      _bannerData = { active, icon, title, text, id: d.id };
+      const msg = document.getElementById('banner-save-msg');
+      msg.textContent = '✅ Encart mis à jour !';
+      msg.style.display = 'block';
+      setTimeout(() => renderBanner(), 800);
+    }
+  } catch(e) {
+    alert('Erreur lors de la sauvegarde : ' + e.message);
+  }
 }
 
 // ── Init ──────────────────────────────
