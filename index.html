@@ -1804,7 +1804,9 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 
-// melInited, melBusy, hist définis dans l'arbre MEL
+// Variables chat MEL
+let melInited=false, melBusy=false;
+const hist=[];
 function addMsg(role,text){
   const c=document.getElementById('msgs');
   const d=document.createElement('div'); d.className='msg '+role;
@@ -4196,7 +4198,7 @@ const MEL_TREE = {
 
 let _melCat=null, _melZone=null, _melZoneLabel=null, _melAddr=null;
 let _melChatContext='', _melChatCategory='autre', _melChatTopic='autre';
-// melInited, melBusy, hist définis dans l'arbre MEL
+let _melZoneNorm=null;
 
 function melShowTree(){
   const tree=document.getElementById('mel-tree');
@@ -4488,25 +4490,26 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
   const inp=document.getElementById('minp');
   if(!inp) return;
 
+  // Labels catégories pour le pré-remplissage
+  const catLabels = {
+    urbanisme:"une question d'urbanisme",
+    enfance:"une question sur l'enfance et la jeunesse",
+    administratif:"une question sur les démarches administratives",
+    dechets:"une question sur les déchets",
+    numerique:"une question sur le numérique"
+  };
+  const catPhrase = catLabels[_melChatCategory] || '';
+  const zonePhrase = _melZone ? ', je suis en zone '+_melZone : '';
+
   if(initialMsg && initialMsg.trim()){
-    // Envoyer le message initial automatiquement
     inp.value=initialMsg;
     inp.placeholder='Votre question…';
-    // Court délai pour que le DOM soit prêt
     setTimeout(()=>{ melBusy=false; sendMel(); }, 200);
   } else {
-    // Pré-remplir le champ avec contexte zone si urbanisme
-    if(_melZone){
-      inp.value = 'J\'habite en zone '+_melZone+(_melAddr?' ('+_melAddr+')':'') + '. ';
-    } else if(catLabel){
-      inp.value = '';
-      inp.placeholder = 'Votre question sur : '+catLabel+'…';
-    } else {
-      inp.value='';
-      inp.placeholder='Votre question…';
-    }
+    // Format demandé : "J'ai une question [catégorie], je suis en zone [zone]. "
+    inp.value = catPhrase ? 'J\'ai '+catPhrase+zonePhrase+'. ' : '';
+    inp.placeholder='Votre question…';
     inp.focus();
-    // Placer le curseur en fin de texte
     const len=inp.value.length;
     inp.setSelectionRange(len,len);
   }
