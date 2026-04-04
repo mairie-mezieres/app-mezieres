@@ -669,6 +669,24 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
 .plu-interdits li{margin-bottom:2px;}
 .plu-footer{font-size:.73rem;color:var(--muted,#5a7065);margin-top:10px;padding-top:8px;border-top:1px solid var(--border,rgba(0,0,0,.07));line-height:1.5;}
 
+
+/* ══ PLU — Onglets et navigation ══════════════════════════════ */
+.plu-answer-hdr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.plu-close-btn{background:var(--mist);border:none;border-radius:8px;padding:5px 10px;font-size:.75rem;font-weight:700;color:var(--leaf);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.plu-close-btn:active{background:var(--sage);color:white;}
+.plu-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:nowrap;overflow-x:auto;}
+.plu-tab{flex:1;padding:7px 6px;border:1.5px solid var(--border);background:white;border-radius:8px;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;min-width:0;}
+.plu-tab.active{background:var(--forest);color:white;border-color:var(--forest);}
+.plu-tab:active{opacity:.8;}
+.plu-back-bottom-btn{width:100%;padding:9px;background:var(--mist);border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;color:var(--leaf);cursor:pointer;}
+.plu-back-bottom-btn:active{background:var(--sage);color:white;}
+.plu-form-link{display:inline-block;margin-left:6px;padding:2px 8px;background:var(--leaf);color:white;border-radius:6px;text-decoration:none;font-size:.72rem;font-weight:700;vertical-align:middle;}
+.plu-form-link:active{opacity:.8;}
+
+
+.mel-sub-back-bottom{width:100%;margin-top:4px;padding:9px;background:var(--mist);border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;color:var(--leaf);cursor:pointer;text-align:center;}
+.mel-sub-back-bottom:active{background:var(--sage);color:white;}
+
 </style>
 </head>
 
@@ -756,7 +774,7 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
   <div class="grid2">
     <button class="card simple-card" onclick="openMel()">
       <div class="ico ico-mel">👩‍💼</div>
-      <div class="ct"><div class="ct-label">Mes démarches</div><div class="ct-sub">MEL assistante IA</div></div>
+      <div class="ct"><div class="ct-label">Démarches</div><div class="ct-sub">MEL assistante IA</div></div>
     </button>
     <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
       <div class="ico ico-site">🌐</div>
@@ -3856,12 +3874,23 @@ function pluGetZone(zoneKey) {
   return PLU_DATA.zones[zoneKey] || null;
 }
 
+function pluAuthLink(auth) {
+  // Retourne un lien cliquable si DP ou PC reconnu
+  if (/Déclaration Préalable|\bDP\b/.test(auth)) {
+    return auth + ' <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/R11646" target="_blank" class="plu-form-link">📄 Cerfa DP</a>';
+  }
+  if (/Permis de Construire|\bPC\b/.test(auth)) {
+    return auth + ' <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/R11637" target="_blank" class="plu-form-link">📄 Cerfa PC</a>';
+  }
+  return auth;
+}
+
 function pluRenderAuth(authKey) {
   const a = PLU_DATA.autorisations[authKey];
   if (!a) return '';
   let h = '<div class="plu-auth"><div class="plu-auth-title">📋 Autorisation requise</div><table class="plu-table">';
   for (const row of (a.tableau||[])) {
-    h += `<tr><td>${row.cas}</td><td class="plu-auth-val">${row.auth}</td></tr>`;
+    h += `<tr><td>${row.cas}</td><td class="plu-auth-val">${pluAuthLink(row.auth)}</td></tr>`;
   }
   h += '</table>';
   if (a.notes) h += '<ul class="plu-notes">'+a.notes.map(n=>`<li>${n}</li>`).join('')+'</ul>';
@@ -4069,7 +4098,7 @@ const MEL_TREE = {
       },
       {id:"cni",ico:"🪪",label:"Carte d'identité / Passeport",
         directAnswer:{text:"CNI et passeports nécessitent une mairie équipée d'un dispositif biométrique. La mairie de Mézières vous orientera vers le point le plus proche. Prenez rendez-vous au préalable. Pièces à prévoir : justificatif domicile, photo, timbre fiscal pour passeport.",
-          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"🌐 Prendre RDV en ligne",url:"https://www.service-public.fr/particuliers/vosdroits/R61075"}]}
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"🌐 Prendre RDV en ligne",url:"https://www.service-public.gouv.fr/particuliers/vosdroits/R63715"}]}
       },
       {id:"assainissement",ico:"🚰",label:"Assainissement (fosse, raccordement, SPANC)",
         directAnswer:{text:"L'assainissement collectif et le SPANC (contrôle des fosses septiques) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
@@ -4176,7 +4205,10 @@ function _buildSubLevel(cat,def){
   for(const q of def.questions){
     h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
   }
-  h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion('${cat}','__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button></div>`;
+  h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion('${cat}','__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button>`;
+  // Bouton retour en bas
+  h+=`<button class="mel-sub-back-bottom" onclick="melResetTree()">← Retour aux catégories</button>`;
+  h+=`</div>`;
   return h;
 }
 
@@ -4237,17 +4269,87 @@ function melSelectQuestion(cat,qid){
 function _showPluAnswer(pluHtml, questionLabel, cat, qid, zoneCtx){
   const l2=document.getElementById('mel-tree-l2');
   if(!l2)return;
+
+  // Masquer les boutons de questions (on garde juste le header et le bloc zone)
+  const subDiv=l2.querySelector('.mel-sub');
+  if(subDiv){
+    subDiv.querySelectorAll('.mel-q-btn').forEach(b=>b.style.display='none');
+  }
+
+  // Supprimer réponse précédente si elle existe
   l2.querySelector('.mel-plu-answer')?.remove();
-  const container=l2.querySelector('.mel-sub');
-  if(!container)return;
+
+  const zoneData = _melZone ? pluGetZone(_melZone) : null;
+  const ctx=encodeURIComponent((zoneCtx||'').substring(0,300));
+
+  // Construire le HTML complet avec onglets
   const div=document.createElement('div');
   div.className='mel-plu-answer';
-  const ctx=encodeURIComponent((zoneCtx||'').substring(0,300));
-  div.innerHTML='<div class="plu-answer-title">📐 '+questionLabel+' — Zone '+(_melZone||'')+'</div>'
-    + pluHtml
-    +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect(\''+cat+'\',\'urbanisme\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>';
-  container.appendChild(div);
-  setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+
+  // Titre + bouton fermer
+  div.innerHTML = '<div class="plu-answer-hdr">'
+    +'<div class="plu-answer-title">📐 '+questionLabel+' — Zone <strong>'+(_melZone||'?')+'</strong></div>'
+    +'<button class="plu-close-btn" onclick="pluCloseAnswer()" title="Retour aux questions">✕ Retour</button>'
+    +'</div>';
+
+  // Onglets
+  div.innerHTML += '<div class="plu-tabs">'
+    +'<button class="plu-tab active" onclick="pluSwitchTab(this,'auth')">📋 Autorisation</button>'
+    +'<button class="plu-tab" onclick="pluSwitchTab(this,'rules')">📐 Règles de zone</button>'
+    +'<button class="plu-tab" onclick="pluSwitchTab(this,'interdits')">🚫 Interdictions</button>'
+    +'</div>';
+
+  // Onglet 1 : Autorisation (contenu principal)
+  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-auth">'+pluHtml+'</div>';
+
+  // Onglet 2 : Toutes les règles de la zone
+  let rulesHtml = '';
+  if(zoneData){
+    rulesHtml = pluRenderZoneCard(zoneData).replace(/<ul class="plu-interdits[\s\S]*?<\/ul>/,'').replace(/<div class="plu-interdits[\s\S]*?<\/div>/,'').replace(/<div class="plu-alerte[\s\S]*?<\/div>/,'');
+  } else {
+    rulesHtml = '<p style="color:var(--muted);font-size:.82rem;padding:8px 0;">Zone non identifiée — saisissez votre adresse pour obtenir les règles spécifiques.</p>';
+  }
+  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-rules" style="display:none">'+rulesHtml+'</div>';
+
+  // Onglet 3 : Interdictions
+  let interditsHtml = '';
+  if(zoneData && zoneData.interdictions && zoneData.interdictions.length){
+    interditsHtml = '<ul class="plu-interdits">'
+      + zoneData.interdictions.map(i=>'<li>'+i+'</li>').join('')
+      + '</ul>';
+    if(zoneData.alerte) interditsHtml = '<div class="plu-alerte">'+zoneData.alerte+'</div>'+interditsHtml;
+  } else {
+    interditsHtml = '<p style="color:var(--muted);font-size:.82rem;padding:8px 0;">Aucune interdiction spécifique trouvée pour cette zone.</p>';
+  }
+  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-interdits" style="display:none">'+interditsHtml+'</div>';
+
+  // Bouton MEL + bouton retour en bas
+  div.innerHTML += '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
+    +'<button class="mel-open-chat-btn" onclick="melOpenChatFromDirect(\''+cat+'\',\'urbanisme\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>'
+    +'<button class="plu-back-bottom-btn" onclick="pluCloseAnswer()">← Retour aux questions</button>'
+    +'</div>';
+
+  if(subDiv) subDiv.appendChild(div);
+  else l2.appendChild(div);
+  setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function pluCloseAnswer(){
+  // Réafficher les boutons de questions, supprimer la réponse
+  const l2=document.getElementById('mel-tree-l2');
+  if(!l2)return;
+  l2.querySelectorAll('.mel-q-btn').forEach(b=>b.style.display='');
+  l2.querySelector('.mel-plu-answer')?.remove();
+}
+
+function pluSwitchTab(btn, tabId){
+  const answer=btn.closest('.mel-plu-answer');
+  if(!answer)return;
+  answer.querySelectorAll('.plu-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  answer.querySelectorAll('.plu-tab-content').forEach(c=>c.style.display='none');
+  const target=answer.querySelector('#plu-tab-'+tabId);
+  if(target)target.style.display='';
 }
 
 function _renderDirectAnswer(answer){
