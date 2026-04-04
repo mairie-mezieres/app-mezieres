@@ -568,7 +568,7 @@ html.theme-sombre .ctx-close{background:rgba(255,255,255,.08);color:#e2e8f0;}
 .notif-status-on{color:#15803d !important;font-weight:900;}\n.notif-status-off{color:#b91c1c !important;font-weight:900;}\n.acc-option{align-items:flex-start;}\n.acc-option > div:first-child{flex:1;min-width:0;}\n.acc-switch{flex-shrink:0;margin-left:auto;margin-top:2px;}\n@media (max-width:420px){.acc-option{gap:10px;}.acc-option-label{font-size:0.8rem;}.acc-option-sub{font-size:0.67rem;}.acc-toggle{flex-wrap:wrap;justify-content:flex-end;}}\n
 
 /* ── Modale MAT ── */
-.mat-modal{position:fixed;inset:0;z-index:4000;background:rgba(26,61,43,.58);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;}
+.mat-modal{position:fixed;inset:0;z-index:9999;background:rgba(26,61,43,.58);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:18px;}
 .mat-modal.open{display:flex;animation:fadeOv .18s ease;}
 .mat-modal-card{width:min(100%,420px);background:var(--warm);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.28);overflow:hidden;border:1px solid var(--border);}
 .mat-modal-head{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 16px;display:flex;align-items:center;gap:10px;}
@@ -1588,6 +1588,9 @@ function openMatModal(opts){
       + '<button class="mat-modal-btn secondary" type="button" id="mat-modal-cancel" onclick="closeMatModal(false)">Annuler</button>'
       + '<button class="mat-modal-btn primary" type="button" id="mat-modal-ok" onclick="closeMatModal(true)">OK</button>'
       + '</div></div></div>';
+    document.body.appendChild(modal);
+  } else {
+    // Toujours replacer en fin de body pour échapper aux stacking contexts (backdrop-filter des overlays)
     document.body.appendChild(modal);
   }
   const title = document.getElementById('mat-modal-title');
@@ -4066,8 +4069,8 @@ function pluBuildAnswer(qid, zone, zoneKey) {
     html += `<div class="plu-footer">
       ⚠️ Informations issues du PLU approuvé le 30/01/2013 — à titre indicatif.<br>
       Toute décision définitive relève du service urbanisme.
-      <a href="mailto:urbanisme@mezieres-lez-clery.fr" style="display:block;margin-top:6px;padding:8px 12px;background:var(--forest);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">✉️ Contacter le service urbanisme</a>
-      <a href="tel:0238456176" style="display:block;margin-top:5px;padding:8px 12px;background:var(--leaf);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">📞 Mairie : 02 38 45 61 76</a>
+      <a href="mailto:urbanisme@mezieres-lez-clery.fr" onclick="event.stopPropagation();window.location.href='mailto:urbanisme@mezieres-lez-clery.fr';return false;" style="display:block;margin-top:6px;padding:8px 12px;background:var(--forest);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">✉️ Contacter le service urbanisme</a>
+      <a href="tel:0238456176" onclick="event.stopPropagation();window.location.href='tel:0238456176';return false;" style="display:block;margin-top:5px;padding:8px 12px;background:var(--leaf);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">📞 Mairie : 02 38 45 61 76</a>
     </div>`;
   }
 
@@ -4323,25 +4326,24 @@ function _showPluAnswer(pluHtml, questionLabel, cat, qid, zoneCtx){
   const zoneData = _melZone ? pluGetZone(_melZone) : null;
   const ctx=encodeURIComponent((zoneCtx||'').substring(0,300));
 
-  // Construire le HTML complet avec onglets
-  const div=document.createElement('div');
-  div.className='mel-plu-answer';
+  // ── Construire TOUT le HTML en une seule passe (évite innerHTML += qui casse les liens) ──
+  let fullHtml = '';
 
   // Titre + bouton fermer
-  div.innerHTML = '<div class="plu-answer-hdr">'
+  fullHtml += '<div class="plu-answer-hdr">'
     +'<div class="plu-answer-title">📐 '+questionLabel+' — Zone <strong>'+(_melZone||'?')+'</strong></div>'
     +'<button class="plu-close-btn" onclick="pluCloseAnswer()" title="Retour aux questions">✕ Retour</button>'
     +'</div>';
 
   // Onglets
-  div.innerHTML += '<div class="plu-tabs">'
+  fullHtml += '<div class="plu-tabs">'
     +'<button class="plu-tab active" onclick="pluSwitchTab(this,&quot;auth&quot;)">📋 Autorisation</button>'
     +'<button class="plu-tab" onclick="pluSwitchTab(this,&quot;rules&quot;)">📐 Règles de zone</button>'
     +'<button class="plu-tab" onclick="pluSwitchTab(this,&quot;interdits&quot;)">🚫 Interdictions</button>'
     +'</div>';
 
   // Onglet 1 : Autorisation (contenu principal)
-  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-auth">'+pluHtml+'</div>';
+  fullHtml += '<div class="plu-tab-content" id="plu-tab-auth">'+pluHtml+'</div>';
 
   // Onglet 2 : Toutes les règles de la zone
   let rulesHtml = '';
@@ -4350,7 +4352,7 @@ function _showPluAnswer(pluHtml, questionLabel, cat, qid, zoneCtx){
   } else {
     rulesHtml = '<p style="color:var(--muted);font-size:.82rem;padding:8px 0;">Zone non identifiée — saisissez votre adresse pour obtenir les règles spécifiques.</p>';
   }
-  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-rules" style="display:none">'+rulesHtml+'</div>';
+  fullHtml += '<div class="plu-tab-content" id="plu-tab-rules" style="display:none">'+rulesHtml+'</div>';
 
   // Onglet 3 : Interdictions
   let interditsHtml = '';
@@ -4362,13 +4364,20 @@ function _showPluAnswer(pluHtml, questionLabel, cat, qid, zoneCtx){
   } else {
     interditsHtml = '<p style="color:var(--muted);font-size:.82rem;padding:8px 0;">Aucune interdiction spécifique trouvée pour cette zone.</p>';
   }
-  div.innerHTML += '<div class="plu-tab-content" id="plu-tab-interdits" style="display:none">'+interditsHtml+'</div>';
+  fullHtml += '<div class="plu-tab-content" id="plu-tab-interdits" style="display:none">'+interditsHtml+'</div>';
+
+  const ctxSafe = ctx.replace(/'/g, '%27');
 
   // Bouton MEL + bouton retour en bas
-  div.innerHTML += '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
-    +'<button class="mel-open-chat-btn" onclick="melOpenChatFromDirect(\''+cat+'\',\'urbanisme\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>'
+  fullHtml += '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
+    +'<button class="mel-open-chat-btn" onclick="melOpenChatFromDirect(\''+cat+'\',\'urbanisme\',decodeURIComponent(\''+ctxSafe+'\'))">💬 Question complémentaire ? Parler à MEL</button>'
     +'<button class="plu-back-bottom-btn" onclick="pluCloseAnswer()">← Retour aux questions</button>'
     +'</div>';
+
+  // ── Injection unique dans le DOM ──
+  const div=document.createElement('div');
+  div.className='mel-plu-answer';
+  div.innerHTML = fullHtml;
 
   if(subDiv) subDiv.appendChild(div);
   else l2.appendChild(div);
@@ -4411,7 +4420,9 @@ function _renderDirectAnswer(answer){
     for(const lk of answer.links){
       const href=lk.tel?'tel:'+lk.tel:lk.url;
       const target=lk.tel?'':'target="_blank"';
-      h+='<a href="'+href+'" '+target+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+lk.label+'</a>';
+      const isLocal=href.startsWith('tel:')||href.startsWith('mailto:');
+      const clickHandler=isLocal?' onclick="event.stopPropagation();window.location.href=\''+href.replace(/'/g,"\\'")+'\';return false;"':'';
+      h+='<a href="'+href+'" '+target+clickHandler+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+lk.label+'</a>';
     }
     h+='</div>';
   }
@@ -4426,7 +4437,7 @@ function _showDirectAnswer(answer,cat,topic,ctxForMel){
   if(!container){console.warn('mel-sub not found in l2');return;}
   const div=document.createElement('div');
   div.className='mel-direct-answer';
-  const ctx=encodeURIComponent((ctxForMel||'').substring(0,300));
+  const ctx=encodeURIComponent((ctxForMel||'').substring(0,300)).replace(/'/g,'%27');
   div.innerHTML='<span class="da-label">Réponse</span>'
     +_renderDirectAnswer(answer)
     +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect(\''+cat+'\',\''+topic+'\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>';
