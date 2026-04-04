@@ -955,14 +955,25 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
     </div>
     <div class="ctx-help" id="ctx-mel"></div>
     <div id="mel-disclaimer" style="font-size:0.59rem;color:var(--muted);text-align:center;padding:5px 14px 4px;line-height:1.4;border-bottom:1px solid var(--border);background:var(--warm);flex-shrink:0;">⚠️ MEL peut se tromper. Réponses indicatives sous la responsabilité du lecteur.</div>
-    <div class="msgs" id="msgs"></div>
-    <div class="sugs" id="sugs">
-      <button class="sug" onclick="showMelThemeQuestions('urbanisme')">🏗️ Urbanisme</button>
-      <button class="sug" onclick="showMelThemeQuestions('enfance')">🧒 Enfance</button>
-      <button class="sug" onclick="showMelThemeQuestions('demarches')">📄 Démarches</button>
-      <button class="sug" onclick="showMelThemeQuestions('fibre')">🌐 Fibre</button>
+    <!-- ── Arbre de décision ── -->
+    <div id="mel-tree" class="mel-tree">
+      <div id="mel-tree-l1">
+        <div class="mel-tree-title">Comment puis-je vous aider ?</div>
+        <div class="mel-cats">
+          <button class="mel-cat-btn" onclick="melSelectCat('urbanisme')"><span class="ico">🏗️</span>Urbanisme &amp; Construction</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('enfance')"><span class="ico">🎒</span>Enfance &amp; Jeunesse</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('administratif')"><span class="ico">📋</span>Démarches Admin.</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('dechets')"><span class="ico">♻️</span>Déchets &amp; Propreté</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('numerique')"><span class="ico">📡</span>Numérique &amp; Internet</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('autre')"><span class="ico">💬</span>Autre question</button>
+        </div>
+      </div>
+      <div id="mel-tree-l2" style="display:none"></div>
     </div>
-    <div class="mbar">
+    <!-- ── Chat (caché par défaut) ── -->
+    <div class="msgs" id="msgs" style="display:none"></div>
+    <div class="sugs" id="sugs" style="display:none"></div>
+    <div class="mbar" style="display:none">
       <input class="minp" id="minp" placeholder="Votre question…" onkeydown="if(event.key==='Enter')sendMel()">
       <button class="msnd" onclick="sendMel()">➤</button>
     </div>
@@ -1576,7 +1587,11 @@ history.pushState({mat:'overlay'}, '');
 
 function openMajordome(){ openOv('majordome'); }
 function openConseil(){ openOv('conseil'); buildTrombi(); }
-function openMel(){openOv('mel'); renderContextHelp('mel'); if(!melInited){melInited=true;addMsg('bot','Bonjour\u00a0! Je suis MEL, l\u2019aide communale de la mairie.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');} renderMelThemes(); setTimeout(()=>document.getElementById('minp').focus(),300);}
+function openMel(){
+  openOv('mel');
+  renderContextHelp('mel');
+  melShowTree();
+}
 function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal');}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
@@ -1695,8 +1710,7 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 
-let melInited=false, melBusy=false;
-const hist=[];
+// melInited, melBusy, hist définis dans l'arbre MEL
 function addMsg(role,text){
   const c=document.getElementById('msgs');
   const d=document.createElement('div'); d.className='msg '+role;
@@ -1721,7 +1735,7 @@ async function sendMel(){
   inp.value=''; document.getElementById('sugs').style.display='none';
   addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
   try{
-    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8)})});
+    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8),category:_melChatCategory||'autre',extraCtx:_melChatContext||''})});
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
     var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); hist.push({role:'assistant',content:rep}); addMsg('bot',rep);
@@ -3565,6 +3579,246 @@ if (!('setAppBadge' in navigator)) {
   const el = document.getElementById('opt-badge-notif');
   if (el) el.style.display = 'none';
 }
+
+// ════════════════════════════════════════════════════════
+// MEL — Arbre de décision v1.0
+// ════════════════════════════════════════════════════════
+const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
+
+const MEL_TREE = {
+  urbanisme:{
+    label:"Urbanisme & Construction", ico:"🏗️", needZone:true,
+    questions:[
+      {id:"permis",ico:"📄",label:"Permis de construire / Déclaration préalable",prompt:"J'ai besoin d'informations sur le permis de construire ou la déclaration préalable de travaux à Mézières-lez-Cléry.",topic:"urbanisme"},
+      {id:"piscine",ico:"🏊",label:"Piscine",prompt:"Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?",topic:"urbanisme"},
+      {id:"cloture",ico:"🔲",label:"Clôture / Mur / Portail",prompt:"Je souhaite installer une clôture, un mur ou un portail. Quelles sont les règles et formalités ?",topic:"urbanisme"},
+      {id:"extension",ico:"📐",label:"Extension / Agrandissement",prompt:"Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables à mon terrain ?",topic:"urbanisme"},
+      {id:"abri",ico:"🌿",label:"Abri de jardin / Garage / Annexe",prompt:"Je souhaite construire un abri de jardin, un garage ou une dépendance. Quelles sont les règles ?",topic:"urbanisme"},
+      {id:"toiture",ico:"🏠",label:"Toiture / Façade / Matériaux",prompt:"Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?",topic:"urbanisme"},
+    ]
+  },
+  enfance:{
+    label:"Enfance & Jeunesse", ico:"🎒", needZone:false,
+    questions:[
+      {id:"ecole",ico:"📚",label:"École La Forêt",prompt:"J'ai une question sur l'école de Mézières-lez-Cléry.",topic:"scolaire",directAnswer:"🏫 L'école La Forêt accueille les élèves de la commune. Pour les inscriptions et horaires, contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/lecole-de-la-foret/"},
+      {id:"cantine",ico:"🍽️",label:"Restaurant scolaire / Cantine",prompt:"J'ai une question sur le restaurant scolaire.",topic:"scolaire",directAnswer:"🍽️ Le restaurant scolaire fonctionne les jours d'école. Pour les inscriptions et tarifs, contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/le-restaurant-scolaire/"},
+      {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",prompt:"J'ai une question sur la crèche familiale Les Marmousets.",topic:"scolaire",directAnswer:"👶 La crèche familiale Les Marmousets accueille les enfants de 0 à 3 ans. Contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/creche-familiale-les-marmousets/"},
+      {id:"loisirs",ico:"🎨",label:"Centre de loisirs",prompt:"J'ai une question sur le centre de loisirs (inscriptions, dates, activités).",topic:"scolaire",directAnswer:"🎨 Le centre de loisirs accueille les enfants pendant les vacances scolaires. Inscriptions et informations au 02 38 45 61 76 ou mezieres-lez-clery.fr/centre-de-loisirs/"},
+    ]
+  },
+  administratif:{
+    label:"Démarches Administratives", ico:"📋", needZone:false,
+    questions:[
+      {id:"etatcivil",ico:"📜",label:"État civil (naissance, mariage, décès)",prompt:"J'ai besoin d'informations sur les démarches d'état civil à Mézières-lez-Cléry.",topic:"demarches",directAnswer:"📜 Pour les actes d'état civil, adressez-vous à la mairie au 02 38 45 61 76 ou mairie@mezieres-lez-clery.fr. Horaires : lundi 14h-17h30, vendredi 8h30-11h30."},
+      {id:"cni",ico:"🪪",label:"Carte d'identité / Passeport",prompt:"Comment obtenir une carte d'identité ou un passeport depuis Mézières-lez-Cléry ?",topic:"demarches",directAnswer:"🪪 CNI et passeports se font dans les mairies équipées de dispositifs biométriques. La mairie de Mézières vous orientera vers la plus proche (souvent Cléry-Saint-André). Contactez le 02 38 45 61 76."},
+      {id:"assainissement",ico:"🚰",label:"Assainissement",prompt:"J'ai une question sur l'assainissement à Mézières-lez-Cléry (raccordement, fosse, contrôle).",topic:"assainissement"},
+      {id:"location",ico:"🪑",label:"Location de matériel communal",prompt:"Comment louer du matériel auprès de la commune ?",topic:"location",directAnswer:"🪑 La commune propose la location de matériel (tables, chaises, barnums…). Contactez la mairie au 02 38 45 61 76 ou mezieres-lez-clery.fr/location-de-materiel/"},
+    ]
+  },
+  dechets:{
+    label:"Déchets & Propreté", ico:"♻️", needZone:false,
+    questions:[
+      {id:"collecte",ico:"🗑️",label:"Jours de collecte",prompt:"Quels sont les jours de collecte des ordures ménagères et du tri à Mézières-lez-Cléry ?",topic:"dechets",directAnswer:"🗑️ Les jours de collecte sont organisés par la CCTVL. Consultez mezieres-lez-clery.fr/gestion-des-dechets/ ou la CCTVL au 02 38 44 59 35."},
+      {id:"dechetterie",ico:"♻️",label:"Déchetterie",prompt:"Où se trouve la déchetterie la plus proche et quels sont ses horaires ?",topic:"dechets",directAnswer:"♻️ La déchetterie de Cléry-Saint-André est la plus proche. Inscription obligatoire sur portail-usagers.ccterresduvaldeloire.fr. Hiver 10h-12h/14h-17h, été 9h-12h/14h-18h (lun-sam). Tél : 02 38 44 59 35."},
+      {id:"encombrants",ico:"🛋️",label:"Encombrants / Objets volumineux",prompt:"Comment se débarrasser d'objets encombrants à Mézières-lez-Cléry ?",topic:"dechets"},
+      {id:"tri",ico:"📦",label:"Tri sélectif — que jeter où ?",prompt:"Comment fonctionne le tri sélectif à Mézières-lez-Cléry ?",topic:"dechets"},
+    ]
+  },
+  numerique:{
+    label:"Numérique & Internet", ico:"📡", needZone:false,
+    questions:[
+      {id:"fibre",ico:"🌐",label:"Fibre optique / Déploiement",prompt:"La fibre est-elle disponible à Mézières-lez-Cléry ? Quand sera-t-elle déployée ?",topic:"fibre",directAnswer:"📡 Mézières-lez-Cléry dispose d'une offre THD Radio (4G fixe) comme alternative à la fibre. Consultez mezieres-lez-clery.fr/offre-thd-radio-4g-fixe/ pour les détails et l'éligibilité."},
+      {id:"thd",ico:"📶",label:"THD Radio / 4G fixe",prompt:"Comment fonctionne l'offre THD Radio ou 4G fixe à Mézières-lez-Cléry ?",topic:"fibre",directAnswer:"📶 L'offre THD Radio (4G fixe) permet d'avoir internet très haut débit sans attendre la fibre. Consultez mezieres-lez-clery.fr/offre-thd-radio-4g-fixe/ pour l'éligibilité par adresse."},
+      {id:"eligibilite",ico:"📍",label:"Éligibilité à mon adresse",prompt:"Mon adresse est-elle éligible à la fibre ou au THD à Mézières-lez-Cléry ?",topic:"fibre"},
+    ]
+  },
+  autre:{label:"Autre question",ico:"💬",needZone:false,openChatDirectly:true,questions:[]}
+};
+
+let _melCat=null, _melZone=null, _melZoneLabel=null, _melAddr=null;
+let _melChatContext='', _melChatCategory='autre', _melChatTopic='autre';
+// melInited, melBusy, hist définis dans l'arbre MEL
+
+function melShowTree(){
+  const tree=document.getElementById('mel-tree');
+  const msgs=document.getElementById('msgs');
+  const sugs=document.getElementById('sugs');
+  const mbar=document.querySelector('.mbar');
+  if(tree)tree.style.display='flex';
+  if(msgs)msgs.style.display='none';
+  if(sugs)sugs.style.display='none';
+  if(mbar)mbar.style.display='none';
+  melResetTree();
+}
+
+function melSelectCat(cat){
+  _melCat=cat;
+  const def=MEL_TREE[cat];
+  if(!def)return;
+  document.querySelectorAll('.mel-cat-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget && event.currentTarget.classList.add('active');
+  if(def.openChatDirectly){
+    melOpenChat('',cat,'');
+    return;
+  }
+  const l2=document.getElementById('mel-tree-l2');
+  l2.style.display='block';
+  l2.innerHTML=_buildSubLevel(cat,def);
+  l2.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _buildSubLevel(cat,def){
+  let h=`<div class="mel-sub"><div class="mel-sub-title"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
+  if(def.needZone){
+    h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg, Mézières-lez-Cléry" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
+  }
+  for(const q of def.questions){
+    h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
+  }
+  h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion('${cat}','__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button></div>`;
+  return h;
+}
+
+function melSelectQuestion(cat,qid){
+  const def=MEL_TREE[cat];
+  if(!def)return;
+  const zoneCtx=_melZone?`Zone PLU : ${_melZone}${_melZoneLabel?' ('+_melZoneLabel+')':''}.${_melAddr?' Adresse : '+_melAddr+'.':''}`
+    :(_melAddr?`Adresse : ${_melAddr}.`:'');
+  if(qid==='__autre__'){
+    melOpenChat('',cat,`Catégorie : ${def.label}. ${zoneCtx}`);
+    return;
+  }
+  const q=def.questions.find(x=>x.id===qid);
+  if(!q)return;
+  if(q.directAnswer&&!def.needZone){
+    _showDirectAnswer(q.directAnswer,cat,q.topic,zoneCtx+' '+q.prompt);
+    return;
+  }
+  melOpenChat(`${zoneCtx}\n${q.prompt}`.trim(),cat,zoneCtx,q.topic||cat);
+}
+
+function _showDirectAnswer(answer,cat,topic,ctxForMel){
+  const l2=document.getElementById('mel-tree-l2');
+  l2.querySelector('.mel-direct-answer')?.remove();
+  const div=document.createElement('div');
+  div.className='mel-direct-answer';
+  const safeCtx=(ctxForMel||'').replace(/'/g,"\'").replace(/\n/g,' ');
+  div.innerHTML=`<span class="da-label">Réponse</span><div>${answer.replace(/\n/g,'<br>')}</div><button class="mel-open-chat-btn" onclick="melOpenChat('','${cat}','${safeCtx}','${topic||cat}')">💬 Question complémentaire ? Parler à MEL</button>`;
+  l2.querySelector('.mel-sub').appendChild(div);
+  div.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function melOpenChat(initialMsg,category,extraCtx,topic){
+  _melChatContext=extraCtx||'';
+  _melChatCategory=category||'autre';
+  _melChatTopic=topic||category||'autre';
+  const tree=document.getElementById('mel-tree');
+  const msgs=document.getElementById('msgs');
+  const sugs=document.getElementById('sugs');
+  const mbar=document.querySelector('.mbar');
+  if(tree)tree.style.display='none';
+  if(msgs)msgs.style.display='flex';
+  if(sugs)sugs.style.display='';
+  if(mbar)mbar.style.display='flex';
+  if(!melInited){
+    melInited=true;
+    addMsg('bot','Bonjour\u00a0! Je suis MEL.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');
+  }
+  if(initialMsg&&initialMsg.trim()){
+    const inp=document.getElementById('minp');
+    if(inp){inp.value=initialMsg;setTimeout(()=>sendMel(),80);}
+  } else {
+    setTimeout(()=>{const inp=document.getElementById('minp');if(inp)inp.focus();},100);
+  }
+}
+
+function melResetTree(){
+  _melCat=null;_melZone=null;_melZoneLabel=null;_melAddr=null;
+  const l2=document.getElementById('mel-tree-l2');
+  if(l2){l2.style.display='none';l2.innerHTML='';}
+  document.querySelectorAll('.mel-cat-btn').forEach(b=>b.classList.remove('active'));
+}
+
+async function melFindZoneByAddr(){
+  const inp=document.getElementById('mel-addr-input');
+  const addr=(inp?.value||'').trim();
+  if(!addr){_setZoneResult('warn','⚠️ Saisissez une adresse');return;}
+  _setZoneResult('','⏳ Recherche…',true);
+  try{
+    const q=encodeURIComponent(addr+' Mézières-lez-Cléry 45370');
+    const geo=await fetch(`https://api-adresse.data.gouv.fr/search/?q=${q}&limit=1&citycode=45204`);
+    const gd=await geo.json();
+    const feat=gd?.features?.[0];
+    if(!feat){_setZoneResult('warn','⚠️ Adresse introuvable. Essayez avec moins de mots ou utilisez le GPS.');return;}
+    const [lon,lat]=feat.geometry.coordinates;
+    _melAddr=feat.properties?.label||addr;
+    await _fetchZonePLU(lat,lon);
+  }catch(e){_setZoneResult('err','❌ Erreur réseau. Réessayez ou utilisez le GPS.');}
+}
+
+function melFindZoneByGPS(){
+  if(!navigator.geolocation){_setZoneResult('warn','⚠️ GPS non disponible.');return;}
+  _setZoneResult('','📍 Localisation…',true);
+  navigator.geolocation.getCurrentPosition(
+    async pos=>{
+      _melAddr=`GPS (${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)})`;
+      await _fetchZonePLU(pos.coords.latitude,pos.coords.longitude);
+    },
+    ()=>_setZoneResult('warn','⚠️ GPS refusé. Saisissez votre adresse.'),
+    {enableHighAccuracy:true,timeout:8000}
+  );
+}
+
+async function _fetchZonePLU(lat,lon){
+  try{
+    const r=await fetch(`${MEL_BACKEND}/api/zone-plu?lat=${lat}&lon=${lon}`);
+    const d=await r.json();
+    if(!d.ok||!d.zone){
+      _setZoneResult('warn','⚠️ Zone PLU non trouvée automatiquement. Sélectionnez-la manuellement :');
+      _showManualZoneSelector();return;
+    }
+    _melZone=d.zone;_melZoneLabel=d.liblong||'';
+    _setZoneResult('ok',`✅ Zone PLU détectée : <strong>${d.zone}</strong>${d.liblong?' — '+d.liblong:''}`);
+  }catch(e){
+    _setZoneResult('err','❌ Service IGN indisponible. Sélectionnez votre zone :');
+    _showManualZoneSelector();
+  }
+}
+
+function _showManualZoneSelector(){
+  const result=document.getElementById('mel-zone-result');
+  if(!result||result.querySelector('select'))return;
+  const sel=document.createElement('select');
+  sel.className='mel-zone-manual';
+  sel.innerHTML='<option value="">— Sélectionner votre zone —</option>'
+    +'<option value="Ua">Ua – Centre-bourg / hameaux anciens</option>'
+    +'<option value="Ub">Ub – Habitat résidentiel récent</option>'
+    +'<option value="Ub1">Ub1 – Clos de Manthelon</option>'
+    +'<option value="Ue">Ue – Équipements publics</option>'
+    +'<option value="Ui">Ui – Zone industrielle</option>'
+    +'<option value="1AU">1AU – Zone à urbaniser</option>'
+    +'<option value="2AU">2AU – Réserve foncière (inconstructible)</option>'
+    +'<option value="A">A – Zone agricole</option>'
+    +'<option value="Ah">Ah – Hameaux agricoles</option>'
+    +'<option value="N">N – Zone naturelle</option>'
+    +'<option value="Nh">Nh – Hameaux naturels</option>'
+    +'<option value="Nj">Nj – Jardins</option>';
+  sel.onchange=()=>{
+    _melZone=sel.value||null;
+    _melZoneLabel=sel.options[sel.selectedIndex]?.text?.split('–')[1]?.trim()||'';
+    if(_melZone)_setZoneResult('ok',`✅ Zone sélectionnée : <strong>${_melZone}</strong> — ${_melZoneLabel}`);
+  };
+  result.after(sel);
+}
+
+function _setZoneResult(type,html,spin=false){
+  const el=document.getElementById('mel-zone-result');
+  if(!el)return;
+  el.style.display='block';
+  el.className='mel-zone-result'+(type?' '+type:'');
+  el.innerHTML=spin?`<span class="mel-zone-spin">⏳</span> ${html}`:html;
+}
+
 </script>
 </body>
 </html>
