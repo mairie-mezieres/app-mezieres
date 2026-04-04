@@ -1826,7 +1826,7 @@ function showTyping(){
 async function sendMel(){
   const inp=document.getElementById('minp');
   const txt=inp.value.trim(); if(!txt||melBusy)return;
-  inp.value=''; document.getElementById('sugs').style.display='none';
+  inp.value=''; inp.placeholder='Votre question…'; const _sugs=document.getElementById('sugs'); if(_sugs)_sugs.style.display='none';
   addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
   try{
     const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8),category:_melChatCategory||'autre',extraCtx:_melChatContext||''})});
@@ -4433,24 +4433,41 @@ function _showDirectAnswer(answer,cat,topic,ctxForMel){
 }
 
 function melOpenChatFromDirect(cat,topic,ctx){
-  // Construire un message pré-rempli avec le contexte zone si dispo
-  const zoneInfo = _melZone ? 'Je suis en zone PLU '+_melZone+(_melAddr?' ('+_melAddr+')':'')+'. ' : '';
-  melOpenChat('',cat,zoneInfo+ctx,topic||cat);
+  melOpenChat('',cat,ctx||'',topic||cat);
 }
 
 function melOpenChat(initialMsg,category,extraCtx,topic){
   _melChatContext=extraCtx||'';
   _melChatCategory=category||'autre';
   _melChatTopic=topic||category||'autre';
+
+  // Construire le contexte complet à injecter dans _melChatContext
+  // Zone PLU + adresse si disponibles
+  const zonePrefix = _melZone
+    ? '[Zone PLU : '+_melZone+(_melAddr?' — '+_melAddr:'')+'] '
+    : (_melAddr ? '[Adresse : '+_melAddr+'] ' : '');
+  const catLabel = {
+    urbanisme:'Urbanisme & Construction',
+    enfance:'Enfance & Jeunesse',
+    administratif:'Démarches administratives',
+    dechets:'Déchets & Propreté',
+    numerique:'Numérique & Internet',
+    autre:''
+  }[_melChatCategory]||'';
+  const catPrefix = catLabel ? '[Catégorie : '+catLabel+'] ' : '';
+  if(!_melChatContext) _melChatContext = zonePrefix + catPrefix;
+  else _melChatContext = zonePrefix + catPrefix + _melChatContext;
+
+  // Afficher le chat, cacher l'arbre
   const tree=document.getElementById('mel-tree');
   const msgs=document.getElementById('msgs');
   const mbar=document.querySelector('.mbar');
   if(tree)tree.style.display='none';
-  if(msgs)msgs.style.display='flex';
+  if(msgs){msgs.style.display='flex';msgs.style.flexDirection='column';}
   if(mbar)mbar.style.display='flex';
-  // Ajouter bouton retour à l'arbre dans le chat
-  const existing=document.getElementById('mel-back-btn');
-  if(!existing){
+
+  // Bouton retour vers l'arbre
+  if(!document.getElementById('mel-back-btn')){
     const backBtn=document.createElement('button');
     backBtn.id='mel-back-btn';
     backBtn.textContent='← Retour aux thèmes';
@@ -4458,31 +4475,40 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
     backBtn.onclick=()=>{document.getElementById('mel-back-btn')?.remove();melShowTree();};
     if(msgs)msgs.parentNode.insertBefore(backBtn,msgs);
   }
+
+  // Message d'accueil MEL (une seule fois)
   if(!melInited){
     melInited=true;
     addMsg('bot','Bonjour\u00a0! Je suis MEL.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');
   }
-  if(initialMsg&&initialMsg.trim()){
-    setTimeout(()=>{
-      const inp=document.getElementById('minp');
-      if(inp && document.getElementById('msgs') && document.getElementById('msgs').style.display!=='none'){
-        inp.value=initialMsg;
-        sendMel();
-      }
-    },180);
+
+  // Reset melBusy (sécurité si état corrompu)
+  melBusy=false;
+
+  const inp=document.getElementById('minp');
+  if(!inp) return;
+
+  if(initialMsg && initialMsg.trim()){
+    // Envoyer le message initial automatiquement
+    inp.value=initialMsg;
+    inp.placeholder='Votre question…';
+    // Court délai pour que le DOM soit prêt
+    setTimeout(()=>{ melBusy=false; sendMel(); }, 200);
   } else {
-    // Pré-remplir le contexte zone dans le placeholder si dispo
-    setTimeout(()=>{
-      const inp=document.getElementById('minp');
-      if(inp){
-        if(_melZone && _melAddr){
-          inp.placeholder='Ex : j\'habite en zone '+_melZone+', je voudrais savoir…';
-        } else if(_melZone){
-          inp.placeholder='Ex : en zone '+_melZone+', puis-je…';
-        }
-        inp.focus();
-      }
-    },120);
+    // Pré-remplir le champ avec contexte zone si urbanisme
+    if(_melZone){
+      inp.value = 'J\'habite en zone '+_melZone+(_melAddr?' ('+_melAddr+')':'') + '. ';
+    } else if(catLabel){
+      inp.value = '';
+      inp.placeholder = 'Votre question sur : '+catLabel+'…';
+    } else {
+      inp.value='';
+      inp.placeholder='Votre question…';
+    }
+    inp.focus();
+    // Placer le curseur en fin de texte
+    const len=inp.value.length;
+    inp.setSelectionRange(len,len);
   }
 }
 
