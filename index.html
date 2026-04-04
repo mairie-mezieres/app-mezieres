@@ -729,7 +729,7 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
   <div class="grid2">
     <button class="card simple-card" onclick="openMel()">
       <div class="ico ico-mel">👩‍💼</div>
-      <div class="ct"><div class="ct-label">MEL</div><div class="ct-sub">Assistante IA</div></div>
+      <div class="ct"><div class="ct-label">Mes démarches</div><div class="ct-sub">MEL assistante IA</div></div>
     </button>
     <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
       <div class="ico ico-site">🌐</div>
@@ -3780,7 +3780,7 @@ function melSelectCat(cat){
 function _buildSubLevel(cat,def){
   let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
   if(def.needZone){
-    h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg, Mézières-lez-Cléry" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
+    h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg" oninput="this.style.borderColor='';document.getElementById('mel-addr-warn')?.remove()" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
   }
   for(const q of def.questions){
     h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
@@ -3792,22 +3792,43 @@ function _buildSubLevel(cat,def){
 function melSelectQuestion(cat,qid){
   const def=MEL_TREE[cat];
   if(!def)return;
+
+  // ── Urbanisme : adresse obligatoire avant de continuer ──────────
+  if(def.needZone && !_melAddr){
+    const inp=document.getElementById('mel-addr-input');
+    if(inp){
+      inp.style.borderColor='#e53e3e';
+      inp.placeholder='⚠️ Saisissez votre adresse d\'abord…';
+      inp.focus();
+      // Message d'alerte sous le champ
+      let warn=document.getElementById('mel-addr-warn');
+      if(!warn){
+        warn=document.createElement('div');
+        warn.id='mel-addr-warn';
+        warn.style.cssText='color:#e53e3e;font-size:.78rem;font-weight:700;margin-top:5px;padding:6px 10px;background:#fff5f5;border-radius:7px;';
+        inp.closest('.mel-zone-row').after(warn);
+      }
+      warn.textContent='⚠️ Veuillez saisir votre adresse ou utiliser le GPS pour identifier votre zone PLU.';
+    }
+    return;
+  }
+
   const zoneCtx=[
-    _melAddr ? `Adresse : ${_melAddr}.` : '',
-    _melZone ? `Zone PLU identifiée : ${_melZone}${_melZoneLabel?' ('+_melZoneLabel+')':''}.` : ''
+    _melAddr ? 'Adresse : '+_melAddr+'.' : '',
+    _melZone ? 'Zone PLU : '+_melZone+(_melZoneLabel?' ('+_melZoneLabel+')':'')+'.' : ''
   ].filter(Boolean).join(' ');
+
   if(qid==='__autre__'){
-    melOpenChat('',cat,`Catégorie : ${def.label}. ${zoneCtx}`);
+    melOpenChat('',cat,'Catégorie : '+def.label+'. '+zoneCtx);
     return;
   }
   const q=def.questions.find(x=>x.id===qid);
   if(!q)return;
-  // directAnswer : affichage direct (toutes catégories y compris urbanisme)
   if(q.directAnswer){
     _showDirectAnswer(q.directAnswer,cat,q.topic,zoneCtx+' '+q.prompt);
     return;
   }
-  // Pas de directAnswer : ouvrir MEL avec contexte complet
+  // Ouvrir MEL — le prompt est envoyé comme message utilisateur initial
   const fullPrompt=[zoneCtx,q.prompt].filter(Boolean).join('\n');
   melOpenChat(fullPrompt,cat,zoneCtx,q.topic||cat);
 }
@@ -3882,10 +3903,19 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
     addMsg('bot','Bonjour\u00a0! Je suis MEL.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');
   }
   if(initialMsg&&initialMsg.trim()){
-    const inp=document.getElementById('minp');
-    if(inp){inp.value=initialMsg;setTimeout(()=>sendMel(),80);}
+    // Délai plus long pour que le DOM soit stable et msgs visible
+    setTimeout(()=>{
+      const inp=document.getElementById('minp');
+      if(inp){
+        inp.value=initialMsg;
+        // sendMel uniquement si le champ est bien prêt
+        if(document.getElementById('msgs')&&document.getElementById('msgs').style.display!=='none'){
+          sendMel();
+        }
+      }
+    },150);
   } else {
-    setTimeout(()=>{const inp=document.getElementById('minp');if(inp)inp.focus();},100);
+    setTimeout(()=>{const inp=document.getElementById('minp');if(inp)inp.focus();},120);
   }
 }
 
