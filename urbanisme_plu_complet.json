@@ -1,0 +1,556 @@
+{
+  "meta": {
+    "commune": "Mézières-lez-Cléry",
+    "plu_approuve": "30 janvier 2013",
+    "source": "Règlement PLU 4.1",
+    "note": "Ce document est à usage indicatif. Toute décision définitive relève de la mairie ou d'un professionnel habilité."
+  },
+
+  "etape_1_zone": {
+    "question": "Dans quelle zone se situe votre terrain ?",
+    "aide": "Consultez le plan de zonage PLU disponible en mairie ou sur le site de la communauté de communes. Votre acte de propriété ou le cadastre peut aussi vous orienter.",
+    "options": {
+      "Ua": "Zone urbaine ancienne (centre-bourg et hameaux anciens)",
+      "Ub": "Zone urbaine habitat récent (2ème moitié XXe siècle)",
+      "Ub1": "Zone urbaine - Clos de Manthelon (prescriptions spécifiques)",
+      "Ue": "Zone urbaine équipements publics",
+      "Ui": "Zone urbaine industrielle",
+      "1AU": "Zone à urbaniser à court terme (habitat)",
+      "1AUe": "Zone à urbaniser équipements publics",
+      "2AU": "Zone à urbaniser à long terme (inconstructible sauf services publics)",
+      "A": "Zone agricole",
+      "Ah": "Zone agricole - hameaux non agricoles",
+      "N": "Zone naturelle et forestière",
+      "Nh": "Zone naturelle - hameaux",
+      "Nj": "Zone naturelle - jardins",
+      "Nl": "Zone naturelle - loisirs",
+      "Np": "Zone naturelle - photovoltaïque",
+      "NDc": "Zone naturelle - centre d'enfouissement technique"
+    }
+  },
+
+  "etape_2_projet": {
+    "question": "Quel est l'objet de votre projet ?",
+    "options": [
+      "construction_principale",
+      "extension",
+      "annexe_garage",
+      "abri_jardin",
+      "piscine",
+      "cloture_mur",
+      "portail",
+      "toiture_facade",
+      "velux_lucarne",
+      "veranda",
+      "panneaux_solaires",
+      "changement_destination",
+      "demolition"
+    ]
+  },
+
+  "zones": {
+
+    "Ua": {
+      "description": "Secteurs bâtis les plus anciens du bourg. Vocation principale : habitat. Commerce, bureaux, artisanat admis sous conditions.",
+      "interdictions": [
+        "Constructions incompatibles avec le caractère du voisinage",
+        "Installations classées soumises à autorisation (ICPE)",
+        "Constructions agricoles",
+        "Carrières",
+        "Caravanes, camping, habitations légères de loisirs sur terrains non bâtis",
+        "Affouillements/exhaussements non liés aux travaux autorisés"
+      ],
+      "regles": {
+        "emprise_sol": "50% maximum de la superficie du terrain",
+        "hauteur_principale": "6 m maximum à l'égout du toit",
+        "hauteur_annexes": "non limitée spécifiquement (voir aspect ext.)",
+        "recul_voie": {
+          "constructions_principales": "À l'alignement ou recul de 2 m minimum si continuité assurée par clôture",
+          "annexes": "À l'alignement ou recul de 3 m minimum",
+          "abris_jardin": "Recul de 3 m minimum"
+        },
+        "recul_limites_separatives": {
+          "constructions_principales": "En contiguïté ou retrait de 3 m minimum",
+          "annexes": "En contiguïté ou retrait de 3 m minimum"
+        },
+        "stationnement": "2 places minimum par logement (garages compris). Artisanat/bureaux : 1 place/25 m² de surface de plancher",
+        "espaces_verts": "Espaces libres à aménager et paysager (pas de % imposé)",
+        "toiture": {
+          "principale": "Au moins 2 pentes ≥ 35°. Couverture : ardoises ou tuiles plates",
+          "annexes_sup30m2": "Au moins 1 pente ≥ 25°. Ardoises ou tuiles plates",
+          "annexes_inf30m2": "Pente ≥ 25°. Teinte ardoise ou brun rouge"
+        },
+        "facades": {
+          "interdits": "Enduits/peinture sur pierre de taille ou brique prévus apparents. Matériaux nus non recouverts (carreaux de plâtre, briques creuses, agglomérés ciment)",
+          "niveau_rdc": "≤ 0,50 m par rapport au niveau naturel ou trottoir"
+        },
+        "clotures": {
+          "soumises_dp": true,
+          "sur_voie": {
+            "types_autorises": ["Mur plein (pierre, brique, maçonnerie enduite)", "Mur à claire-voie"],
+            "hauteur_max": "1,50 m",
+            "carrefour": "1,20 m max sur 20 m de part et d'autre du croisement"
+          },
+          "limites_separatives": {
+            "types_autorises": ["Mur plein (pierre, brique, maçonnerie enduite)", "Grillage/treillage bois ou métal avec ou sans soubassement, doublé ou non de haie"],
+            "hauteur_max": "1,80 m"
+          },
+          "existantes_traditionnelles": "Restauration à l'identique obligatoire"
+        },
+        "lucarnes": {
+          "types_autorises": ["Châssis dans le pan de toiture", "Lucarnes à deux pans ou à croupe"],
+          "interdits": ["Lucarnes rampantes"],
+          "regles": "Rectangulaires, plus hautes que larges. Largeur cumulée ≤ 2/3 de la façade. Pas de mélange de styles/matériaux"
+        },
+        "abris_jardin": "Matériaux d'aspect naturel : pierre, brique, parpaing enduit ou bois"
+      },
+      "autorisation_type": {
+        "note": "Voir tableau général DP/PC selon surface"
+      }
+    },
+
+    "Ub": {
+      "description": "Habitat résidentiel de la 2ème moitié du XXe siècle.",
+      "interdictions": [
+        "Constructions industrielles",
+        "Exploitations agricoles ou forestières",
+        "Dépôts de matériaux à l'air libre",
+        "Carrières",
+        "Caravanes, camping",
+        "Affouillements/exhaussements non liés aux travaux autorisés"
+      ],
+      "regles": {
+        "emprise_sol": "30% maximum de la superficie du terrain",
+        "espaces_verts": "30% minimum de la surface du terrain en espace vert (libre de construction et d'imperméabilisation)",
+        "hauteur_principale": "4 m maximum à l'égout du toit",
+        "hauteur_annexes": "2,5 m maximum",
+        "recul_voie": {
+          "constructions_principales": "Recul de 5 m minimum",
+          "annexes": "À l'alignement ou recul de 5 m minimum",
+          "abris_jardin": "Recul de 3 m minimum"
+        },
+        "recul_limites_separatives": {
+          "constructions_principales": "En contiguïté ou retrait de 3 m minimum",
+          "annexes": "En contiguïté ou retrait de 3 m minimum"
+        },
+        "stationnement": "2 places minimum par logement (garages compris). Artisanat/bureaux : 1 place/25 m² de surface de plancher",
+        "toiture": {
+          "principale": "Au moins 2 pentes ≥ 35°. Couverture : ardoises ou tuiles plates",
+          "annexes_sup30m2": "Au moins 1 pente ≥ 25°. Ardoises ou tuiles plates",
+          "annexes_inf30m2": "Pente ≥ 25°. Teinte ardoise ou brun rouge"
+        },
+        "facades": {
+          "interdits": "Enduits/peinture sur pierre de taille ou brique prévus apparents. Matériaux nus. Blanc pur et couleurs vives",
+          "teintes": "Palettes traditionnelles en harmonie avec bâtiments voisins",
+          "niveau_rdc": "≤ 0,30 m par rapport au niveau naturel ou trottoir"
+        },
+        "clotures": {
+          "soumises_dp": true,
+          "sur_voie": {
+            "types_autorises": ["Mur à claire-voie uniquement"],
+            "hauteur_max": "1,50 m",
+            "carrefour": "1,20 m max sur 20 m de part et d'autre du croisement"
+          },
+          "limites_separatives": {
+            "types_autorises": ["Mur plein pierre ou maçonnerie enduite", "Grillage/treillage bois ou métal avec ou sans soubassement, doublé ou non de haie"],
+            "hauteur_max": "1,80 m"
+          }
+        },
+        "lucarnes": {
+          "types_autorises": ["Châssis dans le pan de toiture", "Lucarnes à deux pans ou à croupe"],
+          "interdits": ["Lucarnes rampantes"],
+          "regles": "Rectangulaires, plus hautes que larges. Largeur cumulée ≤ 2/3 de la façade"
+        },
+        "abris_jardin": "Matériaux traditionnels : pierre, brique, parpaing enduit ou bois. Tôle ondulée interdite"
+      }
+    },
+
+    "Ub1": {
+      "description": "Extension du Clos de Manthelon. Prescriptions architecturales spécifiques supplémentaires.",
+      "base_regles": "Ub (mêmes règles de base sauf exceptions ci-dessous)",
+      "specifiques": {
+        "hauteur_max_absolue": "8 m (ouvrages techniques exclus)",
+        "niveaux_autorises": "Rez-de-chaussée seul, ou RDC + combles",
+        "toiture": {
+          "pente": "Entre 40° et 45° (sauf vérandas)",
+          "materiaux": "Tuiles plates couleur terre cuite exclusivement (tuiles couleur ardoise interdites). Tôle ondulée interdite. Amiante-ciment interdit",
+          "faitage": "Orientation selon plan parcellaire (sauf lot n°7)",
+          "terrasses": "Interdites",
+          "toits_un_versant": "Interdits (sauf annexes)",
+          "toits_quatre_pans": "Interdits",
+          "min_tuiles": "22 tuiles plates minimum par m²"
+        },
+        "clotures": {
+          "facade_rue": "Haie végétale dense (≥ 3 variétés) avec éventuellement grillage ou treillis soudé vert, hauteur max 1,50 m. Grillage en retrait de 0,80 m minimum par rapport à la limite",
+          "mitoyennes": "Grillage vert 1,50 m max sur potelets fer/bois, doublé éventuellement d'une haie (max 1,80 m). Plaques ciment interdites"
+        },
+        "portail": "En retrait de 5 m par rapport aux espaces communs. Hauteur max 1,50 m. Piliers max 1,80 m",
+        "stationnement_specifique": "Lots 1, 2, 5, 6 : aire de stationnement en façade sur rue (2 véhicules)"
+      }
+    },
+
+    "Ue": {
+      "description": "Zone d'équipements publics.",
+      "interdictions": ["Industrie", "Artisanat", "Agriculture/sylviculture", "Dépôts à l'air libre", "Caravanes/camping", "Carrières"],
+      "regles": {
+        "emprise_sol": "Non réglementée",
+        "hauteur": "7 m maximum",
+        "recul_voie": "À l'alignement ou recul de 2 m minimum",
+        "recul_limites": "En contiguïté ou retrait de 3 m minimum",
+        "stationnement": {
+          "bureaux": "1 place / 40 m² de surface de plancher",
+          "activite": "1 place / 100 m² de surface de plancher",
+          "enseignement": "2 places par classe + 1 place par emploi + aire 2 roues"
+        }
+      }
+    },
+
+    "Ui": {
+      "description": "Zone d'activités industrielles.",
+      "interdictions": ["Hébergement hôtelier", "Agriculture", "Caravanes/camping", "Carrières"],
+      "regles": {
+        "emprise_sol": "60% maximum",
+        "hauteur": "8 m maximum",
+        "recul_voie": "À l'alignement ou recul de 5 m minimum",
+        "recul_limites": "Distance ≥ moitié de la hauteur, minimum 3 m",
+        "clotures": {
+          "sur_voie": "Grillage couleur sombre, hauteur max 1,50 m",
+          "limites_separatives": "Grillage couleur sombre, hauteur max 1,80 m, avec ou sans soubassement, doublé ou non de haie"
+        },
+        "stationnement": "2 places / 100 m² (industrie, artisanat, bureaux) + espaces camions"
+      }
+    },
+
+    "1AU": {
+      "description": "Zone à urbaniser à court terme, vocation habitat. Opération d'ensemble obligatoire.",
+      "interdictions": ["Industrie", "Agriculture/sylviculture", "Dépôts", "Caravanes/camping", "Carrières"],
+      "regles": {
+        "condition_principale": "Construction uniquement dans le cadre d'une opération d'aménagement d'ensemble",
+        "emprise_sol": "40% maximum",
+        "espaces_verts": "30% minimum en espace vert libre",
+        "hauteur_principale": "5 m maximum",
+        "hauteur_annexes": "2,5 m maximum",
+        "recul_voie": "5 m minimum (constructions et annexes)",
+        "recul_limites": "En contiguïté ou retrait de 3 m minimum",
+        "clotures": {
+          "obligation": "Clôture non obligatoire",
+          "si_cloture_voie": "Grillage couleur sombre, max 1,20 m, doublé de haie",
+          "si_cloture_separative": "Grillage couleur sombre, max 1,50 m, doublé de haie"
+        },
+        "stationnement": "2 places minimum / logement"
+      }
+    },
+
+    "2AU": {
+      "description": "Zone inconstructible. Réserve foncière à long terme. Urbanisation possible uniquement après modification/révision du PLU.",
+      "regles": {
+        "constructions_autorisees": "Uniquement constructions et installations nécessaires aux services publics ou d'intérêt collectif, sous réserve de ne pas compromettre l'aménagement ultérieur",
+        "tout_le_reste": "INTERDIT"
+      }
+    },
+
+    "A": {
+      "description": "Zone agricole. Seules les constructions liées à l'exploitation agricole sont autorisées en règle générale.",
+      "autorisations": [
+        "Constructions nécessaires à l'exploitation agricole (à proximité des bâtiments existants)",
+        "Changement de destination des bâtiments agricoles identifiés au plan",
+        "Abris pour animaux (usage agricole, à +50 m des habitations)",
+        "Équipements collectifs compatibles avec l'activité agricole",
+        "Installations classées agricoles"
+      ],
+      "regles": {
+        "recul_voie": "8 m minimum (sauf A71 : 100 m de l'axe)",
+        "recul_limites": "En contiguïté ou retrait de 3 m minimum",
+        "hauteur_agricole": "10 m maximum hors tout",
+        "hauteur_habitation": "5 m maximum à l'égout",
+        "hauteur_abris_animaux": "2,5 m maximum",
+        "clotures": {
+          "type": "Agricole : pieux de bois + 3 fils répartis",
+          "interdit": "Piquets fer, poteaux béton, grillage (sauf exceptions élevage/sylviculture)",
+          "hauteur_max": "1,20 m (1,80 m max si élevage déclaré ou activité sylvicole)"
+        }
+      }
+    },
+
+    "Ah": {
+      "description": "Hameaux et écarts non agricoles en zone A.",
+      "base_regles": "Zone A avec assouplissements",
+      "specifiques": {
+        "extensions_autorisees": "20% de la surface de plancher existante",
+        "annexes": "Emprise au sol max 50 m²",
+        "changement_destination": "Autorisé vers habitat, bureaux, commerce, artisanat, tourisme, loisirs",
+        "recul_voie": "À l'alignement ou recul de 5 m minimum",
+        "hauteur": "5 m maximum (constructions), 2,5 m (annexes)",
+        "espaces_verts": "30% minimum",
+        "toiture": "≥ 2 pentes ≥ 35°. Ardoises ou tuiles plates",
+        "facades": "Palettes traditionnelles. Blanc pur et couleurs vives interdits"
+      }
+    },
+
+    "N": {
+      "description": "Zone naturelle et forestière à protéger.",
+      "autorisations_generales": [
+        "Constructions agricoles et forestières",
+        "Reconstruction à l'identique après sinistre (si bâtiment régulièrement édifié)",
+        "Abris pour animaux en bois (à +50 m des zones U, AU, Nh, sans fondation, fermés max 3 côtés)",
+        "Constructions et installations nécessaires aux services publics",
+        "Aménagements de loisirs ou promenade (sans compromettre la qualité environnementale)",
+        "Aires de stationnement agricoles (sans imperméabilisation)"
+      ],
+      "interdictions": [
+        "Industrie, artisanat, bureaux, services, entrepôts",
+        "Dépôts de matériaux",
+        "Camping/caravaning",
+        "Tout changement affectant les Espaces Boisés Classés"
+      ]
+    },
+
+    "Nh": {
+      "description": "Hameaux et écarts non agricoles en zone naturelle.",
+      "specifiques": {
+        "extensions_autorisees": "20% de la surface de plancher existante",
+        "annexes": "Emprise au sol max 50 m²",
+        "nouvelles_constructions_principales": "INTERDITES",
+        "changement_destination": "Autorisé vers habitat, tourisme, loisirs compatible",
+        "hauteur": "5 m maximum (constructions), 2,5 m (annexes)",
+        "recul_voie": "5 m minimum",
+        "espaces_verts": "30% minimum",
+        "clotures": {
+          "type": "Agricole : pieux de bois + 3 fils",
+          "interdit": "Piquets fer, poteaux béton, grillage",
+          "hauteur_max": "1,20 m"
+        }
+      }
+    },
+
+    "Nj": {
+      "description": "Jardins d'intérêt.",
+      "autorisations": [
+        "Abris de jardin (emprise ≤ 20 m²)",
+        "Piscines et locaux techniques dédiés"
+      ],
+      "regles": {
+        "emprise_sol_max": "20 m²",
+        "hauteur_max": "2,5 m",
+        "recul_voie": "10 m minimum"
+      }
+    }
+  },
+
+  "types_travaux": {
+
+    "autorisation_quoi": {
+      "titre": "Quelle autorisation pour quel travail ?",
+      "source": "Feuille générale urbanisme",
+      "tableau": {
+        "extension_non_accolee": {
+          "inf20m2": "Déclaration Préalable (DP)",
+          "sup20m2": "Permis de Construire (PC)"
+        },
+        "garage_accolee_habitation": {
+          "inf40m2": "DP",
+          "sup40m2": "PC"
+        },
+        "garage_non_accolee": {
+          "inf20m2": "DP",
+          "sup20m2": "PC"
+        },
+        "abri_jardin_cabane_appentis": {
+          "inf5m2": "Aucune formalité",
+          "5_a_20m2": "DP",
+          "sup20m2": "PC"
+        },
+        "piscine": {
+          "inf10m2_non_couverte_moins3mois": "Aucune formalité",
+          "inf100m2_non_couverte": "DP",
+          "inf100m2_couverture_inf1m80": "DP",
+          "sup100m2": "PC"
+        },
+        "mur_cloture": "DP (si délibération municipale applicable)",
+        "portail": "DP",
+        "facade_ravalement_bardage": "DP si changement aspect (remplacement identique = aucune formalité)",
+        "toiture_tuiles": "DP si changement aspect (remplacement identique = aucune formalité)",
+        "velux_fenetre_toit": "DP (chaque fenêtre ≤ 80 cm²)",
+        "lucarne": "DP",
+        "veranda_terrasse_couverte": {
+          "inf5m2": "Aucune formalité",
+          "inf40m2": "DP",
+          "sup40m2": "PC"
+        },
+        "terrasse_non_couverte_plain_pied": {
+          "sans_surelevation": "Aucune formalité quelle que soit la surface",
+          "surelevee_inf5m2": "Aucune formalité",
+          "surelevee_5_40m2": "DP",
+          "surelevee_sup40m2": "PC"
+        },
+        "panneaux_photovoltaiques_toit": "DP",
+        "parabole_sup1m": "DP",
+        "fenetre_porte_fenetre_creation_changement": "DP",
+        "aménagement_combles": {
+          "inf40m2": "DP",
+          "sup40m2": "PC"
+        }
+      },
+      "notes": [
+        "Au-delà de 150 m² de surface de plancher : architecte obligatoire",
+        "Délai instruction DP : 1 mois",
+        "Délai instruction PC : 2 mois",
+        "Validité DP/PC : 3 ans",
+        "Dépôt : mairie ou GNAU (Communauté de Communes Terres de Val de Loire)"
+      ]
+    },
+
+    "piscine": {
+      "questions": ["Zone ?", "Surface ? (< 10 m², 10-100 m², > 100 m²)", "Couverte ou non ?", "Couverture > 1,80 m de haut ?"],
+      "regles_zones": {
+        "Ua": "Autorisée (sous réserve règles emprise au sol 50%)",
+        "Ub": "Autorisée (sous réserve règles emprise au sol 30% et espaces verts 30%)",
+        "Ub1": "Autorisée (zones constructibles du plan parcellaire)",
+        "Ue": "Non précisée dans le règlement - consulter mairie",
+        "Ui": "Non destinée à cet usage - consulter mairie",
+        "1AU": "Autorisée sous réserve emprise 40%",
+        "2AU": "INTERDITE",
+        "A": "INTERDITE (sauf secteur Ah : si dans les limites d'extension de 20%)",
+        "Ah": "Possible si dans le cadre de l'extension autorisée (20% SP)",
+        "N": "INTERDITE sauf Nj",
+        "Nj": "Autorisée explicitement avec local technique dédié",
+        "Nh": "INTERDITE (pas de nouvelle construction principale, piscine = équipement)"
+      }
+    },
+
+    "cloture": {
+      "questions": ["Zone ?", "Sur voie publique ou en limite séparative ?", "Type souhaité ?", "Hauteur envisagée ?"],
+      "autorisation": "Déclaration Préalable obligatoire dans toutes les zones urbaines (délibération CM 1er mars 2012)",
+      "synthese_par_zone": {
+        "Ua": {
+          "sur_voie": "Mur plein ou claire-voie, max 1,50 m",
+          "separative": "Mur plein ou grillage/treillage (bois/métal) + haie possible, max 1,80 m",
+          "carrefour": "Max 1,20 m sur 20 m"
+        },
+        "Ub": {
+          "sur_voie": "Mur à claire-voie UNIQUEMENT, max 1,50 m",
+          "separative": "Mur plein pierre/maçonnerie ou grillage/treillage + haie, max 1,80 m",
+          "carrefour": "Max 1,20 m sur 20 m"
+        },
+        "Ub1": {
+          "facade_rue": "Haie végétale ≥ 3 variétés + éventuellement grillage vert 1,50 m max. Grillage en retrait 0,80 m de la limite",
+          "mitoyenne": "Grillage vert 1,50 m max + haie possible 1,80 m max. Plaques ciment INTERDITES"
+        },
+        "Ui": {
+          "sur_voie": "Grillage couleur sombre, max 1,50 m",
+          "separative": "Grillage couleur sombre, max 1,80 m"
+        },
+        "A_N": {
+          "type": "Pieux de bois + 3 fils métalliques",
+          "interdit": "Piquets fer, poteaux béton, tout grillage",
+          "hauteur": "Max 1,20 m (exception élevage/sylviculture : 1,80 m)"
+        }
+      }
+    },
+
+    "abri_jardin": {
+      "questions": ["Zone ?", "Surface ? (< 5 m², 5-20 m², > 20 m²)", "Matériaux envisagés ?"],
+      "autorisations": {
+        "inf5m2": "Aucune formalité",
+        "5_a_20m2": "Déclaration Préalable",
+        "sup20m2": "Permis de Construire"
+      },
+      "materiaux_par_zone": {
+        "Ua": "Pierre, brique, parpaing enduit ou bois",
+        "Ub": "Pierre, brique, parpaing enduit ou bois. INTERDIT : tôle ondulée",
+        "Ub1": "Couleur de toiture rappelant la couverture principale. Tôle ondulée INTERDITE",
+        "1AU": "Matériaux traditionnels (pierre, brique, parpaing enduit) et bois",
+        "Nj": "Autorisé dans la limite de 20 m² d'emprise au sol"
+      },
+      "recul_voie_par_zone": {
+        "Ua": "3 m minimum",
+        "Ub": "3 m minimum",
+        "Ub1": "5 m minimum"
+      }
+    },
+
+    "toiture": {
+      "questions": ["Zone ?", "Construction principale ou annexe ?", "Surface de l'annexe ? (> ou < 30 m²)", "Matériau envisagé ?"],
+      "synthese": {
+        "construction_principale": {
+          "Ua_Ub_Ah_Nh": "≥ 2 pentes, ≥ 35°. Ardoises ou tuiles plates",
+          "Ub1": "2 pentes entre 40° et 45°. Tuiles plates terre cuite uniquement. Min 22 tuiles/m²"
+        },
+        "annexe_sup30m2": {
+          "Ua_Ub_Ah_Nh": "≥ 1 pente, ≥ 25°. Ardoises ou tuiles plates"
+        },
+        "annexe_inf30m2": {
+          "Ua_Ub_Ah_Nh": "Pente ≥ 25°. Teinte ardoise ou brun rouge"
+        },
+        "exceptions": "Petits appentis, vérandas, verrières : règles toiture non applicables"
+      }
+    },
+
+    "extension": {
+      "questions": [
+        "Zone ?",
+        "Accolée à la construction principale ?",
+        "Surface de l'extension ? (< 20 m², 20-40 m², > 40 m²)",
+        "L'emprise au sol totale restera-t-elle dans les limites ?"
+      ],
+      "regles_cles_par_zone": {
+        "Ua": "Emprise totale ≤ 50%. Hauteur ≤ 6 m. Implantation cohérente avec la construction existante",
+        "Ub": "Emprise totale ≤ 30%. Espaces verts ≥ 30%. Hauteur ≤ 4 m",
+        "Ah_Nh": "Extension limitée à +20% de la surface de plancher existante"
+      }
+    },
+
+    "changement_destination": {
+      "questions": ["Zone ?", "Type de bâtiment actuel ?", "Usage envisagé ?"],
+      "regles": {
+        "Ua": "Commerce, bureaux, artisanat admis sous conditions de compatibilité avec le voisinage",
+        "Ub": "Commerce, bureaux, artisanat admis sous conditions",
+        "A": "Changement possible pour les bâtiments identifiés au plan graphique uniquement",
+        "Ah": "Possible vers habitat, bureaux, commerce, artisanat, tourisme, loisirs",
+        "Nh": "Possible vers habitat, tourisme, loisirs uniquement",
+        "2AU_N": "Très restreint, consulter mairie"
+      }
+    },
+
+    "construction_neuve": {
+      "questions": [
+        "Zone ?",
+        "Usage : habitation / commerce / artisanat / équipement ?",
+        "Surface de plancher totale ? (seuil 150 m² pour architecte obligatoire)",
+        "Terrain suffisamment grand ? (emprise autorisée)",
+        "Présence assainissement collectif ?"
+      ],
+      "regles_assainissement": {
+        "collectif": "Raccordement obligatoire si réseau existant",
+        "non_collectif": "Terrain ≥ 900 m² requis (zones Ua, Ub). Étude de sol obligatoire"
+      }
+    }
+  },
+
+  "questions_frequentes": [
+    {
+      "question": "Puis-je construire une piscine dans mon jardin ?",
+      "arbre": ["Zone ?", "Si Ua/Ub : surface + emprise totale OK ?", "Si Nj : OUI explicitement", "Si 2AU/A/N/Nh : NON"]
+    },
+    {
+      "question": "Quelle hauteur pour ma clôture ?",
+      "arbre": ["Zone ?", "Sur voie ou séparative ?", "Ua/Ub : voir tableau clôtures", "A/N : 1,20 m max, pieux bois uniquement"]
+    },
+    {
+      "question": "Puis-je poser des panneaux solaires ?",
+      "arbre": ["Toutes zones : DP obligatoire", "Toitures : ouvrage lié ENR exclu du calcul de hauteur", "Adaptation architecturale requise dans zones patrimoniales"]
+    },
+    {
+      "question": "Mon abri de jardin nécessite-t-il une autorisation ?",
+      "arbre": ["< 5 m² : aucune formalité (toutes zones)", "5-20 m² : DP", "> 20 m² : PC", "Matériaux imposés selon zone"]
+    },
+    {
+      "question": "Je suis en zone 2AU, que puis-je faire ?",
+      "arbre": ["Aucune construction privée autorisée", "Seuls les équipements publics peuvent être autorisés", "Urbanisation possible après révision/modification du PLU uniquement"]
+    },
+    {
+      "question": "Je souhaite créer un portail",
+      "arbre": ["Toutes zones : Déclaration Préalable obligatoire", "Ub1 : hauteur max 1,50 m, piliers max 1,80 m, retrait 5 m des espaces communs"]
+    }
+  ]
+}
