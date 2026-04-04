@@ -598,6 +598,50 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 .trombi-name{font-size:0.6rem;font-weight:800;color:var(--text);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
 html.theme-sombre .trombi-name{color:#f1f5f9;}
 html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
+
+/* ══ MEL — Arbre de décision ══════════════════════════════════ */
+#mel-tree{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+#mel-tree-l1{display:flex;flex-direction:column;overflow-y:auto;padding:14px 14px 8px;}
+#mel-tree-l2{display:none;flex-direction:column;flex:1;overflow-y:auto;padding:10px 14px 8px;}
+#mel-tree-l2.active{display:flex;}
+.mel-tree-title{font-size:.82rem;font-weight:800;color:var(--forest);margin-bottom:12px;}
+.mel-cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mel-cat-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 8px;border-radius:14px;border:2px solid var(--border);background:var(--card);cursor:pointer;transition:all .15s;font-family:'Nunito',sans-serif;color:var(--text);font-size:.76rem;font-weight:700;text-align:center;line-height:1.2;-webkit-tap-highlight-color:transparent;}
+.mel-cat-btn:active{background:var(--mist);border-color:var(--leaf);}
+.mel-cat-btn .ico{font-size:1.5rem;}
+.mel-sub{display:flex;flex-direction:column;gap:7px;}
+.mel-sub-hdr{display:flex;align-items:center;gap:8px;background:var(--forest);color:white;border-radius:12px;padding:10px 12px;margin-bottom:4px;flex-shrink:0;}
+.mel-sub-hdr span{flex:1;font-size:.82rem;font-weight:700;}
+.mel-sub-back{background:rgba(255,255,255,.18);border:none;cursor:pointer;color:white;font-size:.75rem;font-weight:700;padding:4px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0;font-family:'Nunito',sans-serif;}
+.mel-sub-back:active{background:rgba(255,255,255,.3);}
+.mel-zone-block{background:var(--mist);border-radius:11px;padding:11px 12px;margin-bottom:4px;flex-shrink:0;}
+.mel-zone-block label{font-size:.72rem;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:7px;}
+.mel-zone-row{display:flex;gap:6px;}
+.mel-addr-input{flex:1;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-size:16px !important;font-family:'Nunito',sans-serif;background:white;color:var(--text);min-width:0;}
+.mel-addr-input:focus{outline:none;border-color:var(--leaf);}
+.mel-gps-btn,.mel-addr-btn{padding:9px 11px;border-radius:9px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;transition:background .15s;white-space:nowrap;font-family:'Nunito',sans-serif;flex-shrink:0;}
+.mel-gps-btn{background:var(--leaf);color:white;}
+.mel-addr-btn{background:var(--gold);color:white;}
+.mel-zone-result{margin-top:7px;padding:7px 10px;border-radius:8px;font-size:.79rem;font-weight:600;display:none;}
+.mel-zone-result.ok{background:#d1fae5;color:#065f46;}
+.mel-zone-result.warn{background:#fef3c7;color:#92400e;}
+.mel-zone-result.err{background:#fee2e2;color:#991b1b;}
+.mel-zone-spin{display:inline-block;animation:mzspin .8s linear infinite;}
+@keyframes mzspin{to{transform:rotate(360deg);}}
+.mel-zone-manual{margin-top:7px;width:100%;padding:8px;border-radius:8px;border:1.5px solid var(--border);font-size:16px !important;background:white;font-family:'Nunito',sans-serif;}
+.mel-q-btn{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:11px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-family:'Nunito',sans-serif;font-size:.83rem;color:var(--text);text-align:left;transition:all .15s;width:100%;-webkit-tap-highlight-color:transparent;}
+.mel-q-btn:active{background:var(--mist);border-color:var(--sage);}
+.mel-q-btn .q-ico{font-size:1.05rem;flex-shrink:0;}
+.mel-q-btn.mel-autre{border-style:dashed;color:var(--muted);}
+.mel-direct-answer{background:var(--mist);border-radius:11px;padding:13px 14px;margin-top:4px;font-size:.84rem;line-height:1.6;color:var(--text);border-left:3px solid var(--leaf);}
+.mel-direct-answer .da-label{font-size:.68rem;font-weight:800;color:var(--leaf);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
+.mel-open-chat-btn{width:100%;margin-top:10px;padding:11px;background:var(--forest);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;}
+html.theme-sombre #mel-tree-l1,.html.theme-sombre #mel-tree-l2{background:#1e293b;}
+html.theme-sombre .mel-cat-btn{background:#2d3748;border-color:#374151;color:#e2e8f0;}
+html.theme-sombre .mel-q-btn{background:#2d3748;border-color:#374151;color:#e2e8f0;}
+html.theme-sombre .mel-zone-block{background:#2d3748;}
+html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background:#374151;color:#e2e8f0;border-color:#4b5563;}
+
 </style>
 </head>
 
@@ -3641,34 +3685,40 @@ let _melChatContext='', _melChatCategory='autre', _melChatTopic='autre';
 
 function melShowTree(){
   const tree=document.getElementById('mel-tree');
+  const l1=document.getElementById('mel-tree-l1');
+  const l2=document.getElementById('mel-tree-l2');
   const msgs=document.getElementById('msgs');
   const sugs=document.getElementById('sugs');
   const mbar=document.querySelector('.mbar');
   if(tree)tree.style.display='flex';
+  if(l1)l1.style.display='';
+  if(l2){l2.classList.remove('active');l2.innerHTML='';}
   if(msgs)msgs.style.display='none';
   if(sugs)sugs.style.display='none';
   if(mbar)mbar.style.display='none';
-  melResetTree();
+  _melCat=null;_melZone=null;_melZoneLabel=null;_melAddr=null;
+  _melChatContext='';_melChatCategory='autre';
 }
 
 function melSelectCat(cat){
   _melCat=cat;
   const def=MEL_TREE[cat];
   if(!def)return;
-  document.querySelectorAll('.mel-cat-btn').forEach(b=>b.classList.remove('active'));
-  event.currentTarget && event.currentTarget.classList.add('active');
   if(def.openChatDirectly){
     melOpenChat('',cat,'');
     return;
   }
+  // Cacher l1, afficher l2
+  const l1=document.getElementById('mel-tree-l1');
   const l2=document.getElementById('mel-tree-l2');
-  l2.style.display='block';
+  if(l1)l1.style.display='none';
+  l2.classList.add('active');
   l2.innerHTML=_buildSubLevel(cat,def);
-  l2.scrollIntoView({behavior:'smooth',block:'nearest'});
+  l2.scrollTop=0;
 }
 
 function _buildSubLevel(cat,def){
-  let h=`<div class="mel-sub"><div class="mel-sub-title"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
+  let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
   if(def.needZone){
     h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg, Mézières-lez-Cléry" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
   }
@@ -3682,8 +3732,10 @@ function _buildSubLevel(cat,def){
 function melSelectQuestion(cat,qid){
   const def=MEL_TREE[cat];
   if(!def)return;
-  const zoneCtx=_melZone?`Zone PLU : ${_melZone}${_melZoneLabel?' ('+_melZoneLabel+')':''}.${_melAddr?' Adresse : '+_melAddr+'.':''}`
-    :(_melAddr?`Adresse : ${_melAddr}.`:'');
+  const zoneCtx=[
+    _melAddr ? `Adresse : ${_melAddr}.` : '',
+    _melZone ? `Zone PLU identifiée : ${_melZone}${_melZoneLabel?' ('+_melZoneLabel+')':''}.` : ''
+  ].filter(Boolean).join(' ');
   if(qid==='__autre__'){
     melOpenChat('',cat,`Catégorie : ${def.label}. ${zoneCtx}`);
     return;
@@ -3714,12 +3766,20 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
   _melChatTopic=topic||category||'autre';
   const tree=document.getElementById('mel-tree');
   const msgs=document.getElementById('msgs');
-  const sugs=document.getElementById('sugs');
   const mbar=document.querySelector('.mbar');
   if(tree)tree.style.display='none';
   if(msgs)msgs.style.display='flex';
-  if(sugs)sugs.style.display='';
   if(mbar)mbar.style.display='flex';
+  // Ajouter bouton retour à l'arbre dans le chat
+  const existing=document.getElementById('mel-back-btn');
+  if(!existing){
+    const backBtn=document.createElement('button');
+    backBtn.id='mel-back-btn';
+    backBtn.textContent='← Retour aux thèmes';
+    backBtn.style.cssText='width:100%;padding:8px;background:var(--mist);border:none;border-radius:8px;font-family:Nunito,sans-serif;font-size:.78rem;font-weight:700;color:var(--leaf);cursor:pointer;margin-bottom:6px;flex-shrink:0;';
+    backBtn.onclick=()=>{document.getElementById('mel-back-btn')?.remove();melShowTree();};
+    if(msgs)msgs.parentNode.insertBefore(backBtn,msgs);
+  }
   if(!melInited){
     melInited=true;
     addMsg('bot','Bonjour\u00a0! Je suis MEL.\n\nComment puis-je vous aider\u00a0? \ud83d\ude0a');
@@ -3734,9 +3794,10 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
 
 function melResetTree(){
   _melCat=null;_melZone=null;_melZoneLabel=null;_melAddr=null;
+  const l1=document.getElementById('mel-tree-l1');
   const l2=document.getElementById('mel-tree-l2');
-  if(l2){l2.style.display='none';l2.innerHTML='';}
-  document.querySelectorAll('.mel-cat-btn').forEach(b=>b.classList.remove('active'));
+  if(l1)l1.style.display='';
+  if(l2){l2.classList.remove('active');l2.innerHTML='';}
 }
 
 async function melFindZoneByAddr(){
