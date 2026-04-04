@@ -994,6 +994,9 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
       <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
         &#8635; Réinitialiser les paramètres
       </button>
+      <button class="submit-btn" style="margin-top:6px;background:linear-gradient(135deg,#dc2626,#b91c1c)" onclick="clearCacheAndReload()">
+        🗑️ Vider le cache &amp; recharger
+      </button>
     </div>
   </div>
 </div>
@@ -1008,9 +1011,6 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
 
 <div class="footer" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 16px;">
   <div>MAT · Application officielle · Mairie de Mézières-lez-Cléry</div>
-  <button onclick="clearCacheAndReload()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(216,243,220,0.7);font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:700;padding:5px 12px;cursor:pointer;">
-    🗑️ Vider le cache &amp; réinitialiser les paramètres
-  </button>
 </div>
 
 <!-- ═══ OVERLAY MAJORDOME ═══ -->
@@ -2844,8 +2844,6 @@ setInterval(loadBusRemi, 60000);
 
 // ── Vider cache ──────────────────────
 async function clearCacheAndReload() {
-  if (!await confirmMAT('Vider le cache et réinitialiser les paramètres de personnalisation ?\n\n• Thème, en-tête, accessibilité remis à zéro\n• Cache vidé, application rechargée\n• Abonnements aux notifications conservés','Réinitialiser MAT','🗑️','Réinitialiser','Annuler')) return;
-
   // Réinitialiser les paramètres de personnalisation (PAS les notifs)
   localStorage.removeItem(ACC_KEY);
   const html = document.documentElement;
@@ -2860,7 +2858,13 @@ async function clearCacheAndReload() {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => caches.delete(k)));
   }
-  window.location.reload(true);
+
+  // Message système bref avant rechargement
+  const toast = document.createElement('div');
+  toast.textContent = '✅ Cache vidé — rechargement…';
+  toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--forest);color:white;padding:16px 28px;border-radius:14px;font-family:Nunito,sans-serif;font-size:.88rem;font-weight:800;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,.3);';
+  document.body.appendChild(toast);
+  setTimeout(() => window.location.reload(true), 600);
 }
 
 function urlBase64ToUint8Array(b64){
