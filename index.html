@@ -600,9 +600,9 @@ html.theme-sombre .trombi-name{color:#f1f5f9;}
 html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 
 /* ══ MEL — Arbre de décision ══════════════════════════════════ */
-#mel-tree{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-#mel-tree-l1{display:flex;flex-direction:column;overflow-y:auto;padding:14px 14px 8px;}
-#mel-tree-l2{display:none;flex-direction:column;flex:1;overflow-y:auto;padding:10px 14px 8px;}
+#mel-tree{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
+#mel-tree-l1{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding:14px 14px 8px;min-height:0;}
+#mel-tree-l2{display:none;flex-direction:column;flex:1;overflow-y:auto;padding:10px 14px 8px;min-height:0;}
 #mel-tree-l2.active{display:flex;}
 .mel-tree-title{font-size:.82rem;font-weight:800;color:var(--forest);margin-bottom:12px;}
 .mel-cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -3630,52 +3630,107 @@ if (!('setAppBadge' in navigator)) {
 const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
 
 const MEL_TREE = {
+
   urbanisme:{
     label:"Urbanisme & Construction", ico:"🏗️", needZone:true,
     questions:[
       {id:"permis",ico:"📄",label:"Permis de construire / Déclaration préalable",prompt:"J'ai besoin d'informations sur le permis de construire ou la déclaration préalable de travaux à Mézières-lez-Cléry.",topic:"urbanisme"},
       {id:"piscine",ico:"🏊",label:"Piscine",prompt:"Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?",topic:"urbanisme"},
       {id:"cloture",ico:"🔲",label:"Clôture / Mur / Portail",prompt:"Je souhaite installer une clôture, un mur ou un portail. Quelles sont les règles et formalités ?",topic:"urbanisme"},
-      {id:"extension",ico:"📐",label:"Extension / Agrandissement",prompt:"Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables à mon terrain ?",topic:"urbanisme"},
+      {id:"extension",ico:"📐",label:"Extension / Agrandissement",prompt:"Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables ?",topic:"urbanisme"},
       {id:"abri",ico:"🌿",label:"Abri de jardin / Garage / Annexe",prompt:"Je souhaite construire un abri de jardin, un garage ou une dépendance. Quelles sont les règles ?",topic:"urbanisme"},
       {id:"toiture",ico:"🏠",label:"Toiture / Façade / Matériaux",prompt:"Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?",topic:"urbanisme"},
     ]
   },
+
   enfance:{
     label:"Enfance & Jeunesse", ico:"🎒", needZone:false,
     questions:[
-      {id:"ecole",ico:"📚",label:"École La Forêt",prompt:"J'ai une question sur l'école de Mézières-lez-Cléry.",topic:"scolaire",directAnswer:"🏫 L'école La Forêt accueille les élèves de la commune. Pour les inscriptions et horaires, contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/lecole-de-la-foret/"},
-      {id:"cantine",ico:"🍽️",label:"Restaurant scolaire / Cantine",prompt:"J'ai une question sur le restaurant scolaire.",topic:"scolaire",directAnswer:"🍽️ Le restaurant scolaire fonctionne les jours d'école. Pour les inscriptions et tarifs, contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/le-restaurant-scolaire/"},
-      {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",prompt:"J'ai une question sur la crèche familiale Les Marmousets.",topic:"scolaire",directAnswer:"👶 La crèche familiale Les Marmousets accueille les enfants de 0 à 3 ans. Contactez la mairie au 02 38 45 61 76 ou consultez mezieres-lez-clery.fr/creche-familiale-les-marmousets/"},
-      {id:"loisirs",ico:"🎨",label:"Centre de loisirs",prompt:"J'ai une question sur le centre de loisirs (inscriptions, dates, activités).",topic:"scolaire",directAnswer:"🎨 Le centre de loisirs accueille les enfants pendant les vacances scolaires. Inscriptions et informations au 02 38 45 61 76 ou mezieres-lez-clery.fr/centre-de-loisirs/"},
+      {id:"ecole",ico:"📚",label:"École La Forêt",
+        directAnswer:{text:"L'école La Forêt est située 36 rue du Bourg. Elle ouvre à 8h20 (matin) et 13h30 (après-midi), les cours se terminent à 11h45 et 16h30. Vous pouvez joindre la directrice Mme GUILBERT-CHOLET tous les jours ou lui écrire.",
+          links:[{label:"📞 École : 02 38 45 65 00",tel:"0238456500"},{label:"✉️ ec-mezieres-lez-clery@ac-orleans-tours.fr",url:"mailto:ec-mezieres-lez-clery@ac-orleans-tours.fr"}]}
+      },
+      {id:"periscolaire",ico:"🌅",label:"Accueil périscolaire",
+        directAnswer:{text:"La commune propose un accueil périscolaire avant et après l'école pour les élèves de l'École de la Forêt. Les inscriptions et fiches de réservation sont à remettre en mairie avant le 30 juin pour l'année suivante.",
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
+      },
+      {id:"cantine",ico:"🍽️",label:"Restaurant scolaire",
+        directAnswer:{text:"Le restaurant scolaire prépare environ 100 repas par jour à partir de produits frais. Tarifs 2022/2023 : 3,80 € (1er enfant), 3,06 € (2e enfant), 2,32 € (3e enfant et +). Les fiches d'inscription sont à déposer en mairie avant le 30 juin.",
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
+      },
+      {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",
+        directAnswer:{text:"La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
+          links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"}]}
+      },
+      {id:"loisirs",ico:"🎨",label:"Centre de loisirs",
+        directAnswer:{text:"Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
+          links:[{label:"✉️ accueilloisirs.ardoux@ccterresduvaldeloire.fr",url:"mailto:accueilloisirs.ardoux@ccterresduvaldeloire.fr"},{label:"🌐 Site CCTVL",url:"https://www.ccterresduvaldeloire.fr"}]}
+      },
     ]
   },
+
   administratif:{
     label:"Démarches Administratives", ico:"📋", needZone:false,
     questions:[
-      {id:"etatcivil",ico:"📜",label:"État civil (naissance, mariage, décès)",prompt:"J'ai besoin d'informations sur les démarches d'état civil à Mézières-lez-Cléry.",topic:"demarches",directAnswer:"📜 Pour les actes d'état civil, adressez-vous à la mairie au 02 38 45 61 76 ou mairie@mezieres-lez-clery.fr. Horaires : lundi 14h-17h30, vendredi 8h30-11h30."},
-      {id:"cni",ico:"🪪",label:"Carte d'identité / Passeport",prompt:"Comment obtenir une carte d'identité ou un passeport depuis Mézières-lez-Cléry ?",topic:"demarches",directAnswer:"🪪 CNI et passeports se font dans les mairies équipées de dispositifs biométriques. La mairie de Mézières vous orientera vers la plus proche (souvent Cléry-Saint-André). Contactez le 02 38 45 61 76."},
-      {id:"assainissement",ico:"🚰",label:"Assainissement",prompt:"J'ai une question sur l'assainissement à Mézières-lez-Cléry (raccordement, fosse, contrôle).",topic:"assainissement"},
-      {id:"location",ico:"🪑",label:"Location de matériel communal",prompt:"Comment louer du matériel auprès de la commune ?",topic:"location",directAnswer:"🪑 La commune propose la location de matériel (tables, chaises, barnums…). Contactez la mairie au 02 38 45 61 76 ou mezieres-lez-clery.fr/location-de-materiel/"},
+      {id:"etatcivil",ico:"📜",label:"État civil (naissance, mariage, décès, actes)",
+        directAnswer:{text:"Les actes d'état civil (naissance, mariage, décès, acte de naissance…) sont délivrés par la mairie. Accueil physique : lundi 14h-17h30, vendredi 8h30-11h30. Mercredi sur rendez-vous uniquement.",
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
+      },
+      {id:"cni",ico:"🪪",label:"Carte d'identité / Passeport",
+        directAnswer:{text:"CNI et passeports nécessitent une mairie équipée d'un dispositif biométrique. La mairie de Mézières vous orientera vers le point le plus proche. Prenez rendez-vous au préalable. Pièces à prévoir : justificatif domicile, photo, timbre fiscal pour passeport.",
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"🌐 Prendre RDV en ligne",url:"https://www.service-public.fr/particuliers/vosdroits/R61075"}]}
+      },
+      {id:"assainissement",ico:"🚰",label:"Assainissement (fosse, raccordement, SPANC)",
+        directAnswer:{text:"L'assainissement collectif et le SPANC (contrôle des fosses septiques) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
+          links:[{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"},{label:"✉️ assainissement@ccterresduvaldeloire.fr",url:"mailto:assainissement@ccterresduvaldeloire.fr"},{label:"🌐 Portail usagers CCTVL",url:"https://portail-usagers.ccterresduvaldeloire.fr"}]}
+      },
+      {id:"location",ico:"🪑",label:"Location de matériel communal",
+        directAnswer:{text:"La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"},{label:"🌐 Page location matériel",url:"https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"}]}
+      },
     ]
   },
+
   dechets:{
     label:"Déchets & Propreté", ico:"♻️", needZone:false,
     questions:[
-      {id:"collecte",ico:"🗑️",label:"Jours de collecte",prompt:"Quels sont les jours de collecte des ordures ménagères et du tri à Mézières-lez-Cléry ?",topic:"dechets",directAnswer:"🗑️ Les jours de collecte sont organisés par la CCTVL. Consultez mezieres-lez-clery.fr/gestion-des-dechets/ ou la CCTVL au 02 38 44 59 35."},
-      {id:"dechetterie",ico:"♻️",label:"Déchetterie",prompt:"Où se trouve la déchetterie la plus proche et quels sont ses horaires ?",topic:"dechets",directAnswer:"♻️ La déchetterie de Cléry-Saint-André est la plus proche. Inscription obligatoire sur portail-usagers.ccterresduvaldeloire.fr. Hiver 10h-12h/14h-17h, été 9h-12h/14h-18h (lun-sam). Tél : 02 38 44 59 35."},
-      {id:"encombrants",ico:"🛋️",label:"Encombrants / Objets volumineux",prompt:"Comment se débarrasser d'objets encombrants à Mézières-lez-Cléry ?",topic:"dechets"},
-      {id:"tri",ico:"📦",label:"Tri sélectif — que jeter où ?",prompt:"Comment fonctionne le tri sélectif à Mézières-lez-Cléry ?",topic:"dechets"},
+      {id:"collecte",ico:"🗑️",label:"Jours de collecte ordures / tri sélectif",
+        directAnswer:{text:"Sortez vos bacs la veille au soir ou avant 7h le matin du jour de collecte. La collecte n'a pas lieu les jours fériés — elle est reportée au lendemain. Des points d'apport volontaire (verre, papiers, plastique-cartons, vêtements) sont présents sur la commune. Consultez votre calendrier personnalisé en ligne.",
+          links:[{label:"🗓️ Mon calendrier de collecte",url:"https://mezieres-lez-clery.fr/2018/10/25/gestion-des-dechets/"}]}
+      },
+      {id:"dechetterie",ico:"♻️",label:"Déchetterie — horaires & inscription",
+        directAnswer:{text:"La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lun-sam sauf jours fériés. Une inscription vaut pour tous les sites CCTVL.",
+          links:[{label:"🌐 S'inscrire à la déchetterie",url:"https://portail-usagers.ccterresduvaldeloire.fr"},{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"}]}
+      },
+      {id:"encombrants",ico:"🛋️",label:"Encombrants / objets volumineux",
+        directAnswer:{text:"Les encombrants (meubles, électroménager, gros objets) se déposent à la déchetterie de Cléry-Saint-André. Inscription préalable obligatoire sur le portail usagers CCTVL. Certains équipements électriques peuvent être repris en magasin (obligation légale de reprise 1 pour 1).",
+          links:[{label:"🌐 Portail usagers CCTVL",url:"https://portail-usagers.ccterresduvaldeloire.fr"},{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"}]}
+      },
+      {id:"tri",ico:"📦",label:"Tri sélectif — que mettre où ?",
+        directAnswer:{text:"Sur la commune : bac jaune (plastiques, cartons, papiers, métaux), bac vert (ordures résiduelles). Points d'apport volontaire pour le verre, les papiers-magazines, plastique-cartons et vêtements. En cas de doute sur un déchet, consultez le guide du tri en ligne.",
+          links:[{label:"🌐 Guide du tri CCTVL",url:"https://www.ccterresduvaldeloire.fr/reseau-des-dechetteries/"}]}
+      },
     ]
   },
+
   numerique:{
     label:"Numérique & Internet", ico:"📡", needZone:false,
     questions:[
-      {id:"fibre",ico:"🌐",label:"Fibre optique / Déploiement",prompt:"La fibre est-elle disponible à Mézières-lez-Cléry ? Quand sera-t-elle déployée ?",topic:"fibre",directAnswer:"📡 Mézières-lez-Cléry dispose d'une offre THD Radio (4G fixe) comme alternative à la fibre. Consultez mezieres-lez-clery.fr/offre-thd-radio-4g-fixe/ pour les détails et l'éligibilité."},
-      {id:"thd",ico:"📶",label:"THD Radio / 4G fixe",prompt:"Comment fonctionne l'offre THD Radio ou 4G fixe à Mézières-lez-Cléry ?",topic:"fibre",directAnswer:"📶 L'offre THD Radio (4G fixe) permet d'avoir internet très haut débit sans attendre la fibre. Consultez mezieres-lez-clery.fr/offre-thd-radio-4g-fixe/ pour l'éligibilité par adresse."},
-      {id:"eligibilite",ico:"📍",label:"Éligibilité à mon adresse",prompt:"Mon adresse est-elle éligible à la fibre ou au THD à Mézières-lez-Cléry ?",topic:"fibre"},
+      {id:"fibre",ico:"🌐",label:"Raccordement fibre / Nouvelle construction",
+        directAnswer:{text:"Pour toute nouvelle construction, déclarez-la le plus tôt possible auprès du gestionnaire départemental du réseau fibre (Lysseo). Cliquez sur 'Déclarer une nouvelle construction' en haut à droite du site.",
+          links:[{label:"🌐 Déclarer une nouvelle construction — Lysseo",url:"https://lysseo.fr"}]}
+      },
+      {id:"thd",ico:"📶",label:"Questions fibre (raccordement, éligibilité…)",
+        directAnswer:{text:"Pour toute question sur la fibre — raccordement, éligibilité, délais — contactez directement le service technique via le formulaire Lysseo.",
+          links:[{label:"📞 Contacter le service fibre Lysseo",url:"https://lysseo.fr/page-contact/41"}]}
+      },
+      {id:"probleme",ico:"🔧",label:"Problème sur les installations (armoires, câbles…)",
+        directAnswer:{text:"En cas de problème constaté sur les équipements du réseau (armoires de rue, boîtiers, câbles), faites une déclaration de dommage réseau sur Lysseo via le bouton en haut à droite.",
+          links:[{label:"🛠️ Déclarer un dommage réseau",url:"https://lysseo.fr"}]}
+      },
     ]
   },
+
   autre:{label:"Autre question",ico:"💬",needZone:false,openChatDirectly:true,questions:[]}
 };
 
@@ -3690,12 +3745,14 @@ function melShowTree(){
   const msgs=document.getElementById('msgs');
   const sugs=document.getElementById('sugs');
   const mbar=document.querySelector('.mbar');
-  if(tree)tree.style.display='flex';
-  if(l1)l1.style.display='';
-  if(l2){l2.classList.remove('active');l2.innerHTML='';}
+  const backBtn=document.getElementById('mel-back-btn');
+  if(tree){tree.style.display='flex';tree.style.flexDirection='column';}
+  if(l1){l1.style.display='flex';l1.style.flexDirection='column';}
+  if(l2){l2.classList.remove('active');l2.style.display='none';l2.innerHTML='';}
   if(msgs)msgs.style.display='none';
   if(sugs)sugs.style.display='none';
   if(mbar)mbar.style.display='none';
+  if(backBtn)backBtn.remove();
   _melCat=null;_melZone=null;_melZoneLabel=null;_melAddr=null;
   _melChatContext='';_melChatCategory='autre';
 }
@@ -3708,12 +3765,15 @@ function melSelectCat(cat){
     melOpenChat('',cat,'');
     return;
   }
-  // Cacher l1, afficher l2
   const l1=document.getElementById('mel-tree-l1');
   const l2=document.getElementById('mel-tree-l2');
+  if(!l2){console.error('mel-tree-l2 introuvable');return;}
   if(l1)l1.style.display='none';
-  l2.classList.add('active');
+  // Injecter le contenu AVANT d'afficher pour éviter le flash vide
   l2.innerHTML=_buildSubLevel(cat,def);
+  l2.classList.add('active');
+  l2.style.display='flex';
+  l2.style.flexDirection='column';
   l2.scrollTop=0;
 }
 
@@ -3742,22 +3802,59 @@ function melSelectQuestion(cat,qid){
   }
   const q=def.questions.find(x=>x.id===qid);
   if(!q)return;
-  if(q.directAnswer&&!def.needZone){
+  // directAnswer : affichage direct (toutes catégories y compris urbanisme)
+  if(q.directAnswer){
     _showDirectAnswer(q.directAnswer,cat,q.topic,zoneCtx+' '+q.prompt);
     return;
   }
-  melOpenChat(`${zoneCtx}\n${q.prompt}`.trim(),cat,zoneCtx,q.topic||cat);
+  // Pas de directAnswer : ouvrir MEL avec contexte complet
+  const fullPrompt=[zoneCtx,q.prompt].filter(Boolean).join('\n');
+  melOpenChat(fullPrompt,cat,zoneCtx,q.topic||cat);
+}
+
+function _renderDirectAnswer(answer){
+  // answer peut être une string ou un objet {text, links:[{label,url,tel}]}
+  if(typeof answer==='string'){
+    // Transformer URLs et tél en liens cliquables
+    let t=answer
+      .replace(/\n/g,'<br>')
+      .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" style="color:var(--leaf);font-weight:700;word-break:break-all;">$1</a>')
+      .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" style="color:var(--leaf);font-weight:700;">$1</a>')
+      .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
+    return '<p style="margin:0 0 8px;line-height:1.6;">'+t+'</p>';
+  }
+  // Format objet
+  let h='<p style="margin:0 0 10px;line-height:1.6;">'+answer.text+'</p>';
+  if(answer.links&&answer.links.length){
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    for(const lk of answer.links){
+      const href=lk.tel?'tel:'+lk.tel:lk.url;
+      const target=lk.tel?'':'target="_blank"';
+      h+='<a href="'+href+'" '+target+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+lk.label+'</a>';
+    }
+    h+='</div>';
+  }
+  return h;
 }
 
 function _showDirectAnswer(answer,cat,topic,ctxForMel){
   const l2=document.getElementById('mel-tree-l2');
+  if(!l2)return;
   l2.querySelector('.mel-direct-answer')?.remove();
+  const container=l2.querySelector('.mel-sub');
+  if(!container){console.warn('mel-sub not found in l2');return;}
   const div=document.createElement('div');
   div.className='mel-direct-answer';
-  const safeCtx=(ctxForMel||'').replace(/'/g,"\'").replace(/\n/g,' ');
-  div.innerHTML=`<span class="da-label">Réponse</span><div>${answer.replace(/\n/g,'<br>')}</div><button class="mel-open-chat-btn" onclick="melOpenChat('','${cat}','${safeCtx}','${topic||cat}')">💬 Question complémentaire ? Parler à MEL</button>`;
-  l2.querySelector('.mel-sub').appendChild(div);
-  div.scrollIntoView({behavior:'smooth',block:'nearest'});
+  const ctx=encodeURIComponent((ctxForMel||'').substring(0,300));
+  div.innerHTML='<span class="da-label">Réponse</span>'
+    +_renderDirectAnswer(answer)
+    +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect(\''+cat+'\',\''+topic+'\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>';
+  container.appendChild(div);
+  setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+function melOpenChatFromDirect(cat,topic,ctx){
+  melOpenChat('',cat,ctx,topic||cat);
 }
 
 function melOpenChat(initialMsg,category,extraCtx,topic){
@@ -3797,7 +3894,7 @@ function melResetTree(){
   const l1=document.getElementById('mel-tree-l1');
   const l2=document.getElementById('mel-tree-l2');
   if(l1)l1.style.display='';
-  if(l2){l2.classList.remove('active');l2.innerHTML='';}
+  if(l2){l2.classList.remove('active');l2.style.display='';l2.innerHTML='';}
 }
 
 async function melFindZoneByAddr(){
