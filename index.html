@@ -1563,6 +1563,7 @@ const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
 const ACTU_URL   = 'https://chatbot-mairie-mezieres.onrender.com/actus';
 const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
 const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
+const METEO_FORECAST_URL = 'https://chatbot-mairie-mezieres.onrender.com/meteo/forecast';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
 
@@ -1914,7 +1915,8 @@ const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellem
 
 async function loadMeteo() {
   try {
-    const fr = await fetch('https://api.open-meteo.com/v1/forecast?latitude=47.822&longitude=1.808&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,pressure_msl,precipitation,wind_gusts_10m&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,wind_gusts_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,uv_index_max,sunrise,sunset,wind_direction_10m_dominant,wind_gusts_10m_max&past_days=1&timezone=Europe%2FParis&forecast_days=10', { cache: 'no-store' });
+    // Proxy backend pour contourner le CORS d'Open-Meteo
+    const fr = await fetch(METEO_FORECAST_URL, { cache: 'no-store' });
     if (!fr.ok) throw new Error('HTTP ' + fr.status);
     const d = { forecast: await fr.json(), vigilance: null };
     const cur = (d.forecast || {}).current || {};
@@ -2694,10 +2696,13 @@ async function loadActus(){
     if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
-      const texte=(a.title||'').replace(/#app-mezieres/gi,'').trim();
-      const titre=esc(texte.length>80?texte.substring(0,80)+'...':texte);
-      const texteComplet=texte.length>80?esc(texte):'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${texteComplet?`<div class="actu-text">${texteComplet}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+      // Texte complet : si a.text existe (description longue), l'utiliser, sinon a.title
+      const fullText=((a.text||a.title||'').replace(/#app-mezieres/gi,'')).trim();
+      // Découpage : 1ère ligne = titre, reste = description
+      const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+      const titre=esc(lines[0]||'Actualité');
+      const description=lines.length>1?esc(lines.slice(1).join('\n')).replace(/\n/g,'<br>'):'';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${description?`<div class="actu-text">${description}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
     markActusAsSeen(d.actus||[]);
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
@@ -3354,6 +3359,40 @@ if(window.visualViewport){
 // ── Init ─────────────────────────────────
 loadAccessibilite(); refreshAllContextHelp(); updateNotifCardStatus(null); refreshActusBadge(); loadMeteo(); loadEvents(); loadDechets(); loadMairieStatus(); updateInstallBtn(); loadBusRemi(); loadDateBadge(); fixIOSViewportAfterKeyboard(); restoreSignalFormState(); restoreContactFormState(); restoreBugFormState(); loadMatInfoBanner(); setTimeout(initOnboarding, 800);
 setInterval(loadDechets,60000);
+setInterval(loadMeteo, 600000); // Rafraîchir météo toutes les 10 min
+
+// ── Touche Échap pour fermer overlays & modales ──
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    // Fermer la modale MAT en priorité
+    const matModal = document.getElementById('mat-modal');
+    if (matModal && matModal.classList.contains('open')) { closeMatModal(false); return; }
+    // Fermer le trombi
+    const trombi = document.getElementById('trombi-modal');
+    if (trombi && trombi.style.display === 'flex') { closeTrombi(e); return; }
+    // Fermer le dernier overlay ouvert
+    if (_ovStack.length > 0) { closeOv(_ovStack[_ovStack.length - 1]); return; }
+  }
+});
+
+// ── Détection hors-ligne ──
+(function(){
+  let offlineBanner = null;
+  function showOffline() {
+    if (offlineBanner) return;
+    offlineBanner = document.createElement('div');
+    offlineBanner.id = 'mat-offline-banner';
+    offlineBanner.innerHTML = '📡 Pas de connexion — certaines fonctions peuvent être limitées';
+    offlineBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:8px 16px;background:#dc2626;color:white;font-family:Nunito,sans-serif;font-size:.72rem;font-weight:800;text-align:center;z-index:99998;box-shadow:0 2px 10px rgba(0,0,0,.3);animation:fadeOv .2s ease;';
+    document.body.prepend(offlineBanner);
+  }
+  function hideOffline() {
+    if (offlineBanner) { offlineBanner.remove(); offlineBanner = null; }
+  }
+  window.addEventListener('offline', showOffline);
+  window.addEventListener('online', function(){ hideOffline(); loadMeteo(); loadEvents(); refreshActusBadge(); });
+  if (!navigator.onLine) showOffline();
+})();
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
