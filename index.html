@@ -290,8 +290,9 @@ body.preload #app-splash{opacity:1;visibility:visible;}
 .actu-img{width:100%;height:160px;object-fit:cover;display:block;background:var(--mist);}
 .actu-body{padding:12px 14px;}
 .actu-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);margin-top:5px;flex-shrink:0;}
-.actu-title{font-size:0.85rem;font-weight:700;color:var(--forest);line-height:1.45;margin-bottom:4px;}
-.actu-text{font-size:0.78rem;color:var(--muted);line-height:1.55;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.actu-title{font-size:0.92rem;font-weight:900;color:var(--forest);line-height:1.4;margin-bottom:6px;}
+.actu-text{font-size:0.78rem;color:var(--text);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;word-wrap:break-word;}
+.actu-event{font-size:0.74rem;color:var(--leaf);font-weight:800;background:var(--mist);padding:6px 10px;border-radius:8px;margin:4px 0 6px;display:inline-block;}
 .actu-date{font-size:0.65rem;color:var(--muted);}
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
@@ -533,7 +534,8 @@ html.theme-sombre #ov-conseil .panel-body > div[style] { background:#2d3748 !imp
 /* Overlay notifs */
 html.theme-sombre .actu-item { background:#2d3748 !important;border-color:#374151 !important; }
 html.theme-sombre .actu-title { color:#f1f5f9 !important; }
-html.theme-sombre .actu-text { color:#94a3b8 !important; }
+html.theme-sombre .actu-text { color:#cbd5e1 !important; }
+html.theme-sombre .actu-event { background:#374151 !important; color:#6ee7b7 !important; }
 html.theme-sombre .actu-date { color:#6b7280 !important; }
 html.theme-sombre .actu-empty { color:#94a3b8; }
 html.theme-sombre .panel-body .chart-wrap { background:#2d3748;border-color:#374151; }
@@ -1563,7 +1565,6 @@ const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
 const ACTU_URL   = 'https://chatbot-mairie-mezieres.onrender.com/actus';
 const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
 const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
-const METEO_FORECAST_URL = 'https://chatbot-mairie-mezieres.onrender.com/meteo/forecast';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
 
@@ -1915,10 +1916,10 @@ const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellem
 
 async function loadMeteo() {
   try {
-    // Proxy backend pour contourner le CORS d'Open-Meteo
-    const fr = await fetch(METEO_FORECAST_URL, { cache: 'no-store' });
+    // Proxy backend /meteo/commune retourne {forecast, vigilance}
+    const fr = await fetch(METEO_URL, { cache: 'no-store' });
     if (!fr.ok) throw new Error('HTTP ' + fr.status);
-    const d = { forecast: await fr.json(), vigilance: null };
+    const d = await fr.json();
     const cur = (d.forecast || {}).current || {};
     const vigilance = d.vigilance || null;
     const code = cur.weather_code;
@@ -2696,16 +2697,46 @@ async function loadActus(){
     if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=d.actus.map(a=>{
       const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
-      // Texte complet : si a.text existe (description longue), l'utiliser, sinon a.title
-      const fullText=((a.text||a.title||'').replace(/#app-mezieres/gi,'')).trim();
-      // Découpage : 1ère ligne = titre, reste = description
-      const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
-      const titre=esc(lines[0]||'Actualité');
-      const description=lines.length>1?esc(lines.slice(1).join('\n')).replace(/\n/g,'<br>'):'';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${description?`<div class="actu-text">${description}</div>`:''}<div class="actu-date">📅 ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
+      // Priorité : champ description dédié > parsing du text/title
+      let titre, description;
+      if(a.description && String(a.description).trim()){
+        // Champ description explicite (nouveau format admin)
+        titre = esc((a.title||'Actualité').replace(/#app-mezieres/gi,'').trim());
+        description = esc(String(a.description).trim()).replace(/\n/g,'<br>');
+      } else {
+        // Fallback : parsing du texte (Facebook scrappé ou ancien format)
+        const fullText=((a.text||a.title||'').replace(/#app-mezieres/gi,'')).trim();
+        const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+        titre=esc(lines[0]||'Actualité');
+        description=lines.length>1?esc(lines.slice(1).join('\n')).replace(/\n/g,'<br>'):'';
+      }
+      // Date événement (optionnelle)
+      const eventHTML = a.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(a.eventDate))}${a.eventLocation?' · 📍 '+esc(a.eventLocation):''}</div>` : '';
+      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${description?`<div class="actu-text">${description}</div>`:''}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
     markActusAsSeen(d.actus||[]);
   }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
+}
+
+// Formater une date ISO en texte français pour l'affichage d'un événement
+function formatEventDate(iso){
+  try{
+    const d = new Date(iso);
+    if(isNaN(d)) return iso;
+    const days=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    const months=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    const dayName = days[d.getDay()];
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const hasTime = /T\d{2}:\d{2}/.test(iso);
+    if(hasTime){
+      const h = d.getHours().toString().padStart(2,'0');
+      const m = d.getMinutes().toString().padStart(2,'0');
+      return `${dayName} ${day} ${month} ${year} à ${h}h${m}`;
+    }
+    return `${dayName} ${day} ${month} ${year}`;
+  }catch(e){ return iso; }
 }
 
 // ── Notifications Push ────────────────
