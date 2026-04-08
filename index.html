@@ -708,7 +708,7 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
 </div>
 
 <!-- Bannière install -->
-<div id="install-banner" onclick="installApp()" style="display:none">
+<div id="install-banner" class="hidden" onclick="installApp()">
   <div class="ib-ico">📲</div>
   <div class="ib-t">
     <div class="ib-title" id="ib-title-txt">Installez MAT sur votre téléphone !</div>
@@ -726,7 +726,7 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
       <div style="height:1.8em"></div>
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.6.1</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.6.3</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -1558,7 +1558,7 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
 
 <script>
 // ════════════════════════════════════════
-// MAT v3.6.1 — Mézières Avec Toi
+// MAT v3.6.3 — Mézières Avec Toi
 // ════════════════════════════════════════
 const MEL_PROXY  = 'https://chatbot-mairie-mezieres.onrender.com/mel';
 const SIGNAL_URL = 'https://chatbot-mairie-mezieres.onrender.com/signal';
@@ -1567,6 +1567,7 @@ const ICAL_URL   = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy'
 const METEO_URL  = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB  = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
+const MAT_VERSION = 'v3.6.3';
 
 let _matModalResolver = null;
 function openMatModal(opts){
@@ -1642,6 +1643,7 @@ function shouldHideInstallBanner(){
 function refreshInstallBannerVisibility(){
   const banner = document.getElementById('install-banner');
   if(!banner) return;
+  banner.style.display = '';
   if(shouldHideInstallBanner()) banner.classList.add('hidden');
   else banner.classList.remove('hidden');
 }
@@ -2697,7 +2699,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.6.2'
+    matVersion: MAT_VERSION
   };
 }
 
@@ -2720,6 +2722,7 @@ async function trackStat(service, extra = {}){
   try{
     const payload = {
       service,
+      deviceId: getMatDeviceId(),
       device: detectDevice(),
       ...extra
     };
@@ -2727,8 +2730,7 @@ async function trackStat(service, extra = {}){
     await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
       method:'POST',
       headers:{
-        'Content-Type':'application/json',
-        'x-device-id': getMatDeviceId()
+        'Content-Type':'application/json'
       },
       body: JSON.stringify(payload),
       keepalive: true
