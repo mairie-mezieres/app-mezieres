@@ -22,8 +22,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:var(--text);min-height:100vh;}
-
-/* ── Login ── */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,var(--forest),var(--leaf));}
 .login-box{background:white;border-radius:20px;padding:36px 32px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;}
 .login-logo{font-size:2.5rem;margin-bottom:8px;}
@@ -33,51 +31,58 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .login-input:focus{border-color:var(--sage);}
 .login-btn{width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:800;cursor:pointer;}
 .login-err{color:var(--red);font-size:0.78rem;margin-top:8px;display:none;}
-
-/* ── Layout admin ── */
 #admin-screen{display:none;min-height:100vh;}
 .admin-header{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.admin-header-title{font-size:1rem;font-weight:900;color:var(--cream);display:flex;align-items:center;gap:10px;}
+.admin-header-title{font-size:1rem;font-weight:900;color:var(--cream);}
 .admin-header-sub{font-size:0.7rem;color:rgba(255,255,255,0.6);}
 .logout-btn{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 12px;font-size:0.76rem;font-weight:700;cursor:pointer;}
-
-.admin-nav{background:white;border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;padding:0 16px;}
+.admin-nav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 16px;}
 .nav-tab{padding:16px 20px;font-size:0.82rem;font-weight:800;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
 .nav-tab.on{color:var(--forest);border-bottom-color:var(--forest);}
-
 .admin-body{padding:20px;max-width:1200px;margin:0 auto;}
-
-/* ── Cards ── */
 .section-title{font-size:0.7rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:20px 0 12px;}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
 .stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow);}
 .stat-card-ico{font-size:1.4rem;margin-bottom:6px;}
 .stat-card-val{font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;}
 .stat-card-label{font-size:0.68rem;color:var(--muted);margin-top:4px;font-weight:600;}
-.stat-card-sub{font-size:0.62rem;color:var(--muted);margin-top:2px;}
+.stat-card-sub{font-size:0.62rem;color:var(--muted);margin-top:3px;}
+.stat-card.ok .stat-card-val{color:var(--leaf);}
 .stat-card.warn .stat-card-val{color:var(--orange);}
 .stat-card.danger .stat-card-val{color:var(--red);}
-.stat-card.ok .stat-card-val{color:var(--leaf);}
-
-/* ── Progress bar ── */
+/* Tendances */
+.trend-up{color:#16a34a;font-weight:800;}
+.trend-down{color:#dc2626;font-weight:800;}
+.trend-flat{color:var(--muted);font-weight:800;}
+/* Breakdown appareils */
+.device-block{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:16px;}
+.device-period-tabs,.device-dim-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.dtab{background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:0.7rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.dtab.on{background:var(--forest);color:white;border-color:var(--forest);}
+.device-bars{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.dbar-row{display:flex;align-items:center;gap:8px;}
+.dbar-lbl{font-size:0.72rem;color:var(--text);font-weight:600;width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dbar-track{flex:1;height:9px;background:var(--mist);border-radius:999px;overflow:hidden;}
+.dbar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--sage),var(--leaf));transition:width .5s;}
+.dbar-cnt{font-size:0.68rem;font-weight:800;color:var(--muted);width:52px;text-align:right;flex-shrink:0;}
+.device-empty{font-size:0.76rem;color:var(--muted);text-align:center;padding:18px 0;font-style:italic;}
+/* Progress */
 .progress-wrap{background:white;border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px;}
 .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .progress-label{font-size:0.8rem;font-weight:800;color:var(--text);}
 .progress-val{font-size:0.8rem;font-weight:900;color:var(--muted);}
 .progress-bar{height:10px;background:var(--mist);border-radius:999px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:999px;transition:width 0.5s;}
+.progress-fill{height:100%;border-radius:999px;transition:width .5s;}
 .progress-fill.ok{background:linear-gradient(90deg,var(--sage),var(--leaf));}
 .progress-fill.warn{background:linear-gradient(90deg,#fbbf24,#f59e0b);}
 .progress-fill.danger{background:linear-gradient(90deg,#f87171,var(--red));}
-
-/* ── Charts ── */
+/* Charts */
 .chart-wrap{background:white;border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px;}
 .chart-title{font-size:0.82rem;font-weight:900;color:var(--text);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
 .chart-period-btn{background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:0.7rem;font-weight:700;color:var(--muted);cursor:pointer;}
 .chart-period-btn.on{background:var(--forest);color:white;border-color:var(--forest);}
 canvas{max-height:280px;}
-
-/* ── Tables ── */
+/* Tables */
 .table-wrap{background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:12px;}
 .table-header{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:var(--warm);}
 .table-title{font-size:0.82rem;font-weight:900;color:var(--text);}
@@ -92,37 +97,26 @@ tr:hover td{background:#f9fafb;}
 .badge-blue{background:#dbeafe;color:var(--blue);}
 .badge-orange{background:#fef3c7;color:var(--orange);}
 .badge-red{background:#fee2e2;color:var(--red);}
-
-/* ── Tabs panels ── */
+/* Tabs panels */
 .tab-panel{display:none;}
 .tab-panel.on{display:block;}
-
-/* ── Loading ── */
+/* Loading */
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:0.84rem;}
-.loading-spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--mist);border-top-color:var(--sage);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px;}
+.loading-spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--mist);border-top-color:var(--sage);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── Coût badge ── */
-.cost{font-weight:900;color:var(--leaf);}
-.cost.high{color:var(--orange);}
-
-@media(max-width:600px){
-  .cards-grid{grid-template-columns:1fr 1fr;}
-  .admin-body{padding:12px;}
-}
-/* ── Formulaire publication actu enrichi ── */
+/* Formulaire publication */
 .pub-form-box{background:white;border-radius:14px;padding:18px;border:1px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow);}
 .pub-form-box h3{font-size:0.9rem;font-weight:900;color:var(--forest);margin-bottom:14px;}
 .pub-row{margin-bottom:12px;}
 .pub-label{display:block;font-size:0.76rem;font-weight:800;color:var(--muted);margin-bottom:4px;}
 .pub-required{color:var(--red);}
-.pub-input, .pub-textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.84rem;outline:none;font-family:inherit;box-sizing:border-box;background:white;color:var(--text);}
-.pub-input:focus, .pub-textarea:focus{border-color:var(--sage);}
+.pub-input,.pub-textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.84rem;outline:none;font-family:inherit;background:white;color:var(--text);}
+.pub-input:focus,.pub-textarea:focus{border-color:var(--sage);}
 .pub-textarea{resize:vertical;min-height:120px;line-height:1.55;}
 .pub-char-count{font-size:0.68rem;color:var(--muted);text-align:right;margin-top:2px;}
 .pub-char-count.warn{color:var(--red);font-weight:800;}
-.pub-hint{font-size:0.68rem;color:var(--muted);margin-top:3px;}
-.pub-image-zone{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.pub-hint{font-size:0.68rem;color:var(--muted);margin-top:3px;line-height:1.5;}
+.pub-image-zone{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .15s;}
 .pub-image-zone:hover{border-color:var(--sage);background:#f0fdf4;}
 .pub-image-zone.has-image{padding:0;border-style:solid;border-color:var(--sage);}
 .pub-image-preview{max-width:100%;max-height:250px;display:block;border-radius:8px;margin:0 auto;}
@@ -139,10 +133,15 @@ tr:hover td{background:#f9fafb;}
 .pub-preview-event{font-size:0.72rem;color:var(--leaf);font-weight:800;background:var(--mist);padding:5px 10px;border-radius:8px;margin:6px 0;display:inline-block;}
 .pub-preview-desc{font-size:0.78rem;color:var(--text);line-height:1.55;white-space:pre-wrap;}
 .pub-calendar-warn{background:#fef3c7;border:1px solid #fcd34d;color:#92400e;padding:9px 12px;border-radius:10px;font-size:0.74rem;font-weight:700;margin-top:8px;}
-.pub-status{margin-top:10px;padding:10px 14px;border-radius:10px;font-size:0.78rem;font-weight:700;white-space:pre-line;}
+.pub-status{margin-top:10px;padding:12px 14px;border-radius:10px;font-size:0.78rem;font-weight:700;line-height:1.7;}
 .pub-status.success{background:#dcfce7;color:#166534;}
 .pub-status.error{background:#fee2e2;color:#991b1b;}
 .pub-status.warn{background:#fef3c7;color:#92400e;}
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:1fr 1fr;}
+  .admin-body{padding:12px;}
+  .dbar-lbl{width:100px;}
+}
 </style>
 </head>
 <body>
@@ -150,10 +149,7 @@ tr:hover td{background:#f9fafb;}
 <!-- ── Bannière install admin ── -->
 <div id="admin-install-banner" style="display:none;background:linear-gradient(135deg,#1a3d2b,#2d6a4f);padding:12px 16px;align-items:center;gap:10px;position:fixed;bottom:0;left:0;right:0;z-index:999;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
   <div style="width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔐</div>
-  <div style="flex:1">
-    <div style="font-size:0.8rem;font-weight:900;color:white">Installer MAT Admin</div>
-    <div style="font-size:0.65rem;color:rgba(255,255,255,0.7)">Accès rapide au tableau de bord</div>
-  </div>
+  <div style="flex:1"><div style="font-size:0.8rem;font-weight:900;color:white">Installer MAT Admin</div><div style="font-size:0.65rem;color:rgba(255,255,255,0.7)">Accès rapide au tableau de bord</div></div>
   <button onclick="installAdmin()" style="background:var(--gold);color:#3d2000;border:none;border-radius:10px;padding:8px 14px;font-size:0.76rem;font-weight:900;cursor:pointer;flex-shrink:0">Installer</button>
   <button onclick="document.getElementById('admin-install-banner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
 </div>
@@ -181,64 +177,27 @@ tr:hover td{background:#f9fafb;}
   </div>
 
   <div class="admin-nav">
-    <button class="nav-tab on" onclick="showTab('overview', this)">📊 Vue générale</button>
-    <button class="nav-tab" onclick="showTab('actus', this)">🔔 Actualités</button>
-    <button class="nav-tab" onclick="showTab('banner', this)">📢 Info/Alerte</button>
-    <button class="nav-tab" onclick="showTab('app', this)">📱 Usage app</button>
-    <button class="nav-tab" onclick="showTab('ia', this)">🤖 IA</button>
-    <button class="nav-tab" onclick="showTab('redis', this)">🗄️ Redis</button>
-    <button class="nav-tab" onclick="showTab('ideas', this)">💡 Idées</button>
-    <button class="nav-tab" onclick="showTab('signals', this)">🚨 Signalements</button>
-    <button class="nav-tab" onclick="showTab('purge', this)">🗑️ Purge</button>
+    <button class="nav-tab on" onclick="showTab('overview',this)">📊 Vue générale</button>
+    <button class="nav-tab" onclick="showTab('actus',this)">🔔 Actualités</button>
+    <button class="nav-tab" onclick="showTab('banner',this)">📢 Info/Alerte</button>
+    <button class="nav-tab" onclick="showTab('app',this)">📱 Usage app</button>
+    <button class="nav-tab" onclick="showTab('ia',this)">🤖 IA</button>
+    <button class="nav-tab" onclick="showTab('redis',this)">🗄️ Redis</button>
+    <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
+    <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
+    <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
   </div>
 
   <div class="admin-body">
-
-    <!-- VUE GÉNÉRALE -->
-    <div class="tab-panel on" id="tab-overview">
-      <div id="overview-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- IA & COÛTS -->
-    <div class="tab-panel" id="tab-ia">
-      <div id="ia-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- REDIS -->
-    <div class="tab-panel" id="tab-redis">
-      <div id="redis-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- USAGE APP -->
-    <div class="tab-panel" id="tab-app">
-      <div id="app-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- IDÉES -->
-    <div class="tab-panel" id="tab-ideas">
-      <div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- ACTUALITÉS -->
-    <div class="tab-panel" id="tab-actus">
-      <div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- SIGNALEMENTS -->
-    <div class="tab-panel" id="tab-signals">
-      <div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div>
-    </div>
-
-    <!-- INFO/ALERTE -->
-    <div class="tab-panel" id="tab-banner">
-      <div id="banner-content"></div>
-    </div>
-
-    <!-- PURGE -->
-    <div class="tab-panel" id="tab-purge">
-      <div id="purge-content"></div>
-    </div>
-
+    <div class="tab-panel on" id="tab-overview"><div id="overview-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-ia"><div id="ia-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-redis"><div id="redis-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-app"><div id="app-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-ideas"><div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-actus"><div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-signals"><div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-banner"><div id="banner-content"></div></div>
+    <div class="tab-panel" id="tab-purge"><div id="purge-content"></div></div>
   </div>
 </div>
 
@@ -253,316 +212,144 @@ let _purgeDateValue = new Date().toISOString().slice(0, 10);
 async function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   try {
-    const r = await fetch(`${API}/admin/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwd })
-    });
+    const r = await fetch(`${API}/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pwd}) });
     const d = await r.json();
-    if (d.ok) {
-      TOKEN = d.token;
-      localStorage.setItem('mat_admin_token', TOKEN);
-      showAdmin();
-    } else {
-      document.getElementById('login-err').style.display = 'block';
-    }
-  } catch(e) {
-    document.getElementById('login-err').textContent = 'Erreur de connexion au serveur.';
-    document.getElementById('login-err').style.display = 'block';
+    if (d.ok) { TOKEN = d.token; localStorage.setItem('mat_admin_token',TOKEN); showAdmin(); }
+    else { document.getElementById('login-err').style.display='block'; }
+  } catch(e) { document.getElementById('login-err').textContent='Erreur de connexion au serveur.'; document.getElementById('login-err').style.display='block'; }
+}
+function logout() { localStorage.removeItem('mat_admin_token'); TOKEN=''; document.getElementById('admin-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
+async function showAdmin() { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-screen').style.display='block'; await loadAll(); }
+async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
+async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
+
+function renderAll() { renderOverview(); renderIa(); renderRedis(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); }
+
+// ── Helpers généraux ──────────────────
+function fmt(n) { return (n||0).toLocaleString('fr-FR'); }
+function fmtEurBig(n) { return '€'+(n||0).toFixed(2); }
+function fmtBytes(b) { if(!b)return'—'; if(b>1024*1024)return(b/1024/1024).toFixed(1)+' Mo'; if(b>1024)return(b/1024).toFixed(0)+' Ko'; return b+' o'; }
+function progressClass(p) { return p>=80?'danger':p>=60?'warn':'ok'; }
+function topEntries(obj,limit=10) { return Object.entries(obj||{}).sort((a,b)=>(b[1]||0)-(a[1]||0)).slice(0,limit); }
+function sumValues(obj) { return Object.values(obj||{}).reduce((a,b)=>a+Number(b||0),0); }
+function pctTrend(cur,prev) { if(!prev)return cur>0?'+100%':'—'; const p=((cur-prev)/prev)*100; return`${p>0?'+':''}${p.toFixed(0)}%`; }
+function trendCls(cur,prev) { const d=cur-prev; return d>0?'trend-up':d<0?'trend-down':'trend-flat'; }
+function trendArrow(cur,prev) { const d=cur-prev; return d>0?'↗':d<0?'↘':'→'; }
+
+// ══════════════════════════════════════════════════════════════
+// BREAKDOWN APPAREILS
+// Lit _data.dash.app.devices.{today|month}.{types|os|browsers|pwa|appVersions}
+// ══════════════════════════════════════════════════════════════
+let _dvPeriod = 'month';
+let _dvDim    = 'types';
+
+const DIM_LABELS = {
+  types:       '📱 Type appareil',
+  os:          '💻 Système OS',
+  browsers:    '🌐 Navigateur',
+  pwa:         '📲 Mode accès',
+  appVersions: '🔢 Version MAT'
+};
+const ITEM_ICONS = {
+  'iPhone':'🍎','iPad':'📱','Android Mobile':'🤖','Android Tablet':'📊','Desktop':'🖥️',
+  'iOS':'🍎','iPadOS':'📱','Android':'🤖','Windows':'🪟','macOS':'🍎','Linux':'🐧',
+  'Chrome':'🌐','Safari':'🧭','Firefox':'🦊','Edge':'🔷','Chrome iOS':'🌐','Firefox iOS':'🦊','Edge Android':'🔷',
+  'Oui (installée)':'📲','Non (navigateur)':'🌐',
+};
+
+function renderDeviceBreakdown(wrapId) {
+  const el = document.getElementById(wrapId);
+  if (!el) return;
+  const devices = _data?.dash?.app?.devices || {};
+  const src = _dvPeriod === 'today' ? devices.today : devices.month;
+
+  const periodTabs = Object.entries({today:"Aujourd'hui", month:"Ce mois"}).map(([k,lbl]) =>
+    `<button class="dtab${_dvPeriod===k?' on':''}" onclick="setDvPeriod('${k}')">${lbl}</button>`
+  ).join('');
+
+  const dimTabs = Object.entries(DIM_LABELS).map(([k,lbl]) =>
+    `<button class="dtab${_dvDim===k?' on':''}" onclick="setDvDim('${k}')">${lbl}</button>`
+  ).join('');
+
+  const data = (src || {})[_dvDim] || {};
+  const entries = Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+  const total = entries.reduce((s,[,v])=>s+v, 0);
+
+  let barsHtml;
+  if (!entries.length || total === 0) {
+    barsHtml = `<div class="device-empty">Aucune donnée pour cette période.<br><small style="color:var(--muted)">Les données s'accumulent à chaque ouverture de l'app.</small></div>`;
+  } else {
+    const maxV = entries[0][1] || 1;
+    barsHtml = `<div class="device-bars">` + entries.map(([lbl, cnt]) => {
+      const pct   = Math.round(cnt / maxV * 100);
+      const share = Math.round(cnt / total * 100);
+      const ico   = ITEM_ICONS[lbl] || '';
+      return `<div class="dbar-row">
+        <div class="dbar-lbl" title="${lbl}">${ico ? ico+' ' : ''}${lbl}</div>
+        <div class="dbar-track"><div class="dbar-fill" style="width:${pct}%"></div></div>
+        <div class="dbar-cnt">${cnt} <span style="font-size:0.58rem;font-weight:400;color:var(--muted)">(${share}%)</span></div>
+      </div>`;
+    }).join('') + `</div>
+    <div style="font-size:0.62rem;color:var(--muted);margin-top:10px;text-align:right;">${total} ouverture(s) unique(s) enregistrée(s)</div>`;
   }
-}
 
-function logout() {
-  localStorage.removeItem('mat_admin_token');
-  TOKEN = '';
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-async function showAdmin() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
-  await loadAll();
-}
-
-// ── Chargement données ────────────────
-async function apiGet(path) {
-  const r = await fetch(`${API}${path}`, { headers: { 'x-admin-token': TOKEN } });
-  if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
-  return r.json();
-}
-
-async function apiDelete(path) {
-  const r = await fetch(`${API}${path}`, { method: 'DELETE', headers: { 'x-admin-token': TOKEN } });
-  return r.json();
-}
-
-function renderAll() {
-  renderOverview();
-  renderIa();
-  renderRedis();
-  renderApp();
-  renderIdeas();
-  renderActus();
-  renderSignals();
-  renderBanner();  // async mais on ne bloque pas
-  renderPurge();
-}
-
-// ── NUAGE DE MOTS ─────────────────────
-function drawWordCloud(canvasId, parJour) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const days = Object.keys(parJour).sort().slice(-30);
-  const totals = {};
-  days.forEach(d => {
-    Object.entries(parJour[d] || {}).forEach(([cat, val]) => {
-      totals[cat] = (totals[cat] || 0) + Number(val || 0);
-    });
-  });
-  const entries = Object.entries(totals).sort((a,b) => b[1]-a[1]).slice(0, 20);
-  if (!entries.length) return;
-
-  const maxVal = entries[0][1] || 1;
-  const minVal = entries[entries.length-1][1] || 1;
-  const palette = ['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0891b2','#b45309','#0f766e'];
-
-  const W = canvas.parentElement?.offsetWidth || 480;
-  const H = 200;
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-
-  const placed = [];
-  entries.forEach(([cat, val], i) => {
-    const ratio = (val - minVal) / (maxVal - minVal + 1);
-    const fontSize = Math.round(11 + ratio * 26);
-    ctx.font = `${900} ${fontSize}px 'Segoe UI', sans-serif`;
-    const color = palette[i % palette.length];
-    const w = ctx.measureText(cat).width;
-    const h = fontSize;
-
-    let placed_ok = false;
-    for (let r = 0; r < 120 && !placed_ok; r += 2) {
-      const angle = r * 0.4;
-      const cx = W/2 + r * Math.cos(angle) * 1.8;
-      const cy = H/2 + r * Math.sin(angle) * 0.9;
-      const x = cx - w/2;
-      const y = cy + h/3;
-      if (x < 2 || x + w > W - 2 || y - h < 2 || y > H - 2) continue;
-      const box = {x, y: y-h, w, h: h+2};
-      const overlap = placed.some(p => !(box.x > p.x+p.w || box.x+box.w < p.x || box.y > p.y+p.h || box.y+box.h < p.y));
-      if (!overlap) {
-        ctx.fillStyle = color;
-        ctx.fillText(cat, x, y);
-        placed.push(box);
-        placed_ok = true;
-      }
-    }
-  });
-}
-
-// ── PURGE DES DONNÉES ─────────────────
-function renderPurge() {
-  const today = new Date().toISOString().slice(0, 10);
-  if (!_purgeDateValue) _purgeDateValue = today;
-  document.getElementById('purge-content').innerHTML = `
-    <div class="section-title">🗑️ Purge des données par date</div>
-    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">
-        Supprime les données antérieures à la date choisie.<br>
-        <strong style="color:var(--red);">⚠️ Action irréversible.</strong>
-      </p>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <label style="font-size:0.8rem;font-weight:800;width:120px;flex-shrink:0;">Purger avant le</label>
-          <input type="date" id="purge-date" value="${_purgeDateValue}" max="${today}" onchange="rememberPurgeDate(this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;background:#fee2e2;border-radius:10px;padding:10px 14px;">
-            <span style="font-size:0.82rem;font-weight:700;color:var(--red);">🧨 Tout purger avant la date</span>
-            <button onclick="doPurge('all')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Tout purger</button>
-          </div>
-          ${[
-            ['stats_parjour','📊 Stats usage par jour (parJour)'],
-            ['ia_stats_daily','🤖 Stats IA journalières (daily)'],
-            ['ia_categories_parjour','🏷️ Catégories MEL journalières'],
-            ['actus','📰 Actualités antérieures à la date'],
-            ['signals','🚨 Signalements antérieurs à la date'],
-          ].map(([type,label]) => `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--warm);border-radius:10px;padding:10px 14px;">
-            <span style="font-size:0.82rem;font-weight:600;">${label}</span>
-            <button onclick="doPurge('${type}')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Purger</button>
-          </div>`).join('')}
-        </div>
-        <div id="purge-msg" style="display:none;font-size:0.8rem;font-weight:800;"></div>
-      </div>
-    </div>
+  el.innerHTML = `
+    <div style="font-size:0.78rem;font-weight:900;color:var(--text);margin-bottom:10px;">👥 Répartition des appareils</div>
+    <div class="device-period-tabs">${periodTabs}</div>
+    <div class="device-dim-tabs">${dimTabs}</div>
+    ${barsHtml}
   `;
 }
 
-function rememberPurgeDate(value) {
-  if (value) _purgeDateValue = value;
-}
+function setDvPeriod(p) { _dvPeriod = p; renderDeviceBreakdown('device-wrap'); }
+function setDvDim(d)    { _dvDim = d; renderDeviceBreakdown('device-wrap'); }
 
-async function doPurge(type) {
-  const dateEl = document.getElementById('purge-date');
-  const beforeDate = dateEl?.value;
-  if (!beforeDate) { alert('Date requise'); return; }
-  rememberPurgeDate(beforeDate);
-  const label = type === 'all' ? 'toutes les données' : 'les données de type "' + type + '"';
-  if (!confirm('Purger ' + label + ' antérieures au ' + beforeDate + ' ?')) return;
-  try {
-    const r = await fetch(API + '/admin/purge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
-      body: JSON.stringify({ type, beforeDate })
-    });
-    const d = await r.json();
-    const msg = document.getElementById('purge-msg');
-    if (d.ok) {
-      if (msg) { msg.textContent = '✅ Purge effectuée : ' + d.deleted + ' entrée(s) supprimée(s).'; msg.style.color='var(--leaf)'; msg.style.display='block'; }
-      setTimeout(async () => { await loadAll(); renderPurge(); }, 800);
-    } else {
-      if (msg) { msg.textContent = '❌ Erreur : ' + (d.error||'inconnue'); msg.style.color='var(--red)'; msg.style.display='block'; }
-    }
-  } catch(e) {
-    alert('Erreur réseau : ' + e.message);
-  }
-}
-
-// ── Tabs ──────────────────────────────
-function showTab(id, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
-  document.getElementById('tab-' + id).classList.add('on');
-  if (btn) btn.classList.add('on');
-}
-
-// ── Helpers ───────────────────────────
-function topEntries(obj, limit = 10) {
-  return Object.entries(obj || {}).sort((a,b) => (b[1]||0) - (a[1]||0)).slice(0, limit);
-}
-
-// ── buildCategorySeries ───────────────────────────────────────
-// Retourne { labels, periods (alias), datasets, topCats }
-// CORRECTION : labels = periods (le code appelant utilise .labels)
-function buildCategorySeries(source, limitPeriods = 12, topCatsCount = 5) {
-  const periods = Object.keys(source || {}).sort().slice(-limitPeriods);
-  const totals = {};
-  for (const period of periods) {
-    const cats = source[period] || {};
-    for (const [cat, val] of Object.entries(cats)) {
-      totals[cat] = (totals[cat] || 0) + Number(val || 0);
-    }
-  }
-  const topCats = Object.entries(totals)
-    .sort((a,b) => b[1] - a[1])
-    .slice(0, topCatsCount)
-    .map(([cat]) => cat);
-  const palette = ['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0891b2'];
-  const datasets = topCats.map((cat, i) => ({
-    label: cat,
-    data: periods.map(p => Number((source[p] || {})[cat] || 0)),
-    color: palette[i % palette.length]
-  }));
-  // labels = periods (alias pour compatibilité avec les appels renderLineChart)
-  return { labels: periods, periods, datasets, topCats };
-}
-
-function fmt(n) { return (n || 0).toLocaleString('fr-FR'); }
-function fmtEur(n) { return '€' + (n || 0).toFixed(4); }
-function fmtEurBig(n) { return '€' + (n || 0).toFixed(2); }
-function fmtBytes(b) {
-  if (!b) return '—';
-  if (b > 1024*1024) return (b/1024/1024).toFixed(1) + ' Mo';
-  if (b > 1024) return (b/1024).toFixed(0) + ' Ko';
-  return b + ' o';
-}
-function progressClass(pct) {
-  if (pct >= 80) return 'danger';
-  if (pct >= 60) return 'warn';
-  return 'ok';
-}
-
-// ── VUE GÉNÉRALE ─────────────────────
-function sumValues(obj) {
-  return Object.values(obj || {}).reduce((a,b) => a + Number(b || 0), 0);
-}
-
-function pctTrend(current, previous) {
-  if (!previous) return current > 0 ? '+100%' : '0%';
-  const pct = ((current - previous) / previous) * 100;
-  return `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
-}
-
-function trendBadge(current, previous, suffix = '') {
-  const diff = current - previous;
-  const good = diff >= 0;
-  const arrow = diff > 0 ? '↗' : diff < 0 ? '↘' : '→';
-  const label = previous === 0
-    ? (current > 0 ? '+100%' : '0%')
-    : `${diff > 0 ? '+' : ''}${(((diff) / previous) * 100).toFixed(1)}%`;
-  return `<span class="badge ${good ? 'badge-green' : 'badge-red'}">${arrow} ${label}${suffix}</span>`;
-}
-
+// ══════════════════════════════════════════════════════════════
+// VUE GÉNÉRALE
+// ══════════════════════════════════════════════════════════════
 function renderOverview() {
   const { dash } = _data;
-  const app = dash.app || {};
-  const ia = dash.ia || {};
+  const app    = dash.app   || {};
+  const ia     = dash.ia    || {};
+  const ov     = app.overview || {};
+  const uniq   = app.uniqueUsers || {};
   const trends = (dash.iaCategories?.trends || []).slice(0, 8);
-  const today = new Date().toISOString().slice(0, 10);
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  const month = today.slice(0, 7);
-  const prevMonthDate = new Date();
-  prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
-  const prevMonth = prevMonthDate.toISOString().slice(0, 7);
 
-  const parJour = app.parJour || {};
-  const parMois = {};
-  for (const [day, svcs] of Object.entries(parJour)) {
-    const key = day.slice(0, 7);
-    if (!parMois[key]) parMois[key] = {};
-    for (const [svc, cnt] of Object.entries(svcs || {})) {
-      parMois[key][svc] = (parMois[key][svc] || 0) + Number(cnt || 0);
-    }
-  }
+  const today     = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0, 10);
+  const month     = today.slice(0, 7);
 
-  const todayAccess = sumValues(parJour[today]);
-  const yesterdayAccess = sumValues(parJour[yesterday]);
-  const monthAccess = sumValues(parMois[month]);
-  const prevMonthAccess = sumValues(parMois[prevMonth]);
-
+  // Coût IA ce mois
   const monthIa = ia.monthly?.[month] || {};
   let totalEurMonth = 0;
-  for (const [prov, d] of Object.entries(monthIa)) {
-    if (prov !== '_total') totalEurMonth += d.costEur || 0;
-  }
+  for (const [prov, d] of Object.entries(monthIa)) { if (prov !== '_total') totalEurMonth += d.costEur || 0; }
 
-  const ideaCount = _data.ideas.length;
+  const todayAccess = sumValues((app.parJour||{})[today]);
+  const yesterdayAccess = sumValues((app.parJour||{})[yesterday]);
+  const ideaCount   = _data.ideas.length;
   const signalCount = _data.signals.length;
-  const pushCount = _data.dash.redis?.keys?.subs || 0;
+  const pushCount   = dash.redis?.keys?.subs || 0;
+
+  // Visiteurs uniques
+  const uToday  = ov.uniqueToday    || 0;
+  const uYest   = ov.uniqueYesterday|| 0;
+  const uMonth  = ov.uniqueMonth    || 0;
+  const uPrevM  = ov.uniquePrevMonth|| 0;
+  const uTotal  = uniq.total || 0;
 
   document.getElementById('overview-content').innerHTML = `
-    <div class="section-title">Tableau de bord — Résumé</div>
+    <div class="section-title">📊 Résumé d'activité</div>
     <div class="cards-grid">
       <div class="stat-card ok">
         <div class="stat-card-ico">📲</div>
-        <div class="stat-card-val">${fmt(app.totalInstalls || 0)}</div>
-        <div class="stat-card-label">Installations</div>
+        <div class="stat-card-val">${fmt(app.totalInstalls||0)}</div>
+        <div class="stat-card-label">Installations totales</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🗓️</div>
         <div class="stat-card-val">${fmt(todayAccess)}</div>
         <div class="stat-card-label">Accès aujourd'hui</div>
-        <div class="stat-card-sub">vs hier : ${pctTrend(todayAccess, yesterdayAccess)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">📅</div>
-        <div class="stat-card-val">${fmt(monthAccess)}</div>
-        <div class="stat-card-label">Accès ce mois</div>
-        <div class="stat-card-sub">vs mois précédent : ${pctTrend(monthAccess, prevMonthAccess)}</div>
+        <div class="stat-card-sub ${trendCls(todayAccess,yesterdayAccess)}">${trendArrow(todayAccess,yesterdayAccess)} vs hier ${pctTrend(todayAccess,yesterdayAccess)}</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🤖</div>
@@ -586,151 +373,149 @@ function renderOverview() {
       </div>
     </div>
 
-    <div class="section-title">Usage app aujourd'hui</div>
-    ${renderServiceBadges(app.parJour?.[today] || {})}
+    <!-- ══ VISITEURS UNIQUES ══ -->
+    <div class="section-title">👥 Visiteurs uniques — appareils distincts</div>
+    <div class="cards-grid">
+      <div class="stat-card ok">
+        <div class="stat-card-ico">📱</div>
+        <div class="stat-card-val">${fmt(uTotal)}</div>
+        <div class="stat-card-label">Total appareils connus</div>
+        <div class="stat-card-sub">Depuis le début des stats</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🗓️</div>
+        <div class="stat-card-val">${fmt(uToday)}</div>
+        <div class="stat-card-label">Appareils uniques aujourd'hui</div>
+        <div class="stat-card-sub ${trendCls(uToday,uYest)}">
+          ${trendArrow(uToday,uYest)} vs hier : ${fmt(uYest)}
+          ${uYest > 0 ? ' ('+pctTrend(uToday,uYest)+')' : ''}
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📅</div>
+        <div class="stat-card-val">${fmt(uMonth)}</div>
+        <div class="stat-card-label">Appareils uniques ce mois</div>
+        <div class="stat-card-sub ${trendCls(uMonth,uPrevM)}">
+          ${trendArrow(uMonth,uPrevM)} vs mois précédent : ${fmt(uPrevM)}
+          ${uPrevM > 0 ? ' ('+pctTrend(uMonth,uPrevM)+')' : ''}
+        </div>
+      </div>
+    </div>
+
+    <!-- Breakdown dynamique appareils -->
+    <div class="device-block" id="device-wrap">
+      <div class="device-empty">Chargement…</div>
+    </div>
+
+    <div class="section-title">⚡ Usage app aujourd'hui</div>
+    ${renderServiceBadges((app.parJour||{})[today] || {})}
 
     <div class="table-wrap">
-      <div class="table-header"><span class="table-title">MEL — Catégories qui montent</span></div>
+      <div class="table-header"><span class="table-title">MEL — Catégories en tendance (7 derniers jours)</span></div>
       <table>
-        <tr><th>Catégorie</th><th>7 derniers jours</th><th>7 jours précédents</th><th>Écart</th><th>Évolution</th></tr>
-        ${trends.length ? trends.map(t => `<tr><td><strong>${t.category}</strong></td><td>${fmt(t.current)}</td><td>${fmt(t.previous)}</td><td>${t.diff > 0 ? '+' : ''}${fmt(t.diff)}</td><td>${t.pct > 0 ? '+' : ''}${t.pct}%</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune tendance disponible</td></tr>'}
+        <tr><th>Catégorie</th><th>7 j. actuels</th><th>7 j. précédents</th><th>Écart</th><th>Évolution</th></tr>
+        ${trends.length
+          ? trends.map(t => `<tr>
+              <td><strong>${t.category}</strong></td><td>${fmt(t.current)}</td><td>${fmt(t.previous)}</td>
+              <td>${t.diff>0?'+':''}${fmt(t.diff)}</td>
+              <td class="${t.pct>0?'trend-up':t.pct<0?'trend-down':'trend-flat'}">${t.pct>0?'↗ +':t.pct<0?'↘ ':'→ '}${t.pct}%</td>
+            </tr>`).join('')
+          : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune tendance disponible</td></tr>'}
       </table>
     </div>
   `;
+
+  // Injecter le breakdown après le rendu
+  renderDeviceBreakdown('device-wrap');
 }
 
 function renderServiceBadges(services) {
-  const icons = { mel:'🤖', signalement:'🚨', actualites:'🔔', meteo:'🌤️', contact:'💬', idees:'💡', installation:'📲', bug:'🐞', agenda:'📅', transport:'🚌' };
+  const icons = {mel:'🤖',signalement:'🚨',actualites:'🔔',meteo:'🌤️',contact:'💬',idees:'💡',installation:'📲',bug:'🐞',agenda:'📅',transport:'🚌'};
   const HIDDEN = ['installation','conseil_municipal'];
-  const entries = Object.entries(services)
-    .filter(([k]) => !HIDDEN.includes(k) && !k.startsWith('elu_'))
-    .sort((a,b) => b[1]-a[1]);
+  const entries = Object.entries(services).filter(([k])=>!HIDDEN.includes(k)&&!k.startsWith('elu_')).sort((a,b)=>b[1]-a[1]);
   if (!entries.length) return '<div style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucun accès aujourd\'hui.</div>';
-  return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">' +
-    entries.map(([k,v]) => `<div class="stat-card" style="min-width:110px;padding:10px 14px">
-      <div style="font-size:1.2rem">${icons[k]||'📌'}</div>
-      <div style="font-size:1.3rem;font-weight:900;color:var(--text)">${v}</div>
-      <div style="font-size:0.65rem;color:var(--muted)">${k}</div>
-    </div>`).join('') + '</div>';
+  return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">'
+    + entries.map(([k,v]) => `<div class="stat-card" style="min-width:110px;padding:10px 14px"><div style="font-size:1.2rem">${icons[k]||'📌'}</div><div style="font-size:1.3rem;font-weight:900;color:var(--text)">${v}</div><div style="font-size:0.65rem;color:var(--muted)">${k}</div></div>`).join('')
+    + '</div>';
 }
 
-// ── IA & COÛTS ────────────────────────
-let iaView = 'daily';
+// ══════════════════════════════════════════════════════════════
+// IA
+// ══════════════════════════════════════════════════════════════
+function buildCategorySeries(source, limitPeriods=12, topCatsCount=5) {
+  const periods = Object.keys(source||{}).sort().slice(-limitPeriods);
+  const totals = {};
+  for (const period of periods) { const cats=source[period]||{}; for (const [cat,val] of Object.entries(cats)) totals[cat]=(totals[cat]||0)+Number(val||0); }
+  const topCats = Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,topCatsCount).map(([c])=>c);
+  const palette = ['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0891b2'];
+  const datasets = topCats.map((cat,i)=>({ label:cat, data:periods.map(p=>Number((source[p]||{})[cat]||0)), color:palette[i%palette.length] }));
+  return { labels:periods, periods, datasets, topCats };
+}
+
 function renderIa() {
   const { dash } = _data;
   const iaCategories = dash.iaCategories || {};
   const ia = dash.ia || {};
   const monthly = ia.monthly || {};
-
-  const month = new Date().toISOString().slice(0, 7);
-  const mData = monthly[month] || {};
-  const mMistral = mData.mistral || { in:0, out:0, calls:0, costEur:0 };
-  const mClaude  = mData.claude  || { in:0, out:0, calls:0, costEur:0 };
-
+  const month = new Date().toISOString().slice(0,7);
+  const mData    = monthly[month] || {};
+  const mMistral = mData.mistral || {in:0,out:0,calls:0,costEur:0};
+  const mClaude  = mData.claude  || {in:0,out:0,calls:0,costEur:0};
   const catMonth = iaCategories.parMois?.[month] || {};
   const topMonthCats = topEntries(catMonth, 12);
-  // buildCategorySeries retourne { labels, periods, datasets, topCats }
-  const daySeries = buildCategorySeries(iaCategories.parJour || {}, 30, 5);
+  const daySeries   = buildCategorySeries(iaCategories.parJour || {}, 30, 5);
   const monthSeries = buildCategorySeries(iaCategories.parMois || {}, 12, 5);
 
   document.getElementById('ia-content').innerHTML = `
     <div class="section-title">IA — Résumé</div>
     <div class="cards-grid">
-      <div class="stat-card">
-        <div class="stat-card-ico">🟠</div>
-        <div class="stat-card-val">${fmtEurBig(mMistral.costEur)}</div>
-        <div class="stat-card-label">Mistral ce mois</div>
-        <div class="stat-card-sub">${fmt(mMistral.calls)} appels</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">🟣</div>
-        <div class="stat-card-val">${fmtEurBig(mClaude.costEur)}</div>
-        <div class="stat-card-label">Claude ce mois</div>
-        <div class="stat-card-sub">${fmt(mClaude.calls)} appels</div>
-      </div>
+      <div class="stat-card"><div class="stat-card-ico">🟠</div><div class="stat-card-val">${fmtEurBig(mMistral.costEur)}</div><div class="stat-card-label">Mistral ce mois</div><div class="stat-card-sub">${fmt(mMistral.calls)} appels</div></div>
+      <div class="stat-card"><div class="stat-card-ico">🟣</div><div class="stat-card-val">${fmtEurBig(mClaude.costEur)}</div><div class="stat-card-label">Claude ce mois</div><div class="stat-card-sub">${fmt(mClaude.calls)} appels</div></div>
     </div>
-
     <div class="chart-wrap" style="overflow:hidden;">
       <div class="chart-title">☁️ Nuage de catégories MEL — 30 derniers jours</div>
       <canvas id="chart-wordcloud" style="width:100%;height:200px;"></canvas>
     </div>
-
     <div class="chart-wrap">
-      <div class="chart-title">Évolution journalière des catégories (30 derniers jours)</div>
+      <div class="chart-title">Évolution journalière des catégories (30 j.)</div>
       <canvas id="chart-ia-categories-daily"></canvas>
     </div>
-
     <div class="chart-wrap">
       <div class="chart-title">Évolution mensuelle des catégories</div>
       <canvas id="chart-ia-categories-monthly"></canvas>
     </div>
-
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">Top catégories du mois</span></div>
-      <table>
-        <tr><th>Catégorie</th><th>Questions</th></tr>
-        ${topMonthCats.length ? topMonthCats.map(([cat,val]) => `<tr><td>${cat}</td><td><strong>${fmt(val)}</strong></td></tr>`).join('') : '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Aucune donnée ce mois</td></tr>'}
+      <table><tr><th>Catégorie</th><th>Questions</th></tr>
+        ${topMonthCats.length ? topMonthCats.map(([c,v])=>`<tr><td>${c}</td><td><strong>${fmt(v)}</strong></td></tr>`).join('') : '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Aucune donnée ce mois</td></tr>'}
       </table>
     </div>
   `;
-
-  // Dessiner le nuage de mots
-  drawWordCloud('chart-wordcloud', iaCategories.parJour || {});
-  // CORRECTION : utiliser .labels (alias de .periods) — les deux fonctionnent maintenant
-  renderLineChart('chart-ia-categories-daily', daySeries.labels, daySeries.datasets, { stacked: false, yTitle: 'Questions' });
-  renderLineChart('chart-ia-categories-monthly', monthSeries.labels, monthSeries.datasets, { stacked: false, yTitle: 'Questions' });
+  drawWordCloud('chart-wordcloud', iaCategories.parJour||{});
+  renderLineChart('chart-ia-categories-daily',   daySeries.labels,   daySeries.datasets,   {stacked:false, yTitle:'Questions'});
+  renderLineChart('chart-ia-categories-monthly', monthSeries.labels, monthSeries.datasets, {stacked:false, yTitle:'Questions'});
 }
-
-function setIaView(v) { iaView = v; renderIa(); }
 
 // ── REDIS ─────────────────────────────
 function renderRedis() {
   const redis = _data.dash.redis || {};
   const pct = redis.pct || 0;
   const cls = progressClass(pct);
-
   document.getElementById('redis-content').innerHTML = `
     <div class="section-title">Utilisation Upstash Redis (limite gratuite : 256 Mo)</div>
     <div class="progress-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Mémoire utilisée</span>
-        <span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div>
-      </div>
+      <div class="progress-header"><span class="progress-label">Mémoire utilisée</span><span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)</span></div>
+      <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
     </div>
-
     <div class="section-title">Clés stockées</div>
     <div class="cards-grid">
-      <div class="stat-card">
-        <div class="stat-card-ico">🔔</div>
-        <div class="stat-card-val">${redis.keys?.subs||0}</div>
-        <div class="stat-card-label">Abonnés push</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">📰</div>
-        <div class="stat-card-val">${redis.keys?.actus||0}</div>
-        <div class="stat-card-label">Actualités</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">💡</div>
-        <div class="stat-card-val">${redis.keys?.ideas||0}</div>
-        <div class="stat-card-label">Idées</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">🚨</div>
-        <div class="stat-card-val">${redis.keys?.signals||0}</div>
-        <div class="stat-card-label">Signalements</div>
-      </div>
+      <div class="stat-card"><div class="stat-card-ico">🔔</div><div class="stat-card-val">${redis.keys?.subs||0}</div><div class="stat-card-label">Abonnés push</div></div>
+      <div class="stat-card"><div class="stat-card-ico">📰</div><div class="stat-card-val">${redis.keys?.actus||0}</div><div class="stat-card-label">Actualités</div></div>
+      <div class="stat-card"><div class="stat-card-ico">💡</div><div class="stat-card-val">${redis.keys?.ideas||0}</div><div class="stat-card-label">Idées</div></div>
+      <div class="stat-card"><div class="stat-card-ico">🚨</div><div class="stat-card-val">${redis.keys?.signals||0}</div><div class="stat-card-label">Signalements</div></div>
     </div>
-
-    ${pct >= 80 ? `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
-      ⚠️ Attention : ${pct}% de la mémoire Redis utilisée. Pensez à purger les anciennes entrées ou upgrader votre plan Upstash.
-    </div>` : ''}
-    ${pct >= 60 && pct < 80 ? `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;color:var(--orange);font-size:0.82rem;font-weight:700;margin-top:8px">
-      ⚡ ${pct}% utilisé. Surveillance recommandée.
-    </div>` : ''}
+    ${pct>=80?`<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">⚠️ ${pct}% — Pensez à purger.</div>`:''}
+    ${pct>=60&&pct<80?`<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;color:var(--orange);font-size:0.82rem;font-weight:700;margin-top:8px">⚡ ${pct}% — Surveillance recommandée.</div>`:''}
   `;
 }
 
@@ -739,34 +524,18 @@ let appView = 'daily';
 function renderApp() {
   const app = _data.dash.app || {};
   const parJour = app.parJour || {};
-
   const parMois = {};
-  for (const [day, svcs] of Object.entries(parJour)) {
-    const m = day.slice(0,7);
-    if (!parMois[m]) parMois[m] = {};
-    for (const [svc, cnt] of Object.entries(svcs)) {
-      parMois[m][svc] = (parMois[m][svc]||0) + cnt;
-    }
-  }
-
-  const source = appView === 'daily' ? parJour : parMois;
+  for (const [day,svcs] of Object.entries(parJour)) { const m=day.slice(0,7); if(!parMois[m])parMois[m]={}; for(const[svc,cnt]of Object.entries(svcs))parMois[m][svc]=(parMois[m][svc]||0)+cnt; }
+  const source  = appView==='daily'?parJour:parMois;
   const periods = Object.keys(source).sort().slice(-30);
-  const services = ['mel','signalement','actualites','meteo','contact','idees','installation'];
-  const colors   = ['#2563eb','#dc2626','#f59e0b','#38bdf8','#8b5cf6','#d4a843','#16a34a'];
-
-  const datasets = services.map((svc,i) => ({
-    label: svc,
-    data: periods.map(p => source[p]?.[svc] || 0),
-    color: colors[i]
-  }));
-
-  const month = new Date().toISOString().slice(0, 7);
-  const monthSvcs = parMois[month] || {};
-
+  const services= ['mel','signalement','actualites','meteo','contact','idees','installation'];
+  const colors  = ['#2563eb','#dc2626','#f59e0b','#38bdf8','#8b5cf6','#d4a843','#16a34a'];
+  const datasets = services.map((svc,i)=>({label:svc, data:periods.map(p=>source[p]?.[svc]||0), color:colors[i]}));
+  const month = new Date().toISOString().slice(0,7);
+  const monthSvcs = parMois[month]||{};
   document.getElementById('app-content').innerHTML = `
     <div class="chart-wrap">
-      <div class="chart-title">
-        Accès par fonctionnalité
+      <div class="chart-title">Accès par fonctionnalité
         <div style="display:flex;gap:6px">
           <button class="chart-period-btn ${appView==='daily'?'on':''}" onclick="setAppView('daily')">Jours</button>
           <button class="chart-period-btn ${appView==='monthly'?'on':''}" onclick="setAppView('monthly')">Mois</button>
@@ -774,148 +543,94 @@ function renderApp() {
       </div>
       <canvas id="chart-app"></canvas>
     </div>
-
     <div class="section-title">Détail par service — ce mois</div>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Service</th><th>Ce mois</th><th>Total</th></tr>
-        ${services
-          .map(svc => ({ svc, month: monthSvcs[svc]||0, total: app.parService?.[svc]||0 }))
-          .sort((a,b) => b.month - a.month)
-          .map(({svc, month, total}) => `<tr>
-          <td>${svc}</td>
-          <td>${fmt(month)}</td>
-          <td>${fmt(total)}</td>
-        </tr>`).join('')}
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <tr><th>Service</th><th>Ce mois</th><th>Total</th></tr>
+      ${services.map(svc=>({svc,month:monthSvcs[svc]||0,total:app.parService?.[svc]||0})).sort((a,b)=>b.month-a.month).map(({svc,month,total})=>`<tr><td>${svc}</td><td>${fmt(month)}</td><td>${fmt(total)}</td></tr>`).join('')}
+    </table></div>
   `;
-
-  renderLineChart('chart-app', periods, datasets, { stacked: true, yTitle: 'Accès' });
+  renderLineChart('chart-app', periods, datasets, {stacked:true, yTitle:'Accès'});
 }
-
-function setAppView(v) { appView = v; renderApp(); }
+function setAppView(v) { appView=v; renderApp(); }
 
 // ── IDÉES ─────────────────────────────
 function renderIdeas() {
-  const ideas = [..._data.ideas].sort((a,b) => (b.votes||0)-(a.votes||0));
+  const ideas = [..._data.ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
   document.getElementById('ideas-content').innerHTML = `
     <div class="table-wrap">
-      <div class="table-header">
-        <span class="table-title">💡 Idées (${ideas.length})</span>
-      </div>
-      <table>
-        <tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th></th></tr>
-        ${ideas.length ? ideas.map(i => `<tr>
-          <td style="max-width:300px">${i.text}</td>
-          <td><span class="badge badge-orange">${i.cat}</span></td>
-          <td><strong>${i.votes||0}</strong></td>
-          <td>${i.date}</td>
-          <td><button class="del-btn" onclick="deleteIdea(${i.id})">🗑️ Supprimer</button></td>
-        </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
+      <div class="table-header"><span class="table-title">💡 Idées (${ideas.length})</span></div>
+      <table><tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th></th></tr>
+        ${ideas.length ? ideas.map(i=>`<tr><td style="max-width:300px">${i.text}</td><td><span class="badge badge-orange">${i.cat}</span></td><td><strong>${i.votes||0}</strong></td><td>${i.date}</td><td><button class="del-btn" onclick="deleteIdea(${i.id})">🗑️ Supprimer</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
       </table>
-    </div>
-  `;
+    </div>`;
 }
+async function deleteIdea(id) { if(!confirm('Supprimer cette idée ?'))return; await apiDelete(`/admin/ideas/${id}`); _data.ideas=_data.ideas.filter(i=>i.id!==id); renderIdeas(); }
 
-async function deleteIdea(id) {
-  if (!confirm('Supprimer cette idée ?')) return;
-  await apiDelete(`/admin/ideas/${id}`);
-  _data.ideas = _data.ideas.filter(i => i.id !== id);
-  renderIdeas();
-}
-
-// ── ACTUALITÉS ────────────────────────
+// ══════════════════════════════════════════════════════════════
+// ACTUALITÉS — publication multi-canal
+// ══════════════════════════════════════════════════════════════
 function renderActus() {
   const actus = _data.actus;
   document.getElementById('actus-content').innerHTML = `
     <div class="section-title">➕ Publier une actualité</div>
     <div class="pub-form-box">
       <h3>📢 Nouvelle actualité</h3>
-
       <div class="pub-row">
         <label class="pub-label">Titre <span class="pub-required">*</span></label>
         <input type="text" id="pub-title" class="pub-input" maxlength="150" placeholder="Ex. Conseil municipal du 15 mai" oninput="pubUpdate()">
         <div class="pub-char-count" id="pub-title-count">0 / 150</div>
       </div>
-
       <div class="pub-row">
         <label class="pub-label">Description <span class="pub-required">*</span></label>
-        <textarea id="pub-desc" class="pub-textarea" maxlength="3000" placeholder="Décrivez l'actualité. Peut contenir plusieurs paragraphes." oninput="pubUpdate()"></textarea>
+        <textarea id="pub-desc" class="pub-textarea" maxlength="3000" placeholder="Décrivez l'actualité…" oninput="pubUpdate()"></textarea>
         <div class="pub-char-count" id="pub-desc-count">0 / 3000</div>
       </div>
-
       <div class="pub-row">
         <label class="pub-label">Photo (facultatif)</label>
         <div class="pub-image-zone" id="pub-image-zone" onclick="document.getElementById('pub-image-input').click()">
-          <div id="pub-image-empty">
-            <div style="font-size:2rem;margin-bottom:4px">📷</div>
-            <div style="font-weight:800;color:var(--muted)">Cliquer pour choisir une image</div>
-            <div class="pub-hint">JPG, PNG — max 5 Mo</div>
-          </div>
+          <div id="pub-image-empty"><div style="font-size:2rem;margin-bottom:4px">📷</div><div style="font-weight:800;color:var(--muted)">Cliquer pour choisir une image</div><div class="pub-hint">JPG, PNG — max 5 Mo</div></div>
           <img id="pub-image-preview" class="pub-image-preview" style="display:none">
         </div>
         <input type="file" id="pub-image-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="pubHandleImage(event)">
         <button type="button" id="pub-image-remove-btn" class="pub-image-remove" style="display:none" onclick="pubRemoveImage()">🗑️ Retirer l'image</button>
       </div>
-
       <div class="pub-row">
         <label class="pub-label">Date de l'événement (facultatif)</label>
         <input type="datetime-local" id="pub-event-date" class="pub-input" oninput="pubUpdate(); pubCheckDuplicates();">
-        <div class="pub-hint">Si rempli, un événement sera créé dans Google Agenda (avec détection des doublons)</div>
+        <div class="pub-hint">Si rempli, un événement sera créé dans Google Agenda.<br>⚠️ Si un événement au titre similaire existe déjà ce jour-là, il sera <strong>automatiquement remplacé</strong> (similarité > 60%).</div>
       </div>
-
       <div class="pub-row">
         <label class="pub-label">Lieu de l'événement (facultatif)</label>
         <input type="text" id="pub-event-location" class="pub-input" maxlength="200" placeholder="Ex. Salle des fêtes" oninput="pubUpdate()">
       </div>
-
+      <div class="pub-calendar-warn" id="pub-calendar-warn" style="display:none">⚠️ <span id="pub-calendar-warn-text"></span></div>
       <div class="pub-row">
         <label class="pub-label">Canaux de publication</label>
         <div class="pub-options-grid">
-          <label class="pub-checkbox-row">
-            <input type="checkbox" id="pub-opt-fb" checked>
-            <span>📘 Publier sur Facebook</span>
-          </label>
-          <label class="pub-checkbox-row">
-            <input type="checkbox" id="pub-opt-push" checked>
-            <span>🔔 Notification push</span>
-          </label>
-          <label class="pub-checkbox-row">
-            <input type="checkbox" id="pub-opt-calendar" checked>
-            <span>📅 Google Agenda</span>
-          </label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-fb" checked><span>📘 Publier sur Facebook</span></label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-push" checked><span>🔔 Notification push</span></label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-calendar" checked><span>📅 Google Agenda</span></label>
         </div>
       </div>
-
-      <div class="pub-calendar-warn" id="pub-calendar-warn" style="display:none">
-        ⚠️ <span id="pub-calendar-warn-text"></span>
-      </div>
-
       <div class="pub-preview" id="pub-preview" style="display:none">
         <div class="pub-preview-label">Aperçu dans la PWA</div>
         <div class="pub-preview-title" id="pub-preview-title"></div>
         <div class="pub-preview-event" id="pub-preview-event" style="display:none"></div>
         <div class="pub-preview-desc" id="pub-preview-desc"></div>
       </div>
-
       <button type="button" class="pub-publish-btn" id="pub-submit" onclick="pubSubmit()">📢 Publier</button>
-
       <div class="pub-status" id="pub-status" style="display:none"></div>
     </div>
-
     <div class="table-wrap">
-      <div class="table-header">
-        <span class="table-title">🔔 Actualités publiées (${actus.length})</span>
-      </div>
+      <div class="table-header"><span class="table-title">🔔 Actualités publiées (${actus.length})</span></div>
       <table>
         <tr><th>Titre</th><th>Description</th><th>Date</th><th>Photo</th><th>Source</th><th></th></tr>
-        ${actus.length ? actus.map(a => `<tr>
+        ${actus.length ? actus.map(a=>`<tr>
           <td style="max-width:260px"><strong>${a.title||'—'}</strong></td>
-          <td style="max-width:260px;font-size:0.72rem;color:var(--muted)">${a.description ? (a.description.substring(0,100) + (a.description.length > 100 ? '…' : '')) : '—'}</td>
-          <td style="font-size:0.72rem">${a.date}${a.eventDate ? '<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>' : ''}</td>
-          <td>${a.photo ? '<span class="badge badge-green">✓</span>' : '<span class="badge">—</span>'}</td>
-          <td>${a.source === 'admin' ? '<span class="badge badge-blue">Admin</span>' : a.source === 'facebook' ? '<span class="badge badge-orange">FB</span>' : '<span class="badge">—</span>'}</td>
+          <td style="max-width:260px;font-size:0.72rem;color:var(--muted)">${a.description?(a.description.substring(0,100)+(a.description.length>100?'…':'')):' —'}</td>
+          <td style="font-size:0.72rem">${a.date}${a.eventDate?'<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>':''}</td>
+          <td>${a.photo?'<span class="badge badge-green">✓</span>':'<span class="badge">—</span>'}</td>
+          <td>${a.source==='admin'?'<span class="badge badge-blue">Admin</span>':a.source==='facebook'?'<span class="badge badge-orange">FB</span>':'<span class="badge">—</span>'}</td>
           <td><button class="del-btn" onclick="deleteActu(${a.id})">🗑️</button></td>
         </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucune actualité</td></tr>'}
       </table>
@@ -924,559 +639,369 @@ function renderActus() {
   pubUpdate();
 }
 
-// ── Helpers formulaire publication ────
 let _pubImageBase64 = null;
 
-function pubUpdate(){
-  const title = (document.getElementById('pub-title')?.value || '').trim();
-  const desc = (document.getElementById('pub-desc')?.value || '').trim();
-  const eventDate = document.getElementById('pub-event-date')?.value || '';
-  const eventLoc = (document.getElementById('pub-event-location')?.value || '').trim();
-
-  const tc = document.getElementById('pub-title-count');
-  if (tc) {
-    tc.textContent = `${title.length} / 150`;
-    tc.className = 'pub-char-count' + (title.length > 140 ? ' warn' : '');
-  }
-  const dc = document.getElementById('pub-desc-count');
-  if (dc) {
-    dc.textContent = `${desc.length} / 3000`;
-    dc.className = 'pub-char-count' + (desc.length > 2900 ? ' warn' : '');
-  }
-
-  const prev = document.getElementById('pub-preview');
-  if (!prev) return;
-
-  if (title || desc) {
-    prev.style.display = 'block';
-    document.getElementById('pub-preview-title').textContent = title || '(titre)';
-    document.getElementById('pub-preview-desc').textContent = desc || '';
-    const ev = document.getElementById('pub-preview-event');
-    if (eventDate) {
-      const d = new Date(eventDate);
-      const days = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-      const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-      let txt = `📅 ${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-      if (d.getHours() || d.getMinutes()) {
-        txt += ` à ${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
-      }
-      if (eventLoc) txt += ` · 📍 ${eventLoc}`;
-      ev.textContent = txt;
-      ev.style.display = 'inline-block';
-    } else {
-      ev.style.display = 'none';
-    }
-  } else {
-    prev.style.display = 'none';
-  }
+function pubUpdate() {
+  const title    = (document.getElementById('pub-title')?.value||'').trim();
+  const desc     = (document.getElementById('pub-desc')?.value||'').trim();
+  const eventDate= document.getElementById('pub-event-date')?.value||'';
+  const eventLoc = (document.getElementById('pub-event-location')?.value||'').trim();
+  const tc=document.getElementById('pub-title-count'); if(tc){tc.textContent=`${title.length} / 150`;tc.className='pub-char-count'+(title.length>140?' warn':'');}
+  const dc=document.getElementById('pub-desc-count'); if(dc){dc.textContent=`${desc.length} / 3000`;dc.className='pub-char-count'+(desc.length>2900?' warn':'');}
+  const prev=document.getElementById('pub-preview'); if(!prev)return;
+  if(title||desc){
+    prev.style.display='block';
+    document.getElementById('pub-preview-title').textContent=title||'(titre)';
+    document.getElementById('pub-preview-desc').textContent=desc||'';
+    const ev=document.getElementById('pub-preview-event');
+    if(eventDate){
+      const d=new Date(eventDate);
+      const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+      const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      let txt=`📅 ${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`;
+      if(d.getHours()||d.getMinutes())txt+=` à ${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`;
+      if(eventLoc)txt+=` · 📍 ${eventLoc}`;
+      ev.textContent=txt; ev.style.display='inline-block';
+    } else { ev.style.display='none'; }
+  } else { prev.style.display='none'; }
 }
 
-function pubHandleImage(e){
-  const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    alert("Image trop lourde (max 5 Mo)");
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = () => {
-    _pubImageBase64 = reader.result;
-    const img = document.getElementById('pub-image-preview');
-    img.src = reader.result;
-    img.style.display = 'block';
-    document.getElementById('pub-image-empty').style.display = 'none';
+function pubHandleImage(e) {
+  const file=e.target.files[0]; if(!file)return;
+  if(file.size>5*1024*1024){alert("Image trop lourde (max 5 Mo)");return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    _pubImageBase64=reader.result;
+    document.getElementById('pub-image-preview').src=reader.result;
+    document.getElementById('pub-image-preview').style.display='block';
+    document.getElementById('pub-image-empty').style.display='none';
     document.getElementById('pub-image-zone').classList.add('has-image');
-    document.getElementById('pub-image-remove-btn').style.display = 'inline-block';
+    document.getElementById('pub-image-remove-btn').style.display='inline-block';
   };
   reader.readAsDataURL(file);
 }
-
-function pubRemoveImage(){
-  _pubImageBase64 = null;
-  const input = document.getElementById('pub-image-input');
-  if (input) input.value = '';
-  document.getElementById('pub-image-preview').style.display = 'none';
-  document.getElementById('pub-image-empty').style.display = 'block';
+function pubRemoveImage() {
+  _pubImageBase64=null;
+  const input=document.getElementById('pub-image-input'); if(input)input.value='';
+  document.getElementById('pub-image-preview').style.display='none';
+  document.getElementById('pub-image-empty').style.display='block';
   document.getElementById('pub-image-zone').classList.remove('has-image');
-  document.getElementById('pub-image-remove-btn').style.display = 'none';
+  document.getElementById('pub-image-remove-btn').style.display='none';
 }
 
-async function pubCheckDuplicates(){
-  const eventDate = document.getElementById('pub-event-date')?.value;
-  const warn = document.getElementById('pub-calendar-warn');
-  if (!warn) return;
-  if (!eventDate) { warn.style.display = 'none'; return; }
-  const dateOnly = eventDate.slice(0, 10);
+async function pubCheckDuplicates() {
+  const eventDate=document.getElementById('pub-event-date')?.value;
+  const warn=document.getElementById('pub-calendar-warn'); if(!warn)return;
+  if(!eventDate){warn.style.display='none';return;}
   try {
-    const r = await fetch(`${API}/admin/calendar/day?date=${dateOnly}`, {
-      headers: { 'x-admin-token': TOKEN }
-    });
-    const d = await r.json();
-    if (d.ok && d.events && d.events.length > 0) {
-      const names = d.events.map(e => `"${e.summary}"`).join(", ");
-      document.getElementById('pub-calendar-warn-text').textContent =
-        `${d.events.length} événement(s) déjà prévu(s) ce jour-là : ${names}. Un éventuel doublon (similarité > 60%) sera automatiquement remplacé.`;
-      warn.style.display = 'block';
-    } else {
-      warn.style.display = 'none';
-    }
-  } catch(e) { warn.style.display = 'none'; }
+    const r=await fetch(`${API}/admin/calendar/day?date=${eventDate.slice(0,10)}`,{headers:{'x-admin-token':TOKEN}});
+    const d=await r.json();
+    if(d.ok&&d.events&&d.events.length>0){
+      const names=d.events.map(e=>`"${e.summary}"`).join(', ');
+      document.getElementById('pub-calendar-warn-text').textContent=`${d.events.length} événement(s) déjà ce jour : ${names}. Si le titre est similaire (> 60%), il sera automatiquement remplacé.`;
+      warn.style.display='block';
+    } else { warn.style.display='none'; }
+  } catch(e){ warn.style.display='none'; }
 }
 
-async function pubSubmit(){
-  const title = (document.getElementById('pub-title')?.value || '').trim();
-  const description = (document.getElementById('pub-desc')?.value || '').trim();
-  const eventDate = document.getElementById('pub-event-date')?.value || '';
-  const eventLocation = (document.getElementById('pub-event-location')?.value || '').trim();
-  const publishFacebook = document.getElementById('pub-opt-fb')?.checked || false;
-  const sendPush = document.getElementById('pub-opt-push')?.checked || false;
-  const createCalendar = (document.getElementById('pub-opt-calendar')?.checked || false) && !!eventDate;
+async function pubSubmit() {
+  const title        =(document.getElementById('pub-title')?.value||'').trim();
+  const description  =(document.getElementById('pub-desc')?.value||'').trim();
+  const eventDate    = document.getElementById('pub-event-date')?.value||'';
+  const eventLocation=(document.getElementById('pub-event-location')?.value||'').trim();
+  const publishFacebook=document.getElementById('pub-opt-fb')?.checked||false;
+  const sendPush       =document.getElementById('pub-opt-push')?.checked||false;
+  const createCalendar =(document.getElementById('pub-opt-calendar')?.checked||false)&&!!eventDate;
 
-  if (!title) { alert("Le titre est obligatoire"); return; }
-  if (!description) { alert("La description est obligatoire"); return; }
+  if(!title){alert("Le titre est obligatoire");return;}
+  if(!description){alert("La description est obligatoire");return;}
 
-  const status = document.getElementById('pub-status');
-  const btn = document.getElementById('pub-submit');
-  btn.disabled = true;
-  btn.textContent = '⏳ Publication en cours…';
-  status.style.display = 'none';
-
-  const body = {
-    title, description,
-    imageBase64: _pubImageBase64,
-    eventDate: eventDate || null,
-    eventLocation: eventLocation || null,
-    publishFacebook, sendPush, createCalendar
-  };
+  const status=document.getElementById('pub-status');
+  const btn=document.getElementById('pub-submit');
+  btn.disabled=true; btn.textContent='⏳ Publication en cours…'; status.style.display='none';
 
   try {
-    const r = await fetch(`${API}/admin/actus/add`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
-      body: JSON.stringify(body)
+    const r=await fetch(`${API}/admin/actus/add`,{
+      method:'POST', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
+      body:JSON.stringify({title, description, imageBase64:_pubImageBase64, eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar})
     });
-    const d = await r.json();
+    const d=await r.json();
 
-    if (!r.ok || !d.ok) {
-      status.className = 'pub-status error';
-      status.textContent = '❌ Erreur : ' + (d.error || 'Publication échouée');
-      status.style.display = 'block';
+    if(!r.ok||!d.ok){
+      status.className='pub-status error';
+      status.innerHTML='❌ Erreur : '+(d.error||'Publication échouée');
+      status.style.display='block';
       return;
     }
 
-    let msg = '✅ Actualité publiée !';
-    const parts = [];
-    if (d.facebook?.ok) parts.push('Facebook');
-    if (d.push?.sent) parts.push(`${d.push.sent} notification(s)`);
-    if (d.calendar?.ok) {
-      parts.push('Google Agenda' + (d.calendar.deleted_duplicates ? ` (${d.calendar.deleted_duplicates} doublon(s) remplacé(s))` : ''));
-    }
-    if (parts.length) msg += '\n✓ ' + parts.join(' · ');
+    // ══ Construction du récapitulatif enrichi ══
+    const lines=[];
+    lines.push('✅ Actualité publiée avec succès !');
 
-    if (d.warnings && d.warnings.length) {
-      status.className = 'pub-status warn';
-      msg += '\n⚠️ ' + d.warnings.join(' · ');
-    } else {
-      status.className = 'pub-status success';
+    if(publishFacebook){
+      if(d.facebook?.ok){
+        const mode=d.facebook.mode==='photo'?'avec photo':'texte seul';
+        const fb=d.facebook.fallbackUsed?' <em>(photo non envoyée, fallback texte)</em>':'';
+        lines.push(`📘 Facebook — ${mode}${fb}`);
+      } else if(d.facebook){
+        lines.push(`⚠️ Facebook : ${d.facebook.error||'échec'}`);
+      }
     }
 
-    status.textContent = msg;
-    status.style.display = 'block';
+    if(sendPush){
+      if(d.push?.sent>0) lines.push(`🔔 ${d.push.sent} notification(s) push envoyée(s)`);
+      else if(d.push?.total===0) lines.push('⚠️ Push : aucun abonné enregistré');
+      else if(d.push) lines.push(`⚠️ Push : ${d.push.sent||0} envoyée(s), ${d.push.failed||0} échec(s)`);
+    }
 
-    document.getElementById('pub-title').value = '';
-    document.getElementById('pub-desc').value = '';
-    document.getElementById('pub-event-date').value = '';
-    document.getElementById('pub-event-location').value = '';
+    if(createCalendar){
+      if(d.calendar?.ok){
+        const replaced=d.calendar.deleted_duplicates||0;
+        // ══ Affichage explicite du remplacement ══
+        if(replaced>0){
+          lines.push(`📅 Google Agenda — ${replaced} événement(s) similaire(s) <strong>remplacé(s)</strong> 🔄`);
+        } else {
+          lines.push('📅 Google Agenda — événement créé');
+        }
+        if(d.calendar.html_link){
+          lines.push(`&nbsp;&nbsp;└ <a href="${d.calendar.html_link}" target="_blank" style="color:var(--leaf);font-weight:700;">Voir dans l'agenda →</a>`);
+        }
+      } else if(d.calendar){
+        lines.push(`⚠️ Google Agenda : ${d.calendar.error||'échec'}`);
+      }
+    }
+
+    if(d.warnings&&d.warnings.length){
+      for(const w of d.warnings) lines.push(`⚠️ ${w}`);
+    }
+
+    const hasWarn=lines.some(l=>l.startsWith('⚠️'));
+    status.className=hasWarn?'pub-status warn':'pub-status success';
+    status.innerHTML=lines.join('<br>');
+    status.style.display='block';
+
+    // Reset
+    document.getElementById('pub-title').value='';
+    document.getElementById('pub-desc').value='';
+    document.getElementById('pub-event-date').value='';
+    document.getElementById('pub-event-location').value='';
     pubRemoveImage();
+    document.getElementById('pub-calendar-warn').style.display='none';
+    pubUpdate();
 
-    setTimeout(async () => {
-      try {
-        const actus = await apiGet('/admin/actus');
-        _data.actus = actus.actus || [];
-        renderActus();
-      } catch(e) {}
-    }, 800);
-  } catch(e) {
-    status.className = 'pub-status error';
-    status.textContent = '❌ Erreur réseau : ' + e.message;
-    status.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '📢 Publier';
-  }
+    setTimeout(async()=>{
+      try{ const actus=await apiGet('/admin/actus'); _data.actus=actus.actus||[]; renderActus(); }catch(e){}
+    },800);
+
+  } catch(e){
+    status.className='pub-status error';
+    status.textContent='❌ Erreur réseau : '+e.message;
+    status.style.display='block';
+  } finally { btn.disabled=false; btn.textContent='📢 Publier'; }
 }
 
-async function deleteActu(id) {
-  if (!confirm('Supprimer cette actualité ?')) return;
-  await apiDelete(`/admin/actus/${id}`);
-  _data.actus = _data.actus.filter(a => a.id !== id);
-  renderActus();
-}
+async function deleteActu(id) { if(!confirm('Supprimer cette actualité ?'))return; await apiDelete(`/admin/actus/${id}`); _data.actus=_data.actus.filter(a=>a.id!==id); renderActus(); }
 
 // ── SIGNALEMENTS ─────────────────────
 function renderSignals() {
-  const signals = _data.signals;
-  document.getElementById('signals-content').innerHTML = `
+  const signals=_data.signals;
+  document.getElementById('signals-content').innerHTML=`
     <div class="table-wrap">
-      <div class="table-header">
-        <span class="table-title">🚨 Signalements (${signals.length})</span>
-      </div>
-      <table>
-        <tr><th>Catégorie</th><th>Description</th><th>GPS</th><th>Photo</th><th>Date</th><th></th></tr>
-        ${signals.length ? signals.map(s => `<tr>
+      <div class="table-header"><span class="table-title">🚨 Signalements (${signals.length})</span></div>
+      <table><tr><th>Catégorie</th><th>Description</th><th>GPS</th><th>Photo</th><th>Date</th><th></th></tr>
+        ${signals.length?signals.map(s=>`<tr>
           <td><span class="badge badge-red">${s.cat||'—'}</span></td>
           <td style="max-width:220px;font-size:0.74rem">${(s.desc||'—').substring(0,80)}</td>
-          <td>${s.mapsLink ? `<a href="${s.mapsLink}" target="_blank" style="color:var(--blue);font-size:0.72rem">📍 Voir</a>` : '—'}</td>
-          <td>${s.hasPhoto ? '<span class="badge badge-green">✓</span>' : '—'}</td>
+          <td>${s.mapsLink?`<a href="${s.mapsLink}" target="_blank" style="color:var(--blue);font-size:0.72rem">📍 Voir</a>`:'—'}</td>
+          <td>${s.hasPhoto?'<span class="badge badge-green">✓</span>':'—'}</td>
           <td style="font-size:0.72rem">${s.date}</td>
           <td><button class="del-btn" onclick="deleteSignal(${s.id})">🗑️</button></td>
-        </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucun signalement</td></tr>'}
+        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucun signalement</td></tr>'}
       </table>
-    </div>
-  `;
+    </div>`;
 }
-
-async function deleteSignal(id) {
-  if (!confirm('Supprimer ce signalement ?')) return;
-  await apiDelete(`/admin/signals/${id}`);
-  _data.signals = _data.signals.filter(s => s.id !== id);
-  renderSignals();
-}
+async function deleteSignal(id) { if(!confirm('Supprimer ce signalement ?'))return; await apiDelete(`/admin/signals/${id}`); _data.signals=_data.signals.filter(s=>s.id!==id); renderSignals(); }
 
 // ══════════════════════════════════════════════════════════════
-// CHARTS — renderLineChart (CORRECTION : fonction manquante !)
-// Crée un graphique en courbes/aires via Chart.js
-// Paramètres :
-//   id       : id du canvas HTML
-//   labels   : tableau de labels (axe X)
-//   datasets : [{label, data, color}]
-//   opts     : { stacked, yTitle }
+// CHARTS
 // ══════════════════════════════════════════════════════════════
 function renderLineChart(id, labels, datasets, opts) {
-  opts = opts || {};
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  if (_charts[id]) { _charts[id].destroy(); }
-
-  _charts[id] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels || [],
-      datasets: (datasets || []).map(function(d) {
-        return {
-          label: d.label,
-          data: d.data,
-          backgroundColor: d.color + (opts.stacked ? '55' : '22'),
-          borderColor: d.color,
-          borderWidth: 2,
-          tension: 0.3,
-          fill: !!opts.stacked,
-          pointRadius: 2,
-          pointHoverRadius: 5,
-        };
-      })
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 11 } },
-          onClick: function(e, legendItem, legend) {
-            var ci = legend.chart;
-            var dss = ci.data.datasets;
-            var idx = legendItem.datasetIndex;
-            var visibleCount = dss.filter(function(_, i) { return !ci.getDatasetMeta(i).hidden; }).length;
-            if (visibleCount === 1 && !ci.getDatasetMeta(idx).hidden) {
-              dss.forEach(function(_, i) { ci.getDatasetMeta(i).hidden = false; });
-            } else {
-              dss.forEach(function(_, i) { ci.getDatasetMeta(i).hidden = i !== idx; });
-            }
-            ci.update();
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { font: { size: 10 }, maxRotation: 45 } },
-        y: {
-          beginAtZero: true,
-          stacked: !!opts.stacked,
-          ticks: { font: { size: 10 } },
-          title: opts.yTitle ? { display: true, text: opts.yTitle, font: { size: 10 } } : { display: false }
-        }
+  opts=opts||{};
+  const ctx=document.getElementById(id); if(!ctx)return;
+  if(_charts[id]){_charts[id].destroy();}
+  _charts[id]=new Chart(ctx,{
+    type:'line',
+    data:{ labels:labels||[], datasets:(datasets||[]).map(d=>({label:d.label,data:d.data,backgroundColor:d.color+(opts.stacked?'55':'22'),borderColor:d.color,borderWidth:2,tension:0.3,fill:!!opts.stacked,pointRadius:2,pointHoverRadius:5})) },
+    options:{
+      responsive:true, interaction:{mode:'index',intersect:false},
+      plugins:{ legend:{ position:'bottom', labels:{font:{size:11}},
+        onClick(e,legendItem,legend){ const ci=legend.chart,dss=ci.data.datasets,idx=legendItem.datasetIndex; const vis=dss.filter((_,i)=>!ci.getDatasetMeta(i).hidden).length; if(vis===1&&!ci.getDatasetMeta(idx).hidden)dss.forEach((_,i)=>{ci.getDatasetMeta(i).hidden=false;}); else dss.forEach((_,i)=>{ci.getDatasetMeta(i).hidden=i!==idx;}); ci.update(); }
+      }},
+      scales:{
+        x:{ticks:{font:{size:10},maxRotation:45}},
+        y:{beginAtZero:true,stacked:!!opts.stacked,ticks:{font:{size:10}},title:opts.yTitle?{display:true,text:opts.yTitle,font:{size:10}}:{display:false}}
       }
     }
   });
 }
 
-// drawChart : graphique barre ou ligne (version legacy)
-function drawChart(id, labels, datasets, type) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  if (_charts[id]) { _charts[id].destroy(); }
-
-  _charts[id] = new Chart(ctx, {
+function drawChart(id,labels,datasets,type) {
+  const ctx=document.getElementById(id); if(!ctx)return;
+  if(_charts[id]){_charts[id].destroy();}
+  _charts[id]=new Chart(ctx,{
     type,
-    data: {
-      labels,
-      datasets: datasets.map(d => ({
-        label: d.label,
-        data: d.data,
-        backgroundColor: d.color + (type === 'line' ? '33' : 'bb'),
-        borderColor: d.color,
-        borderWidth: type === 'line' ? 2 : 1,
-        tension: 0.4,
-        fill: type === 'line',
-        pointRadius: type === 'line' ? 2 : 0,
-      }))
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 11 } },
-          onClick: function(e, legendItem, legend) {
-            const ci = legend.chart;
-            const dss = ci.data.datasets;
-            const idx = legendItem.datasetIndex;
-            const visibleCount = dss.filter((_, i) => !ci.getDatasetMeta(i).hidden).length;
-            if (visibleCount === 1 && !ci.getDatasetMeta(idx).hidden) {
-              dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = false; });
-            } else {
-              dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = i !== idx; });
-            }
-            ci.update();
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { font: { size: 10 }, maxRotation: 45 } },
-        y: { beginAtZero: true, ticks: { font: { size: 10 } } }
-      }
+    data:{ labels, datasets:datasets.map(d=>({label:d.label,data:d.data,backgroundColor:d.color+(type==='line'?'33':'bb'),borderColor:d.color,borderWidth:type==='line'?2:1,tension:0.4,fill:type==='line',pointRadius:type==='line'?2:0})) },
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}},onClick(e,l,legend){ const ci=legend.chart,dss=ci.data.datasets,idx=l.datasetIndex; const vis=dss.filter((_,i)=>!ci.getDatasetMeta(i).hidden).length; if(vis===1&&!ci.getDatasetMeta(idx).hidden)dss.forEach((_,i)=>{ci.getDatasetMeta(i).hidden=false;}); else dss.forEach((_,i)=>{ci.getDatasetMeta(i).hidden=i!==idx;}); ci.update(); }}},scales:{x:{ticks:{font:{size:10},maxRotation:45}},y:{beginAtZero:true,ticks:{font:{size:10}}}}}
+  });
+}
+
+function drawWordCloud(canvasId,parJour) {
+  const canvas=document.getElementById(canvasId); if(!canvas)return;
+  const days=Object.keys(parJour).sort().slice(-30);
+  const totals={};
+  days.forEach(d=>{Object.entries(parJour[d]||{}).forEach(([cat,val])=>{totals[cat]=(totals[cat]||0)+Number(val||0);});});
+  const entries=Object.entries(totals).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  if(!entries.length)return;
+  const maxVal=entries[0][1]||1, minVal=entries[entries.length-1][1]||1;
+  const palette=['#2563eb','#16a34a','#f59e0b','#7c3aed','#dc2626','#0891b2','#b45309','#0f766e'];
+  const W=canvas.parentElement?.offsetWidth||480, H=200;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,W,H);
+  const placed=[];
+  entries.forEach(([cat,val],i)=>{
+    const ratio=(val-minVal)/(maxVal-minVal+1), fontSize=Math.round(11+ratio*26);
+    ctx.font=`900 ${fontSize}px 'Segoe UI',sans-serif`;
+    const color=palette[i%palette.length], w=ctx.measureText(cat).width, h=fontSize;
+    let ok=false;
+    for(let r=0;r<120&&!ok;r+=2){
+      const angle=r*0.4, cx=W/2+r*Math.cos(angle)*1.8, cy=H/2+r*Math.sin(angle)*0.9;
+      const x=cx-w/2, y=cy+h/3;
+      if(x<2||x+w>W-2||y-h<2||y>H-2)continue;
+      const box={x,y:y-h,w,h:h+2};
+      const overlap=placed.some(p=>!(box.x>p.x+p.w||box.x+box.w<p.x||box.y>p.y+p.h||box.y+box.h<p.y));
+      if(!overlap){ctx.fillStyle=color;ctx.fillText(cat,x,y);placed.push(box);ok=true;}
     }
   });
 }
 
 // ── ENCART INFO/ALERTE ────────────────
-let _bannerData = { active: false, icon: 'ℹ️', title: '', text: '' };
-
+let _bannerData = {active:false,icon:'ℹ️',title:'',text:''};
 async function renderBanner() {
-  try {
-    const r = await fetch(`${API}/info-banner`);
-    if (r.ok) _bannerData = await r.json();
-  } catch(e) {}
-
-  document.getElementById('banner-content').innerHTML = `
+  try{const r=await fetch(`${API}/info-banner`);if(r.ok)_bannerData=await r.json();}catch(e){}
+  document.getElementById('banner-content').innerHTML=`
     <div class="section-title">📢 Encart d'information / alerte</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">
-        Cet encart s'affiche dans la PWA au-dessus des encarts Mairie et Météo.<br>
-        Les alertes météo Météo-France s'affichent automatiquement (priorité sur cet encart).<br>
-        Si inactif ou vide, l'encart est masqué.
-      </p>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Cet encart s'affiche dans la PWA au-dessus des encarts Mairie et Météo.<br>Les alertes météo Météo-France s'affichent automatiquement (priorité sur cet encart).<br>Si inactif ou vide, l'encart est masqué.</p>
       <div style="display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Icône</label>
-          <input id="b-icon" value="${_bannerData.icon||'ℹ️'}" style="width:70px;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:1rem;text-align:center;">
-          <span style="font-size:0.72rem;color:var(--muted);">Ex: ℹ️ ⚠️ 🎉 🚧 📢</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Titre</label>
-          <input id="b-title" value="${_bannerData.title||''}" placeholder="Ex: Nouvelle fonctionnalité !" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;">
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;">
-          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;margin-top:6px;">Texte</label>
-          <textarea id="b-text" rows="3" placeholder="Message affiché dans l'encart…" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;resize:vertical;">${_bannerData.text||''}</textarea>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Activer</label>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="b-active" ${_bannerData.active?'checked':''} style="width:18px;height:18px;cursor:pointer;">
-            <span style="font-size:0.84rem;color:var(--text);">${_bannerData.active?'<span style="color:var(--leaf);font-weight:800;">✅ Encart actif</span>':'<span style="color:var(--muted);">Encart inactif</span>'}</span>
-          </label>
-        </div>
+        <div style="display:flex;gap:10px;align-items:center;"><label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Icône</label><input id="b-icon" value="${_bannerData.icon||'ℹ️'}" style="width:70px;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:1rem;text-align:center;"><span style="font-size:0.72rem;color:var(--muted);">Ex: ℹ️ ⚠️ 🎉 🚧 📢</span></div>
+        <div style="display:flex;gap:10px;align-items:center;"><label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Titre</label><input id="b-title" value="${_bannerData.title||''}" placeholder="Ex: Nouvelle fonctionnalité !" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;"></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;margin-top:6px;">Texte</label><textarea id="b-text" rows="3" placeholder="Message affiché dans l'encart…" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.84rem;resize:vertical;">${_bannerData.text||''}</textarea></div>
+        <div style="display:flex;gap:10px;align-items:center;"><label style="font-size:0.8rem;font-weight:800;width:80px;flex-shrink:0;">Activer</label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="b-active" ${_bannerData.active?'checked':''} style="width:18px;height:18px;cursor:pointer;"><span style="font-size:0.84rem;color:var(--text);">${_bannerData.active?'<span style="color:var(--leaf);font-weight:800;">✅ Encart actif</span>':'<span style="color:var(--muted);">Encart inactif</span>'}</span></label></div>
         <button onclick="saveBanner()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:11px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;align-self:flex-start;">💾 Enregistrer</button>
         <div id="banner-save-msg" style="display:none;color:var(--leaf);font-weight:800;font-size:0.8rem;"></div>
       </div>
     </div>
-
     <div class="section-title">Aperçu</div>
     <div style="background:linear-gradient(160deg,#1a3d2b,#2d6a4f);border-radius:14px;padding:16px;margin-bottom:16px;">
-      ${_bannerData.active && _bannerData.text ? `
-        <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 14px;">
-          <span style="font-size:1.4rem;">${_bannerData.icon||'ℹ️'}</span>
-          <div style="flex:1;">
-            <div style="font-size:0.72rem;font-weight:900;color:#fff;text-transform:uppercase;">${_bannerData.title||''}</div>
-            <div style="font-size:0.76rem;color:rgba(255,255,255,0.9);margin-top:2px;">${_bannerData.text}</div>
-          </div>
-        </div>` : '<div style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;padding:8px;">Encart inactif — non affiché dans la PWA</div>'}
-    </div>
-  `;
+      ${_bannerData.active&&_bannerData.text
+        ?`<div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 14px;"><span style="font-size:1.4rem;">${_bannerData.icon||'ℹ️'}</span><div style="flex:1;"><div style="font-size:0.72rem;font-weight:900;color:#fff;text-transform:uppercase;">${_bannerData.title||''}</div><div style="font-size:0.76rem;color:rgba(255,255,255,0.9);margin-top:2px;">${_bannerData.text}</div></div></div>`
+        :'<div style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;padding:8px;">Encart inactif — non affiché dans la PWA</div>'}
+    </div>`;
 }
-
 async function saveBanner() {
-  const icon = document.getElementById('b-icon').value.trim() || 'ℹ️';
-  const title = document.getElementById('b-title').value.trim();
-  const text = document.getElementById('b-text').value.trim();
-  const active = document.getElementById('b-active').checked;
-  try {
-    const r = await fetch(`${API}/admin/info-banner`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
-      body: JSON.stringify({ active, icon, title, text })
-    });
-    const d = await r.json();
-    if (d.ok) {
-      _bannerData = { active, icon, title, text, id: d.id };
-      const msg = document.getElementById('banner-save-msg');
-      msg.textContent = '✅ Encart mis à jour !';
-      msg.style.display = 'block';
-      setTimeout(() => renderBanner(), 800);
-    }
-  } catch(e) {
-    alert('Erreur lors de la sauvegarde : ' + e.message);
-  }
+  const icon=document.getElementById('b-icon').value.trim()||'ℹ️';
+  const title=document.getElementById('b-title').value.trim();
+  const text=document.getElementById('b-text').value.trim();
+  const active=document.getElementById('b-active').checked;
+  try{
+    const r=await fetch(`${API}/admin/info-banner`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({active,icon,title,text})});
+    const d=await r.json();
+    if(d.ok){_bannerData={active,icon,title,text,id:d.id};const msg=document.getElementById('banner-save-msg');msg.textContent='✅ Encart mis à jour !';msg.style.display='block';setTimeout(()=>renderBanner(),800);}
+  }catch(e){alert('Erreur lors de la sauvegarde : '+e.message);}
 }
 
-// ── Init ──────────────────────────────
+// ── PURGE ─────────────────────────────
+function renderPurge() {
+  const today=new Date().toISOString().slice(0,10); if(!_purgeDateValue)_purgeDateValue=today;
+  document.getElementById('purge-content').innerHTML=`
+    <div class="section-title">🗑️ Purge des données par date</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Supprime les données antérieures à la date choisie.<br><strong style="color:var(--red);">⚠️ Action irréversible.</strong></p>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;gap:10px;align-items:center;"><label style="font-size:0.8rem;font-weight:800;width:120px;flex-shrink:0;">Purger avant le</label><input type="date" id="purge-date" value="${_purgeDateValue}" max="${today}" onchange="rememberPurgeDate(this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#fee2e2;border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:700;color:var(--red);">🧨 Tout purger avant la date</span><button onclick="doPurge('all')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Tout purger</button></div>
+          ${[['stats_parjour','📊 Stats usage par jour'],['ia_stats_daily','🤖 Stats IA journalières'],['ia_categories_parjour','🏷️ Catégories MEL journalières'],['actus','📰 Actualités antérieures à la date'],['signals','🚨 Signalements antérieurs à la date']].map(([type,label])=>`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--warm);border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:600;">${label}</span><button onclick="doPurge('${type}')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Purger</button></div>`).join('')}
+        </div>
+        <div id="purge-msg" style="display:none;font-size:0.8rem;font-weight:800;"></div>
+      </div>
+    </div>`;
+}
+function rememberPurgeDate(v){if(v)_purgeDateValue=v;}
+async function doPurge(type){
+  const dateEl=document.getElementById('purge-date'); const beforeDate=dateEl?.value;
+  if(!beforeDate){alert('Date requise');return;}
+  rememberPurgeDate(beforeDate);
+  const label=type==='all'?'toutes les données':'les données de type "'+type+'"';
+  if(!confirm('Purger '+label+' antérieures au '+beforeDate+' ?'))return;
+  try{
+    const r=await fetch(API+'/admin/purge',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({type,beforeDate})});
+    const d=await r.json(); const msg=document.getElementById('purge-msg');
+    if(d.ok){if(msg){msg.textContent='✅ Purge effectuée : '+d.deleted+' entrée(s) supprimée(s).';msg.style.color='var(--leaf)';msg.style.display='block';}setTimeout(async()=>{await loadAll();renderPurge();},800);}
+    else{if(msg){msg.textContent='❌ Erreur : '+(d.error||'inconnue');msg.style.color='var(--red)';msg.style.display='block';}}
+  }catch(e){alert('Erreur réseau : '+e.message);}
+}
+
+// ── Tabs ──────────────────────────────
+function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');}
+
+// ── Init / loadAll ────────────────────
 async function init() {
-  if (!TOKEN) {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-screen').style.display = 'none';
-    return;
-  }
-
-  try {
-    const r = await fetch(`${API}/admin/dashboard`, {
-      headers: { 'x-admin-token': TOKEN },
-      signal: AbortSignal.timeout(8000)
-    });
-
-    if (r.status === 401) { logout(); return; }
-    if (!r.ok) throw new Error(`dashboard ${r.status}`);
-
-    const d = await r.json();
-
-    const [ideas, actus, signals] = await Promise.all([
-      apiGet('/admin/ideas'),
-      apiGet('/admin/actus'),
-      apiGet('/admin/signals')
-    ]);
-
-    _data = {
-      dash: d,
-      ideas: ideas.ideas || [],
-      actus: actus.actus || [],
-      signals: signals.signals || []
-    };
-
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
-
+  if(!TOKEN){document.getElementById('login-screen').style.display='flex';document.getElementById('admin-screen').style.display='none';return;}
+  try{
+    const r=await fetch(`${API}/admin/dashboard`,{headers:{'x-admin-token':TOKEN},signal:AbortSignal.timeout(8000)});
+    if(r.status===401){logout();return;} if(!r.ok)throw new Error(`dashboard ${r.status}`);
+    const d=await r.json();
+    const[ideas,actus,signals]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals')]);
+    _data={dash:d,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[]};
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    document.getElementById('last-refresh').textContent=new Date().toLocaleTimeString('fr-FR');
     renderAll();
-
-  } catch (e) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-
-    const el = document.getElementById('overview-content');
-    if (el) {
-      el.innerHTML = `
-        <div style="text-align:center;padding:40px;color:var(--red)">
-          <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
-          <div style="font-weight:800;margin-bottom:8px">Erreur de chargement</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">${e.message}</div>
-          <button onclick="location.reload()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer">
-            🔄 Réessayer
-          </button>
-        </div>`;
-    }
+  }catch(e){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-screen').style.display='block';
+    const el=document.getElementById('overview-content');
+    if(el)el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--red)"><div style="font-size:2rem;margin-bottom:12px">⚠️</div><div style="font-weight:800;margin-bottom:8px">Erreur de chargement</div><div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">${e.message}</div><button onclick="location.reload()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer">🔄 Réessayer</button></div>`;
   }
 }
 
 async function loadAll() {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
-
-    const dashRes = await fetch(`${API}/admin/dashboard`, {
-      headers: { 'x-admin-token': TOKEN },
-      signal: controller.signal
-    });
-
-    if (dashRes.status === 401) { clearTimeout(timer); logout(); return; }
-    if (!dashRes.ok) { clearTimeout(timer); throw new Error(`dashboard ${dashRes.status}`); }
-
-    const dash = await dashRes.json();
-    const [ideas, actus, signals] = await Promise.all([
-      apiGet('/admin/ideas'),
-      apiGet('/admin/actus'),
-      apiGet('/admin/signals')
-    ]);
-
+  try{
+    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),15000);
+    const dashRes=await fetch(`${API}/admin/dashboard`,{headers:{'x-admin-token':TOKEN},signal:controller.signal});
+    if(dashRes.status===401){clearTimeout(timer);logout();return;} if(!dashRes.ok){clearTimeout(timer);throw new Error(`dashboard ${dashRes.status}`);}
+    const dash=await dashRes.json();
+    const[ideas,actus,signals]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals')]);
     clearTimeout(timer);
-
-    _data = {
-      dash,
-      ideas: ideas.ideas || [],
-      actus: actus.actus || [],
-      signals: signals.signals || []
-    };
-
-    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
+    _data={dash,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[]};
+    document.getElementById('last-refresh').textContent=new Date().toLocaleTimeString('fr-FR');
     renderAll();
-
-  } catch (e) {
-    console.warn('loadAll échoué:', e.message);
-    document.getElementById('last-refresh').textContent = '⚠️ Erreur — ' + new Date().toLocaleTimeString('fr-FR');
-  }
+  }catch(e){console.warn('loadAll échoué:',e.message);document.getElementById('last-refresh').textContent='⚠️ Erreur — '+new Date().toLocaleTimeString('fr-FR');}
 }
 
 init();
-
-// Rafraîchir toutes les 5 minutes
-setInterval(loadAll, 5 * 60 * 1000);
+setInterval(loadAll, 5*60*1000);
 
 // ── Install PWA Admin ─────────────────
-let _dpAdmin = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _dpAdmin = e;
-  if (!localStorage.getItem('mat_admin_installed')) {
-    document.getElementById('admin-install-banner').style.display = 'flex';
-  }
-});
-window.addEventListener('appinstalled', () => {
-  localStorage.setItem('mat_admin_installed', '1');
-  document.getElementById('admin-install-banner').style.display = 'none';
-});
-
-function installAdmin() {
-  if (_dpAdmin) {
-    _dpAdmin.prompt();
-    _dpAdmin.userChoice.then(r => {
-      if (r.outcome === 'accepted') {
-        localStorage.setItem('mat_admin_installed', '1');
-        document.getElementById('admin-install-banner').style.display = 'none';
-      }
-      _dpAdmin = null;
-    });
-  } else {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      alert('Pour installer MAT Admin :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');
-    } else {
-      alert('Pour installer MAT Admin sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');
-    }
-  }
+let _dpAdmin=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dpAdmin=e;if(!localStorage.getItem('mat_admin_installed'))document.getElementById('admin-install-banner').style.display='flex';});
+window.addEventListener('appinstalled',()=>{localStorage.setItem('mat_admin_installed','1');document.getElementById('admin-install-banner').style.display='none';});
+function installAdmin(){
+  if(_dpAdmin){_dpAdmin.prompt();_dpAdmin.userChoice.then(r=>{if(r.outcome==='accepted'){localStorage.setItem('mat_admin_installed','1');document.getElementById('admin-install-banner').style.display='none';}_dpAdmin=null;});}
+  else{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m)alert('Pour installer MAT Admin :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');else alert('Pour installer MAT Admin sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');}
 }
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw-admin.js').catch(() => {});
-}
+if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw-admin.js').catch(()=>{});}
 </script>
 </body>
 </html>
