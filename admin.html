@@ -110,7 +110,7 @@ tr:hover td{background:#f9fafb;}
   .cards-grid{grid-template-columns:1fr 1fr;}
   .admin-body{padding:12px;}
 }
-* ── Formulaire publication actu enrichi ── */
+/* ── Formulaire publication actu enrichi ── */
 .pub-form-box{background:white;border-radius:14px;padding:18px;border:1px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow);}
 .pub-form-box h3{font-size:0.9rem;font-weight:900;color:var(--forest);margin-bottom:14px;}
 .pub-row{margin-bottom:12px;}
@@ -1294,45 +1294,64 @@ async function saveBanner() {
 
 // ── Init ──────────────────────────────
 async function init() {
-  if (TOKEN) {
-    // Vérifier que le token est toujours valide
-    try {
-      const r = await fetch(`${API}/admin/dashboard`, {
-        headers: { 'x-admin-token': TOKEN },
-        signal: AbortSignal.timeout(8000)
-      });
-      if (r.status === 401) {
-        localStorage.removeItem('mat_admin_token');
-        TOKEN = '';
-        document.getElementById('login-screen').style.display = 'flex';
-      } else {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-screen').style.display = 'block';
-        const d = await r.json();
-        // Charger les autres données
-        const [ideas, actus, signals] = await Promise.all([
-          apiGet('/admin/ideas'),
-          apiGet('/admin/actus'),
-          apiGet('/admin/signals')
-        ]);
-        _data = { dash: d, ideas: ideas.ideas || [], actus: actus.actus || [], signals: signals.signals || [] };
-        document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
-        renderAll();
-      }
-    } catch(e) {
-      // Serveur indisponible ou timeout
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-screen').style.display = 'block';
-      document.getElementById('tab-overview').innerHTML = `
+  if (!TOKEN) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-screen').style.display = 'none';
+    return;
+  }
+
+  try {
+    const r = await fetch(`${API}/admin/dashboard`, {
+      headers: { 'x-admin-token': TOKEN },
+      signal: AbortSignal.timeout(8000)
+    });
+
+    if (r.status === 401) {
+      logout();
+      return;
+    }
+
+    if (!r.ok) throw new Error(`dashboard ${r.status}`);
+
+    const d = await r.json();
+
+    const [ideas, actus, signals] = await Promise.all([
+      apiGet('/admin/ideas'),
+      apiGet('/admin/actus'),
+      apiGet('/admin/signals')
+    ]);
+
+    _data = {
+      dash: d,
+      ideas: ideas.ideas || [],
+      actus: actus.actus || [],
+      signals: signals.signals || []
+    };
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
+
+    renderAll();
+
+  } catch (e) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+
+    const el = document.getElementById('overview-content');
+    if (el) {
+      el.innerHTML = `
         <div style="text-align:center;padding:40px;color:var(--red)">
           <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
-          <div style="font-weight:800;margin-bottom:8px">Serveur indisponible</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">Le serveur Render est peut-être en démarrage (cold start). Attendez 30 secondes.</div>
-          <button onclick="location.reload()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer">🔄 Réessayer</button>
+          <div style="font-weight:800;margin-bottom:8px">Erreur de chargement</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">
+            ${e.message}
+          </div>
+          <button onclick="location.reload()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer">
+            🔄 Réessayer
+          </button>
         </div>`;
     }
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
   }
 }
 
@@ -1341,20 +1360,49 @@ async function loadAll() {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
-    const [dash, ideas, actus, signals] = await Promise.all([
-      fetch(`${API}/admin/dashboard`, { headers: { 'x-admin-token': TOKEN }, signal: controller.signal }).then(r => r.json()),
+
+    const dashRes = await fetch(`${API}/admin/dashboard`, {
+      headers: { 'x-admin-token': TOKEN },
+      signal: controller.signal
+    });
+
+    if (dashRes.status === 401) {
+      clearTimeout(timer);
+      logout();
+      return;
+    }
+
+    if (!dashRes.ok) {
+      clearTimeout(timer);
+      throw new Error(`dashboard ${dashRes.status}`);
+    }
+
+    const dash = await dashRes.json();
+
+    const [ideas, actus, signals] = await Promise.all([
       apiGet('/admin/ideas'),
       apiGet('/admin/actus'),
       apiGet('/admin/signals')
     ]);
+
     clearTimeout(timer);
-    _data = { dash, ideas: ideas.ideas || [], actus: actus.actus || [], signals: signals.signals || [] };
-    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
+
+    _data = {
+      dash,
+      ideas: ideas.ideas || [],
+      actus: actus.actus || [],
+      signals: signals.signals || []
+    };
+
+    document.getElementById('last-refresh').textContent =
+      new Date().toLocaleTimeString('fr-FR');
+
     renderAll();
-  } catch(e) {
+
+  } catch (e) {
     console.warn('loadAll échoué:', e.message);
-    // Ne pas bloquer — afficher un bouton retry discret
-    document.getElementById('last-refresh').textContent = '⚠️ Erreur — ' + new Date().toLocaleTimeString('fr-FR');
+    document.getElementById('last-refresh').textContent =
+      '⚠️ Erreur — ' + new Date().toLocaleTimeString('fr-FR');
   }
 }
 
