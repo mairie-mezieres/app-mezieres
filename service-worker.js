@@ -1,11 +1,28 @@
-// SERVICE WORKER v3.6.1 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.7.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-const CACHE = 'mat-v3.6.1';
+// Phase 1 : précache CSS externalisé + préparation JSON externes
+const CACHE = 'mat-v3.7.0';
+
+// Fichiers locaux à précacher au démarrage
+const PRECACHE_URLS = [
+  './index.html',
+  './css/mat.css',
+  './mat-header.png',
+  './icon-192.png'
+];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(['./index.html', './mat-header.png', './icon-192.png']))
+    caches.open(CACHE).then(c =>
+      // addAll est atomique : si un fichier échoue, rien n'est caché
+      // On fait un fallback par fichier pour éviter ce problème
+      Promise.all(
+        PRECACHE_URLS.map(url =>
+          c.add(url).catch(err => console.warn('[SW] precache skipped:', url, err.message))
+        )
+      )
+    )
   );
 });
 
@@ -19,21 +36,32 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = e.request.url;
+
+  // Ne pas intercepter les appels vers les APIs externes
   if (url.includes('onrender.com') || url.includes('googleapis.com') ||
       url.includes('open-meteo.com') || url.includes('facebook.com') ||
-      url.includes('panneaupocket') || url.includes('github.io')) return;
+      url.includes('panneaupocket') || url.includes('api-adresse.data.gouv.fr') ||
+      url.includes('apicarto.ign.fr') || url.includes('overpass-api')) return;
+
+  // Ne pas intercepter les requêtes non-GET
+  if (e.request.method !== 'GET') return;
 
   e.respondWith(
     fetch(e.request.clone())
       .then(res => {
-        if (res && res.ok && e.request.method === 'GET') {
+        if (res && res.ok) {
           const resClone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, resClone));
         }
         return res;
       })
       .catch(() =>
-        caches.match(e.request).then(c => c || caches.match('./index.html'))
+        caches.match(e.request).then(c => {
+          if (c) return c;
+          // Fallback HTML uniquement pour les requêtes de navigation
+          if (e.request.mode === 'navigate') return caches.match('./index.html');
+          return new Response('', { status: 504, statusText: 'Offline' });
+        })
       )
   );
 });
