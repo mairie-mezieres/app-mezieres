@@ -1628,34 +1628,91 @@ function confirmMAT(message, title, icon, okText, cancelText){
 
 // ── Installation PWA ──────────────────
 let dp = null;
-if (localStorage.getItem(INSTALL_KEY)) document.getElementById('install-banner').classList.add('hidden');
-window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp = e; });
-window.addEventListener('appinstalled', () => { localStorage.setItem(INSTALL_KEY,'1'); document.getElementById('install-banner').classList.add('hidden'); });
+
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function shouldHideInstallBanner(){
+  if(isStandaloneMode()) return true;
+  const v = localStorage.getItem(INSTALL_KEY);
+  return v === '1' || v === 'dismissed';
+}
+
+function refreshInstallBannerVisibility(){
+  const banner = document.getElementById('install-banner');
+  if(!banner) return;
+  if(shouldHideInstallBanner()) banner.classList.add('hidden');
+  else banner.classList.remove('hidden');
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  dp = e;
+
+  if(!isStandaloneMode() && localStorage.getItem(INSTALL_KEY) !== 'dismissed'){
+    const banner = document.getElementById('install-banner');
+    if(banner) banner.classList.remove('hidden');
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  localStorage.setItem(INSTALL_KEY, '1');
+  const banner = document.getElementById('install-banner');
+  if(banner) banner.classList.add('hidden');
+  trackStat('installation', { device: detectDevice() });
+  updateInstallBtn();
+});
 
 function updateInstallBanner() {
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const titleEl = document.getElementById('ib-title-txt');
   const subEl   = document.getElementById('ib-sub-txt');
+
   if (!isMobile) {
     if (titleEl) titleEl.textContent = 'Installez MAT sur votre ordinateur !';
-    if (subEl)   subEl.textContent   = 'Chrome/Edge : cliquez l\'icône ⊕ dans la barre d\'adresse · Firefox : non supporté';
+    if (subEl) subEl.textContent = 'Chrome/Edge : cliquez l’icône ⊕ dans la barre d’adresse · Firefox : non supporté';
   }
+
+  refreshInstallBannerVisibility();
 }
 updateInstallBanner();
 
 function installApp(){
-  if(dp){ dp.prompt(); dp.userChoice.then(r=>{ if(r.outcome==='accepted'){localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');} dp=null; }); }
-  else {
+  if(dp){
+    dp.prompt();
+    dp.userChoice.then(r => {
+      if(r.outcome === 'accepted'){
+        localStorage.setItem(INSTALL_KEY, '1');
+        const banner = document.getElementById('install-banner');
+        if(banner) banner.classList.add('hidden');
+      }
+      dp = null;
+    });
+  } else {
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile) {
-      alertMAT('Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"','Installer MAT','📲');
+      alertMAT(
+        'Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l’écran d’accueil"\n\nAndroid : menu navigateur → "Ajouter à l’écran d’accueil"',
+        'Installer MAT',
+        '📲'
+      );
     } else {
-      alertMAT('Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse (à droite)\n\nSi elle n\'apparaît pas, ouvrez le menu du navigateur → "Installer l\'application"','Installer MAT','📲');
+      alertMAT(
+        'Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l’icône ⊕ dans la barre d’adresse\n\nSinon ouvrez le menu du navigateur → "Installer l’application"',
+        'Installer MAT',
+        '📲'
+      );
     }
   }
 }
-function hideBanner(e){ e.stopPropagation(); document.getElementById('install-banner').classList.add('hidden'); localStorage.setItem(INSTALL_KEY,'dismissed'); }
 
+function hideBanner(e){
+  e.stopPropagation();
+  const banner = document.getElementById('install-banner');
+  if(banner) banner.classList.add('hidden');
+  localStorage.setItem(INSTALL_KEY, 'dismissed');
+}
 // ── Overlays + gestion bouton retour ─────────────────────────
 const _ovStack = [];
 
@@ -2647,47 +2704,86 @@ function detectDevice() {
 // ── Stats ─────────────────────────────
 // ── Identifiant unique persistant pour les stats visiteurs uniques ──
 const MAT_DEVICE_KEY = 'mat_device_id_v1';
+
 function getMatDeviceId(){
   let id = localStorage.getItem(MAT_DEVICE_KEY);
   if(!id){
-    id = 'mat-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+    id = 'mat-' + Date.now().toString(36) + '-' +
+         Math.random().toString(36).substring(2, 10) +
+         Math.random().toString(36).substring(2, 10);
     try { localStorage.setItem(MAT_DEVICE_KEY, id); } catch(e) {}
   }
   return id;
 }
+
 async function trackStat(service, extra = {}){
   try{
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{
+    const payload = {
+      service,
+      device: detectDevice(),
+      ...extra
+    };
+
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
         'x-device-id': getMatDeviceId()
       },
-      body:JSON.stringify({service, ...extra})
+      body: JSON.stringify(payload),
+      keepalive: true
     });
-  }catch(e){updateNotifCardStatus(false);}
+  }catch(e){
+    try{ updateNotifCardStatus(false); }catch(_e){}
+  }
 }
+
 function trackAppOpenOncePerDay(){
   const now = new Date();
-  const parts = new Intl.DateTimeFormat('fr-CA', { timeZone:'Europe/Paris', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(now);
+  const parts = new Intl.DateTimeFormat('fr-CA', {
+    timeZone:'Europe/Paris',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).formatToParts(now);
+
   const get = t => parts.find(p => p.type === t)?.value || '';
   const today = `${get('year')}-${get('month')}-${get('day')}`;
   const key = 'mat_app_open_tracked_' + today;
-  try {
+
+  try{
     if(localStorage.getItem(key)) return;
     localStorage.setItem(key, '1');
-  } catch(e) {}
-  trackStat('app_open', { device: detectDevice() });
+  }catch(e){}
+
+  trackStat('app_open');
 }
-const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
-window.openMel=()=>{trackStat('mel');_origOpenMel();};
-window.openSignal=()=>{trackStat('signalement');_origOpenSignal();};
-window.openIdees=()=>{trackStat('idees');_origOpenIdees();};
-window.openNotifs=()=>{trackStat('actualites');_origOpenNotifs();};
-window.openMeteo=()=>{trackStat('meteo');_origOpenMeteo();};
-window.openContact=()=>{trackStat('contact');_origOpenContact();};
-window.addEventListener('appinstalled',()=>{localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');trackStat('installation');updateInstallBtn();});
-window.addEventListener('load', () => { setTimeout(trackAppOpenOncePerDay, 1200); });
+
+const _origOpenMel = openMel,
+      _origOpenSignal = openSignal,
+      _origOpenIdees = openIdees,
+      _origOpenNotifs = openNotifs,
+      _origOpenMeteo = openMeteo,
+      _origOpenContact = openContact;
+
+window.openMel = () => { trackStat('mel'); _origOpenMel(); };
+window.openSignal = () => { trackStat('signalement'); _origOpenSignal(); };
+window.openIdees = () => { trackStat('idees'); _origOpenIdees(); };
+window.openNotifs = () => { trackStat('actualites'); _origOpenNotifs(); };
+window.openMeteo = () => { trackStat('meteo'); _origOpenMeteo(); };
+window.openContact = () => { trackStat('contact'); _origOpenContact(); };
+
+// Plus fiable que load + 1200 ms
+document.addEventListener('DOMContentLoaded', () => {
+  trackAppOpenOncePerDay();
+});
+
+// Bonus : si l’utilisateur revient dans l’app
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){
+    trackStat('app_resume');
+  }
+});
 
 // ── Actualités ────────────────────────// ── Actualités ────────────────────────
 const ACTUS_SEEN_KEY='mat_actus_seen_v1';
@@ -2932,6 +3028,8 @@ async function clearCacheAndReload() {
   toast.textContent = '✅ Cache vidé — rechargement…';
   toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--forest);color:white;padding:16px 28px;border-radius:14px;font-family:Nunito,sans-serif;font-size:.88rem;font-weight:800;z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,.3);';
   document.body.appendChild(toast);
+  localStorage.removeItem(INSTALL_KEY);
+  dp = null;
   setTimeout(() => window.location.reload(true), 600);
 }
 
@@ -3220,6 +3318,18 @@ function closeTrombiBtn(){
   setTimeout(()=>{ document.getElementById('trombi-modal').style.display='none'; },250);
 }
 
+let deferredPrompt = null;
+
+// Intercepte l'événement d'installation
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // 👉 affiche ton bouton installer
+  const installBtn = document.getElementById('installBtn');
+  if (installBtn) installBtn.style.display = 'block';
+});
+  
 // Init trombi au chargement
 document.addEventListener('DOMContentLoaded', buildTrombi);
 
