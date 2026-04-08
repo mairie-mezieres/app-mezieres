@@ -305,7 +305,7 @@ function renderAll() {
   renderIdeas();
   renderActus();
   renderSignals();
-  renderBanner();
+  renderBanner();  // async mais on ne bloque pas
   renderPurge();
 }
 
@@ -313,7 +313,6 @@ function renderAll() {
 function drawWordCloud(canvasId, parJour) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
-  // Agréger sur 30 jours
   const days = Object.keys(parJour).sort().slice(-30);
   const totals = {};
   days.forEach(d => {
@@ -335,17 +334,15 @@ function drawWordCloud(canvasId, parJour) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, W, H);
 
-  // Placer les mots en spirale simple
   const placed = [];
   entries.forEach(([cat, val], i) => {
     const ratio = (val - minVal) / (maxVal - minVal + 1);
-    const fontSize = Math.round(11 + ratio * 26); // 11px à 37px
+    const fontSize = Math.round(11 + ratio * 26);
     ctx.font = `${900} ${fontSize}px 'Segoe UI', sans-serif`;
     const color = palette[i % palette.length];
     const w = ctx.measureText(cat).width;
     const h = fontSize;
 
-    // Essayer des positions en spirale
     let placed_ok = false;
     for (let r = 0; r < 120 && !placed_ok; r += 2) {
       const angle = r * 0.4;
@@ -444,11 +441,13 @@ function showTab(id, btn) {
 }
 
 // ── Helpers ───────────────────────────
-
 function topEntries(obj, limit = 10) {
   return Object.entries(obj || {}).sort((a,b) => (b[1]||0) - (a[1]||0)).slice(0, limit);
 }
 
+// ── buildCategorySeries ───────────────────────────────────────
+// Retourne { labels, periods (alias), datasets, topCats }
+// CORRECTION : labels = periods (le code appelant utilise .labels)
 function buildCategorySeries(source, limitPeriods = 12, topCatsCount = 5) {
   const periods = Object.keys(source || {}).sort().slice(-limitPeriods);
   const totals = {};
@@ -468,7 +467,8 @@ function buildCategorySeries(source, limitPeriods = 12, topCatsCount = 5) {
     data: periods.map(p => Number((source[p] || {})[cat] || 0)),
     color: palette[i % palette.length]
   }));
-  return { periods, datasets, topCats };
+  // labels = periods (alias pour compatibilité avec les appels renderLineChart)
+  return { labels: periods, periods, datasets, topCats };
 }
 
 function fmt(n) { return (n || 0).toLocaleString('fr-FR'); }
@@ -601,7 +601,6 @@ function renderOverview() {
 
 function renderServiceBadges(services) {
   const icons = { mel:'🤖', signalement:'🚨', actualites:'🔔', meteo:'🌤️', contact:'💬', idees:'💡', installation:'📲', bug:'🐞', agenda:'📅', transport:'🚌' };
-  // Exclure conseil_municipal de la vue générale + les clics élus individuels
   const HIDDEN = ['installation','conseil_municipal'];
   const entries = Object.entries(services)
     .filter(([k]) => !HIDDEN.includes(k) && !k.startsWith('elu_'))
@@ -621,7 +620,6 @@ function renderIa() {
   const { dash } = _data;
   const iaCategories = dash.iaCategories || {};
   const ia = dash.ia || {};
-  const daily   = ia.daily   || {};
   const monthly = ia.monthly || {};
 
   const month = new Date().toISOString().slice(0, 7);
@@ -631,6 +629,7 @@ function renderIa() {
 
   const catMonth = iaCategories.parMois?.[month] || {};
   const topMonthCats = topEntries(catMonth, 12);
+  // buildCategorySeries retourne { labels, periods, datasets, topCats }
   const daySeries = buildCategorySeries(iaCategories.parJour || {}, 30, 5);
   const monthSeries = buildCategorySeries(iaCategories.parMois || {}, 12, 5);
 
@@ -675,9 +674,11 @@ function renderIa() {
     </div>
   `;
 
+  // Dessiner le nuage de mots
   drawWordCloud('chart-wordcloud', iaCategories.parJour || {});
-  renderLineChart('chart-ia-categories-daily', daySeries.labels, daySeries.datasets, { stacked:false, yTitle:'Questions' });
-  renderLineChart('chart-ia-categories-monthly', monthSeries.labels, monthSeries.datasets, { stacked:false, yTitle:'Questions' });
+  // CORRECTION : utiliser .labels (alias de .periods) — les deux fonctionnent maintenant
+  renderLineChart('chart-ia-categories-daily', daySeries.labels, daySeries.datasets, { stacked: false, yTitle: 'Questions' });
+  renderLineChart('chart-ia-categories-monthly', monthSeries.labels, monthSeries.datasets, { stacked: false, yTitle: 'Questions' });
 }
 
 function setIaView(v) { iaView = v; renderIa(); }
@@ -693,9 +694,7 @@ function renderRedis() {
     <div class="progress-wrap">
       <div class="progress-header">
         <span class="progress-label">Mémoire utilisée</span>
-        <span class="progress-val ${cls==='danger'?'':''}">
-          ${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)
-        </span>
+        <span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div>
@@ -729,7 +728,6 @@ function renderRedis() {
     ${pct >= 80 ? `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
       ⚠️ Attention : ${pct}% de la mémoire Redis utilisée. Pensez à purger les anciennes entrées ou upgrader votre plan Upstash.
     </div>` : ''}
-
     ${pct >= 60 && pct < 80 ? `<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;color:var(--orange);font-size:0.82rem;font-weight:700;margin-top:8px">
       ⚡ ${pct}% utilisé. Surveillance recommandée.
     </div>` : ''}
@@ -793,13 +791,12 @@ function renderApp() {
     </div>
   `;
 
-  renderLineChart('chart-app', periods, datasets, { stacked:true, yTitle:'Accès' });
+  renderLineChart('chart-app', periods, datasets, { stacked: true, yTitle: 'Accès' });
 }
 
 function setAppView(v) { appView = v; renderApp(); }
 
 // ── IDÉES ─────────────────────────────
-// ── IDÉES ────────────────────────────
 function renderIdeas() {
   const ideas = [..._data.ideas].sort((a,b) => (b.votes||0)-(a.votes||0));
   document.getElementById('ideas-content').innerHTML = `
@@ -924,7 +921,7 @@ function renderActus() {
       </table>
     </div>
   `;
-  pubUpdate(); // initialise l'aperçu
+  pubUpdate();
 }
 
 // ── Helpers formulaire publication ────
@@ -1008,10 +1005,7 @@ async function pubCheckDuplicates(){
   const eventDate = document.getElementById('pub-event-date')?.value;
   const warn = document.getElementById('pub-calendar-warn');
   if (!warn) return;
-  if (!eventDate) {
-    warn.style.display = 'none';
-    return;
-  }
+  if (!eventDate) { warn.style.display = 'none'; return; }
   const dateOnly = eventDate.slice(0, 10);
   try {
     const r = await fetch(`${API}/admin/calendar/day?date=${dateOnly}`, {
@@ -1026,9 +1020,7 @@ async function pubCheckDuplicates(){
     } else {
       warn.style.display = 'none';
     }
-  } catch(e) {
-    warn.style.display = 'none';
-  }
+  } catch(e) { warn.style.display = 'none'; }
 }
 
 async function pubSubmit(){
@@ -1050,23 +1042,17 @@ async function pubSubmit(){
   status.style.display = 'none';
 
   const body = {
-    title,
-    description,
+    title, description,
     imageBase64: _pubImageBase64,
     eventDate: eventDate || null,
     eventLocation: eventLocation || null,
-    publishFacebook,
-    sendPush,
-    createCalendar
+    publishFacebook, sendPush, createCalendar
   };
 
   try {
     const r = await fetch(`${API}/admin/actus/add`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-token': TOKEN
-      },
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
       body: JSON.stringify(body)
     });
     const d = await r.json();
@@ -1097,14 +1083,12 @@ async function pubSubmit(){
     status.textContent = msg;
     status.style.display = 'block';
 
-    // Reset formulaire
     document.getElementById('pub-title').value = '';
     document.getElementById('pub-desc').value = '';
     document.getElementById('pub-event-date').value = '';
     document.getElementById('pub-event-location').value = '';
     pubRemoveImage();
 
-    // Recharger la liste des actus
     setTimeout(async () => {
       try {
         const actus = await apiGet('/admin/actus');
@@ -1159,7 +1143,74 @@ async function deleteSignal(id) {
   renderSignals();
 }
 
-// ── Charts ────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// CHARTS — renderLineChart (CORRECTION : fonction manquante !)
+// Crée un graphique en courbes/aires via Chart.js
+// Paramètres :
+//   id       : id du canvas HTML
+//   labels   : tableau de labels (axe X)
+//   datasets : [{label, data, color}]
+//   opts     : { stacked, yTitle }
+// ══════════════════════════════════════════════════════════════
+function renderLineChart(id, labels, datasets, opts) {
+  opts = opts || {};
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  if (_charts[id]) { _charts[id].destroy(); }
+
+  _charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels || [],
+      datasets: (datasets || []).map(function(d) {
+        return {
+          label: d.label,
+          data: d.data,
+          backgroundColor: d.color + (opts.stacked ? '55' : '22'),
+          borderColor: d.color,
+          borderWidth: 2,
+          tension: 0.3,
+          fill: !!opts.stacked,
+          pointRadius: 2,
+          pointHoverRadius: 5,
+        };
+      })
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 } },
+          onClick: function(e, legendItem, legend) {
+            var ci = legend.chart;
+            var dss = ci.data.datasets;
+            var idx = legendItem.datasetIndex;
+            var visibleCount = dss.filter(function(_, i) { return !ci.getDatasetMeta(i).hidden; }).length;
+            if (visibleCount === 1 && !ci.getDatasetMeta(idx).hidden) {
+              dss.forEach(function(_, i) { ci.getDatasetMeta(i).hidden = false; });
+            } else {
+              dss.forEach(function(_, i) { ci.getDatasetMeta(i).hidden = i !== idx; });
+            }
+            ci.update();
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10 }, maxRotation: 45 } },
+        y: {
+          beginAtZero: true,
+          stacked: !!opts.stacked,
+          ticks: { font: { size: 10 } },
+          title: opts.yTitle ? { display: true, text: opts.yTitle, font: { size: 10 } } : { display: false }
+        }
+      }
+    }
+  });
+}
+
+// drawChart : graphique barre ou ligne (version legacy)
 function drawChart(id, labels, datasets, type) {
   const ctx = document.getElementById(id);
   if (!ctx) return;
@@ -1190,13 +1241,10 @@ function drawChart(id, labels, datasets, type) {
             const ci = legend.chart;
             const dss = ci.data.datasets;
             const idx = legendItem.datasetIndex;
-            // Compter les datasets visibles
             const visibleCount = dss.filter((_, i) => !ci.getDatasetMeta(i).hidden).length;
             if (visibleCount === 1 && !ci.getDatasetMeta(idx).hidden) {
-              // Déjà isolé → tout réafficher
               dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = false; });
             } else {
-              // Isoler la série cliquée
               dss.forEach((_, i) => { ci.getDatasetMeta(i).hidden = i !== idx; });
             }
             ci.update();
@@ -1306,11 +1354,7 @@ async function init() {
       signal: AbortSignal.timeout(8000)
     });
 
-    if (r.status === 401) {
-      logout();
-      return;
-    }
-
+    if (r.status === 401) { logout(); return; }
     if (!r.ok) throw new Error(`dashboard ${r.status}`);
 
     const d = await r.json();
@@ -1344,9 +1388,7 @@ async function init() {
         <div style="text-align:center;padding:40px;color:var(--red)">
           <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
           <div style="font-weight:800;margin-bottom:8px">Erreur de chargement</div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">
-            ${e.message}
-          </div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">${e.message}</div>
           <button onclick="location.reload()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;cursor:pointer">
             🔄 Réessayer
           </button>
@@ -1355,7 +1397,6 @@ async function init() {
   }
 }
 
-// Fix loadAll pour ne pas rester bloqué
 async function loadAll() {
   try {
     const controller = new AbortController();
@@ -1366,19 +1407,10 @@ async function loadAll() {
       signal: controller.signal
     });
 
-    if (dashRes.status === 401) {
-      clearTimeout(timer);
-      logout();
-      return;
-    }
-
-    if (!dashRes.ok) {
-      clearTimeout(timer);
-      throw new Error(`dashboard ${dashRes.status}`);
-    }
+    if (dashRes.status === 401) { clearTimeout(timer); logout(); return; }
+    if (!dashRes.ok) { clearTimeout(timer); throw new Error(`dashboard ${dashRes.status}`); }
 
     const dash = await dashRes.json();
-
     const [ideas, actus, signals] = await Promise.all([
       apiGet('/admin/ideas'),
       apiGet('/admin/actus'),
@@ -1394,15 +1426,12 @@ async function loadAll() {
       signals: signals.signals || []
     };
 
-    document.getElementById('last-refresh').textContent =
-      new Date().toLocaleTimeString('fr-FR');
-
+    document.getElementById('last-refresh').textContent = new Date().toLocaleTimeString('fr-FR');
     renderAll();
 
   } catch (e) {
     console.warn('loadAll échoué:', e.message);
-    document.getElementById('last-refresh').textContent =
-      '⚠️ Erreur — ' + new Date().toLocaleTimeString('fr-FR');
+    document.getElementById('last-refresh').textContent = '⚠️ Erreur — ' + new Date().toLocaleTimeString('fr-FR');
   }
 }
 
@@ -1416,7 +1445,6 @@ let _dpAdmin = null;
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   _dpAdmin = e;
-  // Afficher la bannière seulement si pas encore installé
   if (!localStorage.getItem('mat_admin_installed')) {
     document.getElementById('admin-install-banner').style.display = 'flex';
   }
@@ -1446,7 +1474,6 @@ function installAdmin() {
   }
 }
 
-// Enregistrer un service worker minimal pour la PWA
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw-admin.js').catch(() => {});
 }
