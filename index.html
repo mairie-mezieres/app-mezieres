@@ -2645,8 +2645,28 @@ function detectDevice() {
 }
 
 // ── Stats ─────────────────────────────
+// ── Identifiant unique persistant pour les stats visiteurs uniques ──
+const MAT_DEVICE_KEY = 'mat_device_id_v1';
+function getMatDeviceId(){
+  let id = localStorage.getItem(MAT_DEVICE_KEY);
+  if(!id){
+    // UUID v4 simple (suffisant pour anonymiser un appareil)
+    id = 'mat-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+    try { localStorage.setItem(MAT_DEVICE_KEY, id); } catch(e) {}
+  }
+  return id;
+}
 async function trackStat(service){
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service})});}catch(e){updateNotifCardStatus(false);}
+  try{
+    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-device-id': getMatDeviceId()
+      },
+      body:JSON.stringify({service})
+    });
+  }catch(e){updateNotifCardStatus(false);}
 }
 const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
 window.openMel=()=>{trackStat('mel');_origOpenMel();};
@@ -3149,7 +3169,7 @@ function buildTrombi(){
 
 function openTrombi(idx){
   const e = ELUS[idx];
-  try{const eluKey='elu_'+(e.nom||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').substring(0,25);fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:eluKey})});}catch(_){}
+  try{const eluKey='elu_'+(e.nom||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').substring(0,25);fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json','x-device-id':getMatDeviceId()},body:JSON.stringify({service:eluKey})});}catch(_){}
   const modal = document.getElementById('trombi-modal');
   const card = document.getElementById('trombi-card');
   document.getElementById('trombi-big-img').src = e.img;
