@@ -181,15 +181,15 @@ tr:hover td{background:#f9fafb;}
   </div>
 
   <div class="admin-nav">
-    <button class="nav-tab on" onclick="showTab('overview')">📊 Vue générale</button>
-    <button class="nav-tab" onclick="showTab('app')">📱 Usage app</button>
-    <button class="nav-tab" onclick="showTab('ia')">🤖 IA & Coûts</button>
-    <button class="nav-tab" onclick="showTab('redis')">🗄️ Redis</button>
-    <button class="nav-tab" onclick="showTab('ideas')">💡 Idées</button>
-    <button class="nav-tab" onclick="showTab('actus')">🔔 Actualités</button>
-    <button class="nav-tab" onclick="showTab('signals')">🚨 Signalements</button>
-    <button class="nav-tab" onclick="showTab('banner')">📢 Info/Alerte</button>
-    <button class="nav-tab" onclick="showTab('purge')">🗑️ Purge</button>
+    <button class="nav-tab on" onclick="showTab('overview', this)">📊 Vue générale</button>
+    <button class="nav-tab" onclick="showTab('actus', this)">🔔 Actualités</button>
+    <button class="nav-tab" onclick="showTab('banner', this)">📢 Info/Alerte</button>
+    <button class="nav-tab" onclick="showTab('app', this)">📱 Usage app</button>
+    <button class="nav-tab" onclick="showTab('ia', this)">🤖 IA</button>
+    <button class="nav-tab" onclick="showTab('redis', this)">🗄️ Redis</button>
+    <button class="nav-tab" onclick="showTab('ideas', this)">💡 Idées</button>
+    <button class="nav-tab" onclick="showTab('signals', this)">🚨 Signalements</button>
+    <button class="nav-tab" onclick="showTab('purge', this)">🗑️ Purge</button>
   </div>
 
   <div class="admin-body">
@@ -247,6 +247,7 @@ const API = 'https://chatbot-mairie-mezieres.onrender.com';
 let TOKEN = localStorage.getItem('mat_admin_token') || '';
 let _data = null;
 let _charts = {};
+let _purgeDateValue = new Date().toISOString().slice(0, 10);
 
 // ── Auth ──────────────────────────────
 async function doLogin() {
@@ -368,6 +369,7 @@ function drawWordCloud(canvasId, parJour) {
 // ── PURGE DES DONNÉES ─────────────────
 function renderPurge() {
   const today = new Date().toISOString().slice(0, 10);
+  if (!_purgeDateValue) _purgeDateValue = today;
   document.getElementById('purge-content').innerHTML = `
     <div class="section-title">🗑️ Purge des données par date</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
@@ -378,9 +380,13 @@ function renderPurge() {
       <div style="display:flex;flex-direction:column;gap:14px;">
         <div style="display:flex;gap:10px;align-items:center;">
           <label style="font-size:0.8rem;font-weight:800;width:120px;flex-shrink:0;">Purger avant le</label>
-          <input type="date" id="purge-date" value="${today}" max="${today}" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;">
+          <input type="date" id="purge-date" value="${_purgeDateValue}" max="${today}" onchange="rememberPurgeDate(this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;">
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#fee2e2;border-radius:10px;padding:10px 14px;">
+            <span style="font-size:0.82rem;font-weight:700;color:var(--red);">🧨 Tout purger avant la date</span>
+            <button onclick="doPurge('all')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Tout purger</button>
+          </div>
           ${[
             ['stats_parjour','📊 Stats usage par jour (parJour)'],
             ['ia_stats_daily','🤖 Stats IA journalières (daily)'],
@@ -399,11 +405,17 @@ function renderPurge() {
   `;
 }
 
+function rememberPurgeDate(value) {
+  if (value) _purgeDateValue = value;
+}
+
 async function doPurge(type) {
   const dateEl = document.getElementById('purge-date');
   const beforeDate = dateEl?.value;
   if (!beforeDate) { alert('Date requise'); return; }
-  if (!confirm('Purger les données de type "' + type + '" antérieures au ' + beforeDate + ' ?')) return;
+  rememberPurgeDate(beforeDate);
+  const label = type === 'all' ? 'toutes les données' : 'les données de type "' + type + '"';
+  if (!confirm('Purger ' + label + ' antérieures au ' + beforeDate + ' ?')) return;
   try {
     const r = await fetch(API + '/admin/purge', {
       method: 'POST',
@@ -414,7 +426,7 @@ async function doPurge(type) {
     const msg = document.getElementById('purge-msg');
     if (d.ok) {
       if (msg) { msg.textContent = '✅ Purge effectuée : ' + d.deleted + ' entrée(s) supprimée(s).'; msg.style.color='var(--leaf)'; msg.style.display='block'; }
-      setTimeout(() => loadAll(), 1000);
+      setTimeout(async () => { await loadAll(); renderPurge(); }, 800);
     } else {
       if (msg) { msg.textContent = '❌ Erreur : ' + (d.error||'inconnue'); msg.style.color='var(--red)'; msg.style.display='block'; }
     }
@@ -424,11 +436,11 @@ async function doPurge(type) {
 }
 
 // ── Tabs ──────────────────────────────
-function showTab(id) {
+function showTab(id, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('on'));
   document.getElementById('tab-' + id).classList.add('on');
-  event.target.classList.add('on');
+  if (btn) btn.classList.add('on');
 }
 
 // ── Helpers ───────────────────────────
@@ -475,82 +487,115 @@ function progressClass(pct) {
 }
 
 // ── VUE GÉNÉRALE ─────────────────────
+function sumValues(obj) {
+  return Object.values(obj || {}).reduce((a,b) => a + Number(b || 0), 0);
+}
+
+function pctTrend(current, previous) {
+  if (!previous) return current > 0 ? '+100%' : '0%';
+  const pct = ((current - previous) / previous) * 100;
+  return `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+}
+
+function trendBadge(current, previous, suffix = '') {
+  const diff = current - previous;
+  const good = diff >= 0;
+  const arrow = diff > 0 ? '↗' : diff < 0 ? '↘' : '→';
+  const label = previous === 0
+    ? (current > 0 ? '+100%' : '0%')
+    : `${diff > 0 ? '+' : ''}${(((diff) / previous) * 100).toFixed(1)}%`;
+  return `<span class="badge ${good ? 'badge-green' : 'badge-red'}">${arrow} ${label}${suffix}</span>`;
+}
+
 function renderOverview() {
   const { dash } = _data;
-  const redis = dash.redis || {};
   const app = dash.app || {};
   const ia = dash.ia || {};
+  const trends = (dash.iaCategories?.trends || []).slice(0, 8);
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const month = today.slice(0, 7);
+  const prevMonthDate = new Date();
+  prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
+  const prevMonth = prevMonthDate.toISOString().slice(0, 7);
 
-  // Coût total mois courant
-  const month = new Date().toISOString().slice(0, 7);
+  const parJour = app.parJour || {};
+  const parMois = {};
+  for (const [day, svcs] of Object.entries(parJour)) {
+    const key = day.slice(0, 7);
+    if (!parMois[key]) parMois[key] = {};
+    for (const [svc, cnt] of Object.entries(svcs || {})) {
+      parMois[key][svc] = (parMois[key][svc] || 0) + Number(cnt || 0);
+    }
+  }
+
+  const todayAccess = sumValues(parJour[today]);
+  const yesterdayAccess = sumValues(parJour[yesterday]);
+  const monthAccess = sumValues(parMois[month]);
+  const prevMonthAccess = sumValues(parMois[prevMonth]);
+
   const monthIa = ia.monthly?.[month] || {};
   let totalEurMonth = 0;
   for (const [prov, d] of Object.entries(monthIa)) {
     if (prov !== '_total') totalEurMonth += d.costEur || 0;
   }
 
-  // Coût total aujourd'hui
-  const today = new Date().toISOString().slice(0, 10);
-  const todayIa = ia.daily?.[today] || {};
-  let totalEurDay = 0;
-  for (const [prov, d] of Object.entries(todayIa)) {
-    if (prov !== '_total') totalEurDay += d.costEur || 0;
-  }
-
-  const redisPct = redis.pct || 0;
-  const redisClass = progressClass(redisPct);
+  const ideaCount = _data.ideas.length;
+  const signalCount = _data.signals.length;
+  const pushCount = _data.dash.redis?.keys?.subs || 0;
 
   document.getElementById('overview-content').innerHTML = `
     <div class="section-title">Tableau de bord — Résumé</div>
     <div class="cards-grid">
-      <div class="stat-card ${redisClass}">
-        <div class="stat-card-ico">🗄️</div>
-        <div class="stat-card-val">${redis.pct || 0}%</div>
-        <div class="stat-card-label">Redis utilisé</div>
-        <div class="stat-card-sub">${fmtBytes(redis.usedBytes)} / 256 Mo</div>
-      </div>
       <div class="stat-card ok">
-        <div class="stat-card-ico">👥</div>
-        <div class="stat-card-val">${fmt(app.uniqueUsers?.total || 0)}</div>
-        <div class="stat-card-label">Visiteurs uniques</div>
-        <div class="stat-card-sub">${fmt(app.uniqueUsers?.today || 0)} aujourd'hui · ${fmt(app.uniqueUsers?.month || 0)} ce mois</div>
+        <div class="stat-card-ico">📲</div>
+        <div class="stat-card-val">${fmt(app.totalInstalls || 0)}</div>
+        <div class="stat-card-label">Installations</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-ico">👁️</div>
-        <div class="stat-card-val">${fmt(app.totalAcces)}</div>
-        <div class="stat-card-label">Accès total</div>
-        <div class="stat-card-sub">${fmt(app.totalInstalls)} installations</div>
+        <div class="stat-card-ico">🗓️</div>
+        <div class="stat-card-val">${fmt(todayAccess)}</div>
+        <div class="stat-card-label">Accès aujourd'hui</div>
+        <div class="stat-card-sub">vs hier : ${pctTrend(todayAccess, yesterdayAccess)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📅</div>
+        <div class="stat-card-val">${fmt(monthAccess)}</div>
+        <div class="stat-card-label">Accès ce mois</div>
+        <div class="stat-card-sub">vs mois précédent : ${pctTrend(monthAccess, prevMonthAccess)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🤖</div>
+        <div class="stat-card-val">${fmtEurBig(totalEurMonth)}</div>
+        <div class="stat-card-label">Coût IA ce mois</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🔔</div>
-        <div class="stat-card-val">${_data.dash.redis?.keys?.subs || 0}</div>
+        <div class="stat-card-val">${fmt(pushCount)}</div>
         <div class="stat-card-label">Abonnés push</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">💡</div>
-        <div class="stat-card-val">${_data.ideas.length}</div>
+        <div class="stat-card-val">${fmt(ideaCount)}</div>
         <div class="stat-card-label">Idées</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🚨</div>
-        <div class="stat-card-val">${_data.signals.length}</div>
+        <div class="stat-card-val">${fmt(signalCount)}</div>
         <div class="stat-card-label">Signalements</div>
-      </div>
-    </div>
-
-    <div class="section-title">Utilisation Redis</div>
-    <div class="progress-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Mémoire Upstash (limite 256 Mo gratuit)</span>
-        <span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill ${redisClass}" style="width:${Math.min(redisPct,100)}%"></div>
       </div>
     </div>
 
     <div class="section-title">Usage app aujourd'hui</div>
     ${renderServiceBadges(app.parJour?.[today] || {})}
+
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">MEL — Catégories qui montent</span></div>
+      <table>
+        <tr><th>Catégorie</th><th>7 derniers jours</th><th>7 jours précédents</th><th>Écart</th><th>Évolution</th></tr>
+        ${trends.length ? trends.map(t => `<tr><td><strong>${t.category}</strong></td><td>${fmt(t.current)}</td><td>${fmt(t.previous)}</td><td>${t.diff > 0 ? '+' : ''}${fmt(t.diff)}</td><td>${t.pct > 0 ? '+' : ''}${t.pct}%</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune tendance disponible</td></tr>'}
+      </table>
+    </div>
   `;
 }
 
@@ -578,16 +623,6 @@ function renderIa() {
   const ia = dash.ia || {};
   const daily   = ia.daily   || {};
   const monthly = ia.monthly || {};
-  const claudeInfo  = ia.claude  || {};
-  const mistralInfo = ia.mistral || {};
-
-  const source = iaView === 'daily' ? daily : monthly;
-  const periods = Object.keys(source).sort().slice(-30);
-
-  const mistralCosts = periods.map(p => source[p]?.mistral?.costEur || 0);
-  const claudeCosts  = periods.map(p => source[p]?.claude?.costEur  || 0);
-  const mistralCalls = periods.map(p => source[p]?.mistral?.calls   || 0);
-  const claudeCalls  = periods.map(p => source[p]?.claude?.calls    || 0);
 
   const month = new Date().toISOString().slice(0, 7);
   const mData = monthly[month] || {};
@@ -595,48 +630,25 @@ function renderIa() {
   const mClaude  = mData.claude  || { in:0, out:0, calls:0, costEur:0 };
 
   const catMonth = iaCategories.parMois?.[month] || {};
-  const topMonthCats = topEntries(catMonth, 8);
-  const trends = (iaCategories.trends || []).slice(0, 8);
-  const sourceCats = topEntries(iaCategories.sources || {}, 10);
+  const topMonthCats = topEntries(catMonth, 12);
   const daySeries = buildCategorySeries(iaCategories.parJour || {}, 30, 5);
   const monthSeries = buildCategorySeries(iaCategories.parMois || {}, 12, 5);
 
   document.getElementById('ia-content').innerHTML = `
-    <div class="section-title">Coûts IA — ${month}</div>
+    <div class="section-title">IA — Résumé</div>
     <div class="cards-grid">
       <div class="stat-card">
         <div class="stat-card-ico">🟠</div>
         <div class="stat-card-val">${fmtEurBig(mMistral.costEur)}</div>
         <div class="stat-card-label">Mistral ce mois</div>
-        <div class="stat-card-sub">${fmt(mMistral.calls)} appels · ${fmt(mMistral.in+mMistral.out)} tokens</div>
+        <div class="stat-card-sub">${fmt(mMistral.calls)} appels</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🟣</div>
         <div class="stat-card-val">${fmtEurBig(mClaude.costEur)}</div>
         <div class="stat-card-label">Claude ce mois</div>
-        <div class="stat-card-sub">${fmt(mClaude.calls)} appels · ${fmt(mClaude.in+mClaude.out)} tokens</div>
+        <div class="stat-card-sub">${fmt(mClaude.calls)} appels</div>
       </div>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">
-        Coûts IA (€)
-        <div style="display:flex;gap:6px">
-          <button class="chart-period-btn ${iaView==='daily'?'on':''}" onclick="setIaView('daily')">Jours</button>
-          <button class="chart-period-btn ${iaView==='monthly'?'on':''}" onclick="setIaView('monthly')">Mois</button>
-        </div>
-      </div>
-      <canvas id="chart-ia-cost"></canvas>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-title">Appels IA</div>
-      <canvas id="chart-ia-calls"></canvas>
-    </div>
-
-    <div class="section-title">Catégories de questions MEL</div>
-    <div class="cards-grid">
-      ${topMonthCats.length ? topMonthCats.slice(0,4).map(([cat,val]) => `<div class="stat-card"><div class="stat-card-ico">🏷️</div><div class="stat-card-val">${fmt(val)}</div><div class="stat-card-label">${cat}</div><div class="stat-card-sub">Mois courant</div></div>`).join('') : `<div class="stat-card"><div class="stat-card-ico">🏷️</div><div class="stat-card-val">0</div><div class="stat-card-label">Aucune catégorie</div><div class="stat-card-sub">Pas encore de données</div></div>`}
     </div>
 
     <div class="chart-wrap" style="overflow:hidden;">
@@ -655,71 +667,17 @@ function renderIa() {
     </div>
 
     <div class="table-wrap">
-      <div class="table-header"><span class="table-title">Catégories qui montent</span></div>
-      <table>
-        <tr><th>Catégorie</th><th>7 derniers jours</th><th>7 jours précédents</th><th>Écart</th><th>Évolution</th></tr>
-        ${trends.length ? trends.map(t => `<tr><td><strong>${t.category}</strong></td><td>${fmt(t.current)}</td><td>${fmt(t.previous)}</td><td>${t.diff > 0 ? '+' : ''}${fmt(t.diff)}</td><td>${t.pct > 0 ? '+' : ''}${t.pct}%</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune tendance disponible</td></tr>'}
-      </table>
-    </div>
-
-    <div class="table-wrap">
       <div class="table-header"><span class="table-title">Top catégories du mois</span></div>
       <table>
         <tr><th>Catégorie</th><th>Questions</th></tr>
         ${topMonthCats.length ? topMonthCats.map(([cat,val]) => `<tr><td>${cat}</td><td><strong>${fmt(val)}</strong></td></tr>`).join('') : '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Aucune donnée ce mois</td></tr>'}
       </table>
     </div>
-
-    <div class="table-wrap">
-      <div class="table-header"><span class="table-title">Origine des questions</span></div>
-      <table>
-        <tr><th>Source</th><th>Total catégories détectées</th></tr>
-        ${sourceCats.length ? sourceCats.map(([src,val]) => `<tr><td>${src}</td><td><strong>${fmt(val)}</strong></td></tr>`).join('') : '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Aucune source enregistrée</td></tr>'}
-      </table>
-    </div>
-
-    <div class="section-title">Tarifs appliqués</div>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Modèle</th><th>Input (€/1M tokens)</th><th>Output (€/1M tokens)</th></tr>
-        <tr><td>🟠 Mistral Small</td><td>${mistralInfo.priceIn||0.10}</td><td>${mistralInfo.priceOut||0.30}</td></tr>
-        <tr><td>🟣 Claude Haiku 4.5</td><td>${(claudeInfo.priceIn||0.80)} $/1M → €</td><td>${(claudeInfo.priceOut||4.00)} $/1M → €</td></tr>
-      </table>
-    </div>
-
-    <div class="section-title">Historique mensuel détaillé</div>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Mois</th><th>Mistral appels</th><th>Mistral €</th><th>Claude appels</th><th>Claude €</th><th>Total €</th></tr>
-        ${Object.keys(monthly).sort().reverse().map(m => {
-          const mm = monthly[m].mistral || {calls:0,costEur:0};
-          const mc = monthly[m].claude  || {calls:0,costEur:0};
-          const tot = (mm.costEur||0)+(mc.costEur||0);
-          return `<tr>
-            <td><strong>${m}</strong></td>
-            <td>${fmt(mm.calls)}</td><td class="cost">${fmtEur(mm.costEur)}</td>
-            <td>${fmt(mc.calls)}</td><td class="cost">${fmtEur(mc.costEur)}</td>
-            <td><strong class="cost ${tot>0.5?'high':''}">${fmtEurBig(tot)}</strong></td>
-          </tr>`;
-        }).join('')}
-      </table>
-    </div>
   `;
 
-  drawChart('chart-ia-cost', periods, [
-    { label: 'Mistral (€)', data: mistralCosts, color: '#f97316' },
-    { label: 'Claude (€)',  data: claudeCosts,  color: '#8b5cf6' }
-  ], 'line');
-
-  drawChart('chart-ia-calls', periods, [
-    { label: 'Mistral appels', data: mistralCalls, color: '#f97316' },
-    { label: 'Claude appels',  data: claudeCalls,  color: '#8b5cf6' }
-  ], 'bar');
-
-  drawChart('chart-ia-categories-daily', daySeries.periods, daySeries.datasets, 'line');
-  drawChart('chart-ia-categories-monthly', monthSeries.periods, monthSeries.datasets, 'bar');
-  // Nuage de mots des catégories sur 30 jours
   drawWordCloud('chart-wordcloud', iaCategories.parJour || {});
+  renderLineChart('chart-ia-categories-daily', daySeries.labels, daySeries.datasets, { stacked:false, yTitle:'Questions' });
+  renderLineChart('chart-ia-categories-monthly', monthSeries.labels, monthSeries.datasets, { stacked:false, yTitle:'Questions' });
 }
 
 function setIaView(v) { iaView = v; renderIa(); }
@@ -783,10 +741,7 @@ let appView = 'daily';
 function renderApp() {
   const app = _data.dash.app || {};
   const parJour = app.parJour || {};
-  const today   = new Date().toISOString().slice(0, 10);
-  const month   = new Date().toISOString().slice(0, 7);
 
-  // Agréger par mois
   const parMois = {};
   for (const [day, svcs] of Object.entries(parJour)) {
     const m = day.slice(0,7);
@@ -807,37 +762,10 @@ function renderApp() {
     color: colors[i]
   }));
 
-  // Stats aujourd'hui
-  const todaySvcs = parJour[today] || {};
+  const month = new Date().toISOString().slice(0, 7);
   const monthSvcs = parMois[month] || {};
 
   document.getElementById('app-content').innerHTML = `
-    <div class="section-title">Usage global</div>
-    <div class="cards-grid">
-      <div class="stat-card ok">
-        <div class="stat-card-ico">👥</div>
-        <div class="stat-card-val">${fmt(app.uniqueUsers?.total || 0)}</div>
-        <div class="stat-card-label">Visiteurs uniques (total)</div>
-        <div class="stat-card-sub">${fmt(app.uniqueUsers?.today || 0)} aujourd'hui · ${fmt(app.uniqueUsers?.month || 0)} ce mois</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">👁️</div>
-        <div class="stat-card-val">${fmt(app.totalAcces)}</div>
-        <div class="stat-card-label">Accès total</div>
-        <div class="stat-card-sub">${fmt(app.totalInstalls)} installations</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">🗓️</div>
-        <div class="stat-card-val">${fmt(Object.values(todaySvcs).reduce((a,b)=>a+b,0))}</div>
-        <div class="stat-card-label">Accès aujourd'hui</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">📅</div>
-        <div class="stat-card-val">${fmt(Object.values(monthSvcs).reduce((a,b)=>a+b,0))}</div>
-        <div class="stat-card-label">Accès ce mois</div>
-      </div>
-    </div>
-
     <div class="chart-wrap">
       <div class="chart-title">
         Accès par fonctionnalité
@@ -863,25 +791,14 @@ function renderApp() {
         </tr>`).join('')}
       </table>
     </div>
-
-    <div class="section-title">Clics sur les fiches élus</div>
-    <div class="table-wrap">
-      <table>
-        <tr><th>Élu</th><th>Clics totaux</th></tr>
-        ${Object.entries(app.parService || {})
-          .filter(([k]) => k.startsWith('elu_'))
-          .sort((a,b) => b[1]-a[1])
-          .map(([k,v]) => `<tr><td>${k.replace('elu_','').replace(/_/g,' ')}</td><td><strong>${fmt(v)}</strong></td></tr>`)
-          .join('') || '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:16px">Aucun clic enregistré</td></tr>'}
-      </table>
-    </div>
   `;
 
-  drawChart('chart-app', periods, datasets, 'bar');
+  renderLineChart('chart-app', periods, datasets, { stacked:true, yTitle:'Accès' });
 }
 
 function setAppView(v) { appView = v; renderApp(); }
 
+// ── IDÉES ─────────────────────────────
 // ── IDÉES ────────────────────────────
 function renderIdeas() {
   const ideas = [..._data.ideas].sort((a,b) => (b.votes||0)-(a.votes||0));
