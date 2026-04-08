@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.6.1 -->
+<!-- VERSION 3.6.2 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
@@ -2640,7 +2640,7 @@ function detectDevice() {
     browser:   browser + (browserVersion ? ' ' + browserVersion.split('.')[0] : ''),
     screen:    screen.width + 'x' + screen.height,
     pwa:       isPWA ? 'Oui (installée)' : 'Non (navigateur)',
-    matVersion:'v3.6.1'
+    matVersion:'v3.6.2'
   };
 }
 
@@ -2650,13 +2650,12 @@ const MAT_DEVICE_KEY = 'mat_device_id_v1';
 function getMatDeviceId(){
   let id = localStorage.getItem(MAT_DEVICE_KEY);
   if(!id){
-    // UUID v4 simple (suffisant pour anonymiser un appareil)
     id = 'mat-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
     try { localStorage.setItem(MAT_DEVICE_KEY, id); } catch(e) {}
   }
   return id;
 }
-async function trackStat(service){
+async function trackStat(service, extra = {}){
   try{
     await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{
       method:'POST',
@@ -2664,9 +2663,21 @@ async function trackStat(service){
         'Content-Type':'application/json',
         'x-device-id': getMatDeviceId()
       },
-      body:JSON.stringify({service})
+      body:JSON.stringify({service, ...extra})
     });
   }catch(e){updateNotifCardStatus(false);}
+}
+function trackAppOpenOncePerDay(){
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('fr-CA', { timeZone:'Europe/Paris', year:'numeric', month:'2-digit', day:'2-digit' }).formatToParts(now);
+  const get = t => parts.find(p => p.type === t)?.value || '';
+  const today = `${get('year')}-${get('month')}-${get('day')}`;
+  const key = 'mat_app_open_tracked_' + today;
+  try {
+    if(localStorage.getItem(key)) return;
+    localStorage.setItem(key, '1');
+  } catch(e) {}
+  trackStat('app_open', { device: detectDevice() });
 }
 const _origOpenMel=openMel,_origOpenSignal=openSignal,_origOpenIdees=openIdees,_origOpenNotifs=openNotifs,_origOpenMeteo=openMeteo,_origOpenContact=openContact;
 window.openMel=()=>{trackStat('mel');_origOpenMel();};
@@ -2676,8 +2687,9 @@ window.openNotifs=()=>{trackStat('actualites');_origOpenNotifs();};
 window.openMeteo=()=>{trackStat('meteo');_origOpenMeteo();};
 window.openContact=()=>{trackStat('contact');_origOpenContact();};
 window.addEventListener('appinstalled',()=>{localStorage.setItem(INSTALL_KEY,'1');document.getElementById('install-banner').classList.add('hidden');trackStat('installation');updateInstallBtn();});
+window.addEventListener('load', () => { setTimeout(trackAppOpenOncePerDay, 1200); });
 
-// ── Actualités ────────────────────────
+// ── Actualités ────────────────────────// ── Actualités ────────────────────────
 const ACTUS_SEEN_KEY='mat_actus_seen_v1';
 function getActuKey(a){
   return [a.date||'',a.title||'',a.photo||''].join('||');
