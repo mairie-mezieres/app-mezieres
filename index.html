@@ -224,7 +224,7 @@ body.preload #app-splash{opacity:1;visibility:visible;}
 .sug{background:white;border:1.5px solid var(--sage);color:var(--leaf);font-size:0.78rem;font-weight:700;padding:7px 12px;border-radius:999px;white-space:nowrap;cursor:pointer;font-family:'Nunito',sans-serif;display:inline-flex;align-items:center;gap:4px;}
 .sug:active{background:var(--mist);}
 .mbar{padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));background:white;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
-.minp{flex:1;border:1.5px solid rgba(0,0,0,0.12);border-radius:22px;padding:9px 14px;font-size:0.9rem;font-family:'Nunito',sans-serif;outline:none;background:var(--warm);}
+.minp{flex:1;border:1.5px solid rgba(0,0,0,0.12);border-radius:18px;padding:9px 14px;font-size:0.9rem;font-family:'Nunito',sans-serif;outline:none;background:var(--warm);resize:none;line-height:1.35;min-height:44px;}
 .minp:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(82,183,136,0.15);}
 .msnd{width:40px;height:40px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:none;border-radius:50%;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 
@@ -827,9 +827,9 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
 
   <div class="sec">Agenda &amp; Sorties</div>
   <div class="grid2">
-    <button class="card simple-card" onclick="openAgenda()">
+<button class="card simple-card" onclick="openAgenda()">
       <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda &amp; Sorties</div><div class="ct-sub">Événements &amp; manifestations</div></div>
+      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
     </button>
     <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
       <div class="ico ico-rando">🥾</div>
@@ -1069,8 +1069,8 @@ html.theme-sombre .mel-addr-input,.html.theme-sombre .mel-zone-manual{background
     <!-- ── Chat (caché par défaut) ── -->
     <div class="msgs" id="msgs" style="display:none"></div>
     <div class="sugs" id="sugs" style="display:none"></div>
-    <div class="mbar" style="display:none">
-      <input class="minp" id="minp" placeholder="Votre question…" onkeydown="if(event.key==='Enter')sendMel()">
+<div class="mbar" style="display:none">
+      <textarea class="minp" id="minp" rows="2" placeholder="Votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMel();}"></textarea>
       <button class="msnd" onclick="sendMel()">➤</button>
     </div>
   </div>
@@ -2005,8 +2005,10 @@ async function loadMeteo() {
     badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : "✅ Pas d'alerte";
     badge.style.display = 'inline-flex';
     window._meteoData = d;
-  } catch (e) {
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">Météo indisponible</span>';
+} catch (e) {
+    var offline = !navigator.onLine;
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">'+(offline?'📡 Hors ligne':'Météo indisponible')+'</span>';
+    document.getElementById('meteo-desc').textContent = offline?'Reconnectez-vous pour actualiser':'';
     document.getElementById('meteo-alerte').style.display = 'none';
   }
 }
@@ -2087,17 +2089,17 @@ function loadMeteoDetail() {
   var hrlyWGst = (forecast.hourly||{}).wind_gusts_10m || [];
   var hrlyPrec = hP2; // precipitation horaire déjà chargée
 
-  function tendance(valNow, valBefore, seuilFort, seuilMod) {
+function tendance(valNow, valBefore, seuilFort, seuilMod) {
     if (valBefore == null || valNow == null) return {ico:'', lbl:'', col:'var(--muted)'};
     var diff = valNow - valBefore;
     var absDiff = Math.abs(diff);
-    if (absDiff < seuilMod * 0.3) return {ico:'→', lbl:'Stable', col:'#6b7280'};
+    if (absDiff < seuilMod * 0.3) return {ico:'➡', lbl:'Stable', col:'#6b7280'};
     if (diff > 0) {
-      if (absDiff >= seuilFort) return {ico:'↑↑', lbl:'Hausse importante', col:'#dc2626'};
-      return {ico:'↑', lbl:'Hausse modérée', col:'#f59e0b'};
+      if (absDiff >= seuilFort) return {ico:'⬆', lbl:'Hausse importante', col:'#dc2626'};
+      return {ico:'↗', lbl:'Hausse modérée', col:'#f59e0b'};
     } else {
-      if (absDiff >= seuilFort) return {ico:'↓↓', lbl:'Baisse forte', col:'#2563eb'};
-      return {ico:'↓', lbl:'Baisse modérée', col:'#60a5fa'};
+      if (absDiff >= seuilFort) return {ico:'⬇', lbl:'Baisse forte', col:'#2563eb'};
+      return {ico:'↘', lbl:'Baisse modérée', col:'#60a5fa'};
     }
   }
 
@@ -2116,10 +2118,10 @@ function loadMeteoDetail() {
   var tPres  = tendance(presCur, presBef, 5, 1.5);
   var tHum   = tendance(humCur, humBef, 15, 5);
 
-  function tBadge(t) {
+function tBadge(t) {
     if (!t.ico) return '';
-    return '<span style="font-size:0.65rem;font-weight:900;color:'+t.col+';margin-left:4px" title="'+t.lbl+'">'+t.ico+'</span>'
-      + '<div style="font-size:0.52rem;color:'+t.col+';margin-top:1px">'+t.lbl+'</div>';
+    return '<span style="font-size:1rem;font-weight:900;color:'+t.col+';margin-left:6px;display:inline-block;line-height:1;" title="'+t.lbl+'">'+t.ico+'</span>'
+      + '<div style="font-size:0.55rem;font-weight:700;color:'+t.col+';margin-top:2px">'+t.lbl+'</div>';
   }
 
   // ── Bloc 2 : Grille 4 encarts avec tendances ──
@@ -2233,8 +2235,11 @@ async function ensureAgendaEvents(){
 async function loadAgenda(){
   var content=document.getElementById('agenda-content');
   content.innerHTML='<div class="agenda-empty">Chargement de l\'agenda…</div>';
-  try{ await ensureAgendaEvents(); renderAgenda(); }
-  catch(e){ content.innerHTML='<div class="agenda-empty">Agenda indisponible.</div>'; }
+try{ await ensureAgendaEvents(); renderAgenda(); }
+  catch(e){
+    var offline = !navigator.onLine;
+    content.innerHTML='<div class="agenda-empty">'+(offline?'📡 Vous êtes hors ligne.<br>L\'agenda sera disponible au retour de la connexion.':'Agenda indisponible.')+'</div>';
+  }
 }
 function setAgendaView(view){
   agendaView=view;
@@ -2309,10 +2314,11 @@ async function loadEvents(){
     document.getElementById('next-event-date').textContent=first.start.getDate()+' '+MONTHS[first.start.getMonth()];
     document.getElementById('next-event-name').textContent=first.summary;
     document.getElementById('next-event-days').textContent=diffTxt;
-  }catch(e){
-    document.getElementById('next-event-date').textContent='Indisponible';
-    document.getElementById('next-event-name').textContent='Agenda';
-    document.getElementById('next-event-days').textContent='Réessayez plus tard';
+}catch(e){
+    var offline = !navigator.onLine;
+    document.getElementById('next-event-date').textContent = offline?'📡 Hors ligne':'Indisponible';
+    document.getElementById('next-event-name').textContent = offline?'Agenda non dispo':'Agenda';
+    document.getElementById('next-event-days').textContent = offline?'Reconnectez-vous':'Réessayez plus tard';
   }
 }
 
@@ -2720,9 +2726,10 @@ function getMatDeviceId(){
 
 async function trackStat(service, extra = {}){
   try{
+    const deviceId = getMatDeviceId();
     const payload = {
       service,
-      deviceId: getMatDeviceId(),
+      deviceId,
       device: detectDevice(),
       ...extra
     };
@@ -2730,7 +2737,8 @@ async function trackStat(service, extra = {}){
     await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
       method:'POST',
       headers:{
-        'Content-Type':'application/json'
+        'Content-Type':'application/json',
+        'x-device-id': deviceId
       },
       body: JSON.stringify(payload),
       keepalive: true
@@ -2845,7 +2853,10 @@ async function loadActus(){
       return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${description?`<div class="actu-text">${description}</div>`:''}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
     }).join('');
     markActusAsSeen(d.actus||[]);
-  }catch(e){el.innerHTML='<div class="actu-empty">Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a></div>';}
+}catch(e){
+    var offline = !navigator.onLine;
+    el.innerHTML='<div class="actu-empty">'+(offline?'📡 <strong>Vous êtes hors ligne</strong><br><br>Les actualités seront à nouveau disponibles dès que votre connexion reviendra.':'Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a>')+'</div>';
+  }
 }
 
 // Formater une date ISO en texte français pour l'affichage d'un événement
@@ -4355,16 +4366,16 @@ const MEL_TREE = {
         directAnswer:{text:"Le passeport se fait dans une mairie équipée d'un dispositif biométrique. Vous pouvez faire une pré-demande sur ants.gouv.fr. Documents nécessaires selon la situation : première demande ou renouvellement, majeur ou mineur. Un timbre fiscal est requis. Le délai varie selon la période et le lieu.",
           links:[{label:"🌐 Toutes les infos passeport",url:"https://www.service-public.gouv.fr/particuliers/vosdroits/N360"},{label:"🌐 Pré-demande sur ANTS",url:"https://ants.gouv.fr"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
-      {id:"pacs",ico:"💑",label:"PACS — Pacte Civil de Solidarité",
-        directAnswer:{text:"Le PACS se déclare à la mairie. Il faut remplir la déclaration conjointe (cerfa 15725), joindre une convention (cerfa 15726 ou convention personnalisée) et les justificatifs d'identité. Vous pouvez télécharger les formulaires sur service-public.gouv.fr.",
-          links:[{label:"📄 Déclaration PACS (cerfa 15725)",url:"https://www.formulaires.modernisation.gouv.fr/gf/cerfa_15725.do"},{label:"📄 Convention PACS (cerfa 15726)",url:"https://www.formulaires.modernisation.gouv.fr/gf/cerfa_15726.do"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
+{id:"pacs",ico:"💑",label:"PACS — Pacte Civil de Solidarité",
+        directAnswer:{text:"Le PACS se déclare à la mairie. Il faut remplir la déclaration conjointe (cerfa 15725*03) avec attestations sur l'honneur de non-parenté, non-alliance et résidence commune, joindre une convention-type (cerfa 15726*02) ou une convention personnalisée, et les justificatifs d'identité.",
+          links:[{label:"📄 Déclaration PACS (cerfa 15725*03)",url:"https://www.service-public.fr/particuliers/vosdroits/R42142"},{label:"📄 Convention-type PACS (cerfa 15726*02)",url:"https://www.service-public.fr/particuliers/vosdroits/R43750"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"vote",ico:"🗳️",label:"Inscription sur les listes électorales",
         directAnswer:{text:"Pour voter, vous devez être inscrit sur les listes électorales. Inscription en mairie ou en ligne sur service-public.gouv.fr. Documents à prévoir : pièce d'identité et justificatif de domicile.",
           links:[{label:"📄 Formulaire d'inscription (cerfa 12669)",url:"https://www.service-public.fr/particuliers/vosdroits/R16024"},{label:"🌐 Inscription en ligne",url:"https://www.service-public.gouv.fr"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"assainissement",ico:"🚰",label:"Assainissement (fosse, raccordement, SPANC)",
-        directAnswer:{text:"L'assainissement collectif et le SPANC (contrôle des fosses septiques) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
+        directAnswer:{text:"L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
           links:[{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"},{label:"✉️ assainissement@ccterresduvaldeloire.fr",url:"mailto:assainissement@ccterresduvaldeloire.fr"},{label:"🌐 Portail usagers CCTVL",url:"https://portail-usagers.ccterresduvaldeloire.fr"}]}
       },
       {id:"location",ico:"🪑",label:"Location de matériel communal",
@@ -4520,8 +4531,8 @@ function melSelectQuestion(cat,qid){
   }
 
   // ── Autres catégories ou cas non couverts : directAnswer ou MEL ──
-  if(q.directAnswer){
-    _showDirectAnswer(q.directAnswer,cat,q.topic,zoneCtx+' '+(q.prompt||''));
+if(q.directAnswer){
+    _showDirectAnswer(q.directAnswer,cat,q.topic||cat,zoneCtx+' '+(q.prompt||''),q.label);
     return;
   }
   const fullPrompt=[zoneCtx,q.prompt].filter(Boolean).join('\n');
@@ -4647,7 +4658,7 @@ function _renderDirectAnswer(answer){
   return h;
 }
 
-function _showDirectAnswer(answer,cat,topic,ctxForMel){
+function _showDirectAnswer(answer,cat,topic,ctxForMel,questionLabel){
   const l2=document.getElementById('mel-tree-l2');
   if(!l2)return;
   l2.querySelector('.mel-direct-answer')?.remove();
@@ -4655,7 +4666,9 @@ function _showDirectAnswer(answer,cat,topic,ctxForMel){
   if(!container){console.warn('mel-sub not found in l2');return;}
   const div=document.createElement('div');
   div.className='mel-direct-answer';
-  const ctx=encodeURIComponent((ctxForMel||'').substring(0,300)).replace(/'/g,'%27');
+  // Enrichir le contexte avec le libellé de la question posée
+  const fullCtx = (questionLabel ? 'Question initiale : '+questionLabel+'. ' : '') + (ctxForMel||'');
+  const ctx=encodeURIComponent(fullCtx.substring(0,400)).replace(/'/g,'%27');
   div.innerHTML='<span class="da-label">Réponse</span>'
     +_renderDirectAnswer(answer)
     +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect(\''+cat+'\',\''+topic+'\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>';
