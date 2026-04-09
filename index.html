@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
-<!-- VERSION 3.7.1 -->
+<!-- VERSION 3.7.2 -->
 <link rel="manifest" href="manifest.webmanifest">
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
@@ -31,22 +31,22 @@
 })();
 </script>
 
-<link rel="stylesheet" href="css/mat.css?v=3.7.1">
+<link rel="stylesheet" href="css/mat.css?v=3.7.2">
 
 <!-- ════════════════════════════════════════════════════════════
      MAT — Modules JavaScript v3.7.1
      L'ordre est CRITIQUE : utils → core → reste → init en dernier
      ════════════════════════════════════════════════════════════ -->
-<script defer src="js/mat-utils.js?v=3.7.1"></script>
-<script defer src="js/mat-core.js?v=3.7.1"></script>
-<script defer src="js/mat-accessibility.js?v=3.7.1"></script>
-<script defer src="js/mat-widgets.js?v=3.7.1"></script>
-<script defer src="js/mat-agenda.js?v=3.7.1"></script>
-<script defer src="js/mat-forms.js?v=3.7.1"></script>
-<script defer src="js/mat-actus.js?v=3.7.1"></script>
-<script defer src="js/mat-trombi.js?v=3.7.1"></script>
-<script defer src="js/mat-mel.js?v=3.7.1"></script>
-<script defer src="js/mat-init.js?v=3.7.1"></script>
+<script defer src="js/mat-utils.js?v=3.7.2"></script>
+<script defer src="js/mat-core.js?v=3.7.2"></script>
+<script defer src="js/mat-accessibility.js?v=3.7.2"></script>
+<script defer src="js/mat-widgets.js?v=3.7.2"></script>
+<script defer src="js/mat-agenda.js?v=3.7.2"></script>
+<script defer src="js/mat-forms.js?v=3.7.2"></script>
+<script defer src="js/mat-actus.js?v=3.7.2"></script>
+<script defer src="js/mat-trombi.js?v=3.7.2"></script>
+<script defer src="js/mat-mel.js?v=3.7.2"></script>
+<script defer src="js/mat-init.js?v=3.7.2"></script>
 
 </head>
 
@@ -79,7 +79,7 @@
       <div style="height:1.8em"></div>
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
-      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.7.1</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.7.2</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -522,6 +522,20 @@
         </div>
         <button class="notif-btn off" id="push-btn" onclick="togglePush()">Chargement…</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY DÉTAIL ACTUALITÉ ═══ -->
+<div class="ov" id="ov-actu" onclick="ovClick('actu',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fff7ed">📰</div>
+      <div class="panel-title">Détail actualité</div>
+      <button class="panel-close" onclick="closeActuDetail()">✕</button>
+    </div>
+    <div class="panel-body" id="actu-detail-body">
+      <div class="actu-empty">Chargement…</div>
     </div>
   </div>
 </div>
