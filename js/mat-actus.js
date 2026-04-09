@@ -1,12 +1,71 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.7.0
+   MAT — Actualités & Notifications Push v3.7.2
    ════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────
 const ACTUS_SEEN_KEY='mat_actus_seen_v1';
+const ACTUS_ROUTE_PREFIX='#actu=';
+let _actusCache = null;
+let _actusCacheAt = 0;
+const ACTUS_CACHE_MS = 30000;
 
 function getActuKey(a){
   return [a.date||'',a.title||'',a.photo||''].join('||');
+}
+
+function getActuId(a){
+  return a && a.id != null ? String(a.id) : '';
+}
+
+function getActuPlainDescription(a){
+  if(a && a.description && String(a.description).trim()) return String(a.description).trim();
+  const fullText=((a && (a.text||a.title))||'').replace(/#app-mezieres/gi,'').trim();
+  const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+  return lines.length>1 ? lines.slice(1).join('\n') : '';
+}
+
+function getActuDisplayTitle(a){
+  if(!a) return 'Actualité';
+  if(a.title && String(a.title).trim()) return String(a.title).replace(/#app-mezieres/gi,'').trim();
+  const fullText=((a.text||'')+'').replace(/#app-mezieres/gi,'').trim();
+  const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+  return lines[0] || 'Actualité';
+}
+
+function getActuPreviewDescription(a, maxLen){
+  const txt=getActuPlainDescription(a);
+  if(!txt) return '';
+  const oneLine=txt.replace(/\s+/g,' ').trim();
+  const limit=maxLen||180;
+  return oneLine.length>limit ? oneLine.substring(0,limit-1)+'…' : oneLine;
+}
+
+function actuHash(id){
+  return ACTUS_ROUTE_PREFIX + encodeURIComponent(String(id||''));
+}
+
+function setActuHash(id){
+  try{ history.replaceState(history.state||{},'',actuHash(id)); }
+  catch(e){ location.hash=actuHash(id); }
+}
+
+function clearActuHash(){
+  try{
+    if((location.hash||'').indexOf(ACTUS_ROUTE_PREFIX)===0){
+      history.replaceState(history.state||{},'',location.pathname+location.search);
+    }
+  }catch(e){}
+}
+
+async function fetchActus(force){
+  const fresh = _actusCache && (Date.now()-_actusCacheAt < ACTUS_CACHE_MS);
+  if(!force && fresh) return _actusCache;
+  const r=await fetch(ACTU_URL,{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const d=await r.json();
+  _actusCache=d.actus||[];
+  _actusCacheAt=Date.now();
+  return _actusCache;
 }
 
 function updateActuBadge(count){
@@ -15,7 +74,6 @@ function updateActuBadge(count){
   const n=Number(count)||0;
   el.textContent=n>99?'99+':String(n);
   el.classList.toggle('show', n>0);
-  // Badge icône PWA
   updateAppBadge(n);
 }
 
@@ -29,10 +87,7 @@ function markActusAsSeen(actus){
 
 async function refreshActusBadge(){
   try{
-    const r=await fetch(ACTU_URL,{cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const actus=d.actus||[];
+    const actus=await fetchActus(true);
     const seen=JSON.parse(localStorage.getItem(ACTUS_SEEN_KEY)||'[]');
     const unseen=actus.filter(a=>!seen.includes(getActuKey(a))).length;
     updateActuBadge(unseen);
@@ -62,29 +117,69 @@ function formatEventDate(iso){
   }catch(e){ return iso; }
 }
 
+function renderActuListItem(a){
+  const id=getActuId(a);
+  const jsId=JSON.stringify(id).replace(/"/g,'&quot;');
+  const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
+  const titre=esc(getActuDisplayTitle(a));
+  const preview=esc(getActuPreviewDescription(a, 190));
+  const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
+  const eventHTML = a.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(a.eventDate))}${a.eventLocation?' · 📍 '+esc(a.eventLocation):''}</div>` : '';
+  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détail</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Facebook</a></div></div></div>`;
+}
+
+function renderActuDetail(actu){
+  const el=document.getElementById('actu-detail-body');
+  if(!el) return;
+  if(!actu){
+    el.innerHTML='<div class="actu-empty">Actualité introuvable.</div><div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button></div>';
+    return;
+  }
+  const title=esc(getActuDisplayTitle(actu));
+  const desc=getActuPlainDescription(actu);
+  const descHTML=desc?`<div class="actu-detail-text">${esc(desc).replace(/\n/g,'<br>')}</div>`:'';
+  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${actu.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'"></div>`:'';
+  const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
+  const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir Facebook</a></div></div>`;
+}
+
+async function openActuDetail(id, opts){
+  opts=opts||{};
+  const body=document.getElementById('actu-detail-body');
+  if(body) body.innerHTML='<div class="actu-empty">Chargement…</div>';
+  const notifs=document.getElementById('ov-notifs');
+  if(notifs && notifs.classList.contains('open')) closeOv('notifs');
+  openOv('actu');
+  if(!opts.fromHash) setActuHash(id);
+  try{
+    const actus=await fetchActus(false);
+    renderActuDetail((actus||[]).find(a=>getActuId(a)===String(id)));
+    markActusAsSeen(actus||[]);
+  }catch(e){
+    if(body) body.innerHTML='<div class="actu-empty">Impossible de charger cette actualité.</div><div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button></div>';
+  }
+}
+
+function backToActus(){
+  closeOv('actu');
+  try{ history.replaceState(history.state||{},'', '#notifs'); }catch(e){ location.hash='#notifs'; }
+  openNotifs();
+}
+
+function closeActuDetail(){
+  closeOv('actu');
+  clearActuHash();
+}
+
 async function loadActus(){
   const el=document.getElementById('actu-list');
   el.innerHTML='<div class="actu-empty">Chargement…</div>';
   try{
-    const r=await fetch(ACTU_URL), d=await r.json();
-    if(!d.actus||!d.actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
-    el.innerHTML=d.actus.map(a=>{
-      const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
-      // Priorité : champ description dédié > parsing du text/title
-      let titre, description;
-      if(a.description && String(a.description).trim()){
-        titre = esc((a.title||'Actualité').replace(/#app-mezieres/gi,'').trim());
-        description = esc(String(a.description).trim()).replace(/\n/g,'<br>');
-      } else {
-        const fullText=((a.text||a.title||'').replace(/#app-mezieres/gi,'')).trim();
-        const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
-        titre=esc(lines[0]||'Actualité');
-        description=lines.length>1?esc(lines.slice(1).join('\n')).replace(/\n/g,'<br>'):'';
-      }
-      const eventHTML = a.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(a.eventDate))}${a.eventLocation?' · 📍 '+esc(a.eventLocation):''}</div>` : '';
-      return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${description?`<div class="actu-text">${description}</div>`:''}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><a class="actu-fb-link" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir sur Facebook</a></div></div>`;
-    }).join('');
-    markActusAsSeen(d.actus||[]);
+    const actus=await fetchActus(true);
+    if(!actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
+    el.innerHTML=actus.map(renderActuListItem).join('');
+    markActusAsSeen(actus||[]);
   }catch(e){
     var offline = !navigator.onLine;
     el.innerHTML='<div class="actu-empty">'+(offline?'📡 <strong>Vous êtes hors ligne</strong><br><br>Les actualités seront à nouveau disponibles dès que votre connexion reviendra.':'Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a>')+'</div>';
