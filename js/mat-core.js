@@ -349,12 +349,44 @@ document.addEventListener('keydown', function(e) {
 })();
 
 // ── Service Worker + hash routing ─────────────────────────────
+function handleMatHashRoute(){
+  try{
+    var h=(location.hash||'').trim();
+    if(!h) return;
+    if(h==='#notifs'){ setTimeout(function(){ openNotifs(); }, 180); return; }
+    if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
+    if(h.indexOf('#actu=')===0){
+      var raw=h.substring(6);
+      var id=decodeURIComponent(raw||'').trim();
+      if(id && typeof openActuDetail==='function'){
+        setTimeout(function(){ openActuDetail(id,{ fromHash:true }); }, 220);
+      }
+    }
+  }catch(e){}
+}
+
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
-  navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.action==='openNotifs')openNotifs();});
+  navigator.serviceWorker.addEventListener('message', function(e){
+    var data=(e&&e.data)||{};
+    if(data.action==='openNotifs'){ openNotifs(); return; }
+    if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
+      openActuDetail(String(data.actuId),{ fromHash:false });
+      return;
+    }
+    if(data.action==='openUrl' && data.url){
+      try{
+        var url=String(data.url);
+        if(url.indexOf('#')!==-1){
+          location.hash=url.substring(url.indexOf('#'));
+          handleMatHashRoute();
+        }
+      }catch(_e){}
+    }
+  });
 }
-if(location.hash==='#notifs'){setTimeout(()=>openNotifs(),600);}
-if(location.hash==='#mel'){setTimeout(()=>openMel(),600);}
+handleMatHashRoute();
+window.addEventListener('hashchange', handleMatHashRoute);
 
 window.addEventListener('load', function(){
   setTimeout(checkPushStatus, 250);
