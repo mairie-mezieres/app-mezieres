@@ -273,6 +273,17 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-date{font-size:0.65rem;color:var(--muted);}
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
+.actu-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.actu-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:9px 12px;border-radius:10px;font-size:0.74rem;font-weight:900;text-decoration:none;border:none;font-family:'Nunito',sans-serif;cursor:pointer;}
+.actu-btn-detail{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
+.actu-btn-fb{background:#e8f0fc;color:#1877f2;}
+.actu-detail-card{display:flex;flex-direction:column;gap:12px;}
+.actu-detail-media{background:var(--warm);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.actu-detail-img{width:100%;max-height:360px;object-fit:contain;display:block;background:var(--warm);}
+.actu-detail-meta{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.actu-detail-title{font-size:1.08rem;line-height:1.35;color:var(--forest);font-weight:900;}
+.actu-detail-text{font-size:0.84rem;color:var(--text);line-height:1.75;white-space:pre-wrap;word-wrap:break-word;}
+.actu-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
 
 /* ── Contact mairie ── */
 .contact-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}
@@ -526,6 +537,12 @@ html.theme-sombre .actu-date { color:#6b7280 !important; }
 html.theme-sombre .actu-empty { color:#94a3b8; }
 html.theme-sombre .panel-body .chart-wrap { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .actu-fb-link { color:#60a5fa !important; }
+html.theme-sombre .actu-btn-fb { background:#1e3a8a !important;color:#dbeafe !important; }
+html.theme-sombre .actu-detail-title { color:#f1f5f9 !important; }
+html.theme-sombre .actu-detail-text { color:#cbd5e1 !important; }
+html.theme-sombre .actu-detail-media { background:#111827;border-color:#374151; }
+html.theme-sombre .actu-detail-img { background:#111827; }
+html.theme-sombre .actu-detail-meta { color:#94a3b8 !important; }
 
 /* Textes génériques dans panel-body */
 html.theme-sombre .panel-body strong { color:#f1f5f9; }
