@@ -120,9 +120,6 @@ function renderCommissionsForElu(elu){
     + `<div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--leaf)">🏛️ Commissions et représentations</div>`
     + `<div style="font-size:0.78rem;font-weight:800;color:var(--forest);margin-top:4px">${elu.totalCommissions || 0} participation${(elu.totalCommissions || 0) > 1 ? 's' : ''}</div>`
     + `</div>`);
-  if(elu.representations && elu.representations.length){
-    parts.push(commissionSectionHTML('Représentation complémentaire', '🏢', elu.representations, 'rgba(14,116,144,0.08)'));
-  }
   parts.push(commissionSectionHTML('Présidence', '👑', c.president, 'rgba(212,168,67,0.12)'));
   parts.push(commissionSectionHTML('Titulaire', '✅', c.titulaire, 'rgba(37,99,235,0.08)'));
   parts.push(commissionSectionHTML('Suppléance', '🪪', c.suppleant, 'rgba(245,158,11,0.10)'));
@@ -168,6 +165,25 @@ function openTrombi(idx){
   document.getElementById('trombi-nom').textContent = e.nom;
   document.getElementById('trombi-role-badge').textContent = e.role;
   document.getElementById('trombi-pole').textContent = e.pole ? '🏷️ ' + e.pole : '';
+  const poleEl = document.getElementById('trombi-pole');
+  let topRepr = document.getElementById('trombi-top-representations');
+  if(poleEl && poleEl.parentNode){
+    if(!topRepr){
+      topRepr = document.createElement('div');
+      topRepr.id = 'trombi-top-representations';
+      poleEl.insertAdjacentElement('afterend', topRepr);
+    }
+    if(e.representations && e.representations.length){
+      topRepr.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 8px 20px rgba(217,119,6,0.22)">`
+        + `<div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;opacity:0.9">🏛️ Intercommunalité</div>`
+        + e.representations.map(item => `<div style="margin-top:5px;font-size:0.95rem;line-height:1.35;font-weight:900">${esc(item)}</div>`).join('')
+        + `</div>`;
+      topRepr.style.display = '';
+    } else {
+      topRepr.innerHTML = '';
+      topRepr.style.display = 'none';
+    }
+  }
   document.getElementById('trombi-age').textContent = e.age + ' ans';
   document.getElementById('trombi-prof').textContent = e.prof;
   document.getElementById('trombi-mandats').textContent = e.mandats;
