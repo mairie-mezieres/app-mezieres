@@ -3,7 +3,7 @@
    ════════════════════════════════════════════════════════════ */
 
 const ELUS = [
-  {nom:"Romuald GENTY",age:43,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"Le Bourg",role:"Maire",pole:"Finances et achats",img:"Romuald GENTY 43 ans - 2 Mandats - Officier Sapeur-Pompier Professionnel - Le Bourg.jpg"},
+  {nom:"Romuald GENTY",age:43,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"Le Bourg",role:"Maire",pole:"Finances et achats",representations:["3ème vice-président de la Communauté de communes"],img:"Romuald GENTY 43 ans - 2 Mandats - Officier Sapeur-Pompier Professionnel - Le Bourg.jpg"},
   {nom:"Sandra BARET",age:50,prof:"Directrice d'établissements sociaux et médico-sociaux",mandats:"2 Mandats",hameau:"Manthelon",role:"2ème adjointe",pole:"Pôle Social et Environnement",img:"Sandra BARET 50 ans - 2 Mandats - Directrice d établissements sociaux et médico sociaux - Manthelon.jpg"},
   {nom:"Damien BOUGRÉ",age:49,prof:"Chef de service Jeunesse, Réussite et Parentalité",mandats:"2 Mandats",hameau:"Mézières",role:"1er adjoint",pole:"Pôle Vie scolaire / enfance-jeunesse",img:"Damien BOUGR\u00c9 49 ans - 2 Mandats - Chef de service Jeunesse, R\u00e9ussite et Parentalit\u00e9 - M\u00e9zi\u00e8res.jpg"},
   {nom:"Stéphanie GREUIN",age:43,prof:"Hypnothérapeute",mandats:"2 Mandats",hameau:"",role:"4ème adjointe",pole:"Pôle Relation avec les entreprises",img:"St\u00e9phanie GREUIN-Hypnoth\u00e9ratpeute-43-2 Mandats.jpg"},
@@ -120,6 +120,9 @@ function renderCommissionsForElu(elu){
     + `<div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--leaf)">🏛️ Commissions et représentations</div>`
     + `<div style="font-size:0.78rem;font-weight:800;color:var(--forest);margin-top:4px">${elu.totalCommissions || 0} participation${(elu.totalCommissions || 0) > 1 ? 's' : ''}</div>`
     + `</div>`);
+  if(elu.representations && elu.representations.length){
+    parts.push(commissionSectionHTML('Représentation complémentaire', '🏢', elu.representations, 'rgba(14,116,144,0.08)'));
+  }
   parts.push(commissionSectionHTML('Présidence', '👑', c.president, 'rgba(212,168,67,0.12)'));
   parts.push(commissionSectionHTML('Titulaire', '✅', c.titulaire, 'rgba(37,99,235,0.08)'));
   parts.push(commissionSectionHTML('Suppléance', '🪪', c.suppleant, 'rgba(245,158,11,0.10)'));
