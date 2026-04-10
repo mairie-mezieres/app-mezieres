@@ -1,20 +1,35 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — MEL Assistante IA v3.7.0
+   MAT — MEL Assistante IA v3.7.2 (Phase 3)
    ════════════════════════════════════════════════════════════
    Contenu :
-   - PLU_DATA   : base de connaissances PLU (zones + autorisations)
-   - MEL_TREE   : arbre de décision (catégories + questions + réponses)
+   - _PLU_DATA_FALLBACK  : base PLU embarquée (résilience offline 1er lancement)
+   - _MEL_TREE_FALLBACK  : arbre de décision embarqué
+   - PLU_DATA, MEL_TREE  : variables mutables, initialisées au fallback,
+                            puis écrasées par les JSON externes dès qu'ils
+                            arrivent via loadMelData() (arrière-plan).
+   - loadMelData()       : fetch non-bloquant de data/plu-data.json et
+                            data/mel-tree.json — appelé depuis mat-init.js.
    - PLU helpers : pluNormalizeZone, pluGetZone, pluRenderAuth, pluRenderZoneCard, pluBuildAnswer
    - MEL UI     : melShowTree, melSelectCat, melSelectQuestion, _showPluAnswer, pluCloseAnswer, pluSwitchTab
    - Direct     : _renderDirectAnswer, _showDirectAnswer, melOpenChatFromDirect
    - Chat       : melOpenChat, melResetTree, addMsg, showTyping, sendMel, MEL_THEME_SUGGESTIONS
    - Zone PLU   : melFindZoneByAddr, melFindZoneByGPS, _fetchZonePLU, _showManualZoneSelector, _setZoneResult
+
+   ── PHASE 3 : externalisation des données ──
+   Les données PLU et MEL_TREE vivent désormais dans :
+     - data/plu-data.json
+     - data/mel-tree.json
+   Pour modifier une zone, une question ou une réponse, éditez le JSON
+   sur GitHub directement — AUCUN changement de code nécessaire.
+   Le fallback embarqué ci-dessous garantit que MEL fonctionne même si
+   les fichiers JSON ne sont pas accessibles (offline, 404, etc.).
    ════════════════════════════════════════════════════════════ */
 
 // ════════════════════════════════════════════════════════
-// PLU — Base de connaissances JSON (extrait du règlement 4.1)
+// PLU — Fallback embarqué (extrait du règlement 4.1)
+// ⚠️ Ne pas modifier ce bloc : éditez data/plu-data.json à la place
 // ════════════════════════════════════════════════════════
-const PLU_DATA = {
+const _PLU_DATA_FALLBACK = {
   zones: {
     Ua: {
       label: "Ua – Centre-bourg / hameaux anciens",
@@ -412,9 +427,10 @@ function pluBuildAnswer(qid, zone, zoneKey) {
 }
 
 // ════════════════════════════════════════════════════════
-// MEL — Arbre de décision v1.0
+// MEL — Arbre de décision (fallback embarqué)
+// ⚠️ Ne pas modifier ce bloc : éditez data/mel-tree.json à la place
 // ════════════════════════════════════════════════════════
-const MEL_TREE = {
+const _MEL_TREE_FALLBACK = {
 
   urbanisme:{
     label:"Urbanisme & Construction", ico:"🏗️", needZone:true,
@@ -530,6 +546,59 @@ const MEL_TREE = {
 
   autre:{label:"Autre question",ico:"💬",needZone:false,openChatDirectly:true,questions:[]}
 };
+
+// ════════════════════════════════════════════════════════
+// PHASE 3 — Données MEL/PLU externalisées
+// ────────────────────────────────────────────────────────
+// PLU_DATA et MEL_TREE sont initialisées au fallback embarqué,
+// puis écrasées par les fichiers JSON externes dès qu'ils arrivent.
+// Avantage : MEL fonctionne IMMÉDIATEMENT au chargement du script,
+// sans attendre le fetch réseau. Le SW cache les JSON dès la 1ère
+// visite, donc à partir du 2e lancement tout est instantané.
+// ════════════════════════════════════════════════════════
+let PLU_DATA = _PLU_DATA_FALLBACK;
+let MEL_TREE = _MEL_TREE_FALLBACK;
+let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
+
+async function loadMelData() {
+  // Appelé depuis mat-init.js en arrière-plan (non-bloquant).
+  // Si fetch échoue (offline 1er lancement, 404, erreur JSON), on garde
+  // silencieusement le fallback embarqué → MEL reste 100% fonctionnel.
+  //
+  // ⚠️ À chaque mise à jour des JSON, bumper V ici en phase avec le SW.
+  const V = '3.7.2';
+  try {
+    const [pluRes, treeRes] = await Promise.all([
+      fetch('./data/plu-data.json?v=' + V, { cache: 'no-cache' }),
+      fetch('./data/mel-tree.json?v=' + V, { cache: 'no-cache' })
+    ]);
+    if (!pluRes.ok) throw new Error('plu-data.json HTTP ' + pluRes.status);
+    if (!treeRes.ok) throw new Error('mel-tree.json HTTP ' + treeRes.status);
+
+    const plu = await pluRes.json();
+    const tree = await treeRes.json();
+
+    // Validation basique : on n'écrase que si la structure est cohérente
+    if (plu && plu.zones && plu.autorisations && Object.keys(plu.zones).length >= 5) {
+      PLU_DATA = plu;
+    } else {
+      console.warn('[MEL] plu-data.json structure invalide — fallback conservé');
+    }
+    if (tree && typeof tree === 'object' && Object.keys(tree).length >= 3) {
+      MEL_TREE = tree;
+    } else {
+      console.warn('[MEL] mel-tree.json structure invalide — fallback conservé');
+    }
+
+    _melDataLoaded = true;
+    console.log('[MEL] Données externes chargées : ' +
+      Object.keys(PLU_DATA.zones).length + ' zones PLU, ' +
+      Object.keys(MEL_TREE).length + ' catégories MEL');
+  } catch (e) {
+    // Échec silencieux : le fallback embarqué prend le relais
+    console.warn('[MEL] Fallback embarqué utilisé :', e.message || e);
+  }
+}
 
 // ════════════════════════════════════════════════════════
 // MEL — État global du module
