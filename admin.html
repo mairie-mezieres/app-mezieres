@@ -137,6 +137,25 @@ tr:hover td{background:#f9fafb;}
 .pub-status.success{background:#dcfce7;color:#166534;}
 .pub-status.error{background:#fee2e2;color:#991b1b;}
 .pub-status.warn{background:#fef3c7;color:#92400e;}
+/* Services */
+.service-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+.service-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+.service-card{background:white;border:1px solid var(--border);border-left:4px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);}
+.service-card.ok{border-left-color:var(--leaf);}
+.service-card.warn{border-left-color:var(--orange);}
+.service-card.danger{border-left-color:var(--red);}
+.service-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.service-name{font-size:0.82rem;font-weight:900;color:var(--text);}
+.service-state{font-size:0.68rem;font-weight:900;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+.service-state.ok{background:var(--mist);color:var(--leaf);}
+.service-state.warn{background:#fef3c7;color:var(--orange);}
+.service-state.danger{background:#fee2e2;color:var(--red);}
+.service-msg{font-size:0.74rem;color:var(--text);line-height:1.5;}
+.service-meta{font-size:0.68rem;color:var(--muted);margin-top:6px;line-height:1.5;}
+.service-detail{margin-top:8px;}
+.service-detail summary{cursor:pointer;font-size:0.7rem;font-weight:800;color:var(--muted);}
+.service-log{margin-top:8px;background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:0.68rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto;}
+.service-empty{background:white;border:1px solid var(--border);border-radius:14px;padding:20px;color:var(--muted);font-size:0.82rem;text-align:center;}
 @media(max-width:600px){
   .cards-grid{grid-template-columns:1fr 1fr;}
   .admin-body{padding:12px;}
@@ -183,6 +202,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('app',this)">📱 Usage app</button>
     <button class="nav-tab" onclick="showTab('ia',this)">🤖 IA</button>
     <button class="nav-tab" onclick="showTab('redis',this)">🗄️ Redis</button>
+    <button class="nav-tab" onclick="showTab('services',this)">🧪 Services</button>
     <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
     <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
     <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
@@ -192,6 +212,7 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel on" id="tab-overview"><div id="overview-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-ia"><div id="ia-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-redis"><div id="redis-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-services"><div id="services-content"></div></div>
     <div class="tab-panel" id="tab-app"><div id="app-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-ideas"><div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-actus"><div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
@@ -207,6 +228,8 @@ let TOKEN = localStorage.getItem('mat_admin_token') || '';
 let _data = null;
 let _charts = {};
 let _purgeDateValue = new Date().toISOString().slice(0, 10);
+let _serviceDiag = null;
+let _serviceDiagRunning = false;
 
 // ── Auth ──────────────────────────────
 async function doLogin() {
@@ -223,7 +246,7 @@ async function showAdmin() { document.getElementById('login-screen').style.displ
 async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
 async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
 
-function renderAll() { renderOverview(); renderIa(); renderRedis(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); }
+function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); }
 
 // ── Helpers généraux ──────────────────
 function fmt(n) { return (n||0).toLocaleString('fr-FR'); }
@@ -235,6 +258,7 @@ function sumValues(obj) { return Object.values(obj||{}).reduce((a,b)=>a+Number(b
 function pctTrend(cur,prev) { if(!prev)return cur>0?'+100%':'—'; const p=((cur-prev)/prev)*100; return`${p>0?'+':''}${p.toFixed(0)}%`; }
 function trendCls(cur,prev) { const d=cur-prev; return d>0?'trend-up':d<0?'trend-down':'trend-flat'; }
 function trendArrow(cur,prev) { const d=cur-prev; return d>0?'↗':d<0?'↘':'→'; }
+function safe(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));}
 
 // ══════════════════════════════════════════════════════════════
 // BREAKDOWN APPAREILS
@@ -918,6 +942,73 @@ async function saveBanner() {
     const d=await r.json();
     if(d.ok){_bannerData={active,icon,title,text,id:d.id};const msg=document.getElementById('banner-save-msg');msg.textContent='✅ Encart mis à jour !';msg.style.display='block';setTimeout(()=>renderBanner(),800);}
   }catch(e){alert('Erreur lors de la sauvegarde : '+e.message);}
+}
+
+// ── SERVICES / DIAGNOSTICS ───────────
+function serviceTone(status){ return status==='ok' ? 'ok' : status==='warn' ? 'warn' : 'danger'; }
+function serviceLabel(status){ return status==='ok' ? 'OK' : status==='warn' ? 'Alerte' : 'Erreur'; }
+function serviceMetaText(meta){
+  if(!meta) return '';
+  if(typeof meta === 'string') return meta;
+  const parts = [];
+  for(const [k,v] of Object.entries(meta)){
+    if(v===null || v===undefined || v==='') continue;
+    parts.push(`${k} : ${v}`);
+  }
+  return parts.join(' · ');
+}
+function renderServices(){
+  const el=document.getElementById('services-content');
+  if(!el) return;
+  const data=_serviceDiag;
+  const summary=data?.summary||{ok:0,warn:0,error:0,total:0};
+  const checkedAt=data?.checkedAt?new Date(data.checkedAt).toLocaleString('fr-FR'):'Jamais';
+  const cards=(data?.services||[]).map(s=>{
+    const tone=serviceTone(s.status);
+    const detail=s.detail!=null ? safe(JSON.stringify(s.detail,null,2)) : '';
+    const meta=serviceMetaText(s.meta);
+    return `<div class="service-card ${tone}">
+      <div class="service-head">
+        <div class="service-name">${safe(s.label||s.key||'Service')}</div>
+        <div class="service-state ${tone}">${serviceLabel(s.status)}</div>
+      </div>
+      <div class="service-msg">${safe(s.message||'')}</div>
+      ${meta?`<div class="service-meta">${safe(meta)}</div>`:''}
+      ${detail?`<details class="service-detail"><summary>Voir le détail</summary><div class="service-log">${detail}</div></details>`:''}
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`
+    <div class="section-title">🧪 État des services et outils</div>
+    <div class="service-actions">
+      <button type="button" class="pub-publish-btn" style="width:auto;min-width:240px;margin-top:0" onclick="runServicesTest()" ${_serviceDiagRunning?'disabled':''}>${_serviceDiagRunning?'⏳ Test en cours…':'🧪 Lancer le test automatique'}</button>
+      <div style="font-size:0.76rem;color:var(--muted);font-weight:700;">Dernier test : ${safe(checkedAt)}</div>
+    </div>
+    ${data?`<div class="service-summary cards-grid">
+      <div class="stat-card ok"><div class="stat-card-ico">✅</div><div class="stat-card-val">${summary.ok||0}</div><div class="stat-card-label">Services OK</div></div>
+      <div class="stat-card warn"><div class="stat-card-ico">⚠️</div><div class="stat-card-val">${summary.warn||0}</div><div class="stat-card-label">Alertes</div></div>
+      <div class="stat-card danger"><div class="stat-card-ico">❌</div><div class="stat-card-val">${summary.error||0}</div><div class="stat-card-label">Erreurs</div></div>
+      <div class="stat-card"><div class="stat-card-ico">🧩</div><div class="stat-card-val">${summary.total||0}</div><div class="stat-card-label">Tests exécutés</div></div>
+    </div>`:''}
+    ${cards||'<div class="service-empty">Aucun diagnostic lancé pour le moment.</div>'}
+  `;
+}
+async function runServicesTest(){
+  if(_serviceDiagRunning) return;
+  _serviceDiagRunning=true;
+  renderServices();
+  try{
+    const r=await fetch(`${API}/admin/services/test`,{headers:{'x-admin-token':TOKEN}});
+    if(r.status===401){logout();return;}
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||(`HTTP ${r.status}`));
+    _serviceDiag=d;
+  }catch(e){
+    _serviceDiag={ok:false,checkedAt:new Date().toISOString(),summary:{ok:0,warn:0,error:1,total:1},services:[{key:'diagnostic',label:'Diagnostic global',status:'error',message:e.message||'Erreur inconnue'}]};
+  }finally{
+    _serviceDiagRunning=false;
+    renderServices();
+  }
 }
 
 // ── PURGE ─────────────────────────────
