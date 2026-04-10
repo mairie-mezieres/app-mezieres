@@ -523,14 +523,85 @@ function renderIa() {
 // ── REDIS ─────────────────────────────
 function renderRedis() {
   const redis = _data.dash.redis || {};
-  const pct = redis.pct || 0;
+  const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
+
+  const commands = redis.commands || {};
+
+  const day = commands.day;
+  const month = commands.month;
+  const readDay = commands.readDay;
+  const writeDay = commands.writeDay;
+  const readMonth = commands.readMonth;
+  const writeMonth = commands.writeMonth;
+
+  const pctDay = Number(commands.pctDay || 0);
+  const pctMonth = Number(commands.pctMonth || 0);
+
+  const clsDay = progressClass(pctDay);
+  const clsMonth = progressClass(pctMonth);
+
   document.getElementById('redis-content').innerHTML = `
-    <div class="section-title">Utilisation Upstash Redis (limite gratuite : 256 Mo)</div>
+    <div class="section-title">Utilisation Upstash Redis</div>
+
     <div class="progress-wrap">
-      <div class="progress-header"><span class="progress-label">Mémoire utilisée</span><span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)</span></div>
-      <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
+      <div class="progress-header">
+        <span class="progress-label">Mémoire utilisée</span>
+        <span class="progress-val">${fmtBytes(redis.usedBytes)} / 256 Mo (${pct}%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${cls}" style="width:${Math.min(pct,100)}%"></div>
+      </div>
     </div>
+
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Commandes aujourd’hui</span>
+        <span class="progress-val">
+          ${day == null ? 'Indisponible' : `${fmt(day)} / ${fmt(commands.limitDay || 10000)} (${pctDay}%)`}
+        </span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${clsDay}" style="width:${Math.min(pctDay,100)}%"></div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Commandes ce mois</span>
+        <span class="progress-val">
+          ${month == null ? 'Indisponible' : `${fmt(month)} / ${fmt(commands.limitMonth || 500000)} (${pctMonth}%)`}
+        </span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill ${clsMonth}" style="width:${Math.min(pctMonth,100)}%"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Détail des commandes</div>
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-card-ico">📥</div>
+        <div class="stat-card-val">${readDay == null ? '—' : fmt(readDay)}</div>
+        <div class="stat-card-label">Lectures aujourd’hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📤</div>
+        <div class="stat-card-val">${writeDay == null ? '—' : fmt(writeDay)}</div>
+        <div class="stat-card-label">Écritures aujourd’hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🗓️</div>
+        <div class="stat-card-val">${readMonth == null ? '—' : fmt(readMonth)}</div>
+        <div class="stat-card-label">Lectures ce mois</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">✍️</div>
+        <div class="stat-card-val">${writeMonth == null ? '—' : fmt(writeMonth)}</div>
+        <div class="stat-card-label">Écritures ce mois</div>
+      </div>
+    </div>
+
     <div class="section-title">Clés stockées</div>
     <div class="cards-grid">
       <div class="stat-card"><div class="stat-card-ico">🔔</div><div class="stat-card-val">${redis.keys?.subs||0}</div><div class="stat-card-label">Abonnés push</div></div>
@@ -538,8 +609,24 @@ function renderRedis() {
       <div class="stat-card"><div class="stat-card-ico">💡</div><div class="stat-card-val">${redis.keys?.ideas||0}</div><div class="stat-card-label">Idées</div></div>
       <div class="stat-card"><div class="stat-card-ico">🚨</div><div class="stat-card-val">${redis.keys?.signals||0}</div><div class="stat-card-label">Signalements</div></div>
     </div>
-    ${pct>=80?`<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">⚠️ ${pct}% — Pensez à purger.</div>`:''}
-    ${pct>=60&&pct<80?`<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:14px;color:var(--orange);font-size:0.82rem;font-weight:700;margin-top:8px">⚡ ${pct}% — Surveillance recommandée.</div>`:''}
+
+    ${commands.error ? `
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
+        ⚠️ Stats Upstash indisponibles : ${commands.error}
+      </div>
+    ` : ''}
+
+    ${pctDay>=80 ? `
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
+        ⚠️ ${pctDay}% du quota journalier Redis utilisé.
+      </div>
+    ` : ''}
+
+    ${pctMonth>=80 ? `
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:14px;color:var(--red);font-size:0.82rem;font-weight:700;margin-top:8px">
+        ⚠️ ${pctMonth}% du quota mensuel Redis utilisé.
+      </div>
+    ` : ''}
   `;
 }
 
