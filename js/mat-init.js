@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Initialisation v3.7.0
+   MAT — Initialisation v3.7.2 (Phase 3)
    Séquence d'amorçage appelée au chargement de la page.
    DOIT ÊTRE CHARGÉ EN DERNIER — tous les autres modules doivent
    déjà avoir défini leurs fonctions globales.
@@ -40,10 +40,18 @@
   // 8) Protection email mairie (déobfuscation)
   try { initMailProtection(); } catch(e){}
 
-  // 9) Onboarding (décalé pour ne pas bloquer l'affichage initial)
+  // 9) PHASE 3 — Chargement des données MEL externes en arrière-plan
+  //    MEL fonctionne déjà avec le fallback embarqué, donc non-bloquant.
+  //    Délai de 150 ms pour laisser le rendu initial se stabiliser.
+  setTimeout(function(){
+    try { if (typeof loadMelData === 'function') loadMelData(); }
+    catch(e){ console.warn('[init] loadMelData', e); }
+  }, 150);
+
+  // 10) Onboarding (décalé pour ne pas bloquer l'affichage initial)
   setTimeout(function(){ try { initOnboarding(); } catch(e){} }, 800);
 
-  // 10) Intervalles périodiques
+  // 11) Intervalles périodiques
   setInterval(function(){ try { loadDechets(); }      catch(e){} },  60000);  // 1 min
   setInterval(function(){ try { loadMairieStatus(); } catch(e){} },  60000);  // 1 min
   setInterval(function(){ try { loadBusRemi(); }      catch(e){} },  60000);  // 1 min
