@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Utilitaires communs v3.7.2
+   MAT — Utilitaires communs v3.7.3
    Helpers partagés par tous les modules
    ════════════════════════════════════════════════════════════ */
 
@@ -11,7 +11,7 @@ const ICAL_URL    = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy
 const METEO_URL   = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB   = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
-const MAT_VERSION = 'v3.7.2';
+const MAT_VERSION = 'v3.7.3';
 const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
 
 // ── Échappement HTML (sécurité caractères spéciaux) ─────────
