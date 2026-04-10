@@ -172,17 +172,38 @@ function meteoBuildSunBlock(days, nowDate) {
   var sunriseIso = (days.sunrise || [])[0];
   var sunsetIso  = (days.sunset || [])[0];
   if (!sunriseIso || !sunsetIso) return '';
-  var sunrise = new Date(sunriseIso);
-  var sunset  = new Date(sunsetIso);
-  if (isNaN(sunrise.getTime()) || isNaN(sunset.getTime())) return '';
-  var total = sunset.getTime() - sunrise.getTime();
-  var progress = total > 0 ? ((nowDate.getTime() - sunrise.getTime()) / total) * 100 : 0;
+
+  function isoToMinutes(iso) {
+    var m = String(iso || '').match(/T(\d{2}):(\d{2})/);
+    if (!m) return null;
+    return Number(m[1]) * 60 + Number(m[2]);
+  }
+  function minutesToLabel(mins) {
+    if (mins == null || isNaN(mins)) return '—';
+    var h = String(Math.floor(mins / 60)).padStart(2, '0');
+    var m = String(mins % 60).padStart(2, '0');
+    return h + 'h' + m;
+  }
+  function parisNowMinutes(dateObj) {
+    var parts = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).formatToParts(dateObj || new Date());
+    var get = function(type){ var p = parts.find(function(x){ return x.type === type; }); return p ? Number(p.value) : 0; };
+    return get('hour') * 60 + get('minute');
+  }
+
+  var sunriseMins = isoToMinutes(sunriseIso);
+  var sunsetMins = isoToMinutes(sunsetIso);
+  if (sunriseMins == null || sunsetMins == null || sunsetMins <= sunriseMins) return '';
+
+  var nowMins = parisNowMinutes(nowDate);
+  var total = sunsetMins - sunriseMins;
+  var progress = ((nowMins - sunriseMins) / total) * 100;
   progress = Math.max(0, Math.min(100, progress));
   var moon = meteoGetMoonPhase(nowDate);
-
-  function onlyTime(dateObj) {
-    return dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h');
-  }
 
   return '<div class="meteo-card meteo-sun-card">'
     + '<div class="meteo-sun-head">'
@@ -190,9 +211,9 @@ function meteoBuildSunBlock(days, nowDate) {
     + '<div class="meteo-moon-chip" title="' + esc(moon.label) + '"><span>' + moon.icon + '</span>' + esc(moon.label) + '</div>'
     + '</div>'
     + '<div class="meteo-sun-row">'
-    + '<div><div class="meteo-mini-label">Lever</div><div class="meteo-sun-time">' + esc(onlyTime(sunrise)) + '</div></div>'
+    + '<div><div class="meteo-mini-label">Lever</div><div class="meteo-sun-time">' + esc(minutesToLabel(sunriseMins)) + '</div></div>'
     + '<div class="meteo-sun-progress"><div class="meteo-sun-progress-bar" style="width:' + progress + '%"></div><div class="meteo-sun-progress-dot" style="left:calc(' + progress + '% - 7px)"></div></div>'
-    + '<div><div class="meteo-mini-label">Coucher</div><div class="meteo-sun-time">' + esc(onlyTime(sunset)) + '</div></div>'
+    + '<div><div class="meteo-mini-label">Coucher</div><div class="meteo-sun-time">' + esc(minutesToLabel(sunsetMins)) + '</div></div>'
     + '</div>'
     + '</div>';
 }
@@ -418,10 +439,10 @@ function loadMeteoDetail() {
 
   html += '<div class="meteo-card meteo-current-card">'
     + '<div class="meteo-current-main">'
-    + '<div><div class="meteo-card-kicker">🌡️ Température actuelle</div><div class="meteo-current-value">' + tempCur + '°C <span>(' + ressenti + '°C)</span></div><div class="meteo-current-sub">Température actuelle (ressenti)</div></div>'
+    + '<div><div class="meteo-card-kicker">🌡️ Température actuelle</div><div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div></div>'
     + '<div class="meteo-current-norms">'
-    + '<div class="meteo-current-norm"><span>Écart T°</span><strong>' + eTemp + '</strong></div>'
-    + '<div class="meteo-current-norm"><span>Écart ress.</span><strong>' + eRes + '</strong></div>'
+    + '<div class="meteo-current-norm"><span>Saison T°</span><strong>' + eTemp + '</strong></div>'
+    + '<div class="meteo-current-norm"><span>Saison ress.</span><strong>' + eRes + '</strong></div>'
     + '</div>'
     + '</div>'
     + '</div>';
@@ -430,9 +451,9 @@ function loadMeteoDetail() {
 
   html += '<div class="meteo-grid-2 meteo-grid-secondary">'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-value">' + pluie24h + ' mm</div>' + meteoTrendBadge(tPluie) + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌀 Rafales</div><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%</div>' + meteoTrendBadge(tHum) + '</div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div>'
     + '</div>';
 
   html += '<div class="meteo-source">Source : Open-Meteo · Vigilance : Météo-France</div>';
