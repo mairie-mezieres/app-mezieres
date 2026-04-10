@@ -17,6 +17,10 @@ const PRECACHE_URLS = [
   './js/mat-trombi.js?v=3.7.2',
   './js/mat-mel.js?v=3.7.2',
   './js/mat-init.js?v=3.7.2',
+  // Phase 3 : données MEL/PLU externalisées
+  './data/plu-data.json?v=3.7.2',
+  './data/mel-tree.json?v=3.7.2',
+  // Assets statiques  
   './mat-header.png',
   './icon-192.png'
 ];
