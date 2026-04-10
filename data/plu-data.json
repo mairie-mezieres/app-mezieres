@@ -1,0 +1,354 @@
+{
+  "zones": {
+    "Ua": {
+      "label": "Ua – Centre-bourg / hameaux anciens",
+      "description": "Secteurs bâtis les plus anciens du bourg. Vocation principale : habitat.",
+      "interdictions": [
+        "Industrie",
+        "Agriculture",
+        "Carrières",
+        "Caravanes/camping",
+        "ICPE soumises à autorisation"
+      ],
+      "emprise": "50% max",
+      "espaces_verts": "non réglementé",
+      "hauteur_principale": "6 m max à l'égout du toit",
+      "hauteur_annexe": "non limitée spécifiquement",
+      "recul_voie_principale": "à l'alignement ou ≥ 2 m (si clôture assure la continuité)",
+      "recul_voie_annexe": "à l'alignement ou ≥ 3 m",
+      "recul_voie_abri": "≥ 3 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "toiture_principale": "≥ 2 pentes ≥ 35°, ardoises ou tuiles plates",
+      "toiture_annexe_sup30": "≥ 1 pente ≥ 25°, ardoises ou tuiles plates",
+      "toiture_annexe_inf30": "pente ≥ 25°, teinte ardoise ou brun rouge",
+      "cloture_voie": "mur plein ou claire-voie, max 1,50 m",
+      "cloture_sep": "mur plein ou grillage/treillage + haie, max 1,80 m",
+      "cloture_carrefour": "max 1,20 m sur 20 m",
+      "cloture_dp": true,
+      "abri_materiaux": "pierre, brique, parpaing enduit ou bois",
+      "piscine": "✅ Autorisée (emprise totale ≤ 50%)",
+      "stationnement": "2 places min/logement",
+      "rdc_max": "≤ 0,50 m / sol naturel"
+    },
+    "Ub": {
+      "label": "Ub – Habitat résidentiel récent",
+      "description": "Secteur bâti à dominante d'habitat construit principalement dans la 2e moitié du XXe siècle.",
+      "interdictions": [
+        "Industrie",
+        "Agriculture/sylviculture",
+        "Dépôts à l'air libre",
+        "Carrières",
+        "Caravanes/camping"
+      ],
+      "emprise": "30% max",
+      "espaces_verts": "30% min (libre de construction et imperméabilisation)",
+      "hauteur_principale": "4 m max à l'égout du toit",
+      "hauteur_annexe": "2,5 m max",
+      "recul_voie_principale": "≥ 5 m",
+      "recul_voie_annexe": "à l'alignement ou ≥ 5 m",
+      "recul_voie_abri": "≥ 3 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "toiture_principale": "≥ 2 pentes ≥ 35°, ardoises ou tuiles plates",
+      "toiture_annexe_sup30": "≥ 1 pente ≥ 25°, ardoises ou tuiles plates",
+      "toiture_annexe_inf30": "pente ≥ 25°, teinte ardoise ou brun rouge",
+      "cloture_voie": "mur à claire-voie UNIQUEMENT, max 1,50 m",
+      "cloture_sep": "mur plein pierre/maçonnerie ou grillage/treillage + haie, max 1,80 m",
+      "cloture_carrefour": "max 1,20 m sur 20 m",
+      "cloture_dp": true,
+      "abri_materiaux": "pierre, brique, parpaing enduit ou bois — tôle ondulée INTERDITE",
+      "piscine": "✅ Autorisée (emprise ≤ 30%, espaces verts ≥ 30%)",
+      "stationnement": "2 places min/logement",
+      "rdc_max": "≤ 0,30 m / sol naturel",
+      "facades": "palettes traditionnelles — blanc pur et couleurs vives INTERDITS"
+    },
+    "Ub1": {
+      "label": "Ub1 – Clos de Manthelon (prescriptions spécifiques)",
+      "description": "Extension du lotissement Clos de Manthelon. Mêmes règles que Ub + prescriptions spécifiques ci-dessous.",
+      "interdictions": [
+        "Terrasses en toiture",
+        "Toits à un seul versant (sauf annexes)",
+        "Toits à 4 pans",
+        "Tuiles couleur ardoise",
+        "Tôle ondulée",
+        "Amiante-ciment",
+        "Plaques ciment en clôture"
+      ],
+      "emprise": "30% max + implantation dans zones constructibles du plan parcellaire",
+      "espaces_verts": "30% min + 1 arbre haute tige / 250 m²",
+      "hauteur_principale": "4 m max (égout) ET 8 m max absolu",
+      "hauteur_annexe": "2,5 m max",
+      "recul_voie_principale": "≥ 5 m",
+      "recul_voie_abri": "≥ 5 m",
+      "recul_sep": "≥ 3 m",
+      "toiture_principale": "2 pentes entre 40° et 45°, tuiles plates TERRE CUITE uniquement, min 22 tuiles/m², faîtage selon plan parcellaire",
+      "cloture_voie": "haie végétale ≥ 3 variétés + grillage vert max 1,50 m (retrait 0,80 m de la limite)",
+      "cloture_sep": "grillage vert max 1,50 m + haie max 1,80 m — plaques ciment INTERDITES",
+      "cloture_portail": "retrait 5 m espaces communs, hauteur max 1,50 m, piliers max 1,80 m",
+      "cloture_dp": true,
+      "niveaux": "RDC seul ou RDC + combles UNIQUEMENT",
+      "piscine": "✅ Autorisée (selon zones constructibles du plan parcellaire)"
+    },
+    "Ue": {
+      "label": "Ue – Équipements publics",
+      "description": "Zone réservée aux équipements publics.",
+      "interdictions": [
+        "Industrie",
+        "Artisanat",
+        "Agriculture",
+        "Dépôts",
+        "Caravanes",
+        "Carrières"
+      ],
+      "emprise": "non réglementée",
+      "hauteur_principale": "7 m max",
+      "recul_voie_principale": "à l'alignement ou ≥ 2 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "piscine": "❌ Zone réservée aux équipements publics — consulter mairie"
+    },
+    "Ui": {
+      "label": "Ui – Zone industrielle",
+      "interdictions": [
+        "Hébergement hôtelier",
+        "Agriculture",
+        "Caravanes",
+        "Carrières"
+      ],
+      "emprise": "60% max",
+      "hauteur_principale": "8 m max",
+      "recul_voie_principale": "à l'alignement ou ≥ 5 m",
+      "recul_sep": "≥ moitié de la hauteur, min 3 m",
+      "cloture_voie": "grillage couleur sombre, max 1,50 m",
+      "cloture_sep": "grillage couleur sombre, max 1,80 m",
+      "cloture_dp": true,
+      "piscine": "❌ Zone industrielle — non destinée à cet usage"
+    },
+    "1AU": {
+      "label": "1AU – Zone à urbaniser (court terme)",
+      "description": "Construction uniquement dans le cadre d'une opération d'aménagement d'ensemble.",
+      "interdictions": [
+        "Constructions isolées hors opération d'ensemble",
+        "Industrie",
+        "Agriculture",
+        "Dépôts",
+        "Caravanes"
+      ],
+      "emprise": "40% max",
+      "espaces_verts": "30% min",
+      "hauteur_principale": "5 m max",
+      "hauteur_annexe": "2,5 m max",
+      "recul_voie_principale": "≥ 5 m",
+      "recul_voie_annexe": "≥ 5 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "cloture_voie": "non obligatoire — si clôture : grillage sombre max 1,20 m + haie",
+      "cloture_sep": "non obligatoire — si clôture : grillage sombre max 1,50 m + haie",
+      "cloture_dp": true,
+      "abri_materiaux": "matériaux traditionnels (pierre, brique, parpaing enduit) et bois",
+      "piscine": "✅ Autorisée (emprise ≤ 40%)",
+      "stationnement": "2 places min/logement",
+      "alerte": "⚠️ Toute construction doit s'inscrire dans une opération d'aménagement d'ensemble (lotissement, ZAC…)."
+    },
+    "2AU": {
+      "label": "2AU – Réserve foncière (long terme)",
+      "description": "Zone inconstructible. Urbanisation uniquement après révision du PLU.",
+      "interdictions": [
+        "TOUTE construction privée"
+      ],
+      "piscine": "❌ INTERDITE — zone inconstructible",
+      "alerte": "🚫 Cette zone est inconstructible. Seuls les équipements publics peuvent être autorisés après révision du PLU."
+    },
+    "A": {
+      "label": "A – Zone agricole",
+      "description": "Seules les constructions liées à l'exploitation agricole sont autorisées.",
+      "interdictions": [
+        "Constructions non agricoles",
+        "Habitations (sauf logement de fonction)",
+        "Grillages/piquets fer/poteaux béton"
+      ],
+      "hauteur_principale": "10 m max hors tout (exploitation) / 5 m max (habitation) / 2,5 m (abris animaux)",
+      "recul_voie_principale": "≥ 8 m (100 m de l'axe A71)",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "cloture_voie": "pieux de bois + 3 fils métalliques, max 1,20 m",
+      "cloture_sep": "pieux de bois + 3 fils, max 1,20 m (1,80 m si élevage déclaré)",
+      "piscine": "❌ INTERDITE en zone A",
+      "alerte": "⚠️ Zone strictement agricole. Constructions non agricoles interdites. Voir secteur Ah pour les hameaux."
+    },
+    "Ah": {
+      "label": "Ah – Hameaux agricoles",
+      "description": "Hameaux et écarts non agricoles en zone A. Extensions limitées.",
+      "emprise": "Extensions ≤ 20% de la SP existante / Annexes ≤ 50 m²",
+      "espaces_verts": "30% min",
+      "hauteur_principale": "5 m max",
+      "hauteur_annexe": "2,5 m max",
+      "recul_voie_principale": "à l'alignement ou ≥ 5 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "toiture_principale": "≥ 2 pentes ≥ 35°, ardoises ou tuiles plates",
+      "piscine": "⚠️ Possible si dans le cadre de l'extension autorisée (≤ 20% SP existante)",
+      "changement_destination": "Autorisé vers habitat, bureaux, commerce, artisanat, tourisme, loisirs",
+      "alerte": "Seules extensions (+20% max) et annexes (≤ 50 m²) autorisées. Pas de nouvelle construction principale."
+    },
+    "N": {
+      "label": "N – Zone naturelle et forestière",
+      "interdictions": [
+        "Industrie",
+        "Artisanat",
+        "Bureaux",
+        "Entrepôts",
+        "Dépôts",
+        "Camping",
+        "Tout changement dans les EBC"
+      ],
+      "piscine": "❌ INTERDITE en zone N",
+      "alerte": "🌲 Zone naturelle protégée. Seules constructions agricoles/forestières et d'intérêt public autorisées."
+    },
+    "Nh": {
+      "label": "Nh – Hameaux naturels",
+      "emprise": "Extensions ≤ 20% de la SP existante / Annexes ≤ 50 m²",
+      "espaces_verts": "30% min",
+      "hauteur_principale": "5 m max",
+      "hauteur_annexe": "2,5 m max",
+      "recul_voie_principale": "≥ 5 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "cloture_voie": "pieux de bois + 3 fils, max 1,20 m",
+      "toiture_principale": "≥ 2 pentes ≥ 35°, ardoises ou tuiles d'aspect plat",
+      "piscine": "❌ INTERDITE — pas de nouvelle construction principale",
+      "changement_destination": "Autorisé vers habitat, tourisme, loisirs uniquement",
+      "alerte": "Seules extensions (+20% max) et annexes (≤ 50 m²) autorisées. Pas de nouvelle construction principale."
+    },
+    "Nj": {
+      "label": "Nj – Jardins naturels",
+      "emprise": "≤ 20 m²",
+      "hauteur_principale": "2,5 m max",
+      "recul_voie_principale": "≥ 10 m",
+      "recul_sep": "en contiguïté ou ≥ 3 m",
+      "piscine": "✅ Autorisée explicitement avec local technique dédié",
+      "alerte": "Seuls abris de jardin (≤ 20 m²), piscines et locaux techniques autorisés."
+    },
+    "Nl": {
+      "label": "Nl – Loisirs naturels",
+      "piscine": "❌ Zone publique collective — projets privés non admis",
+      "alerte": "Seuls aménagements de loisirs à vocation publique et collective autorisés."
+    }
+  },
+  "autorisations": {
+    "permis": {
+      "label": "Permis de construire / Déclaration préalable",
+      "tableau": [
+        {
+          "cas": "Extension accolée < 40 m² (SP totale ≤ 150 m²)",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Extension accolée ≥ 40 m² ou SP totale > 150 m²",
+          "auth": "Permis de Construire (PC)"
+        },
+        {
+          "cas": "Garage/annexe non accolé < 20 m²",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Garage/annexe non accolé ≥ 20 m²",
+          "auth": "Permis de Construire (PC)"
+        },
+        {
+          "cas": "Construction neuve",
+          "auth": "Permis de Construire (PC) — architecte si > 150 m² SP"
+        }
+      ],
+      "notes": [
+        "Délai DP : 1 mois | PC : 2 mois",
+        "Validité : 3 ans",
+        "Dépôt : mairie ou GNAU CCTVL",
+        "Architecte obligatoire si SP > 150 m²"
+      ]
+    },
+    "piscine": {
+      "tableau": [
+        {
+          "cas": "< 10 m², non couverte, restant < 3 mois",
+          "auth": "Aucune formalité"
+        },
+        {
+          "cas": "< 100 m², non couverte",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "< 100 m², couverte < 1,80 m de hauteur",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "> 100 m²",
+          "auth": "Permis de Construire (PC)"
+        }
+      ]
+    },
+    "cloture": {
+      "tableau": [
+        {
+          "cas": "Tout type de clôture, mur, portail",
+          "auth": "Déclaration Préalable obligatoire (délibération CM 01/03/2012)"
+        }
+      ]
+    },
+    "abri": {
+      "tableau": [
+        {
+          "cas": "< 5 m²",
+          "auth": "Aucune formalité"
+        },
+        {
+          "cas": "5 à 20 m²",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "> 20 m²",
+          "auth": "Permis de Construire (PC)"
+        }
+      ]
+    },
+    "toiture": {
+      "tableau": [
+        {
+          "cas": "Remplacement à l'identique (même matériau, même couleur)",
+          "auth": "Aucune formalité"
+        },
+        {
+          "cas": "Changement de matériau ou de couleur",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Velux / fenêtre de toit",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Lucarne (ajout ou modification)",
+          "auth": "Déclaration Préalable (DP)"
+        }
+      ]
+    },
+    "extension": {
+      "tableau": [
+        {
+          "cas": "Extension accolée < 20 m² (si aspect modifié)",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Extension 20 à 40 m² (zone urbaine, SP ≤ 150 m²)",
+          "auth": "Déclaration Préalable (DP)"
+        },
+        {
+          "cas": "Extension > 40 m² ou SP totale > 150 m²",
+          "auth": "Permis de Construire (PC)"
+        }
+      ]
+    },
+    "panneaux_solaires": {
+      "tableau": [
+        {
+          "cas": "Panneaux photovoltaïques en toiture",
+          "auth": "Déclaration Préalable (DP)"
+        }
+      ],
+      "note": "Les ouvrages ENR sont exclus du calcul de hauteur maximale dans toutes les zones."
+    }
+  }
+}

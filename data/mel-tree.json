@@ -1,0 +1,421 @@
+{
+  "urbanisme": {
+    "label": "Urbanisme & Construction",
+    "ico": "🏗️",
+    "needZone": true,
+    "questions": [
+      {
+        "id": "piscine",
+        "ico": "🏊",
+        "label": "Piscine",
+        "prompt": "Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?",
+        "topic": "urbanisme"
+      },
+      {
+        "id": "cloture",
+        "ico": "🔲",
+        "label": "Clôture / Mur / Portail",
+        "prompt": "Je souhaite installer une clôture, un mur ou un portail. Quelles sont les règles et formalités ?",
+        "topic": "urbanisme"
+      },
+      {
+        "id": "extension",
+        "ico": "📐",
+        "label": "Extension / Agrandissement",
+        "prompt": "Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables ?",
+        "topic": "urbanisme"
+      },
+      {
+        "id": "abri",
+        "ico": "🌿",
+        "label": "Abri de jardin / Garage / Annexe",
+        "prompt": "Je souhaite construire un abri de jardin, un garage ou une dépendance. Quelles sont les règles ?",
+        "topic": "urbanisme"
+      },
+      {
+        "id": "toiture",
+        "ico": "🏠",
+        "label": "Toiture / Façade / Matériaux",
+        "prompt": "Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?",
+        "topic": "urbanisme"
+      }
+    ]
+  },
+  "enfance": {
+    "label": "Enfance & Jeunesse",
+    "ico": "🎒",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "ecole",
+        "ico": "📚",
+        "label": "École La Forêt",
+        "directAnswer": {
+          "text": "L'école La Forêt est située 36 rue du Bourg. Elle ouvre à 8h20 (matin) et 13h30 (après-midi), les cours se terminent à 11h45 et 16h30. Vous pouvez joindre la directrice Mme GUILBERT-CHOLET tous les jours ou lui écrire.",
+          "links": [
+            {
+              "label": "📞 École : 02 38 45 65 00",
+              "tel": "0238456500"
+            },
+            {
+              "label": "✉️ ec-mezieres-lez-clery@ac-orleans-tours.fr",
+              "url": "mailto:ec-mezieres-lez-clery@ac-orleans-tours.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "periscolaire",
+        "ico": "🌅",
+        "label": "Accueil périscolaire",
+        "directAnswer": {
+          "text": "La commune propose un accueil périscolaire avant et après l'école pour les élèves de l'École de la Forêt. Les inscriptions et fiches de réservation sont à remettre en mairie avant le 30 juin pour l'année suivante.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cantine",
+        "ico": "🍽️",
+        "label": "Restaurant scolaire",
+        "directAnswer": {
+          "text": "Le restaurant scolaire prépare environ 100 repas par jour à partir de produits frais. Tarifs 2022/2023 : 3,80 € (1er enfant), 3,06 € (2e enfant), 2,32 € (3e enfant et +). Les fiches d'inscription sont à déposer en mairie avant le 30 juin.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "creche",
+        "ico": "👶",
+        "label": "Crèche familiale Les Marmousets",
+        "directAnswer": {
+          "text": "La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
+          "links": [
+            {
+              "label": "📞 Crèche Les Marmousets : 02 38 45 76 56",
+              "tel": "0238457656"
+            }
+          ]
+        }
+      },
+      {
+        "id": "loisirs",
+        "ico": "🎨",
+        "label": "Centre de loisirs",
+        "directAnswer": {
+          "text": "Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
+          "links": [
+            {
+              "label": "✉️ accueilloisirs.ardoux@ccterresduvaldeloire.fr",
+              "url": "mailto:accueilloisirs.ardoux@ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "🌐 Site CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/listes/enfance-jeunesse/"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "administratif": {
+    "label": "Démarches Administratives",
+    "ico": "📋",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "etatcivil",
+        "ico": "📜",
+        "label": "État civil (naissance, mariage, décès, actes)",
+        "directAnswer": {
+          "text": "Les actes d'état civil (naissance, mariage, décès, acte de naissance…) sont délivrés par la mairie. Accueil physique : lundi 14h-17h30, vendredi 8h30-11h30. Mercredi sur rendez-vous uniquement.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cni",
+        "ico": "🪪",
+        "label": "Carte Nationale d'Identité",
+        "directAnswer": {
+          "text": "La CNI se fait dans une mairie équipée d'un dispositif biométrique (la mairie de Mézières vous orientera vers la plus proche, souvent Cléry-Saint-André). Démarche en ligne sur le site ANTS : créer un compte → commencer la démarche → renseigner vos informations → acheter votre timbre fiscal → valider → prendre rendez-vous en mairie → préparer vos pièces justificatives → déposer le dossier en mairie.",
+          "links": [
+            {
+              "label": "🌐 Démarche CNI sur ANTS",
+              "url": "https://ants.gouv.fr"
+            },
+            {
+              "label": "📅 Prendre rendez-vous",
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R63715"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
+      },
+      {
+        "id": "passeport",
+        "ico": "🛂",
+        "label": "Passeport",
+        "directAnswer": {
+          "text": "Le passeport se fait dans une mairie équipée d'un dispositif biométrique. Vous pouvez faire une pré-demande sur ants.gouv.fr. Documents nécessaires selon la situation : première demande ou renouvellement, majeur ou mineur. Un timbre fiscal est requis. Le délai varie selon la période et le lieu.",
+          "links": [
+            {
+              "label": "🌐 Toutes les infos passeport",
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/N360"
+            },
+            {
+              "label": "🌐 Pré-demande sur ANTS",
+              "url": "https://ants.gouv.fr"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
+      },
+      {
+        "id": "pacs",
+        "ico": "💑",
+        "label": "PACS — Pacte Civil de Solidarité",
+        "directAnswer": {
+          "text": "Le PACS se déclare à la mairie. Il faut remplir la déclaration conjointe (cerfa 15725*03) avec attestations sur l'honneur de non-parenté, non-alliance et résidence commune, joindre une convention-type (cerfa 15726*02) ou une convention personnalisée, et les justificatifs d'identité.",
+          "links": [
+            {
+              "label": "📄 Déclaration PACS (cerfa 15725*03)",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/R42142"
+            },
+            {
+              "label": "📄 Convention-type PACS (cerfa 15726*02)",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/R43750"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
+      },
+      {
+        "id": "vote",
+        "ico": "🗳️",
+        "label": "Inscription sur les listes électorales",
+        "directAnswer": {
+          "text": "Pour voter, vous devez être inscrit sur les listes électorales. Inscription en mairie ou en ligne sur service-public.gouv.fr. Documents à prévoir : pièce d'identité et justificatif de domicile.",
+          "links": [
+            {
+              "label": "📄 Formulaire d'inscription (cerfa 12669)",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/R16024"
+            },
+            {
+              "label": "🌐 Inscription en ligne",
+              "url": "https://www.service-public.gouv.fr"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
+      },
+      {
+        "id": "assainissement",
+        "ico": "🚰",
+        "label": "Assainissement (fosse, raccordement, SPANC)",
+        "directAnswer": {
+          "text": "L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
+          "links": [
+            {
+              "label": "📞 CCTVL : 02 38 44 59 35",
+              "tel": "0238445935"
+            },
+            {
+              "label": "✉️ assainissement@ccterresduvaldeloire.fr",
+              "url": "mailto:assainissement@ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "🌐 Portail usagers CCTVL",
+              "url": "https://portail-usagers.ccterresduvaldeloire.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "location",
+        "ico": "🪑",
+        "label": "Location de matériel communal",
+        "directAnswer": {
+          "text": "La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            },
+            {
+              "label": "🌐 Page location matériel",
+              "url": "https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "dechets": {
+    "label": "Déchets & Propreté",
+    "ico": "♻️",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "collecte",
+        "ico": "🗑️",
+        "label": "Jours de collecte ordures / tri sélectif",
+        "directAnswer": {
+          "text": "Sortez vos bacs la veille au soir ou avant 7h le matin du jour de collecte. La collecte n'a pas lieu les jours fériés — elle est reportée au lendemain. Des points d'apport volontaire (verre, papiers, plastique-cartons, vêtements) sont présents sur la commune. Consultez votre calendrier personnalisé en ligne.",
+          "links": [
+            {
+              "label": "🗓️ Mon calendrier de collecte",
+              "url": "https://mezieres-lez-clery.fr/2018/10/25/gestion-des-dechets/"
+            }
+          ]
+        }
+      },
+      {
+        "id": "dechetterie",
+        "ico": "♻️",
+        "label": "Déchetterie — horaires & inscription",
+        "directAnswer": {
+          "text": "La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lun-sam sauf jours fériés. Une inscription vaut pour tous les sites CCTVL.",
+          "links": [
+            {
+              "label": "🌐 S'inscrire à la déchetterie",
+              "url": "https://portail-usagers.ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "📞 CCTVL : 02 38 44 59 35",
+              "tel": "0238445935"
+            }
+          ]
+        }
+      },
+      {
+        "id": "encombrants",
+        "ico": "🛋️",
+        "label": "Encombrants / objets volumineux",
+        "directAnswer": {
+          "text": "Les encombrants (meubles, électroménager, gros objets) se déposent à la déchetterie de Cléry-Saint-André. Inscription préalable obligatoire sur le portail usagers CCTVL. Certains équipements électriques peuvent être repris en magasin (obligation légale de reprise 1 pour 1).",
+          "links": [
+            {
+              "label": "🌐 Portail usagers CCTVL",
+              "url": "https://portail-usagers.ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "📞 CCTVL : 02 38 44 59 35",
+              "tel": "0238445935"
+            }
+          ]
+        }
+      },
+      {
+        "id": "tri",
+        "ico": "📦",
+        "label": "Tri sélectif — que mettre où ?",
+        "directAnswer": {
+          "text": "Sur la commune : bac jaune (plastiques, cartons, papiers, métaux), bac vert (ordures résiduelles). Points d'apport volontaire pour le verre, les papiers-magazines, plastique-cartons et vêtements. En cas de doute sur un déchet, consultez le guide du tri en ligne.",
+          "links": [
+            {
+              "label": "🌐 Guide du tri CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/reseau-des-dechetteries/"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "numerique": {
+    "label": "Numérique & Internet",
+    "ico": "📡",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "fibre",
+        "ico": "🌐",
+        "label": "Raccordement fibre / Nouvelle construction",
+        "directAnswer": {
+          "text": "Pour toute nouvelle construction, déclarez-la le plus tôt possible auprès du gestionnaire départemental du réseau fibre (Lysseo). Cliquez sur 'Déclarer une nouvelle construction' en haut à droite du site.",
+          "links": [
+            {
+              "label": "🌐 Déclarer une nouvelle construction — Lysseo",
+              "url": "https://lysseo.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "thd",
+        "ico": "📶",
+        "label": "Questions fibre (raccordement, éligibilité…)",
+        "directAnswer": {
+          "text": "Pour toute question sur la fibre — raccordement, éligibilité, délais — contactez directement le service technique via le formulaire Lysseo.",
+          "links": [
+            {
+              "label": "📞 Contacter le service fibre Lysseo",
+              "url": "https://lysseo.fr/page-contact/41"
+            }
+          ]
+        }
+      },
+      {
+        "id": "probleme",
+        "ico": "🔧",
+        "label": "Problème sur les installations (armoires, câbles…)",
+        "directAnswer": {
+          "text": "En cas de problème constaté sur les équipements du réseau (armoires de rue, boîtiers, câbles), faites une déclaration de dommage réseau sur Lysseo via le bouton en haut à droite.",
+          "links": [
+            {
+              "label": "🛠️ Déclarer un dommage réseau",
+              "url": "https://lysseo.fr"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "autre": {
+    "label": "Autre question",
+    "ico": "💬",
+    "needZone": false,
+    "openChatDirectly": true,
+    "questions": []
+  }
+}
