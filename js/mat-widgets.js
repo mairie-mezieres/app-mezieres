@@ -97,9 +97,7 @@ function meteoTrend(valNow, valBefore, seuilFort, seuilMod) {
 
 function meteoTrendBadge(trend) {
   if (!trend || !trend.ico) return '';
-  return '<div class="meteo-trend-badge" style="color:' + trend.col + '" title="' + esc(trend.lbl || '') + '">'
-    + '<span class="meteo-trend-ico">' + trend.ico + '</span>'
-    + '</div>';
+  return ' <span class="meteo-trend-inline" style="color:' + trend.col + '" title="' + esc(trend.lbl || '') + '">' + trend.ico + '</span>';
 }
 
 function meteoBuildHourlyTimeline(hourly, nowDate) {
@@ -438,22 +436,19 @@ function loadMeteoDetail() {
   html += '</div></div></div>';
 
   html += '<div class="meteo-card meteo-current-card">'
-    + '<div class="meteo-current-main">'
-    + '<div><div class="meteo-card-kicker">🌡️ Température actuelle</div><div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div></div>'
-    + '<div class="meteo-current-norms">'
-    + '<div class="meteo-current-norm"><span>Saison T°</span><strong>' + eTemp + '</strong></div>'
-    + '<div class="meteo-current-norm"><span>Saison ress.</span><strong>' + eRes + '</strong></div>'
-    + '</div>'
+    + '<div class="meteo-current-main meteo-current-main-tight">'
+    + '<div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div>'
+    + '<div class="meteo-current-norms-inline"><span>Écart / normales de saison</span><strong>T° ' + eTemp + ' · R ' + eRes + '</strong></div>'
     + '</div>'
     + '</div>';
 
   html += meteoBuildSunBlock(days, now);
 
   html += '<div class="meteo-grid-2 meteo-grid-secondary">'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm</div>' + meteoTrendBadge(tPluie) + '</div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%</div>' + meteoTrendBadge(tHum) + '</div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm' + meteoTrendBadge(tPluie) + '</div></div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%' + meteoTrendBadge(tHum) + '</div></div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + meteoTrendBadge(tRaf) + '</div></div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres) + '</div></div></div>'
     + '</div>';
 
   html += '<div class="meteo-source">Source : Open-Meteo · Vigilance : Météo-France</div>';
