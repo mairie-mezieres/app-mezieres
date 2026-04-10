@@ -561,21 +561,18 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 
 .meteo-stat-card{display:flex;flex-direction:column;justify-content:center;min-height:92px;}
 .meteo-stat-compact{min-height:72px;padding:9px 10px;}
-.meteo-stat-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;min-width:0;}
+.meteo-stat-line{display:block;margin-top:4px;min-width:0;}
 .meteo-stat-value{font-size:1rem;font-weight:900;color:var(--text);line-height:1.15;min-width:0;}
-.meteo-trend-badge{display:flex;align-items:center;justify-content:flex-end;margin-top:0;font-weight:800;flex-shrink:0;}
-.meteo-trend-ico{font-size:1rem;line-height:1;}
-.meteo-trend-label{display:none;}
+.meteo-trend-inline{display:inline;font-size:1rem;line-height:1;font-weight:900;vertical-align:baseline;}
 
 .meteo-current-card{padding:11px 13px;}
-.meteo-current-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;}
-.meteo-current-value{font-size:1.12rem;font-weight:900;color:var(--text);line-height:1.15;}
-.meteo-current-value span{font-size:.8rem;color:var(--muted);font-weight:800;white-space:nowrap;}
+.meteo-current-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;}
+.meteo-current-value{font-size:1.08rem;font-weight:900;color:var(--text);line-height:1.1;white-space:nowrap;min-width:0;}
+.meteo-current-value span{font-size:.76rem;color:var(--muted);font-weight:800;white-space:nowrap;}
 .meteo-current-sub{display:none;}
-.meteo-current-norms{display:grid;grid-template-columns:1fr;gap:6px;justify-content:flex-end;}
-.meteo-current-norm{background:linear-gradient(135deg,#f8fafc,#fff);border:1px solid rgba(0,0,0,.06);border-radius:11px;padding:6px 8px;min-width:82px;text-align:center;}
-.meteo-current-norm span{display:block;font-size:.52rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-.meteo-current-norm strong{display:block;font-size:.84rem;font-weight:900;color:var(--text);margin-top:1px;}
+.meteo-current-norms-inline{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;background:linear-gradient(135deg,#f8fafc,#fff);border:1px solid rgba(0,0,0,.06);border-radius:11px;padding:6px 8px;justify-self:end;}
+.meteo-current-norms-inline span{font-size:.56rem;font-weight:800;color:var(--muted);letter-spacing:.02em;white-space:nowrap;}
+.meteo-current-norms-inline strong{font-size:.76rem;font-weight:900;color:var(--text);white-space:nowrap;}
 
 .meteo-sun-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
 .meteo-moon-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:linear-gradient(135deg,#eef2ff,#fff);border:1px solid rgba(99,102,241,.14);font-size:.68rem;font-weight:800;color:#4338ca;}
@@ -605,8 +602,10 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
   .meteo-grid-2{grid-template-columns:1fr;}
   .meteo-grid-secondary{grid-template-columns:1fr 1fr;}
   .meteo-alert-periods{grid-template-columns:1fr;}
-  .meteo-current-main{grid-template-columns:minmax(0,1fr) auto;align-items:start;}
-  .meteo-current-norms{justify-content:flex-end;}
+  .meteo-current-main{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;}
+  .meteo-current-norms-inline{padding:5px 7px;gap:5px;}
+  .meteo-current-norms-inline span{font-size:.5rem;}
+  .meteo-current-norms-inline strong{font-size:.7rem;}
   .meteo-stat-value{font-size:.9rem;}
   .meteo-stat-compact .meteo-card-kicker{font-size:.56rem;}
   .meteo-stat-line{gap:6px;}
