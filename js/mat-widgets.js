@@ -450,10 +450,10 @@ function loadMeteoDetail() {
   html += meteoBuildSunBlock(days, now);
 
   html += '<div class="meteo-grid-2 meteo-grid-secondary">'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-value">' + pluie24h + ' mm</div>' + meteoTrendBadge(tPluie) + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%</div>' + meteoTrendBadge(tHum) + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm</div>' + meteoTrendBadge(tPluie) + '</div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%</div>' + meteoTrendBadge(tHum) + '</div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div></div>'
     + '</div>';
 
   html += '<div class="meteo-source">Source : Open-Meteo · Vigilance : Météo-France</div>';
