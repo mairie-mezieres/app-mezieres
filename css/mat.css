@@ -521,7 +521,7 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-grid-mixed > .meteo-card{height:100%;}
 .meteo-grid-secondary .meteo-card{min-width:0;}
 .meteo-grid-secondary .meteo-stat-card{height:100%;}
-.meteo-inline-soft{font-size:.72rem;color:#334155;font-weight:800;}
+.meteo-inline-soft{font-size:.66rem;color:#334155;font-weight:800;white-space:nowrap;}
 .meteo-mini-label{font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
 .meteo-source{font-size:.62rem;color:var(--muted);text-align:center;}
 
@@ -559,10 +559,11 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-hour-mm{font-size:.54rem;color:#475569;margin-top:2px;white-space:nowrap;}
 .meteo-hour-wind{font-size:.6rem;color:#334155;margin-top:4px;font-weight:900;}
 
-.meteo-stat-card{display:flex;flex-direction:column;justify-content:space-between;min-height:116px;}
-.meteo-stat-compact{min-height:86px;padding:10px 11px;}
-.meteo-stat-value{font-size:1rem;font-weight:900;color:var(--text);line-height:1.2;}
-.meteo-trend-badge{display:flex;align-items:center;justify-content:flex-end;margin-top:6px;font-weight:800;}
+.meteo-stat-card{display:flex;flex-direction:column;justify-content:center;min-height:92px;}
+.meteo-stat-compact{min-height:72px;padding:9px 10px;}
+.meteo-stat-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;min-width:0;}
+.meteo-stat-value{font-size:1rem;font-weight:900;color:var(--text);line-height:1.15;min-width:0;}
+.meteo-trend-badge{display:flex;align-items:center;justify-content:flex-end;margin-top:0;font-weight:800;flex-shrink:0;}
 .meteo-trend-ico{font-size:1rem;line-height:1;}
 .meteo-trend-label{display:none;}
 
@@ -606,8 +607,9 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
   .meteo-alert-periods{grid-template-columns:1fr;}
   .meteo-current-main{grid-template-columns:minmax(0,1fr) auto;align-items:start;}
   .meteo-current-norms{justify-content:flex-end;}
-  .meteo-stat-value{font-size:.92rem;}
+  .meteo-stat-value{font-size:.9rem;}
   .meteo-stat-compact .meteo-card-kicker{font-size:.56rem;}
+  .meteo-stat-line{gap:6px;}
 }
 
 /* Overlay météo */
