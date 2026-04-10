@@ -1,9 +1,10 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.7.2
+   MAT — Actualités & Notifications Push v3.7.3
    ════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────
 const ACTUS_SEEN_KEY='mat_actus_seen_v1';
+const IDEAS_SEEN_BADGE_KEY='mat_ideas_seen_v1';
 const ACTUS_ROUTE_PREFIX='#actu=';
 let _actusCache = null;
 let _actusCacheAt = 0;
@@ -11,6 +12,10 @@ const ACTUS_CACHE_MS = 30000;
 
 function getActuKey(a){
   return [a.date||'',a.title||'',a.photo||''].join('||');
+}
+
+function getIdeaBadgeKey(idea){
+  return [(idea&&idea.id)||'',(idea&&idea.date)||'',(idea&&idea.text)||''].join('||');
 }
 
 function getActuId(a){
@@ -68,12 +73,35 @@ async function fetchActus(force){
   return _actusCache;
 }
 
-function updateActuBadge(count){
+async function fetchIdeasForBadge(){
+  try{
+    if(typeof fetchIdeasList==='function') return await fetchIdeasList();
+  }catch(e){}
+  try{
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees',{cache:'no-store'});
+    const d=await r.json();
+    return d.idees||[];
+  }catch(e){
+    try{ return typeof getIdeas==='function' ? getIdeas() : []; }catch(_e){ return []; }
+  }
+}
+
+function getUnseenIdeasCount(ideas){
+  try{
+    if(typeof getUnreadIdeasCount==='function') return getUnreadIdeasCount(ideas||[]);
+  }catch(e){}
+  const seen=JSON.parse(localStorage.getItem(IDEAS_SEEN_BADGE_KEY)||'[]');
+  return (ideas||[]).filter(idea=>!seen.includes(getIdeaBadgeKey(idea))).length;
+}
+
+function updateActuBadge(count, titleTxt){
   const el=document.getElementById('notif-unread-badge');
   if(!el) return;
   const n=Number(count)||0;
   el.textContent=n>99?'99+':String(n);
   el.classList.toggle('show', n>0);
+  if(titleTxt) el.title=titleTxt;
+  else el.removeAttribute('title');
   updateAppBadge(n);
 }
 
@@ -81,22 +109,55 @@ function markActusAsSeen(actus){
   try{
     const keys=(actus||[]).map(getActuKey);
     localStorage.setItem(ACTUS_SEEN_KEY, JSON.stringify(keys));
-    updateActuBadge(0);
   }catch(e){}
+  try{ refreshActusBadge(); }catch(e){}
+}
+
+function ensureNotifIdeasCalloutBox(){
+  const actusList=document.getElementById('actu-list');
+  if(!actusList || !actusList.parentNode) return null;
+  let box=document.getElementById('notif-ideas-callout');
+  if(!box){
+    box=document.createElement('div');
+    box.id='notif-ideas-callout';
+    actusList.parentNode.insertBefore(box, actusList);
+  }
+  return box;
+}
+
+async function renderNotifIdeasCallout(ideasUnseen, ideas){
+  const box=ensureNotifIdeasCalloutBox();
+  if(!box) return;
+  const unseen = typeof ideasUnseen === 'number' ? ideasUnseen : getUnseenIdeasCount(ideas || await fetchIdeasForBadge());
+  if(!unseen){ box.innerHTML=''; return; }
+  box.innerHTML=`<div style="background:linear-gradient(135deg,#fff7cc,#fff1a8);border:1px solid rgba(212,168,67,0.35);border-radius:16px;padding:12px 14px;margin-bottom:10px;box-shadow:0 6px 18px rgba(212,168,67,0.12)"><div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#8a5a00;margin-bottom:6px">💡 Boîte à idées</div><div style="font-size:0.84rem;font-weight:900;color:#5b3d00">${unseen} nouvelle${unseen>1?'s':''} idée${unseen>1?'s':''} à consulter</div><div style="font-size:0.72rem;color:#7a5600;line-height:1.45;margin-top:4px">Des habitants ont proposé de nouvelles idées pour la commune.</div><button onclick="openIdeasFromNotifs()" style="margin-top:10px;background:var(--forest);color:white;border:none;border-radius:10px;padding:8px 12px;font-size:0.74rem;font-weight:900;cursor:pointer">Voir les idées</button></div>`;
+}
+
+function openIdeasFromNotifs(){
+  try{ closeOv('notifs'); }catch(e){}
+  openIdees();
 }
 
 async function refreshActusBadge(){
+  let actusUnseen=0, ideasUnseen=0;
   try{
     const actus=await fetchActus(true);
     const seen=JSON.parse(localStorage.getItem(ACTUS_SEEN_KEY)||'[]');
-    const unseen=actus.filter(a=>!seen.includes(getActuKey(a))).length;
-    updateActuBadge(unseen);
-  }catch(e){
-    updateActuBadge(0);
-  }
+    actusUnseen=actus.filter(a=>!seen.includes(getActuKey(a))).length;
+  }catch(e){}
+  let ideas=[];
+  try{
+    ideas=await fetchIdeasForBadge();
+    ideasUnseen=getUnseenIdeasCount(ideas);
+  }catch(e){}
+  const total=actusUnseen+ideasUnseen;
+  const parts=[];
+  if(actusUnseen) parts.push(actusUnseen+' actu'+(actusUnseen>1?'s':''));
+  if(ideasUnseen) parts.push(ideasUnseen+' idée'+(ideasUnseen>1?'s':''));
+  updateActuBadge(total, parts.length ? 'Nouveautés : '+parts.join(' · ') : '');
+  renderNotifIdeasCallout(ideasUnseen, ideas).catch(()=>{});
 }
 
-// Formater une date ISO pour l'affichage d'un événement
 function formatEventDate(iso){
   try{
     const d = new Date(iso);
@@ -174,9 +235,11 @@ function closeActuDetail(){
 
 async function loadActus(){
   const el=document.getElementById('actu-list');
+  if(!el) return;
   el.innerHTML='<div class="actu-empty">Chargement…</div>';
   try{
     const actus=await fetchActus(true);
+    await renderNotifIdeasCallout();
     if(!actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=actus.map(renderActuListItem).join('');
     markActusAsSeen(actus||[]);
@@ -185,6 +248,17 @@ async function loadActus(){
     el.innerHTML='<div class="actu-empty">'+(offline?'📡 <strong>Vous êtes hors ligne</strong><br><br>Les actualités seront à nouveau disponibles dès que votre connexion reviendra.':'Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a>')+'</div>';
   }
 }
+
+function handleActuHashRoute(){
+  try{
+    const hash=location.hash||'';
+    if(hash.indexOf(ACTUS_ROUTE_PREFIX)!==0) return;
+    const id=decodeURIComponent(hash.substring(ACTUS_ROUTE_PREFIX.length));
+    if(id) openActuDetail(id,{fromHash:true});
+  }catch(e){}
+}
+window.addEventListener('hashchange', handleActuHashRoute);
+window.addEventListener('load', function(){ setTimeout(handleActuHashRoute, 700); });
 
 // ── Notifications Push ────────────────────────────────
 let pushRegistered=false;
