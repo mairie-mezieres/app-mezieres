@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Formulaires v3.7.0
+   MAT — Formulaires v3.7.3
    Signalement, contact, bug, idées
    ════════════════════════════════════════════════════════════ */
 
@@ -85,18 +85,51 @@ function resetSignal(){
 }
 
 // ── Boîte à idées ─────────────────────────────────────────
-const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3';
+const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3', IDEAS_SEEN_KEY='mat_ideas_seen_v1';
+const IDEAS_URL='https://chatbot-mairie-mezieres.onrender.com/idees';
 let ideaCat='';
 function selIdeaCat(btn,cat){document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));btn.classList.add('on');ideaCat=cat;}
 function getIdeas(){try{return JSON.parse(localStorage.getItem(IDEAS_KEY)||'[]');}catch(e){return[];}}
 function getVotes(){try{return JSON.parse(localStorage.getItem(VOTES_KEY)||'{}');}catch(e){return {};}}
+function getIdeaSeenKeys(){try{return JSON.parse(localStorage.getItem(IDEAS_SEEN_KEY)||'[]');}catch(e){return[];}}
+function getIdeaKey(idea){return [(idea&&idea.id)||'',(idea&&idea.date)||'',(idea&&idea.text)||''].join('||');}
+function rememberSeenIdeas(ideas){
+  try{
+    const merged=[...new Set(getIdeaSeenKeys().concat((ideas||[]).map(getIdeaKey)))].slice(-500);
+    localStorage.setItem(IDEAS_SEEN_KEY,JSON.stringify(merged));
+  }catch(e){}
+}
+function markIdeasAsSeen(ideas){
+  rememberSeenIdeas(ideas||[]);
+  try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
+}
+function mergeIdeasLists(serverIdeas){
+  const remote=Array.isArray(serverIdeas)?serverIdeas:[];
+  const local=getIdeas().filter(li=>!remote.find(si=>String(si.id)===String(li.id)));
+  return [...local,...remote].sort((a,b)=>(b.votes||0)-(a.votes||0));
+}
+function getUnreadIdeasCount(ideas){
+  const seen=getIdeaSeenKeys();
+  return (ideas||[]).filter(idea=>!seen.includes(getIdeaKey(idea))).length;
+}
+async function fetchIdeasList(){
+  try{
+    const r=await fetch(IDEAS_URL,{cache:'no-store'});
+    const d=await r.json();
+    return mergeIdeasLists(d.idees||[]);
+  }catch(e){
+    return getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));
+  }
+}
 
 async function submitIdee(){
   const txt=document.getElementById('idea-input').value.trim();
   if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR')};
   const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
+  rememberSeenIdeas([idea]);
   try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
+  try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
   loadIdees();
 }
@@ -111,15 +144,16 @@ async function voteIdee(id){
 async function loadIdees(){
   const votes=getVotes(); const el=document.getElementById('ideas-list');
   el.innerHTML='<div class="no-ideas">Chargement…</div>';
-  let ideas=[];
-  try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees');
-    const d=await r.json(); ideas=d.idees||[];
-    const local=getIdeas().filter(li=>!ideas.find(si=>si.id===li.id));
-    ideas=[...local,...ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
-  }catch(e){ideas=getIdeas().sort((a,b)=>(b.votes||0)-(a.votes||0));}
-  if(!ideas.length){el.innerHTML='<div class="no-ideas">Aucune idée pour l\'instant.<br>Soyez le premier à proposer !</div>';return;}
-  el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${esc(idea.cat)}</div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(idea.date)}</div></div></div>`).join('');
+  const ideas=await fetchIdeasList();
+  
+  
+  
+  
+  
+  
+  if(!ideas.length){el.innerHTML=`<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>`; markIdeasAsSeen([]); return;}
+ el.innerHTML=ideas.map(idea=>`<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-cat-badge">${esc(idea.cat)}</div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(idea.date)}</div></div></div>`).join('');
+  markIdeasAsSeen(ideas);
 }
 
 // ── Contact mairie → Trello ────────────────────────────
