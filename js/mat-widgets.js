@@ -438,7 +438,7 @@ function loadMeteoDetail() {
   html += '<div class="meteo-card meteo-current-card">'
     + '<div class="meteo-current-main meteo-current-main-tight">'
     + '<div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div>'
-    + '<div class="meteo-current-norms-inline"><span>Écart / normales de saison</span><strong>T° ' + eTemp + ' · R ' + eRes + '</strong></div>'
+    + '<div class="meteo-current-norms-inline"><span>Écart saison</span><strong>' + eTemp + '</strong></div>'
     + '</div>'
     + '</div>';
 
