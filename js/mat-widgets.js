@@ -6,6 +6,256 @@
 // ── Météo ─────────────────────────────────────────────────
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
 const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
+const METEO_ALERT_COLORS = {1:'vert',2:'jaune',3:'orange',4:'rouge'};
+const METEO_ALERT_ICONS = {1:'✅',2:'🟡',3:'🟠',4:'🔴'};
+
+function meteoHasAlert(vigilance) {
+  return !!(vigilance && Number(vigilance.level || 0) >= 2);
+}
+
+function meteoFormatAlertDate(iso, withYear) {
+  if (!iso) return 'à préciser';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return 'à préciser';
+  return d.toLocaleString('fr-FR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: withYear ? 'numeric' : undefined,
+    hour: '2-digit',
+    minute: '2-digit'
+  }).replace(',', ' ·');
+}
+
+function meteoAlertSummary(vigilance) {
+  if (vigilance && vigilance.main_text) return vigilance.main_text;
+  if (meteoHasAlert(vigilance)) {
+    return 'Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + ' en cours sur le Loiret.';
+  }
+  return 'Situation météo normale sur la commune.';
+}
+
+function meteoPhenomenonIcon(vigilance) {
+  var id = Number((vigilance || {}).phenomenon_id || 0);
+  if (id === 1) return '💨';
+  if (id === 2 || id === 4 || id === 9) return '🌊';
+  if (id === 3) return '⛈️';
+  if (id === 5) return '❄️';
+  if (id === 6) return '🥵';
+  if (id === 7) return '🥶';
+  return METEO_ALERT_ICONS[Number((vigilance || {}).level || 1)] || '⚠️';
+}
+
+function meteoFindClosestHourlyIndex(times, targetDate) {
+  if (!times || !times.length || !targetDate) return -1;
+  var targetMs = targetDate.getTime();
+  var bestIdx = -1;
+  var bestDiff = Infinity;
+  for (var i = 0; i < times.length; i++) {
+    var dt = new Date(times[i]);
+    var ms = dt.getTime();
+    if (isNaN(ms)) continue;
+    var diff = Math.abs(ms - targetMs);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
+}
+
+function meteoFindFirstFutureIndex(times, nowDate) {
+  if (!times || !times.length) return -1;
+  var nowMs = nowDate.getTime();
+  for (var i = 0; i < times.length; i++) {
+    var ms = new Date(times[i]).getTime();
+    if (!isNaN(ms) && ms >= nowMs - 30 * 60000) return i;
+  }
+  return meteoFindClosestHourlyIndex(times, nowDate);
+}
+
+function meteoDir(deg) {
+  if (deg == null || isNaN(Number(deg))) return '';
+  var dirs = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  return dirs[Math.round((Number(deg) || 0) / 45) % 8];
+}
+
+function meteoTrend(valNow, valBefore, seuilFort, seuilMod) {
+  if (valBefore == null || valNow == null || isNaN(Number(valBefore)) || isNaN(Number(valNow))) {
+    return { ico:'', lbl:'', col:'var(--muted)' };
+  }
+  var diff = Number(valNow) - Number(valBefore);
+  var absDiff = Math.abs(diff);
+  if (absDiff < seuilMod * 0.3) return { ico:'➡', lbl:'Stable', col:'#6b7280' };
+  if (diff > 0) {
+    if (absDiff >= seuilFort) return { ico:'⬆', lbl:'Hausse importante', col:'#dc2626' };
+    return { ico:'↗', lbl:'Hausse modérée', col:'#f59e0b' };
+  }
+  if (absDiff >= seuilFort) return { ico:'⬇', lbl:'Baisse forte', col:'#2563eb' };
+  return { ico:'↘', lbl:'Baisse modérée', col:'#60a5fa' };
+}
+
+function meteoTrendBadge(trend) {
+  if (!trend || !trend.ico) return '';
+  return '<div class="meteo-trend-badge" style="color:' + trend.col + '">'
+    + '<span class="meteo-trend-ico">' + trend.ico + '</span>'
+    + '<span class="meteo-trend-label">' + trend.lbl + '</span>'
+    + '</div>';
+}
+
+function meteoBuildHourlyTimeline(hourly, nowDate) {
+  var times = (hourly || {}).time || [];
+  var start = meteoFindFirstFutureIndex(times, nowDate);
+  if (start === -1) return '';
+  var slice = [];
+  for (var i = start; i < Math.min(start + 12, times.length); i++) {
+    var dt = new Date(times[i]);
+    if (isNaN(dt.getTime())) continue;
+    slice.push({
+      hour: dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h'),
+      temp: Math.round(((hourly || {}).temperature_2m || [])[i] != null ? ((hourly || {}).temperature_2m || [])[i] : 0),
+      prob: Math.round(((hourly || {}).precipitation_probability || [])[i] || 0),
+      mm: Number((((hourly || {}).precipitation || [])[i] || 0).toFixed ? (((hourly || {}).precipitation || [])[i] || 0).toFixed(1) : (((hourly || {}).precipitation || [])[i] || 0)),
+      wind: Math.round((((hourly || {}).wind_speed_10m || [])[i] || 0)),
+      code: (((hourly || {}).weather_code || [])[i] || 0)
+    });
+  }
+  if (!slice.length) return '';
+  var maxMm = 0;
+  slice.forEach(function(item){ maxMm = Math.max(maxMm, Number(item.mm || 0)); });
+  if (maxMm <= 0) maxMm = 1;
+
+  return '<div class="meteo-card meteo-hourly-card">'
+    + '<div class="meteo-card-kicker">🕒 Prochaines 12 heures</div>'
+    + '<div class="meteo-hourly-track">'
+    + slice.map(function(item){
+        var barH = Math.max(6, Math.round((Number(item.mm || 0) / maxMm) * 34));
+        return '<div class="meteo-hour-col">'
+          + '<div class="meteo-hour-time">' + esc(item.hour) + '</div>'
+          + '<div class="meteo-hour-icon">' + (METEO_ICONS[item.code] || '🌡️') + '</div>'
+          + '<div class="meteo-hour-temp">' + item.temp + '°</div>'
+          + '<div class="meteo-hour-rain-wrap"><div class="meteo-hour-rain-bar" style="height:' + barH + 'px"></div></div>'
+          + '<div class="meteo-hour-rain">' + item.prob + '%</div>'
+          + '<div class="meteo-hour-wind">💨 ' + item.wind + '</div>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div class="meteo-card-foot">Barres = intensité de pluie prévue · valeur sous la barre = probabilité</div>'
+    + '</div>';
+}
+
+function meteoBuildSunBlock(days, nowDate) {
+  var sunriseIso = (days.sunrise || [])[0];
+  var sunsetIso  = (days.sunset || [])[0];
+  if (!sunriseIso || !sunsetIso) return '';
+  var sunrise = new Date(sunriseIso);
+  var sunset  = new Date(sunsetIso);
+  if (isNaN(sunrise.getTime()) || isNaN(sunset.getTime())) return '';
+  var total = sunset.getTime() - sunrise.getTime();
+  var progress = total > 0 ? ((nowDate.getTime() - sunrise.getTime()) / total) * 100 : 0;
+  progress = Math.max(0, Math.min(100, progress));
+  var daylightH = Math.floor(total / 3600000);
+  var daylightM = Math.round((total % 3600000) / 60000);
+  return '<div class="meteo-card meteo-sun-card">'
+    + '<div class="meteo-card-kicker">☀️ Soleil</div>'
+    + '<div class="meteo-sun-row">'
+    + '<div><div class="meteo-mini-label">Lever</div><div class="meteo-sun-time">' + esc(meteoFormatAlertDate(sunrise.toISOString(), false).split('·').pop().trim()) + '</div></div>'
+    + '<div class="meteo-sun-progress"><div class="meteo-sun-progress-bar" style="width:' + progress + '%"></div></div>'
+    + '<div><div class="meteo-mini-label">Coucher</div><div class="meteo-sun-time">' + esc(meteoFormatAlertDate(sunset.toISOString(), false).split('·').pop().trim()) + '</div></div>'
+    + '</div>'
+    + '<div class="meteo-card-foot">Journée en cours · lumière du jour : ' + daylightH + 'h' + String(daylightM).padStart(2, '0') + '</div>'
+    + '</div>';
+}
+
+function meteoBuildRiskCard(forecast, vigilance, nowDate) {
+  var hourly = forecast.hourly || {};
+  var daily = forecast.daily || {};
+  var times = hourly.time || [];
+  var start = meteoFindFirstFutureIndex(times, nowDate);
+  var items = [];
+
+  if (meteoHasAlert(vigilance)) {
+    items.push('Vigilance ' + esc(vigilance.color_label || 'météo') + ' : ' + esc(vigilance.phenomenon_label || 'phénomène météo') + '.');
+  }
+
+  var bestRain = null, bestGust = null;
+  for (var i = start; i !== -1 && i < Math.min(start + 18, times.length); i++) {
+    var prob = Math.round((hourly.precipitation_probability || [])[i] || 0);
+    var mm = Number((hourly.precipitation || [])[i] || 0);
+    var gust = Math.round((hourly.wind_gusts_10m || [])[i] || 0);
+    if (prob >= 50 || mm >= 0.8) {
+      if (!bestRain || prob > bestRain.prob || mm > bestRain.mm) {
+        bestRain = { idx:i, prob:prob, mm:mm };
+      }
+    }
+    if (gust >= 40) {
+      if (!bestGust || gust > bestGust.gust) bestGust = { idx:i, gust:gust };
+    }
+  }
+
+  if (bestRain) {
+    var rainDt = new Date(times[bestRain.idx]);
+    items.push('Averse probable vers ' + rainDt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h') + ' (' + bestRain.prob + '%).');
+  }
+  if (bestGust) {
+    var gustDt = new Date(times[bestGust.idx]);
+    items.push('Rafales jusqu’à ' + bestGust.gust + ' km/h vers ' + gustDt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h') + '.');
+  }
+  if ((daily.uv_index_max || [])[1] != null && Number((daily.uv_index_max || [])[1]) >= 6) {
+    items.push('UV fort demain : ' + Number((daily.uv_index_max || [])[1]).toFixed(1) + '.');
+  }
+  if (!items.length) {
+    items.push('Pas de risque météo notable détecté dans les prochaines heures.');
+  }
+
+  return '<div class="meteo-card meteo-risk-card">'
+    + '<div class="meteo-card-kicker">⚡ Prochains risques</div>'
+    + '<div class="meteo-risk-list">'
+    + items.slice(0, 3).map(function(txt){ return '<div class="meteo-risk-item">' + txt + '</div>'; }).join('')
+    + '</div>'
+    + '</div>';
+}
+
+function meteoBuildAlertCard(vigilance) {
+  if (!meteoHasAlert(vigilance)) {
+    return '<div class="meteo-card meteo-alert-card level-1">'
+      + '<div class="meteo-alert-topline"><span class="meteo-alert-chip">✅ Situation</span></div>'
+      + '<div class="meteo-alert-title">Aucune vigilance météo en cours</div>'
+      + '<div class="meteo-alert-text">' + esc(meteoAlertSummary(vigilance)) + '</div>'
+      + '</div>';
+  }
+
+  var level = Number(vigilance.level || 2);
+  var startTxt = meteoFormatAlertDate(vigilance.start, false);
+  var endTxt = meteoFormatAlertDate(vigilance.end, false);
+  var summary = meteoAlertSummary(vigilance);
+
+  return '<details class="meteo-card meteo-alert-card level-' + level + '" open>'
+    + '<summary class="meteo-alert-summary">'
+    + '<div class="meteo-alert-topline">'
+    + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + '</span>'
+    + '<span class="meteo-alert-action">Touchez pour le détail</span>'
+    + '</div>'
+    + '<div class="meteo-alert-head">'
+    + '<div class="meteo-alert-icon">' + meteoPhenomenonIcon(vigilance) + '</div>'
+    + '<div class="meteo-alert-copy">'
+    + '<div class="meteo-alert-title">' + esc(vigilance.phenomenon_label || 'Alerte météo') + '</div>'
+    + '<div class="meteo-alert-text">' + esc(summary) + '</div>'
+    + '</div>'
+    + '</div>'
+    + '<div class="meteo-alert-periods">'
+    + '<div class="meteo-alert-period"><span>Début</span><strong>' + esc(startTxt) + '</strong></div>'
+    + '<div class="meteo-alert-period"><span>Fin</span><strong>' + esc(endTxt) + '</strong></div>'
+    + '</div>'
+    + '</summary>'
+    + '<div class="meteo-alert-detail">'
+    + '<div class="meteo-alert-detail-line"><strong>Début :</strong> ' + esc(startTxt) + '</div>'
+    + '<div class="meteo-alert-detail-line"><strong>Fin :</strong> ' + esc(endTxt) + '</div>'
+    + '<div class="meteo-alert-detail-line"><strong>Zone :</strong> Loiret (45)</div>'
+    + '<div class="meteo-alert-detail-text">' + esc(summary).replace(/\n/g, '<br>') + '</div>'
+    + '</div>'
+    + '</details>';
+}
 
 async function loadMeteo() {
   try {
@@ -17,32 +267,33 @@ async function loadMeteo() {
     const code = cur.weather_code;
     const temp = Math.round(cur.temperature_2m != null ? cur.temperature_2m : 0);
     const vent = Math.round(cur.wind_speed_10m != null ? cur.wind_speed_10m : 0);
-    document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
-    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">'+temp+'°C</strong>';
-
-    // Pluie à venir dans les 3h
-    const hrly=(d.forecast||{}).hourly||{};
-    const nowH=new Date();
-    const hTimes=(hrly.time||[]),hPrec=(hrly.precipitation||[]),hProb=(hrly.precipitation_probability||[]),hCode=(hrly.weather_code||[]);
-    let rainSoon=null;
-    for(let hi=0;hi<hTimes.length;hi++){
-      const t=new Date(hTimes[hi]),diff=(t-nowH)/60000;
-      if(diff>=0&&diff<=180){
-        if((hPrec[hi]||0)>0.1||(hProb[hi]||0)>=40){
-          rainSoon={prob:hProb[hi]||0,mm:hPrec[hi]||0,label:METEO_DESC[hCode[hi]]||''};break;
-        }
-      }
-    }
-    const rainTxt=rainSoon?' · 🌧️ Pluie dans 3h ('+rainSoon.prob+'%)':'';
-    document.getElementById('meteo-desc').textContent=(METEO_DESC[code]||'Météo')+' · Vent '+vent+' km/h'+rainTxt;
     const badge = document.getElementById('meteo-alerte');
-    badge.textContent = (vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Vigilance '+(vigilance.color_label||'') : "✅ Pas d'alerte";
+    const descEl = document.getElementById('meteo-desc');
+    const baseDesc = (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
+
+    document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
+    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">' + temp + '°C</strong>';
+
+    if (meteoHasAlert(vigilance)) {
+      const startTxt = meteoFormatAlertDate(vigilance.start, false);
+      const endTxt = meteoFormatAlertDate(vigilance.end, false);
+      descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">Début ' + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
+      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo');
+      badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
+      badge.title = 'Touchez pour voir le détail de l’alerte';
+    } else {
+      descEl.textContent = baseDesc;
+      badge.textContent = '✅ Pas d\'alerte';
+      badge.classList.remove('meteo-badge-alert', 'level-2', 'level-3', 'level-4');
+      badge.title = '';
+    }
+
     badge.style.display = 'inline-flex';
     window._meteoData = d;
   } catch (e) {
     var offline = !navigator.onLine;
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">'+(offline?'📡 Hors ligne':'Météo indisponible')+'</span>';
-    document.getElementById('meteo-desc').textContent = offline?'Reconnectez-vous pour actualiser':'';
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : 'Météo indisponible') + '</span>';
+    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : '';
     document.getElementById('meteo-alerte').style.display = 'none';
   }
 }
@@ -50,165 +301,125 @@ async function loadMeteo() {
 function loadMeteoDetail() {
   var d = window._meteoData;
   var el = document.getElementById('meteo-detail');
-  if (!d) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>'; return; }
-  var forecast = d.forecast || {}, cur = forecast.current || {}, days = forecast.daily || {}, vigilance = d.vigilance || null;
+  if (!d) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
+    return;
+  }
+
+  var forecast = d.forecast || {};
+  var cur = forecast.current || {};
+  var days = forecast.daily || {};
+  var hourly = forecast.hourly || {};
+  var vigilance = d.vigilance || null;
+  var now = new Date();
   var JOURS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-  var html = '<div style="background:white;border-radius:14px;padding:12px;margin-bottom:14px;border:1px solid var(--border)"><div style="font-size:0.82rem;font-weight:900;color:var(--text)">'
-    + ((vigilance && Number(vigilance.level||0) >= 2) ? '⚠️ Alerte en cours : vigilance '+(vigilance.color_label||'') : '✅ Aucune alerte météo en cours')
-    + '</div><div style="font-size:0.72rem;color:var(--muted);margin-top:4px">'
-    + ((vigilance && vigilance.main_text) ? vigilance.main_text : 'Situation météo normale sur la commune.')
-    + '</div></div>';
+  var NORM_MAX = [5,7,12,16,20,24,26,26,22,17,10,6];
+  var NORM_MIN = [0,1,3,6,10,13,15,15,11,8,4,1];
+  var moisN = now.getMonth();
+  var times = hourly.time || [];
 
-  var NORM_MAX=[5,7,12,16,20,24,26,26,22,17,10,6];
-  var NORM_MIN=[0,1,3,6,10,13,15,15,11,8,4,1];
-  var moisN=new Date().getMonth();
-  function wDir(deg){if(deg==null)return '';var d=['N','NE','E','SE','S','SO','O','NO'];return d[Math.round((deg||0)/45)%8];}
+  var idxNow = meteoFindClosestHourlyIndex(times, now);
+  var idx3hBefore = meteoFindClosestHourlyIndex(times, new Date(now.getTime() - 3 * 3600000));
 
-  var hrly2=forecast.hourly||{};
-  var hT2=(hrly2.time||[]),hP2=(hrly2.precipitation||[]),hPr2=(hrly2.precipitation_probability||[]),hC2=(hrly2.weather_code||[]),hA2=(hrly2.apparent_temperature||[]),hW2=(hrly2.wind_speed_10m||[]);
-  var nowH2=new Date();
+  var hrlyHum  = hourly.relative_humidity_2m || [];
+  var hrlyPres = hourly.surface_pressure || hourly.pressure_msl || [];
+  var hrlyWGst = hourly.wind_gusts_10m || [];
+  var hrlyPrec = hourly.precipitation || [];
 
-  var rain3h=null;
-  for(var hi=0;hi<hT2.length;hi++){var t2=new Date(hT2[hi]),df=(t2-nowH2)/60000;if(df>=0&&df<=180){if((hP2[hi]||0)>0.1||(hPr2[hi]||0)>=40){rain3h={prob:hPr2[hi]||0,mm:hP2[hi]||0,desc:METEO_DESC[hC2[hi]]||''};break;}}}
+  var pluie24h = days.precipitation_sum && days.precipitation_sum[0] != null ? parseFloat(days.precipitation_sum[0]).toFixed(1) : '–';
+  var rafaleMax24 = days.wind_gusts_10m_max && days.wind_gusts_10m_max[0] != null ? Math.round(days.wind_gusts_10m_max[0]) : '–';
+  var ventDirCur = meteoDir(cur.wind_direction_10m);
+  var tempCur = cur.temperature_2m != null ? Math.round(cur.temperature_2m) : '–';
+  var ressenti = cur.apparent_temperature != null ? Math.round(cur.apparent_temperature) : '–';
 
-  var pluie24h=days.precipitation_sum&&days.precipitation_sum[0]!=null?parseFloat(days.precipitation_sum[0]).toFixed(1):'–';
-  var rafaleMax24=days.wind_gusts_10m_max&&days.wind_gusts_10m_max[0]!=null?Math.round(days.wind_gusts_10m_max[0]):'–';
-  var ventDirCur=wDir(cur.wind_direction_10m);
+  var pluieCur3h = idxNow !== -1 ? (hrlyPrec[idxNow] != null ? hrlyPrec[idxNow] : null) : null;
+  var pluieBef3h = idx3hBefore !== -1 ? (hrlyPrec[idx3hBefore] != null ? hrlyPrec[idx3hBefore] : null) : null;
+  var rafCur = idxNow !== -1 ? (hrlyWGst[idxNow] != null ? hrlyWGst[idxNow] : null) : null;
+  var rafBef = idx3hBefore !== -1 ? (hrlyWGst[idx3hBefore] != null ? hrlyWGst[idx3hBefore] : null) : null;
+  var presCur = cur.pressure_msl != null ? cur.pressure_msl : (idxNow !== -1 ? hrlyPres[idxNow] : null);
+  var presBef = idx3hBefore !== -1 ? (hrlyPres[idx3hBefore] != null ? hrlyPres[idx3hBefore] : null) : null;
+  var humCur = cur.relative_humidity_2m != null ? cur.relative_humidity_2m : (idxNow !== -1 ? hrlyHum[idxNow] : null);
+  var humBef = idx3hBefore !== -1 ? (hrlyHum[idx3hBefore] != null ? hrlyHum[idx3hBefore] : null) : null;
 
-  var next3={};
-  if(hT2.length){for(var hi=0;hi<hT2.length;hi++){var t3=new Date(hT2[hi]);if(t3>=nowH2){next3={temp:hA2[hi]!=null?Math.round(hA2[hi]):null,wind:hW2[hi]!=null?Math.round(hW2[hi]):null,prob:hPr2[hi]||0,desc:METEO_DESC[hC2[hi]]||'',ico:METEO_ICONS[hC2[hi]]||'🌡️'};break;}}}
+  var tPluie = meteoTrend(pluieCur3h, pluieBef3h, 2, 0.5);
+  var tRaf = meteoTrend(rafCur, rafBef, 20, 5);
+  var tPres = meteoTrend(presCur, presBef, 5, 1.5);
+  var tHum = meteoTrend(humCur, humBef, 15, 5);
 
-  var ressenti=cur.apparent_temperature!=null?Math.round(cur.apparent_temperature):'–';
-
-  var tAjMax=days.temperature_2m_max&&days.temperature_2m_max[1]!=null?Math.round(days.temperature_2m_max[1]):null;
-  var tAjMin=days.temperature_2m_min&&days.temperature_2m_min[1]!=null?Math.round(days.temperature_2m_min[1]):null;
-  function fmtE(v,n){if(v==null)return '';var e=v-n;return (e>=0?'+':'')+e+'° vs norm.';}
-  var eMax=fmtE(tAjMax,NORM_MAX[moisN]), eMin=fmtE(tAjMin,NORM_MIN[moisN]);
-  var eMaxC=tAjMax!=null?(tAjMax-NORM_MAX[moisN]>=0?'#dc2626':'#2563eb'):'';
-  var eMinC=tAjMin!=null?(tAjMin-NORM_MIN[moisN]>=0?'#dc2626':'#2563eb'):'';
-
-  // Bloc 1 : Météo dans les 3h
-  html += '<div style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border-radius:14px;padding:12px 14px;margin-bottom:12px;border:1px solid #bae6fd">'
-    + '<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#0369a1;margin-bottom:6px">⏰ Météo dans les 3 prochaines heures</div>';
-  if(rain3h){
-    html += '<div style="display:flex;align-items:center;gap:8px">'
-      + '<span style="font-size:1.4rem">🌧️</span>'
-      + '<div><div style="font-size:0.88rem;font-weight:900;color:#0369a1">Pluie probable ('+rain3h.prob+'%)</div>'
-      + '<div style="font-size:0.72rem;color:#0c4a6e">'+rain3h.mm+' mm prévu · '+rain3h.desc+'</div></div></div>';
-  } else if(next3.temp!=null){
-    html += '<div style="display:flex;align-items:center;gap:10px">'
-      + '<span style="font-size:1.4rem">'+next3.ico+'</span>'
-      + '<div>'
-      + '<div style="font-size:0.88rem;font-weight:900;color:#0369a1">'+next3.desc+'</div>'
-      + '<div style="font-size:0.72rem;color:#0c4a6e">Ressenti '+next3.temp+'°C · Vent '+next3.wind+' km/h</div>'
-      + '</div></div>';
-  } else {
-    html += '<div style="font-size:0.82rem;color:#0369a1">Pas de précipitations attendues</div>';
+  var tAjMax = days.temperature_2m_max && days.temperature_2m_max[1] != null ? Math.round(days.temperature_2m_max[1]) : null;
+  var tAjMin = days.temperature_2m_min && days.temperature_2m_min[1] != null ? Math.round(days.temperature_2m_min[1]) : null;
+  function fmtE(v, n) {
+    if (v == null || n == null) return '';
+    var e = v - n;
+    return (e >= 0 ? '+' : '') + e + '° vs norm.';
   }
-  html += '</div>';
+  var eMax = fmtE(tAjMax, NORM_MAX[moisN]);
+  var eMin = fmtE(tAjMin, NORM_MIN[moisN]);
+  var eMaxC = tAjMax != null ? (tAjMax - NORM_MAX[moisN] >= 0 ? '#dc2626' : '#2563eb') : '';
+  var eMinC = tAjMin != null ? (tAjMin - NORM_MIN[moisN] >= 0 ? '#dc2626' : '#2563eb') : '';
 
-  // Tendances
-  var nowH3 = new Date(), idxNow = -1, idx3hBefore = -1;
-  for (var hi = 0; hi < hT2.length; hi++) {
-    var tH = new Date(hT2[hi]);
-    var diffMin = (tH - nowH3) / 60000;
-    if (diffMin >= -10 && diffMin <= 60 && idxNow === -1) idxNow = hi;
-    if (diffMin >= -200 && diffMin <= -160 && idx3hBefore === -1) idx3hBefore = hi;
-  }
-  var hrlyHum  = (forecast.hourly||{}).relative_humidity_2m || [];
-  var hrlyPres = (forecast.hourly||{}).surface_pressure || (forecast.hourly||{}).pressure_msl || [];
-  var hrlyWGst = (forecast.hourly||{}).wind_gusts_10m || [];
-  var hrlyPrec = hP2;
-
-  function tendance(valNow, valBefore, seuilFort, seuilMod) {
-    if (valBefore == null || valNow == null) return {ico:'', lbl:'', col:'var(--muted)'};
-    var diff = valNow - valBefore;
-    var absDiff = Math.abs(diff);
-    if (absDiff < seuilMod * 0.3) return {ico:'➡', lbl:'Stable', col:'#6b7280'};
-    if (diff > 0) {
-      if (absDiff >= seuilFort) return {ico:'⬆', lbl:'Hausse importante', col:'#dc2626'};
-      return {ico:'↗', lbl:'Hausse modérée', col:'#f59e0b'};
-    } else {
-      if (absDiff >= seuilFort) return {ico:'⬇', lbl:'Baisse forte', col:'#2563eb'};
-      return {ico:'↘', lbl:'Baisse modérée', col:'#60a5fa'};
-    }
-  }
-
-  var pluieCur3h = idxNow !== -1 ? (hrlyPrec[idxNow] || 0) : null;
-  var pluieBef3h = idx3hBefore !== -1 ? (hrlyPrec[idx3hBefore] || 0) : null;
-  var rafCur   = idxNow !== -1 ? hrlyWGst[idxNow] : null;
-  var rafBef   = idx3hBefore !== -1 ? hrlyWGst[idx3hBefore] : null;
-  var presCur  = cur.pressure_msl || null;
-  var presBef  = idx3hBefore !== -1 ? hrlyPres[idx3hBefore] : null;
-  var humCur   = cur.relative_humidity_2m || null;
-  var humBef   = idx3hBefore !== -1 ? hrlyHum[idx3hBefore] : null;
-
-  var tPluie = tendance(pluieCur3h, pluieBef3h, 2, 0.5);
-  var tRaf   = tendance(rafCur, rafBef, 20, 5);
-  var tPres  = tendance(presCur, presBef, 5, 1.5);
-  var tHum   = tendance(humCur, humBef, 15, 5);
-
-  function tBadge(t) {
-    if (!t.ico) return '';
-    return '<span style="font-size:1rem;font-weight:900;color:'+t.col+';margin-left:6px;display:inline-block;line-height:1;" title="'+t.lbl+'">'+t.ico+'</span>'
-      + '<div style="font-size:0.55rem;font-weight:700;color:'+t.col+';margin-top:2px">'+t.lbl+'</div>';
-  }
-
-  // Bloc 2 : Grille 4 encarts avec tendances
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'
-    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌧️ Cumul pluie 24h</div>'
-    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+pluie24h+' mm'+tBadge(tPluie)+'</div></div>'
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'
-    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">🌪️ Rafale max 24h</div>'
-    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+rafaleMax24+' km/h '+ventDirCur+tBadge(tRaf)+'</div></div>'
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'
-    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">📊 Pression</div>'
-    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+Math.round(cur.pressure_msl||0)+' hPa'+tBadge(tPres)+'</div></div>'
-    + '<div style="background:white;border-radius:12px;padding:10px 12px;border:1px solid var(--border)">'
-    + '<div style="font-size:0.58rem;color:var(--muted);font-weight:700">💧 Humidité</div>'
-    + '<div style="font-size:0.95rem;font-weight:800;color:var(--text);margin-top:2px">'+(cur.relative_humidity_2m||0)+'%'+tBadge(tHum)+'</div></div>'
+  var html = '<div class="meteo-premium">';
+  html += meteoBuildAlertCard(vigilance);
+  html += meteoBuildHourlyTimeline(hourly, now);
+  html += '<div class="meteo-grid-2">'
+    + '<div class="meteo-card meteo-stat-card"><div class="meteo-card-kicker">🌧️ Cumul pluie 24h</div><div class="meteo-stat-value">' + pluie24h + ' mm</div>' + meteoTrendBadge(tPluie) + '</div>'
+    + '<div class="meteo-card meteo-stat-card"><div class="meteo-card-kicker">🌪️ Rafale max 24h</div><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + '</div>' + meteoTrendBadge(tRaf) + '</div>'
+    + '<div class="meteo-card meteo-stat-card"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa</div>' + meteoTrendBadge(tPres) + '</div>'
+    + '<div class="meteo-card meteo-stat-card"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%</div>' + meteoTrendBadge(tHum) + '</div>'
     + '</div>';
 
-  // Bloc 3 : Ressenti + écarts normales
-  html += '<div style="background:white;border-radius:12px;padding:10px 14px;margin-bottom:14px;border:1px solid var(--border)">'
-    + '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">'
-    + '<div><div style="font-size:0.58rem;color:var(--muted);font-weight:700">Ressenti actuel</div><div style="font-size:1rem;font-weight:900;color:var(--text)">'+ressenti+'°C</div></div>'
-    + (eMax?'<div><div style="font-size:0.58rem;color:var(--muted);font-weight:700">Écart max j.</div><div style="font-size:0.95rem;font-weight:900;color:'+eMaxC+'">'+eMax+'</div></div>':'')
-    + (eMin?'<div><div style="font-size:0.58rem;color:var(--muted);font-weight:700">Écart min j.</div><div style="font-size:0.95rem;font-weight:900;color:'+eMinC+'">'+eMin+'</div></div>':'')
-    + '</div></div>';
+  html += '<div class="meteo-grid-2 meteo-grid-mixed">'
+    + '<div class="meteo-card meteo-ressenti-card">'
+    + '<div class="meteo-card-kicker">🌡️ Température actuelle</div>'
+    + '<div class="meteo-ressenti-main">' + tempCur + '°C <span>(ressenti ' + ressenti + '°C)</span></div>'
+    + '<div class="meteo-ressenti-sub">Mesure instantanée sur la commune</div>'
+    + '</div>'
+    + meteoBuildSunBlock(days, now)
+    + '</div>';
 
-  // 10 jours scrollable
-  html+='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px"><div style="display:flex;gap:8px;min-width:max-content;padding-bottom:4px">';
-  var nD=Math.min((days.time||[]).length,11);
-  for(var i=1;i<nD;i++){
-    var dt=days.time[i]?new Date(days.time[i]):new Date();
-    var jr=i===1?'Auj.':i===2?'Dem.':JOURS[dt.getDay()]+' '+dt.getDate();
-    var co=(days.weather_code||[])[i]||0;
-    var tx=Math.round((days.temperature_2m_max||[])[i]||0);
-    var tn=Math.round((days.temperature_2m_min||[])[i]||0);
-    var rx=Math.round((days.apparent_temperature_max||[])[i]!=null?(days.apparent_temperature_max||[])[i]:tx);
-    var pl=parseFloat((days.precipitation_sum||[])[i]||0).toFixed(1);
-    var uv=(days.uv_index_max||[])[i]!=null?(days.uv_index_max||[])[i]:'-';
-    var wd=wDir((days.wind_direction_10m_dominant||[])[i]);
-    var gust=(days.wind_gusts_10m_max||[])[i]!=null?Math.round((days.wind_gusts_10m_max||[])[i]):'–';
-    var nmD=new Date(); nmD.setDate(nmD.getDate()+(i-1)); var nmM=nmD.getMonth();
-    var em=NORM_MAX[nmM]!=null?tx-NORM_MAX[nmM]:null;
-    var emTxt=em!=null?'<div style="font-size:0.55rem;color:'+(em>=0?'#dc2626':'#2563eb')+';margin-top:1px">'+(em>=0?'+':'')+em+'° norm</div>':'';
-    html+='<div style="background:white;border-radius:12px;padding:10px 7px;text-align:center;border:1px solid var(--border);min-width:80px">'
-      +'<div style="font-size:0.6rem;font-weight:900;color:var(--muted);margin-bottom:2px">'+jr+'</div>'
-      +'<div style="font-size:1.5rem">'+(METEO_ICONS[co]||'🌡️')+'</div>'
-      +'<div style="font-size:0.76rem;font-weight:800;color:var(--text);margin-top:2px">'+tx+'°/'+tn+'°</div>'
-      +'<div style="font-size:0.58rem;color:#6b7280">Res. '+rx+'°</div>'
-      +emTxt
-      +'<div style="font-size:0.58rem;color:var(--muted);margin-top:1px">'+(METEO_DESC[co]||'')+'</div>'
-      +'<div style="font-size:0.58rem;color:#2563eb">🌧️ '+pl+' mm</div>'
-      +'<div style="font-size:0.58rem;color:#ca8a04">🌞 UV '+uv+'</div>'
-      +'<div style="font-size:0.58rem;color:#6b7280">💨 '+gust+' '+wd+'</div>'
-      +'</div>';
+  html += '<div class="meteo-card meteo-norm-card">'
+    + '<div class="meteo-card-kicker">📏 Écarts aux normales</div>'
+    + '<div class="meteo-norm-row">'
+    + '<div><div class="meteo-mini-label">Max demain</div><div class="meteo-norm-value" style="color:' + (eMaxC || 'var(--text)') + '">' + (eMax || '—') + '</div></div>'
+    + '<div><div class="meteo-mini-label">Min demain</div><div class="meteo-norm-value" style="color:' + (eMinC || 'var(--text)') + '">' + (eMin || '—') + '</div></div>'
+    + '</div>'
+    + '</div>';
+
+  html += meteoBuildRiskCard(forecast, vigilance, now);
+
+  html += '<div class="meteo-days-scroll"><div class="meteo-days-track">';
+  var nD = Math.min((days.time || []).length, 11);
+  for (var i = 1; i < nD; i++) {
+    var dt = days.time[i] ? new Date(days.time[i]) : new Date();
+    var jr = i === 1 ? 'Auj.' : i === 2 ? 'Dem.' : JOURS[dt.getDay()] + ' ' + dt.getDate();
+    var co = (days.weather_code || [])[i] || 0;
+    var tx = Math.round((days.temperature_2m_max || [])[i] || 0);
+    var tn = Math.round((days.temperature_2m_min || [])[i] || 0);
+    var rx = Math.round((days.apparent_temperature_max || [])[i] != null ? (days.apparent_temperature_max || [])[i] : tx);
+    var pl = parseFloat((days.precipitation_sum || [])[i] || 0).toFixed(1);
+    var uv = (days.uv_index_max || [])[i] != null ? (days.uv_index_max || [])[i] : '-';
+    var wd = meteoDir((days.wind_direction_10m_dominant || [])[i]);
+    var gust = (days.wind_gusts_10m_max || [])[i] != null ? Math.round((days.wind_gusts_10m_max || [])[i]) : '–';
+    var nmD = new Date();
+    nmD.setDate(nmD.getDate() + (i - 1));
+    var nmM = nmD.getMonth();
+    var em = NORM_MAX[nmM] != null ? tx - NORM_MAX[nmM] : null;
+    var emTxt = em != null ? '<div class="meteo-day-norm" style="color:' + (em >= 0 ? '#dc2626' : '#2563eb') + '">' + (em >= 0 ? '+' : '') + em + '° norm</div>' : '';
+    html += '<div class="meteo-day-card">'
+      + '<div class="meteo-day-title">' + jr + '</div>'
+      + '<div class="meteo-day-icon">' + (METEO_ICONS[co] || '🌡️') + '</div>'
+      + '<div class="meteo-day-temp">' + tx + '° / ' + tn + '°</div>'
+      + '<div class="meteo-day-feel">Res. ' + rx + '°</div>'
+      + emTxt
+      + '<div class="meteo-day-desc">' + (METEO_DESC[co] || '') + '</div>'
+      + '<div class="meteo-day-meta">🌧️ ' + pl + ' mm</div>'
+      + '<div class="meteo-day-meta">🌞 UV ' + uv + '</div>'
+      + '<div class="meteo-day-meta">💨 ' + gust + ' ' + wd + '</div>'
+      + '</div>';
   }
-  html+='</div></div>';
-  html+='<div style="font-size:0.62rem;color:var(--muted);text-align:center">Source : Open-Meteo · Vigilance : Météo-France</div>';
+  html += '</div></div>';
+  html += '<div class="meteo-source">Source : Open-Meteo · Vigilance : Météo-France</div>';
+  html += '</div>';
   el.innerHTML = html;
 }
 
