@@ -418,8 +418,8 @@ function pluBuildAnswer(qid, zone, zoneKey) {
     html += `<div class="plu-footer">
       ⚠️ Informations issues du PLU approuvé le 30/01/2013 — à titre indicatif.<br>
       Toute décision définitive relève du service urbanisme.
-      <a href="mailto:urbanisme@mezieres-lez-clery.fr" onclick="event.stopPropagation();window.location.href='mailto:urbanisme@mezieres-lez-clery.fr';return false;" style="display:block;margin-top:6px;padding:8px 12px;background:var(--forest);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">✉️ Contacter le service urbanisme</a>
-      <a href="tel:0238456176" onclick="event.stopPropagation();window.location.href='tel:0238456176';return false;" style="display:block;margin-top:5px;padding:8px 12px;background:var(--leaf);color:white;border-radius:8px;text-decoration:none;font-weight:700;text-align:center;">📞 Mairie : 02 38 45 61 76</a>
+      <a href="mailto:urbanisme@mezieres-lez-clery.fr" onclick="event.stopPropagation();window.location.href='mailto:urbanisme@mezieres-lez-clery.fr';return false;" class="mel-action-btn" style="margin-top:6px;text-align:center;">✉️ Contacter le service urbanisme</a>
+      <a href="tel:0238456176" onclick="event.stopPropagation();window.location.href='tel:0238456176';return false;" class="mel-action-btn secondary" style="margin-top:5px;text-align:center;">📞 Mairie : 02 38 45 61 76</a>
     </div>`;
   }
 
@@ -939,21 +939,21 @@ function _renderDirectAnswer(answer){
     // Transformer URLs et tél en liens cliquables
     let t=answer
       .replace(/\n/g,'<br>')
-      .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" style="color:var(--leaf);font-weight:700;word-break:break-all;">$1</a>')
-      .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" style="color:var(--leaf);font-weight:700;">$1</a>')
-      .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
-    return '<p style="margin:0 0 8px;line-height:1.6;">'+t+'</p>';
+      .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" class="mel-inline-link">$1</a>')
+      .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" class="mel-inline-link">$1</a>')
+      .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" class="mel-inline-link">📞 $1</a>');
+    return '<p class="mel-rich-text">'+t+'</p>';
   }
   // Format objet
-  let h='<p style="margin:0 0 10px;line-height:1.6;">'+answer.text+'</p>';
+  let h='<p class="mel-rich-text">'+esc(answer.text).replace(/\n/g,'<br>')+'</p>';
   if(answer.links&&answer.links.length){
-    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    h+='<div class="mel-action-links">';
     for(const lk of answer.links){
       const href=lk.tel?'tel:'+lk.tel:lk.url;
       const target=lk.tel?'':'target="_blank"';
       const isLocal=href.startsWith('tel:')||href.startsWith('mailto:');
       const clickHandler=isLocal?' onclick="event.stopPropagation();window.location.href=\''+href.replace(/'/g,"\\'")+'\';return false;"':'';
-      h+='<a href="'+href+'" '+target+clickHandler+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+lk.label+'</a>';
+      h+='<a href="'+href+'" '+target+clickHandler+' class="mel-action-btn'+(lk.tel?' secondary':'')+'">'+lk.label+'</a>';
     }
     h+='</div>';
   }
