@@ -457,9 +457,15 @@
         </div>
         <div class="form-group">
           <label class="form-label">Photo (facultatif)</label>
-          <input type="file" id="signal-photo-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto()">
-          <button class="photo-btn" onclick="document.getElementById('signal-photo-input').click()">📷 Prendre une photo ou choisir une image</button>
+          <input type="file" id="signal-photo-camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto('camera')">
+          <input type="file" id="signal-photo-input" accept="image/*" style="display:none" onchange="previewPhoto('gallery')">
+          <div class="photo-actions" id="signal-photo-actions">
+            <button type="button" class="photo-btn" onclick="document.getElementById('signal-photo-camera-input').click()">📷 Prendre une photo</button>
+            <button type="button" class="photo-btn secondary" onclick="document.getElementById('signal-photo-input').click()">🖼️ Choisir dans la galerie</button>
+          </div>
+          <div class="photo-help">Astuce : vous pouvez envoyer une photo prise sur place ou une image déjà enregistrée.</div>
           <img id="signal-photo-preview" class="photo-preview">
+          <button type="button" id="signal-photo-remove" class="photo-remove-btn" onclick="removeSignalPhoto()">🗑️ Retirer l'image</button>
         </div>
         <div class="form-group">
           <label class="form-label">Localisation (facultatif)</label>
@@ -499,6 +505,13 @@
           <button class="idea-cat" onclick="selIdeaCat(this,'💡 Autre')">💡 Autre</button>
         </div>
         <button class="idea-submit" onclick="submitIdee()">💡 Soumettre mon idée</button>
+      </div>
+      <div class="ideas-toolbar">
+        <div class="ideas-sort-group">
+          <button type="button" class="ideas-sort-btn on" id="ideas-sort-pop" onclick="setIdeasSort('popular')">🔥 Populaires</button>
+          <button type="button" class="ideas-sort-btn" id="ideas-sort-recent" onclick="setIdeasSort('recent')">🕒 Récentes</button>
+        </div>
+        <div class="idea-sort-note" id="ideas-sort-note">Tri par votes décroissants</div>
       </div>
       <div id="ideas-list" class="ideas-list"></div>
     </div>
@@ -689,6 +702,18 @@
         <div class="form-group">
           <label class="form-label">Description du problème</label>
           <textarea class="form-textarea" id="bug-desc" placeholder="Décrivez ce qui ne fonctionne pas…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capture d'écran / photo (facultatif)</label>
+          <input type="file" id="bug-photo-camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewBugPhoto('camera')">
+          <input type="file" id="bug-photo-input" accept="image/*" style="display:none" onchange="previewBugPhoto('gallery')">
+          <div class="photo-actions" id="bug-photo-actions">
+            <button type="button" class="photo-btn" onclick="document.getElementById('bug-photo-camera-input').click()">📷 Prendre une photo</button>
+            <button type="button" class="photo-btn secondary" onclick="document.getElementById('bug-photo-input').click()">🖼️ Choisir une capture</button>
+          </div>
+          <div class="photo-help">Une capture d'écran aide beaucoup pour diagnostiquer le problème.</div>
+          <img id="bug-photo-preview" class="photo-preview">
+          <button type="button" id="bug-photo-remove" class="photo-remove-btn" onclick="removeBugPhoto()">🗑️ Retirer l'image</button>
         </div>
         <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
       </div>
