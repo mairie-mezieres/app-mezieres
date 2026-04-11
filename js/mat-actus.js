@@ -186,7 +186,7 @@ function renderActuListItem(a){
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
   const eventHTML = a.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(a.eventDate))}${a.eventLocation?' · 📍 '+esc(a.eventLocation):''}</div>` : '';
-  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détail</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Facebook</a></div></div></div>`;
+  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a></div></div></div>`;
 }
 
 function renderActuDetail(actu){
@@ -202,7 +202,7 @@ function renderActuDetail(actu){
   const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${actu.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'"></div>`:'';
   const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
   const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank">📘 Voir Facebook</a></div></div>`;
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a></div></div>`;
 }
 
 async function openActuDetail(id, opts){
