@@ -108,7 +108,9 @@ function resetSignal(){
 const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3', IDEAS_SEEN_KEY='mat_ideas_seen_v1';
 const IDEAS_URL='https://chatbot-mairie-mezieres.onrender.com/idees';
 const IDEAS_SORT_KEY='mat_ideas_sort_v1';
-const IDEA_HOT_THRESHOLD=5;
+const IDEA_TREND_MIN_VOTES=3;
+const IDEA_TREND_MAX_AGE_DAYS=10;
+const IDEA_TREND_MIN_VOTES_PER_DAY=1;
 let ideaCat='';
 let _ideasSort=(localStorage.getItem(IDEAS_SORT_KEY)||'popular');
 function selIdeaCat(btn,cat){document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));btn.classList.add('on');ideaCat=cat;}
@@ -153,6 +155,23 @@ function _ideaTimestamp(idea){
   if(m) return new Date(Number(m[3]), Number(m[2])-1, Number(m[1])).getTime();
   const p=Date.parse(raw);
   return isNaN(p)?0:p;
+}
+function _ideaAgeDays(idea){
+  const ts=_ideaTimestamp(idea);
+  if(!ts) return Infinity;
+  const diff=Math.max(0, Date.now()-ts);
+  return diff/86400000;
+}
+function _ideaVotesPerDay(idea){
+  const votes=Math.max(0, Number((idea&&idea.votes)||0));
+  const ageDays=_ideaAgeDays(idea);
+  return votes/Math.max(1, ageDays);
+}
+function isIdeaTrending(idea){
+  const votes=Math.max(0, Number((idea&&idea.votes)||0));
+  const ageDays=_ideaAgeDays(idea);
+  const speed=_ideaVotesPerDay(idea);
+  return votes>=IDEA_TREND_MIN_VOTES && ageDays<=IDEA_TREND_MAX_AGE_DAYS && speed>=IDEA_TREND_MIN_VOTES_PER_DAY;
 }
 function sortIdeasList(ideas, mode){
   const list=(ideas||[]).slice();
@@ -204,9 +223,9 @@ async function loadIdees(){
   const ideas=sortIdeasList(await fetchIdeasList(), _ideasSort);
   if(!ideas.length){el.innerHTML=`<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>`; markIdeasAsSeen([]); return;}
   el.innerHTML=ideas.map(idea=>{
-    const hot = Number(idea.votes||0) >= IDEA_HOT_THRESHOLD;
+    const hot = isIdeaTrending(idea);
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
-    return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot">🔥 Plébiscite</div>':''}</div></div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(metaDate)}</div></div></div>`;
+    return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Idée récente qui reçoit des votes rapidement">🔥 Tendance</div>':''}</div></div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(metaDate)}</div></div></div>`;
   }).join('');
   markIdeasAsSeen(ideas);
 }
