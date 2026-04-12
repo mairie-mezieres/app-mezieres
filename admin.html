@@ -232,7 +232,6 @@ let _serviceDiag = null;
 let _serviceDiagRunning = false;
 
 
-// settings
 async function saveStatsSettings() {
   const detailed = !!document.getElementById('set-detailed-stats')?.checked;
   const mel      = !!document.getElementById('set-mel-stats')?.checked;
@@ -261,16 +260,18 @@ async function saveStatsSettings() {
       appOpenStatsEnabled: appOpen
     };
 
-    if (statusEl) {
-      statusEl.textContent = '✅ Réglages enregistrés';
-      statusEl.style.color = 'var(--leaf)';
-    }
-
     renderRedis();
+
+    const newStatusEl = document.getElementById('stats-settings-status');
+    if (newStatusEl) {
+      newStatusEl.textContent = '✅ Réglages enregistrés';
+      newStatusEl.style.color = 'var(--leaf)';
+    }
   } catch (e) {
-    if (statusEl) {
-      statusEl.textContent = '❌ ' + e.message;
-      statusEl.style.color = 'var(--red)';
+    const errEl = document.getElementById('stats-settings-status');
+    if (errEl) {
+      errEl.textContent = '❌ ' + e.message;
+      errEl.style.color = 'var(--red)';
     }
   }
 }
