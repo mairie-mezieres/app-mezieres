@@ -233,7 +233,6 @@ let _serviceDiagRunning = false;
 
 
 // settings
-
 async function saveStatsSettings() {
   const detailed = !!document.getElementById('set-detailed-stats')?.checked;
   const mel      = !!document.getElementById('set-mel-stats')?.checked;
@@ -276,29 +275,6 @@ async function saveStatsSettings() {
   }
 }
 
-    if (!r.ok) throw new Error(r.error || 'Erreur');
-
-    if (!_data) _data = {};
-    if (!_data.dash) _data.dash = {};
-    _data.dash.settings = r.settings || {
-      detailedStatsEnabled: detailed,
-      melUsageStatsEnabled: mel,
-      appOpenStatsEnabled: appOpen
-    };
-
-    if (statusEl) {
-      statusEl.textContent = '✅ Réglages enregistrés';
-      statusEl.style.color = 'var(--leaf)';
-    }
-
-    renderRedis();
-  } catch (e) {
-    if (statusEl) {
-      statusEl.textContent = '❌ ' + e.message;
-      statusEl.style.color = 'var(--red)';
-    }
-  }
-}
 // ── Auth ──────────────────────────────
 async function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
