@@ -275,6 +275,30 @@ async function saveStatsSettings() {
     }
   }
 }
+
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+
+    if (!_data) _data = {};
+    if (!_data.dash) _data.dash = {};
+    _data.dash.settings = r.settings || {
+      detailedStatsEnabled: detailed,
+      melUsageStatsEnabled: mel,
+      appOpenStatsEnabled: appOpen
+    };
+
+    if (statusEl) {
+      statusEl.textContent = '✅ Réglages enregistrés';
+      statusEl.style.color = 'var(--leaf)';
+    }
+
+    renderRedis();
+  } catch (e) {
+    if (statusEl) {
+      statusEl.textContent = '❌ ' + e.message;
+      statusEl.style.color = 'var(--red)';
+    }
+  }
+}
 // ── Auth ──────────────────────────────
 async function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
@@ -582,11 +606,15 @@ function renderIa() {
 
 // ── REDIS ─────────────────────────────
 function renderRedis() {
-  const settings = _data?.dash?.settings || {};
-  const detailedStatsEnabled = settings.detailedStatsEnabled !== false;
-  const melUsageStatsEnabled = settings.melUsageStatsEnabled !== false;
-  const appOpenStatsEnabled  = settings.appOpenStatsEnabled !== false;
-  const redis = _data.dash.redis || {};
+  const redis = (_data && _data.dash && _data.dash.redis) || {};
+  const settings = (_data && _data.dash && _data.dash.settings) || {
+    detailedStatsEnabled: true,
+    melUsageStatsEnabled: true,
+    appOpenStatsEnabled: true
+  };
+  const detailedStatsEnabled = settings.detailedStatsEnabled === true;
+  const melUsageStatsEnabled = settings.melUsageStatsEnabled === true;
+  const appOpenStatsEnabled  = settings.appOpenStatsEnabled === true;
   const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
 
