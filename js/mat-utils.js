@@ -198,7 +198,8 @@ function openMatModal(opts){
   const cancel = document.getElementById('mat-modal-cancel');
   if(!title || !text || !ico || !ok || !cancel) return Promise.resolve(false);
   title.textContent = opts.title || 'MAT';
-  text.textContent = opts.message || '';
+  if (opts.html) text.innerHTML = opts.html;
+  else text.textContent = opts.message || '';
   ico.textContent = opts.icon || 'ℹ️';
   ok.textContent = opts.okText || 'OK';
   cancel.textContent = opts.cancelText || 'Annuler';
