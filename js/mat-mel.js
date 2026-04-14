@@ -561,46 +561,46 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  // Appelé depuis mat-init.js en arrière-plan (non-bloquant).
-  // Priorité : configuration MEL sauvegardée côté serveur, puis fallback
-  // sur les JSON statiques versionnés.
   const V = '3.7.3';
+
   try {
-    const [pluRes, remoteTreeRes, staticTreeRes] = await Promise.all([
+    const [pluRes, treeRes, serverTreeRes] = await Promise.all([
       fetch('./data/plu-data.json?v=' + V, { cache: 'no-cache' }),
-      fetch(MEL_BACKEND + '/mel/tree', { cache: 'no-cache' }).catch(() => null),
-      fetch('./data/mel-tree.json?v=' + V, { cache: 'no-cache' }).catch(() => null)
+      fetch('./data/mel-tree.json?v=' + V, { cache: 'no-cache' }),
+      fetch(MEL_BACKEND + '/mel/tree', { cache: 'no-cache' }).catch(() => null)
     ]);
 
-    if (!pluRes || !pluRes.ok) throw new Error('plu-data.json HTTP ' + (pluRes ? pluRes.status : '0'));
-    const plu = await pluRes.json();
+    if (pluRes && pluRes.ok) {
+      const plu = await pluRes.json();
+      if (plu && plu.zones && Object.keys(plu.zones).length >= 5) {
+        PLU_DATA = plu;
+      }
+    }
 
     let tree = null;
-    if (remoteTreeRes && remoteTreeRes.ok) {
-      try {
-        const remotePayload = await remoteTreeRes.json();
-        if (remotePayload && remotePayload.tree && typeof remotePayload.tree === 'object') tree = remotePayload.tree;
-      } catch (e) {}
-    }
-    if (!tree && staticTreeRes && staticTreeRes.ok) {
-      tree = await staticTreeRes.json();
+
+    if (serverTreeRes && serverTreeRes.ok) {
+      const remote = await serverTreeRes.json();
+      if (remote && remote.ok && remote.tree && typeof remote.tree === 'object' && Object.keys(remote.tree).length >= 1) {
+        tree = remote.tree;
+      }
     }
 
-    if (plu && plu.zones && plu.autorisations && Object.keys(plu.zones).length >= 5) {
-      PLU_DATA = plu;
-    } else {
-      console.warn('[MEL] plu-data.json structure invalide — fallback conservé');
+    if (!tree && treeRes && treeRes.ok) {
+      const localTree = await treeRes.json();
+      if (localTree && typeof localTree === 'object' && Object.keys(localTree).length >= 3) {
+        tree = localTree;
+      }
     }
-    if (tree && typeof tree === 'object' && Object.keys(tree).length >= 3) {
+
+    if (tree) {
       MEL_TREE = tree;
-    } else {
-      console.warn('[MEL] mel-tree structure invalide — fallback conservé');
     }
 
     _melDataLoaded = true;
     console.log('[MEL] Données chargées : ' +
-      Object.keys(PLU_DATA.zones).length + ' zones PLU, ' +
-      Object.keys(MEL_TREE).length + ' catégories MEL');
+      Object.keys(PLU_DATA.zones || {}).length + ' zones PLU, ' +
+      Object.keys(MEL_TREE || {}).length + ' catégories MEL');
   } catch (e) {
     console.warn('[MEL] Fallback embarqué utilisé :', e.message || e);
   }
