@@ -261,6 +261,50 @@ let _serviceDiagRunning = false;
 let _melTreeEditor = null;
 let _melTreeLoadedFrom = '';
 
+async function saveStatsSettings() {
+  const detailed = !!document.getElementById('set-detailed-stats')?.checked;
+  const mel      = !!document.getElementById('set-mel-stats')?.checked;
+  const appOpen  = !!document.getElementById('set-appopen-stats')?.checked;
+  const statusEl = document.getElementById('stats-settings-status');
+
+  try {
+    if (statusEl) {
+      statusEl.textContent = 'Enregistrement…';
+      statusEl.style.color = 'var(--muted)';
+    }
+
+    const r = await apiPost('/admin/settings', {
+      detailedStatsEnabled: detailed,
+      melUsageStatsEnabled: mel,
+      appOpenStatsEnabled: appOpen
+    });
+
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+
+    if (!_data) _data = {};
+    if (!_data.dash) _data.dash = {};
+    _data.dash.settings = r.settings || {
+      detailedStatsEnabled: detailed,
+      melUsageStatsEnabled: mel,
+      appOpenStatsEnabled: appOpen
+    };
+
+    renderRedis();
+
+    const newStatusEl = document.getElementById('stats-settings-status');
+    if (newStatusEl) {
+      newStatusEl.textContent = '✅ Réglages enregistrés';
+      newStatusEl.style.color = 'var(--leaf)';
+    }
+  } catch (e) {
+    const errEl = document.getElementById('stats-settings-status');
+    if (errEl) {
+      errEl.textContent = '❌ ' + e.message;
+      errEl.style.color = 'var(--red)';
+    }
+  }
+}
+  
 // ── Auth ──────────────────────────────
 async function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
@@ -276,7 +320,22 @@ async function showAdmin() { document.getElementById('login-screen').style.displ
 async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
 async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
 
-
+async function apiPost(path, body) {
+  const r = await fetch(`${API}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-token': TOKEN
+    },
+    body: JSON.stringify(body || {})
+  });
+  if (r.status === 401) {
+    logout();
+    throw new Error('Non autorisé');
+  }
+  return r.json();
+}
+    
 function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); if(_melTreeEditor) renderMelAdmin(); }
 
 // ── Helpers généraux ──────────────────
@@ -573,7 +632,62 @@ function renderRedis() {
   const clsMonth = progressClass(pctMonth);
 
   document.getElementById('redis-content').innerHTML = `
-    <div class="section-title">Utilisation Upstash Redis</div>
+  <div class="section-title">Réglages du tracking</div>
+
+  <div class="progress-wrap">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">Stats détaillées</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
+          Active ou coupe les stats de services secondaires : météo, contact, actualités, signalement, idées, reprise d’application, etc.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-detailed-stats" ${detailedStatsEnabled ? 'checked' : ''}>
+        Activer
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">Usage de MEL</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
+          Active ou coupe le comptage de MEL et des catégories IA. MEL continue de fonctionner même si cette option est coupée.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-mel-stats" ${melUsageStatsEnabled ? 'checked' : ''}>
+        Activer
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">Ouvertures de l’application</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
+          Active ou coupe le comptage de <strong>app_open</strong> et des courbes d’ouvertures de l’application.
+          Les visiteurs uniques quotidiens restent comptés dans tous les cas.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-appopen-stats" ${appOpenStatsEnabled ? 'checked' : ''}>
+        Activer
+      </label>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <button onclick="saveStatsSettings()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 16px;font-size:0.78rem;font-weight:900;cursor:pointer">
+      💾 Enregistrer les réglages
+    </button>
+    <div id="stats-settings-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></div>
+  </div>
+
+  <div class="section-title">Utilisation Upstash Redis</div>
 
     <div class="progress-wrap">
       <div class="progress-header">
