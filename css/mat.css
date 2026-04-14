@@ -346,15 +346,38 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus Rémi strip ── */
-.bus-strip{padding:6px 0 0;width:100%;}
+.bus-strip{padding:8px 10px 10px;width:100%;border-radius:14px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);cursor:pointer;transition:transform .12s ease, background .12s ease;outline:none;}
+.bus-strip:hover,.bus-strip:focus-visible{background:rgba(255,255,255,.12);transform:translateY(-1px);}
+.bus-strip:active{transform:scale(.99);}
 .bus-strip-head{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
 .bus-strip-ico{font-size:.9rem;}
 .bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);}
-.bus-strip-periode{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.5);margin-left:auto;}
-.bus-stop-row{display:block;font-size:.65rem;color:rgba(255,255,255,.85);line-height:1.65;white-space:nowrap;}
-.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.6);font-weight:800;margin-right:4px;}
+.bus-strip-periode{font-size:.58rem;font-weight:800;color:#fff3c7;margin-left:auto;background:rgba(255,255,255,.12);padding:2px 7px;border-radius:999px;}
+.bus-stop-row{display:block;font-size:.65rem;color:rgba(255,255,255,.92);line-height:1.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.68);font-weight:800;margin-right:4px;}
 .bus-next{font-weight:900;color:#bfdbfe;}
 .bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
+.bus-strip-cta{margin-top:6px;font-size:.62rem;font-weight:900;color:#fff2c7;}
+
+/* ── Overlay Rémi ── */
+.remi-intro{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.remi-intro-title{font-size:.9rem;font-weight:900;color:var(--forest);margin-bottom:6px;}
+.remi-intro-text{font-size:.76rem;color:var(--muted);line-height:1.6;}
+.remi-link-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;text-decoration:none;border-radius:12px;padding:10px 12px;font-size:.76rem;font-weight:900;}
+.remi-week{display:flex;flex-direction:column;gap:10px;}
+.remi-day-card{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);}
+.remi-day-card.today{border-color:rgba(212,168,67,.45);box-shadow:0 6px 18px rgba(212,168,67,.14);}
+.remi-day-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.remi-day-title{font-size:.82rem;font-weight:900;color:var(--forest);text-transform:capitalize;}
+.remi-day-badge{font-size:.64rem;font-weight:900;color:var(--leaf);background:var(--mist);padding:4px 8px;border-radius:999px;white-space:nowrap;}
+.remi-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.remi-stop-box{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:10px 11px;}
+.remi-stop-title{font-size:.74rem;font-weight:900;color:var(--forest);margin-bottom:6px;}
+.remi-line{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px dashed rgba(0,0,0,.08);}
+.remi-line:first-of-type{border-top:none;padding-top:0;}
+.remi-line span{font-size:.68rem;font-weight:700;color:var(--muted);}
+.remi-line strong{font-size:.78rem;color:var(--text);line-height:1.45;word-break:break-word;}
+@media(min-width:480px){.remi-grid{grid-template-columns:1fr 1fr;}}
 
 /* ── Text-to-Speech ── */
 .tts-btn{background:none;border:1.5px solid var(--sage);border-radius:999px;padding:4px 10px;font-size:0.7rem;font-weight:800;color:var(--leaf);cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-family:'Nunito',sans-serif;}
@@ -706,6 +729,7 @@ html.theme-sombre .ctx-close{background:rgba(255,255,255,.08);color:#e2e8f0;}
 .mat-modal-close{border:none;background:rgba(255,255,255,.16);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;}
 .mat-modal-body{padding:16px;}
 .mat-modal-text{font-size:.84rem;color:var(--text);line-height:1.65;white-space:pre-line;}
+.mat-modal-text a{color:var(--leaf);font-weight:900;}
 .mat-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
 .mat-modal-btn{border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:900;cursor:pointer;}
 .mat-modal-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
