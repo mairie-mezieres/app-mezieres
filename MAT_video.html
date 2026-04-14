@@ -1,5 +1,12 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAT — Mézières Avec Toi</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;padding:16px}
 .stage{width:100%;aspect-ratio:9/16;max-width:360px;margin:0 auto;background:#000;overflow:hidden;position:relative;border-radius:20px}
 .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;opacity:0;pointer-events:none}
 .slide.active{opacity:1;pointer-events:auto}
@@ -33,14 +40,17 @@
 .nav-btn:active{transform:scale(.97)}
 .slide-counter{font-size:12px;color:rgba(255,255,255,.45);min-width:40px;text-align:center}
 </style>
-
-<h2 class="sr-only">Présentation animée MAT — Mézières Avec Toi — 8 slides avec visuels MAT et MEL</h2>
+</head>
+<body>
 
 <div class="stage" id="stage">
 
-  <!-- SLIDE 0 — INTRO avec photo MAT plateau -->
+  <!-- SLIDE 0 — INTRO avec MAT plateau -->
   <div class="slide active" id="s0" style="background:#000;justify-content:flex-end;padding:0">
-    <img src="/mnt/user-data/uploads/mat-header.png" class="anim-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"/>
+    <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/mat-header.png"
+         class="anim-img"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"
+         alt="MAT — Mézières Avec Toi"/>
     <div style="position:relative;z-index:2;width:100%;padding:0 0 52px;text-align:center;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,0) 100%)">
       <div class="anim-up d3" style="font-size:13px;color:#9FE1CB;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Commune de Mézières-lez-Cléry</div>
       <div class="anim-up d4" style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1.1">Votre commune<br>dans votre poche</div>
@@ -176,9 +186,12 @@
     </div>
   </div>
 
-  <!-- SLIDE 7 — CTA FINAL avec photo MAT & MEL -->
+  <!-- SLIDE 7 — CTA FINAL avec MAT et MEL -->
   <div class="slide" id="s7" style="background:#000;justify-content:flex-end;padding:0">
-    <img src="/mnt/user-data/uploads/MAT_et_MEL.png" class="anim-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"/>
+    <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/MAT%20et%20MEL.png"
+         class="anim-img"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"
+         alt="MAT et MEL"/>
     <div style="position:relative;z-index:2;width:100%;padding:0 0 52px;text-align:center;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,0) 100%)">
       <div class="anim-up d2" style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px">Rejoignez MAT &amp; MEL !</div>
       <div class="anim-up d3" style="font-size:13px;color:#9FE1CB;margin-bottom:18px;line-height:1.5">L'application et son assistante IA<br>au service de Mézières-lez-Cléry</div>
@@ -278,3 +291,5 @@ document.getElementById('stage').addEventListener('touchend',function(e){
   if(Math.abs(dx)>40){stopProgress();goTo(cur+(dx<0?1:-1));if(autoPlay)startProgress();}
 },{passive:true});
 </script>
+</body>
+</html>
