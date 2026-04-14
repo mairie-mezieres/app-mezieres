@@ -613,6 +613,15 @@ function renderIa() {
 // ── REDIS ─────────────────────────────
 function renderRedis() {
   const redis = _data.dash.redis || {};
+  const settings = (_data && _data.dash && _data.dash.settings) || {
+    detailedStatsEnabled: true,
+    melUsageStatsEnabled: true,
+    appOpenStatsEnabled: true
+  };
+  const detailedStatsEnabled = settings.detailedStatsEnabled === true;
+  const melUsageStatsEnabled = settings.melUsageStatsEnabled === true;
+  const appOpenStatsEnabled  = settings.appOpenStatsEnabled === true;
+  
   const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
 
