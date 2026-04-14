@@ -78,8 +78,8 @@ self.addEventListener('fetch', e => {
 function normalizePushPayload(raw) {
   const nested = raw && raw.data && typeof raw.data === 'object' ? raw.data : {};
   const actuId = nested.actuId != null ? String(nested.actuId) : null;
-  const url = nested.url || raw.url || (actuId ? `/#actu=${encodeURIComponent(actuId)}` : '/#notifs');
-  const listUrl = nested.listUrl || '/#notifs';
+  const url = nested.url || raw.url || (actuId ? `./#actu=${encodeURIComponent(actuId)}` : './#notifs');
+  const listUrl = nested.listUrl || './#notifs';
   const open = nested.open || (actuId ? 'actu' : 'notifs');
   const actions = Array.isArray(raw.actions) && raw.actions.length ? raw.actions : (actuId ? [{ action: 'detail', title: 'Détail' }] : []);
   return {
@@ -123,32 +123,34 @@ self.addEventListener('notificationclick', e => {
 
   const data = e.notification.data || {};
   const wantsDetail = e.action === 'detail' || data.open === 'actu' || !e.action;
-  const targetHash = wantsDetail
-    ? (data.url || (data.actuId ? `/#actu=${encodeURIComponent(String(data.actuId))}` : '/#notifs'))
-    : (data.listUrl || '/#notifs');
 
-  const absoluteUrl = new URL(targetHash, self.location.origin).href;
+  const targetUrl = wantsDetail
+    ? new URL(
+        data.url || (data.actuId != null
+          ? `./#actu=${encodeURIComponent(String(data.actuId))}`
+          : './#notifs'),
+        self.registration.scope
+      ).href
+    : new URL(data.listUrl || './#notifs', self.registration.scope).href;
 
   e.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cls => {
-      const existing = cls.find(c => c.url.startsWith(self.location.origin));
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async cls => {
+      const existing = cls.find(c => c.url.startsWith(self.registration.scope));
+
       if (existing) {
-        return existing.focus().then(() => {
-          try {
-            existing.postMessage({ action: 'openUrl', url: targetHash });
-            if (wantsDetail && data.actuId != null) {
-              existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
-            } else {
-              existing.postMessage({ action: 'openNotifs' });
-            }
-          } catch (_) {}
-          if ('navigate' in existing) {
-            return existing.navigate(absoluteUrl).catch(() => existing);
+        await existing.focus();
+
+        try {
+          if (wantsDetail && data.actuId != null) {
+            existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
+          } else {
+            existing.postMessage({ action: 'openNotifs' });
           }
-          return existing;
-        });
+        } catch (_) {}
+
+        return existing;
       }
-      return clients.openWindow(absoluteUrl);
+      return clients.openWindow(targetUrl);
     })
   );
 });
