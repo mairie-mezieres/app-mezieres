@@ -80,6 +80,7 @@
       <div class="mat-badge" id="mat-date-badge">Chargement…</div>
       <div class="mat-title">Mézières Avec Toi</div>
       <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v3.7.3</div>
+      <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Mézièrois(es) ont installé MAT</div>
     </div>
     <!-- Droite : icône MAT -->
     <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
@@ -962,5 +963,42 @@
   </div>
 </div>
 
+
+<script>
+(function(){
+  var CACHE_KEY = 'mat_install_count';
+  var CACHE_TTL = 86400000;
+  var API_URL = 'https://chatbot-mairie-mezieres.onrender.com/api/install-count';
+
+  function showCount(n){
+    if(!n || n < 2) return;
+    var badge = document.getElementById('install-count-badge');
+    var val = document.getElementById('install-count-val');
+    if(badge && val){
+      val.textContent = n;
+      badge.style.display = 'block';
+    }
+  }
+
+  try {
+    var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if(cached && cached.ts && (Date.now() - cached.ts) < CACHE_TTL){
+      showCount(cached.count);
+      return;
+    }
+  } catch(e){}
+
+  fetch(API_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var n = d && d.count ? parseInt(d.count) : 0;
+      if(n > 0){
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({count:n, ts:Date.now()})); } catch(e){}
+        showCount(n);
+      }
+    })
+    .catch(function(){});
+})();
+</script>
 </body>
 </html>
