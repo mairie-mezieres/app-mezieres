@@ -1,26 +1,24 @@
-// SERVICE WORKER v3.7.3 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.7.4 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 3 : détail d'actualité depuis notification push
-const CACHE = 'mat-v3.7.3';
+const CACHE = 'mat-v3.7.4';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
-  './css/mat.css?v=3.7.3',
-  './js/mat-utils.js?v=3.7.3',
-  './js/mat-core.js?v=3.7.3',
-  './js/mat-accessibility.js?v=3.7.3',
-  './js/mat-widgets.js?v=3.7.3',
-  './js/mat-agenda.js?v=3.7.3',
-  './js/mat-forms.js?v=3.7.3',
-  './js/mat-actus.js?v=3.7.3',
-  './js/mat-trombi.js?v=3.7.3',
-  './js/mat-mel.js?v=3.7.3',
-  './js/mat-init.js?v=3.7.3',
-  // Phase 3 : données MEL/PLU externalisées
-  './data/plu-data.json?v=3.7.3',
-  './data/mel-tree.json?v=3.7.3',
-  // Assets statiques  
+  './css/mat.css?v=3.7.4',
+  './js/mat-utils.js?v=3.7.4',
+  './js/mat-core.js?v=3.7.4',
+  './js/mat-accessibility.js?v=3.7.4',
+  './js/mat-widgets.js?v=3.7.4',
+  './js/mat-agenda.js?v=3.7.4',
+  './js/mat-forms.js?v=3.7.4',
+  './js/mat-actus.js?v=3.7.4',
+  './js/mat-trombi.js?v=3.7.4',
+  './js/mat-mel.js?v=3.7.4',
+  './js/mat-init.js?v=3.7.4',
+  './data/plu-data.json?v=3.7.4',
+  './data/mel-tree.json?v=3.7.4',
   './mat-header.png',
   './icon-192.png'
 ];
@@ -50,15 +48,17 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
 
   // Ne JAMAIS cacher les API backend et services externes
-  if (url.includes('onrender.com') ||
-      url.includes('googleapis.com') ||
-      url.includes('open-meteo.com') ||
-      url.includes('facebook.com') ||
-      url.includes('panneaupocket') ||
-      url.includes('api-adresse.data.gouv.fr') ||
-      url.includes('geoportail-urbanisme') ||
-      url.includes('raw.githubusercontent.com') ||
-      url.includes('res.cloudinary.com')) return;
+  if (
+    url.includes('onrender.com') ||
+    url.includes('googleapis.com') ||
+    url.includes('open-meteo.com') ||
+    url.includes('facebook.com') ||
+    url.includes('panneaupocket') ||
+    url.includes('api-adresse.data.gouv.fr') ||
+    url.includes('geoportail-urbanisme') ||
+    url.includes('raw.githubusercontent.com') ||
+    url.includes('res.cloudinary.com')
+  ) return;
 
   e.respondWith(
     fetch(e.request.clone())
@@ -75,13 +75,51 @@ self.addEventListener('fetch', e => {
   );
 });
 
+function normalizeInAppPath(input, fallback) {
+  const raw = String(input || '').trim();
+  const fb = fallback || './#notifs';
+
+  if (!raw) return fb;
+
+  // Cas ancien payload : "/#actu=123" ou "/#notifs"
+  if (raw.startsWith('/#')) return `.${raw}`;
+
+  // Cas déjà bon
+  if (raw.startsWith('./#')) return raw;
+
+  // Cas hash seul
+  if (raw.startsWith('#')) return `./${raw}`;
+
+  // Cas URL absolue du même domaine avec hash
+  try {
+    const u = new URL(raw, self.location.origin);
+    if (u.origin === self.location.origin && u.hash) {
+      return `./${u.hash}`;
+    }
+  } catch (_) {}
+
+  return fb;
+}
+
 function normalizePushPayload(raw) {
   const nested = raw && raw.data && typeof raw.data === 'object' ? raw.data : {};
   const actuId = nested.actuId != null ? String(nested.actuId) : null;
-  const url = nested.url || raw.url || (actuId ? `./#actu=${encodeURIComponent(actuId)}` : './#notifs');
-  const listUrl = nested.listUrl || './#notifs';
+
+  const url = normalizeInAppPath(
+    nested.url || raw.url,
+    actuId ? `./#actu=${encodeURIComponent(actuId)}` : './#notifs'
+  );
+
+  const listUrl = normalizeInAppPath(
+    nested.listUrl,
+    './#notifs'
+  );
+
   const open = nested.open || (actuId ? 'actu' : 'notifs');
-  const actions = Array.isArray(raw.actions) && raw.actions.length ? raw.actions : (actuId ? [{ action: 'detail', title: 'Détail' }] : []);
+  const actions = Array.isArray(raw.actions) && raw.actions.length
+    ? raw.actions
+    : (actuId ? [{ action: 'detail', title: 'Détail' }] : []);
+
   return {
     title: raw.title || 'MAT — Mézières Avec Toi',
     body: raw.body || '',
@@ -103,8 +141,9 @@ function normalizePushPayload(raw) {
 self.addEventListener('push', e => {
   const raw = e.data ? e.data.json() : { title: 'MAT', body: 'Nouvelle publication Radio Mézières' };
   const notif = normalizePushPayload(raw || {});
-  e.waitUntil(
-    self.registration.showNotification(notif.title, {
+
+  e.waitUntil((async () => {
+    await self.registration.showNotification(notif.title, {
       body: notif.body,
       icon: notif.icon,
       badge: notif.badge,
@@ -114,8 +153,14 @@ self.addEventListener('push', e => {
       tag: notif.tag,
       renotify: false,
       data: notif.data
-    })
-  );
+    });
+
+    try {
+      if (self.navigator && 'setAppBadge' in self.navigator) {
+        await self.navigator.setAppBadge();
+      }
+    } catch (_) {}
+  })());
 });
 
 self.addEventListener('notificationclick', e => {
@@ -126,12 +171,18 @@ self.addEventListener('notificationclick', e => {
 
   const targetUrl = wantsDetail
     ? new URL(
-        data.url || (data.actuId != null
-          ? `./#actu=${encodeURIComponent(String(data.actuId))}`
-          : './#notifs'),
+        normalizeInAppPath(
+          data.url,
+          data.actuId != null
+            ? `./#actu=${encodeURIComponent(String(data.actuId))}`
+            : './#notifs'
+        ),
         self.registration.scope
       ).href
-    : new URL(data.listUrl || './#notifs', self.registration.scope).href;
+    : new URL(
+        normalizeInAppPath(data.listUrl, './#notifs'),
+        self.registration.scope
+      ).href;
 
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async cls => {
@@ -150,7 +201,22 @@ self.addEventListener('notificationclick', e => {
 
         return existing;
       }
+
       return clients.openWindow(targetUrl);
     })
   );
+});
+
+self.addEventListener('message', e => {
+  if (!e.data) return;
+
+  if (e.data === 'clearBadge' || (typeof e.data === 'object' && e.data.action === 'clearBadge')) {
+    e.waitUntil((async () => {
+      try {
+        if (self.navigator && 'clearAppBadge' in self.navigator) {
+          await self.navigator.clearAppBadge();
+        }
+      } catch (_) {}
+    })());
+  }
 });
