@@ -346,18 +346,130 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus Rémi strip ── */
-.bus-strip{padding:8px 10px 10px;width:100%;border-radius:14px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);cursor:pointer;transition:transform .12s ease, background .12s ease;outline:none;}
-.bus-strip:hover,.bus-strip:focus-visible{background:rgba(255,255,255,.12);transform:translateY(-1px);}
-.bus-strip:active{transform:scale(.99);}
-.bus-strip-head{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
-.bus-strip-ico{font-size:.9rem;}
-.bus-strip-title{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.65);}
-.bus-strip-periode{font-size:.58rem;font-weight:800;color:#fff3c7;margin-left:auto;background:rgba(255,255,255,.12);padding:2px 7px;border-radius:999px;}
-.bus-stop-row{display:block;font-size:.65rem;color:rgba(255,255,255,.92);line-height:1.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bus-stop-name{font-size:.6rem;color:rgba(255,255,255,.68);font-weight:800;margin-right:4px;}
-.bus-next{font-weight:900;color:#bfdbfe;}
-.bus-loading{font-size:.65rem;color:rgba(255,255,255,.65);font-style:italic;}
-.bus-strip-cta{margin-top:6px;font-size:.62rem;font-weight:900;color:#fff2c7;}
+.bus-strip{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+  cursor:pointer;
+  transition:transform .12s ease, background .12s ease;
+  outline:none;
+}
+
+.bus-strip:hover,
+.bus-strip:focus-visible{
+  background:rgba(255,255,255,.12);
+  transform:translateY(-1px);
+}
+
+.bus-strip:active{
+  transform:scale(.99);
+}
+
+.bus-strip-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:0;
+  flex-shrink:0;
+  min-width:max-content;
+}
+
+.bus-strip-ico{font-size:.95rem;}
+
+.bus-strip-title{
+  font-size:.58rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.68);
+}
+
+.bus-strip-periode{
+  font-size:.58rem;
+  font-weight:900;
+  color:#fff3c7;
+  background:rgba(255,255,255,.12);
+  padding:2px 7px;
+  border-radius:999px;
+  margin-left:6px;
+}
+
+#bus-strip-stops{
+  flex:1;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  overflow:hidden;
+}
+
+.bus-stop-row{
+  display:block;
+  flex:1;
+  min-width:0;
+  font-size:.64rem;
+  color:rgba(255,255,255,.92);
+  line-height:1.35;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.bus-stop-name{
+  font-size:.6rem;
+  color:rgba(255,255,255,.68);
+  font-weight:800;
+  margin-right:4px;
+}
+
+.bus-next{
+  font-weight:900;
+  color:#bfdbfe;
+}
+
+.bus-loading{
+  font-size:.65rem;
+  color:rgba(255,255,255,.65);
+  font-style:italic;
+}
+
+.bus-strip-cta{
+  flex-shrink:0;
+  font-size:.62rem;
+  font-weight:900;
+  color:#fff2c7;
+  white-space:nowrap;
+}
+
+@media (max-width:520px){
+  .bus-strip{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  #bus-strip-stops{
+    width:100%;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+  }
+
+  .bus-stop-row,
+  .bus-strip-cta{
+    width:100%;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
 
 /* ── Overlay Rémi ── */
 .remi-intro{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
