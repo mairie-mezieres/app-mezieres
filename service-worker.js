@@ -81,16 +81,10 @@ function normalizeInAppPath(input, fallback) {
 
   if (!raw) return fb;
 
-  // Cas ancien payload : "/#actu=123" ou "/#notifs"
-  if (raw.startsWith('/#')) return `.${raw}`;
-
-  // Cas déjà bon
   if (raw.startsWith('./#')) return raw;
-
-  // Cas hash seul
+  if (raw.startsWith('/#')) return `.${raw}`;
   if (raw.startsWith('#')) return `./${raw}`;
 
-  // Cas URL absolue du même domaine avec hash
   try {
     const u = new URL(raw, self.location.origin);
     if (u.origin === self.location.origin && u.hash) {
@@ -136,7 +130,6 @@ function normalizePushPayload(raw) {
     }
   };
 }
-
 // ── Notifications Push ──
 self.addEventListener('push', e => {
   const raw = e.data ? e.data.json() : { title: 'MAT', body: 'Nouvelle publication Radio Mézières' };
