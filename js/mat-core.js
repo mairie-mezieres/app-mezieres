@@ -42,16 +42,77 @@ window.addEventListener('appinstalled', () => {
 });
 
 function updateInstallBanner() {
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
   const titleEl = document.getElementById('ib-title-txt');
   const subEl   = document.getElementById('ib-sub-txt');
 
-  if (!isMobile) {
-    if (titleEl) titleEl.textContent = 'Installez MAT sur votre ordinateur !';
-    if (subEl) subEl.textContent = 'Chrome/Edge : cliquez l’icône ⊕ dans la barre d’adresse · Firefox : non supporté';
+  if (isIOS) {
+    if (titleEl) titleEl.textContent = 'Installez MAT sur votre iPhone / iPad';
+    if (subEl) subEl.textContent = 'Touchez pour voir les étapes d’installation dans Safari';
+  } else if (isAndroid) {
+    if (titleEl) titleEl.textContent = 'Installez MAT sur votre téléphone';
+    if (subEl) subEl.textContent = 'Touchez pour voir les étapes Android';
+  } else {
+    if (titleEl) titleEl.textContent = 'Installez MAT sur votre ordinateur';
+    if (subEl) subEl.textContent = 'Touchez pour voir les étapes PC';
   }
 
   refreshInstallBannerVisibility();
+}
+
+function getInstallHelpHtml(){
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+
+  if (isIOS) {
+    return `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
+          <strong>iOS</strong><br>
+          1. Touchez le bouton <strong>Partager</strong> dans Safari.<br>
+          2. Faites défiler puis touchez <strong>Sur l’écran d’accueil</strong>.<br>
+          3. Confirmez avec <strong>Ajouter</strong>.
+        </div>
+        <a href="installer-ios.mp4" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:900">🎬 Voir la vidéo iOS</a>
+        <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)">La vidéo s’ouvrira si le fichier <strong>installer-ios.mp4</strong> est présent à la racine de la PWA.</div>
+      </div>`;
+  }
+
+  if (isAndroid) {
+    return `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
+          <strong>Android</strong><br>
+          1. Ouvrez le menu du navigateur.<br>
+          2. Touchez <strong>Ajouter à l’écran d’accueil</strong> ou <strong>Installer l’application</strong>.<br>
+          3. Confirmez l’installation.
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
+        <strong>PC</strong><br>
+        1. Dans <strong>Chrome</strong> ou <strong>Edge</strong>, cliquez sur l’icône d’installation dans la barre d’adresse.<br>
+        2. Ou ouvrez le menu du navigateur puis cliquez sur <strong>Installer l’application</strong>.<br>
+        3. Validez pour ajouter MAT sur le bureau.
+      </div>
+      <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)"><strong>Firefox</strong> ne propose généralement pas l’installation PWA.</div>
+    </div>`;
+}
+
+function openInstallHelp(){
+  return openMatModal({
+    type:'alert',
+    title:'Installer MAT',
+    icon:'📲',
+    okText:'Fermer',
+    html:getInstallHelpHtml()
+  });
 }
 
 function installApp(){
@@ -66,20 +127,7 @@ function installApp(){
       dp = null;
     });
   } else {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      alertMAT(
-        'Pour installer MAT :\n\niPhone/iPad : bouton Partager → "Sur l’écran d’accueil"\n\nAndroid : menu navigateur → "Ajouter à l’écran d’accueil"',
-        'Installer MAT',
-        '📲'
-      );
-    } else {
-      alertMAT(
-        'Pour installer MAT sur PC :\n\nChrome / Edge : cliquez sur l’icône ⊕ dans la barre d’adresse\n\nSinon ouvrez le menu du navigateur → "Installer l’application"',
-        'Installer MAT',
-        '📲'
-      );
-    }
+    openInstallHelp();
   }
 }
 
