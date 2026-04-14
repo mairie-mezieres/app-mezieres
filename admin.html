@@ -161,6 +161,32 @@ tr:hover td{background:#f9fafb;}
   .admin-body{padding:12px;}
   .dbar-lbl{width:100px;}
 }
+
+/* MEL admin */
+.mel-admin-box{background:white;border-radius:14px;padding:18px;border:1px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow);}
+.mel-admin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.mel-admin-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.mel-admin-btn{background:var(--forest);color:white;border:none;border-radius:10px;padding:9px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;}
+.mel-admin-btn.sec{background:var(--warm);color:var(--text);border:1px solid var(--border);}
+.mel-admin-btn.warn{background:var(--red);}
+.mel-admin-status{font-size:0.74rem;font-weight:800;}
+.mel-cat-card,.mel-q-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow);}
+.mel-cat-card{margin-bottom:14px;}
+.mel-cat-head,.mel-q-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+.mel-cat-title,.mel-q-title{font-size:0.86rem;font-weight:900;color:var(--forest);}
+.mel-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:10px;}
+.mel-admin-field{display:flex;flex-direction:column;gap:4px;}
+.mel-admin-field label{font-size:0.68rem;font-weight:800;color:var(--muted);}
+.mel-admin-input,.mel-admin-textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;font-size:0.82rem;font-family:inherit;background:white;color:var(--text);outline:none;}
+.mel-admin-input:focus,.mel-admin-textarea:focus{border-color:var(--sage);}
+.mel-admin-textarea{min-height:90px;resize:vertical;line-height:1.5;}
+.mel-admin-checks{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 12px;}
+.mel-admin-checks label{display:flex;align-items:center;gap:7px;font-size:0.75rem;font-weight:700;color:var(--text);}
+.mel-q-list{display:flex;flex-direction:column;gap:10px;}
+.mel-mini{font-size:0.66rem;color:var(--muted);line-height:1.45;}
+.mel-admin-json{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:12px;white-space:pre-wrap;font-size:0.7rem;color:var(--text);max-height:260px;overflow:auto;}
+@media(max-width:640px){.mel-admin-toolbar{align-items:flex-start;}.mel-admin-actions{width:100%;}.mel-admin-btn{flex:1;justify-content:center;text-align:center;padding:10px 12px;}}
+
 </style>
 </head>
 <body>
@@ -205,6 +231,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('services',this)">🧪 Services</button>
     <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
     <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
+    <button class="nav-tab" onclick="showTab('mel',this)">👩‍💼 MEL</button>
     <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
   </div>
 
@@ -217,6 +244,7 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel" id="tab-ideas"><div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-actus"><div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-signals"><div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-mel"><div id="mel-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-banner"><div id="banner-content"></div></div>
     <div class="tab-panel" id="tab-purge"><div id="purge-content"></div></div>
   </div>
@@ -230,51 +258,8 @@ let _charts = {};
 let _purgeDateValue = new Date().toISOString().slice(0, 10);
 let _serviceDiag = null;
 let _serviceDiagRunning = false;
-
-
-async function saveStatsSettings() {
-  const detailed = !!document.getElementById('set-detailed-stats')?.checked;
-  const mel      = !!document.getElementById('set-mel-stats')?.checked;
-  const appOpen  = !!document.getElementById('set-appopen-stats')?.checked;
-  const statusEl = document.getElementById('stats-settings-status');
-
-  try {
-    if (statusEl) {
-      statusEl.textContent = 'Enregistrement…';
-      statusEl.style.color = 'var(--muted)';
-    }
-
-    const r = await apiPost('/admin/settings', {
-      detailedStatsEnabled: detailed,
-      melUsageStatsEnabled: mel,
-      appOpenStatsEnabled: appOpen
-    });
-
-    if (!r.ok) throw new Error(r.error || 'Erreur');
-
-    if (!_data) _data = {};
-    if (!_data.dash) _data.dash = {};
-    _data.dash.settings = r.settings || {
-      detailedStatsEnabled: detailed,
-      melUsageStatsEnabled: mel,
-      appOpenStatsEnabled: appOpen
-    };
-
-    renderRedis();
-
-    const newStatusEl = document.getElementById('stats-settings-status');
-    if (newStatusEl) {
-      newStatusEl.textContent = '✅ Réglages enregistrés';
-      newStatusEl.style.color = 'var(--leaf)';
-    }
-  } catch (e) {
-    const errEl = document.getElementById('stats-settings-status');
-    if (errEl) {
-      errEl.textContent = '❌ ' + e.message;
-      errEl.style.color = 'var(--red)';
-    }
-  }
-}
+let _melTreeEditor = null;
+let _melTreeLoadedFrom = '';
 
 // ── Auth ──────────────────────────────
 async function doLogin() {
@@ -291,23 +276,8 @@ async function showAdmin() { document.getElementById('login-screen').style.displ
 async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
 async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
 
-async function apiPost(path, body) {
-  const r = await fetch(`${API}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-admin-token': TOKEN
-    },
-    body: JSON.stringify(body || {})
-  });
-  if (r.status === 401) {
-    logout();
-    throw new Error('Non autorisé');
-  }
-  return r.json();
-}
-  
-function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); }
+
+function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderPurge(); if(_melTreeEditor) renderMelAdmin(); }
 
 // ── Helpers généraux ──────────────────
 function fmt(n) { return (n||0).toLocaleString('fr-FR'); }
@@ -583,15 +553,7 @@ function renderIa() {
 
 // ── REDIS ─────────────────────────────
 function renderRedis() {
-  const redis = (_data && _data.dash && _data.dash.redis) || {};
-  const settings = (_data && _data.dash && _data.dash.settings) || {
-    detailedStatsEnabled: true,
-    melUsageStatsEnabled: true,
-    appOpenStatsEnabled: true
-  };
-  const detailedStatsEnabled = settings.detailedStatsEnabled === true;
-  const melUsageStatsEnabled = settings.melUsageStatsEnabled === true;
-  const appOpenStatsEnabled  = settings.appOpenStatsEnabled === true;
+  const redis = _data.dash.redis || {};
   const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
 
@@ -611,62 +573,7 @@ function renderRedis() {
   const clsMonth = progressClass(pctMonth);
 
   document.getElementById('redis-content').innerHTML = `
-  <div class="section-title">Réglages du tracking</div>
-
-  <div class="progress-wrap">
-    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
-      <div>
-        <div class="progress-label">Stats détaillées</div>
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
-          Active ou coupe les stats de services secondaires : météo, contact, actualités, signalement, idées, reprise d’application, etc.
-        </div>
-      </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
-        <input type="checkbox" id="set-detailed-stats" ${detailedStatsEnabled ? 'checked' : ''}>
-        Activer
-      </label>
-    </div>
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
-      <div>
-        <div class="progress-label">Usage de MEL</div>
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
-          Active ou coupe le comptage de MEL et des catégories IA. MEL continue de fonctionner même si cette option est coupée.
-        </div>
-      </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
-        <input type="checkbox" id="set-mel-stats" ${melUsageStatsEnabled ? 'checked' : ''}>
-        Activer
-      </label>
-    </div>
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
-      <div>
-        <div class="progress-label">Ouvertures de l’application</div>
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
-          Active ou coupe le comptage de <strong>app_open</strong> et des courbes d’ouvertures de l’application.
-          Les visiteurs uniques quotidiens restent comptés dans tous les cas.
-        </div>
-      </div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
-        <input type="checkbox" id="set-appopen-stats" ${appOpenStatsEnabled ? 'checked' : ''}>
-        Activer
-      </label>
-    </div>
-  </div>
-
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-    <button onclick="saveStatsSettings()" style="background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 16px;font-size:0.78rem;font-weight:900;cursor:pointer">
-      💾 Enregistrer les réglages
-    </button>
-    <div id="stats-settings-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></div>
-  </div>
-
-  <div class="section-title">Utilisation Upstash Redis</div>
+    <div class="section-title">Utilisation Upstash Redis</div>
 
     <div class="progress-wrap">
       <div class="progress-header">
@@ -1254,8 +1161,190 @@ async function doPurge(type){
   }catch(e){alert('Erreur réseau : '+e.message);}
 }
 
+
+function melClone(v){ return JSON.parse(JSON.stringify(v)); }
+function melNormalizeForEditor(tree){
+  const src = tree && typeof tree === 'object' ? tree : {};
+  return {
+    categories: Object.entries(src).map(([key, cat]) => ({
+      key,
+      label: cat?.label || '',
+      ico: cat?.ico || '💬',
+      needZone: !!cat?.needZone,
+      openChatDirectly: !!cat?.openChatDirectly,
+      questions: Array.isArray(cat?.questions) ? cat.questions.map(q => ({
+        id: q?.id || '',
+        ico: q?.ico || '💬',
+        label: q?.label || '',
+        topic: q?.topic || '',
+        prompt: q?.prompt || '',
+        directAnswerText: typeof q?.directAnswer === 'string' ? q.directAnswer : (q?.directAnswer?.text || ''),
+        linksText: Array.isArray(q?.directAnswer?.links) ? q.directAnswer.links.map(link => `${link.label || ''} | ${link.tel || link.url || ''}`).join('\n') : ''
+      })) : []
+    }))
+  };
+}
+function melParseLinksText(text){
+  return String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|');
+    if (parts.length < 2) return null;
+    const label = parts[0].trim();
+    const value = parts.slice(1).join('|').trim();
+    if (!label || !value) return null;
+    if (/^(?:tel:)?0\d/.test(value.replace(/\s+/g,''))) return { label, tel: value.replace(/^tel:/i,'').replace(/\s+/g,'') };
+    return { label, url: value };
+  }).filter(Boolean);
+}
+function melSerializeEditor(){
+  const out = {};
+  const seenCats = new Set();
+  (_melTreeEditor?.categories || []).forEach((cat, catIndex) => {
+    const key = String(cat.key || '').trim();
+    const label = String(cat.label || '').trim();
+    if (!key) throw new Error(`Catégorie ${catIndex + 1} : clé manquante`);
+    if (!label) throw new Error(`Catégorie ${key} : libellé manquant`);
+    if (seenCats.has(key)) throw new Error(`Clé de catégorie en double : ${key}`);
+    seenCats.add(key);
+    const questions = [];
+    const seenQuestions = new Set();
+    (cat.questions || []).forEach((q, qIndex) => {
+      const id = String(q.id || '').trim();
+      const qLabel = String(q.label || '').trim();
+      if (!id) throw new Error(`Question ${qIndex + 1} de ${key} : id manquant`);
+      if (!qLabel) throw new Error(`Question ${id} de ${key} : libellé manquant`);
+      if (seenQuestions.has(id)) throw new Error(`Question en double dans ${key} : ${id}`);
+      seenQuestions.add(id);
+      const item = { id, ico: String(q.ico || '💬').trim() || '💬', label: qLabel };
+      const topic = String(q.topic || '').trim();
+      const prompt = String(q.prompt || '').trim();
+      const directAnswerText = String(q.directAnswerText || '').trim();
+      const links = melParseLinksText(q.linksText || '');
+      if (topic) item.topic = topic;
+      if (prompt) item.prompt = prompt;
+      if (directAnswerText || links.length) {
+        item.directAnswer = {};
+        if (directAnswerText) item.directAnswer.text = directAnswerText;
+        if (links.length) item.directAnswer.links = links;
+      }
+      questions.push(item);
+    });
+    out[key] = {
+      label,
+      ico: String(cat.ico || '💬').trim() || '💬',
+      needZone: !!cat.needZone,
+      questions
+    };
+    if (cat.openChatDirectly) out[key].openChatDirectly = true;
+  });
+  if (!Object.keys(out).length) throw new Error('Ajoute au moins une catégorie');
+  return out;
+}
+async function loadMelAdmin(force){
+  const el = document.getElementById('mel-content');
+  if (!force && _melTreeEditor && el && el.dataset.loaded === '1') { renderMelAdmin(); return; }
+  if (el) el.innerHTML = `<div class="loading"><div class="loading-spinner"></div><br>Chargement de MEL…</div>`;
+  try {
+    const resp = await apiGet('/admin/mel-tree');
+    let tree = resp && resp.tree ? resp.tree : null;
+    if (tree) {
+      _melTreeLoadedFrom = 'serveur';
+    } else {
+      const localRes = await fetch('./data/mel-tree.json', { cache: 'no-store' });
+      if (!localRes.ok) throw new Error('mel-tree.json introuvable');
+      tree = await localRes.json();
+      _melTreeLoadedFrom = 'fichier local';
+    }
+    _melTreeEditor = melNormalizeForEditor(tree);
+    if (el) el.dataset.loaded = '1';
+    renderMelAdmin('');
+  } catch (e) {
+    if (el) el.innerHTML = `<div class="mel-admin-box"><div style="font-size:0.9rem;font-weight:900;color:var(--red);margin-bottom:8px">❌ Impossible de charger MEL</div><div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">${safe(e.message)}</div><button class="mel-admin-btn" onclick="loadMelAdmin(true)">Réessayer</button></div>`;
+  }
+}
+function renderMelAdmin(statusMsg, statusClass){
+  const el = document.getElementById('mel-content');
+  if (!el) return;
+  if (!_melTreeEditor) { el.innerHTML = `<div class="loading"><div class="loading-spinner"></div><br>Chargement…</div>`; return; }
+  const cats = _melTreeEditor.categories || [];
+  const cards = cats.map((cat, ci) => `
+    <div class="mel-cat-card">
+      <div class="mel-cat-head">
+        <div class="mel-cat-title">${safe(cat.ico || '💬')} ${safe(cat.label || 'Nouvelle catégorie')}</div>
+        <button class="mel-admin-btn warn" onclick="melDeleteCategory(${ci})">Supprimer</button>
+      </div>
+      <div class="mel-admin-grid">
+        <div class="mel-admin-field"><label>Clé technique</label><input class="mel-admin-input" value="${safe(cat.key)}" oninput="melSetCatField(${ci},'key',this.value)"></div>
+        <div class="mel-admin-field"><label>Icône</label><input class="mel-admin-input" value="${safe(cat.ico)}" oninput="melSetCatField(${ci},'ico',this.value)"></div>
+        <div class="mel-admin-field" style="grid-column:span 2;"><label>Libellé</label><input class="mel-admin-input" value="${safe(cat.label)}" oninput="melSetCatField(${ci},'label',this.value)"></div>
+      </div>
+      <div class="mel-admin-checks">
+        <label><input type="checkbox" ${cat.needZone?'checked':''} onchange="melSetCatField(${ci},'needZone',this.checked)"> Demande la zone PLU</label>
+        <label><input type="checkbox" ${cat.openChatDirectly?'checked':''} onchange="melSetCatField(${ci},'openChatDirectly',this.checked)"> Ouvre directement le chat</label>
+      </div>
+      <div class="mel-q-list">
+        ${(cat.questions || []).map((q, qi) => `
+          <div class="mel-q-card">
+            <div class="mel-q-head">
+              <div class="mel-q-title">${safe(q.ico || '💬')} ${safe(q.label || 'Nouvelle question')}</div>
+              <button class="mel-admin-btn warn" onclick="melDeleteQuestion(${ci},${qi})">Supprimer</button>
+            </div>
+            <div class="mel-admin-grid">
+              <div class="mel-admin-field"><label>ID question</label><input class="mel-admin-input" value="${safe(q.id)}" oninput="melSetQuestionField(${ci},${qi},'id',this.value)"></div>
+              <div class="mel-admin-field"><label>Icône</label><input class="mel-admin-input" value="${safe(q.ico)}" oninput="melSetQuestionField(${ci},${qi},'ico',this.value)"></div>
+              <div class="mel-admin-field" style="grid-column:span 2;"><label>Libellé</label><input class="mel-admin-input" value="${safe(q.label)}" oninput="melSetQuestionField(${ci},${qi},'label',this.value)"></div>
+              <div class="mel-admin-field"><label>Topic IA</label><input class="mel-admin-input" value="${safe(q.topic)}" oninput="melSetQuestionField(${ci},${qi},'topic',this.value)"></div>
+              <div class="mel-admin-field"><label>Prompt IA</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'prompt',this.value)">${safe(q.prompt)}</textarea></div>
+              <div class="mel-admin-field"><label>Réponse directe</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'directAnswerText',this.value)">${safe(q.directAnswerText)}</textarea></div>
+              <div class="mel-admin-field"><label>Liens</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'linksText',this.value)">${safe(q.linksText)}</textarea><div class="mel-mini">Une ligne par lien : <b>Libellé | URL</b> ou <b>Libellé | 0238456176</b></div></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:10px"><button class="mel-admin-btn sec" onclick="melAddQuestion(${ci})">+ Ajouter une question</button></div>
+    </div>
+  `).join('');
+  const preview = (() => { try { return JSON.stringify(melSerializeEditor(), null, 2); } catch (e) { return '⚠️ ' + e.message; } })();
+  el.innerHTML = `
+    <div class="mel-admin-box">
+      <div class="mel-admin-toolbar">
+        <div>
+          <div style="font-size:0.95rem;font-weight:900;color:var(--forest)">👩‍💼 Gestionnaire MEL</div>
+          <div class="mel-mini">Source actuelle : ${safe(_melTreeLoadedFrom || 'inconnue')} · ${cats.length} catégorie(s)</div>
+        </div>
+        <div class="mel-admin-actions">
+          <button class="mel-admin-btn sec" onclick="loadMelAdmin(true)">Recharger</button>
+          <button class="mel-admin-btn sec" onclick="melAddCategory()">+ Catégorie</button>
+          <button class="mel-admin-btn" onclick="saveMelAdmin()">💾 Enregistrer</button>
+        </div>
+      </div>
+      <div id="mel-admin-status" class="mel-admin-status" style="color:${statusClass==='error'?'var(--red)':statusClass==='success'?'var(--leaf)':'var(--muted)'}">${safe(statusMsg || 'Tu peux modifier les catégories, questions, réponses et liens.')}</div>
+    </div>
+    ${cards || `<div class="mel-admin-box">Aucune catégorie.</div>`}
+    <div class="mel-admin-box"><div style="font-size:0.82rem;font-weight:900;margin-bottom:8px">Aperçu JSON</div><div class="mel-admin-json">${safe(preview)}</div></div>
+  `;
+}
+function melSetCatField(ci, field, value){ if(!_melTreeEditor?.categories?.[ci]) return; _melTreeEditor.categories[ci][field]=value; renderMelAdmin(); }
+function melSetQuestionField(ci, qi, field, value){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; _melTreeEditor.categories[ci].questions[qi][field]=value; renderMelAdmin(); }
+function melAddCategory(){ if(!_melTreeEditor) _melTreeEditor={categories:[]}; const n=_melTreeEditor.categories.length+1; _melTreeEditor.categories.push({ key:'categorie'+n, label:'Nouvelle catégorie', ico:'💬', needZone:false, openChatDirectly:false, questions:[] }); renderMelAdmin(); }
+function melDeleteCategory(ci){ if(!_melTreeEditor?.categories?.[ci]) return; if(!confirm('Supprimer cette catégorie ?')) return; _melTreeEditor.categories.splice(ci,1); renderMelAdmin(); }
+function melAddQuestion(ci){ if(!_melTreeEditor?.categories?.[ci]) return; const cat=_melTreeEditor.categories[ci]; const n=(cat.questions||[]).length+1; cat.questions.push({ id:'question'+n, ico:'💬', label:'Nouvelle question', topic:'', prompt:'', directAnswerText:'', linksText:'' }); renderMelAdmin(); }
+function melDeleteQuestion(ci,qi){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; if(!confirm('Supprimer cette question ?')) return; _melTreeEditor.categories[ci].questions.splice(qi,1); renderMelAdmin(); }
+async function saveMelAdmin(){
+  try {
+    renderMelAdmin('Enregistrement en cours…');
+    const tree = melSerializeEditor();
+    const resp = await apiPost('/admin/mel-tree', { tree });
+    if (!resp.ok) throw new Error(resp.error || 'Erreur');
+    _melTreeEditor = melNormalizeForEditor(resp.tree || tree);
+    _melTreeLoadedFrom = 'serveur';
+    renderMelAdmin('✅ Arbre MEL enregistré côté serveur. La PWA chargera désormais cette version.', 'success');
+  } catch (e) {
+    renderMelAdmin('❌ ' + e.message, 'error');
+  }
+}
+
 // ── Tabs ──────────────────────────────
-function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');}
+function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();}
 
 // ── Init / loadAll ────────────────────
 async function init() {
