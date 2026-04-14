@@ -2,12 +2,29 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>MAT — Mézières Avec Toi</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif;padding:16px}
-.stage{width:100%;aspect-ratio:9/16;max-width:360px;margin:0 auto;background:#000;overflow:hidden;position:relative;border-radius:20px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif}
+
+/* ── MODE NORMAL : centré avec contrôles ── */
+body:not(.fs) .wrapper{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:12px}
+body:not(.fs) .stage{width:100%;aspect-ratio:9/16;max-width:360px;border-radius:20px}
+body:not(.fs) .nav-controls{display:flex;margin-top:12px}
+body:not(.fs) .fs-hint{display:block}
+
+/* ── MODE PLEIN ÉCRAN ── */
+body.fs .wrapper{display:block;padding:0}
+body.fs .stage{width:100vw;height:100vh;max-width:none;border-radius:0}
+body.fs .nav-controls{display:none}
+body.fs .fs-hint{display:none}
+body.fs .fs-overlay{display:flex}
+
+.stage{background:#000;overflow:hidden;position:relative}
 .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:stretch;opacity:0;pointer-events:none}
 .slide.active{opacity:1;pointer-events:auto}
 
@@ -15,6 +32,7 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;justi
 @keyframes scaleIn{from{opacity:0;transform:scale(.84)}to{opacity:1;transform:scale(1)}}
 @keyframes slideRight{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
 @keyframes imgFade{from{opacity:0}to{opacity:1}}
+@keyframes tapFade{0%{opacity:.4}100%{opacity:0}}
 
 .anim-up{animation:fadeUp .5s ease both}
 .anim-scale{animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1) both}
@@ -23,278 +41,195 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;justi
 .d1{animation-delay:.05s}.d2{animation-delay:.2s}.d3{animation-delay:.35s}
 .d4{animation-delay:.5s}.d5{animation-delay:.62s}.d6{animation-delay:.74s}.d7{animation-delay:.86s}
 
-/* Photo slides : image top 45%, texte bottom 55% */
 .photo-top{flex:0 0 45%;position:relative;overflow:hidden}
 .photo-top img{width:100%;height:100%;object-fit:cover;object-position:center top}
-.photo-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 22px 44px;text-align:center}
+.photo-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px 48px;text-align:center}
 
-/* Feature slides : icone/avatar top ~30%, contenu bas */
-.feat-top{flex:0 0 30%;display:flex;align-items:center;justify-content:center;padding-top:8px}
-.feat-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 20px 44px;width:100%}
+.feat-top{flex:0 0 28%;display:flex;align-items:center;justify-content:center;padding-top:6px}
+.feat-bottom{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 18px 46px;width:100%}
 
-.progress-bar{position:absolute;bottom:0;left:0;height:3px;background:#1D9E75;transition:width linear;z-index:10}
-.dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:10}
+.progress-bar{position:absolute;bottom:0;left:0;height:3px;background:#1D9E75;transition:width linear;z-index:20}
+.dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:20}
 .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .3s,transform .3s;cursor:pointer}
 .dot.active{background:#1D9E75;transform:scale(1.35)}
+
+/* Overlay plein écran — contrôles discrets */
+.fs-overlay{display:none;position:absolute;top:0;left:0;right:0;z-index:30;padding:10px 14px;justify-content:space-between;align-items:center;background:linear-gradient(to bottom,rgba(0,0,0,.5),transparent)}
+.fs-btn{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;backdrop-filter:blur(4px)}
+
+/* Tap zones plein écran */
+.tap-prev{position:absolute;left:0;top:0;width:30%;height:100%;z-index:15;cursor:pointer}
+.tap-next{position:absolute;right:0;top:0;width:30%;height:100%;z-index:15;cursor:pointer}
+.tap-flash{position:absolute;inset:0;background:rgba(255,255,255,.12);opacity:0;pointer-events:none;z-index:16}
+.tap-flash.pop{animation:tapFade .25s ease both}
 
 .badge{display:inline-block;padding:4px 13px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
 .feat-line{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border-radius:11px;margin-bottom:7px;border:1px solid rgba(255,255,255,.06)}
 .feat-line-icon{font-size:18px;width:26px;text-align:center;flex-shrink:0}
 .feat-line-text{font-size:12px;color:rgba(255,255,255,.9);line-height:1.35}
+.mel-avatar{width:86px;height:86px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #534AB7}
 
-.mel-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #534AB7}
-
-.nav-controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:12px}
-.nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:7px 16px;font-size:13px;cursor:pointer;transition:background .2s}
-.nav-btn:hover{background:rgba(255,255,255,.2)}
+.nav-controls{display:flex;align-items:center;gap:10px;justify-content:center}
+.nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:7px 14px;font-size:13px;cursor:pointer}
 .nav-btn:active{transform:scale(.97)}
 .slide-counter{font-size:12px;color:rgba(255,255,255,.45);min-width:44px;text-align:center}
+.fs-hint{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px;text-align:center}
 </style>
 </head>
 <body>
-
+<div class="wrapper">
 <div class="stage" id="stage">
 
-  <!-- ── SLIDE 0 — INTRO : photo MAT plateau ── -->
+  <!-- Tap zones plein écran -->
+  <div class="tap-prev" onclick="tapNav(-1)"></div>
+  <div class="tap-next" onclick="tapNav(1)"></div>
+  <div class="tap-flash" id="flash-l"></div>
+  <div class="tap-flash" id="flash-r"></div>
+
+  <!-- Overlay contrôles plein écran -->
+  <div class="fs-overlay" id="fs-overlay">
+    <button class="fs-btn" onclick="tapNav(-1)">← Préc.</button>
+    <button class="fs-btn" id="fs-play-btn" onclick="toggleAuto()">⏵ Auto</button>
+    <button class="fs-btn" onclick="exitFS()">✕ Quitter</button>
+  </div>
+
+  <!-- ── SLIDE 0 — INTRO : MAT plateau ── -->
   <div class="slide active" id="s0" style="background:#000">
     <div class="photo-top">
-      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/mat-header.png"
-           class="anim-img" alt="MAT"/>
+      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/mat-header.png" class="anim-img" alt="MAT"/>
     </div>
     <div class="photo-bottom" style="background:linear-gradient(160deg,#042C53,#085041)">
-      <div class="anim-up d2" style="font-size:12px;color:#9FE1CB;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Commune de Mézières-lez-Cléry</div>
-      <div class="anim-up d3" style="font-size:26px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:14px">Votre commune<br>dans votre poche</div>
-      <div class="anim-scale d4" style="margin-bottom:12px">
+      <div class="anim-up d2" style="font-size:11px;color:#9FE1CB;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Commune de Mézières-lez-Cléry</div>
+      <div class="anim-up d3" style="font-size:25px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:14px">Votre commune<br>dans votre poche</div>
+      <div class="anim-scale d4" style="margin-bottom:10px">
         <span class="badge" style="background:#1D9E75;color:#E1F5EE">Gratuit · Sans inscription</span>
       </div>
-      <div class="anim-up d5" style="font-size:12px;color:rgba(255,255,255,.5)">mairie-mezieres.github.io/app-mezieres</div>
+      <div class="anim-up d5" style="font-size:11px;color:rgba(255,255,255,.45)">mairie-mezieres.github.io/app-mezieres</div>
     </div>
   </div>
 
-  <!-- ── SLIDE 1 — MEL assistante ── -->
+  <!-- ── SLIDE 1 — MEL ── -->
   <div class="slide" id="s1" style="background:linear-gradient(160deg,#042C53,#26215C)">
     <div class="feat-top">
-      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/MEL.jpg"
-           class="mel-avatar anim-scale d1" alt="MEL"/>
+      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/MEL.jpg" class="mel-avatar anim-scale d1" alt="MEL"/>
     </div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">MEL — Votre assistante</div>
-      <div class="anim-up d3" style="font-size:12px;color:#AFA9EC;margin-bottom:16px;text-align:center">Disponible 24h/24, 7j/7</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🏛️</span>
-        <span class="feat-line-text">Démarches, horaires, contacts mairie</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">🏗️</span>
-        <span class="feat-line-text">PLU et règles d'urbanisme</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">👶</span>
-        <span class="feat-line-text">Enfance, cantine, périscolaire</span>
-      </div>
-      <div class="anim-right d6 feat-line">
-        <span class="feat-line-icon">🤖</span>
-        <span class="feat-line-text">Intelligence artificielle · sans attente</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#AFA9EC;margin-bottom:14px;text-align:center">Disponible 24h/24, 7j/7</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🏛️</span><span class="feat-line-text">Démarches, horaires, contacts mairie</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">🏗️</span><span class="feat-line-text">PLU et règles d'urbanisme</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">👶</span><span class="feat-line-text">Enfance, cantine, périscolaire</span></div>
+      <div class="anim-right d6 feat-line"><span class="feat-line-icon">🤖</span><span class="feat-line-text">Intelligence artificielle · sans attente</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 2 — ACTUALITÉS ── -->
   <div class="slide" id="s2" style="background:linear-gradient(150deg,#042C53,#0C447C)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">📢</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">📢</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Actualités</div>
-      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:16px;text-align:center">Restez informés en temps réel</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🔔</span>
-        <span class="feat-line-text">Notifications push dès qu'une info paraît</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">📸</span>
-        <span class="feat-line-text">Photos, événements, travaux, annonces</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">📘</span>
-        <span class="feat-line-text">Synchronisé avec la page Facebook</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:14px;text-align:center">Restez informés en temps réel</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🔔</span><span class="feat-line-text">Notifications push dès qu'une info paraît</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">📸</span><span class="feat-line-text">Photos, événements, travaux, annonces</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">📘</span><span class="feat-line-text">Synchronisé avec la page Facebook</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 3 — AGENDA ── -->
   <div class="slide" id="s3" style="background:linear-gradient(150deg,#042C53,#185FA5)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">📅</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">📅</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Agenda</div>
-      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:16px;text-align:center">Tous les événements de la commune</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🎪</span>
-        <span class="feat-line-text">Fêtes, réunions, associations, marchés</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">🔄</span>
-        <span class="feat-line-text">Mis à jour automatiquement</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">📥</span>
-        <span class="feat-line-text">Export en un clic dans votre agenda</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:14px;text-align:center">Tous les événements de la commune</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🎪</span><span class="feat-line-text">Fêtes, réunions, associations, marchés</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">🔄</span><span class="feat-line-text">Mis à jour automatiquement</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">📥</span><span class="feat-line-text">Export en un clic dans votre agenda</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 4 — MÉTÉO ── -->
   <div class="slide" id="s4" style="background:linear-gradient(150deg,#042C53,#412402)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">⛅</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">⛅</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Météo locale</div>
-      <div class="anim-up d3" style="font-size:12px;color:#FAC775;margin-bottom:16px;text-align:center">La météo de Mézières-lez-Cléry</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🌡️</span>
-        <span class="feat-line-text">Température, vent, humidité en temps réel</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">📈</span>
-        <span class="feat-line-text">Prévisions sur 7 jours</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">⚠️</span>
-        <span class="feat-line-text">Alertes vigilance Météo-France</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#FAC775;margin-bottom:14px;text-align:center">La météo de Mézières-lez-Cléry</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🌡️</span><span class="feat-line-text">Température, vent, humidité en temps réel</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">📈</span><span class="feat-line-text">Prévisions sur 7 jours</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">⚠️</span><span class="feat-line-text">Alertes vigilance Météo-France</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 5 — DÉCHETS ── -->
   <div class="slide" id="s5" style="background:linear-gradient(150deg,#042C53,#173404)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">♻️</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">♻️</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Déchets</div>
-      <div class="anim-up d3" style="font-size:12px;color:#C0DD97;margin-bottom:16px;text-align:center">Calendrier de collecte toujours à portée</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🗑️</span>
-        <span class="feat-line-text">Ordures ménagères, bacs jaunes, verts</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">📦</span>
-        <span class="feat-line-text">Encombrants et déchets spéciaux</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">📶</span>
-        <span class="feat-line-text">Consultable même sans connexion</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#C0DD97;margin-bottom:14px;text-align:center">Calendrier de collecte toujours à portée</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🗑️</span><span class="feat-line-text">Ordures ménagères, bacs jaunes, verts</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">📦</span><span class="feat-line-text">Encombrants et déchets spéciaux</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">📶</span><span class="feat-line-text">Consultable même sans connexion</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 6 — SIGNALEMENT ── -->
   <div class="slide" id="s6" style="background:linear-gradient(150deg,#042C53,#4A1B0C)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">📸</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">📸</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Signalement</div>
-      <div class="anim-up d3" style="font-size:12px;color:#F5C4B3;margin-bottom:16px;text-align:center">Signalez un problème à la mairie</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🛣️</span>
-        <span class="feat-line-text">Voirie, éclairage, mobilier urbain</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">📷</span>
-        <span class="feat-line-text">Photo + description en 30 secondes</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">✅</span>
-        <span class="feat-line-text">Suivi du traitement par la mairie</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#F5C4B3;margin-bottom:14px;text-align:center">Signalez un problème à la mairie</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🛣️</span><span class="feat-line-text">Voirie, éclairage, mobilier urbain</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">📷</span><span class="feat-line-text">Photo + description en 30 secondes</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">✅</span><span class="feat-line-text">Suivi du traitement par la mairie</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 7 — RANDONNÉES ── -->
   <div class="slide" id="s7" style="background:linear-gradient(150deg,#042C53,#173404)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">🥾</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">🥾</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Randonnées</div>
-      <div class="anim-up d3" style="font-size:12px;color:#C0DD97;margin-bottom:16px;text-align:center">Explorez les sentiers de la commune</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🗺️</span>
-        <span class="feat-line-text">Carte interactive des sentiers</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">🚴</span>
-        <span class="feat-line-text">Itinéraires pédestres et vélo</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">📍</span>
-        <span class="feat-line-text">GPS et points d'intérêt locaux</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#C0DD97;margin-bottom:14px;text-align:center">Explorez les sentiers de la commune</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🗺️</span><span class="feat-line-text">Carte interactive des sentiers</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">🚴</span><span class="feat-line-text">Itinéraires pédestres et vélo</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">📍</span><span class="feat-line-text">GPS et points d'intérêt locaux</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 8 — BUS RÉMI ── -->
   <div class="slide" id="s8" style="background:linear-gradient(150deg,#042C53,#185FA5)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">🚌</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">🚌</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Bus Rémi</div>
-      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:16px;text-align:center">Les horaires du réseau régional</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">🕐</span>
-        <span class="feat-line-text">Horaires des lignes desservant la commune</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">🏫</span>
-        <span class="feat-line-text">Lignes scolaires et régulières</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">📶</span>
-        <span class="feat-line-text">Consultable hors connexion</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#85B7EB;margin-bottom:14px;text-align:center">Les horaires du réseau régional</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">🕐</span><span class="feat-line-text">Horaires des lignes desservant la commune</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">🏫</span><span class="feat-line-text">Lignes scolaires et régulières</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">📶</span><span class="feat-line-text">Consultable hors connexion</span></div>
     </div>
   </div>
 
   <!-- ── SLIDE 9 — BOÎTE À IDÉES ── -->
   <div class="slide" id="s9" style="background:linear-gradient(150deg,#042C53,#412402)">
-    <div class="feat-top">
-      <div class="anim-scale d1" style="font-size:62px">💡</div>
-    </div>
+    <div class="feat-top"><div class="anim-scale d1" style="font-size:60px">💡</div></div>
     <div class="feat-bottom">
       <div class="anim-up d2" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-align:center">Boîte à idées</div>
-      <div class="anim-up d3" style="font-size:12px;color:#FAC775;margin-bottom:16px;text-align:center">Participez à la vie de votre commune</div>
-      <div class="anim-right d3 feat-line">
-        <span class="feat-line-icon">✍️</span>
-        <span class="feat-line-text">Soumettez vos idées d'amélioration</span>
-      </div>
-      <div class="anim-right d4 feat-line">
-        <span class="feat-line-icon">👍</span>
-        <span class="feat-line-text">Votez pour les idées des autres habitants</span>
-      </div>
-      <div class="anim-right d5 feat-line">
-        <span class="feat-line-icon">🏛️</span>
-        <span class="feat-line-text">Idées transmises directement à la mairie</span>
-      </div>
+      <div class="anim-up d3" style="font-size:12px;color:#FAC775;margin-bottom:14px;text-align:center">Participez à la vie de la commune</div>
+      <div class="anim-right d3 feat-line"><span class="feat-line-icon">✍️</span><span class="feat-line-text">Soumettez vos idées d'amélioration</span></div>
+      <div class="anim-right d4 feat-line"><span class="feat-line-icon">👍</span><span class="feat-line-text">Votez pour les idées des autres habitants</span></div>
+      <div class="anim-right d5 feat-line"><span class="feat-line-icon">🏛️</span><span class="feat-line-text">Transmises directement à la mairie</span></div>
     </div>
   </div>
 
-  <!-- ── SLIDE 10 — CTA FINAL : photo MAT & MEL ── -->
+  <!-- ── SLIDE 10 — CTA FINAL : MAT & MEL ── -->
   <div class="slide" id="s10" style="background:#000">
     <div class="photo-top">
-      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/MAT%20et%20MEL.png"
-           class="anim-img" alt="MAT et MEL"/>
+      <img src="https://raw.githubusercontent.com/mairie-mezieres/app-mezieres/main/MAT%20et%20MEL.png" class="anim-img" alt="MAT et MEL"/>
     </div>
     <div class="photo-bottom" style="background:linear-gradient(160deg,#042C53,#26215C)">
       <div class="anim-up d2" style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px">Rejoignez MAT &amp; MEL !</div>
-      <div class="anim-up d3" style="font-size:12px;color:#9FE1CB;margin-bottom:16px;line-height:1.5">L'app officielle et son assistante IA<br>au service de Mézières-lez-Cléry</div>
-      <div class="anim-scale d4" style="background:rgba(29,158,117,.2);border:1px solid #1D9E75;border-radius:14px;padding:10px 18px;margin-bottom:14px">
+      <div class="anim-up d3" style="font-size:12px;color:#9FE1CB;margin-bottom:14px;line-height:1.5">L'app officielle et son assistante IA<br>au service de Mézières-lez-Cléry</div>
+      <div class="anim-scale d4" style="background:rgba(29,158,117,.2);border:1px solid #1D9E75;border-radius:14px;padding:10px 16px;margin-bottom:12px">
         <div style="font-size:10px;color:#9FE1CB;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">Ouvrir gratuitement</div>
-        <div style="font-size:13px;font-weight:700;color:#E1F5EE">mairie-mezieres.github.io/app-mezieres</div>
+        <div style="font-size:12px;font-weight:700;color:#E1F5EE">mairie-mezieres.github.io/app-mezieres</div>
       </div>
       <div class="anim-up d5" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
         <span class="badge" style="background:rgba(255,255,255,.1);color:#9FE1CB;border:1px solid rgba(255,255,255,.15)">Gratuit</span>
@@ -308,11 +243,15 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;justi
   <div class="dots" id="dots"></div>
 </div>
 
+<!-- Contrôles normaux (hors plein écran) -->
 <div class="nav-controls">
-  <button class="nav-btn" id="btn-prev" onclick="nav(-1)">← Préc.</button>
+  <button class="nav-btn" onclick="nav(-1)">← Préc.</button>
   <span class="slide-counter" id="counter">1 / 11</span>
-  <button class="nav-btn" id="btn-next" onclick="nav(1)">Suiv. →</button>
-  <button class="nav-btn" id="btn-play" onclick="toggleAuto()" style="background:rgba(29,158,117,.25);border-color:#1D9E75;color:#9FE1CB">⏵ Auto</button>
+  <button class="nav-btn" id="play-btn" onclick="toggleAuto()" style="background:rgba(29,158,117,.25);border-color:#1D9E75;color:#9FE1CB">⏵ Auto</button>
+  <button class="nav-btn" onclick="nav(1)">Suiv. →</button>
+  <button class="nav-btn" onclick="enterFS()" style="background:rgba(255,255,255,.15);font-size:15px">⛶</button>
+</div>
+<div class="fs-hint">Tap ⛶ pour plein écran · swipe pour naviguer</div>
 </div>
 
 <script>
@@ -338,55 +277,71 @@ function goTo(idx){
   s.classList.add('active');
   getDot(cur).classList.add('active');
   document.getElementById('counter').textContent=(cur+1)+' / '+TOTAL;
-  s.querySelectorAll('[class*="anim-"]').forEach(el=>{
-    el.style.animation='none';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
+  s.querySelectorAll('[class*="anim-"]').forEach(el=>{el.style.animation='none';void el.offsetWidth;el.style.animation='';});
   if(autoPlay) startProgress();
 }
 
 function startProgress(){
   clearTimeout(timer);
   const bar=document.getElementById('pbar');
-  bar.style.transition='none'; bar.style.width='0%';
+  bar.style.transition='none';bar.style.width='0%';
   void bar.offsetWidth;
   bar.style.transition='width '+DURATION+'ms linear';
   bar.style.width='100%';
-  timer=setTimeout(()=>goTo(cur+1), DURATION);
+  timer=setTimeout(()=>goTo(cur+1),DURATION);
 }
-
 function stopProgress(){
   clearTimeout(timer);
   const bar=document.getElementById('pbar');
-  bar.style.transition='none'; bar.style.width='0%';
+  bar.style.transition='none';bar.style.width='0%';
 }
-
-function nav(dir){
-  stopProgress();
-  goTo(cur+dir);
-  if(autoPlay) startProgress();
+function nav(dir){stopProgress();goTo(cur+dir);if(autoPlay)startProgress();}
+function tapNav(dir){
+  const fl=document.getElementById(dir<0?'flash-l':'flash-r');
+  fl.classList.remove('pop');void fl.offsetWidth;fl.classList.add('pop');
+  nav(dir);
 }
 
 function toggleAuto(){
   autoPlay=!autoPlay;
-  const btn=document.getElementById('btn-play');
-  if(autoPlay){
-    btn.textContent='⏸ Pause';
-    btn.style.background='rgba(29,158,117,.4)';
-    startProgress();
-  } else {
-    btn.textContent='⏵ Auto';
-    btn.style.background='rgba(29,158,117,.25)';
-    stopProgress();
-  }
+  ['play-btn','fs-play-btn'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    if(autoPlay){btn.textContent='⏸ Pause';btn.style.background='rgba(29,158,117,.45)';}
+    else{btn.textContent='⏵ Auto';btn.style.background='rgba(29,158,117,.25)';}
+  });
+  autoPlay?startProgress():stopProgress();
 }
 
-document.getElementById('stage').addEventListener('touchstart',function(e){this._tx=e.touches[0].clientX},{passive:true});
-document.getElementById('stage').addEventListener('touchend',function(e){
-  const dx=e.changedTouches[0].clientX-this._tx;
-  if(Math.abs(dx)>40){stopProgress();goTo(cur+(dx<0?1:-1));if(autoPlay)startProgress();}
+function enterFS(){
+  const el=document.documentElement;
+  const req=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen;
+  if(req)req.call(el);
+  document.body.classList.add('fs');
+  screen.orientation&&screen.orientation.lock&&screen.orientation.lock('portrait').catch(()=>{});
+}
+function exitFS(){
+  const ex=document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen;
+  if(ex)ex.call(document);
+  document.body.classList.remove('fs');
+}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('fs');});
+document.addEventListener('webkitfullscreenchange',()=>{if(!document.webkitFullscreenElement)document.body.classList.remove('fs');});
+
+let tx=0;
+document.getElementById('stage').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.getElementById('stage').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>40)tapNav(dx<0?1:-1);
 },{passive:true});
+
+let fsTimeout;
+document.getElementById('stage').addEventListener('click',()=>{
+  if(!document.body.classList.contains('fs'))return;
+  const ov=document.getElementById('fs-overlay');
+  ov.style.opacity='1';clearTimeout(fsTimeout);
+  fsTimeout=setTimeout(()=>ov.style.opacity='0',3000);
+});
 </script>
 </body>
 </html>
