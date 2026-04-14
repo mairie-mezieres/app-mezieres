@@ -543,10 +543,18 @@ const VACANCES_SCOLAIRES = [
   ['2026-07-04','2026-08-31'],
 ];
 
-function isVacancesScolaires() {
-  const now = new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
-  const iso = now.toISOString().slice(0,10);
+function toParisDate(date) {
+  return date ? new Date(date.toLocaleString('en-US',{timeZone:'Europe/Paris'})) : new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
+}
+
+function isVacancesScolairesForDate(date) {
+  var d = toParisDate(date);
+  var iso = d.toISOString().slice(0,10);
   return VACANCES_SCOLAIRES.some(function(p){ return iso >= p[0] && iso <= p[1]; });
+}
+
+function isVacancesScolaires() {
+  return isVacancesScolairesForDate(new Date());
 }
 
 const BUS_HORAIRES = {
@@ -580,6 +588,57 @@ function getNextBus(times) {
   return null;
 }
 
+function getBusTimes(stopKey, directionKey, date) {
+  var vac = isVacancesScolairesForDate(date);
+  var stop = BUS_HORAIRES[stopKey] || {};
+  var suffix = vac ? '_vacances' : '_scolaire';
+  return stop[directionKey + suffix] || [];
+}
+
+function formatBusTimesList(times) {
+  return (times && times.length) ? times.join(' · ') : '—';
+}
+
+function formatRemiDayLabel(date) {
+  var d = toParisDate(date);
+  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+}
+
+function buildRemiWeekCard(date, isToday) {
+  var vac = isVacancesScolairesForDate(date);
+  var mairieOrleans = formatBusTimesList(getBusTimes('mairie', 'orleans', date));
+  var mairieNouan   = formatBusTimesList(getBusTimes('mairie', 'nouan', date));
+  var breauOrleans  = formatBusTimesList(getBusTimes('breau',  'orleans', date));
+  var breauNouan    = formatBusTimesList(getBusTimes('breau',  'nouan', date));
+
+  return '<div class="remi-day-card' + (isToday ? ' today' : '') + '">'     + '<div class="remi-day-head">'     +   '<div class="remi-day-title">' + esc(formatRemiDayLabel(date)) + '</div>'     +   '<div class="remi-day-badge">' + (vac ? 'Vacances' : 'Scolaire') + '</div>'     + '</div>'     + '<div class="remi-grid">'     +   '<div class="remi-stop-box">'     +     '<div class="remi-stop-title">Mairie</div>'     +     '<div class="remi-line"><span>→ Orléans</span><strong>' + esc(mairieOrleans) + '</strong></div>'     +     '<div class="remi-line"><span>→ Saint-Laurent-Nouan</span><strong>' + esc(mairieNouan) + '</strong></div>'     +   '</div>'     +   '<div class="remi-stop-box">'     +     '<div class="remi-stop-title">Le Bréau</div>'     +     '<div class="remi-line"><span>→ Orléans</span><strong>' + esc(breauOrleans) + '</strong></div>'     +     '<div class="remi-line"><span>→ Saint-Laurent-Nouan</span><strong>' + esc(breauNouan) + '</strong></div>'     +   '</div>'     + '</div>'     + '</div>';
+}
+
+function loadRemiDetail() {
+  var el = document.getElementById('remi-detail');
+  if (!el) return;
+
+  var now = toParisDate(new Date());
+  var cards = '';
+  for (var i = 0; i < 7; i++) {
+    var day = new Date(now);
+    day.setDate(now.getDate() + i);
+    cards += buildRemiWeekCard(day, i === 0);
+  }
+
+  el.innerHTML = '<div class="remi-intro">'
+    + '<div class="remi-intro-title">Planning sur 7 jours</div>'
+    + '<div class="remi-intro-text">Affichage basé sur les horaires actuellement intégrés dans MAT, avec distinction <strong>scolaire</strong> / <strong>vacances</strong>. En cas de doute, vérifiez la fiche officielle Rémi.</div>'
+    + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/" target="_blank" rel="noopener">🌐 Ouvrir le site Rémi</a>'
+    + '</div>'
+    + '<div class="remi-week">' + cards + '</div>';
+}
+
+function openRemi(){
+  openOv('remi');
+  loadRemiDetail();
+}
+
 function loadBusRemi() {
   var el  = document.getElementById('bus-strip-stops');
   var pel = document.getElementById('bus-periode');
@@ -587,7 +646,7 @@ function loadBusRemi() {
 
   var vac = isVacancesScolaires();
   var H   = BUS_HORAIRES;
-  if (pel) pel.textContent = '';
+  if (pel) pel.textContent = vac ? 'Vacances' : 'Scolaire';
 
   var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
   var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
