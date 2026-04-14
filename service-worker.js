@@ -1,25 +1,25 @@
-// SERVICE WORKER v3.7.2 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.7.3 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 3 : détail d'actualité depuis notification push
-const CACHE = 'mat-v3.7.2';
+const CACHE = 'mat-v3.7.3';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
-  './css/mat.css?v=3.7.2',
-  './js/mat-utils.js?v=3.7.2',
-  './js/mat-core.js?v=3.7.2',
-  './js/mat-accessibility.js?v=3.7.2',
-  './js/mat-widgets.js?v=3.7.2',
-  './js/mat-agenda.js?v=3.7.2',
-  './js/mat-forms.js?v=3.7.2',
-  './js/mat-actus.js?v=3.7.2',
-  './js/mat-trombi.js?v=3.7.2',
-  './js/mat-mel.js?v=3.7.2',
-  './js/mat-init.js?v=3.7.2',
+  './css/mat.css?v=3.7.3',
+  './js/mat-utils.js?v=3.7.3',
+  './js/mat-core.js?v=3.7.3',
+  './js/mat-accessibility.js?v=3.7.3',
+  './js/mat-widgets.js?v=3.7.3',
+  './js/mat-agenda.js?v=3.7.3',
+  './js/mat-forms.js?v=3.7.3',
+  './js/mat-actus.js?v=3.7.3',
+  './js/mat-trombi.js?v=3.7.3',
+  './js/mat-mel.js?v=3.7.3',
+  './js/mat-init.js?v=3.7.3',
   // Phase 3 : données MEL/PLU externalisées
-  './data/plu-data.json?v=3.7.2',
-  './data/mel-tree.json?v=3.7.2',
+  './data/plu-data.json?v=3.7.3',
+  './data/mel-tree.json?v=3.7.3',
   // Assets statiques  
   './mat-header.png',
   './icon-192.png'
