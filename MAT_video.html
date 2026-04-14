@@ -1,0 +1,280 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.stage{width:100%;aspect-ratio:9/16;max-width:360px;margin:0 auto;background:#000;overflow:hidden;position:relative;border-radius:20px}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:auto}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes imgRise{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.anim-up{animation:fadeUp .55s ease both}
+.anim-in{animation:fadeIn .7s ease both}
+.anim-scale{animation:scaleIn .55s cubic-bezier(.34,1.56,.64,1) both}
+.anim-right{animation:slideRight .5s ease both}
+.anim-img{animation:imgRise .7s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.2s}.d3{animation-delay:.35s}
+.d4{animation-delay:.5s}.d5{animation-delay:.65s}.d6{animation-delay:.8s}
+
+.progress-bar{position:absolute;bottom:0;left:0;height:3px;background:#1D9E75;transition:width linear;z-index:10}
+.dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .3s,transform .3s;cursor:pointer}
+.dot.active{background:#1D9E75;transform:scale(1.3)}
+
+.badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.feat-line{display:flex;align-items:center;gap:12px;width:100%;padding:10px 14px;background:rgba(255,255,255,.08);border-radius:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06)}
+.feat-line-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.feat-line-text{font-size:13px;color:rgba(255,255,255,.9);line-height:1.4}
+.nav-controls{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:14px}
+.nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:8px 18px;font-size:13px;cursor:pointer;transition:background .2s}
+.nav-btn:hover{background:rgba(255,255,255,.2)}
+.nav-btn:active{transform:scale(.97)}
+.slide-counter{font-size:12px;color:rgba(255,255,255,.45);min-width:40px;text-align:center}
+</style>
+
+<h2 class="sr-only">Présentation animée MAT — Mézières Avec Toi — 8 slides avec visuels MAT et MEL</h2>
+
+<div class="stage" id="stage">
+
+  <!-- SLIDE 0 — INTRO avec photo MAT plateau -->
+  <div class="slide active" id="s0" style="background:#000;justify-content:flex-end;padding:0">
+    <img src="/mnt/user-data/uploads/mat-header.png" class="anim-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"/>
+    <div style="position:relative;z-index:2;width:100%;padding:0 0 52px;text-align:center;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,0) 100%)">
+      <div class="anim-up d3" style="font-size:13px;color:#9FE1CB;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Commune de Mézières-lez-Cléry</div>
+      <div class="anim-up d4" style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1.1">Votre commune<br>dans votre poche</div>
+      <div class="anim-scale d5" style="margin-top:14px">
+        <span class="badge" style="background:#1D9E75;color:#E1F5EE">Gratuit · Sans inscription</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 1 — ACTUALITÉS -->
+  <div class="slide" id="s1" style="background:linear-gradient(150deg,#042C53 0%,#0C447C 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">📢</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">Actualités</div>
+      <div class="anim-up d2" style="font-size:13px;color:#85B7EB;margin-bottom:22px">Restez informés en temps réel</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🔔</span>
+        <span class="feat-line-text">Notifications push dès qu'une info est publiée</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">📸</span>
+        <span class="feat-line-text">Photos, événements, travaux, annonces</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">📘</span>
+        <span class="feat-line-text">Synchronisé avec la page Facebook</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — AGENDA -->
+  <div class="slide" id="s2" style="background:linear-gradient(150deg,#042C53 0%,#185FA5 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">📅</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">Agenda</div>
+      <div class="anim-up d2" style="font-size:13px;color:#85B7EB;margin-bottom:22px">Tous les événements de la commune</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🎪</span>
+        <span class="feat-line-text">Fêtes, réunions, associations, marchés</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">🔄</span>
+        <span class="feat-line-text">Mis à jour automatiquement</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">📥</span>
+        <span class="feat-line-text">Export en un clic dans votre agenda</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — MÉTÉO -->
+  <div class="slide" id="s3" style="background:linear-gradient(150deg,#042C53 0%,#412402 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">⛅</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">Météo locale</div>
+      <div class="anim-up d2" style="font-size:13px;color:#FAC775;margin-bottom:22px">La météo de Mézières-lez-Cléry</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🌡️</span>
+        <span class="feat-line-text">Température, vent, humidité en temps réel</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">📈</span>
+        <span class="feat-line-text">Prévisions sur 7 jours</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">⚠️</span>
+        <span class="feat-line-text">Alertes vigilance Météo-France</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — DÉCHETS -->
+  <div class="slide" id="s4" style="background:linear-gradient(150deg,#042C53 0%,#173404 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">♻️</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">Déchets</div>
+      <div class="anim-up d2" style="font-size:13px;color:#C0DD97;margin-bottom:22px">Calendrier de collecte toujours à portée</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🗑️</span>
+        <span class="feat-line-text">Ordures ménagères, bacs jaunes, verts</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">📦</span>
+        <span class="feat-line-text">Encombrants et déchets spéciaux</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">📶</span>
+        <span class="feat-line-text">Consultable même sans connexion</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — SIGNALEMENT -->
+  <div class="slide" id="s5" style="background:linear-gradient(150deg,#042C53 0%,#4A1B0C 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">📸</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">Signalement</div>
+      <div class="anim-up d2" style="font-size:13px;color:#F5C4B3;margin-bottom:22px">Signalez un problème à la mairie</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🛣️</span>
+        <span class="feat-line-text">Voirie, éclairage, mobilier urbain</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">📷</span>
+        <span class="feat-line-text">Photo + description en 30 secondes</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">✅</span>
+        <span class="feat-line-text">Suivi du traitement par la mairie</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — MEL -->
+  <div class="slide" id="s6" style="background:linear-gradient(150deg,#042C53 0%,#26215C 100%)">
+    <div style="text-align:center;width:100%">
+      <div class="anim-scale" style="font-size:56px;margin-bottom:8px">🤖</div>
+      <div class="anim-up d1" style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px">MEL — Assistante IA</div>
+      <div class="anim-up d2" style="font-size:13px;color:#AFA9EC;margin-bottom:22px">Vos questions, des réponses immédiates</div>
+      <div class="anim-right d3 feat-line">
+        <span class="feat-line-icon">🏛️</span>
+        <span class="feat-line-text">Démarches, horaires, contacts mairie</span>
+      </div>
+      <div class="anim-right d4 feat-line">
+        <span class="feat-line-icon">🏗️</span>
+        <span class="feat-line-text">PLU et règles d'urbanisme</span>
+      </div>
+      <div class="anim-right d5 feat-line">
+        <span class="feat-line-icon">🕐</span>
+        <span class="feat-line-text">Disponible 24h/24, 7j/7</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — CTA FINAL avec photo MAT & MEL -->
+  <div class="slide" id="s7" style="background:#000;justify-content:flex-end;padding:0">
+    <img src="/mnt/user-data/uploads/MAT_et_MEL.png" class="anim-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top"/>
+    <div style="position:relative;z-index:2;width:100%;padding:0 0 52px;text-align:center;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,0) 100%)">
+      <div class="anim-up d2" style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px">Rejoignez MAT &amp; MEL !</div>
+      <div class="anim-up d3" style="font-size:13px;color:#9FE1CB;margin-bottom:18px;line-height:1.5">L'application et son assistante IA<br>au service de Mézières-lez-Cléry</div>
+      <div class="anim-scale d4" style="background:rgba(29,158,117,.2);border:1px solid #1D9E75;border-radius:14px;padding:12px 18px;display:inline-block;margin-bottom:14px">
+        <div style="font-size:11px;color:#9FE1CB;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Ouvrir gratuitement</div>
+        <div style="font-size:13px;font-weight:700;color:#E1F5EE">mairie-mezieres.github.io</div>
+      </div>
+      <div class="anim-up d5" style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap">
+        <span class="badge" style="background:rgba(255,255,255,.12);color:#9FE1CB;border:1px solid rgba(255,255,255,.15)">Gratuit</span>
+        <span class="badge" style="background:rgba(255,255,255,.12);color:#9FE1CB;border:1px solid rgba(255,255,255,.15)">Sans inscription</span>
+        <span class="badge" style="background:rgba(255,255,255,.12);color:#9FE1CB;border:1px solid rgba(255,255,255,.15)">Officiel mairie</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="pbar" style="width:0%"></div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<div class="nav-controls">
+  <button class="nav-btn" id="btn-prev" onclick="nav(-1)">← Préc.</button>
+  <span class="slide-counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="btn-next" onclick="nav(1)">Suiv. →</button>
+  <button class="nav-btn" id="btn-play" onclick="toggleAuto()" style="background:rgba(29,158,117,.25);border-color:#1D9E75;color:#9FE1CB">⏵ Auto</button>
+</div>
+
+<script>
+const TOTAL=8, DURATION=4500;
+let cur=0, autoPlay=false, timer=null;
+
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function getSlide(i){return document.getElementById('s'+i)}
+function getDot(i){return dotsEl.children[i]}
+
+function goTo(idx){
+  getSlide(cur).classList.remove('active');
+  getDot(cur).classList.remove('active');
+  cur=((idx%TOTAL)+TOTAL)%TOTAL;
+  const s=getSlide(cur);
+  s.classList.add('active');
+  getDot(cur).classList.add('active');
+  document.getElementById('counter').textContent=(cur+1)+' / '+TOTAL;
+  s.querySelectorAll('[class*="anim-"]').forEach(el=>{
+    el.style.animation='none';
+    void el.offsetWidth;
+    el.style.animation='';
+  });
+  if(autoPlay) startProgress();
+}
+
+function startProgress(){
+  clearTimeout(timer);
+  const bar=document.getElementById('pbar');
+  bar.style.transition='none'; bar.style.width='0%';
+  void bar.offsetWidth;
+  bar.style.transition='width '+DURATION+'ms linear';
+  bar.style.width='100%';
+  timer=setTimeout(()=>goTo(cur+1), DURATION);
+}
+
+function stopProgress(){
+  clearTimeout(timer);
+  const bar=document.getElementById('pbar');
+  bar.style.transition='none'; bar.style.width='0%';
+}
+
+function nav(dir){
+  stopProgress();
+  goTo(cur+dir);
+  if(autoPlay) startProgress();
+}
+
+function toggleAuto(){
+  autoPlay=!autoPlay;
+  const btn=document.getElementById('btn-play');
+  if(autoPlay){
+    btn.textContent='⏸ Pause';
+    btn.style.background='rgba(29,158,117,.4)';
+    startProgress();
+  } else {
+    btn.textContent='⏵ Auto';
+    btn.style.background='rgba(29,158,117,.25)';
+    stopProgress();
+  }
+}
+
+document.getElementById('stage').addEventListener('touchstart',function(e){this._tx=e.touches[0].clientX},{passive:true});
+document.getElementById('stage').addEventListener('touchend',function(e){
+  const dx=e.changedTouches[0].clientX-this._tx;
+  if(Math.abs(dx)>40){stopProgress();goTo(cur+(dx<0?1:-1));if(autoPlay)startProgress();}
+},{passive:true});
+</script>
