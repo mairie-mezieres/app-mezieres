@@ -111,17 +111,29 @@
       <div class="event-name" id="next-event-name"></div>
       <div class="event-days" id="next-event-days"></div>
     </div>
+
     <!-- Ligne bus Rémi pleine largeur -->
-    <div class="bus-strip" onclick="openRemi()" role="button" tabindex="0" aria-label="Voir le détail des prochains bus Rémi" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRemi();}">
-      <div class="bus-strip-head">
-        <span class="bus-strip-ico">🚌</span>
-        <span class="bus-strip-title">Ligne 8 Rémi</span>
-        <span class="bus-strip-periode" id="bus-periode"></span>
+    <div class="bus-strip"
+         onclick="openRemi()"
+         role="button"
+         tabindex="0"
+         aria-label="Voir le détail des prochains bus Rémi"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRemi();}">
+      <div class="bus-strip-main">
+        <div class="bus-strip-left">
+          <div class="bus-strip-head">
+            <span class="bus-strip-ico">🚌</span>
+            <span class="bus-strip-title">Ligne 8 Rémi</span>
+            <span class="bus-strip-periode" id="bus-periode"></span>
+          </div>
+          <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
+        </div>
+    
+        <div class="bus-strip-right">
+          <div class="bus-strip-cta">Voir le planning<br>sur 7 jours →</div>
+        </div>
       </div>
-      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
-      <div class="bus-strip-cta">Voir le planning sur 7 jours →</div>
     </div>
-  </div>
 
   <div class="header-tools">
     <button class="header-tool-btn urgent" onclick="openNums()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#b91c1c,#dc2626);box-shadow:0 3px 10px rgba(185,28,28,0.45);border:none;"><span style="font-size:1.1rem;filter:drop-shadow(0 0 3px rgba(255,255,255,0.7))">📞</span><span>Urgences</span></button>
