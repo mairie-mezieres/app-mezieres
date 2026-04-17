@@ -621,7 +621,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.3';
+  const V = '3.7.4';
 
   try {
     const [pluRes, treeRes, serverTreeRes] = await Promise.all([
