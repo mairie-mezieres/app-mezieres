@@ -956,3 +956,64 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 .mel-schema-block{margin:6px 0 8px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:white;}
 .mel-schema-label{font-size:.72rem;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px;background:var(--mist);}
 .mel-schema-img{width:100%;display:block;max-height:220px;object-fit:contain;background:white;}
+
+/* ─── Bouton MEL mis en avant ───────────────────────────── */
+.mel-entry{
+  background:linear-gradient(135deg,#fff4d8 0%, #ffe39a 100%);
+  border:1px solid #f3c95b;
+  box-shadow:0 6px 16px rgba(217,164,31,.20);
+  position:relative;
+  overflow:hidden;
+  transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.mel-entry:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(217,164,31,.28);
+  filter:brightness(1.01);
+}
+
+.mel-entry .ct-label{
+  color:#7a4b00;
+  font-weight:900;
+}
+
+.mel-entry .ct-sub{
+  color:#8a6a25;
+}
+
+.mel-entry .ico{
+  background:linear-gradient(135deg,#fff8e8,#ffe08a);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.7), 0 4px 10px rgba(217,164,31,.25);
+}
+
+/* petite pastille d'appel */
+.mel-entry::after{
+  content:"Nouveau";
+  position:absolute;
+  top:8px;
+  right:8px;
+  font-size:.62rem;
+  font-weight:800;
+  color:#7a0000;
+  background:#fff;
+  border:1px solid #f0b4b4;
+  border-radius:999px;
+  padding:2px 7px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+/* animation wiggle de l’icône */
+.mel-wiggle{
+  display:inline-flex;
+  transform-origin:70% 70%;
+  animation:melWiggle 3s ease-in-out infinite;
+}
+
+@keyframes melWiggle{
+  0%, 85%, 100% { transform:rotate(0deg); }
+  88% { transform:rotate(12deg); }
+  91% { transform:rotate(-10deg); }
+  94% { transform:rotate(8deg); }
+  97% { transform:rotate(-4deg); }
+}
