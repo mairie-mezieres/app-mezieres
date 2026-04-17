@@ -38,9 +38,91 @@
         "label": "Toiture / Façade / Matériaux",
         "prompt": "Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?",
         "topic": "urbanisme"
+      },
+      {
+        "id": "changement_destination",
+        "ico": "🏢",
+        "label": "Changer la destination d’un bâtiment ou d’un local",
+        "prompt": "Je souhaite changer la destination d’un bâtiment ou d’un local. Quelles sont les règles applicables à mon terrain ?",
+        "topic": "urbanisme"
       }
     ]
   },
+  "urbanisme_demarches": {
+  "label": "Urbanisme — Démarches",
+  "ico": "📋",
+  "needZone": false,
+  "questions": [
+    {
+      "id": "certificat_urbanisme",
+      "ico": "📄",
+      "label": "Certificat d’urbanisme",
+      "directAnswer": {
+        "text": "Le certificat d’urbanisme permet de connaître les règles applicables à un terrain et de savoir si une opération est réalisable. Ce n’est pas une autorisation de travaux. Vous pouvez déposer votre demande en mairie ou en ligne si vous préférez la dématérialisation. Le délai d’instruction est en principe de 2 mois. Le certificat est valable 18 mois.",
+        "links": [
+          { "label": "📄 Formulaire certificat d’urbanisme", "url": "https://entreprendre.service-public.fr/vosdroits/R1970" },
+          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
+          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
+          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
+        ]
+      }
+    },
+    {
+      "id": "ouverture_chantier",
+      "ico": "🚧",
+      "label": "Déclarer l’ouverture d’un chantier",
+      "directAnswer": {
+        "text": "Si vos travaux sont autorisés par un permis de construire ou un permis d’aménager, vous devez déclarer l’ouverture du chantier dès le démarrage des travaux. Cette formalité n’est pas demandée pour une simple déclaration préalable. Vous pouvez transmettre la déclaration à la mairie ou effectuer la démarche en ligne si vous utilisez le dépôt dématérialisé.",
+        "links": [
+          { "label": "📄 Déclaration d’ouverture de chantier", "url": "https://www.service-public.fr/particuliers/vosdroits/R1976" },
+          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
+          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
+          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
+        ]
+      }
+    },
+    {
+      "id": "fin_travaux",
+      "ico": "✅",
+      "label": "Déclarer la fin des travaux",
+      "directAnswer": {
+        "text": "À la fin des travaux autorisés par une déclaration préalable, un permis de construire ou un permis d’aménager, vous devez déposer une déclaration attestant l’achèvement et la conformité des travaux. La mairie peut ensuite contrôler la conformité du dossier. En règle générale, elle dispose de 3 mois pour la contester, et de 5 mois dans certains cas particuliers.",
+        "links": [
+          { "label": "📄 Déclaration d’achèvement et de conformité", "url": "https://www.service-public.fr/particuliers/vosdroits/R1978" },
+          { "label": "ℹ️ Informations DAACT", "url": "https://www.service-public.fr/particuliers/vosdroits/F1997" },
+          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
+          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
+          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
+        ]
+      }
+    },
+    {
+      "id": "adressage",
+      "ico": "📍",
+      "label": "Numéro de rue / modification d’adressage",
+      "directAnswer": {
+        "text": "L’attribution d’un numéro de rue ou la modification d’un adressage relève de la mairie. Pour faire votre demande, préparez si possible l’adresse concernée, la référence cadastrale et un court descriptif de la situation. La mairie vous indiquera la marche à suivre selon votre dossier.",
+        "links": [
+          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
+          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
+        ]
+      }
+    },
+    {
+      "id": "occupation_domaine_public",
+      "ico": "🛠️",
+      "label": "Benne / échafaudage sur le domaine public",
+      "directAnswer": {
+        "text": "Pour installer une benne, un échafaudage ou occuper temporairement la voie publique, vous devez demander une autorisation préalable. Si l’installation gêne la circulation ou le stationnement, une demande d’arrêté temporaire de circulation peut aussi être nécessaire. Le plus simple est de contacter d’abord la mairie, qui vous indiquera la démarche adaptée à votre situation.",
+        "links": [
+          { "label": "📄 Demande d’arrêté temporaire de circulation", "url": "https://entreprendre.service-public.fr/vosdroits/R10216" },
+          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
+          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
+        ]
+      }
+    }
+  ]
+},
   "enfance": {
     "label": "Enfance & Jeunesse",
     "ico": "🎒",
