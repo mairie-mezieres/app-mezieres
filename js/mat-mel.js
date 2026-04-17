@@ -412,7 +412,67 @@ function pluBuildAnswer(qid, zone, zoneKey) {
       html += '</div>';
     }
   }
-
+   else if (qid === 'changement_destination') {
+     hasPluAnswer = true;
+   
+     html += `<div class="plu-auth">
+       <div class="plu-auth-title">📋 Changement de destination</div>
+       <div class="plu-zone-rule plu-warn-block">
+         Le changement de destination consiste à faire passer un bâtiment d’une destination à une autre
+         (par exemple : agricole vers habitation, habitation vers commerce, local vers bureaux).
+         <br><br>
+         <strong>Autorisation :</strong><br>
+         • Sans modification de façade ni de structure porteuse : <strong>Déclaration préalable (DP)</strong><br>
+         • Avec modification de façade et/ou de structure porteuse : <strong>Permis de construire (PC)</strong>
+       </div>
+     </div>`;
+   
+     if (zoneKey === 'A') {
+       html += `<div class="plu-zone-rule plu-nok-block">
+         <strong>En zone A :</strong><br>
+         Le changement de destination n’est autorisé que pour les <strong>bâtiments agricoles identifiés</strong>
+         dans les documents graphiques du PLU.<br>
+         Si le bâtiment n’est pas identifié, le changement de destination n’est pas autorisé en l’état.
+       </div>`;
+     }
+     else if (zoneKey === 'Ah') {
+       html += `<div class="plu-zone-rule plu-ok-block">
+         <strong>En secteur Ah :</strong><br>
+         Le changement de destination des constructions existantes est autorisé vers :<br>
+         • l’habitat<br>
+         • les bureaux<br>
+         • le commerce<br>
+         • l’artisanat<br>
+         • le tourisme<br>
+         • les loisirs<br><br>
+         Le projet doit rester compatible avec le voisinage en termes de nuisances et d’aspect extérieur.
+       </div>`;
+     }
+     else if (zoneKey === 'Nh') {
+       html += `<div class="plu-zone-rule plu-ok-block">
+         <strong>En secteur Nh :</strong><br>
+         Le changement de destination des constructions existantes est autorisé vers :<br>
+         • l’habitat<br>
+         • le tourisme<br>
+         • les loisirs<br><br>
+         Le projet doit rester compatible avec le caractère de la zone.
+       </div>`;
+     }
+     else {
+       html += `<div class="plu-zone-rule plu-warn-block">
+         <strong>En zone ${zoneKey || '?' } :</strong><br>
+         Le PLU ne prévoit pas ici, dans les extraits intégrés à MEL, de règle spéciale aussi explicite que pour
+         les secteurs A, Ah ou Nh.<br>
+         Le projet doit donc être vérifié au cas par cas par le service urbanisme, selon la destination actuelle
+         du bâtiment, la destination envisagée et les éventuelles modifications extérieures ou structurelles.
+       </div>`;
+     }
+   
+     html += `<div class="plu-note">
+       ℹ️ Avant dépôt, vérifiez aussi si le bâtiment est situé dans un lotissement, s’il est repéré au PLU,
+       ou si d’autres contraintes s’appliquent.
+     </div>`;
+   }
   // Footer commun : contact mairie
   if (hasPluAnswer) {
     html += `<div class="plu-footer">
