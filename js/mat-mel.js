@@ -673,7 +673,7 @@ async function sendMel(){
       const sug=document.createElement('div'); sug.className='msg bot';
       sug.innerHTML='<div class="mav">👩</div><div class="bub" style="background:var(--mist);border:1px solid rgba(0,0,0,0.06);padding:10px 12px;">'
         +'<div style="font-size:0.72rem;font-weight:900;color:var(--forest);margin-bottom:6px">🏗️ Schéma des autorisations d\'urbanisme</div>'
-        +'<img src="https://raw.githubusercontent.com/mairie-mezieres/mairie-mezieres.github.io/main/autorisation-urbanisme.jpg" '
+        +'<img src="./autorisation-urbanisme.jpg?v=3.7.3" '
         +'alt="Autorisations urbanisme" style="width:100%;border-radius:8px;display:block;margin-bottom:6px;" '
         +'onerror="this.style.display=\'none\'">'
         +'<div style="font-size:0.67rem;color:var(--muted);line-height:1.5">DP = Déclaration Préalable · PC = Permis de Construire · SP = Surface Plancher</div>'
@@ -793,7 +793,7 @@ function _buildSubLevel(cat,def){
   let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
   if(def.needZone){
     h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg" oninput="this.style.borderColor='';document.getElementById('mel-addr-warn')?.remove()" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
-    h+=`<div class="mel-schema-block"><div class="mel-schema-label">📋 Schéma des autorisations</div><img src="https://raw.githubusercontent.com/mairie-mezieres/mairie-mezieres.github.io/main/autorisation-urbanisme.jpg" alt="Autorisations urbanisme" class="mel-schema-img" onerror="this.closest('.mel-schema-block').style.display='none'"/></div>`;
+    h+=`<div class="mel-schema-block"><div class="mel-schema-label">📋 Schéma des autorisations</div><img src="./autorisation-urbanisme.jpg?v=3.7.3" alt="Autorisations urbanisme" class="mel-schema-img" onerror="this.closest('.mel-schema-block').style.display='none'"/></div>`;
   }
   for(const q of def.questions){
     h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
