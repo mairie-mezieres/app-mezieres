@@ -1445,6 +1445,8 @@ function renderMelAdmin(statusMsg, statusClass){
         </div>
         <div class="mel-admin-actions">
           <button class="mel-admin-btn sec" onclick="loadMelAdmin(true)">Recharger</button>
+          <button class="mel-admin-btn sec" onclick="importLocalMelToServer()">📥 Importer JSON local</button>
+          <button class="mel-admin-btn sec" onclick="exportMelJson()">⬇️ Exporter JSON</button>
           <button class="mel-admin-btn sec" onclick="melAddCategory()">+ Catégorie</button>
           <button class="mel-admin-btn" onclick="saveMelAdmin()">💾 Enregistrer</button>
         </div>
@@ -1455,6 +1457,48 @@ function renderMelAdmin(statusMsg, statusClass){
     <div class="mel-admin-box"><div style="font-size:0.82rem;font-weight:900;margin-bottom:8px">Aperçu JSON</div><div class="mel-admin-json">${safe(preview)}</div></div>
   `;
 }
+
+async function importLocalMelToServer(){
+  try{
+    renderMelAdmin('Import du fichier local en cours…');
+
+    const localRes = await fetch('./data/mel-tree.json', { cache: 'no-store' });
+    if(!localRes.ok) throw new Error('mel-tree.json introuvable');
+
+    const tree = await localRes.json();
+    if(!tree || typeof tree !== 'object' || !Object.keys(tree).length){
+      throw new Error('mel-tree.json vide ou invalide');
+    }
+
+    const resp = await apiPost('/admin/mel-tree', { tree });
+    if(!resp.ok) throw new Error(resp.error || 'Erreur serveur');
+
+    _melTreeEditor = melNormalizeForEditor(resp.tree || tree);
+    _melTreeLoadedFrom = 'serveur';
+    renderMelAdmin('✅ Le fichier local a été importé vers le serveur.', 'success');
+  }catch(e){
+    renderMelAdmin('❌ ' + e.message, 'error');
+  }
+}
+
+function exportMelJson(){
+  try{
+    const tree = melSerializeEditor();
+    const blob = new Blob([JSON.stringify(tree, null, 2)], { type:'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mel-tree.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    renderMelAdmin('✅ Export JSON téléchargé.', 'success');
+  }catch(e){
+    renderMelAdmin('❌ ' + e.message, 'error');
+  }
+}
+  
 function melUpdatePreviewOnly(statusMsg, statusClass){
   const statusEl = document.getElementById('mel-admin-status');
   if(statusEl){
