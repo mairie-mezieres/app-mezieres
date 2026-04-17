@@ -1,6 +1,6 @@
 {
   "urbanisme": {
-    "label": "Construction & règles PLU",
+    "label": "Urbanisme & Construction",
     "ico": "🏗️",
     "needZone": true,
     "questions": [
@@ -38,84 +38,189 @@
         "label": "Piscine",
         "topic": "urbanisme",
         "prompt": "Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?"
+      },
+      {
+        "id": "changement_destination",
+        "ico": "🏢",
+        "label": "Changer la destination d’un bâtiment ou d’un local",
+        "topic": "urbanisme",
+        "prompt": "Je souhaite changer la destination d’un bâtiment ou d’un local. Quelles sont les règles applicables à mon terrain ?"
       }
     ]
   },
   "urbanisme_demarches": {
-  "label": "Urbanisme — Démarches",
-  "ico": "📋",
-  "needZone": false,
-  "questions": [
-    {
-      "id": "certificat_urbanisme",
-      "ico": "📄",
-      "label": "Certificat d’urbanisme",
-      "directAnswer": {
-        "text": "Le certificat d’urbanisme permet de connaître les règles applicables à un terrain et de savoir si une opération est réalisable. Ce n’est pas une autorisation de travaux. Vous pouvez déposer votre demande en mairie ou en ligne si vous préférez la dématérialisation. Le délai d’instruction est en principe de 2 mois. Le certificat est valable 18 mois.",
-        "links": [
-          { "label": "📄 Formulaire certificat d’urbanisme", "url": "https://entreprendre.service-public.fr/vosdroits/R1970" },
-          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
-          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
-          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
-        ]
+    "label": "Habitat & démarches",
+    "ico": "📋",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "certificat_urbanisme",
+        "ico": "📄",
+        "label": "Certificat d’urbanisme",
+        "directAnswer": {
+          "text": "Le certificat d’urbanisme permet de connaître les règles applicables à un terrain et de savoir si une opération est réalisable. Ce n’est pas une autorisation de travaux. Vous pouvez déposer votre demande en mairie ou en ligne si vous préférez la dématérialisation. Le délai d’instruction est en principe de 2 mois. Le certificat est valable 18 mois.",
+          "links": [
+            {
+              "label": "📄 Formulaire certificat d’urbanisme",
+              "url": "https://entreprendre.service-public.fr/vosdroits/R1970"
+            },
+            {
+              "label": "🌐 Déposer en ligne via le GNAU CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ouverture_chantier",
+        "ico": "🚧",
+        "label": "Déclarer l’ouverture d’un chantier",
+        "directAnswer": {
+          "text": "Si vos travaux sont autorisés par un permis de construire ou un permis d’aménager, vous devez déclarer l’ouverture du chantier dès le démarrage des travaux. Cette formalité n’est pas demandée pour une simple déclaration préalable. Vous pouvez transmettre la déclaration à la mairie ou effectuer la démarche en ligne si vous utilisez le dépôt dématérialisé.",
+          "links": [
+            {
+              "label": "📄 Déclaration d’ouverture de chantier",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/R1976"
+            },
+            {
+              "label": "🌐 Déposer en ligne via le GNAU CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fin_travaux",
+        "ico": "✅",
+        "label": "Déclarer la fin des travaux",
+        "directAnswer": {
+          "text": "À la fin des travaux autorisés par une déclaration préalable, un permis de construire ou un permis d’aménager, vous devez déposer une déclaration attestant l’achèvement et la conformité des travaux. La mairie peut ensuite contrôler la conformité du dossier. En règle générale, elle dispose de 3 mois pour la contester, et de 5 mois dans certains cas particuliers.",
+          "links": [
+            {
+              "label": "📄 Déclaration d’achèvement et de conformité",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/R1978"
+            },
+            {
+              "label": "ℹ️ Informations DAACT",
+              "url": "https://www.service-public.fr/particuliers/vosdroits/F1997"
+            },
+            {
+              "label": "🌐 Déposer en ligne via le GNAU CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "adressage",
+        "ico": "📍",
+        "label": "Numéro de rue / modification d’adressage",
+        "directAnswer": {
+          "text": "L’attribution d’un numéro de rue ou la modification d’un adressage relève de la mairie. Pour faire votre demande, préparez si possible l’adresse concernée, la référence cadastrale et un court descriptif de la situation. La mairie vous indiquera la marche à suivre selon votre dossier.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "occupation_domaine_public",
+        "ico": "🛠️",
+        "label": "Benne / échafaudage sur le domaine public",
+        "directAnswer": {
+          "text": "Pour installer une benne, un échafaudage ou occuper temporairement la voie publique, vous devez demander une autorisation préalable. Si l’installation gêne la circulation ou le stationnement, une demande d’arrêté temporaire de circulation peut aussi être nécessaire. Le plus simple est de contacter d’abord la mairie, qui vous indiquera la démarche adaptée à votre situation.",
+          "links": [
+            {
+              "label": "📄 Demande d’arrêté temporaire de circulation",
+              "url": "https://entreprendre.service-public.fr/vosdroits/R10216"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "location",
+        "ico": "🪑",
+        "label": "Location de matériel communal",
+        "directAnswer": {
+          "text": "La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            },
+            {
+              "label": "🌐 Page location matériel",
+              "url": "https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"
+            }
+          ]
+        }
+      },
+      {
+        "id": "assainissement",
+        "ico": "🚰",
+        "label": "Assainissement (fosse, raccordement, SPANC)",
+        "directAnswer": {
+          "text": "L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
+          "links": [
+            {
+              "label": "📞 CCTVL : 02 38 44 59 35",
+              "tel": "0238445935"
+            },
+            {
+              "label": "✉️ assainissement@ccterresduvaldeloire.fr",
+              "url": "mailto:assainissement@ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "🌐 Portail usagers CCTVL",
+              "url": "https://portail-usagers.ccterresduvaldeloire.fr"
+            }
+          ]
+        }
       }
-    },
-    {
-      "id": "ouverture_chantier",
-      "ico": "🚧",
-      "label": "Déclarer l’ouverture d’un chantier",
-      "directAnswer": {
-        "text": "Si vos travaux sont autorisés par un permis de construire ou un permis d’aménager, vous devez déclarer l’ouverture du chantier dès le démarrage des travaux. Cette formalité n’est pas demandée pour une simple déclaration préalable. Vous pouvez transmettre la déclaration à la mairie ou effectuer la démarche en ligne si vous utilisez le dépôt dématérialisé.",
-        "links": [
-          { "label": "📄 Déclaration d’ouverture de chantier", "url": "https://www.service-public.fr/particuliers/vosdroits/R1976" },
-          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
-          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
-          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
-        ]
-      }
-    },
-    {
-      "id": "fin_travaux",
-      "ico": "✅",
-      "label": "Déclarer la fin des travaux",
-      "directAnswer": {
-        "text": "À la fin des travaux autorisés par une déclaration préalable, un permis de construire ou un permis d’aménager, vous devez déposer une déclaration attestant l’achèvement et la conformité des travaux. La mairie peut ensuite contrôler la conformité du dossier. En règle générale, elle dispose de 3 mois pour la contester, et de 5 mois dans certains cas particuliers.",
-        "links": [
-          { "label": "📄 Déclaration d’achèvement et de conformité", "url": "https://www.service-public.fr/particuliers/vosdroits/R1978" },
-          { "label": "ℹ️ Informations DAACT", "url": "https://www.service-public.fr/particuliers/vosdroits/F1997" },
-          { "label": "🌐 Déposer en ligne via le GNAU CCTVL", "url": "https://www.ccterresduvaldeloire.fr/guichet-numerique-des-autorisations-durbanisme-gnau/" },
-          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
-          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
-        ]
-      }
-    },
-    {
-      "id": "adressage",
-      "ico": "📍",
-      "label": "Numéro de rue / modification d’adressage",
-      "directAnswer": {
-        "text": "L’attribution d’un numéro de rue ou la modification d’un adressage relève de la mairie. Pour faire votre demande, préparez si possible l’adresse concernée, la référence cadastrale et un court descriptif de la situation. La mairie vous indiquera la marche à suivre selon votre dossier.",
-        "links": [
-          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
-          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
-        ]
-      }
-    },
-    {
-      "id": "occupation_domaine_public",
-      "ico": "🛠️",
-      "label": "Benne / échafaudage sur le domaine public",
-      "directAnswer": {
-        "text": "Pour installer une benne, un échafaudage ou occuper temporairement la voie publique, vous devez demander une autorisation préalable. Si l’installation gêne la circulation ou le stationnement, une demande d’arrêté temporaire de circulation peut aussi être nécessaire. Le plus simple est de contacter d’abord la mairie, qui vous indiquera la démarche adaptée à votre situation.",
-        "links": [
-          { "label": "📄 Demande d’arrêté temporaire de circulation", "url": "https://entreprendre.service-public.fr/vosdroits/R10216" },
-          { "label": "📞 Mairie : 02 38 45 61 76", "tel": "0238456176" },
-          { "label": "✉️ mairie@mezieres-lez-clery.fr", "url": "mailto:mairie@mezieres-lez-clery.fr" }
-        ]
-      }
-    }
-  ]
-},
+    ]
+  },
   "enfance": {
     "label": "Enfance & Jeunesse",
     "ico": "🎒",
@@ -210,7 +315,7 @@
     ]
   },
   "administratif": {
-    "label": "État civil et papiers",
+    "label": "Démarches Administratives",
     "ico": "📋",
     "needZone": false,
     "questions": [
@@ -319,50 +424,6 @@
             }
           ]
         }
-      },
-      {
-        "id": "assainissement",
-        "ico": "🚰",
-        "label": "Assainissement (fosse, raccordement, SPANC)",
-        "directAnswer": {
-          "text": "L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
-          "links": [
-            {
-              "label": "📞 CCTVL : 02 38 44 59 35",
-              "tel": "0238445935"
-            },
-            {
-              "label": "✉️ assainissement@ccterresduvaldeloire.fr",
-              "url": "mailto:assainissement@ccterresduvaldeloire.fr"
-            },
-            {
-              "label": "🌐 Portail usagers CCTVL",
-              "url": "https://portail-usagers.ccterresduvaldeloire.fr"
-            }
-          ]
-        }
-      },
-      {
-        "id": "location",
-        "ico": "🪑",
-        "label": "Location de matériel communal",
-        "directAnswer": {
-          "text": "La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
-          "links": [
-            {
-              "label": "📞 Mairie : 02 38 45 61 76",
-              "tel": "0238456176"
-            },
-            {
-              "label": "✉️ mairie@mezieres-lez-clery.fr",
-              "url": "mailto:mairie@mezieres-lez-clery.fr"
-            },
-            {
-              "label": "🌐 Page location matériel",
-              "url": "https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"
-            }
-          ]
-        }
       }
     ]
   },
@@ -424,17 +485,13 @@
       {
         "id": "bac",
         "ico": "🗑️",
-        "label": "Demander un bac",
+        "label": "Demandes de dotation, échange ou réparation de bacs",
         "directAnswer": {
-          "text": "Vous allez ou venez d’emménager et vous n’avez pas de bacs ? La taille de vos bacs n’est pas suffisante ou trop importante par rapport au nombre de personnes dans votre foyer ? Votre bac est cassé suite à une collecte ?\n\nVous pouvez remplir le formulaire sur le site de la communauté de commune.",
+          "text": "Vous allez ou venez d’emménager et vous n’avez pas de bacs ? La taille de vos bacs n’est pas suffisante ou trop importante par rapport au nombre de personnes dans votre foyer ? Votre bac est cassé suite à une collecte ?",
           "links": [
             {
-              "label": "🌐 Demander un bac",
+              "label": "🌐 Demande de bac",
               "url": "https://www.ccterresduvaldeloire.fr/collecte-des-dechets-smirtom/"
-            },
-            {
-              "label": "📞 CCTVL : 02 38 44 59 35",
-              "tel": "0238445935"
             }
           ]
         }
@@ -496,17 +553,5 @@
     "needZone": false,
     "questions": [],
     "openChatDirectly": true
-  },
-  "habitat": {
-    "label": "Habitat, eau & assainissement",
-    "ico": "🏠",
-    "needZone": false,
-    "questions": [
-      {
-        "id": "question1",
-        "ico": "💬",
-        "label": "Nouvelle question"
-      }
-    ]
   }
 }
