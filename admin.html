@@ -1446,8 +1446,31 @@ function renderMelAdmin(statusMsg, statusClass){
     <div class="mel-admin-box"><div style="font-size:0.82rem;font-weight:900;margin-bottom:8px">Aperçu JSON</div><div class="mel-admin-json">${safe(preview)}</div></div>
   `;
 }
-function melSetCatField(ci, field, value){ if(!_melTreeEditor?.categories?.[ci]) return; _melTreeEditor.categories[ci][field]=value; renderMelAdmin(); }
-function melSetQuestionField(ci, qi, field, value){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; _melTreeEditor.categories[ci].questions[qi][field]=value; renderMelAdmin(); }
+function melUpdatePreviewOnly(statusMsg, statusClass){
+  const statusEl = document.getElementById('mel-admin-status');
+  if(statusEl){
+    statusEl.textContent = statusMsg || 'Tu peux modifier les catégories, questions, réponses et liens.';
+    statusEl.style.color = statusClass==='error' ? 'var(--red)' : statusClass==='success' ? 'var(--leaf)' : 'var(--muted)';
+  }
+
+  const previewEl = document.querySelector('.mel-admin-json');
+  if(previewEl){
+    try { previewEl.textContent = JSON.stringify(melSerializeEditor(), null, 2); }
+    catch (e) { previewEl.textContent = '⚠️ ' + e.message; }
+  }
+}
+
+function melSetCatField(ci, field, value){
+  if(!_melTreeEditor?.categories?.[ci]) return;
+  _melTreeEditor.categories[ci][field] = value;
+  melUpdatePreviewOnly();
+}
+
+function melSetQuestionField(ci, qi, field, value){
+  if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return;
+  _melTreeEditor.categories[ci].questions[qi][field] = value;
+  melUpdatePreviewOnly();
+}
 function melAddCategory(){ if(!_melTreeEditor) _melTreeEditor={categories:[]}; const n=_melTreeEditor.categories.length+1; _melTreeEditor.categories.push({ key:'categorie'+n, label:'Nouvelle catégorie', ico:'💬', needZone:false, openChatDirectly:false, questions:[] }); renderMelAdmin(); }
 function melDeleteCategory(ci){ if(!_melTreeEditor?.categories?.[ci]) return; if(!confirm('Supprimer cette catégorie ?')) return; _melTreeEditor.categories.splice(ci,1); renderMelAdmin(); }
 function melAddQuestion(ci){ if(!_melTreeEditor?.categories?.[ci]) return; const cat=_melTreeEditor.categories[ci]; const n=(cat.questions||[]).length+1; cat.questions.push({ id:'question'+n, ico:'💬', label:'Nouvelle question', topic:'', prompt:'', directAnswerText:'', linksText:'' }); renderMelAdmin(); }
