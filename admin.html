@@ -1393,7 +1393,11 @@ function renderMelAdmin(statusMsg, statusClass){
     <div class="mel-cat-card">
       <div class="mel-cat-head">
         <div class="mel-cat-title">${safe(cat.ico || '💬')} ${safe(cat.label || 'Nouvelle catégorie')}</div>
-        <button class="mel-admin-btn warn" onclick="melDeleteCategory(${ci})">Supprimer</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="mel-admin-btn sec" onclick="melMoveCategory(${ci},-1)" ${ci===0?'disabled':''}>⬆ Monter</button>
+          <button class="mel-admin-btn sec" onclick="melMoveCategory(${ci},1)" ${ci===cats.length-1?'disabled':''}>⬇ Descendre</button>
+          <button class="mel-admin-btn warn" onclick="melDeleteCategory(${ci})">Supprimer</button>
+        </div>
       </div>
       <div class="mel-admin-grid">
         <div class="mel-admin-field"><label>Clé technique</label><input class="mel-admin-input" value="${safe(cat.key)}" oninput="melSetCatField(${ci},'key',this.value)"></div>
@@ -1409,7 +1413,11 @@ function renderMelAdmin(statusMsg, statusClass){
           <div class="mel-q-card">
             <div class="mel-q-head">
               <div class="mel-q-title">${safe(q.ico || '💬')} ${safe(q.label || 'Nouvelle question')}</div>
-              <button class="mel-admin-btn warn" onclick="melDeleteQuestion(${ci},${qi})">Supprimer</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                <button class="mel-admin-btn sec" onclick="melMoveQuestion(${ci},${qi},-1)" ${qi===0?'disabled':''}>⬆ Monter</button>
+                <button class="mel-admin-btn sec" onclick="melMoveQuestion(${ci},${qi},1)" ${qi===((cat.questions||[]).length-1)?'disabled':''}>⬇ Descendre</button>
+                <button class="mel-admin-btn warn" onclick="melDeleteQuestion(${ci},${qi})">Supprimer</button>
+              </div>
             </div>
             <div class="mel-admin-grid">
               <div class="mel-admin-field"><label>ID question</label><input class="mel-admin-input" value="${safe(q.id)}" oninput="melSetQuestionField(${ci},${qi},'id',this.value)"></div>
@@ -1419,6 +1427,7 @@ function renderMelAdmin(statusMsg, statusClass){
               <div class="mel-admin-field"><label>Prompt IA</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'prompt',this.value)">${safe(q.prompt)}</textarea></div>
               <div class="mel-admin-field"><label>Réponse directe</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'directAnswerText',this.value)">${safe(q.directAnswerText)}</textarea></div>
               <div class="mel-admin-field"><label>Liens</label><textarea class="mel-admin-textarea" oninput="melSetQuestionField(${ci},${qi},'linksText',this.value)">${safe(q.linksText)}</textarea><div class="mel-mini">Une ligne par lien : <b>Libellé | URL</b> ou <b>Libellé | 0238456176</b></div></div>
+              <div class="mel-admin-field" style="grid-column:span 2;"><label>Déplacer vers une autre catégorie</label><div style="display:flex;gap:8px;flex-wrap:wrap"><select class="mel-admin-input" id="mel-move-${ci}-${qi}" style="flex:1;min-width:220px">${cats.map((destCat, destCi) => `<option value="${destCi}" ${destCi===ci?'selected':''}>${safe(destCat.ico || '💬')} ${safe(destCat.label || destCat.key || ('Catégorie ' + (destCi + 1)))}</option>`).join('')}</select><button class="mel-admin-btn sec" onclick="melMoveQuestionToCategory(${ci},${qi},document.getElementById('mel-move-${ci}-${qi}').value)">Déplacer</button></div></div>
             </div>
           </div>
         `).join('')}
@@ -1440,7 +1449,7 @@ function renderMelAdmin(statusMsg, statusClass){
           <button class="mel-admin-btn" onclick="saveMelAdmin()">💾 Enregistrer</button>
         </div>
       </div>
-      <div id="mel-admin-status" class="mel-admin-status" style="color:${statusClass==='error'?'var(--red)':statusClass==='success'?'var(--leaf)':'var(--muted)'}">${safe(statusMsg || 'Tu peux modifier les catégories, questions, réponses et liens.')}</div>
+      <div id="mel-admin-status" class="mel-admin-status" style="color:${statusClass==='error'?'var(--red)':statusClass==='success'?'var(--leaf)':'var(--muted)'}">${safe(statusMsg || 'Tu peux modifier les catégories, questions, réponses, ordre et déplacement.')}</div>
     </div>
     ${cards || `<div class="mel-admin-box">Aucune catégorie.</div>`}
     <div class="mel-admin-box"><div style="font-size:0.82rem;font-weight:900;margin-bottom:8px">Aperçu JSON</div><div class="mel-admin-json">${safe(preview)}</div></div>
@@ -1449,32 +1458,47 @@ function renderMelAdmin(statusMsg, statusClass){
 function melUpdatePreviewOnly(statusMsg, statusClass){
   const statusEl = document.getElementById('mel-admin-status');
   if(statusEl){
-    statusEl.textContent = statusMsg || 'Tu peux modifier les catégories, questions, réponses et liens.';
+    statusEl.textContent = statusMsg || 'Tu peux modifier les catégories, questions, réponses, ordre et déplacement.';
     statusEl.style.color = statusClass==='error' ? 'var(--red)' : statusClass==='success' ? 'var(--leaf)' : 'var(--muted)';
   }
-
   const previewEl = document.querySelector('.mel-admin-json');
   if(previewEl){
     try { previewEl.textContent = JSON.stringify(melSerializeEditor(), null, 2); }
     catch (e) { previewEl.textContent = '⚠️ ' + e.message; }
   }
 }
-
-function melSetCatField(ci, field, value){
+function melSetCatField(ci, field, value){ if(!_melTreeEditor?.categories?.[ci]) return; _melTreeEditor.categories[ci][field]=value; melUpdatePreviewOnly(); }
+function melSetQuestionField(ci, qi, field, value){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; _melTreeEditor.categories[ci].questions[qi][field]=value; melUpdatePreviewOnly(); }
+function melMoveCategory(ci, direction){
   if(!_melTreeEditor?.categories?.[ci]) return;
-  _melTreeEditor.categories[ci][field] = value;
-  melUpdatePreviewOnly();
+  const to = ci + Number(direction || 0);
+  if(to < 0 || to >= _melTreeEditor.categories.length) return;
+  const moved = _melTreeEditor.categories.splice(ci, 1)[0];
+  _melTreeEditor.categories.splice(to, 0, moved);
+  renderMelAdmin('✅ Catégorie déplacée', 'success');
 }
-
-function melSetQuestionField(ci, qi, field, value){
+function melAddCategory(){ if(!_melTreeEditor) _melTreeEditor={categories:[]}; const n=_melTreeEditor.categories.length+1; _melTreeEditor.categories.push({ key:'categorie'+n, label:'Nouvelle catégorie', ico:'💬', needZone:false, openChatDirectly:false, questions:[] }); renderMelAdmin('✅ Catégorie ajoutée', 'success'); }
+function melDeleteCategory(ci){ if(!_melTreeEditor?.categories?.[ci]) return; if(!confirm('Supprimer cette catégorie ?')) return; _melTreeEditor.categories.splice(ci,1); renderMelAdmin('✅ Catégorie supprimée', 'success'); }
+function melAddQuestion(ci){ if(!_melTreeEditor?.categories?.[ci]) return; const cat=_melTreeEditor.categories[ci]; const n=(cat.questions||[]).length+1; cat.questions.push({ id:'question'+n, ico:'💬', label:'Nouvelle question', topic:'', prompt:'', directAnswerText:'', linksText:'' }); renderMelAdmin('✅ Question ajoutée', 'success'); }
+function melMoveQuestion(ci, qi, direction){
   if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return;
-  _melTreeEditor.categories[ci].questions[qi][field] = value;
-  melUpdatePreviewOnly();
+  const questions = _melTreeEditor.categories[ci].questions;
+  const to = qi + Number(direction || 0);
+  if(to < 0 || to >= questions.length) return;
+  const moved = questions.splice(qi, 1)[0];
+  questions.splice(to, 0, moved);
+  renderMelAdmin('✅ Ordre des questions mis à jour', 'success');
 }
-function melAddCategory(){ if(!_melTreeEditor) _melTreeEditor={categories:[]}; const n=_melTreeEditor.categories.length+1; _melTreeEditor.categories.push({ key:'categorie'+n, label:'Nouvelle catégorie', ico:'💬', needZone:false, openChatDirectly:false, questions:[] }); renderMelAdmin(); }
-function melDeleteCategory(ci){ if(!_melTreeEditor?.categories?.[ci]) return; if(!confirm('Supprimer cette catégorie ?')) return; _melTreeEditor.categories.splice(ci,1); renderMelAdmin(); }
-function melAddQuestion(ci){ if(!_melTreeEditor?.categories?.[ci]) return; const cat=_melTreeEditor.categories[ci]; const n=(cat.questions||[]).length+1; cat.questions.push({ id:'question'+n, ico:'💬', label:'Nouvelle question', topic:'', prompt:'', directAnswerText:'', linksText:'' }); renderMelAdmin(); }
-function melDeleteQuestion(ci,qi){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; if(!confirm('Supprimer cette question ?')) return; _melTreeEditor.categories[ci].questions.splice(qi,1); renderMelAdmin(); }
+function melMoveQuestionToCategory(fromCi, qi, toCi){
+  const targetIndex = Number(toCi);
+  if(!_melTreeEditor?.categories?.[fromCi]?.questions?.[qi]) return;
+  if(!_melTreeEditor?.categories?.[targetIndex]) return;
+  if(fromCi === targetIndex){ renderMelAdmin('ℹ️ La question est déjà dans cette catégorie'); return; }
+  const moved = _melTreeEditor.categories[fromCi].questions.splice(qi, 1)[0];
+  _melTreeEditor.categories[targetIndex].questions.push(moved);
+  renderMelAdmin('✅ Question déplacée vers une autre catégorie', 'success');
+}
+function melDeleteQuestion(ci,qi){ if(!_melTreeEditor?.categories?.[ci]?.questions?.[qi]) return; if(!confirm('Supprimer cette question ?')) return; _melTreeEditor.categories[ci].questions.splice(qi,1); renderMelAdmin('✅ Question supprimée', 'success'); }
 async function saveMelAdmin(){
   try {
     renderMelAdmin('Enregistrement en cours…');
