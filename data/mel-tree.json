@@ -1,50 +1,43 @@
 {
   "urbanisme": {
-    "label": "Urbanisme & Construction",
+    "label": "Construction & règles PLU",
     "ico": "🏗️",
     "needZone": true,
     "questions": [
       {
-        "id": "piscine",
-        "ico": "🏊",
-        "label": "Piscine",
-        "prompt": "Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?",
-        "topic": "urbanisme"
-      },
-      {
         "id": "cloture",
         "ico": "🔲",
         "label": "Clôture / Mur / Portail",
-        "prompt": "Je souhaite installer une clôture, un mur ou un portail. Quelles sont les règles et formalités ?",
-        "topic": "urbanisme"
-      },
-      {
-        "id": "extension",
-        "ico": "📐",
-        "label": "Extension / Agrandissement",
-        "prompt": "Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables ?",
-        "topic": "urbanisme"
+        "topic": "urbanisme",
+        "prompt": "Je souhaite installer une clôture, un mur ou un portail. Quelles sont les règles et formalités ?"
       },
       {
         "id": "abri",
         "ico": "🌿",
         "label": "Abri de jardin / Garage / Annexe",
-        "prompt": "Je souhaite construire un abri de jardin, un garage ou une dépendance. Quelles sont les règles ?",
-        "topic": "urbanisme"
+        "topic": "urbanisme",
+        "prompt": "Je souhaite construire un abri de jardin, un garage ou une dépendance. Quelles sont les règles ?"
+      },
+      {
+        "id": "extension",
+        "ico": "📐",
+        "label": "Extension / Agrandissement",
+        "topic": "urbanisme",
+        "prompt": "Je souhaite agrandir ma maison. Quelles sont les règles d'extension applicables ?"
       },
       {
         "id": "toiture",
         "ico": "🏠",
         "label": "Toiture / Façade / Matériaux",
-        "prompt": "Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?",
-        "topic": "urbanisme"
+        "topic": "urbanisme",
+        "prompt": "Je souhaite modifier la toiture ou la façade de ma maison. Quelles sont les règles applicables ?"
       },
       {
-        "id": "changement_destination",
-        "ico": "🏢",
-        "label": "Changer la destination d’un bâtiment ou d’un local",
-        "prompt": "Je souhaite changer la destination d’un bâtiment ou d’un local. Quelles sont les règles applicables à mon terrain ?",
-        "topic": "urbanisme"
+        "id": "piscine",
+        "ico": "🏊",
+        "label": "Piscine",
+        "topic": "urbanisme",
+        "prompt": "Je souhaite construire une piscine. Quelles sont les règles PLU applicables à mon terrain ?"
       }
     ]
   },
@@ -217,7 +210,7 @@
     ]
   },
   "administratif": {
-    "label": "Démarches Administratives",
+    "label": "État civil et papiers",
     "ico": "📋",
     "needZone": false,
     "questions": [
@@ -292,11 +285,11 @@
           "links": [
             {
               "label": "📄 Déclaration PACS (cerfa 15725*03)",
-              "url": "https://www.service-public.fr/particuliers/vosdroits/R42142"
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R48756"
             },
             {
               "label": "📄 Convention-type PACS (cerfa 15726*02)",
-              "url": "https://www.service-public.fr/particuliers/vosdroits/R43750"
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R48755"
             },
             {
               "label": "📞 Mairie : 02 38 45 61 76",
@@ -379,20 +372,6 @@
     "needZone": false,
     "questions": [
       {
-        "id": "collecte",
-        "ico": "🗑️",
-        "label": "Jours de collecte ordures / tri sélectif",
-        "directAnswer": {
-          "text": "Sortez vos bacs la veille au soir ou avant 7h le matin du jour de collecte. La collecte n'a pas lieu les jours fériés — elle est reportée au lendemain. Des points d'apport volontaire (verre, papiers, plastique-cartons, vêtements) sont présents sur la commune. Consultez votre calendrier personnalisé en ligne.",
-          "links": [
-            {
-              "label": "🗓️ Mon calendrier de collecte",
-              "url": "https://mezieres-lez-clery.fr/2018/10/25/gestion-des-dechets/"
-            }
-          ]
-        }
-      },
-      {
         "id": "dechetterie",
         "ico": "♻️",
         "label": "Déchetterie — horaires & inscription",
@@ -438,6 +417,24 @@
             {
               "label": "🌐 Guide du tri CCTVL",
               "url": "https://www.ccterresduvaldeloire.fr/reseau-des-dechetteries/"
+            }
+          ]
+        }
+      },
+      {
+        "id": "bac",
+        "ico": "🗑️",
+        "label": "Demander un bac",
+        "directAnswer": {
+          "text": "Vous allez ou venez d’emménager et vous n’avez pas de bacs ? La taille de vos bacs n’est pas suffisante ou trop importante par rapport au nombre de personnes dans votre foyer ? Votre bac est cassé suite à une collecte ?\n\nVous pouvez remplir le formulaire sur le site de la communauté de commune.",
+          "links": [
+            {
+              "label": "🌐 Demander un bac",
+              "url": "https://www.ccterresduvaldeloire.fr/collecte-des-dechets-smirtom/"
+            },
+            {
+              "label": "📞 CCTVL : 02 38 44 59 35",
+              "tel": "0238445935"
             }
           ]
         }
@@ -497,7 +494,19 @@
     "label": "Autre question",
     "ico": "💬",
     "needZone": false,
-    "openChatDirectly": true,
-    "questions": []
+    "questions": [],
+    "openChatDirectly": true
+  },
+  "habitat": {
+    "label": "Habitat, eau & assainissement",
+    "ico": "🏠",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "question1",
+        "ico": "💬",
+        "label": "Nouvelle question"
+      }
+    ]
   }
 }
