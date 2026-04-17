@@ -733,9 +733,11 @@ async function sendMel(){
       const sug=document.createElement('div'); sug.className='msg bot';
       sug.innerHTML='<div class="mav">👩</div><div class="bub" style="background:var(--mist);border:1px solid rgba(0,0,0,0.06);padding:10px 12px;">'
         +'<div style="font-size:0.72rem;font-weight:900;color:var(--forest);margin-bottom:6px">🏗️ Schéma des autorisations d\'urbanisme</div>'
-        +'<img src="./autorisation-urbanisme.jpg?v=3.7.3" '
-        +'alt="Autorisations urbanisme" style="width:100%;border-radius:8px;display:block;margin-bottom:6px;" '
-        +'onerror="this.style.display=\'none\'">'
+         +'<img src="./autorisation-urbanisme.jpg?v=3.7.4" '
+         +'alt="Autorisations urbanisme" '
+         +'style="width:100%;border-radius:8px;display:block;margin-bottom:6px;cursor:zoom-in" '
+         +'onclick="openMelImageModal(this.src, \'Schéma des autorisations d\\\'urbanisme\')" '
+         +'onerror="this.style.display=\'none\'">'
         +'<div style="font-size:0.67rem;color:var(--muted);line-height:1.5">DP = Déclaration Préalable · PC = Permis de Construire · SP = Surface Plancher</div>'
         +'</div>';
       c.appendChild(sug); c.scrollTop=99999;
@@ -853,7 +855,16 @@ function _buildSubLevel(cat,def){
   let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
   if(def.needZone){
     h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg" oninput="this.style.borderColor='';document.getElementById('mel-addr-warn')?.remove()" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
-    h+=`<div class="mel-schema-block"><div class="mel-schema-label">📋 Schéma des autorisations</div><img src="./autorisation-urbanisme.jpg?v=3.7.3" alt="Autorisations urbanisme" class="mel-schema-img" onerror="this.closest('.mel-schema-block').style.display='none'"/></div>`;
+    h+=`<div class="mel-schema-block">
+  <div class="mel-schema-label">📋 Schéma des autorisations</div>
+  <img
+    src="./autorisation-urbanisme.jpg?v=3.7.4"
+    alt="Autorisations urbanisme"
+    class="mel-schema-img"
+    onclick="openMelImageModal(this.src, 'Schéma des autorisations d\\'urbanisme')"
+    style="cursor:zoom-in"
+    onerror="this.closest('.mel-schema-block').style.display='none'"/>
+</div>`;
   }
   for(const q of def.questions){
     h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
@@ -861,6 +872,50 @@ function _buildSubLevel(cat,def){
   h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion('${cat}','__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button>`;
   h+=`</div>`;
   return h;
+}
+
+function openMelImageModal(src, title){
+  closeMelImageModal();
+
+  const ov = document.createElement('div');
+  ov.id = 'mel-image-modal';
+  ov.style.cssText = `
+    position:fixed; inset:0; z-index:99999;
+    background:rgba(0,0,0,.82);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+  `;
+  ov.onclick = function(e){
+    if(e.target === ov) closeMelImageModal();
+  };
+
+  ov.innerHTML = `
+    <div style="position:relative;max-width:95vw;max-height:95vh;width:100%;display:flex;flex-direction:column;align-items:center;">
+      <button onclick="closeMelImageModal()" style="
+        position:absolute;top:-6px;right:-6px;
+        width:40px;height:40px;border:none;border-radius:999px;
+        background:white;color:#111;font-size:22px;font-weight:900;cursor:pointer;
+        box-shadow:0 4px 16px rgba(0,0,0,.35);
+      ">×</button>
+      <div style="color:white;font-weight:800;font-size:.95rem;margin-bottom:10px;text-align:center;">${title || ''}</div>
+      <img src="${src}" alt="${title || 'Image'}" style="
+        max-width:100%;
+        max-height:calc(95vh - 50px);
+        border-radius:12px;
+        box-shadow:0 12px 40px rgba(0,0,0,.45);
+        background:white;
+      ">
+    </div>
+  `;
+
+  document.body.appendChild(ov);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMelImageModal(){
+  const el = document.getElementById('mel-image-modal');
+  if(el) el.remove();
+  document.body.style.overflow = '';
 }
 
 function melSelectQuestion(cat,qid){
