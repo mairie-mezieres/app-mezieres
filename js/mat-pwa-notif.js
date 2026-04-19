@@ -1,8 +1,28 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Prompt notifications post-installation v3.7.6
+   MAT — Prompt notifications post-installation v3.7.7
    Propose d'activer les alertes juste après l'installation PWA.
    Chargé dynamiquement par mat-init.js.
    ════════════════════════════════════════════════════════════ */
+
+var PUSH_PENDING_SYNC_KEY = 'mat_push_pending_sync';
+
+// Retente l'enregistrement serveur si échoué lors d'une session précédente
+async function retryPendingPushSync() {
+  if (!localStorage.getItem(PUSH_PENDING_SYNC_KEY)) return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (!sub) { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); return; }
+    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub),
+      keepalive: true
+    });
+    if (r.ok) localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+  } catch(_) {}
+}
 
 async function showPostInstallNotifPrompt() {
   if (localStorage.getItem(NOTIF_PROMPTED_KEY)) return;
@@ -44,13 +64,18 @@ async function showPostInstallNotifPrompt() {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
     });
-    // Enregistrement serveur en arrière-plan — ne bloque pas si Render est en veille
+    // Enregistrement serveur en arrière-plan ; si échec, flag pour retry au prochain lancement
     fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSub),
       keepalive: true
-    }).catch(function() {});
+    }).then(function(r) {
+      if (!r.ok) localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
+      else localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+    }).catch(function() {
+      localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
+    });
     pushRegistered = true;
     try { updateNotifCardStatus(true); } catch(_) {}
     try {
@@ -101,8 +126,10 @@ window.addEventListener('appinstalled', function() {
 // Détection premier démarrage standalone — compatible chargement dynamique
 if (document.readyState === 'complete') {
   setTimeout(checkFirstStandaloneRun, 1500);
+  setTimeout(retryPendingPushSync, 3000);
 } else {
   window.addEventListener('load', function() {
     setTimeout(checkFirstStandaloneRun, 1500);
+    setTimeout(retryPendingPushSync, 3000);
   });
 }
