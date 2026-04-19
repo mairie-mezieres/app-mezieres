@@ -79,27 +79,30 @@ function _buildTriCard() {
   return html;
 }
 
-// Patch loadDechetsDetail pour injecter le guide tri + la carte notification
+// Patch loadDechetsDetail — ordre : collecte → rappels → tri → déchetterie
 (function() {
   var _orig = window.loadDechetsDetail;
   window.loadDechetsDetail = function() {
     if (typeof _orig === 'function') _orig();
     var el = document.getElementById('dechets-content');
     if (!el) return;
+    // Référence au bloc déchetterie (2e enfant) pour insérer avant lui
+    var dechetterie = el.children[1] || null;
 
-    // Guide tri sélectif
-    var triDiv = document.createElement('div');
-    triDiv.innerHTML = _buildTriCard();
-    el.appendChild(triDiv);
-
-    // Carte rappels collecte
+    // Carte rappels collecte — juste sous "Collecte des ordures"
     var card = document.createElement('div');
     card.style.cssText = 'background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:14px;border:1px solid rgba(34,197,94,0.25);margin-bottom:12px';
     card.innerHTML = '<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:4px">🔔 Rappels collecte</div>'
       + '<div style="font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:10px">Recevez une notification à 18h la veille de chaque collecte (bac noir et bac jaune).</div>'
       + '<button id="dechets-notif-btn" onclick="toggleDechetsNotif()" style="width:100%;padding:10px 14px;border:none;border-radius:10px;font-family:Nunito,sans-serif;font-size:0.8rem;font-weight:900;cursor:pointer;color:white;background:var(--forest)">Chargement…</button>'
       + '<div id="dechets-notif-info" style="font-size:0.7rem;color:var(--muted);margin-top:6px;min-height:1em"></div>';
-    el.appendChild(card);
+    el.insertBefore(card, dechetterie);
+
+    // Guide tri sélectif — entre rappels et déchetterie
+    var triDiv = document.createElement('div');
+    triDiv.innerHTML = _buildTriCard();
+    el.insertBefore(triDiv, dechetterie);
+
     checkDechetsNotifStatus();
   };
 })();
@@ -132,7 +135,7 @@ async function checkDechetsNotifStatus() {
   btn.disabled = false;
   btn.textContent = enabled ? '🔕 Désactiver les rappels' : '🔔 Activer les rappels collecte';
   btn.style.background = enabled ? '#ef4444' : 'var(--forest)';
-  if (info) info.textContent = enabled ? 'Rappel à 18h la veille de chaque collecte.' : '';
+  if (info) info.textContent = '';
 }
 
 async function toggleDechetsNotif() {
