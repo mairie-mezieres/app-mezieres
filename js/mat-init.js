@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Initialisation v3.7.2 (Phase 3)
    Séquence d'amorçage appelée au chargement de la page.
-   DOIT ÊTRE CHARGÉ EN DERNIER — tous les autres modules doivent
+   DOIT Être CHARGÉ EN DERNIER — tous les autres modules doivent
    déjà avoir défini leurs fonctions globales.
    ════════════════════════════════════════════════════════════ */
 
@@ -63,5 +63,12 @@
 (function(){
   var s = document.createElement('script');
   s.src = 'js/mat-pwa-notif.js?v=3.7.5';
+  document.head.appendChild(s);
+})();
+
+// Chargement dynamique du module rappels collecte déchets
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-dechets-notif.js?v=3.7.8';
   document.head.appendChild(s);
 })();
