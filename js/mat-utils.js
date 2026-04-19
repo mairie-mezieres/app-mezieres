@@ -11,6 +11,7 @@ const ICAL_URL    = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy
 const METEO_URL   = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB   = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
+const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
 const MAT_VERSION = 'v3.7.4';
 const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
 
@@ -359,7 +360,7 @@ function formatMelText(text) {
   });
 
   // 2. www.xxx sans http
-  result = result.replace(/(?<!["\/\w])(www\.[a-zA-Z0-9-]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi, (url) => {
+  result = result.replace(/(?<![":\/\w])(www\.[a-zA-Z0-9-]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi, (url) => {
     const href = 'https://' + url;
     return `<a href="${href}" target="_blank" style="${linkStyle}">${urlToLabel(href)}</a>`;
   });
@@ -367,7 +368,7 @@ function formatMelText(text) {
   // 3. Domaines connus
   for (const domain of KNOWN_DOMAINS) {
     const esc2 = domain.replace(/\./g,'\\.');
-    const re = new RegExp('(?<!["\/\.\w@])(' + esc2 + '(?:\/[^\s<>"]*)?)', 'gi');
+    const re = new RegExp('(?<![":\/\.\w@])(' + esc2 + '(?:\/[^\s<>"]*)?)', 'gi');
     result = result.replace(re, (url) => {
       const href = 'https://' + url;
       return `<a href="${href}" target="_blank" style="${linkStyle}">${urlToLabel(href)}</a>`;
