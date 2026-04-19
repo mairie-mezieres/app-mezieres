@@ -1,7 +1,7 @@
-// SERVICE WORKER v3.7.4 — MAT Mézières Avec Toi
+// SERVICE WORKER v3.8.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 3 : détail d'actualité depuis notification push
-const CACHE = 'mat-v3.7.4';
+const CACHE = 'mat-v3.8.0';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -16,7 +16,11 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=3.7.4',
   './js/mat-trombi.js?v=3.7.4',
   './js/mat-mel.js?v=3.7.4',
-  './js/mat-init.js?v=3.7.4',
+  './js/mat-init.js?v=3.7.9',
+  './js/mat-pwa-notif.js?v=3.7.5',
+  './js/mat-dechets-notif.js?v=3.7.9',
+  './js/mat-jours-feries.js?v=3.7.9',
+  './js/mat-eau.js?v=3.8.0',
   './data/plu-data.json?v=3.7.4',
   './data/mel-tree.json?v=3.7.4',
   './mat-header.png',
