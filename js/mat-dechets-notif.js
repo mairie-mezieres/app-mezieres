@@ -1,19 +1,98 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Rappels collecte déchets v3.7.8
-   Bouton dans l'overlay déchets pour activer les notifications
-   de rappel la veille des collectes (à 18h).
+   MAT — Déchets v3.7.9
+   Guide tri sélectif + rappels collecte push (18h la veille).
    Chargé dynamiquement par mat-init.js.
    ════════════════════════════════════════════════════════════ */
 
 var DECHETS_NOTIF_KEY = 'mat_dechets_notif_v1';
 
-// Patch loadDechetsDetail pour ajouter la carte notification en bas
+var _TRI_DATA = [
+  {
+    id: 'jaune', color: '#eab308', bg: '#fefce8', border: 'rgba(234,179,8,0.35)',
+    label: 'Bac jaune', emoji: '🟡',
+    subtitle: 'Emballages & cartons',
+    items: [
+      '♻️ Bouteilles et flacons plastiques',
+      '🥫 Boîtes de conserve et canettes',
+      '🧃 Briques alimentaires',
+      '📦 Cartons et boîtes d\'emballage',
+      '🛍️ Sacs et films plastiques propres'
+    ],
+    tip: 'Videz et essorez les emballages — pas besoin de les laver.'
+  },
+  {
+    id: 'bleu', color: '#3b82f6', bg: '#eff6ff', border: 'rgba(59,130,246,0.35)',
+    label: 'Bac bleu', emoji: '🔵',
+    subtitle: 'Papiers',
+    items: [
+      '📰 Journaux et magazines',
+      '✉️ Courrier et enveloppes',
+      '📚 Cahiers et livres',
+      '🖨️ Papiers d\'impression',
+      '📄 Brochures et prospectus'
+    ],
+    tip: 'Le papier mouillé ou gras n\'est pas recyclable — jetez-le dans le bac noir.'
+  },
+  {
+    id: 'vert', color: '#22c55e', bg: '#f0fdf4', border: 'rgba(34,197,94,0.35)',
+    label: 'Bac vert', emoji: '🟢',
+    subtitle: 'Verre',
+    items: [
+      '🍷 Bouteilles en verre',
+      '🫙 Bocaux et pots en verre',
+      '🍯 Pots à confiture et conserves'
+    ],
+    tip: 'Retirez bouchons et couvercles. Pas de verre cassé en vrac ni de vaisselle.'
+  }
+];
+
+function _triToggle(id) {
+  _TRI_DATA.forEach(function(b) {
+    var body = document.getElementById('tri-body-' + b.id);
+    var chevron = document.getElementById('tri-chev-' + b.id);
+    if (!body) return;
+    var open = b.id === id ? body.style.display === 'none' : false;
+    body.style.display = open ? 'block' : 'none';
+    if (chevron) chevron.textContent = open ? '▲' : '▼';
+  });
+}
+
+function _buildTriCard() {
+  var html = '<div style="background:#fff;border-radius:14px;padding:14px;border:1px solid rgba(0,0,0,0.08);margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+    + '<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:10px">♻️ Guide du tri sélectif</div>';
+  _TRI_DATA.forEach(function(b) {
+    html += '<div style="border:1px solid ' + b.border + ';border-radius:10px;margin-bottom:8px;overflow:hidden">'
+      + '<button onclick="_triToggle(\'' + b.id + '\')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + b.bg + ';border:none;cursor:pointer;font-family:Nunito,sans-serif;text-align:left">'
+      + '<span style="font-size:1rem">' + b.emoji + '</span>'
+      + '<span style="flex:1;font-size:0.82rem;font-weight:900;color:#1e293b">' + b.label + ' <span style="font-weight:600;color:#64748b">· ' + b.subtitle + '</span></span>'
+      + '<span id="tri-chev-' + b.id + '" style="font-size:0.65rem;color:#94a3b8">▼</span>'
+      + '</button>'
+      + '<div id="tri-body-' + b.id + '" style="display:none;padding:10px 12px;background:#fff">'
+      + '<ul style="margin:0 0 8px 0;padding-left:18px;list-style:none">';
+    b.items.forEach(function(item) {
+      html += '<li style="font-size:0.77rem;color:#334155;line-height:1.7;padding-left:0;margin-left:-4px">' + item + '</li>';
+    });
+    html += '</ul><div style="font-size:0.72rem;color:#64748b;background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5">💡 ' + b.tip + '</div>'
+      + '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// Patch loadDechetsDetail pour injecter le guide tri + la carte notification
 (function() {
   var _orig = window.loadDechetsDetail;
   window.loadDechetsDetail = function() {
     if (typeof _orig === 'function') _orig();
     var el = document.getElementById('dechets-content');
     if (!el) return;
+
+    // Guide tri sélectif
+    var triDiv = document.createElement('div');
+    triDiv.innerHTML = _buildTriCard();
+    el.appendChild(triDiv);
+
+    // Carte rappels collecte
     var card = document.createElement('div');
     card.style.cssText = 'background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:14px;border:1px solid rgba(34,197,94,0.25);margin-bottom:12px';
     card.innerHTML = '<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:4px">🔔 Rappels collecte</div>'
