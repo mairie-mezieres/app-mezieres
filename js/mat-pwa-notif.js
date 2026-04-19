@@ -1,10 +1,9 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Prompt notifications post-installation v3.7.5
    Propose d'activer les alertes juste après l'installation PWA.
-   Chargé après mat-core.js, mat-actus.js et mat-utils.js.
+   Chargé dynamiquement par mat-init.js.
    ════════════════════════════════════════════════════════════ */
 
-// Affiche la modale de proposition d'alertes
 async function showPostInstallNotifPrompt() {
   if (localStorage.getItem(NOTIF_PROMPTED_KEY)) return;
   localStorage.setItem(NOTIF_PROMPTED_KEY, '1');
@@ -39,7 +38,6 @@ async function showPostInstallNotifPrompt() {
   }
 }
 
-// Détection premier lancement en mode standalone (iOS / navigateurs sans beforeinstallprompt)
 function checkFirstStandaloneRun() {
   if (!isStandaloneMode()) return;
   if (!localStorage.getItem(INSTALL_KEY)) {
@@ -50,7 +48,7 @@ function checkFirstStandaloneRun() {
   showPostInstallNotifPrompt();
 }
 
-// Cas Chrome/Android : override de installApp pour intercepter l'acceptation
+// Override installApp pour intercepter l'acceptation Chrome/Android
 (function() {
   window.installApp = function() {
     if (typeof dp !== 'undefined' && dp) {
@@ -70,12 +68,16 @@ function checkFirstStandaloneRun() {
   };
 })();
 
-// Cas appinstalled (complète le listener de mat-core.js)
+// Cas appinstalled
 window.addEventListener('appinstalled', function() {
   setTimeout(showPostInstallNotifPrompt, 800);
 });
 
-// Détection premier démarrage standalone au chargement
-window.addEventListener('load', function() {
+// Détection premier démarrage standalone — compatible chargement dynamique
+if (document.readyState === 'complete') {
   setTimeout(checkFirstStandaloneRun, 1500);
-});
+} else {
+  window.addEventListener('load', function() {
+    setTimeout(checkFirstStandaloneRun, 1500);
+  });
+}

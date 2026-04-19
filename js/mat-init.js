@@ -58,3 +58,10 @@
   setInterval(function(){ try { loadMeteo(); }        catch(e){} }, 600000);  // 10 min
   setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000); // 5 min
 })();
+
+// Chargement dynamique du module post-installation (prompt notifications)
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-pwa-notif.js?v=3.7.5';
+  document.head.appendChild(s);
+})();
