@@ -79,3 +79,10 @@
   s.src = 'js/mat-jours-feries.js?v=3.7.9';
   document.head.appendChild(s);
 })();
+
+// Chargement dynamique du module eau (nappe + restrictions) dans la météo
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-eau.js?v=3.8.0';
+  document.head.appendChild(s);
+})();
