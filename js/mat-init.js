@@ -59,6 +59,14 @@
   setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000); // 5 min
 })();
 
+// Debug version indicator — à retirer après confirmation
+(function(){
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:4px;left:4px;font-size:9px;color:rgba(0,0,0,0.3);z-index:9999;pointer-events:none';
+  el.textContent = 'MAT v3.8.0';
+  document.body.appendChild(el);
+})();
+
 // Chargement dynamique du module post-installation (prompt notifications)
 (function(){
   var s = document.createElement('script');
