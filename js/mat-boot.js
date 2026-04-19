@@ -83,6 +83,6 @@
 // Chargement dynamique du module eau (nappe + restrictions) dans la météo
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-hydro.js?v=3.8.1';
+  s.src = 'js/mat-eau2.js?v=3.8.3';
   document.head.appendChild(s);
 })();
