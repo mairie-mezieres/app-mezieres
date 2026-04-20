@@ -43,20 +43,20 @@ function removeSignalPhoto(){
 }
 function getLocation(){
   if(!navigator.geolocation){document.getElementById('loc-status').textContent='GPS non disponible';return;}
-  document.getElementById('loc-btn').textContent='📍 Localisation en cours…';
+  document.getElementById('loc-btn').textContent='\uD83D\uDCCD Localisation en cours\u2026';
   navigator.geolocation.getCurrentPosition(pos=>{
     sigLat=pos.coords.latitude.toFixed(5); sigLon=pos.coords.longitude.toFixed(5);
-    document.getElementById('loc-btn').textContent='✅ Position obtenue ('+sigLat+', '+sigLon+')';
+    document.getElementById('loc-btn').textContent='\u2705 Position obtenue ('+sigLat+', '+sigLon+')';
     document.getElementById('loc-btn').classList.add('on');
     document.getElementById('loc-status').textContent='';
-  },()=>{document.getElementById('loc-btn').textContent='❌ Position refusée';document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres';});
+  },()=>{document.getElementById('loc-btn').textContent='\u274C Position refus\u00E9e';document.getElementById('loc-status').textContent='Activez la localisation dans les param\u00E8tres';});
 }
 
 async function submitSignal(){
   const desc=document.getElementById('signal-desc').value.trim();
   const photoEl=document.getElementById('signal-photo-preview');
   const btn=document.querySelector('#signal-form .submit-btn');
-  btn.textContent='Envoi en cours…'; btn.disabled=true;
+  btn.textContent='Envoi en cours\u2026'; btn.disabled=true;
 
   // Compresser la photo (max 800px, qualité 0.7)
   let photoB64 = '';
@@ -66,8 +66,8 @@ async function submitSignal(){
   }
 
   const _dev = detectDevice();
-  const descWithDevice = desc + (desc ? '\n\n' : '') + '📱 ' + _dev.type + ' · ' + _dev.os + ' · ' + _dev.browser + ' · ' + _dev.pwa;
-  const body={cat:sigCat||'Non précisé',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64};
+  const descWithDevice = desc + (desc ? '\n\n' : '') + '\uD83D\uDCF1 ' + _dev.type + ' \u00B7 ' + _dev.os + ' \u00B7 ' + _dev.browser + ' \u00B7 ' + _dev.pwa;
+  const body={cat:sigCat||'Non pr\u00E9cis\u00E9',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64};
   const controller = new AbortController();
   const timer = setTimeout(()=>controller.abort(), 35000);
   try{
@@ -81,15 +81,15 @@ async function submitSignal(){
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
     } else {
-      alertMAT('Erreur d\'envoi. Vérifiez votre connexion.','Signalement','⚠️');
-      btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
+      alertMAT('Erreur d\'envoi. V\u00E9rifiez votre connexion.','Signalement','\u26A0\uFE0F');
+      btn.textContent='\uD83D\uDCE4 Envoyer le signalement'; btn.disabled=false;
     }
   }
 }
 
 function restoreSignalFormState(){
   const btn=document.querySelector('#signal-form .submit-btn');
-  if(btn){btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;}
+  if(btn){btn.textContent='\uD83D\uDCE4 Envoyer le signalement'; btn.disabled=false;}
 }
 
 function resetSignal(){
@@ -99,7 +99,7 @@ function resetSignal(){
   removeSignalPhoto();
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
   sigCat='';sigLat='';sigLon='';
-  document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
+  document.getElementById('loc-btn').textContent='\uD83D\uDCCD Utiliser ma position GPS';
   document.getElementById('loc-btn').classList.remove('on');
   restoreSignalFormState();
 }
@@ -187,7 +187,7 @@ function refreshIdeasSortUi(){
   if(pop) pop.classList.toggle('on', mode==='popular');
   if(recent) recent.classList.toggle('on', mode==='recent');
   const note=document.getElementById('ideas-sort-note');
-  if(note) note.textContent = mode==='recent' ? 'Tri par date la plus récente' : 'Tri par votes décroissants';
+  if(note) note.textContent = mode==='recent' ? 'Tri par date la plus r\u00E9cente' : 'Tri par votes d\u00E9croissants';
 }
 function setIdeasSort(mode){
   _ideasSort = mode==='recent' ? 'recent' : 'popular';
@@ -198,8 +198,8 @@ function setIdeasSort(mode){
 
 async function submitIdee(){
   const txt=document.getElementById('idea-input').value.trim();
-  if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
-  const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
+  if(!txt){await alertMAT('Veuillez \u00E9crire votre id\u00E9e !','Vos id\u00E9es','\uD83D\uDCA1');return;}
+  const idea={id:Date.now(),text:txt,cat:ideaCat||'\uD83D\uDCA1 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
   const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
   rememberSeenIdeas([idea]);
   try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
@@ -217,9 +217,13 @@ async function voteIdee(id){
 
 function _ideaStatusBadgePublic(status){
   if(!status) return '';
-  const map={studying:['\uD83D\uDD0D En cours d\u2019\u00E9tude','#2563eb'],accepted:['\u2705 Retenue','#16a34a'],rejected:['\u274C Non retenue','#dc2626']};
+  const map={
+    studying:['\uD83D\uDD0D En cours d\u2019\u00E9tude','#2563eb'],
+    accepted:['\u2705 Retenue','#16a34a'],
+    rejected:['\u274C Non retenue','#dc2626']
+  };
   const entry=map[status]; if(!entry) return '';
-  return `<div class="idea-status-badge" style="background:${entry[1]}">${entry[0]}</div>`;
+  return `<div style="display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 9px;font-size:0.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:white;background:${entry[1]}">${entry[0]}</div>`;
 }
 
 async function loadIdees(){
@@ -233,7 +237,7 @@ async function loadIdees(){
     const hot = isIdeaTrending(idea);
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
     const statusBadge = _ideaStatusBadgePublic(idea.status);
-    const commentHtml = idea.adminComment ? `<div class="idea-admin-comment">\uD83C\uDFDB\uFE0F ${esc(idea.adminComment)}</div>` : '';
+    const commentHtml = idea.adminComment ? `<div style="margin-top:7px;padding:7px 10px;background:var(--warm);border-left:3px solid var(--sage);border-radius:0 8px 8px 0;font-size:0.78rem;color:var(--text);line-height:1.45;font-style:italic">\uD83C\uDFDB\uFE0F ${esc(idea.adminComment)}</div>` : '';
     return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">\uD83D\uDC4D</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Id\u00E9e r\u00E9cente qui re\u00E7oit des votes rapidement">\uD83D\uDD25 Tendance</div>':''}${statusBadge}</div></div><div class="idea-text">${esc(idea.text)}</div>${commentHtml}<div class="idea-date">${esc(metaDate)}</div></div></div>`;
   }).join('');
   markIdeasAsSeen(ideas);
@@ -246,7 +250,7 @@ async function submitContactForm(){
   const name=document.getElementById('contact-name').value.trim();
   const reply=document.getElementById('contact-reply').value.trim();
   const msg=document.getElementById('contact-msg').value.trim();
-  if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
+  if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','\uD83D\uDCAC');return;}
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi\u2026'; btn.disabled=true;
   try{
