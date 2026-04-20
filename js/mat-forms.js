@@ -215,17 +215,26 @@ async function voteIdee(id){
   loadIdees();
 }
 
+function _ideaStatusBadgePublic(status){
+  if(!status) return '';
+  const map={studying:['\uD83D\uDD0D En cours d\u2019\u00E9tude','#2563eb'],accepted:['\u2705 Retenue','#16a34a'],rejected:['\u274C Non retenue','#dc2626']};
+  const entry=map[status]; if(!entry) return '';
+  return `<div class="idea-status-badge" style="background:${entry[1]}">${entry[0]}</div>`;
+}
+
 async function loadIdees(){
   const votes=getVotes(); const el=document.getElementById('ideas-list');
   if(!el) return;
   refreshIdeasSortUi();
-  el.innerHTML='<div class="no-ideas">Chargement…</div>';
+  el.innerHTML='<div class="no-ideas">Chargement\u2026</div>';
   const ideas=sortIdeasList(await fetchIdeasList(), _ideasSort);
-  if(!ideas.length){el.innerHTML=`<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>`; markIdeasAsSeen([]); return;}
+  if(!ideas.length){el.innerHTML=`<div class="no-ideas">Aucune id\u00E9e pour l'instant.<br>Soyez le premier \u00E0 proposer !</div>`; markIdeasAsSeen([]); return;}
   el.innerHTML=ideas.map(idea=>{
     const hot = isIdeaTrending(idea);
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
-    return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Idée récente qui reçoit des votes rapidement">🔥 Tendance</div>':''}</div></div><div class="idea-text">${esc(idea.text)}</div><div class="idea-date">${esc(metaDate)}</div></div></div>`;
+    const statusBadge = _ideaStatusBadgePublic(idea.status);
+    const commentHtml = idea.adminComment ? `<div class="idea-admin-comment">\uD83C\uDFDB\uFE0F ${esc(idea.adminComment)}</div>` : '';
+    return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">\uD83D\uDC4D</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Id\u00E9e r\u00E9cente qui re\u00E7oit des votes rapidement">\uD83D\uDD25 Tendance</div>':''}${statusBadge}</div></div><div class="idea-text">${esc(idea.text)}</div>${commentHtml}<div class="idea-date">${esc(metaDate)}</div></div></div>`;
   }).join('');
   markIdeasAsSeen(ideas);
 }
@@ -239,27 +248,27 @@ async function submitContactForm(){
   const msg=document.getElementById('contact-msg').value.trim();
   if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
   const btn=document.querySelector('#contact-form .submit-btn');
-  btn.textContent='Envoi…'; btn.disabled=true;
+  btn.textContent='Envoi\u2026'; btn.disabled=true;
   try{
     await fetch(SIGNAL_URL,{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         cat:'[Demande] Contact mairie',
-        desc:'Nom/prénom : '+(name||'Non précisé')+'\nRéponse : '+(reply||'Non précisée')+'\n\nMessage : '+msg
+        desc:'Nom/pr\u00E9nom : '+(name||'Non pr\u00E9cis\u00E9')+'\nR\u00E9ponse : '+(reply||'Non pr\u00E9cis\u00E9e')+'\n\nMessage : '+msg
       })
     });
     trackStat('contact');
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
   }catch(e){
-    alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
-    btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
+    alertMAT('Erreur d\'envoi. R\u00E9essayez plus tard.','MAT','\u26A0\uFE0F');
+    btn.textContent='\uD83D\uDCE4 Envoyer ma demande'; btn.disabled=false;
   }
 }
 
 function restoreContactFormState(){
   const btn=document.querySelector('#contact-form .submit-btn');
-  if(btn){btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;}
+  if(btn){btn.textContent='\uD83D\uDCE4 Envoyer ma demande'; btn.disabled=false;}
 }
 
 function resetContact(){
@@ -267,7 +276,7 @@ function resetContact(){
   document.getElementById('contact-success').style.display='none';
   ['contact-name','contact-reply','contact-msg'].forEach(id=>{document.getElementById(id).value='';});
   const btn=document.querySelector('#contact-form .submit-btn');
-  if(btn){btn.textContent='📤 Envoyer ma demande';btn.disabled=false;}
+  if(btn){btn.textContent='\uD83D\uDCE4 Envoyer ma demande';btn.disabled=false;}
   closeOv('contact');
 }
 
@@ -286,7 +295,7 @@ async function submitBug(){
   const desc=document.getElementById('bug-desc').value.trim();
   const btn=document.querySelector('#bug-form .submit-btn');
   const photoEl=document.getElementById('bug-photo-preview');
-  btn.textContent='Envoi…'; btn.disabled=true;
+  btn.textContent='Envoi\u2026'; btn.disabled=true;
   let photoB64='';
   if(photoEl && photoEl.style.display !== 'none' && photoEl.src){
     try{ photoB64 = await compressImage(photoEl.src, 1200, 0.75); }
@@ -298,28 +307,28 @@ async function submitBug(){
       body:(()=>{
         const dev = detectDevice();
         const descFull = 'Appareil : '+dev.type
-          +'\nModèle : '+dev.model
+          +'\nMod\u00E8le : '+dev.model
           +'\nOS : '+dev.os
           +'\nNavigateur : '+dev.browser
-          +'\nÉcran : '+dev.screen
+          +'\n\u00C9cran : '+dev.screen
           +'\nPWA : '+dev.pwa
           +'\nMAT : '+dev.matVersion
           +'\n\nDescription :\n'+desc;
-        return JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug',photoB64});
+        return JSON.stringify({cat:'[BUG] '+(bugService||'Non pr\u00E9cis\u00E9'),desc:descFull,type:'bug',photoB64});
       })()
     });
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
   }catch(e){
-    alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
-    btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
+    alertMAT('Erreur d\'envoi. R\u00E9essayez plus tard.','MAT','\u26A0\uFE0F');
+    btn.textContent='\uD83D\uDCE4 Envoyer le rapport'; btn.disabled=false;
   }
 }
 
 function restoreBugFormState(){
   const btn=document.querySelector('#bug-form .submit-btn');
-  if(btn){btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;}
+  if(btn){btn.textContent='\uD83D\uDCE4 Envoyer le rapport'; btn.disabled=false;}
 }
 
 function resetBug(){
