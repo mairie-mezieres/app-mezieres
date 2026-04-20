@@ -20,7 +20,7 @@ const PRECACHE_URLS = [
   './js/mat-pwa-notif.js?v=3.7.5',
   './js/mat-dechets-notif.js?v=3.7.9',
   './js/mat-jours-feries.js?v=3.7.9',
-  './js/mat-eau6.js?v=3.8.7',
+  './js/mat-eau7.js?v=3.8.8',
   './data/plu-data.json?v=3.7.4',
   './data/mel-tree.json?v=3.7.4',
   './mat-header.png',
