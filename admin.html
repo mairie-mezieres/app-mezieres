@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -319,6 +318,15 @@ function logout() { localStorage.removeItem('mat_admin_token'); TOKEN=''; docume
 async function showAdmin() { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-screen').style.display='block'; await loadAll(); }
 async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
 async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
+async function apiPatch(path, body) {
+  const r = await fetch(`${API}${path}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+    body: JSON.stringify(body || {})
+  });
+  if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
+  return r.json();
+}
 
 async function apiPost(path, body) {
   const r = await fetch(`${API}${path}`, {
@@ -819,15 +827,75 @@ function renderApp() {
 function setAppView(v) { appView=v; renderApp(); }
 
 // ── IDÉES ─────────────────────────────
+function _ideaStatusBadge(status) {
+  if (!status) return '<span style="color:var(--muted);font-size:0.75rem">—</span>';
+  const map = { studying: ['🔍 En cours d\'étude','#2563eb'], accepted: ['✅ Retenue','#16a34a'], rejected: ['❌ Non retenue','#dc2626'] };
+  const [label, color] = map[status] || ['—','var(--muted)'];
+  return `<span style="background:${color};color:white;border-radius:6px;padding:2px 8px;font-size:0.72rem;font-weight:800">${label}</span>`;
+}
 function renderIdeas() {
   const ideas = [..._data.ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
   document.getElementById('ideas-content').innerHTML = `
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">💡 Idées (${ideas.length})</span></div>
-      <table><tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th></th></tr>
-        ${ideas.length ? ideas.map(i=>`<tr><td style="max-width:300px">${i.text}</td><td><span class="badge badge-orange">${i.cat}</span></td><td><strong>${i.votes||0}</strong></td><td>${i.date}</td><td><button class="del-btn" onclick="deleteIdea(${i.id})">🗑️ Supprimer</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
+      <table>
+        <tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
+        ${ideas.length ? ideas.map(i=>`
+          <tr id="idea-row-${i.id}">
+            <td style="max-width:260px">${safe(i.text)}</td>
+            <td><span class="badge badge-orange">${safe(i.cat)}</span></td>
+            <td><strong>${i.votes||0}</strong></td>
+            <td>${i.date||''}</td>
+            <td>${_ideaStatusBadge(i.status)}</td>
+            <td style="white-space:nowrap;display:flex;gap:6px;padding:8px 4px">
+              <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleIdeaEdit(${i.id})">✏️</button>
+              <button class="del-btn" onclick="deleteIdea(${i.id})">🗑️</button>
+            </td>
+          </tr>
+          <tr id="idea-edit-${i.id}" style="display:none;background:#f0f7ff">
+            <td colspan="6" style="padding:14px 16px">
+              <div style="display:flex;flex-direction:column;gap:10px;max-width:520px">
+                <div style="font-weight:800;font-size:0.82rem;color:var(--forest)">✏️ Modifier le statut de l'idée</div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap">
+                  <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.8rem"><input type="radio" name="status-${i.id}" value="" ${!i.status?'checked':''}> Aucun statut</label>
+                  <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.8rem"><input type="radio" name="status-${i.id}" value="studying" ${i.status==='studying'?'checked':''}> 🔍 En cours d'étude</label>
+                  <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.8rem"><input type="radio" name="status-${i.id}" value="accepted" ${i.status==='accepted'?'checked':''}> ✅ Retenue</label>
+                  <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:0.8rem"><input type="radio" name="status-${i.id}" value="rejected" ${i.status==='rejected'?'checked':''}> ❌ Non retenue</label>
+                </div>
+                <textarea id="idea-comment-${i.id}" placeholder="Commentaire de la mairie (optionnel, affiché sur l'idée dans l'app)…" style="border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:0.8rem;resize:vertical;min-height:60px;font-family:inherit;width:100%" maxlength="500">${safe(i.adminComment||'')}</textarea>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <button onclick="saveIdeaStatus(${i.id})" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">💾 Enregistrer</button>
+                  <button onclick="toggleIdeaEdit(${i.id})" style="background:var(--warm);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">Annuler</button>
+                  <span id="idea-save-status-${i.id}" style="font-size:0.78rem;font-weight:800"></span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
       </table>
     </div>`;
+}
+function toggleIdeaEdit(id) {
+  const row = document.getElementById(`idea-edit-${id}`);
+  if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+async function saveIdeaStatus(id) {
+  const statusEl = document.querySelector(`input[name="status-${id}"]:checked`);
+  const commentEl = document.getElementById(`idea-comment-${id}`);
+  const statusMsg = document.getElementById(`idea-save-status-${id}`);
+  const status = statusEl ? statusEl.value : '';
+  const adminComment = commentEl ? commentEl.value.trim() : '';
+  if (statusMsg) { statusMsg.textContent = 'Enregistrement…'; statusMsg.style.color = 'var(--muted)'; }
+  try {
+    const r = await apiPatch(`/admin/ideas/${id}`, { status: status || null, adminComment });
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+    const idx = _data.ideas.findIndex(i => i.id === id);
+    if (idx >= 0) { _data.ideas[idx].status = status || null; _data.ideas[idx].adminComment = adminComment; }
+    if (statusMsg) { statusMsg.textContent = '✅ Enregistré'; statusMsg.style.color = 'var(--leaf)'; }
+    setTimeout(() => { toggleIdeaEdit(id); renderIdeas(); }, 900);
+  } catch(e) {
+    if (statusMsg) { statusMsg.textContent = '❌ ' + e.message; statusMsg.style.color = 'var(--red)'; }
+  }
 }
 async function deleteIdea(id) { if(!confirm('Supprimer cette idée ?'))return; await apiDelete(`/admin/ideas/${id}`); _data.ideas=_data.ideas.filter(i=>i.id!==id); renderIdeas(); }
 
