@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Jours fériés & Vacances Zone B v4.0.0
+   MAT — Jours fériés & Vacances Zone B v4.0.1
    Données officielles via API education.gouv.fr (Zone B)
    Fallback hardcodé si API indisponible.
    ════════════════════════════════════════════════════════════ */
@@ -47,9 +47,9 @@ function _getFeriesForYear(year) {
   ];
 }
 
-// ── Vacances Zone B — fallback hardcodé (Zone B = dernier créneau) ──
-// Source : Ministère EN — Zone B (Orléans-Tours) part en dernier
-// f = premier jour de vacances, t = dernier jour de vacances (veille de la rentrée)
+// ── Vacances Zone B — fallback hardcodé ──────────────────────────────
+// Source : MEN Décembre 2025 — Zone B (Orléans-Tours, Rennes, etc.)
+// f = premier jour de vacances, t = dernier jour (veille de la rentrée)
 var _VACANCES_FALLBACK = [
   {n:'Toussaint 2024',   f:new Date(2024,9,19),  t:new Date(2024,10,3)},
   {n:'Noël 2024',        f:new Date(2024,11,21), t:new Date(2025,0,5)},
@@ -58,16 +58,21 @@ var _VACANCES_FALLBACK = [
   {n:'Été 2025',         f:new Date(2025,6,5),   t:new Date(2025,7,31)},
   {n:'Toussaint 2025',   f:new Date(2025,9,18),  t:new Date(2025,10,2)},
   {n:'Noël 2025',        f:new Date(2025,11,20), t:new Date(2026,0,4)},
-  {n:'Hiver 2026',       f:new Date(2026,1,21),  t:new Date(2026,2,8)},
-  {n:'Printemps 2026',   f:new Date(2026,3,25),  t:new Date(2026,4,10)},
+  {n:'Hiver 2026',       f:new Date(2026,1,14),  t:new Date(2026,2,1)},
+  {n:'Printemps 2026',   f:new Date(2026,3,11),  t:new Date(2026,3,26)},
   {n:'Été 2026',         f:new Date(2026,6,4),   t:new Date(2026,7,31)},
+  {n:'Toussaint 2026',   f:new Date(2026,9,17),  t:new Date(2026,10,1)},
+  {n:'Noël 2026',        f:new Date(2026,11,19), t:new Date(2027,0,3)},
+  {n:'Hiver 2027',       f:new Date(2027,1,20),  t:new Date(2027,2,7)},
+  {n:'Printemps 2027',   f:new Date(2027,3,17),  t:new Date(2027,4,2)},
+  {n:'Été 2027',         f:new Date(2027,6,3),   t:new Date(2027,7,31)},
 ];
 
 var _VACANCES_ZONE_B = _VACANCES_FALLBACK.slice();
 
 // ── Chargement dynamique via API officielle ───────────────
 (function _loadVacancesAPI() {
-  var CACHE_KEY = 'mat_vacances_zoneB_v4';
+  var CACHE_KEY = 'mat_vacances_zoneB_v5';
   var CACHE_TTL = 7 * 24 * 3600 * 1000; // 7 jours
 
   function parseAPIData(records) {

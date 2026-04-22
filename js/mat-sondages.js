@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   MAT — Sondages citoyens v4.0.0
+   MAT — Sondages citoyens v4.0.1
    ═══════════════════════════════════════════════════════════ */
 var _SONDAGES_API = 'https://chatbot-mairie-mezieres.onrender.com';
 var _selectedStar = 0;
@@ -24,7 +24,7 @@ function _renderSondagesList() {
   var el = document.getElementById('sondages-container');
   if (!el) return;
   if (!_currentSondages.length) {
-    el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:28px 0">&#128202; Aucun sondage en cours.<br><span style="font-size:0.76rem;color:var(--muted)">Revenez bientôt !</span></div>';
+    el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:28px 0">&#128202; Aucun sondage en cours.<br><span style="font-size:0.76rem;color:var(--muted)">Revenez bientôt !</span></div>';
     return;
   }
   el.innerHTML = _currentSondages.map(function(s){ return _renderSondageCard(s); }).join('');
@@ -49,7 +49,7 @@ function _renderSondageCard(s) {
     + '</div>';
 }
 
-function _openSondageDetail(id) {
+async function _openSondageDetail(id) {
   var s = _currentSondages.find(function(x){ return x.id === id; });
   if (!s) return;
   var el = document.getElementById('sondages-container');
@@ -58,7 +58,20 @@ function _openSondageDetail(id) {
   el.innerHTML = '<button onclick="_sondageBack()" style="background:none;border:none;color:var(--leaf);font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;padding:0;margin-bottom:16px">← Retour</button>'
     + '<div style="font-weight:900;font-size:1rem;color:var(--text);margin-bottom:6px">' + esc(s.titre) + '</div>'
     + (s.description ? '<div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.45">' + esc(s.description) + '</div>' : '')
-    + (voted ? _renderSondageResults(s, null) : _renderSondageForm(s));
+    + (voted
+      ? '<div id="sond-res-' + id + '"><div class="actu-empty" style="padding:20px">Chargement des résultats…</div></div>'
+      : _renderSondageForm(s));
+  if (voted) {
+    try {
+      var r = await fetch(_SONDAGES_API + '/sondages/' + id + '/results', {cache:'no-store'});
+      var data = await r.json();
+      var resEl = document.getElementById('sond-res-' + id);
+      if (resEl) resEl.outerHTML = _renderSondageResults(s, data);
+    } catch(e) {
+      var resEl = document.getElementById('sond-res-' + id);
+      if (resEl) resEl.outerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px">Impossible de charger les résultats.</div>';
+    }
+  }
 }
 
 function _sondageBack() {
@@ -144,7 +157,7 @@ async function _submitSondage(id) {
       var s2 = _currentSondages[idx] || s;
       el.innerHTML = '<button onclick="_sondageBack()" style="background:none;border:none;color:var(--leaf);font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;padding:0;margin-bottom:16px">← Retour</button>'
         + '<div style="font-weight:900;font-size:1rem;color:var(--text);margin-bottom:12px">' + esc(s2.titre) + '</div>'
-        + '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-size:0.84rem;font-weight:800;color:#166534;margin-bottom:14px">✅ Merci pour votre participation !</div>'
+        + '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-size:0.84rem;font-weight:800;color:#166534;margin-bottom:14px">✅ Merci pour votre participation !</div>'
         + _renderSondageResults(s2, d);
     }
     refreshSondagesBadge();
