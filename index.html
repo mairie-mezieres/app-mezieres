@@ -141,10 +141,10 @@
         <div class="ct-sub">Vos démarches</div>
       </div>
     </button>
-    <a class="card" href="https://mezieres-lez-clery.fr/" target="_blank">
-      <div class="ico ico-site">🌐</div>
-      <div class="ct"><div class="ct-label">Site officiel</div><div class="ct-sub">Commune</div></div>
-    </a>
+    <button class="card" onclick="openDocs()">
+      <div class="ico" style="background:#e8f5e9">📁</div>
+      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, conseils, actes…</div></div>
+    </button>
   </div>
 
   <div class="sec">Réseaux et actualités</div>
@@ -966,6 +966,59 @@
   </div>
 </div>
 
+
+
+<!-- ── Documents officiels ─────────────────────────────────────────────── -->
+<div class="ov" id="ov-docs" onclick="ovClick('docs',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.15)">📁</div>
+      <div class="panel-title">Documents officiels</div>
+      <button class="panel-close" onclick="closeOv('docs')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px">Documents permanents</div>
+
+      <a href="https://drive.google.com/drive/folders/1Hl6GN5JxktJkxnQ3WQ2A_2KxnhJhdijD"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📋</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Bulletins municipaux</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Archives et publications communales</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <a href="https://drive.google.com/drive/folders/1Cly3v5rrIo4wAkm2o8kfaWWjgqVsEVXq"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">🏛️</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Comptes rendus du conseil municipal</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Délibérations et procès-verbaux</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <a href="https://drive.google.com/drive/folders/1LpDrIUL3NrMKLxaI_ZkDtGd38gbKi__y"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📜</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Publicité des actes</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Arrêtés et actes administratifs</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin:18px 0 10px">Documents temporaires</div>
+      <div id="docs-temp-list">
+        <div class="actu-empty">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
