@@ -1,25 +1,26 @@
-// SERVICE WORKER v3.9.0 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.0.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 3 : détail d'actualité depuis notification push
-const CACHE = 'mat-v3.9.0';
+// Phase 4 : sondages citoyens, document à la une, zone B vacances
+const CACHE = 'mat-v4.0.1';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
   './css/mat.css?v=3.7.4',
   './js/mat-utils.js?v=3.7.4',
-  './js/mat-core.js?v=3.9.0',
+  './js/mat-core.js?v=4.0.0',
   './js/mat-accessibility.js?v=3.7.4',
   './js/mat-widgets.js?v=3.7.4',
   './js/mat-agenda.js?v=3.7.4',
-  './js/mat-forms.js?v=3.9.0',
-  './js/mat-actus.js?v=3.9.0',
+  './js/mat-forms.js?v=4.0.0',
+  './js/mat-actus.js?v=4.0.0',
   './js/mat-trombi.js?v=3.7.4',
   './js/mat-mel.js?v=3.7.4',
-  './js/mat-boot.js?v=3.8.0',
+  './js/mat-boot.js?v=4.0.0',
   './js/mat-pwa-notif.js?v=3.7.5',
-  './js/mat-dechets-notif.js?v=3.9.0',
-  './js/mat-jours-feries.js?v=3.9.0',
+  './js/mat-dechets-notif.js?v=4.0.0',
+  './js/mat-jours-feries.js?v=4.0.1',
+  './js/mat-sondages.js?v=4.0.1',
   './js/mat-eau8.js?v=3.8.9',
   './data/plu-data.json?v=3.7.4',
   './data/mel-tree.json?v=3.7.4',
@@ -61,7 +62,8 @@ self.addEventListener('fetch', e => {
     url.includes('api-adresse.data.gouv.fr') ||
     url.includes('geoportail-urbanisme') ||
     url.includes('raw.githubusercontent.com') ||
-    url.includes('res.cloudinary.com')
+    url.includes('res.cloudinary.com') ||
+    url.includes('data.education.gouv.fr')
   ) return;
 
   e.respondWith(
