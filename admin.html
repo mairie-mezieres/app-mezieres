@@ -233,6 +233,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
     <button class="nav-tab" onclick="showTab('mel',this)">👩‍💼 MEL</button>
     <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
+  <button class="nav-tab" onclick="showTab('docs',this)">📁 Documents</button>
   </div>
 
   <div class="admin-body">
@@ -247,6 +248,31 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel" id="tab-mel"><div id="mel-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-banner"><div id="banner-content"></div></div>
     <div class="tab-panel" id="tab-purge"><div id="purge-content"></div></div>
+  <div class="tab-panel" id="tab-docs">
+    <div class="admin-body">
+      <div class="section-title">Documents temporaires</div>
+      <div style="background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px">
+        <div class="section-title" style="margin-top:0">Ajouter un document</div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:600px">
+          <input id="doc-new-title" type="text" placeholder="Titre *"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+          <input id="doc-new-desc" type="text" placeholder="Description courte (optionnelle)"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+          <input id="doc-new-url" type="url" placeholder="URL du document *"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+          <button onclick="addTempDoc()"
+            style="align-self:flex-start;background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:Nunito,sans-serif;font-size:0.84rem;font-weight:800;cursor:pointer">
+            + Ajouter
+          </button>
+          <div id="doc-add-status" style="font-size:0.78rem;min-height:1.2em"></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Documents temporaires</span></div>
+        <div id="docs-admin-list"><div style="padding:20px;color:var(--muted);text-align:center">Chargement…</div></div>
+      </div>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -1627,7 +1653,7 @@ async function saveMelAdmin(){
 }
 
 // ── Tabs ──────────────────────────────
-function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();}
+function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();if(id==='docs')loadDocsAdmin();}
 
 // ── Init / loadAll ────────────────────
 async function init() {
@@ -1676,6 +1702,77 @@ function installAdmin(){
   else{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m)alert('Pour installer MAT Admin :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');else alert('Pour installer MAT Admin sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');}
 }
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw-admin.js').catch(()=>{});}
+
+// ── Documents temporaires admin ───────────────────────────
+async function loadDocsAdmin() {
+  const el = document.getElementById('docs-admin-list');
+  if (!el) return;
+  el.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center">Chargement…</div>';
+  try {
+    const r = await apiGet('/docs/temp');
+    renderDocsAdmin(r.docs || []);
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);padding:12px">Erreur : ' + safe(e.message) + '</div>';
+  }
+}
+
+function renderDocsAdmin(docs) {
+  const el = document.getElementById('docs-admin-list');
+  if (!el) return;
+  if (!docs.length) {
+    el.innerHTML = '<div style="padding:24px;color:var(--muted);font-size:0.84rem;text-align:center">Aucun document temporaire</div>';
+    return;
+  }
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<tr style="background:var(--warm)">'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Titre</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Description</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">URL</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Action</th>'
+    + '</tr>'
+    + docs.map(function(d) {
+      return '<tr style="border-top:1px solid var(--border)">'
+        + '<td style="padding:10px 14px;font-weight:800;font-size:0.84rem">' + safe(d.title) + '</td>'
+        + '<td style="padding:10px 14px;color:var(--muted);font-size:0.78rem">' + safe(d.description || '—') + '</td>'
+        + '<td style="padding:10px 14px;font-size:0.75rem"><a href="' + safe(d.url) + '" target="_blank" style="color:var(--leaf)">' + safe(d.url.length > 55 ? d.url.substring(0, 55) + '…' : d.url) + '</a></td>'
+        + '<td style="padding:10px 14px"><button onclick="deleteTempDoc(' + d.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 12px;font-family:Nunito,sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer">Supprimer</button></td>'
+        + '</tr>';
+    }).join('')
+    + '</table>';
+}
+
+async function addTempDoc() {
+  const title = (document.getElementById('doc-new-title').value || '').trim();
+  const desc  = (document.getElementById('doc-new-desc').value  || '').trim();
+  const url   = (document.getElementById('doc-new-url').value   || '').trim();
+  const st = document.getElementById('doc-add-status');
+  if (!title || !url) {
+    if (st) { st.textContent = '⚠️ Titre et URL requis'; st.style.color = 'var(--red)'; }
+    return;
+  }
+  if (st) { st.textContent = 'Ajout en cours…'; st.style.color = 'var(--muted)'; }
+  try {
+    const r = await apiPost('/admin/docs/temp', { title, description: desc, url });
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+    document.getElementById('doc-new-title').value = '';
+    document.getElementById('doc-new-desc').value  = '';
+    document.getElementById('doc-new-url').value   = '';
+    if (st) { st.textContent = '✅ Document ajouté'; st.style.color = 'var(--leaf)'; setTimeout(() => { if (st) st.textContent = ''; }, 2500); }
+    renderDocsAdmin(r.docs || []);
+  } catch(e) {
+    if (st) { st.textContent = '❌ ' + e.message; st.style.color = 'var(--red)'; }
+  }
+}
+
+async function deleteTempDoc(id) {
+  if (!confirm('Supprimer ce document ?')) return;
+  try {
+    const r = await apiDelete(`/admin/docs/temp/${id}`);
+    renderDocsAdmin(r.docs || []);
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+}
 </script>
 </body>
 </html>
