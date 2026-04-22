@@ -84,6 +84,11 @@
 (function(){
   var s = document.createElement('script');
   s.src = 'js/mat-sondages.js?v=4.0.0';
+  s.onload = function() {
+    setTimeout(function() {
+      try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}
+    }, 400);
+  };
   document.head.appendChild(s);
 })();
 
