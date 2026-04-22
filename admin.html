@@ -343,8 +343,8 @@ async function doLogin() {
 }
 function logout() { localStorage.removeItem('mat_admin_token'); TOKEN=''; document.getElementById('admin-screen').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
 async function showAdmin() { document.getElementById('login-screen').style.display='none'; document.getElementById('admin-screen').style.display='block'; await loadAll(); }
-async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} return r.json(); }
-async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); return r.json(); }
+async function apiGet(path) { const r=await fetch(`${API}${path}`,{headers:{'x-admin-token':TOKEN}}); if(r.status===401){logout();throw new Error('Non autorisé');} if(!(r.headers.get('content-type')||'').includes('json')) throw new Error(`Erreur serveur (${r.status})`); return r.json(); }
+async function apiDelete(path) { const r=await fetch(`${API}${path}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}}); if(!(r.headers.get('content-type')||'').includes('json')) throw new Error(`Erreur serveur (${r.status})`); return r.json(); }
 async function apiPatch(path, body) {
   const r = await fetch(`${API}${path}`, {
     method: 'PATCH',
@@ -352,6 +352,7 @@ async function apiPatch(path, body) {
     body: JSON.stringify(body || {})
   });
   if (r.status === 401) { logout(); throw new Error('Non autorisé'); }
+  if (!(r.headers.get('content-type') || '').includes('json')) throw new Error(`Erreur serveur (${r.status}) — le backend redémarre peut-être, réessayez dans 30 s`);
   return r.json();
 }
 
