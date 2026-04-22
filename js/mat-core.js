@@ -37,7 +37,10 @@ window.addEventListener('appinstalled', () => {
   localStorage.setItem(INSTALL_KEY, '1');
   const banner = document.getElementById('install-banner');
   if(banner) banner.classList.add('hidden');
-  trackStat('installation', { device: detectDevice() });
+  if (!localStorage.getItem('mat_install_tracked')) {
+    trackStat('installation', { device: detectDevice() });
+    localStorage.setItem('mat_install_tracked', '1');
+  }
   updateInstallBtn();
 });
 
@@ -185,7 +188,38 @@ function openAgenda(){
   loadAgenda();
 }
 function openDechets(){openOv('dechets'); loadDechetsDetail();}
-function openDocs(){openOv('docs'); loadTempDocs();}
+function openSondages(){
+  openOv('sondages');
+  localStorage.setItem('mat_sondages_seen_at', String(Date.now()));
+  if (typeof loadSondages === 'function') loadSondages();
+  if (typeof refreshSondagesBadge === 'function') refreshSondagesBadge();
+}
+
+// ── Featured doc (Documents officiels) ────────────────────
+async function loadFeaturedDoc() {
+  var el = document.getElementById('docs-featured-container');
+  if (!el) return;
+  try {
+    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/docs/featured', {cache:'no-store'});
+    var d = await r.json();
+    if (!d.doc) { el.style.display = 'none'; return; }
+    var doc = d.doc;
+    el.style.display = '';
+    el.innerHTML = '<div style="margin-bottom:16px">'
+      + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
+      + '<a href="' + esc(doc.url) + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
+      + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-weight:900;font-size:0.9rem;line-height:1.3">' + esc(doc.title) + '</div>'
+      + (doc.description ? '<div style="font-size:0.72rem;opacity:0.85;margin-top:3px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
+      + '<div style="font-size:0.66rem;opacity:0.7;margin-top:5px">📅 ' + new Date(doc.publishedAt).toLocaleDateString('fr-FR') + '</div>'
+      + '</div>'
+      + '<div style="font-size:1.4rem;flex-shrink:0;opacity:0.9">⬇</div>'
+      + '</a></div>';
+  } catch(e) { el.style.display = 'none'; }
+}
+
+function openDocs(){openOv('docs'); loadFeaturedDoc(); loadTempDocs();}
 function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }
 
