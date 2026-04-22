@@ -185,6 +185,7 @@ function openAgenda(){
   loadAgenda();
 }
 function openDechets(){openOv('dechets'); loadDechetsDetail();}
+function openDocs(){openOv('docs'); loadTempDocs();}
 function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }
 
@@ -198,6 +199,35 @@ function openAgendaFromTopEvent(){
     renderAgenda();
     setTimeout(function(){openEventDetail(first.uid);},200);
   }).catch(function(){loadAgenda();});
+}
+
+
+// ── Documents officiels — chargement dynamique ────────────
+async function loadTempDocs() {
+  var el = document.getElementById('docs-temp-list');
+  if (!el) return;
+  el.innerHTML = '<div class="actu-empty">Chargement…</div>';
+  try {
+    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/docs/temp', {cache:'no-store'});
+    var d = await r.json();
+    var docs = d.docs || [];
+    if (!docs.length) {
+      el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:18px 0">Aucun document temporaire pour le moment.</div>';
+      return;
+    }
+    el.innerHTML = docs.map(function(doc) {
+      return '<a href="' + esc(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">'
+        + '<div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📄</div>'
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-weight:900;font-size:0.86rem">' + esc(doc.title) + '</div>'
+        + (doc.description ? '<div style="font-size:0.73rem;color:var(--muted);margin-top:2px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
+        + '</div>'
+        + '<div style="color:var(--sage);font-size:1rem;flex-shrink:0">→</div>'
+        + '</a>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="actu-empty">Impossible de charger les documents.</div>';
+  }
 }
 
 // Mapping tracking sur ouvertures
