@@ -237,7 +237,7 @@ async function loadIdees(){
     const hot = isIdeaTrending(idea);
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
     const statusBadge = _ideaStatusBadgePublic(idea.status);
-    const commentHtml = idea.adminComment ? `<div style="margin-top:7px;padding:7px 10px;background:var(--warm);border-left:3px solid var(--sage);border-radius:0 8px 8px 0;font-size:0.78rem;color:var(--text);line-height:1.45;font-style:italic">\uD83C\uDFDB\uFE0F ${esc(idea.adminComment)}</div>` : '';
+    const commentHtml = idea.adminComment && idea.status ? `<div style="margin-top:7px;padding:7px 10px;background:var(--warm);border-left:3px solid var(--sage);border-radius:0 8px 8px 0;font-size:0.78rem;color:var(--text);line-height:1.45;font-style:italic">\uD83C\uDFDB\uFE0F ${esc(idea.adminComment)}</div>` : '';
     return `<div class="idea-card"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">\uD83D\uDC4D</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Id\u00E9e r\u00E9cente qui re\u00E7oit des votes rapidement">\uD83D\uDD25 Tendance</div>':''}${statusBadge}</div></div><div class="idea-text">${esc(idea.text)}</div>${commentHtml}<div class="idea-date">${esc(metaDate)}</div></div></div>`;
   }).join('');
   markIdeasAsSeen(ideas);
