@@ -304,7 +304,8 @@ async function checkPushStatus(){
 async function togglePush(){
   const btn=document.getElementById('push-btn');
   if(pushRegistered){
-    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});await sub.unsubscribe();}}catch(e){}
+    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});
+      if(!localStorage.getItem('mat_dechets_notif_v1')) await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
     updateNotifCardStatus(false);
     pushRegistered=false; return;
@@ -317,6 +318,7 @@ async function togglePush(){
       const reg=await navigator.serviceWorker.ready;
       const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
       await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+      if(localStorage.getItem('mat_dechets_notif_v1')){fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});}
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);
       pushRegistered=true;
