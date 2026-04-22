@@ -1953,7 +1953,7 @@ function renderSondagesAdmin() {
         + '<td style="padding:10px 14px"><span style="background:' + (active ? 'var(--leaf)' : '#94a3b8') + ';color:white;border-radius:6px;padding:2px 9px;font-size:0.72rem;font-weight:800">' + (active ? 'Actif' : 'Inactif') + '</span></td>'
         + '<td style="padding:10px 14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">'
         + '<button onclick="toggleSondageActive(' + s.id + ',' + !active + ')" style="background:' + (active ? '#f59e0b' : 'var(--leaf)') + ';color:white;border:none;border-radius:7px;padding:5px 10px;font-size:0.73rem;font-weight:800;cursor:pointer">' + (active ? 'Désactiver' : 'Activer') + '</button>'
-        + '<button onclick="viewSondageResults(' + s.id + ','' + safe(s.titre) + '')" style="background:#2563eb;color:white;border:none;border-radius:7px;padding:5px 10px;font-size:0.73rem;font-weight:800;cursor:pointer">📊 Résultats</button>'
+        + '<button onclick="viewSondageResults(' + s.id + ')" style="background:#2563eb;color:white;border:none;border-radius:7px;padding:5px 10px;font-size:0.73rem;font-weight:800;cursor:pointer">📊 Résultats</button>'
         + '<button onclick="deleteSondage(' + s.id + ')" style="background:#ef4444;color:white;border:none;border-radius:7px;padding:5px 10px;font-size:0.73rem;font-weight:800;cursor:pointer">🗑️</button>'
         + '</td>'
         + '</tr>';
@@ -2016,7 +2016,9 @@ async function deleteSondage(id) {
     alert('Erreur : ' + e.message);
   }
 }
-async function viewSondageResults(id, titre) {
+async function viewSondageResults(id) {
+  const s = _sondagesData.find(x => x.id === id);
+  const titre = s ? s.titre : 'Sondage';
   const panel = document.getElementById('sond-results-panel');
   const body  = document.getElementById('sond-results-body');
   const title = document.getElementById('sond-results-title');
