@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Jours fériés & Vacances Zone B v3.9.0
-   Marque les jours fériés + vacances scolaires Zone B
-   dans la grille du calendrier. Chargé par mat-init.js.
+   MAT — Jours fériés & Vacances Zone B v4.0.0
+   Données officielles via API education.gouv.fr (Zone B)
+   Fallback hardcodé si API indisponible.
    ════════════════════════════════════════════════════════════ */
 
 (function() {
@@ -20,6 +20,7 @@
   document.head.appendChild(style);
 })();
 
+// ── Jours fériés ──────────────────────────────────────────
 function _getFeriesForYear(year) {
   function easter(y) {
     var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4;
@@ -46,20 +47,89 @@ function _getFeriesForYear(year) {
   ];
 }
 
-// Vacances scolaires Zone B — Centre-Val de Loire (Orléans)
-// Source : Ministère de l'Éducation Nationale 2024-2025 et 2025-2026
-var _VACANCES_ZONE_B = [
+// ── Vacances Zone B — fallback hardcodé (Zone B = dernier créneau) ──
+// Source : Ministère EN — Zone B (Orléans-Tours) part en dernier
+// f = premier jour de vacances, t = dernier jour de vacances (veille de la rentrée)
+var _VACANCES_FALLBACK = [
   {n:'Toussaint 2024',   f:new Date(2024,9,19),  t:new Date(2024,10,3)},
   {n:'Noël 2024',        f:new Date(2024,11,21), t:new Date(2025,0,5)},
   {n:'Hiver 2025',       f:new Date(2025,1,22),  t:new Date(2025,2,9)},
-  {n:'Printemps 2025',   f:new Date(2025,3,19),  t:new Date(2025,4,5)},
+  {n:'Printemps 2025',   f:new Date(2025,3,19),  t:new Date(2025,4,4)},
   {n:'Été 2025',         f:new Date(2025,6,5),   t:new Date(2025,7,31)},
   {n:'Toussaint 2025',   f:new Date(2025,9,18),  t:new Date(2025,10,2)},
   {n:'Noël 2025',        f:new Date(2025,11,20), t:new Date(2026,0,4)},
-  {n:'Hiver 2026',       f:new Date(2026,1,14),  t:new Date(2026,2,1)},
-  {n:'Printemps 2026',   f:new Date(2026,3,18),  t:new Date(2026,4,4)},
+  {n:'Hiver 2026',       f:new Date(2026,1,21),  t:new Date(2026,2,8)},
+  {n:'Printemps 2026',   f:new Date(2026,3,25),  t:new Date(2026,4,10)},
   {n:'Été 2026',         f:new Date(2026,6,4),   t:new Date(2026,7,31)},
 ];
+
+var _VACANCES_ZONE_B = _VACANCES_FALLBACK.slice();
+
+// ── Chargement dynamique via API officielle ───────────────
+(function _loadVacancesAPI() {
+  var CACHE_KEY = 'mat_vacances_zoneB_v4';
+  var CACHE_TTL = 7 * 24 * 3600 * 1000; // 7 jours
+
+  function parseAPIData(records) {
+    var result = [];
+    records.forEach(function(rec) {
+      var fields = rec || {};
+      var desc = fields.description || fields.Description || '';
+      var start = fields.start_date || fields['start date'] || '';
+      var end   = fields.end_date   || fields['end date']   || '';
+      if (!start || !end) return;
+      var sp = start.split('-').map(Number);
+      var ep = end.split('-').map(Number);
+      if (sp.length < 3 || ep.length < 3) return;
+      var f = new Date(sp[0], sp[1]-1, sp[2]);
+      // end_date = jour de rentrée → dernier jour vacances = end - 1
+      var t = new Date(ep[0], ep[1]-1, ep[2]-1);
+      var label = desc.replace('Vacances de la ','').replace('Vacances des ','').replace('Vacances d\'','');
+      // Ajouter l'année scolaire
+      var as = fields.annee_scolaire || fields['annee scolaire'] || '';
+      var year = as ? as.substring(0,4) : sp[0];
+      result.push({n: label + ' ' + year, f: f, t: t});
+    });
+    result.sort(function(a,b){return a.f-b.f;});
+    return result;
+  }
+
+  try {
+    var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && cached.ts && (Date.now() - cached.ts < CACHE_TTL) && Array.isArray(cached.data) && cached.data.length > 0) {
+      _VACANCES_ZONE_B = cached.data.map(function(v){
+        return {n:v.n, f:new Date(v.f), t:new Date(v.t)};
+      });
+      return;
+    }
+  } catch(e) {}
+
+  var url = 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records'
+    + '?where=location%3D%22Zone%20B%22&order_by=start_date&limit=100&timezone=Europe%2FParis';
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var records = (d.results || d.records || []).map(function(r){ return r.fields || r; });
+      if (!records.length) return;
+      var parsed = parseAPIData(records);
+      if (parsed.length < 5) return;
+      _VACANCES_ZONE_B = parsed;
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          ts: Date.now(),
+          data: parsed.map(function(v){return {n:v.n,f:v.f.getTime(),t:v.t.getTime()};})
+        }));
+      } catch(e) {}
+      // Rafraîchir l'overlay si déjà affiché
+      if (document.querySelector('#agenda-content .agenda-month-grid')) {
+        _applyFeriesOverlay();
+      }
+    })
+    .catch(function(){
+      // Silently use fallback
+    });
+})();
 
 function _getVacanceForDate(d) {
   var t = d.getTime();
@@ -68,6 +138,7 @@ function _getVacanceForDate(d) {
   }) || null;
 }
 
+// ── Application de l'overlay ──────────────────────────────
 function _applyFeriesOverlay() {
   var year  = (typeof _agendaYear  !== 'undefined') ? _agendaYear  : new Date().getFullYear();
   var month = (typeof _agendaMonth !== 'undefined') ? _agendaMonth : new Date().getMonth();
@@ -83,6 +154,7 @@ function _applyFeriesOverlay() {
   var vacancesThisMonth = [];
 
   cells.forEach(function(cell) {
+    cell.classList.remove('ferie','vacances');
     var dayNum = parseInt(cell.textContent, 10);
     if (!dayNum || cell.style.visibility === 'hidden') return;
     var cur = new Date(year, month, dayNum);

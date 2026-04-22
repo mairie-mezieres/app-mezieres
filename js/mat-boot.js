@@ -69,14 +69,21 @@
 // Chargement dynamique du module rappels collecte déchets + guide tri
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-dechets-notif.js?v=3.9.0';
+  s.src = 'js/mat-dechets-notif.js?v=4.0.0';
   document.head.appendChild(s);
 })();
 
 // Chargement dynamique du module jours fériés dans l'agenda
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-jours-feries.js?v=3.9.0';
+  s.src = 'js/mat-jours-feries.js?v=4.0.0';
+  document.head.appendChild(s);
+})();
+
+// Chargement dynamique du module sondage citoyen
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-sondages.js?v=4.0.0';
   document.head.appendChild(s);
 })();
 

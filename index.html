@@ -38,12 +38,12 @@
      L'ordre est CRITIQUE : utils → core → reste → init en dernier
      ════════════════════════════════════════════════════════════ -->
 <script defer src="js/mat-utils.js?v=3.7.4"></script>
-<script defer src="js/mat-core.js?v=3.9.0"></script>
+<script defer src="js/mat-core.js?v=4.0.0"></script>
 <script defer src="js/mat-accessibility.js?v=3.7.4"></script>
 <script defer src="js/mat-widgets.js?v=3.7.4"></script>
 <script defer src="js/mat-agenda.js?v=3.7.4"></script>
-<script defer src="js/mat-forms.js?v=3.9.0"></script>
-<script defer src="js/mat-actus.js?v=3.9.0"></script>
+<script defer src="js/mat-forms.js?v=4.0.0"></script>
+<script defer src="js/mat-actus.js?v=4.0.0"></script>
 <script defer src="js/mat-trombi.js?v=3.7.4"></script>
 <script defer src="js/mat-mel.js?v=3.7.4"></script>
 <script defer src="js/mat-boot.js?v=3.9.1"></script>
@@ -132,7 +132,7 @@
 <!-- Contenu principal -->
 <div class="content">
 
-  <div class="sec">Services municipaux</div><div class="simple-title" style="display:none">Essentiel</div>
+  <div class="sec">Démarches et Services</div>
   <div class="grid2">
     <button class="card simple-card mel-entry" onclick="openMel()">
       <div class="ico ico-mel mel-wiggle">👩‍💼</div>
@@ -147,15 +147,15 @@
     </button>
   </div>
 
-  <div class="sec">Réseaux et actualités</div>
+  <div class="sec">Actualité et Calendrier</div>
   <div class="grid2">
-    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
-      <div class="ico ico-radio">📻</div>
-      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
-    </a>
     <button class="card simple-card" onclick="openNotifs()">
       <div class="ico ico-notif ico-notif-wrap">🔔<span class="notif-badge" id="notif-unread-badge">0</span></div>
       <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub" id="notif-card-status">Vérification…</div></div>
+    </button>
+    <button class="card simple-card" onclick="openAgenda()">
+      <div class="ico ico-cal">📅</div>
+      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
     </button>
   </div>
 
@@ -165,41 +165,17 @@
       <div class="ico ico-ideas">💡</div>
       <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
     </button>
-    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
-      <div class="ico ico-communaute">🏘️</div>
-      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
-    </a>
+    <button class="card" onclick="openSondages()">
+      <div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+      <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
+    </button>
   </div>
 
-  <div class="sec">Signalements &amp; contacts</div>
+  <div class="sec">Signalements et Contacts</div>
   <div class="grid2">
     <button class="card simple-card" onclick="openSignal()">
       <div class="ico ico-signal">🚨</div>
       <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Voirie, déchets…</div></div>
-    </button>
-    <button class="card simple-card" onclick="openContact()">
-      <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
-    </button>
-  </div>
-
-  <div class="sec">Agenda &amp; Sorties</div>
-  <div class="grid2">
-    <button class="card simple-card" onclick="openAgenda()">
-      <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
-    </button>
-    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
-      <div class="ico ico-rando">🥾</div>
-      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan & Circuits</div></div>
-    </a>
-  </div>
-
-  <div class="sec">Informations</div>
-  <div class="grid2">
-    <button class="card" onclick="openRgpd()">
-      <div class="ico ico-rgpd">🔒</div>
-      <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
     </button>
     <button class="card" id="btn-install-or-bug" onclick="openBug()">
       <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
@@ -208,6 +184,36 @@
         <div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
       </div>
     </button>
+  </div>
+  <div class="grid2">
+    <button class="card simple-card" onclick="openContact()">
+      <div class="ico ico-hab">💬</div>
+      <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
+    </button>
+    <button class="card" onclick="openRgpd()">
+      <div class="ico ico-rgpd">🔒</div>
+      <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Réseaux mairie et citoyens</div>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
+      <div class="ico ico-communaute">🏘️</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+    </a>
+  </div>
+
+  <div class="sec">Les chemins de Mézières</div>
+  <div class="grid2">
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
+      <div class="ico ico-rando">🥾</div>
+      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan &amp; Circuits</div></div>
+    </a>
   </div>
 
 </div>
@@ -976,7 +982,7 @@
       <div class="panel-title">Documents officiels</div>
       <button class="panel-close" onclick="closeOv('docs')">✕</button>
     </div>
-    <div class="panel-body">
+    <div class="panel-body"><div id="docs-featured-container" style="display:none"></div>
       <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px">Documents permanents</div>
 
       <a href="https://drive.google.com/drive/folders/1Hl6GN5JxktJkxnQ3WQ2A_2KxnhJhdijD"
@@ -1056,5 +1062,19 @@
     .catch(function(){});
 })();
 </script>
+
+<!-- ── Sondage citoyen ── -->
+<div class="ov" id="ov-sondages" onclick="ovClick('sondages',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f0fdf4">📊</div>
+      <div class="panel-title">Sondage citoyen</div>
+      <button class="panel-close" onclick="closeOv('sondages')">✕</button>
+    </div>
+    <div class="panel-body" id="sondages-container">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
