@@ -69,14 +69,14 @@
 // Chargement dynamique du module rappels collecte déchets + guide tri
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-dechets-notif.js?v=3.7.9';
+  s.src = 'js/mat-dechets-notif.js?v=3.9.0';
   document.head.appendChild(s);
 })();
 
 // Chargement dynamique du module jours fériés dans l'agenda
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-jours-feries.js?v=3.7.9';
+  s.src = 'js/mat-jours-feries.js?v=3.9.0';
   document.head.appendChild(s);
 })();
 
