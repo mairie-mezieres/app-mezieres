@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.0.3 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.0.4 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 if(window.innerWidth<1024)return;
@@ -8,16 +8,16 @@ var API='https://chatbot-mairie-mezieres.onrender.com';
 /* ── helpers ─────────────────────────────────────────────────── */
 function qs(id){return document.getElementById(id);}
 function fmt(d){
-  var dt=new Date(d);
+  var dt=d instanceof Date?d:new Date(d);
   return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
 }
 function fmtShort(d){
-  var dt=new Date(d);
+  var dt=d instanceof Date?d:new Date(d);
   return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
 }
 function daysUntil(d){
   var now=new Date(); now.setHours(0,0,0,0);
-  var dt=new Date(d); dt.setHours(0,0,0,0);
+  var dt=d instanceof Date?new Date(d):new Date(d); dt.setHours(0,0,0,0);
   return Math.round((dt-now)/86400000);
 }
 function safeSet(id,html){var el=qs(id);if(el)el.innerHTML=html;}
@@ -30,9 +30,14 @@ function loadMeteo(){
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
       if(!d){el.innerHTML='';return;}
-      var ico=d.icon||d.icone||'🌤️';
-      var temp=d.temperature!=null?Math.round(d.temperature)+'°C':(d.temp!=null?Math.round(d.temp)+'°C':'—');
-      var desc=d.description||d.desc||'';
+      var cur=(d.forecast||{}).current||{};
+      var code=cur.weather_code;
+      var icons=typeof METEO_ICONS!=='undefined'?METEO_ICONS:
+        {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',80:'🌦️',95:'⛈️'};
+      var descs=typeof METEO_DESC!=='undefined'?METEO_DESC:{};
+      var ico=icons[code]||'🌤️';
+      var temp=cur.temperature_2m!=null?Math.round(cur.temperature_2m)+'°C':'—';
+      var desc=descs[code]||'';
       el.innerHTML='<div class="d-meteo-box">'+
         '<div class="d-meteo-ico">'+ico+'</div>'+
         '<div class="d-meteo-info">'+
@@ -51,12 +56,13 @@ function loadActus(){
   fetch(API+'/actus')
     .then(function(r){return r.ok?r.json():[];})
     .then(function(data){
-      if(!data||!data.length){
+      var items=Array.isArray(data)?data:(data&&Array.isArray(data.actus)?data.actus:[]);
+      if(!items.length){
         el.innerHTML='<p class="d-empty">Aucune actualité</p>';
         return;
       }
       var html='';
-      data.slice(0,5).forEach(function(a){
+      items.slice(0,5).forEach(function(a){
         var img=a.image?'<img src="'+a.image+'" alt="" onerror="this.style.display=\'none\'">':'';
         html+='<div class="d-actu-item" onclick="openActu && openActu(\''+encodeURIComponent(a.id||a._id||'')+'\')" role="button">'+
           (img?'<div class="d-actu-thumb">'+img+'</div>':'')+
@@ -72,33 +78,32 @@ function loadActus(){
     .catch(function(){safeSet('dsk-actus-list','<p class="d-empty">Chargement impossible</p>');});
 }
 
-/* ── agenda ──────────────────────────────────────────────────── */
+/* ── agenda (via ensureAgendaEvents du module mat-agenda) ────── */
 function loadAgenda(){
-  fetch(API+'/calendar')
-    .then(function(r){return r.ok?r.json():[];})
-    .then(function(data){
-      if(!data||!data.length)return;
+  if(typeof ensureAgendaEvents!=='function')return;
+  ensureAgendaEvents()
+    .then(function(evts){
+      if(!evts||!evts.length)return;
       var now=new Date();
-      var future=data.filter(function(e){return new Date(e.date||e.dateDebut||e.start)>=now;});
-      future.sort(function(a,b){return new Date(a.date||a.dateDebut||a.start)-new Date(b.date||b.dateDebut||b.start);});
+      var future=evts.filter(function(e){return e.start>=now;});
+      future.sort(function(a,b){return a.start-b.start;});
+      if(!future.length)return;
 
-      // featured — first upcoming event
       renderFeatured(future[0]);
 
-      // agenda list — next 5
       var elList=qs('dsk-agenda-list');
       if(elList&&future.length>1){
         var html='';
         future.slice(1,6).forEach(function(e){
-          var d=new Date(e.date||e.dateDebut||e.start);
+          var d=e.start;
           html+='<div class="d-agenda-item">'+
             '<div class="d-agenda-date">'+
               '<span class="d-agenda-day">'+d.getDate()+'</span>'+
               '<span class="d-agenda-mon">'+d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')+'</span>'+
             '</div>'+
             '<div class="d-agenda-info">'+
-              '<strong>'+escHtml(e.titre||e.title||e.name||'')+'</strong>'+
-              (e.lieu||e.location?'<small>'+escHtml(e.lieu||e.location)+'</small>':'')+
+              '<strong>'+escHtml(e.summary||'')+'</strong>'+
+              (e.location?'<small>'+escHtml(e.location)+'</small>':'')+
             '</div>'+
           '</div>';
         });
@@ -111,22 +116,20 @@ function loadAgenda(){
 function renderFeatured(e){
   var el=qs('dsk-featured');
   if(!el||!e)return;
-  var d=new Date(e.date||e.dateDebut||e.start);
-  var days=daysUntil(e.date||e.dateDebut||e.start);
+  var d=e.start;
+  var days=daysUntil(d);
   var countdown=days===0?'Aujourd\'hui !':days===1?'Demain':'Dans '+days+' jour'+(days>1?'s':'');
-  var img=e.image||e.photo||'';
   el.innerHTML=
     '<div class="d-featured">'+
-      (img?'<div class="d-featured-img"><img src="'+img+'" alt="" onerror="this.parentElement.style.display=\'none\'"></div>':'')+
       '<div class="d-featured-body">'+
-        '<div class="d-featured-badge">'+escHtml(e.categorie||e.category||'Événement')+'</div>'+
-        '<h3 class="d-featured-title">'+escHtml(e.titre||e.title||e.name||'')+'</h3>'+
-        (e.lieu||e.location?'<p class="d-featured-lieu">📍 '+escHtml(e.lieu||e.location)+'</p>':'')+
+        '<div class="d-featured-badge">Événement</div>'+
+        '<h3 class="d-featured-title">'+escHtml(e.summary||'')+'</h3>'+
+        (e.location?'<p class="d-featured-lieu">📍 '+escHtml(e.location)+'</p>':'')+
         '<div class="d-featured-meta">'+
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
           '<span class="d-featured-countdown">'+countdown+'</span>'+
         '</div>'+
-        (e.description||e.contenu?'<p class="d-featured-desc">'+escHtml((e.description||e.contenu).substring(0,120))+'…</p>':'')+
+        (e.description?'<p class="d-featured-desc">'+escHtml(e.description.substring(0,120))+'…</p>':'')+
       '</div>'+
     '</div>';
 }
@@ -145,8 +148,8 @@ function renderHoraires(){
     ['Dimanche','Fermée']
   ];
   var now=new Date();
-  var today=now.getDay(); // 0=dim
-  var dayIdx=[6,0,1,2,3,4,5]; // js->rows index
+  var today=now.getDay();
+  var dayIdx=[6,0,1,2,3,4,5];
   var html='<table class="d-horaires"><tbody>';
   rows.forEach(function(r,i){
     var isCurrent=(dayIdx[today]===i);
@@ -156,9 +159,10 @@ function renderHoraires(){
     '</tr>';
   });
   html+='</tbody></table>';
-  html+='<div class="d-mairie-contact">'+
-    '<a href="tel:+33238457028" class="d-contact-btn">📞 02 38 45 70 28</a>'+
-    '<a href="mailto:mairie.mezieres@wanadoo.fr" class="d-contact-btn">✉️ Écrire</a>'+
+  var btnStyle='flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--forest);color:#fff;text-decoration:none;border-radius:10px;padding:9px 8px;font-family:inherit;font-size:0.74rem;font-weight:800';
+  html+='<div style="display:flex;gap:8px;margin-top:10px">'+
+    '<a href="tel:+33238457028" style="'+btnStyle+'">📞 02 38 45 70 28</a>'+
+    '<a href="mailto:mairie.mezieres@wanadoo.fr" style="'+btnStyle+'">✉️ Écrire</a>'+
   '</div>';
   el.innerHTML=html;
 }
@@ -184,28 +188,6 @@ function renderElus(){
     +'</p>'
     +'<button onclick="openConseil()" style="width:100%;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:8px;font-family:inherit;font-size:0.76rem;font-weight:800;cursor:pointer">🏛️ Voir le conseil municipal</button>';
 }
-
-/* ── MEL mini-form ───────────────────────────────────────────── */
-window.deskMelSend=function(ev){
-  ev.preventDefault();
-  var inp=document.getElementById('dsk-mel-inp');
-  var msg=inp?inp.value.trim():'';
-  if(!msg)return;
-  if(typeof openMel==='function')openMel();
-  setTimeout(function(){
-    var mainInp=document.querySelector('#ov-mel textarea, #ov-mel input[type="text"]');
-    if(mainInp){mainInp.value=msg;mainInp.dispatchEvent(new Event('input'));}
-    if(inp)inp.value='';
-  },300);
-};
-
-window.openMelCat=function(cat){
-  if(typeof openMel==='function')openMel();
-  setTimeout(function(){
-    var btns=document.querySelectorAll('#ov-mel [data-cat]');
-    btns.forEach(function(b){if(b.dataset.cat===cat)b.click();});
-  },300);
-};
 
 /* ── utils ───────────────────────────────────────────────────── */
 function escHtml(s){
