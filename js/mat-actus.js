@@ -334,7 +334,7 @@ const MAT_BANNER_DISMISS_KEY = 'mat_banner_dismissed_v3_';
 async function loadMatInfoBanner() {
   // 1. Vigilance météo prioritaire
   try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/vigilance');
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/commune');
     if (r.ok) {
       const d = await r.json();
       const v = d.vigilance;
