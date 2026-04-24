@@ -41,8 +41,6 @@
   try { initMailProtection(); } catch(e){}
 
   // 9) PHASE 3 — Chargement des données MEL externes en arrière-plan
-  //    MEL fonctionne déjà avec le fallback embarqué, donc non-bloquant.
-  //    Délai de 150 ms pour laisser le rendu initial se stabiliser.
   setTimeout(function(){
     try { if (typeof loadMelData === 'function') loadMelData(); }
     catch(e){ console.warn('[init] loadMelData', e); }
@@ -52,38 +50,34 @@
   setTimeout(function(){ try { initOnboarding(); } catch(e){} }, 800);
 
   // 11) Intervalles périodiques
-  setInterval(function(){ try { loadDechets(); }      catch(e){} },  60000);  // 1 min
-  setInterval(function(){ try { loadMairieStatus(); } catch(e){} },  60000);  // 1 min
-  setInterval(function(){ try { loadBusRemi(); }      catch(e){} },  60000);  // 1 min
-  setInterval(function(){ try { loadMeteo(); }        catch(e){} }, 600000);  // 10 min
-  setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000); // 5 min
+  setInterval(function(){ try { loadDechets(); }      catch(e){} },  60000);
+  setInterval(function(){ try { loadMairieStatus(); } catch(e){} },  60000);
+  setInterval(function(){ try { loadBusRemi(); }      catch(e){} },  60000);
+  setInterval(function(){ try { loadMeteo(); }        catch(e){} }, 600000);
+  setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000);
 })();
 
-// Chargement dynamique du module post-installation (prompt notifications)
 (function(){
   var s = document.createElement('script');
   s.src = 'js/mat-pwa-notif.js?v=3.7.5';
   document.head.appendChild(s);
 })();
 
-// Chargement dynamique du module rappels collecte déchets + guide tri
 (function(){
   var s = document.createElement('script');
   s.src = 'js/mat-dechets-notif.js?v=4.0.0';
   document.head.appendChild(s);
 })();
 
-// Chargement dynamique du module jours fériés dans l'agenda
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-jours-feries.js?v=4.0.0';
+  s.src = 'js/mat-jours-feries.js?v=4.0.1';
   document.head.appendChild(s);
 })();
 
-// Chargement dynamique du module sondage citoyen
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-sondages.js?v=4.0.0';
+  s.src = 'js/mat-sondages.js?v=4.0.1';
   s.onload = function() {
     setTimeout(function() {
       try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}
@@ -92,7 +86,12 @@
   document.head.appendChild(s);
 })();
 
-// Chargement dynamique du module eau (nappe + restrictions) dans la météo
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-associations.js?v=4.0.1';
+  document.head.appendChild(s);
+})();
+
 (function(){
   var s = document.createElement('script');
   s.src = 'js/mat-eau8.js?v=3.8.9';
