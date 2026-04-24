@@ -47,7 +47,7 @@
 <script defer src="js/mat-actus.js?v=4.0.2"></script>
 <script defer src="js/mat-trombi.js?v=3.7.4"></script>
 <script defer src="js/mat-mel.js?v=4.0.4"></script>
-<script defer src="js/mat-boot.js?v=4.0.1"></script>
+<script defer src="js/mat-boot.js?v=4.0.2"></script>
 
 </head>
 
@@ -59,25 +59,6 @@
   <span>📍 36 rue du bourg — 45370 Mézières-lez-Cléry</span>
   <span class="d-sep">·</span>
   <span>Lun 14h–17h30 · Mer sur RDV · Ven 8h30–11h30</span>
-</div>
-<div class="d-nav">
-  <div class="d-nav-inner">
-    <div class="d-nav-logo">
-      <img src="icon-192.png" alt="Mézières" class="d-nav-img">
-      <span class="d-nav-title">Mézières-lez-Cléry</span>
-    </div>
-    <nav class="d-nav-links">
-      <button onclick="openNotifs()">Actualités</button>
-      <button onclick="openAgenda()">Agenda</button>
-      <button onclick="openDocs()">Documents officiels</button>
-      <button onclick="openIdees()">Idées</button>
-      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
-      <button onclick="openSondages()">Sondages citoyens</button>
-      <button onclick="openRemi()">🚌 Bus Rémi</button>
-      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">📻 Radio Mézières</a>
-      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">🏘️ Ici c'est Mézières !</a>
-    </nav>
-  </div>
 </div>
 
 <div id="app-splash" class="app-splash" aria-hidden="true">
@@ -175,6 +156,26 @@
   </div>
 </div>
 
+<div class="d-nav">
+  <div class="d-nav-inner">
+    <div class="d-nav-logo">
+      <img src="icon-192.png" alt="Mézières" class="d-nav-img">
+      <span class="d-nav-title">Mézières-lez-Cléry</span>
+    </div>
+    <nav class="d-nav-links">
+      <button onclick="openNotifs()">Actualités</button>
+      <button onclick="openAgenda()">Agenda</button>
+      <button onclick="openDocs()">Documents officiels</button>
+      <button onclick="openIdees()">Idées</button>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
+      <button onclick="openSondages()">Sondages citoyens</button>
+      <button onclick="openRemi()">🚌 Bus Rémi</button>
+      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">📻 Radio Mézières</a>
+      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">🏘️ Ici c'est Mézières !</a>
+    </nav>
+  </div>
+</div>
+
 
 <!-- Contenu principal -->
 <div class="content">
@@ -190,7 +191,7 @@
     </button>
     <button class="card" onclick="openDocs()">
       <div class="ico" style="background:#e8f5e9">📁</div>
-      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, conseils…</div></div>
+      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, CR…</div></div>
     </button>
   </div>
 
@@ -1240,13 +1241,13 @@
     <div class="panel-body">
       <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:14px">
         La demande de subvention doit être complétée via le
-        <strong><a href="https://www.demarches-simplifiees.fr" target="_blank" rel="noopener" style="color:var(--leaf)">formulaire en ligne de demande de subvention</a></strong>
+        <strong><a href="https://docs.google.com/forms/d/1JS_5oL1GhfCuXGv9UoQbkxO2E6Bzzkdpl_w9jeLFZw4" target="_blank" rel="noopener" style="color:var(--leaf)">formulaire en ligne de demande de subvention</a></strong>
         et accompagnée des documents suivants :
       </p>
       <ul style="font-size:0.82rem;color:var(--text);line-height:1.9;padding-left:18px;margin-bottom:14px">
         <li>Fiche INSEE avec le numéro <strong>SIRET</strong> de l'association</li>
         <li>RIB ou RIP de la structure porteuse du projet</li>
-        <li><strong><a href="#" style="color:var(--leaf)">Budget prévisionnel</a></strong> (document à télécharger et à compléter)</li>
+        <li><strong><a href="https://docs.google.com/spreadsheets/d/1q_rewjKk6T_VSIbQMFYOm9_ODzA6PB3E/edit?usp=drivesdk&ouid=101362074311667560869&rtpof=true&sd=true" target="_blank" rel="noopener" style="color:var(--leaf)">Budget prévisionnel</a></strong> (document à télécharger et à compléter)</li>
       </ul>
       <div style="background:#f0f8f3;border-radius:12px;padding:12px 14px;font-size:0.78rem;color:var(--forest);line-height:1.6;margin-bottom:14px">
         <strong>📧 Envoi du dossier complet à :</strong><br>
@@ -1261,6 +1262,6 @@
     </div>
   </div>
 </div>
-<script defer src="js/mat-desktop.js?v=4.0.3"></script>
+<script defer src="js/mat-desktop.js?v=4.0.4"></script>
 </body>
 </html>
