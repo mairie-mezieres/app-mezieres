@@ -1278,7 +1278,8 @@ async function melShowCadastreData(){
   const btn=el&&el.querySelector('.mel-cadastre-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ Chargement des données cadastrales…';}
   try{
-    const r=await fetch(`https://apicarto.ign.fr/api/cadastre/parcelle?lon=${_melLon}&lat=${_melLat}`);
+    const _cqlF=encodeURIComponent(`INTERSECTS(the_geom,POINT(${_melLon} ${_melLat}))`);
+    const r=await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=CADASTRALPARCELS.PARCELLAIRE_EXPRESS:parcelle&CQL_FILTER=${_cqlF}&SRSNAME=EPSG:4326&outputFormat=application%2Fjson&count=1`);
     const d=await r.json();
     const feats=d&&d.features;
     if(!feats||!feats.length){
@@ -1302,7 +1303,7 @@ async function melShowCadastreData(){
     });
     const note=document.createElement('div');
     note.style.cssText='margin-top:8px;font-size:0.67rem;color:#888';
-    note.textContent='Source : apicarto.ign.fr — Données indicatives, à vérifier auprès de la mairie.';
+    note.textContent='Source : cadastre.data.gouv.fr — Données indicatives, à vérifier auprès de la mairie.';
     card.appendChild(note);
     if(btn)btn.remove();
     const resultEl=document.getElementById('mel-zone-result');
