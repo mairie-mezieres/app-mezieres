@@ -32,25 +32,50 @@
 </script>
 
 <link rel="stylesheet" href="css/mat.css?v=3.7.4">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.0.1">
 
 <!-- ════════════════════════════════════════════════════════════
      MAT — Modules JavaScript v3.7.4
      L'ordre est CRITIQUE : utils → core → reste → init en dernier
      ════════════════════════════════════════════════════════════ -->
 <script defer src="js/mat-utils.js?v=3.7.4"></script>
-<script defer src="js/mat-core.js?v=3.7.4"></script>
+<script defer src="js/mat-core.js?v=4.0.0"></script>
 <script defer src="js/mat-accessibility.js?v=3.7.4"></script>
 <script defer src="js/mat-widgets.js?v=3.7.4"></script>
 <script defer src="js/mat-agenda.js?v=3.7.4"></script>
-<script defer src="js/mat-forms.js?v=3.7.4"></script>
-<script defer src="js/mat-actus.js?v=3.7.4"></script>
+<script defer src="js/mat-forms.js?v=4.0.0"></script>
+<script defer src="js/mat-actus.js?v=4.0.1"></script>
 <script defer src="js/mat-trombi.js?v=3.7.4"></script>
 <script defer src="js/mat-mel.js?v=3.7.4"></script>
-<script defer src="js/mat-boot.js?v=3.8.0"></script>
+<script defer src="js/mat-boot.js?v=4.0.1"></script>
 
 </head>
 
 <body class="preload">
+<!-- Desktop uniquement : barre contact + navigation -->
+<div class="d-topbar">
+  <span>📞 02 38 45 61 76</span>
+  <span class="d-sep">·</span>
+  <span>📍 36 rue du bourg — 45370 Mézières-lez-Cléry</span>
+  <span class="d-sep">·</span>
+  <span>Lun 14h–17h30 · Mer sur RDV · Ven 8h30–11h30</span>
+</div>
+<div class="d-nav">
+  <div class="d-nav-inner">
+    <div class="d-nav-logo">
+      <img src="icon-192.png" alt="Mézières" class="d-nav-img">
+      <span class="d-nav-title">Mézières-lez-Cléry</span>
+    </div>
+    <nav class="d-nav-links">
+      <button onclick="openNotifs()">Actualités</button>
+      <button onclick="openAgenda()">Agenda</button>
+      <button onclick="openMel()">MEL</button>
+      <button onclick="openContact()">Contact</button>
+      <button onclick="openAssociations()">Associations</button>
+    </nav>
+  </div>
+</div>
+
 <div id="app-splash" class="app-splash" aria-hidden="true">
   <div class="splash-card">
     <img src="MAT et MEL.png" alt="MAT et MEL" class="splash-logo" onerror="this.onerror=null;this.src='mat-header.png'">
@@ -129,10 +154,34 @@
   </div>
 </div>
 
+<!-- Desktop uniquement : photo hero + stats -->
+<div class="d-hero">
+  <div class="d-hero-bg" style="background-image:url('mezieres-site.jpg')"></div>
+  <div class="d-hero-inner">
+    <div class="d-hero-text">
+      <div class="d-hero-badge">🌿 Commune rurale · Loiret · Val de Loire</div>
+      <h1 class="d-hero-title">Bienvenue à<br><em>Mézières-lez-Cléry</em></h1>
+      <p class="d-hero-desc">Retrouvez toutes les informations de votre commune, les événements, les services municipaux et posez vos questions directement à MEL, votre assistante numérique.</p>
+      <div class="d-hero-btns">
+        <button class="d-btn-primary" onclick="openAgenda()">📅 Voir l'agenda communal</button>
+        <button class="d-btn-sec" onclick="openMel()">💬 Parler à MEL</button>
+      </div>
+    </div>
+    <div class="d-hero-meteo" id="d-hero-meteo"></div>
+  </div>
+</div>
+<div class="d-stats">
+  <div class="d-stat"><div class="d-stat-ico">👥</div><div class="d-stat-n">847</div><div class="d-stat-l">Habitants</div></div>
+  <div class="d-stat" id="dsk-stat-events"><div class="d-stat-ico">📅</div><div class="d-stat-n">–</div><div class="d-stat-l">Événements ce mois</div></div>
+  <div class="d-stat"><div class="d-stat-ico">🥾</div><div class="d-stat-n">12</div><div class="d-stat-l">Circuits de randonnées</div></div>
+  <div class="d-stat" id="dsk-stat-mel"><div class="d-stat-ico">💬</div><div class="d-stat-n">–</div><div class="d-stat-l">Questions MEL répondues</div></div>
+  <div class="d-stat" id="dsk-stat-sig"><div class="d-stat-ico">🚨</div><div class="d-stat-n">–</div><div class="d-stat-l">Signalements traités</div></div>
+</div>
+
 <!-- Contenu principal -->
 <div class="content">
 
-  <div class="sec">Services municipaux</div><div class="simple-title" style="display:none">Essentiel</div>
+  <div class="sec">Démarches et Services</div>
   <div class="grid2">
     <button class="card simple-card mel-entry" onclick="openMel()">
       <div class="ico ico-mel mel-wiggle">👩‍💼</div>
@@ -143,19 +192,19 @@
     </button>
     <button class="card" onclick="openDocs()">
       <div class="ico" style="background:#e8f5e9">📁</div>
-      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, conseils, actes…</div></div>
+      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, conseils…</div></div>
     </button>
   </div>
 
-  <div class="sec">Réseaux et actualités</div>
+  <div class="sec">Actualité et Calendrier</div>
   <div class="grid2">
-    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
-      <div class="ico ico-radio">📻</div>
-      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
-    </a>
     <button class="card simple-card" onclick="openNotifs()">
       <div class="ico ico-notif ico-notif-wrap">🔔<span class="notif-badge" id="notif-unread-badge">0</span></div>
       <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub" id="notif-card-status">Vérification…</div></div>
+    </button>
+    <button class="card simple-card" onclick="openAgenda()">
+      <div class="ico ico-cal">📅</div>
+      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
     </button>
   </div>
 
@@ -165,41 +214,17 @@
       <div class="ico ico-ideas">💡</div>
       <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
     </button>
-    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
-      <div class="ico ico-communaute">🏘️</div>
-      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
-    </a>
+    <button class="card" onclick="openSondages()">
+      <div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+      <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
+    </button>
   </div>
 
-  <div class="sec">Signalements &amp; contacts</div>
+  <div class="sec">Signalements et Contacts</div>
   <div class="grid2">
     <button class="card simple-card" onclick="openSignal()">
       <div class="ico ico-signal">🚨</div>
       <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Voirie, déchets…</div></div>
-    </button>
-    <button class="card simple-card" onclick="openContact()">
-      <div class="ico ico-hab">💬</div>
-      <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
-    </button>
-  </div>
-
-  <div class="sec">Agenda &amp; Sorties</div>
-  <div class="grid2">
-    <button class="card simple-card" onclick="openAgenda()">
-      <div class="ico ico-cal">📅</div>
-      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
-    </button>
-    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
-      <div class="ico ico-rando">🥾</div>
-      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan & Circuits</div></div>
-    </a>
-  </div>
-
-  <div class="sec">Informations</div>
-  <div class="grid2">
-    <button class="card" onclick="openRgpd()">
-      <div class="ico ico-rgpd">🔒</div>
-      <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
     </button>
     <button class="card" id="btn-install-or-bug" onclick="openBug()">
       <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
@@ -209,8 +234,137 @@
       </div>
     </button>
   </div>
+  <hr style="margin:6px 0;border:none;border-top:1px solid var(--border)">
+  <div class="grid2">
+    <button class="card simple-card" onclick="openContact()">
+      <div class="ico ico-hab">💬</div>
+      <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
+    </button>
+    <button class="card" onclick="openRgpd()">
+      <div class="ico ico-rgpd">🔒</div>
+      <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Réseaux mairie et citoyens</div>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
+      <div class="ico ico-communaute">🏘️</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+    </a>
+  </div>
+
+  <div class="sec">Associations &amp; Randonnées</div>
+  <div class="grid2">
+    <button class="card" onclick="openAssociations()">
+      <div class="ico" style="background:#e8f5e9">🤝</div>
+      <div class="ct"><div class="ct-label">Associations</div><div class="ct-sub">Vie associative</div></div>
+    </button>
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
+      <div class="ico ico-rando">🥾</div>
+      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan &amp; Circuits</div></div>
+    </a>
+  </div>
 
 </div>
+<!-- Desktop : grille de panneaux (cachée sur mobile) -->
+<div class="d-main-grid">
+  <div class="d-col d-col-left">
+    <div class="d-card" id="dsk-actus">
+      <div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
+      <div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🚨 Signalement rapide</span></div>
+      <div class="d-signal-grid">
+        <button onclick="openSignal()">🛣️ Voirie</button>
+        <button onclick="openSignal()">💡 Éclairage</button>
+        <button onclick="openSignal()">🌿 Espaces verts</button>
+        <button onclick="openSignal()">🗑️ Propreté</button>
+      </div>
+    </div>
+  </div>
+  <div class="d-col d-col-center">
+    <div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>📅 Agenda communal</span><button onclick="openAgenda()">Voir tout le mois →</button></div>
+      <div class="d-card-body" id="dsk-agenda-list"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-mel-panel">
+      <div class="d-mel-hdr">
+        <img src="MAT et MEL.png" alt="MEL" class="d-mel-img" onerror="this.style.display='none'">
+        <div><div class="d-mel-name">MEL — Mézières En Ligne <span class="d-mel-online">● En ligne</span></div><div class="d-mel-sub">Votre assistante numérique communale</div></div>
+      </div>
+      <div class="d-mel-bubble">Bonjour ! Je suis MEL, l'assistante de la commune. Je peux vous renseigner sur l'urbanisme, les démarches administratives, les déchets, l'école et bien plus. Comment puis-je vous aider ?</div>
+      <div class="d-mel-cats">
+        <button onclick="openMelCat('urbanisme')">🏗️ Urbanisme</button>
+        <button onclick="openMelCat('enfance')">🎒 École</button>
+        <button onclick="openMelCat('dechets')">♻️ Déchets</button>
+        <button onclick="openMelCat('administratif')">📋 Administratif</button>
+        <button onclick="openMelCat('numerique')">📡 Numérique</button>
+      </div>
+      <form class="d-mel-form" onsubmit="deskMelSend(event)">
+        <input class="d-mel-input" id="dsk-mel-input" placeholder="Posez votre question…" autocomplete="off">
+        <button type="submit">➤</button>
+      </form>
+    </div>
+  </div>
+  <div class="d-col d-col-right">
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🏛️ Mairie</span><button onclick="openContact()">Contacter →</button></div>
+      <div class="d-card-body" id="dsk-mairie-body"></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🗑️ Collectes</span><button onclick="openDechets()">Calendrier →</button></div>
+      <div class="d-card-body" id="dsk-collectes-body"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🏛️ Élus</span><button onclick="openConseil()">Voir tous →</button></div>
+      <div class="d-card-body" id="dsk-elus-body"><div class="d-loading">Chargement…</div></div>
+    </div>
+  </div>
+</div>
+<div class="d-rando-banner">
+  <div class="d-rando-inner">
+    <div class="d-rando-left">
+      <div class="d-rando-badge">🥾 HAGE RANDO — MODULE RANDONNÉE</div>
+      <h2 class="d-rando-title">Partez explorer<br>Mézières-lez-Cléry</h2>
+      <p class="d-rando-desc">Sentiers balisés, chemins de terres et routes forestières.<br>Générez votre circuit personnalisé selon votre niveau et vos préférences.</p>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener" class="d-btn-primary">🗺️ Explorer la carte interactive</a>
+    </div>
+    <div class="d-rando-stats">
+      <div class="d-rando-stat"><strong>12</strong><span>Circuits</span></div>
+      <div class="d-rando-stat"><strong>87</strong><span>Km balisés</span></div>
+      <div class="d-rando-stat"><strong>3</strong><span>Niveaux</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Desktop uniquement : pied de page -->
+<div class="d-footer">
+  <div class="d-footer-inner">
+    <div>
+      <strong>Mairie de Mézières-lez-Cléry</strong><br>
+      36 rue du bourg — 45370<br>
+      📞 02 38 45 61 76
+    </div>
+    <div>
+      <strong>Horaires d'ouverture</strong><br>
+      Lundi 14h–17h30<br>
+      Vendredi 8h30–11h30
+    </div>
+    <div>
+      <strong>MAT — Mézières Avec Toi</strong><br>
+      Application officielle de la commune<br>
+      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">Radio Mézières →</a>
+    </div>
+  </div>
+</div>
+
 
 <!-- ═══ OVERLAY ACCESSIBILITÉ ═══ -->
 <div class="ov" id="ov-accessibilite" onclick="ovClick('accessibilite',event)">
@@ -976,7 +1130,7 @@
       <div class="panel-title">Documents officiels</div>
       <button class="panel-close" onclick="closeOv('docs')">✕</button>
     </div>
-    <div class="panel-body">
+    <div class="panel-body"><div id="docs-featured-container" style="display:none"></div>
       <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px">Documents permanents</div>
 
       <a href="https://drive.google.com/drive/folders/1Hl6GN5JxktJkxnQ3WQ2A_2KxnhJhdijD"
@@ -1056,5 +1210,67 @@
     .catch(function(){});
 })();
 </script>
+
+<!-- ── Sondage citoyen ── -->
+<div class="ov" id="ov-sondages" onclick="ovClick('sondages',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f0fdf4">📊</div>
+      <div class="panel-title">Sondage citoyen</div>
+      <button class="panel-close" onclick="closeOv('sondages')">✕</button>
+    </div>
+    <div class="panel-body" id="sondages-container">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY ASSOCIATIONS ═══ -->
+<div class="ov" id="ov-assoc" onclick="ovClick('assoc',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f5e9">🤝</div>
+      <div class="panel-title">Vie associative</div>
+      <button class="panel-close" onclick="closeOv('assoc')">✕</button>
+    </div>
+    <div class="panel-body" id="assoc-panel-body">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ OVERLAY SUBVENTION ═══ -->
+<div class="ov" id="ov-subvention" onclick="ovClick('subvention',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f5e9">💶</div>
+      <div class="panel-title">Demander une subvention</div>
+      <button class="panel-close" onclick="closeOv('subvention')">✕</button>
+    </div>
+    <div class="panel-body">
+      <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:14px">
+        La demande de subvention doit être complétée via le
+        <strong><a href="https://www.demarches-simplifiees.fr" target="_blank" rel="noopener" style="color:var(--leaf)">formulaire en ligne de demande de subvention</a></strong>
+        et accompagnée des documents suivants :
+      </p>
+      <ul style="font-size:0.82rem;color:var(--text);line-height:1.9;padding-left:18px;margin-bottom:14px">
+        <li>Fiche INSEE avec le numéro <strong>SIRET</strong> de l'association</li>
+        <li>RIB ou RIP de la structure porteuse du projet</li>
+        <li><strong><a href="#" style="color:var(--leaf)">Budget prévisionnel</a></strong> (document à télécharger et à compléter)</li>
+      </ul>
+      <div style="background:#f0f8f3;border-radius:12px;padding:12px 14px;font-size:0.78rem;color:var(--forest);line-height:1.6;margin-bottom:14px">
+        <strong>📧 Envoi du dossier complet à :</strong><br>
+        <a href="mailto:mairie@mezieres-lez-clery.fr" style="color:var(--leaf)">mairie@mezieres-lez-clery.fr</a>
+      </div>
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:10px 14px;font-size:0.78rem;color:#7c5e00;line-height:1.5;margin-bottom:14px">
+        ⚠️ À la suite de l'instruction des dossiers, des documents complémentaires financiers et comptables pourront être demandés.
+      </div>
+      <div style="background:#e8f5e9;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:800;color:var(--forest);text-align:center">
+        📅 Date limite d'envoi des dossiers : <strong>28 février</strong>
+      </div>
+    </div>
+  </div>
+</div>
+<script defer src="js/mat-desktop.js?v=4.0.2"></script>
 </body>
 </html>
