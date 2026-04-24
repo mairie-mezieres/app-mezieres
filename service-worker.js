@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.0.4 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.0.5 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 4 : fix associations photos, desktop nav, MEL CTA, cadastre data.geopf.fr
-const CACHE = 'mat-v4.0.4';
+// Phase 5 : fix /meteo/vigilance→/meteo/commune, logos associations agrandis
+const CACHE = 'mat-v4.0.5';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -14,15 +14,15 @@ const PRECACHE_URLS = [
   './js/mat-widgets.js?v=3.7.4',
   './js/mat-agenda.js?v=3.7.4',
   './js/mat-forms.js?v=4.0.0',
-  './js/mat-actus.js?v=4.0.1',
+  './js/mat-actus.js?v=4.0.2',
   './js/mat-trombi.js?v=3.7.4',
   './js/mat-mel.js?v=4.0.4',
-  './js/mat-boot.js?v=4.0.1',
+  './js/mat-boot.js?v=4.0.2',
   './js/mat-pwa-notif.js?v=3.7.5',
   './js/mat-dechets-notif.js?v=4.0.0',
   './js/mat-jours-feries.js?v=4.0.1',
   './js/mat-sondages.js?v=4.0.1',
-  './js/mat-associations.js?v=4.0.4',
+  './js/mat-associations.js?v=4.0.5',
   './js/mat-desktop.js?v=4.0.3',
   './js/mat-eau8.js?v=3.8.9',
   './data/plu-data.json?v=3.7.4',

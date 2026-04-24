@@ -88,7 +88,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-associations.js?v=4.0.1';
+  s.src = 'js/mat-associations.js?v=4.0.5';
   document.head.appendChild(s);
 })();
 

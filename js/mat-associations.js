@@ -1,4 +1,4 @@
-/* MAT — Associations v4.0.4 */
+/* MAT — Associations v4.0.5 */
 (function(){
 var _D=[
   {
@@ -39,10 +39,10 @@ function _e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 
 function _list(){
   return '<div style="font-size:0.82rem;font-weight:900;color:var(--forest);text-align:center;padding:6px 0 10px;letter-spacing:0.01em">Associations domiciliées à Mézières</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:4px 0">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">'
     +_D.map(function(a,i){
-      return '<button onclick="_assocDetail('+i+')" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;width:100%">'
-        +'<img src="'+_e(a.l)+'" alt="'+_e(a.n)+'" style="width:52px;height:52px;object-fit:cover;border-radius:10px;background:#e8f5ee" onerror="this.onerror=null;this.style.display=\'none\'">'
+      return '<button onclick="_assocDetail('+i+')" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;width:100%">'
+        +'<img src="'+_e(a.l)+'" alt="'+_e(a.n)+'" style="width:72px;height:72px;object-fit:contain;border-radius:10px;background:#e8f5ee" onerror="this.onerror=null;this.style.display=\'none\'">'
         +'<span style="font-size:0.62rem;font-weight:800;color:var(--forest);text-align:center;line-height:1.25">'+_e(a.n)+'</span>'
         +'</button>';
     }).join('')
@@ -61,7 +61,7 @@ window._assocDetail=function(i){
   var el=document.getElementById('assoc-panel-body');if(!el)return;
   var h='<button onclick="_assocBack()" style="background:none;border:none;color:var(--leaf);font-family:inherit;font-size:0.82rem;font-weight:800;cursor:pointer;padding:0 0 12px 0">← Retour</button>'
     +'<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0">'
-    +'<img src="'+_e(a.l)+'" alt="'+_e(a.n)+'" style="width:88px;height:88px;object-fit:cover;border-radius:16px;border:1px solid var(--border);background:#e8f5ee" onerror="this.onerror=null;this.style.display=\'none\'">'
+    +'<img src="'+_e(a.l)+'" alt="'+_e(a.n)+'" style="width:100px;height:100px;object-fit:contain;border-radius:16px;border:1px solid var(--border);background:#e8f5ee" onerror="this.onerror=null;this.style.display=\'none\'">'
     +'<div style="font-size:0.96rem;font-weight:900;color:var(--forest);text-align:center">'+_e(a.n)+'</div>'
     +'<p style="font-size:0.80rem;color:var(--text);text-align:center;line-height:1.55;margin:4px 8px">'+_e(a.desc||'')+'</p>'
     +(a.url?'<a href="'+_e(a.url)+'" target="_blank" rel="noopener" style="font-size:0.76rem;color:var(--leaf);text-decoration:none;margin-top:2px">🌐 Site web →</a>':'')
