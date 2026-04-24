@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.0.5 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.0.6 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 5 : fix /meteo/vigilance→/meteo/commune, logos associations agrandis
-const CACHE = 'mat-v4.0.5';
+// Phase 6 : meteo desktop fix, agenda via ensureAgendaEvents, nav position, boutons mairie
+const CACHE = 'mat-v4.0.6';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -23,7 +23,7 @@ const PRECACHE_URLS = [
   './js/mat-jours-feries.js?v=4.0.1',
   './js/mat-sondages.js?v=4.0.1',
   './js/mat-associations.js?v=4.0.5',
-  './js/mat-desktop.js?v=4.0.3',
+  './js/mat-desktop.js?v=4.0.4',
   './js/mat-eau8.js?v=3.8.9',
   './data/plu-data.json?v=3.7.4',
   './data/mel-tree.json?v=3.7.4',
