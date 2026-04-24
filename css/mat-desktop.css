@@ -16,9 +16,9 @@
   .d-nav-img{width:34px;height:34px;border-radius:8px}
   .d-nav-title{font-size:.95rem;font-weight:900;color:#1a3d2b}
   .d-nav-sub{font-size:.62rem;color:#52b788;font-weight:700;display:block;margin-top:-2px}
-  .d-nav-links{display:flex;gap:2px}
-  .d-nav-links button{background:none;border:none;color:#1a3d2b;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;padding:8px 14px;border-radius:10px;transition:background .15s}
-  .d-nav-links button:hover,.d-nav-links button.active{background:#e8f5ee;color:#1a3d2b}
+  .d-nav-links{display:flex;gap:2px;flex-wrap:wrap}
+  .d-nav-links button,.d-nav-links a{background:none;border:none;color:#1a3d2b;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;padding:6px 10px;border-radius:10px;transition:background .15s;text-decoration:none;display:inline-flex;align-items:center}
+  .d-nav-links button:hover,.d-nav-links button.active,.d-nav-links a:hover{background:#e8f5ee;color:#1a3d2b}
   .d-nav-ctas{display:flex;gap:8px}
   .d-nav-cta{padding:8px 16px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;cursor:pointer}
   .d-nav-cta-app{background:#f0f4f8;color:#1a3d2b}
@@ -110,7 +110,9 @@
   .d-agenda-dot{width:8px;height:8px;border-radius:50%;background:#52b788;flex-shrink:0;margin-top:6px}
 
   /* MEL PANEL */
-  .d-mel-panel{background:#fff;border-radius:18px;border:1px solid #e8f0ea;overflow:hidden;box-shadow:0 2px 8px rgba(26,61,43,.05)}
+  .d-mel-panel,.d-mel-cta-panel{background:#fff;border-radius:18px;border:1px solid #e8f0ea;overflow:hidden;box-shadow:0 2px 8px rgba(26,61,43,.05)}
+  .d-mel-cta-panel{padding:0 0 16px}
+  .d-mel-cta-btn{display:block;width:calc(100% - 32px);margin:0 16px;background:linear-gradient(135deg,#1a3d2b,#2d6a4f);color:#fff;border:none;border-radius:12px;padding:13px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;letter-spacing:.02em}
   .d-mel-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#f8fdf9,#f0f8f3);border-bottom:1px solid #e8f0ea}
   .d-mel-img{width:38px;height:38px;border-radius:10px;object-fit:contain}
   .d-mel-name{font-size:.82rem;font-weight:900;color:#1a3d2b}
