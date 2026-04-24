@@ -677,6 +677,7 @@ function _melEsc(v){
 // MEL — État global du module
 // ════════════════════════════════════════════════════════
 let _melCat=null, _melZone=null, _melZoneLabel=null, _melAddr=null;
+let _melLat=null, _melLon=null;
 let _melChatContext='', _melChatCategory='autre', _melChatTopic='autre';
 let _melZoneNorm=null;
 
@@ -1243,6 +1244,7 @@ function melFindZoneByGPS(){
 }
 
 async function _fetchZonePLU(lat,lon){
+  _melLat=lat; _melLon=lon;
   try{
     const r=await fetch(`${MEL_BACKEND}/api/zone-plu?lat=${lat}&lon=${lon}`);
     const d=await r.json();
@@ -1251,13 +1253,73 @@ async function _fetchZonePLU(lat,lon){
       _showManualZoneSelector();return;
     }
     _melZone=d.zone;_melZoneLabel=d.liblong||'';_melZoneNorm=pluNormalizeZone(d.zone);
-    _setZoneResult('ok',`✅ Zone PLU détectée : <strong>${d.zone}</strong>${d.liblong?' — '+d.liblong:''}`);
+    _setZoneResult('ok',`✅ Zone PLU détectée : <strong>${d.zone}</strong>${d.liblong?' — '+d.liblong:''}`);    _appendCadastreBtn();
   }catch(e){
     _setZoneResult('err','❌ Service IGN indisponible. Sélectionnez votre zone :');
     _showManualZoneSelector();
   }
 }
 
+
+function _appendCadastreBtn(){
+  const el=document.getElementById('mel-zone-result');
+  if(!el||el.querySelector('.mel-cadastre-btn'))return;
+  const btn=document.createElement('button');
+  btn.className='mel-cadastre-btn';
+  btn.style.cssText='margin-top:8px;width:100%;background:#f0f4f8;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:0.76rem;font-weight:800;color:var(--forest);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px';
+  btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';
+  btn.onclick=melShowCadastreData;
+  el.appendChild(btn);
+}
+
+async function melShowCadastreData(){
+  if(_melLat==null||_melLon==null)return;
+  const el=document.getElementById('mel-zone-result');
+  const btn=el&&el.querySelector('.mel-cadastre-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Chargement des données cadastrales…';}
+  try{
+    const r=await fetch(`https://apicarto.ign.fr/api/cadastre/parcelle?lon=${_melLon}&lat=${_melLat}`);
+    const d=await r.json();
+    const feats=d&&d.features;
+    if(!feats||!feats.length){
+      if(btn){btn.disabled=false;btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';}
+      _appendCadastreInfo('<em style="font-size:0.76rem">Parcelle non identifiée pour cette position.</em>');
+      return;
+    }
+    const p=feats[0].properties||{};
+    const section=p.section||'—';
+    const numero=p.numero||'—';
+    const surface=p.contenance!=null?`${p.contenance} m²`:'—';
+    const commune=p.commune||'45204';
+    const card=document.createElement('div');
+    card.style.cssText='margin-top:10px;background:#f8fdf9;border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:0.76rem;line-height:1.8';
+    card.innerHTML='<strong style="display:block;margin-bottom:4px;color:var(--forest)">📐 Données cadastrales</strong>';
+    const rows=[['Commune INSEE',commune],['Section',section],['Parcelle n°',numero],['Surface',surface]];
+    rows.forEach(([l,v])=>{
+      const row=document.createElement('div');
+      row.innerHTML=`${l} : <strong>${v}</strong>`;
+      card.appendChild(row);
+    });
+    const note=document.createElement('div');
+    note.style.cssText='margin-top:8px;font-size:0.67rem;color:#888';
+    note.textContent='Source : apicarto.ign.fr — Données indicatives, à vérifier auprès de la mairie.';
+    card.appendChild(note);
+    if(btn)btn.remove();
+    const resultEl=document.getElementById('mel-zone-result');
+    if(resultEl)resultEl.appendChild(card);
+  }catch(ex){
+    if(btn){btn.disabled=false;btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';}
+    _appendCadastreInfo('<em style="font-size:0.76rem;color:#e11d48">Service cadastral indisponible. Réessayez plus tard.</em>');
+  }
+}
+
+function _appendCadastreInfo(html){
+  const el=document.getElementById('mel-zone-result');
+  if(!el)return;
+  let card=el.querySelector('.mel-cadastre-result');
+  if(!card){card=document.createElement('div');card.className='mel-cadastre-result';el.appendChild(card);}
+  card.innerHTML=html;
+}
 function _showManualZoneSelector(){
   const result=document.getElementById('mel-zone-result');
   if(!result||result.querySelector('select'))return;
