@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.0.2 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.0.3 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 if(window.innerWidth<1024)return;
@@ -13,7 +13,7 @@ function fmt(d){
 }
 function fmtShort(d){
   var dt=new Date(d);
-  return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
+  return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
 }
 function daysUntil(d){
   var now=new Date(); now.setHours(0,0,0,0);
@@ -26,13 +26,13 @@ function safeSet(id,html){var el=qs(id);if(el)el.innerHTML=html;}
 function loadMeteo(){
   var el=qs('d-hero-meteo');
   if(!el)return;
-  fetch(API+'/meteo?commune=mezieres-lez-clery')
+  fetch(API+'/meteo/commune')
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
       if(!d){el.innerHTML='';return;}
-      var ico=d.icon||'🌤️';
-      var temp=d.temperature!=null?Math.round(d.temperature)+'°C':'—';
-      var desc=d.description||'';
+      var ico=d.icon||d.icone||'🌤️';
+      var temp=d.temperature!=null?Math.round(d.temperature)+'°C':(d.temp!=null?Math.round(d.temp)+'°C':'—');
+      var desc=d.description||d.desc||'';
       el.innerHTML='<div class="d-meteo-box">'+
         '<div class="d-meteo-ico">'+ico+'</div>'+
         '<div class="d-meteo-info">'+
@@ -74,13 +74,13 @@ function loadActus(){
 
 /* ── agenda ──────────────────────────────────────────────────── */
 function loadAgenda(){
-  fetch(API+'/agenda')
+  fetch(API+'/calendar')
     .then(function(r){return r.ok?r.json():[];})
     .then(function(data){
       if(!data||!data.length)return;
       var now=new Date();
-      var future=data.filter(function(e){return new Date(e.date||e.dateDebut)>=now;});
-      future.sort(function(a,b){return new Date(a.date||a.dateDebut)-new Date(b.date||b.dateDebut);});
+      var future=data.filter(function(e){return new Date(e.date||e.dateDebut||e.start)>=now;});
+      future.sort(function(a,b){return new Date(a.date||a.dateDebut||a.start)-new Date(b.date||b.dateDebut||b.start);});
 
       // featured — first upcoming event
       renderFeatured(future[0]);
@@ -90,24 +90,20 @@ function loadAgenda(){
       if(elList&&future.length>1){
         var html='';
         future.slice(1,6).forEach(function(e){
-          var d=new Date(e.date||e.dateDebut);
+          var d=new Date(e.date||e.dateDebut||e.start);
           html+='<div class="d-agenda-item">'+
             '<div class="d-agenda-date">'+
               '<span class="d-agenda-day">'+d.getDate()+'</span>'+
               '<span class="d-agenda-mon">'+d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')+'</span>'+
             '</div>'+
             '<div class="d-agenda-info">'+
-              '<strong>'+escHtml(e.titre||e.title||'')+'</strong>'+
+              '<strong>'+escHtml(e.titre||e.title||e.name||'')+'</strong>'+
               (e.lieu||e.location?'<small>'+escHtml(e.lieu||e.location)+'</small>':'')+
             '</div>'+
           '</div>';
         });
         elList.innerHTML=html;
       }
-
-      // update stat
-      var sc=qs('dsk-stat-events');
-      if(sc)sc.textContent=future.length;
     })
     .catch(function(){});
 }
@@ -115,8 +111,8 @@ function loadAgenda(){
 function renderFeatured(e){
   var el=qs('dsk-featured');
   if(!el||!e)return;
-  var d=new Date(e.date||e.dateDebut);
-  var days=daysUntil(e.date||e.dateDebut);
+  var d=new Date(e.date||e.dateDebut||e.start);
+  var days=daysUntil(e.date||e.dateDebut||e.start);
   var countdown=days===0?'Aujourd\'hui !':days===1?'Demain':'Dans '+days+' jour'+(days>1?'s':'');
   var img=e.image||e.photo||'';
   el.innerHTML=
@@ -124,7 +120,7 @@ function renderFeatured(e){
       (img?'<div class="d-featured-img"><img src="'+img+'" alt="" onerror="this.parentElement.style.display=\'none\'"></div>':'')+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">'+escHtml(e.categorie||e.category||'Événement')+'</div>'+
-        '<h3 class="d-featured-title">'+escHtml(e.titre||e.title||'')+'</h3>'+
+        '<h3 class="d-featured-title">'+escHtml(e.titre||e.title||e.name||'')+'</h3>'+
         (e.lieu||e.location?'<p class="d-featured-lieu">📍 '+escHtml(e.lieu||e.location)+'</p>':'')+
         '<div class="d-featured-meta">'+
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
@@ -167,52 +163,26 @@ function renderHoraires(){
   el.innerHTML=html;
 }
 
-/* ── collectes ───────────────────────────────────────────────── */
-function loadCollectes(){
+/* ── collectes (statiques) ───────────────────────────────────── */
+function renderCollectes(){
   var el=qs('dsk-collectes-body');
   if(!el)return;
-  fetch(API+'/collectes')
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(d){
-      if(!d){el.innerHTML='<p class="d-empty">Données indisponibles</p>';return;}
-      var types=['ordures','recyclables','verre'];
-      var labels={ordures:'🗑️ Ordures ménagères',recyclables:'♻️ Tri sélectif',verre:'🫙 Verre'};
-      var html='';
-      types.forEach(function(t){
-        if(!d[t])return;
-        var next=d[t];
-        html+='<div class="d-collecte-row">'+
-          '<span class="d-collecte-lbl">'+labels[t]+'</span>'+
-          '<span class="d-collecte-date">'+fmtShort(next)+'</span>'+
-        '</div>';
-      });
-      el.innerHTML=html||'<p class="d-empty">Pas de données</p>';
-    })
-    .catch(function(){el.innerHTML='<p class="d-empty">Chargement impossible</p>';});
+  el.innerHTML='<p style="font-size:0.78rem;color:var(--text);line-height:1.6;margin:0">'
+    +'🗑️ Ordures ménag. — semaines impaires<br>'
+    +'♻️ Tri sélectif — semaines paires<br>'
+    +'🫙 Verre — en déchetterie'
+    +'</p>'
+    +'<button onclick="openDechets()" style="margin-top:10px;width:100%;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:8px;font-family:inherit;font-size:0.76rem;font-weight:800;cursor:pointer">📅 Voir le calendrier complet</button>';
 }
 
-/* ── élus ────────────────────────────────────────────────────── */
-function loadElus(){
+/* ── élus (statiques) ────────────────────────────────────────── */
+function renderElus(){
   var el=qs('dsk-elus-body');
   if(!el)return;
-  fetch(API+'/elus')
-    .then(function(r){return r.ok?r.json():[];})
-    .then(function(data){
-      if(!data||!data.length){el.innerHTML='<p class="d-empty">—</p>';return;}
-      var html='';
-      data.forEach(function(elu){
-        html+='<div class="d-elu-row">'+
-          (elu.photo?'<img class="d-elu-photo" src="'+elu.photo+'" alt="" onerror="this.style.display=\'none\'">':
-            '<div class="d-elu-avatar">'+initials(elu.nom||'')+'</div>')+
-          '<div class="d-elu-info">'+
-            '<strong>'+escHtml(elu.prenom||'')+' '+escHtml(elu.nom||'')+'</strong>'+
-            '<small>'+escHtml(elu.fonction||elu.role||'Conseiller·e municipal·e')+'</small>'+
-          '</div>'+
-        '</div>';
-      });
-      el.innerHTML=html;
-    })
-    .catch(function(){el.innerHTML='<p class="d-empty">Chargement impossible</p>';});
+  el.innerHTML='<p style="font-size:0.78rem;color:var(--text);line-height:1.5;margin:0 0 10px 0">'
+    +'Découvrez vos élus et leurs délégations.'
+    +'</p>'
+    +'<button onclick="openConseil()" style="width:100%;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:8px;font-family:inherit;font-size:0.76rem;font-weight:800;cursor:pointer">🏛️ Voir le conseil municipal</button>';
 }
 
 /* ── MEL mini-form ───────────────────────────────────────────── */
@@ -221,7 +191,6 @@ window.deskMelSend=function(ev){
   var inp=document.getElementById('dsk-mel-inp');
   var msg=inp?inp.value.trim():'';
   if(!msg)return;
-  // open main MEL overlay and pre-fill
   if(typeof openMel==='function')openMel();
   setTimeout(function(){
     var mainInp=document.querySelector('#ov-mel textarea, #ov-mel input[type="text"]');
@@ -238,19 +207,6 @@ window.openMelCat=function(cat){
   },300);
 };
 
-/* ── stats MEL / signalements ────────────────────────────────── */
-function loadStats(){
-  // signalements
-  fetch(API+'/stats')
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(d){
-      if(!d)return;
-      if(d.signalements!=null){var s=qs('dsk-stat-sig');if(s)s.textContent=d.signalements;}
-      if(d.conversations!=null){var m=qs('dsk-stat-mel');if(m)m.textContent=d.conversations;}
-    })
-    .catch(function(){});
-}
-
 /* ── utils ───────────────────────────────────────────────────── */
 function escHtml(s){
   return String(s)
@@ -259,9 +215,6 @@ function escHtml(s){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;');
 }
-function initials(nom){
-  return nom.split(' ').map(function(p){return p[0]||'';}).join('').substring(0,2).toUpperCase();
-}
 
 /* ── boot ────────────────────────────────────────────────────── */
 function init(){
@@ -269,9 +222,8 @@ function init(){
   loadActus();
   loadAgenda();
   renderHoraires();
-  loadCollectes();
-  loadElus();
-  loadStats();
+  renderCollectes();
+  renderElus();
 }
 
 if(document.readyState==='loading'){
