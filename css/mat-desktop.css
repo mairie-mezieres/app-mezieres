@@ -1,4 +1,4 @@
-/* MAT — Desktop v4.0.2 */
+/* MAT — Desktop v4.0.5 */
 .d-topbar,.d-nav,.d-hero,.d-stats,.d-main-grid,.d-rando-banner,.d-footer{display:none}
 .content{display:block}
 
@@ -11,7 +11,7 @@
 
   /* NAV */
   .d-nav{display:flex;position:sticky;top:0;z-index:900;background:#fff;border-bottom:2px solid #e8f0ea;box-shadow:0 2px 8px rgba(26,61,43,.08);padding:0 32px}
-  .d-nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1400px;margin:0 auto;height:58px}
+  .d-nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1400px;margin:0 auto;height:58px;gap:12px}
   .d-nav-logo{display:flex;align-items:center;gap:10px}
   .d-nav-img{width:34px;height:34px;border-radius:8px}
   .d-nav-title{font-size:.95rem;font-weight:900;color:#1a3d2b}
@@ -27,8 +27,8 @@
   /* HERO */
   .header{display:none}
   .d-hero{display:block;position:relative;height:340px;overflow:hidden}
-  .d-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;filter:brightness(.55)}
-  .d-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,61,43,.85) 40%,rgba(26,61,43,.4))}
+  .d-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;filter:brightness(.82)}
+  .d-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,61,43,.45) 25%,rgba(26,61,43,.1))}
   .d-hero-inner{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:32px}
   .d-hero-text{flex:1;max-width:560px}
   .d-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:.68rem;font-weight:800;color:rgba(255,255,255,.9);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
@@ -43,13 +43,30 @@
 
   /* METEO WIDGET */
   .d-hero-meteo{flex-shrink:0;width:220px}
-  .d-meteo-card{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:16px;color:#fff}
+  .d-meteo-card{background:rgba(255,255,255,.18);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.4);border-radius:18px;padding:16px;color:#fff;cursor:pointer;transition:background .2s,box-shadow .2s;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+  .d-meteo-card:hover{background:rgba(255,255,255,.28);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+  .d-meteo-label{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.8);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+  .d-meteo-click-hint{font-size:.58rem;color:rgba(255,255,255,.6)}
   .d-meteo-badge{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7);margin-bottom:8px}
   .d-meteo-temp{font-size:2.8rem;font-weight:900;line-height:1}
   .d-meteo-temp span{font-size:1.4rem}
   .d-meteo-desc{font-size:.8rem;color:rgba(255,255,255,.85);margin:6px 0 10px}
   .d-meteo-row{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.7);padding:5px 0;border-top:1px solid rgba(255,255,255,.1)}
   .d-meteo-row strong{color:#fff}
+
+  /* BUS RÉMI card desktop */
+  .d-bus-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:.78rem}
+  .d-bus-item:last-child{border-bottom:none}
+  .d-bus-stop{font-weight:700;color:#1a3d2b;min-width:64px}
+  .d-bus-dir{flex:1;color:#52b788;font-weight:600}
+  .d-bus-time{font-weight:900;color:#1a3d2b;background:#e8f5ee;border-radius:6px;padding:2px 8px;font-size:.76rem}
+  .d-bus-soon{background:#fef3c7;color:#92400e}
+  .d-bus-empty{font-size:.75rem;color:#aaa;padding:8px 0;text-align:center}
+  .d-bus-periode{font-size:.62rem;background:#e8f0ea;color:#52b788;border-radius:6px;padding:2px 7px;font-weight:800}
+
+  /* Accessibility btn in nav */
+  .d-nav-acc{background:#f0f4f8;border:1px solid #e8f0ea;border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;color:#1a3d2b;transition:background .15s;display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
+  .d-nav-acc:hover{background:#e8f5ee}
 
   /* STATS */
   .d-stats{display:flex;background:#fff;border-bottom:1px solid #e8f0ea;padding:0 32px;justify-content:center;gap:0}
@@ -177,7 +194,7 @@
   .d-footer ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
   .d-footer ul li button,.d-footer ul li a{background:none;border:none;color:rgba(255,255,255,.7);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;padding:0;text-align:left;text-decoration:none}
   .d-footer ul li button:hover,.d-footer ul li a:hover{color:#a7f3d0}
-  .d-footer-bottom{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:16px 0;font-size:.7rem;color:rgba(255,255,255,.4)}
+  .d-footer-bottom{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:16px 0;font-size:.7rem;color:rgba(255,255,255,.4);flex-wrap:wrap;gap:8px}
   .d-footer-links{display:flex;gap:12px;align-items:center}
   .d-footer-links button{background:none;border:none;color:rgba(255,255,255,.4);font-family:'Nunito',sans-serif;font-size:.7rem;cursor:pointer}
   .d-footer-links button:hover{color:rgba(255,255,255,.7)}
