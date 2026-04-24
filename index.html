@@ -32,7 +32,7 @@
 </script>
 
 <link rel="stylesheet" href="css/mat.css?v=3.7.4">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.0.1">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.0.4">
 
 <!-- ════════════════════════════════════════════════════════════
      MAT — Modules JavaScript v3.7.4
@@ -46,7 +46,7 @@
 <script defer src="js/mat-forms.js?v=4.0.0"></script>
 <script defer src="js/mat-actus.js?v=4.0.1"></script>
 <script defer src="js/mat-trombi.js?v=3.7.4"></script>
-<script defer src="js/mat-mel.js?v=3.7.4"></script>
+<script defer src="js/mat-mel.js?v=4.0.4"></script>
 <script defer src="js/mat-boot.js?v=4.0.1"></script>
 
 </head>
@@ -69,9 +69,13 @@
     <nav class="d-nav-links">
       <button onclick="openNotifs()">Actualités</button>
       <button onclick="openAgenda()">Agenda</button>
-      <button onclick="openMel()">MEL</button>
-      <button onclick="openContact()">Contact</button>
-      <button onclick="openAssociations()">Associations</button>
+      <button onclick="openDocs()">Documents officiels</button>
+      <button onclick="openIdees()">Idées</button>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
+      <button onclick="openSondages()">Sondages citoyens</button>
+      <button onclick="openRemi()">🚌 Bus Rémi</button>
+      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">📻 Radio Mézières</a>
+      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">🏘️ Ici c'est Mézières !</a>
     </nav>
   </div>
 </div>
@@ -170,13 +174,7 @@
     <div class="d-hero-meteo" id="d-hero-meteo"></div>
   </div>
 </div>
-<div class="d-stats">
-  <div class="d-stat"><div class="d-stat-ico">👥</div><div class="d-stat-n">847</div><div class="d-stat-l">Habitants</div></div>
-  <div class="d-stat" id="dsk-stat-events"><div class="d-stat-ico">📅</div><div class="d-stat-n">–</div><div class="d-stat-l">Événements ce mois</div></div>
-  <div class="d-stat"><div class="d-stat-ico">🥾</div><div class="d-stat-n">12</div><div class="d-stat-l">Circuits de randonnées</div></div>
-  <div class="d-stat" id="dsk-stat-mel"><div class="d-stat-ico">💬</div><div class="d-stat-n">–</div><div class="d-stat-l">Questions MEL répondues</div></div>
-  <div class="d-stat" id="dsk-stat-sig"><div class="d-stat-ico">🚨</div><div class="d-stat-n">–</div><div class="d-stat-l">Signalements traités</div></div>
-</div>
+
 
 <!-- Contenu principal -->
 <div class="content">
@@ -294,23 +292,15 @@
       <div class="d-card-hdr"><span>📅 Agenda communal</span><button onclick="openAgenda()">Voir tout le mois →</button></div>
       <div class="d-card-body" id="dsk-agenda-list"><div class="d-loading">Chargement…</div></div>
     </div>
-    <div class="d-mel-panel">
+    <div class="d-mel-cta-panel">
       <div class="d-mel-hdr">
         <img src="MAT et MEL.png" alt="MEL" class="d-mel-img" onerror="this.style.display='none'">
-        <div><div class="d-mel-name">MEL — Mézières En Ligne <span class="d-mel-online">● En ligne</span></div><div class="d-mel-sub">Votre assistante numérique communale</div></div>
+        <div>
+          <div class="d-mel-name">MEL — Mézières En Ligne <span class="d-mel-online">● En ligne</span></div>
+          <div class="d-mel-sub">Votre assistante numérique communale</div>
+        </div>
       </div>
-      <div class="d-mel-bubble">Bonjour ! Je suis MEL, l'assistante de la commune. Je peux vous renseigner sur l'urbanisme, les démarches administratives, les déchets, l'école et bien plus. Comment puis-je vous aider ?</div>
-      <div class="d-mel-cats">
-        <button onclick="openMelCat('urbanisme')">🏗️ Urbanisme</button>
-        <button onclick="openMelCat('enfance')">🎒 École</button>
-        <button onclick="openMelCat('dechets')">♻️ Déchets</button>
-        <button onclick="openMelCat('administratif')">📋 Administratif</button>
-        <button onclick="openMelCat('numerique')">📡 Numérique</button>
-      </div>
-      <form class="d-mel-form" onsubmit="deskMelSend(event)">
-        <input class="d-mel-input" id="dsk-mel-input" placeholder="Posez votre question…" autocomplete="off">
-        <button type="submit">➤</button>
-      </form>
+      <button class="d-mel-cta-btn" onclick="openMel()">💬 Parler à MEL</button>
     </div>
   </div>
   <div class="d-col d-col-right">
@@ -360,7 +350,7 @@
     <div>
       <strong>MAT — Mézières Avec Toi</strong><br>
       Application officielle de la commune<br>
-      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">Radio Mézières →</a>
+      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">Ici c'est Mézières ! →</a>
     </div>
   </div>
 </div>
@@ -1271,6 +1261,6 @@
     </div>
   </div>
 </div>
-<script defer src="js/mat-desktop.js?v=4.0.2"></script>
+<script defer src="js/mat-desktop.js?v=4.0.3"></script>
 </body>
 </html>
