@@ -1278,8 +1278,9 @@ async function melShowCadastreData(){
   const btn=el&&el.querySelector('.mel-cadastre-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ Chargement des données cadastrales…';}
   try{
-    const _cqlF=encodeURIComponent(`INTERSECTS(the_geom,POINT(${_melLon} ${_melLat}))`);
-    const r=await fetch(`https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=CADASTRALPARCELS.PARCELLAIRE_EXPRESS:parcelle&CQL_FILTER=${_cqlF}&SRSNAME=EPSG:4326&outputFormat=application%2Fjson&count=1`);
+    const geom=encodeURIComponent(JSON.stringify({type:'Point',coordinates:[_melLon,_melLat]}));
+    const r=await fetch(`https://apicarto.ign.fr/api/cadastre/parcelle?geom=${geom}&source=PCI`);
+    if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     const feats=d&&d.features;
     if(!feats||!feats.length){
@@ -1291,7 +1292,7 @@ async function melShowCadastreData(){
     const section=p.section||'—';
     const numero=p.numero||'—';
     const surface=p.contenance!=null?`${p.contenance} m²`:'—';
-    const commune=p.commune||'45204';
+    const commune=p.code_insee||p.code_com||'45204';
     const card=document.createElement('div');
     card.style.cssText='margin-top:10px;background:#f8fdf9;border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:0.76rem;line-height:1.8';
     card.innerHTML='<strong style="display:block;margin-bottom:4px;color:var(--forest)">📐 Données cadastrales</strong>';
