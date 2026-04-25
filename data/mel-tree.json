@@ -565,17 +565,53 @@
       }
     ]
   },
-  "location": {
-    "label": "Locations matériels",
-    "ico": "🛖",
+  "divers": {
+    "label": "Services divers",
+    "ico": "❔",
     "needZone": false,
     "questions": [
       {
-        "id": "question1",
+        "id": "location",
         "ico": "🛖",
-        "label": "Locations de matériels",
+        "label": "Location de matériel",
         "directAnswer": {
           "text": "A l’occasion de manifestations diverses que nous sommes amenés à organiser,  nous avons souvent besoin de matériels divers. Nous nous posons souvent la question de savoir où nous pourrions nous en procurer.\n\n\n\n\nLa municipalité de Mézières-Lez-Cléry peut dans ce domaine vous apporter la solution.\n\nLa commune dispose en effet de barnums, tables et chaises qui peuvent être mis à disposition pour les macériens dans les conditions suivantes :\n\nTables et chaises (sur la base d’une table et 4 chaises) : 2,5 € le week end\n\nBarmums de la commune :\n\n- 110 € le week-end  le 6 x 8 m\n- 130 € le week-end  le 6 x 12 m \n\nLorsque vous louerez du matériel, vous devrez verser un chèque de caution qui vous sera restitué en fin de location, si aucune dégradation n’a été constatée.\nPar ailleurs, en ce qui concerne la salle communale, elle ne pourra plus être louée désormais.\nPour tous renseignements complémentaires sur les conditions de location, n’hésitez pas à vous renseigner auprès de la mairie.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "entourage",
+        "ico": "👵🏻",
+        "label": "Entour’age",
+        "directAnswer": {
+          "text": "Vous avez plus de 60 ans, vous souhaitez rester à domicile….\n\nVous avez plus de 20 ans, vous êtes handicapés….\n\nEt vous avez besoin de soutien et de conseils….\n\nLe CLIC est là pour vous aider :\n\n- Aide à domicile\n- Téléassistance\n- Portage de repas\n- Etablissements spécialisés\n- Intégration dans le milieu professionnel\n- Aides financières…",
+          "links": [
+            {
+              "label": "📞 CLIC Relais ENTOUR’AGE : 02 38 44 90 20",
+              "tel": "0238449020"
+            },
+            {
+              "label": "✉️ relais.entourage@wanadoo.fr",
+              "url": "mailto:relais.entourage@wanadoo.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cimetiere",
+        "ico": "🪦",
+        "label": "Tarifs cimetière",
+        "directAnswer": {
+          "text": "Les tarifs concernant les concessions du cimetières sont les suivants :\n- Concessions de 30 ans 150 €\n- Concessions de 50 ans 300 €\n- Concessions urnes 30 ans 100 €\n- Concessions urnes 50 ans 200 €",
           "links": [
             {
               "label": "📞 Mairie : 02 38 45 61 76",
