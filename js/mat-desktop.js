@@ -66,7 +66,7 @@ function loadActus(){
       }
       var html='';
       items.slice(0,5).forEach(function(a){
-        var img=a.image?'<img src="'+a.image+'" alt="" onerror="this.style.display=\'none\'">':'';
+        var img=a.photo?'<img src="'+a.photo+'" alt="" onerror="this.style.display=\'none\'">':'';
         var rawDate=a.date||a.createdAt||'';
         var dateStr=rawDate?fmtShort(rawDate):'';
         var actuId=encodeURIComponent(a.id||a._id||'');

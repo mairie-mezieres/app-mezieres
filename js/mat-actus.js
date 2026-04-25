@@ -69,6 +69,7 @@ async function fetchActus(force){
   if(!r.ok) throw new Error('HTTP '+r.status);
   const d=await r.json();
   _actusCache=d.actus||[];
+  window._matActusList=_actusCache;
   _actusCacheAt=Date.now();
   return _actusCache;
 }
@@ -308,6 +309,7 @@ async function togglePush(){
       if(!localStorage.getItem('mat_dechets_notif_v1')) await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
     updateNotifCardStatus(false);
+    localStorage.removeItem('mat_push_active');
     pushRegistered=false; return;
   }
   if(!('Notification' in window)){await alertMAT('Notifications non supportées sur ce navigateur.','Notifications','🔔');return;}
@@ -323,6 +325,7 @@ async function togglePush(){
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);
       pushRegistered=true;
+      localStorage.setItem('mat_push_active','1');
       await alertMAT('Notifications activées !','Notifications','✅');
     }catch(e){await alertMAT('Erreur lors de l\'activation des notifications.','Notifications','⚠️');}
   }
