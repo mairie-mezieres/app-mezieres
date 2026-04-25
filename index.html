@@ -32,7 +32,7 @@
 </script>
 
 <link rel="stylesheet" href="css/mat.css?v=3.7.4">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.0.4">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.0.5">
 
 <!-- ════════════════════════════════════════════════════════════
      MAT — Modules JavaScript v3.7.4
@@ -163,16 +163,14 @@
       <span class="d-nav-title">Mézières-lez-Cléry</span>
     </div>
     <nav class="d-nav-links">
-      <button onclick="openNotifs()">Actualités</button>
-      <button onclick="openAgenda()">Agenda</button>
+      <button onclick="openAssociations()">🤝 Associations</button>
       <button onclick="openDocs()">Documents officiels</button>
       <button onclick="openIdees()">Idées</button>
-      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
       <button onclick="openSondages()">Sondages citoyens</button>
-      <button onclick="openRemi()">🚌 Bus Rémi</button>
-      <a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener">📻 Radio Mézières</a>
-      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">🏘️ Ici c'est Mézières !</a>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
+      <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener">🌐 CCTVL</a>
     </nav>
+    <button class="d-nav-acc" onclick="openAccessibilite()" title="Accessibilité &amp; thème">♿ Accessibilité</button>
   </div>
 </div>
 
@@ -272,10 +270,15 @@
 </div>
 <!-- Desktop : grille de panneaux (cachée sur mobile) -->
 <div class="d-main-grid">
+  <!-- Colonne gauche : Actualités + Bus Rémi + Signalement -->
   <div class="d-col d-col-left">
     <div class="d-card" id="dsk-actus">
       <div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
       <div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card" id="dsk-bus">
+      <div class="d-card-hdr"><span>🚌 Bus Rémi</span><button onclick="openRemi()">Tout voir →</button></div>
+      <div class="d-card-body" id="dsk-bus-body"><div class="d-loading">Chargement…</div></div>
     </div>
     <div class="d-card">
       <div class="d-card-hdr"><span>🚨 Signalement rapide</span></div>
@@ -287,11 +290,16 @@
       </div>
     </div>
   </div>
+  <!-- Colonne centre : Prochain évènement + Agenda + Collectes + MEL -->
   <div class="d-col d-col-center">
     <div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
     <div class="d-card">
       <div class="d-card-hdr"><span>📅 Agenda communal</span><button onclick="openAgenda()">Voir tout le mois →</button></div>
       <div class="d-card-body" id="dsk-agenda-list"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🗑️ Collectes</span><button onclick="openDechets()">Calendrier →</button></div>
+      <div class="d-card-body" id="dsk-collectes-body"><div class="d-loading">Chargement…</div></div>
     </div>
     <div class="d-mel-cta-panel">
       <div class="d-mel-hdr">
@@ -304,14 +312,11 @@
       <button class="d-mel-cta-btn" onclick="openMel()">💬 Parler à MEL</button>
     </div>
   </div>
+  <!-- Colonne droite : Mairie + MEL + Élus -->
   <div class="d-col d-col-right">
     <div class="d-card">
       <div class="d-card-hdr"><span>🏛️ Mairie</span><button onclick="openContact()">Contacter →</button></div>
       <div class="d-card-body" id="dsk-mairie-body"></div>
-    </div>
-    <div class="d-card">
-      <div class="d-card-hdr"><span>🗑️ Collectes</span><button onclick="openDechets()">Calendrier →</button></div>
-      <div class="d-card-body" id="dsk-collectes-body"><div class="d-loading">Chargement…</div></div>
     </div>
     <div class="d-card">
       <div class="d-card-hdr"><span>🏛️ Élus</span><button onclick="openConseil()">Voir tous →</button></div>
@@ -350,8 +355,20 @@
     </div>
     <div>
       <strong>MAT — Mézières Avec Toi</strong><br>
-      Application officielle de la commune<br>
-      <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener">Ici c'est Mézières ! →</a>
+      Application officielle de la commune
+    </div>
+    <div>
+      <strong>Informations</strong><br>
+      <button onclick="openRgpd()" style="background:none;border:none;color:rgba(255,255,255,.7);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;padding:0;text-align:left;margin-bottom:6px;display:block">🔒 Confidentialité &amp; RGPD</button>
+      <button onclick="openBug()" style="background:none;border:none;color:rgba(255,255,255,.7);font-family:'Nunito',sans-serif;font-size:.78rem;cursor:pointer;padding:0;text-align:left;display:block">🐛 Signaler un problème</button>
+    </div>
+  </div>
+  <div class="d-footer-bottom">
+    <span>MAT · Application officielle · Mairie de Mézières-lez-Cléry</span>
+    <div class="d-footer-links">
+      <button onclick="openRgpd()">RGPD</button>
+      <button onclick="openBug()">Contact admin</button>
+      <button onclick="openAccessibilite()">Accessibilité</button>
     </div>
   </div>
 </div>
@@ -883,7 +900,7 @@
   <div class="panel">
     <div class="panel-hdr">
       <div class="panel-ico" style="background:#f0f0f0">🔒</div>
-      <div class="panel-title">Vie privée &amp; RGPD</div>
+      <div class="panel-title">🔒 Vie privée &amp; RGPD — Politique de confidentialité</div>
       <button class="panel-close" onclick="closeOv('rgpd')">✕</button>
     </div>
     <div class="panel-body">
@@ -895,7 +912,8 @@
         <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
-          <tr><td>MEL (chatbot IA)</td><td>Questions posées</td><td>Catégories stockées uniquement (pour améliorations)</td></tr>
+          <tr><td>MEL (assistante IA)</td><td>Questions posées</td><td>Catégories stockées uniquement (pour améliorations)</td></tr>
+          <tr><td>Sondages citoyens</td><td>Réponse anonyme, identifiant appareil local</td><td>Local + compteurs agrégés anonymes</td></tr>
           <tr><td>Signalement citoyen</td><td>Catégorie, description, photo, GPS (tous optionnels)</td><td>Transmis à Trello + Redis, anonyme</td></tr>
           <tr><td>Rapport de bug</td><td>Service concerné, appareil, description</td><td>Transmis à Trello + Redis, anonyme</td></tr>
           <tr><td>Demande de contact</td><td>Nom (optionnel), coordonnée (optionnel), message</td><td>Transmis à Trello + Redis</td></tr>
@@ -924,6 +942,7 @@
           <tr><td>Trello (Atlassian)</td><td>Gestion signalements, bugs et demandes</td><td>États-Unis</td></tr>
           <tr><td>Facebook (Meta)</td><td>Actualités Radio Mézières (lecture seule)</td><td>États-Unis</td></tr>
           <tr><td>Google Calendar</td><td>Agenda communal (lecture seule)</td><td>États-Unis</td></tr>
+          <tr><td>Open-Meteo</td><td>Prévisions météo (lecture seule)</td><td>UE (Suisse)</td></tr>
         </table>
       </div>
       <div class="rgpd-section">
@@ -1262,6 +1281,6 @@
     </div>
   </div>
 </div>
-<script defer src="js/mat-desktop.js?v=4.0.4"></script>
+<script defer src="js/mat-desktop.js?v=4.0.5"></script>
 </body>
 </html>
