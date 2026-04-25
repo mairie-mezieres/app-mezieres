@@ -203,4 +203,5 @@
 }
 .d-featured{cursor:pointer;transition:opacity .15s;}
 .d-featured:hover{opacity:.92;}
+.d-featured-img{display:block;width:calc(100% + 40px);height:160px;object-fit:cover;border-radius:14px 14px 0 0;margin:-20px -20px 16px;}
 @media(min-width:1024px){.d-mobile-only{display:none !important;}}

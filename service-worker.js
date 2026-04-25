@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.0.7 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.0.9 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 6 : meteo desktop fix, agenda via ensureAgendaEvents, nav position, boutons mairie
-const CACHE = 'mat-v4.0.7';
+const CACHE = 'mat-v4.0.9';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
