@@ -1267,7 +1267,7 @@ function _appendCadastreBtn(){
   const btn=document.createElement('button');
   btn.className='mel-cadastre-btn';
   btn.style.cssText='margin-top:8px;width:100%;background:#f0f4f8;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:0.76rem;font-weight:800;color:var(--forest);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px';
-  btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';
+  btn.innerHTML='🗺️ Ouvrir la carte cadastrale';
   btn.onclick=melShowCadastreData;
   el.appendChild(btn);
 }
@@ -1277,42 +1277,9 @@ async function melShowCadastreData(){
   const el=document.getElementById('mel-zone-result');
   const btn=el&&el.querySelector('.mel-cadastre-btn');
   if(btn){btn.disabled=true;btn.textContent='⏳ Chargement des données cadastrales…';}
-  try{
-    const geom=encodeURIComponent(JSON.stringify({type:'Point',coordinates:[_melLon,_melLat]}));
-    const r=await fetch(`https://apicarto.ign.fr/api/cadastre/parcelle?geom=${geom}&source=PCI`);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    const feats=d&&d.features;
-    if(!feats||!feats.length){
-      if(btn){btn.disabled=false;btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';}
-      _appendCadastreInfo('<em style="font-size:0.76rem">Parcelle non identifiée pour cette position.</em>');
-      return;
-    }
-    const p=feats[0].properties||{};
-    const section=p.section||'—';
-    const numero=p.numero||'—';
-    const surface=p.contenance!=null?`${p.contenance} m²`:'—';
-    const commune=p.code_insee||p.code_com||'45204';
-    const card=document.createElement('div');
-    card.style.cssText='margin-top:10px;background:#f8fdf9;border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:0.76rem;line-height:1.8';
-    card.innerHTML='<strong style="display:block;margin-bottom:4px;color:var(--forest)">📐 Données cadastrales</strong>';
-    const rows=[['Commune INSEE',commune],['Section',section],['Parcelle n°',numero],['Surface',surface]];
-    rows.forEach(([l,v])=>{
-      const row=document.createElement('div');
-      row.innerHTML=`${l} : <strong>${v}</strong>`;
-      card.appendChild(row);
-    });
-    const note=document.createElement('div');
-    note.style.cssText='margin-top:8px;font-size:0.67rem;color:#888';
-    note.textContent='Source : cadastre.data.gouv.fr — Données indicatives, à vérifier auprès de la mairie.';
-    card.appendChild(note);
-    if(btn)btn.remove();
-    const resultEl=document.getElementById('mel-zone-result');
-    if(resultEl)resultEl.appendChild(card);
-  }catch(ex){
-    if(btn){btn.disabled=false;btn.innerHTML='📐 Voir les infos cadastrales de cette adresse';}
-    _appendCadastreInfo('<em style="font-size:0.76rem;color:#e11d48">Service cadastral indisponible. Réessayez plus tard.</em>');
-  }
+  const url=`https://cadastre.data.gouv.fr/map?style=plan#17/${_melLat.toFixed(6)}/${_melLon.toFixed(6)}`;
+  window.open(url,'_blank','noopener');
+  if(btn){btn.innerHTML='🗺️ Carte ouverte →';}
 }
 
 function _appendCadastreInfo(html){

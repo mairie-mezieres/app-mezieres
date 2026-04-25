@@ -185,7 +185,7 @@ function renderFeatured(e){
   var days=daysUntil(d);
   var countdown=days===0?'Aujourd\'hui !':days===1?'Demain':'Dans '+days+' jour'+(days>1?'s':'');
   el.innerHTML=
-    '<div class="d-featured">'+
+    '<div class="d-featured" onclick="openAgenda&&openAgenda()" title="Voir l\'agenda complet">'+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">Prochain évènement</div>'+
         '<h3 class="d-featured-title">'+escHtml(e.summary||'')+'</h3>'+
@@ -194,7 +194,8 @@ function renderFeatured(e){
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
           ' · <span class="d-featured-countdown">'+countdown+'</span>'+
         '</div>'+
-        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+escHtml(e.description.substring(0,120))+'…</p>':'')+
+        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+escHtml(e.description)+'</p>':'')+
+        '<p style="font-size:.68rem;color:rgba(255,255,255,.45);margin:8px 0 0">Voir l\'agenda complet →</p>'+
       '</div>'+
     '</div>';
 }
