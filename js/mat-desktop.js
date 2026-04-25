@@ -54,8 +54,8 @@ function loadMeteo(){
 /* ── actualités ──────────────────────────────────────────────── */
 function loadActus(){
   var el=qs('dsk-actus-list');
-  if(!el)return;
-  fetch(API+'/actus')
+  if(!el)return Promise.resolve();
+  return fetch(API+'/actus')
     .then(function(r){return r.ok?r.json():[];})
     .then(function(data){
       var items=Array.isArray(data)?data:(data&&Array.isArray(data.actus)?data.actus:[]);
@@ -277,8 +277,7 @@ function escHtml(s){
 /* ── boot ────────────────────────────────────────────────────── */
 function init(){
   loadMeteo();
-  loadActus();
-  loadAgenda();
+  loadActus().then(function(){loadAgenda();});
   loadBusDesktop();
   renderHoraires();
   renderCollectes();
