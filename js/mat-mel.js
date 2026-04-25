@@ -569,7 +569,7 @@ const _MEL_TREE_FALLBACK = {
     questions:[
       {id:"collecte",ico:"🗑️",label:"Jours de collecte ordures / tri sélectif",
         directAnswer:{text:"Sortez vos bacs la veille au soir ou avant 7h le matin du jour de collecte. La collecte n'a pas lieu les jours fériés — elle est reportée au lendemain. Des points d'apport volontaire (verre, papiers, plastique-cartons, vêtements) sont présents sur la commune. Consultez votre calendrier personnalisé en ligne.",
-          links:[{label:"🗓️ Mon calendrier de collecte",url:"https://mezieres-lez-clery.fr/2018/10/25/gestion-des-dechets/"}]}
+          links:[{label:"🗓️ Mon calendrier de collecte",action:"openDechets()"}]}
       },
       {id:"dechetterie",ico:"♻️",label:"Déchetterie — horaires & inscription",
         directAnswer:{text:"La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lun-sam sauf jours fériés. Une inscription vaut pour tous les sites CCTVL.",
@@ -1088,6 +1088,10 @@ function _renderDirectAnswer(answer){
   if(answer.links&&answer.links.length){
     h+='<div style="display:flex;flex-direction:column;gap:6px;">';
     for(const lk of answer.links){
+      if(lk.action){
+        h+='<button onclick="event.stopPropagation();'+lk.action+'" style="display:block;width:100%;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;text-align:left;">'+lk.label+'</button>';
+        continue;
+      }
       const href=lk.tel?'tel:'+lk.tel:lk.url;
       const target=lk.tel?'':'target="_blank"';
       const isLocal=href.startsWith('tel:')||href.startsWith('mailto:');
