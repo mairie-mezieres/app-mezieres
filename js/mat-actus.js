@@ -65,13 +65,18 @@ function clearActuHash(){
 async function fetchActus(force){
   const fresh = _actusCache && (Date.now()-_actusCacheAt < ACTUS_CACHE_MS);
   if(!force && fresh) return _actusCache;
-  const r=await fetch(ACTU_URL,{cache:'no-store'});
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  const d=await r.json();
-  _actusCache=d.actus||[];
-  window._matActusList=_actusCache;
-  _actusCacheAt=Date.now();
-  return _actusCache;
+  try {
+    const r=await fetch(ACTU_URL,{cache:'no-store',signal:AbortSignal.timeout(8000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    _actusCache=d.actus||[];
+    window._matActusList=_actusCache;
+    _actusCacheAt=Date.now();
+    return _actusCache;
+  } catch(e) {
+    if(typeof matLogError==='function') matLogError('actus','fetchActus: '+e.message);
+    throw e;
+  }
 }
 
 async function fetchIdeasForBadge(){
@@ -79,10 +84,11 @@ async function fetchIdeasForBadge(){
     if(typeof fetchIdeasList==='function') return await fetchIdeasList();
   }catch(e){}
   try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees',{cache:'no-store'});
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees',{cache:'no-store',signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     return d.idees||[];
   }catch(e){
+    if(typeof matLogError==='function') matLogError('actus','fetchIdeas: '+e.message);
     try{ return typeof getIdeas==='function' ? getIdeas() : []; }catch(_e){ return []; }
   }
 }
@@ -337,7 +343,7 @@ const MAT_BANNER_DISMISS_KEY = 'mat_banner_dismissed_v3_';
 async function loadMatInfoBanner() {
   // 1. Vigilance météo prioritaire
   try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/commune');
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/commune',{signal:AbortSignal.timeout(6000)});
     if (r.ok) {
       const d = await r.json();
       const v = d.vigilance;
@@ -349,17 +355,17 @@ async function loadMatInfoBanner() {
         return;
       }
     }
-  } catch(_) {}
+  } catch(e) { if(typeof matLogError==='function') matLogError('banner','meteo: '+e.message); }
   // 2. Sinon, encart admin
   try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/info-banner');
+    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/info-banner',{signal:AbortSignal.timeout(6000)});
     if (!r.ok) return;
     const d = await r.json();
     if (!d.active || !d.text) return;
     const dk = MAT_BANNER_DISMISS_KEY + (d.id || '');
     if (localStorage.getItem(dk)) return;
     showMatInfoBanner(d.icon || 'ℹ️', d.title || 'Information', d.text, 'info', true, dk);
-  } catch(_) {}
+  } catch(e) { if(typeof matLogError==='function') matLogError('banner','info: '+e.message); }
 }
 
 function showMatInfoBanner(ico, title, text, type, closeable, dismissKey) {
