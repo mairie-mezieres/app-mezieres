@@ -194,7 +194,7 @@ function renderFeatured(e){
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
           ' · <span class="d-featured-countdown">'+countdown+'</span>'+
         '</div>'+
-        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+escHtml(e.description)+'</p>':'')+
+        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+nl2br(e.description)+'</p>':'')+
         '<p style="font-size:.68rem;color:rgba(255,255,255,.45);margin:8px 0 0">Voir l\'agenda complet →</p>'+
       '</div>'+
     '</div>';
@@ -254,6 +254,7 @@ function renderElus(){
 }
 
 /* ── utils ───────────────────────────────────────────────────── */
+function nl2br(s){return escHtml(s).replace(/\r?\n/g,'<br>');}
 function escHtml(s){
   return String(s)
     .replace(/&/g,'&amp;')

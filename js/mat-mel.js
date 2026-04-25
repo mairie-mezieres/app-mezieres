@@ -1217,6 +1217,7 @@ async function melFindZoneByAddr(){
   const inp=document.getElementById('mel-addr-input');
   const addr=(inp?.value||'').trim();
   if(!addr){_setZoneResult('warn','⚠️ Saisissez une adresse');return;}
+  document.getElementById('mel-addr-warn')?.remove();
   _setZoneResult('','⏳ Recherche…',true);
   try{
     const q=encodeURIComponent(addr+' Mézières-lez-Cléry 45370');
@@ -1235,6 +1236,7 @@ function melFindZoneByGPS(){
   _setZoneResult('','📍 Localisation…',true);
   navigator.geolocation.getCurrentPosition(
     async pos=>{
+      document.getElementById('mel-addr-warn')?.remove();
       _melAddr=`GPS (${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)})`;
       await _fetchZonePLU(pos.coords.latitude,pos.coords.longitude);
     },

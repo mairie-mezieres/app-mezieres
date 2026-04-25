@@ -203,4 +203,4 @@
 }
 .d-featured{cursor:pointer;transition:opacity .15s;}
 .d-featured:hover{opacity:.92;}
-.d-pc-only-hide{display:none !important;}
+@media(min-width:1024px){.d-mobile-only{display:none !important;}}
