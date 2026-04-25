@@ -309,6 +309,7 @@ async function togglePush(){
       if(!localStorage.getItem('mat_dechets_notif_v1')) await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
     updateNotifCardStatus(false);
+    localStorage.removeItem('mat_push_active');
     pushRegistered=false; return;
   }
   if(!('Notification' in window)){await alertMAT('Notifications non supportées sur ce navigateur.','Notifications','🔔');return;}

@@ -15,7 +15,8 @@ async function checkAndRenewPushSubscription() {
   try {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
-    if (sub) return;
+    if (sub) { localStorage.setItem(PUSH_ACTIVE_KEY, '1'); return; }
+    if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
     var newSub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
