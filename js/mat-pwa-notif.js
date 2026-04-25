@@ -11,7 +11,6 @@ var PUSH_ACTIVE_KEY = 'mat_push_active';
 async function checkAndRenewPushSubscription() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
   try {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();

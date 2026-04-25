@@ -1,13 +1,14 @@
-// SERVICE WORKER v4.1.0 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.2.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 6 : meteo desktop fix, agenda via ensureAgendaEvents, nav position, boutons mairie
-const CACHE = 'mat-v4.1.0';
+// Phase 7 : page offline, thèmes desktop, TTS accessible sur PC, séparateur MEL/Signalement
+const CACHE = 'mat-v4.2.0';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
-  './css/mat.css?v=4.1.0',
-  './css/mat-desktop.css?v=4.1.0',
+  './offline.html',
+  './css/mat.css?v=4.2.0',
+  './css/mat-desktop.css?v=4.2.0',
   './js/mat-utils.js?v=3.7.4',
   './js/mat-core.js?v=4.0.0',
   './js/mat-accessibility.js?v=3.7.4',
@@ -82,7 +83,7 @@ self.addEventListener('fetch', e => {
         return res;
       })
       .catch(() =>
-        caches.match(e.request).then(c => c || caches.match('./index.html'))
+        caches.match(e.request).then(c => c || (e.request.mode==='navigate'?caches.match('./offline.html'):null))
       )
   );
 });
