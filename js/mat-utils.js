@@ -383,3 +383,62 @@ function formatMelText(text) {
 
   return result.replace(/\n/g,'<br>');
 }
+
+// ── Logs d'erreurs centralisés ───────────────────────────────
+var _matLogQueue = [];
+var _matLogFlushTimer = null;
+var _matLogLastSent = {};
+
+function matLogError(module, message, extra) {
+  // Filtrer les erreurs attendues / inoffensives
+  var msg = String(message || '').toLowerCase();
+  if (
+    msg.includes('aborted') ||
+    msg.includes('load failed') ||
+    msg.includes('networkerror') ||
+    msg.includes('failed to fetch') && module === 'SW' ||
+    msg.includes('signal is aborted') ||
+    msg.includes('cancelled')
+  ) return;
+
+  var key = module + ':' + msg.slice(0, 60);
+  var now = Date.now();
+  if (_matLogLastSent[key] && now - _matLogLastSent[key] < 60000) return; // dédoublonnage 1 min
+  _matLogLastSent[key] = now;
+
+  var entry = {
+    ts: new Date().toISOString(),
+    module: module || 'MAT',
+    msg: String(message || '').slice(0, 200),
+    extra: extra ? String(extra).slice(0, 100) : undefined
+  };
+  _matLogQueue.push(entry);
+
+  if (_matLogFlushTimer) clearTimeout(_matLogFlushTimer);
+  _matLogFlushTimer = setTimeout(_matFlushLogs, 3000);
+}
+
+function _matFlushLogs() {
+  var batch = _matLogQueue.splice(0);
+  if (!batch.length) return;
+  try {
+    navigator.sendBeacon(
+      MEL_BACKEND + '/logs/error',
+      new Blob([JSON.stringify(batch)], { type: 'application/json' })
+    );
+  } catch(_) {}
+}
+
+// Intercepteurs globaux (seulement les erreurs non gérées)
+window.addEventListener('error', function(e) {
+  if (!e || !e.message) return;
+  var src = (e.filename || '').split('/').pop().replace(/\.js.*/, '') || 'global';
+  matLogError(src, e.message, e.lineno ? 'L' + e.lineno : undefined);
+}, true);
+
+window.addEventListener('unhandledrejection', function(e) {
+  var reason = e && e.reason;
+  if (!reason) return;
+  var msg = reason.message || String(reason);
+  matLogError('promise', msg);
+});

@@ -235,6 +235,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
   <button class="nav-tab" onclick="showTab('docs',this)">📁 Documents</button>
   <button class="nav-tab" onclick="showTab('sondages',this)">🗳️ Sondages</button>
+  <button class="nav-tab" onclick="showTab('logs',this)">🪲 Logs</button>
   </div>
 
   <div class="admin-body">
@@ -249,6 +250,7 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel" id="tab-mel"><div id="mel-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-banner"><div id="banner-content"></div></div>
     <div class="tab-panel" id="tab-purge"><div id="purge-content"></div></div>
+    <div class="tab-panel" id="tab-logs"><div id="logs-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
   <div class="tab-panel" id="tab-docs">
     <div class="admin-body">
       <div style="background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px">
@@ -1725,7 +1727,48 @@ async function saveMelAdmin(){
 }
 
 // ── Tabs ──────────────────────────────
-function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();if(id==='docs')loadDocsAdmin();if(id==='sondages')loadSondagesAdmin();}
+function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();if(id==='docs')loadDocsAdmin();if(id==='sondages')loadSondagesAdmin();if(id==='logs')loadLogsAdmin();}
+
+// ── Logs PWA ──────────────────────────────────────────────────
+async function loadLogsAdmin(){
+  const el=document.getElementById('logs-content');
+  if(!el)return;
+  el.innerHTML='<div class="loading"><div class="loading-spinner"></div><br>Chargement des logs…</div>';
+  try{
+    const r=await fetch(`${API}/admin/logs`,{headers:{'x-admin-token':TOKEN},signal:AbortSignal.timeout(8000)});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    const logs=d.logs||[];
+    if(!logs.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:0.85rem">✅ Aucune erreur enregistrée</div>';return;}
+    const levelColor={error:'#fee2e2',warn:'#fef9c3',info:'#e0f2fe'};
+    let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:0.82rem;font-weight:800;color:var(--text)">${logs.length} entrée${logs.length>1?'s':''}</div>
+      <button onclick="clearLogsAdmin()" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:6px 14px;font-family:inherit;font-size:0.75rem;font-weight:800;cursor:pointer">🗑️ Tout effacer</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">`;
+    for(const log of logs){
+      const t=log.ts?new Date(log.ts).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}):'–';
+      html+=`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;border-left:3px solid #ef4444">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px">
+          <span style="font-size:0.65rem;font-weight:900;background:#fee2e2;color:#991b1b;border-radius:5px;padding:2px 7px">${esc2(log.module||'MAT')}</span>
+          <span style="font-size:0.68rem;color:var(--muted)">${t}</span>
+          ${log.extra?`<span style="font-size:0.65rem;color:var(--muted)">${esc2(log.extra)}</span>`:''}
+        </div>
+        <div style="font-size:0.78rem;color:var(--text);line-height:1.45">${esc2(log.msg||'')}</div>
+      </div>`;
+    }
+    html+='</div>';
+    el.innerHTML=html;
+  }catch(e){el.innerHTML=`<div style="padding:24px;text-align:center;color:#ef4444;font-size:0.85rem">Erreur : ${e.message}</div>`;}
+}
+async function clearLogsAdmin(){
+  if(!confirm('Effacer tous les logs ?'))return;
+  try{
+    await fetch(`${API}/admin/logs`,{method:'DELETE',headers:{'x-admin-token':TOKEN}});
+    loadLogsAdmin();
+  }catch(e){alert('Erreur : '+e.message);}
+}
+function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 // ── Init / loadAll ────────────────────
 async function init() {

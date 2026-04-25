@@ -9,7 +9,7 @@ const PRECACHE_URLS = [
   './offline.html',
   './css/mat.css?v=4.2.0',
   './css/mat-desktop.css?v=4.2.0',
-  './js/mat-utils.js?v=3.7.4',
+  './js/mat-utils.js?v=4.2.1',
   './js/mat-core.js?v=4.0.0',
   './js/mat-accessibility.js?v=3.7.4',
   './js/mat-widgets.js?v=3.7.4',
