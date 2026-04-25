@@ -1,33 +1,33 @@
-// SERVICE WORKER v4.2.0 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.2.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 7 : page offline, thèmes desktop, TTS accessible sur PC, séparateur MEL/Signalement
-const CACHE = 'mat-v4.2.0';
+// Phase 8 : robustesse (timeouts fetch, matLogError dans catch silencieux), nettoyage
+const CACHE = 'mat-v4.2.1';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.2.0',
-  './css/mat-desktop.css?v=4.2.0',
+  './css/mat.css?v=4.2.1',
+  './css/mat-desktop.css?v=4.2.1',
   './js/mat-utils.js?v=4.2.1',
-  './js/mat-core.js?v=4.0.0',
-  './js/mat-accessibility.js?v=3.7.4',
-  './js/mat-widgets.js?v=3.7.4',
-  './js/mat-agenda.js?v=4.1.0',
-  './js/mat-forms.js?v=4.0.0',
-  './js/mat-actus.js?v=4.1.0',
-  './js/mat-trombi.js?v=3.7.4',
-  './js/mat-mel.js?v=4.0.4',
-  './js/mat-boot.js?v=4.0.2',
-  './js/mat-pwa-notif.js?v=4.1.0',
-  './js/mat-dechets-notif.js?v=4.0.0',
-  './js/mat-jours-feries.js?v=4.0.1',
-  './js/mat-sondages.js?v=4.0.1',
-  './js/mat-associations.js?v=4.0.5',
-  './js/mat-desktop.js?v=4.1.0',
-  './js/mat-eau8.js?v=3.8.9',
-  './data/plu-data.json?v=3.7.4',
-  './data/mel-tree.json?v=3.7.4',
+  './js/mat-core.js?v=4.2.1',
+  './js/mat-accessibility.js?v=4.2.1',
+  './js/mat-widgets.js?v=4.2.1',
+  './js/mat-agenda.js?v=4.2.1',
+  './js/mat-forms.js?v=4.2.1',
+  './js/mat-actus.js?v=4.2.1',
+  './js/mat-trombi.js?v=4.2.1',
+  './js/mat-mel.js?v=4.2.1',
+  './js/mat-boot.js?v=4.2.1',
+  './js/mat-pwa-notif.js?v=4.2.1',
+  './js/mat-dechets-notif.js?v=4.2.1',
+  './js/mat-jours-feries.js?v=4.2.1',
+  './js/mat-sondages.js?v=4.2.1',
+  './js/mat-associations.js?v=4.2.1',
+  './js/mat-desktop.js?v=4.2.1',
+  './js/mat-eau8.js?v=4.2.1',
+  './data/plu-data.json?v=4.2.1',
+  './data/mel-tree.json?v=4.2.1',
   './mat-header.png',
   './icon-192.png'
 ];
