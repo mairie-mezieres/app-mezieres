@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.0.4 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.0.5 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 if(window.innerWidth<1024)return;
@@ -13,6 +13,7 @@ function fmt(d){
 }
 function fmtShort(d){
   var dt=d instanceof Date?d:new Date(d);
+  if(isNaN(dt.getTime()))return '';
   return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
 }
 function daysUntil(d){
@@ -38,12 +39,13 @@ function loadMeteo(){
       var ico=icons[code]||'🌤️';
       var temp=cur.temperature_2m!=null?Math.round(cur.temperature_2m)+'°C':'—';
       var desc=descs[code]||'';
-      el.innerHTML='<div class="d-meteo-box">'+
-        '<div class="d-meteo-ico">'+ico+'</div>'+
-        '<div class="d-meteo-info">'+
-          '<span class="d-meteo-temp">'+temp+'</span>'+
-          '<span class="d-meteo-desc">'+desc+'</span>'+
-        '</div>'+
+      var wind=cur.wind_speed_10m!=null?Math.round(cur.wind_speed_10m)+' km/h':'';
+      el.innerHTML='<div class="d-meteo-card" onclick="openMeteo&&openMeteo()" title="Cliquer pour le détail météo">'+
+        '<div class="d-meteo-label"><span>🌤️ Météo locale</span><span class="d-meteo-click-hint">Détail →</span></div>'+
+        '<div class="d-meteo-ico" style="font-size:2.2rem;line-height:1;margin-bottom:6px">'+ico+'</div>'+
+        '<div class="d-meteo-temp" style="font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:4px">'+temp+'</div>'+
+        '<div class="d-meteo-desc" style="font-size:.78rem;color:rgba(255,255,255,.85)">'+desc+'</div>'+
+        (wind?'<div class="d-meteo-row"><span>💨 Vent</span><strong>'+wind+'</strong></div>':'')+
       '</div>';
     })
     .catch(function(){el.innerHTML='';});
@@ -64,18 +66,81 @@ function loadActus(){
       var html='';
       items.slice(0,5).forEach(function(a){
         var img=a.image?'<img src="'+a.image+'" alt="" onerror="this.style.display=\'none\'">':'';
-        html+='<div class="d-actu-item" onclick="openActu && openActu(\''+encodeURIComponent(a.id||a._id||'')+'\')" role="button">'+
-          (img?'<div class="d-actu-thumb">'+img+'</div>':'')+
+        var rawDate=a.date||a.createdAt||'';
+        var dateStr=rawDate?fmtShort(rawDate):'';
+        var actuId=encodeURIComponent(a.id||a._id||'');
+        html+='<div class="d-actu-item" onclick="(typeof openActuDetail===\'function\'?openActuDetail:function(){openNotifs&&openNotifs()})(\''+actuId+'\')" role="button">'+
+          (img?'<div class="d-actu-thumb" style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0">'+img+'</div>':'')+
           '<div class="d-actu-body">'+
-            '<span class="d-actu-date">'+fmtShort(a.date||a.createdAt||new Date())+'</span>'+
+            (dateStr?'<span class="d-actu-date">'+dateStr+'</span>':'')+
             '<strong class="d-actu-title">'+escHtml(a.titre||a.title||'')+'</strong>'+
-            '<p class="d-actu-excerpt">'+escHtml((a.contenu||a.content||'').substring(0,90))+'…</p>'+
+            '<p class="d-actu-excerpt" style="font-size:.72rem;color:#666;margin:2px 0 0;line-height:1.4">'+escHtml((a.contenu||a.content||'').substring(0,90))+'…</p>'+
           '</div>'+
         '</div>';
       });
       el.innerHTML=html;
     })
     .catch(function(){safeSet('dsk-actus-list','<p class="d-empty">Chargement impossible</p>');});
+}
+
+/* ── bus rémi ─────────────────────────────────────────────────── */
+function loadBusDesktop(){
+  var el=qs('dsk-bus-body');
+  if(!el)return;
+  if(typeof isVacancesScolaires!=='function'||typeof BUS_HORAIRES==='undefined'){
+    el.innerHTML='<p class="d-bus-empty">Données bus non chargées</p>';
+    return;
+  }
+  var vac=isVacancesScolaires();
+  var H=BUS_HORAIRES;
+  var periode=vac?'Vacances scolaires':'Période scolaire';
+
+  function getNext(times){
+    if(!times||!times.length)return null;
+    var now=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
+    var nowMins=now.getHours()*60+now.getMinutes();
+    for(var i=0;i<times.length;i++){
+      var parts=times[i].split(':');
+      var busMins=parseInt(parts[0])*60+parseInt(parts[1]);
+      if(busMins>nowMins){
+        var diff=busMins-nowMins;
+        return {time:times[i],soon:diff<=30,label:diff<=30?'dans '+diff+' min':times[i]};
+      }
+    }
+    return null;
+  }
+
+  var stops=[
+    {name:'Mairie',key:'mairie'},
+    {name:'Le Bréau',key:'breau'}
+  ];
+  var dirs=[
+    {label:'→ Orléans',key:'orleans'},
+    {label:'→ Nouan',key:'nouan'}
+  ];
+  var html='<div style="padding:4px 0 8px;font-size:.65rem;color:#52b788;font-weight:800;display:flex;align-items:center;gap:6px">'+
+    '<span class="d-bus-periode">'+periode+'</span>'+
+  '</div>';
+  var hasNext=false;
+  stops.forEach(function(stop){
+    dirs.forEach(function(dir){
+      var sfx=vac?'_vacances':'_scolaire';
+      var times=(H[stop.key]||{})[dir.key+sfx]||[];
+      var next=getNext(times);
+      if(next){
+        hasNext=true;
+        html+='<div class="d-bus-item">'+
+          '<span class="d-bus-stop">'+stop.name+'</span>'+
+          '<span class="d-bus-dir">'+dir.label+'</span>'+
+          '<span class="d-bus-time'+(next.soon?' d-bus-soon':'')+'">'+next.label+'</span>'+
+        '</div>';
+      }
+    });
+  });
+  if(!hasNext){
+    html+='<p class="d-bus-empty">Plus de bus aujourd\'hui</p>';
+  }
+  el.innerHTML=html;
 }
 
 /* ── agenda (via ensureAgendaEvents du module mat-agenda) ────── */
@@ -122,19 +187,19 @@ function renderFeatured(e){
   el.innerHTML=
     '<div class="d-featured">'+
       '<div class="d-featured-body">'+
-        '<div class="d-featured-badge">Événement</div>'+
+        '<div class="d-featured-badge">Prochain évènement</div>'+
         '<h3 class="d-featured-title">'+escHtml(e.summary||'')+'</h3>'+
         (e.location?'<p class="d-featured-lieu">📍 '+escHtml(e.location)+'</p>':'')+
         '<div class="d-featured-meta">'+
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
-          '<span class="d-featured-countdown">'+countdown+'</span>'+
+          ' · <span class="d-featured-countdown">'+countdown+'</span>'+
         '</div>'+
-        (e.description?'<p class="d-featured-desc">'+escHtml(e.description.substring(0,120))+'…</p>':'')+
+        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+escHtml(e.description.substring(0,120))+'…</p>':'')+
       '</div>'+
     '</div>';
 }
 
-/* ── horaires mairie (statiques) ─────────────────────────────── */
+/* ── horaires mairie (statiques — lun/mer/ven uniquement) ─────── */
 function renderHoraires(){
   var el=qs('dsk-mairie-body');
   if(!el)return;
@@ -143,9 +208,7 @@ function renderHoraires(){
     ['Mardi','Fermée'],
     ['Mercredi','Sur RDV uniquement'],
     ['Jeudi','Fermée'],
-    ['Vendredi','8h30 – 11h30'],
-    ['Samedi','Fermée'],
-    ['Dimanche','Fermée']
+    ['Vendredi','8h30 – 11h30']
   ];
   var now=new Date();
   var today=now.getDay();
@@ -203,6 +266,7 @@ function init(){
   loadMeteo();
   loadActus();
   loadAgenda();
+  loadBusDesktop();
   renderHoraires();
   renderCollectes();
   renderElus();
@@ -211,7 +275,7 @@ function init(){
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',init);
 }else{
-  init();
+  setTimeout(init,100);
 }
 
 })();

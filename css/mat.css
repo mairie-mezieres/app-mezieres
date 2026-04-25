@@ -989,7 +989,7 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 
 /* petite pastille d'appel */
 .mel-entry::after{
-  content:"IA";
+  content:"assistante";
   position:absolute;
   top:8px;
   right:8px;
