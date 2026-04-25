@@ -5,6 +5,31 @@
    ════════════════════════════════════════════════════════════ */
 
 var PUSH_PENDING_SYNC_KEY = 'mat_push_pending_sync';
+var PUSH_ACTIVE_KEY = 'mat_push_active';
+
+// Renouvelle silencieusement l'abonnement push si le navigateur l'a invalidé
+async function checkAndRenewPushSubscription() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (sub) return;
+    var newSub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
+    });
+    fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSub),
+      keepalive: true
+    }).then(function(r) {
+      if (!r.ok) localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
+    }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
+  } catch(e) {}
+}
 
 // Retente l'enregistrement serveur si échoué lors d'une session précédente
 async function retryPendingPushSync() {
@@ -77,6 +102,7 @@ async function showPostInstallNotifPrompt() {
       localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     });
     pushRegistered = true;
+    localStorage.setItem(PUSH_ACTIVE_KEY, '1');
     try { updateNotifCardStatus(true); } catch(_) {}
     try {
       var btn = document.getElementById('push-btn');
@@ -127,9 +153,11 @@ window.addEventListener('appinstalled', function() {
 if (document.readyState === 'complete') {
   setTimeout(checkFirstStandaloneRun, 1500);
   setTimeout(retryPendingPushSync, 3000);
+  setTimeout(checkAndRenewPushSubscription, 5000);
 } else {
   window.addEventListener('load', function() {
     setTimeout(checkFirstStandaloneRun, 1500);
     setTimeout(retryPendingPushSync, 3000);
+    setTimeout(checkAndRenewPushSubscription, 5000);
   });
 }

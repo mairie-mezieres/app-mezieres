@@ -123,8 +123,15 @@ function renderAgendaItem(evt){
 function openEventDetail(uid){
   var evt=(window._agendaEvents||[]).find(function(e){return e.uid===uid;});
   if(!evt) return;
+  var photo='';
+  if(window._matActusList){
+    var eDay=evt.start.toDateString();
+    var match=window._matActusList.find(function(a){return a.eventDate&&new Date(a.eventDate).toDateString()===eDay;});
+    if(match&&match.photo) photo=match.photo;
+  }
+  var photoHTML=photo?'<img class="event-detail-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'';
   var body=document.getElementById('event-detail-body');
-  body.innerHTML='<div class="event-detail-card"><div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
+  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
   openOv('event');
 }
 

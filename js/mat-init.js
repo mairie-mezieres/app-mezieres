@@ -70,7 +70,7 @@
 // Chargement dynamique du module post-installation (prompt notifications)
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=3.7.5';
+  s.src = 'js/mat-pwa-notif.js?v=4.1.0';
   document.head.appendChild(s);
 })();
 
