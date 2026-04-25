@@ -249,7 +249,7 @@
         "ico": "🌅",
         "label": "Accueil périscolaire",
         "directAnswer": {
-          "text": "La commune propose un accueil périscolaire avant et après l'école pour les élèves de l'École de la Forêt. Les inscriptions et fiches de réservation sont à remettre en mairie avant le 30 juin pour l'année suivante.",
+          "text": "La commune propose un accueil périscolaire avant et après l'école pour les élèves de l'École de la Forêt. Les inscriptions et fiches de réservation sont à remettre auprès de la directrice du périscolaire Johany avant le 30 juin pour l'année suivante.",
           "links": [
             {
               "label": "📞 Mairie : 02 38 45 61 76",
@@ -267,7 +267,7 @@
         "ico": "🍽️",
         "label": "Restaurant scolaire",
         "directAnswer": {
-          "text": "Le restaurant scolaire prépare environ 100 repas par jour à partir de produits frais. Tarifs 2022/2023 : 3,80 € (1er enfant), 3,06 € (2e enfant), 2,32 € (3e enfant et +). Les fiches d'inscription sont à déposer en mairie avant le 30 juin.",
+          "text": "Le restaurant scolaire prépare environ 100 repas par jour à partir de produits frais. Tarifs selon le quotient familial. Les fiches d'inscription sont à déposer en mairie avant le 30 juin.",
           "links": [
             {
               "label": "📞 Mairie : 02 38 45 61 76",
@@ -299,7 +299,7 @@
         "ico": "🎨",
         "label": "Centre de loisirs",
         "directAnswer": {
-          "text": "Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
+          "text": "Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer au la CCTVL. Réinscription : dossier pré-rempli par email.",
           "links": [
             {
               "label": "✉️ accueilloisirs.ardoux@ccterresduvaldeloire.fr",
@@ -342,7 +342,7 @@
         "ico": "🪪",
         "label": "Carte Nationale d'Identité",
         "directAnswer": {
-          "text": "La CNI se fait dans une mairie équipée d'un dispositif biométrique (la mairie de Mézières vous orientera vers la plus proche, souvent Cléry-Saint-André). Démarche en ligne sur le site ANTS : créer un compte → commencer la démarche → renseigner vos informations → acheter votre timbre fiscal → valider → prendre rendez-vous en mairie → préparer vos pièces justificatives → déposer le dossier en mairie.",
+          "text": "La CNI se fait dans une mairie équipée d'un dispositif biométrique (les plus proches sont Meung-sur Loire ou Ardon). Démarche en ligne sur le site ANTS : créer un compte → commencer la démarche → renseigner vos informations → acheter votre timbre fiscal → valider → prendre rendez-vous en mairie → préparer vos pièces justificatives → déposer le dossier en mairie.",
           "links": [
             {
               "label": "🌐 Démarche CNI sur ANTS",
@@ -541,6 +541,49 @@
             {
               "label": "🛠️ Déclarer un dommage réseau",
               "url": "https://lysseo.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "inclusionnumerique",
+        "ico": "👩🏻‍💻",
+        "label": "Service inclusion numérique",
+        "directAnswer": {
+          "text": "La Communauté de Communes des Terres du Val de Loire (CCTVL) a développé un service Inclusion Numérique. \n\nRegroupant 3 agents, ce service est mobile et vient à la rencontre des usagers des communes de la CCTVL.\n\nPiloté par un médiateur numérique, ce service permet aux usagers d’appréhender facilement les outils numériques, de se familiariser avec les démarches en ligne ou encore de les sensibiliser aux dangers d’internet.",
+          "links": [
+            {
+              "label": "✉️ numerique@ccterresduvaldeloire.fr",
+              "url": "mailto: numerique@ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "🌐 Site formation CCTVL",
+              "url": "https://numerique.ccterresduvaldeloire.com/"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "location": {
+    "label": "Locations matériels",
+    "ico": "🛖",
+    "needZone": false,
+    "questions": [
+      {
+        "id": "question1",
+        "ico": "🛖",
+        "label": "Locations de matériels",
+        "directAnswer": {
+          "text": "A l’occasion de manifestations diverses que nous sommes amenés à organiser,  nous avons souvent besoin de matériels divers. Nous nous posons souvent la question de savoir où nous pourrions nous en procurer.\n\n\n\n\nLa municipalité de Mézières-Lez-Cléry peut dans ce domaine vous apporter la solution.\n\nLa commune dispose en effet de barnums, tables et chaises qui peuvent être mis à disposition pour les macériens dans les conditions suivantes :\n\nTables et chaises (sur la base d’une table et 4 chaises) : 2,5 € le week end\n\nBarmums de la commune :\n\n- 110 € le week-end  le 6 x 8 m\n- 130 € le week-end  le 6 x 12 m \n\nLorsque vous louerez du matériel, vous devrez verser un chèque de caution qui vous sera restitué en fin de location, si aucune dégradation n’a été constatée.\nPar ailleurs, en ce qui concerne la salle communale, elle ne pourra plus être louée désormais.\nPour tous renseignements complémentaires sur les conditions de location, n’hésitez pas à vous renseigner auprès de la mairie.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
             }
           ]
         }
