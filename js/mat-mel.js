@@ -768,6 +768,9 @@ const MEL_THEME_SUGGESTIONS = {
   cctvl: ["Comment m'inscrire à la déchetterie de Cléry ?","Quelle maison de santé est proche de Mézières ?","Comment bénéficier de l'OPAH pour rénover mon logement ?","Ma fosse septique doit-elle être contrôlée ?"]
 };
 
+var MEL_ACTION_WHITELIST={openDechets:function(){typeof openDechets==='function'&&openDechets();},openAgenda:function(){typeof openAgenda==='function'&&openAgenda();},openNotifs:function(){typeof openNotifs==='function'&&openNotifs();}};
+function melRunAction(name){var fn=MEL_ACTION_WHITELIST[name];if(fn)fn();}
+
 function renderMelThemes(){
   const sugs = document.getElementById('sugs');
   if(!sugs) return;
@@ -1089,7 +1092,8 @@ function _renderDirectAnswer(answer){
     h+='<div style="display:flex;flex-direction:column;gap:6px;">';
     for(const lk of answer.links){
       if(lk.action){
-        h+='<button onclick="event.stopPropagation();'+lk.action+'" style="display:block;width:100%;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;text-align:left;">'+lk.label+'</button>';
+        var safeAct=lk.action.replace(/[^a-zA-Z0-9_]/g,'');
+        h+='<button onclick="event.stopPropagation();melRunAction(\''+safeAct+'\')" style="display:block;width:100%;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;text-align:left;">'+lk.label+'</button>';
         continue;
       }
       const href=lk.tel?'tel:'+lk.tel:lk.url;
