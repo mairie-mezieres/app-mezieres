@@ -54,11 +54,12 @@ function loadMeteo(){
 /* ── actualités ──────────────────────────────────────────────── */
 function loadActus(){
   var el=qs('dsk-actus-list');
-  if(!el)return;
-  fetch(API+'/actus')
+  if(!el)return Promise.resolve();
+  return fetch(API+'/actus')
     .then(function(r){return r.ok?r.json():[];})
     .then(function(data){
       var items=Array.isArray(data)?data:(data&&Array.isArray(data.actus)?data.actus:[]);
+      window._dskActus=items;
       if(!items.length){
         el.innerHTML='<p class="d-empty">Aucune actualité</p>';
         return;
@@ -184,8 +185,18 @@ function renderFeatured(e){
   var d=e.start;
   var days=daysUntil(d);
   var countdown=days===0?'Aujourd\'hui !':days===1?'Demain':'Dans '+days+' jour'+(days>1?'s':'');
+  var photo='';
+  if(window._dskActus){
+    var eDay=d.toDateString();
+    var match=window._dskActus.find(function(a){
+      if(!a.eventDate)return false;
+      return new Date(a.eventDate).toDateString()===eDay;
+    });
+    if(match&&match.photo)photo=match.photo;
+  }
   el.innerHTML=
     '<div class="d-featured" onclick="openAgenda&&openAgenda()" title="Voir l\'agenda complet">'+
+      (photo?'<img class="d-featured-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'')+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">Prochain évènement</div>'+
         '<h3 class="d-featured-title">'+escHtml(e.summary||'')+'</h3>'+
@@ -266,8 +277,7 @@ function escHtml(s){
 /* ── boot ────────────────────────────────────────────────────── */
 function init(){
   loadMeteo();
-  loadActus();
-  loadAgenda();
+  loadActus().then(function(){loadAgenda();});
   loadBusDesktop();
   renderHoraires();
   renderCollectes();
