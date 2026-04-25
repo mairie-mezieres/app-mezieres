@@ -211,7 +211,7 @@
 html.theme-sombre .d-topbar{background:var(--forest)}
 html.theme-sombre .d-nav{background:#1e293b;border-bottom-color:rgba(255,255,255,.08)}
 html.theme-sombre .d-nav-title{color:#f1f5f9}
-html.theme-sombre .d-nav-links button,.d-nav-links a{color:#e2e8f0}
+html.theme-sombre .d-nav-links button,html.theme-sombre .d-nav-links a{color:#e2e8f0}
 html.theme-sombre .d-stats{background:#1e293b;border-bottom-color:rgba(255,255,255,.08)}
 html.theme-sombre .d-stat{border-right-color:rgba(255,255,255,.08)}
 html.theme-sombre .d-stat-l{color:#94a3b8}
@@ -225,12 +225,14 @@ html.theme-sombre .d-actu-item{border-bottom-color:rgba(255,255,255,.06)}
 html.theme-sombre .d-bus-item{border-bottom-color:rgba(255,255,255,.06)}
 html.theme-sombre .d-bus-stop{color:#f1f5f9}
 html.theme-sombre .d-bus-time{color:#f1f5f9;background:#374151}
-html.theme-sombre .d-bus-empty,.d-empty{color:#94a3b8}
+html.theme-sombre .d-bus-empty,html.theme-sombre .d-empty{color:#94a3b8}
 html.theme-sombre .d-agenda-info strong{color:#f1f5f9}
 html.theme-sombre .d-agenda-info small{color:#94a3b8}
 html.theme-sombre .d-agenda-day{color:#f1f5f9}
 html.theme-sombre .d-agenda-item{border-bottom-color:rgba(255,255,255,.06)}
 html.theme-sombre .d-horaires td{color:#f1f5f9}
+html.theme-sombre .d-horaires td:first-child{color:#94a3b8}
+html.theme-sombre .d-horaires tr:nth-child(even){background:rgba(255,255,255,.04)}
 html.theme-sombre .d-horaires tr.d-hor-today{background:#2d3748}
 html.theme-sombre .d-horaires tr.d-hor-today td{color:#f1f5f9}
 html.theme-sombre .d-collecte-name{color:#f1f5f9}
@@ -238,9 +240,11 @@ html.theme-sombre .d-collecte-date{color:#f1f5f9}
 html.theme-sombre .d-elu-name{color:#f1f5f9}
 html.theme-sombre .d-elu-role{color:#94a3b8}
 html.theme-sombre .d-mel-cta-panel{background:#1e293b;border-color:rgba(255,255,255,.08)}
-html.theme-sombre .d-mel-bubble{background:#2d3748;color:#f1f5f9}
+html.theme-sombre .d-mel-hdr{background:#2d3748;border-bottom-color:rgba(255,255,255,.08)}
+html.theme-sombre .d-mel-bubble{background:#374151;color:#f1f5f9}
 html.theme-sombre .d-mel-name{color:#f1f5f9}
-html.theme-sombre .d-mel-online{color:#6b7280}
+html.theme-sombre .d-mel-sub{color:#94a3b8}
+html.theme-sombre .d-mel-online{color:#34d399}
 html.theme-sombre .d-signal-grid button{background:#2d3748;color:#f1f5f9;border-color:rgba(255,255,255,.08)}
 html.theme-sombre .d-mairie-actions a,html.theme-sombre .d-mairie-actions button{background:#2d3748;color:#f1f5f9;border-color:rgba(255,255,255,.08)}
 html.theme-sombre .d-nav-acc{background:#2d3748;border-color:rgba(255,255,255,.08);color:#e2e8f0}
