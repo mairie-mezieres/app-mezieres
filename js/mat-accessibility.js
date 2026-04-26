@@ -345,6 +345,12 @@ async function showObFeature(idx) {
       await new Promise(resolve => setTimeout(resolve, 80));
     }
     const rect = el.getBoundingClientRect();
+    // Élément invisible (display:none en mode desktop) → pas de spotlight
+    if (rect.width === 0 && rect.height === 0) {
+      svg.innerHTML = `<rect width="${window.innerWidth}" height="${window.innerHeight}" fill="rgba(0,0,0,0.65)"/>`;
+      finger.style.display = 'none';
+      return;
+    }
     const pad = 10, r = 14;
     const yOff = f.yOffset || 0;
     const x = rect.left - pad, y = rect.top - pad + yOff;
