@@ -1,33 +1,33 @@
-// SERVICE WORKER v4.2.2 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.2.3 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 9 : nav PC accessible (hauteur + police agrandie), Trello sans double-notif
-const CACHE = 'mat-v4.2.2';
+const CACHE = 'mat-v4.2.3';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.2.2',
-  './css/mat-desktop.css?v=4.2.2',
-  './js/mat-utils.js?v=4.2.2',
-  './js/mat-core.js?v=4.2.2',
-  './js/mat-accessibility.js?v=4.2.2',
-  './js/mat-widgets.js?v=4.2.2',
-  './js/mat-agenda.js?v=4.2.2',
-  './js/mat-forms.js?v=4.2.2',
-  './js/mat-actus.js?v=4.2.2',
-  './js/mat-trombi.js?v=4.2.2',
-  './js/mat-mel.js?v=4.2.2',
-  './js/mat-boot.js?v=4.2.2',
-  './js/mat-pwa-notif.js?v=4.2.2',
-  './js/mat-dechets-notif.js?v=4.2.2',
-  './js/mat-jours-feries.js?v=4.2.2',
-  './js/mat-sondages.js?v=4.2.2',
-  './js/mat-associations.js?v=4.2.2',
-  './js/mat-desktop.js?v=4.2.2',
-  './js/mat-eau8.js?v=4.2.2',
-  './data/plu-data.json?v=4.2.2',
-  './data/mel-tree.json?v=4.2.2',
+  './css/mat.css?v=4.2.3',
+  './css/mat-desktop.css?v=4.2.3',
+  './js/mat-utils.js?v=4.2.3',
+  './js/mat-core.js?v=4.2.3',
+  './js/mat-accessibility.js?v=4.2.3',
+  './js/mat-widgets.js?v=4.2.3',
+  './js/mat-agenda.js?v=4.2.3',
+  './js/mat-forms.js?v=4.2.3',
+  './js/mat-actus.js?v=4.2.3',
+  './js/mat-trombi.js?v=4.2.3',
+  './js/mat-mel.js?v=4.2.3',
+  './js/mat-boot.js?v=4.2.3',
+  './js/mat-pwa-notif.js?v=4.2.3',
+  './js/mat-dechets-notif.js?v=4.2.3',
+  './js/mat-jours-feries.js?v=4.2.3',
+  './js/mat-sondages.js?v=4.2.3',
+  './js/mat-associations.js?v=4.2.3',
+  './js/mat-desktop.js?v=4.2.3',
+  './js/mat-eau8.js?v=4.2.3',
+  './data/plu-data.json?v=4.2.3',
+  './data/mel-tree.json?v=4.2.3',
   './mat-header.png',
   './icon-192.png'
 ];
