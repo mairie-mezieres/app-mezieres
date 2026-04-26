@@ -59,25 +59,25 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=4.2.2';
+  s.src = 'js/mat-pwa-notif.js?v=4.2.3';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-dechets-notif.js?v=4.2.2';
+  s.src = 'js/mat-dechets-notif.js?v=4.2.3';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-jours-feries.js?v=4.2.2';
+  s.src = 'js/mat-jours-feries.js?v=4.2.3';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-sondages.js?v=4.2.2';
+  s.src = 'js/mat-sondages.js?v=4.2.3';
   s.onload = function() {
     setTimeout(function() {
       try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}
@@ -88,12 +88,12 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-associations.js?v=4.2.2';
+  s.src = 'js/mat-associations.js?v=4.2.3';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-eau8.js?v=4.2.2';
+  s.src = 'js/mat-eau8.js?v=4.2.3';
   document.head.appendChild(s);
 })();
