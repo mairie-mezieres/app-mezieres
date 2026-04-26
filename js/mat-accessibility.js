@@ -294,6 +294,17 @@ async function obNext() {
   }
 }
 
+// Retourne le premier élément rendu (non caché) parmi tous les matches du sélecteur.
+// offsetWidth/offsetHeight == 0 détecte display:none sur l'élément ET ses ancêtres.
+function obFirstVisible(sel) {
+  if (!sel) return null;
+  const all = document.querySelectorAll(sel);
+  for (const el of all) {
+    if (el.offsetWidth > 0 || el.offsetHeight > 0) return el;
+  }
+  return all[0] || null;
+}
+
 async function showObFeature(idx) {
   const f = OB_FEATURES[idx];
   if (!f) { obFinish(); return; }
@@ -316,45 +327,22 @@ async function showObFeature(idx) {
   const finger = document.getElementById('ob-finger');
   darkOverlay.style.display = '';
 
+  const isDesktop = window.innerWidth >= 1024;
   let el = null;
-  if (f.sel) {
-    el = document.querySelector(f.sel);
-    if (!el) {
-      const alts = f.sel.split(' ');
-      for (const alt of alts) {
-        el = document.querySelector(alt);
-        if (el) break;
-      }
-    }
-    if (el && el.tagName !== 'BUTTON' && el.tagName !== 'A') {
-      const parentBtn = el.closest('button') || el.closest('a');
-      if (parentBtn) el = parentBtn;
-    }
-  }
+  // Sur desktop : priorité au sélecteur desktop ; sur mobile : priorité au sélecteur mobile
+  if (isDesktop && f.selDesktop) el = document.querySelector(f.selDesktop);
+  if (!el) el = obFirstVisible(f.sel);
+  if (!el && f.selDesktop) el = document.querySelector(f.selDesktop);
+
   if (el) {
-    const isInHeader = el.closest('.header') !== null;
-    if (f.scrollTop) {
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      await new Promise(resolve => setTimeout(resolve, 250));
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      await new Promise(resolve => setTimeout(resolve, 150));
-    } else if (!isInHeader) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-      await new Promise(resolve => setTimeout(resolve, 420));
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 80));
-    }
-    let rect = el.getBoundingClientRect();
-    // Élément invisible (display:none en mode desktop) → essayer le sélecteur desktop
-    if (rect.width === 0 && rect.height === 0 && f.selDesktop) {
-      const dskEl = document.querySelector(f.selDesktop);
-      if (dskEl) {
-        el = dskEl;
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-        await new Promise(resolve => setTimeout(resolve, 420));
-        rect = el.getBoundingClientRect();
-      }
-    }
+    // Déverrouiller temporairement le scroll pour que scrollIntoView fonctionne,
+    // même si la page était scrollée quand l'onboarding a démarré.
+    document.body.style.overflow = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    await new Promise(resolve => setTimeout(resolve, 480));
+    const rect = el.getBoundingClientRect();
+    document.body.style.overflow = 'hidden'; // verrouiller à la nouvelle position
+
     if (rect.width === 0 && rect.height === 0) {
       svg.innerHTML = `<rect width="${window.innerWidth}" height="${window.innerHeight}" fill="rgba(0,0,0,0.65)"/>`;
       finger.style.display = 'none';
