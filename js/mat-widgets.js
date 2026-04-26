@@ -308,7 +308,7 @@ function meteoBuildAlertCard(vigilance) {
 
 async function loadMeteo() {
   try {
-    const fr = await fetch(METEO_URL, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+    const fr = await fetch(METEO_URL, { cache: 'no-store', signal: matAbortTimeout(8000) });
     if (!fr.ok) throw new Error('HTTP ' + fr.status);
     const d = await fr.json();
     const cur = (d.forecast || {}).current || {};

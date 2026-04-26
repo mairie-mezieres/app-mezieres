@@ -15,6 +15,14 @@ const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
 const MAT_VERSION = 'v3.7.4';
 const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
 
+// ── AbortSignal.timeout polyfill (Safari < 16 / old WebView) ─
+function matAbortTimeout(ms) {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') return AbortSignal.timeout(ms);
+  var c = new AbortController();
+  setTimeout(function() { c.abort(); }, ms);
+  return c.signal;
+}
+
 // ── Échappement HTML (sécurité caractères spéciaux) ─────────
 function esc(str) {
   if (!str) return '';
