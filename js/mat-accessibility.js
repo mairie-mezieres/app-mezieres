@@ -213,13 +213,13 @@ const OB_FEATURES = [
   { ico:'🏛️', title:`Mairie & Contact`, desc:`Accédez aux coordonnées de la mairie, aux horaires d'ouverture et contactez vos élus directement.`, sel:'.top-mairie', selDesktop:'#dsk-mairie' },
   { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo', selDesktop:'.d-meteo-card' },
   { ico:'🚌', title:`Bus Ligne 8 Rémi`, desc:`Horaires en temps réel du bus vers Orléans, avec détection automatique période scolaire/vacances.`, sel:'.bus-strip', selDesktop:'#dsk-bus' },
-  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]' },
+  { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]', selDesktop:'.d-mel-cta-panel' },
   { ico:'🔔', title:`Actualités communales`, desc:`Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.`, sel:'button[onclick="openNotifs()"]', selDesktop:'#dsk-actus' },
   { ico:'💡', title:`Vos idées`, desc:`Partagez vos idées pour améliorer la commune. Votez pour les propositions des habitants !`, sel:'button[onclick="openIdees()"]' },
   { ico:'🚨', title:`Signalement citoyen`, desc:`Voirie abîmée, lampadaire en panne ? Signalez-le en quelques secondes, anonymement.`, sel:'button[onclick="openSignal()"]', selDesktop:'#dsk-signal' },
   { ico:'📅', title:`Agenda`, desc:`Consultez toutes les manifestations de la commune. Ne manquez plus aucun événement !`, sel:'button[onclick="openAgenda()"]' },
   { ico:'🏃', title:`Randonnées — Réseau & Parcours`, desc:`Explorez les circuits pédestres autour de Mézières et générez des parcours sur mesure sur le réseau de chemins.`, sel:'a[href*="rando.html"]' },
-  { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]', scrollTop:true },
+  { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]', selDesktop:'.d-nav-acc', scrollTop:true },
 ];
 let _obStep = 0;
 
