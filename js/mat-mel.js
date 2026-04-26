@@ -715,7 +715,7 @@ async function sendMel(){
   inp.value=''; inp.placeholder='Votre question…'; const _sugs=document.getElementById('sugs'); if(_sugs)_sugs.style.display='none';
   addMsg('user',txt); hist.push({role:'user',content:txt}); melBusy=true; showTyping();
   try{
-    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8),category:_melChatCategory||'autre',extraCtx:_melChatContext||''}),signal:AbortSignal.timeout(20000)});
+    const r=await fetch(MEL_PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist.slice(-8),category:_melChatCategory||'autre',extraCtx:_melChatContext||''}),signal:matAbortTimeout(20000)});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
     const rep=(d.reply||'Erreur technique. Contactez la mairie au 02 38 45 61 76.').replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
