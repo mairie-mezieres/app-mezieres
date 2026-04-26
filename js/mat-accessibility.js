@@ -335,16 +335,21 @@ async function showObFeature(idx) {
   if (!el && f.selDesktop) el = document.querySelector(f.selDesktop);
 
   if (el) {
-    // Déverrouiller temporairement le scroll pour que scrollIntoView fonctionne,
-    // même si la page était scrollée quand l'onboarding a démarré.
+    // Déverrouiller le scroll, calculer la position cible et scroller instantanément.
+    // behavior:'smooth' + setTimeout est non fiable sur Android (toolbar Chrome, scroll non terminé).
     document.body.style.overflow = '';
-    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-    await new Promise(resolve => setTimeout(resolve, 480));
+    const preRect = el.getBoundingClientRect();
+    const targetY = Math.max(0,
+      window.scrollY + preRect.top - window.innerHeight / 2 + preRect.height / 2
+    );
+    window.scrollTo({ top: targetY, behavior: 'instant' });
+    // Double RAF : garantit que le navigateur a repeint avant de lire les coordonnées.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const rect = el.getBoundingClientRect();
     document.body.style.overflow = 'hidden'; // verrouiller à la nouvelle position
 
     if (rect.width === 0 && rect.height === 0) {
-      svg.innerHTML = `<rect width="${window.innerWidth}" height="${window.innerHeight}" fill="rgba(0,0,0,0.65)"/>`;
+      svg.innerHTML = `<rect width="100%" height="100%" fill="rgba(0,0,0,0.65)"/>`;
       finger.style.display = 'none';
       return;
     }
@@ -352,15 +357,18 @@ async function showObFeature(idx) {
     const yOff = f.yOffset || 0;
     const x = rect.left - pad, y = rect.top - pad + yOff;
     const w = rect.width + pad*2, h = rect.height + pad*2;
-    const W = window.innerWidth, H = window.innerHeight;
+    // Utiliser les dimensions réelles de l'overlay (plus fiable que window.innerWidth/Height
+    // sur Android où la toolbar dynamique peut fausser window.innerHeight).
+    const W = darkOverlay.offsetWidth || window.innerWidth;
+    const H = darkOverlay.offsetHeight || window.innerHeight;
     svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="var(--sage,#22c55e)" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
     finger.style.display = '';
-    const fingerBelow = rect.bottom + 50 < window.innerHeight * 0.62;
+    const fingerBelow = rect.bottom + 50 < H * 0.62;
     finger.innerHTML = fingerBelow ? '👆' : '👇';
     finger.style.left = (rect.left + rect.width / 2 - 16) + 'px';
     finger.style.top = (fingerBelow ? rect.bottom + 6 : rect.top - 44) + 'px';
   } else {
-    svg.innerHTML = `<rect width="${window.innerWidth}" height="${window.innerHeight}" fill="rgba(0,0,0,0.65)"/>`;
+    svg.innerHTML = `<rect width="100%" height="100%" fill="rgba(0,0,0,0.65)"/>`;
     finger.style.display = 'none';
   }
 }
