@@ -6,7 +6,7 @@
   body{max-width:none;background:#f0ebe3;font-family:'Nunito',sans-serif}
 
   /* TOPBAR */
-  .d-topbar{display:none}
+  .d-topbar{display:flex;background:var(--forest);color:rgba(255,255,255,.8);font-size:.72rem;font-weight:600;padding:6px 32px;justify-content:flex-end;align-items:center;gap:16px}
   .d-sep{opacity:.35}
 
   /* NAV */
@@ -187,7 +187,7 @@
 
   /* FOOTER */
   .footer{display:none}
-  .d-footer{display:none}
+  .d-footer{display:block;background:#111a14;color:rgba(255,255,255,.75);padding:40px 32px 0}
   .d-footer-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,.08)}
   .d-footer-brand strong{display:block;font-size:1rem;font-weight:900;color:#fff;margin-bottom:8px}
   .d-footer-brand p{font-size:.75rem;line-height:1.6;margin:0}
