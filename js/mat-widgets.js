@@ -115,6 +115,7 @@ function meteoBuildHourlyTimeline(hourly, nowDate) {
       prob: Math.round(((hourly || {}).precipitation_probability || [])[i] || 0),
       mm: mmVal,
       wind: Math.round((((hourly || {}).wind_speed_10m || [])[i] || 0)),
+      windDir: meteoDir((((hourly || {}).wind_direction_10m || [])[i])),
       code: (((hourly || {}).weather_code || [])[i] || 0)
     });
   }
@@ -135,7 +136,7 @@ function meteoBuildHourlyTimeline(hourly, nowDate) {
           + '<div class="meteo-hour-rain-wrap"><div class="meteo-hour-rain-bar" style="height:' + barH + 'px"></div></div>'
           + '<div class="meteo-hour-rain">' + item.prob + '%</div>'
           + '<div class="meteo-hour-mm">' + (item.mm > 0 ? item.mm.toFixed(1) + ' mm' : '—') + '</div>'
-          + '<div class="meteo-hour-wind">➜ ' + item.wind + '</div>'
+          + '<div class="meteo-hour-wind">➜ ' + item.wind + (item.windDir ? ' ' + item.windDir : '') + '</div>'
           + '</div>';
       }).join('')
     + '</div>'
