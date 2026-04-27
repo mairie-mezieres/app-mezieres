@@ -716,6 +716,17 @@ function renderIa() {
         ${topMonthCats.length ? topMonthCats.map(([c,v])=>`<tr><td>${c}</td><td><strong>${fmt(v)}</strong></td></tr>`).join('') : '<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Aucune donnée ce mois</td></tr>'}
       </table>
     </div>
+    <div class="section-title">📝 Questions posées dans le chat libre</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      ${!(_data?.dash?.settings?.melQuestionLogEnabled) ? `<div style="font-size:0.77rem;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;color:#92400e;margin-bottom:14px">⚠️ Le journal des questions est désactivé. Activez-le dans l'onglet <strong>🗄️ Redis</strong> pour commencer à enregistrer les questions.</div>` : ''}
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">Questions stockées anonymement (texte + catégorie, sans IP ni identifiant). Expiration automatique après 90 jours.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+        <label style="font-size:0.8rem;font-weight:800;">Date :</label>
+        <input type="date" id="mel-tab-melq-date" value="${new Date().toISOString().slice(0,10)}" max="${new Date().toISOString().slice(0,10)}" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.82rem;outline:none;">
+        <button onclick="loadMelQuestionsTab()" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Charger</button>
+      </div>
+      <div id="mel-tab-melq-list" style="font-size:0.78rem;color:var(--muted);font-style:italic;">Sélectionnez une date et cliquez sur Charger.</div>
+    </div>
   `;
   drawWordCloud('chart-wordcloud', iaCategories.parJour||{});
   renderLineChart('chart-ia-categories-daily',   daySeries.labels,   daySeries.datasets,   {stacked:false, yTitle:'Questions'});
@@ -1492,6 +1503,30 @@ async function loadMelQuestions(){
   const date=document.getElementById('melq-date')?.value;
   if(!date){alert('Date requise');return;}
   const el=document.getElementById('melq-list');
+  if(el) el.innerHTML='<em>Chargement…</em>';
+  try{
+    const r=await apiGet('/admin/mel-questions?date='+date);
+    if(!r.ok) throw new Error(r.error||'Erreur');
+    if(!r.questions||!r.questions.length){
+      if(el) el.innerHTML='<em>Aucune question enregistrée pour cette date.</em>';
+      return;
+    }
+    const catColors={'urbanisme':'#d1fae5','enfance':'#dbeafe','administratif':'#ede9fe','dechets':'#fef9c3','numerique':'#fee2e2','autre':'#f3f4f6'};
+    const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    if(el) el.innerHTML=`<div style="font-size:0.76rem;font-weight:800;margin-bottom:10px;color:var(--text)">${r.count} question(s) — ${esc(date)}</div>`+
+      r.questions.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:${catColors[esc(q.cat)]||'#f3f4f6'};margin-bottom:6px;">
+        <span style="font-size:0.68rem;font-weight:900;color:#64748b;min-width:24px;text-align:right">${i+1}.</span>
+        <div style="flex:1">
+          <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${esc(q.cat)}</span>
+          <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${esc(q.q)}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){if(el) el.innerHTML='<span style="color:var(--red)">❌ '+e.message+'</span>';}
+}
+async function loadMelQuestionsTab(){
+  const date=document.getElementById('mel-tab-melq-date')?.value;
+  if(!date){alert('Date requise');return;}
+  const el=document.getElementById('mel-tab-melq-list');
   if(el) el.innerHTML='<em>Chargement…</em>';
   try{
     const r=await apiGet('/admin/mel-questions?date='+date);
