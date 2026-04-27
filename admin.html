@@ -361,9 +361,10 @@ let _melTreeEditor = null;
 let _melTreeLoadedFrom = '';
 
 async function saveStatsSettings() {
-  const detailed = !!document.getElementById('set-detailed-stats')?.checked;
-  const mel      = !!document.getElementById('set-mel-stats')?.checked;
-  const appOpen  = !!document.getElementById('set-appopen-stats')?.checked;
+  const detailed  = !!document.getElementById('set-detailed-stats')?.checked;
+  const mel       = !!document.getElementById('set-mel-stats')?.checked;
+  const appOpen   = !!document.getElementById('set-appopen-stats')?.checked;
+  const melQLog   = !!document.getElementById('set-mel-question-log')?.checked;
   const statusEl = document.getElementById('stats-settings-status');
 
   try {
@@ -373,9 +374,10 @@ async function saveStatsSettings() {
     }
 
     const r = await apiPost('/admin/settings', {
-      detailedStatsEnabled: detailed,
-      melUsageStatsEnabled: mel,
-      appOpenStatsEnabled: appOpen
+      detailedStatsEnabled:  detailed,
+      melUsageStatsEnabled:  mel,
+      appOpenStatsEnabled:   appOpen,
+      melQuestionLogEnabled: melQLog
     });
 
     if (!r.ok) throw new Error(r.error || 'Erreur');
@@ -383,9 +385,10 @@ async function saveStatsSettings() {
     if (!_data) _data = {};
     if (!_data.dash) _data.dash = {};
     _data.dash.settings = r.settings || {
-      detailedStatsEnabled: detailed,
-      melUsageStatsEnabled: mel,
-      appOpenStatsEnabled: appOpen
+      detailedStatsEnabled:  detailed,
+      melUsageStatsEnabled:  mel,
+      appOpenStatsEnabled:   appOpen,
+      melQuestionLogEnabled: melQLog
     };
 
     renderRedis();
@@ -725,11 +728,13 @@ function renderRedis() {
   const settings = (_data && _data.dash && _data.dash.settings) || {
     detailedStatsEnabled: true,
     melUsageStatsEnabled: true,
-    appOpenStatsEnabled: true
+    appOpenStatsEnabled: true,
+    melQuestionLogEnabled: false
   };
-  const detailedStatsEnabled = settings.detailedStatsEnabled === true;
-  const melUsageStatsEnabled = settings.melUsageStatsEnabled === true;
-  const appOpenStatsEnabled  = settings.appOpenStatsEnabled === true;
+  const detailedStatsEnabled   = settings.detailedStatsEnabled === true;
+  const melUsageStatsEnabled   = settings.melUsageStatsEnabled === true;
+  const appOpenStatsEnabled    = settings.appOpenStatsEnabled === true;
+  const melQuestionLogEnabled  = settings.melQuestionLogEnabled === true;
   
   const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
@@ -793,6 +798,23 @@ function renderRedis() {
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
         <input type="checkbox" id="set-appopen-stats" ${appOpenStatsEnabled ? 'checked' : ''}>
+        Activer
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">📝 Journal des questions MEL <span style="font-size:0.7rem;font-weight:700;background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 7px;margin-left:6px;">RGPD</span></div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.6">
+          Stocke les questions du chat libre de façon <strong>anonyme</strong> (texte + catégorie + jour — aucun identifiant, aucune IP).<br>
+          Expiration automatique après <strong>90 jours</strong>. <strong>Désactivé par défaut</strong> conformément au principe RGPD de minimisation.
+          <br>Consultez les questions dans l'onglet <strong>🗑️ Purge</strong> ci-dessous.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-mel-question-log" ${melQuestionLogEnabled ? 'checked' : ''}>
         Activer
       </label>
     </div>
@@ -1431,11 +1453,25 @@ function renderPurge() {
       <div style="display:flex;flex-direction:column;gap:14px;">
         <div style="display:flex;gap:10px;align-items:center;"><label style="font-size:0.8rem;font-weight:800;width:120px;flex-shrink:0;">Purger avant le</label><input type="date" id="purge-date" value="${_purgeDateValue}" max="${today}" onchange="rememberPurgeDate(this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;outline:none;"></div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;background:#fee2e2;border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:700;color:var(--red);">🧨 Tout purger avant la date</span><button onclick="doPurge('all')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Tout purger</button></div>
-          ${[['stats_parjour','📊 Stats usage par jour'],['ia_stats_daily','🤖 Stats IA journalières'],['ia_categories_parjour','🏷️ Catégories MEL journalières'],['actus','📰 Actualités antérieures à la date'],['signals','🚨 Signalements antérieurs à la date']].map(([type,label])=>`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--warm);border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:600;">${label}</span><button onclick="doPurge('${type}')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Purger</button></div>`).join('')}
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#fee2e2;border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:700;color:var(--red);">🧨 Tout purger avant la date</span><button onclick="doPurge('all_before')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Tout purger</button></div>
+          ${[['stats_parjour','📊 Stats usage par jour'],['ia_stats_daily','🤖 Stats IA journalières'],['ia_categories_parjour','🏷️ Catégories MEL journalières'],['mel_questions','📝 Questions MEL anonymes (chat libre)'],['actus','📰 Actualités antérieures à la date'],['signals','🚨 Signalements antérieurs à la date']].map(([type,label])=>`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--warm);border-radius:10px;padding:10px 14px;"><span style="font-size:0.82rem;font-weight:600;">${label}</span><button onclick="doPurge('${type}')" style="background:var(--red);color:white;border:none;border-radius:8px;padding:6px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Purger</button></div>`).join('')}
         </div>
         <div id="purge-msg" style="display:none;font-size:0.8rem;font-weight:800;"></div>
       </div>
+    </div>
+
+    <div class="section-title">📝 Questions MEL — chat libre</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">
+        Questions stockées anonymement (texte + catégorie, sans IP ni identifiant).<br>
+        Expiration automatique après 90 jours. Activez le journal dans l'onglet <strong>Redis</strong>.
+      </p>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+        <label style="font-size:0.8rem;font-weight:800;">Date :</label>
+        <input type="date" id="melq-date" value="${today}" max="${today}" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.82rem;outline:none;">
+        <button onclick="loadMelQuestions()" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Charger</button>
+      </div>
+      <div id="melq-list" style="font-size:0.78rem;color:var(--muted);font-style:italic;">Sélectionnez une date et cliquez sur Charger.</div>
     </div>`;
 }
 function rememberPurgeDate(v){if(v)_purgeDateValue=v;}
@@ -1443,7 +1479,7 @@ async function doPurge(type){
   const dateEl=document.getElementById('purge-date'); const beforeDate=dateEl?.value;
   if(!beforeDate){alert('Date requise');return;}
   rememberPurgeDate(beforeDate);
-  const label=type==='all'?'toutes les données':'les données de type "'+type+'"';
+  const label=type==='all_before'?'toutes les données':'les données de type "'+type+'"';
   if(!confirm('Purger '+label+' antérieures au '+beforeDate+' ?'))return;
   try{
     const r=await fetch(API+'/admin/purge',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({type,beforeDate})});
@@ -1451,6 +1487,29 @@ async function doPurge(type){
     if(d.ok){if(msg){msg.textContent='✅ Purge effectuée : '+d.deleted+' entrée(s) supprimée(s).';msg.style.color='var(--leaf)';msg.style.display='block';}setTimeout(async()=>{await loadAll();renderPurge();},800);}
     else{if(msg){msg.textContent='❌ Erreur : '+(d.error||'inconnue');msg.style.color='var(--red)';msg.style.display='block';}}
   }catch(e){alert('Erreur réseau : '+e.message);}
+}
+async function loadMelQuestions(){
+  const date=document.getElementById('melq-date')?.value;
+  if(!date){alert('Date requise');return;}
+  const el=document.getElementById('melq-list');
+  if(el) el.innerHTML='<em>Chargement…</em>';
+  try{
+    const r=await apiGet('/admin/mel-questions?date='+date);
+    if(!r.ok) throw new Error(r.error||'Erreur');
+    if(!r.questions||!r.questions.length){
+      if(el) el.innerHTML='<em>Aucune question enregistrée pour cette date.</em>';
+      return;
+    }
+    const catColors={'urbanisme':'#d1fae5','enfance':'#dbeafe','administratif':'#ede9fe','dechets':'#fef9c3','numerique':'#fee2e2','autre':'#f3f4f6'};
+    if(el) el.innerHTML=`<div style="font-size:0.76rem;font-weight:800;margin-bottom:10px;color:var(--text)">${r.count} question(s) — ${date}</div>`+
+      r.questions.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:${catColors[q.cat]||'#f3f4f6'};margin-bottom:6px;">
+        <span style="font-size:0.68rem;font-weight:900;color:#64748b;min-width:24px;text-align:right">${i+1}.</span>
+        <div style="flex:1">
+          <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${q.cat}</span>
+          <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${q.q.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){if(el) el.innerHTML='<span style="color:var(--red)">❌ '+e.message+'</span>';}
 }
 
 

@@ -831,6 +831,8 @@ function melShowTree(){
   if(msgs)msgs.style.display='none';
   if(sugs)sugs.style.display='none';
   if(mbar)mbar.style.display='none';
+  const privacyHint=document.getElementById('mel-privacy-hint');
+  if(privacyHint)privacyHint.style.display='none';
   if(backBtn)backBtn.remove();
   _melCat=null;_melZone=null;_melZoneLabel=null;_melAddr=null;
   _melChatContext='';_melChatCategory='autre';
@@ -1162,6 +1164,8 @@ function melOpenChat(initialMsg,category,extraCtx,topic){
   if(tree)tree.style.display='none';
   if(msgs){msgs.style.display='flex';msgs.style.flexDirection='column';}
   if(mbar)mbar.style.display='flex';
+  const privacyHint=document.getElementById('mel-privacy-hint');
+  if(privacyHint)privacyHint.style.display='block';
 
   // Bouton retour vers l'arbre
   if(!document.getElementById('mel-back-btn')){

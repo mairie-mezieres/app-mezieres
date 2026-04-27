@@ -568,6 +568,7 @@
       <textarea class="minp" id="minp" rows="2" placeholder="Votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMel();}"></textarea>
       <button class="msnd" onclick="sendMel()">➤</button>
     </div>
+    <div id="mel-privacy-hint" style="display:none;font-size:0.65rem;color:var(--muted);text-align:center;padding:3px 10px 4px;line-height:1.4">🔒 Questions anonymisées — <button onclick="openRgpd()" style="background:none;border:none;padding:0;font-size:0.65rem;color:var(--muted);text-decoration:underline;cursor:pointer">vie privée</button></div>
   </div>
 </div>
 
@@ -887,7 +888,8 @@
         <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
         <table class="rgpd-table">
           <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
-          <tr><td>MEL (assistante IA)</td><td>Questions posées</td><td>Catégories stockées uniquement (pour améliorations)</td></tr>
+          <tr><td>MEL — questions prédéfinies</td><td>Catégorie sélectionnée</td><td>Compteurs agrégés anonymes</td></tr>
+          <tr><td>MEL — chat libre</td><td>Texte de la question + catégorie (si activé par l'admin)</td><td>Anonyme, sans IP ni identifiant — 90 jours max</td></tr>
           <tr><td>Sondages citoyens</td><td>Réponse anonyme, identifiant appareil local</td><td>Local + compteurs agrégés anonymes</td></tr>
           <tr><td>Signalement citoyen</td><td>Catégorie, description, photo, GPS (tous optionnels)</td><td>Transmis à Trello + Redis, anonyme</td></tr>
           <tr><td>Rapport de bug</td><td>Service concerné, appareil, description</td><td>Transmis à Trello + Redis, anonyme</td></tr>
