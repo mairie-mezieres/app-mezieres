@@ -1501,12 +1501,13 @@ async function loadMelQuestions(){
       return;
     }
     const catColors={'urbanisme':'#d1fae5','enfance':'#dbeafe','administratif':'#ede9fe','dechets':'#fef9c3','numerique':'#fee2e2','autre':'#f3f4f6'};
-    if(el) el.innerHTML=`<div style="font-size:0.76rem;font-weight:800;margin-bottom:10px;color:var(--text)">${r.count} question(s) — ${date}</div>`+
-      r.questions.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:${catColors[q.cat]||'#f3f4f6'};margin-bottom:6px;">
+    const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    if(el) el.innerHTML=`<div style="font-size:0.76rem;font-weight:800;margin-bottom:10px;color:var(--text)">${r.count} question(s) — ${esc(date)}</div>`+
+      r.questions.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:${catColors[esc(q.cat)]||'#f3f4f6'};margin-bottom:6px;">
         <span style="font-size:0.68rem;font-weight:900;color:#64748b;min-width:24px;text-align:right">${i+1}.</span>
         <div style="flex:1">
-          <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${q.cat}</span>
-          <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${q.q.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+          <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${esc(q.cat)}</span>
+          <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${esc(q.q)}</div>
         </div>
       </div>`).join('');
   }catch(e){if(el) el.innerHTML='<span style="color:var(--red)">❌ '+e.message+'</span>';}
