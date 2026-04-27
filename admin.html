@@ -1719,6 +1719,16 @@ function renderMelAdmin(statusMsg, statusClass){
     </div>
     ${cards || `<div class="mel-admin-box">Aucune catégorie.</div>`}
     <div class="mel-admin-box"><div style="font-size:0.82rem;font-weight:900;margin-bottom:8px">Aperçu JSON</div><div class="mel-admin-json">${safe(preview)}</div></div>
+    <div class="mel-admin-box">
+      <div style="font-size:0.82rem;font-weight:900;margin-bottom:12px">📝 Questions posées dans le chat libre</div>
+      ${!(_data?.dash?.settings?.melQuestionLogEnabled) ? `<div style="font-size:0.77rem;background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;color:#92400e;margin-bottom:12px">⚠️ Le journal des questions est désactivé. Activez-le dans l'onglet <strong>🗄️ Redis</strong> pour commencer à enregistrer les questions.</div>` : ''}
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <label style="font-size:0.8rem;font-weight:800">Date :</label>
+        <input type="date" id="mel-tab-melq-date" value="${new Date().toISOString().slice(0,10)}" max="${new Date().toISOString().slice(0,10)}" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.82rem;outline:none">
+        <button onclick="loadMelQuestionsTab()" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.76rem;font-weight:800;cursor:pointer">Charger</button>
+      </div>
+      <div id="mel-tab-melq-list" style="font-size:0.78rem;color:var(--muted);font-style:italic">Sélectionnez une date et cliquez sur Charger.</div>
+    </div>
   `;
 }
 
