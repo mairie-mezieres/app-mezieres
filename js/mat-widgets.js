@@ -492,20 +492,49 @@ function loadDechets(){
   const jour=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
   const moisP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
   const annee=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
-  const dateP=new Date(annee,moisP-1,jour), dowP=dateP.getDay(), semPaire=getWeekNumber(dateP)%2===0;
+  const dateP=new Date(annee,moisP-1,jour), dowP=dateP.getDay();
+
+  // Bac noir : collecte lundi matin (avant 8h) — sortir dimanche soir
+  let noirJours=(1-dowP+7)%7;
+  if(noirJours===0&&hP>=8) noirJours=7;
+
+  // Bac jaune : collecte mardi matin (semaines paires ISO, avant 8h) — sortir lundi soir
+  let jauneJours;
+  {
+    const d=new Date(annee,moisP-1,jour);
+    if(dowP===2&&hP<8&&getWeekNumber(d)%2===0){jauneJours=0;}
+    else{
+      const candidate=new Date(annee,moisP-1,jour);
+      candidate.setDate(candidate.getDate()+1);
+      for(let i=0;i<15;i++){
+        if(candidate.getDay()===2&&getWeekNumber(candidate)%2===0) break;
+        candidate.setDate(candidate.getDate()+1);
+      }
+      jauneJours=Math.round((candidate-d)/86400000);
+    }
+  }
+
+  function fmtJ(j){
+    if(j===0) return "aujourd'hui";
+    if(j===1) return 'demain';
+    return j+' j';
+  }
+  function renderInfo(el,jours,consigne){
+    if(!el) return;
+    if(consigne) el.innerHTML='<span class="dechet-consigne-pill">'+consigne+'</span>';
+    else el.textContent=fmtJ(jours);
+  }
+
+  const noirConsigne=noirJours===0?'Collecte ce matin':noirJours===1?'Sortir ce soir !':'';
+  const jauneConsigne=jauneJours===0?'Collecte ce matin':jauneJours===1?'Sortir ce soir !':'';
+  renderInfo(document.getElementById('bac-noir-info'),noirJours,noirConsigne);
+  renderInfo(document.getElementById('bac-jaune-info'),jauneJours,jauneConsigne);
+
   const FERIES_FIXES=['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
   const FERIES_DATES=['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
   const mmdd=String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
   const iso=annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
   const ferie=FERIES_FIXES.includes(mmdd)||FERIES_DATES.includes(iso);
-  let bTxt='',bUrg=false;
-  if(dowP===0){bTxt='🗑️ Sortir le bac noir ce soir !';bUrg=true;}
-  else if(dowP===1&&hP<8){bTxt='🗑️ Bac noir : collecte ce matin';bUrg=true;}
-  else if(dowP===1&&semPaire&&hP>=8){bTxt='♻️ Sortir le bac jaune ce soir !';bUrg=true;}
-  else if(dowP===2&&semPaire&&hP<8){bTxt='♻️ Bac jaune : collecte ce matin';bUrg=true;}
-  else{const j2lun=dowP===1?7:(8-dowP)%7||7;if(j2lun===1){bTxt='🗑️ Bac noir demain — sortir ce soir';bUrg=true;}else{bTxt='🗑️ Prochain bac noir : lundi matin';}}
-  const omEl=document.getElementById('om-text');
-  if(omEl){omEl.innerHTML=bTxt;omEl.style.color=bUrg?'#fcd34d':'rgba(216,243,220,0.85)';}
   const isH=moisP>=10||moisP<=3, matO=isH?10:9, apF=isH?17:18;
   const isJourOuv=dowP>=1&&dowP<=6&&!ferie;
   let dTxt='',dOuv=false;

@@ -120,6 +120,14 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .dechet-ok{color:#bbf7d0;}
 .dechet-warn{color:#fde68a;}
 .dechet-info{color:var(--cream);}
+.dechet-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dechet-dot-noir{background:#111;box-shadow:0 0 0 1.5px rgba(255,255,255,0.35);}
+.dechet-dot-jaune{background:#facc15;}
+.dechet-label{font-weight:800;flex:1;}
+.dechet-label-noir{color:#111;}
+.dechet-label-jaune{color:#facc15;}
+.dechet-info-cell{font-size:.6rem;font-weight:800;color:#fff;white-space:nowrap;}
+.dechet-consigne-pill{display:inline-block;background:rgba(255,255,255,0.92);color:#15803d;border-radius:999px;padding:1px 7px;font-size:.56rem;font-weight:900;line-height:1.5;white-space:nowrap;}
 .meteo-ico{font-size:1.2rem;flex-shrink:0;}
 .meteo-temp{font-size:.96rem;font-weight:900;color:var(--cream);}
 .meteo-desc{font-size:.62rem;color:rgba(255,255,255,.88);flex:1;}
