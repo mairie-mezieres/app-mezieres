@@ -18,9 +18,8 @@ Cette campagne présente chaque fonctionnalité de l'application MAT de manière
 | J10 | j10-trombinoscope.md | Vos élus à portée de main |
 | J11 | j11-associations.md | La vie associative de la commune |
 | J12 | j12-demarches.md | Démarches en ligne — simplifiez vos formalités |
-| J13 | j13-eau.md | Suivez votre consommation d'eau |
-| J14 | j14-randonnees.md | Randonnées — explorez Mézières et ses environs |
-| J15 | j15-chatbot.md | Le chatbot — votre assistant 24h/24 |
+| J13 | j13-randonnees.md | Randonnées — explorez Mézières et ses environs |
+| J14 | j14-chatbot.md | Le chatbot — votre assistant 24h/24 |
 
 ## Format de chaque post
 
