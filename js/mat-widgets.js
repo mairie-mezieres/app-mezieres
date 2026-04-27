@@ -217,17 +217,16 @@ function meteoBuildSunBlock(days, nowDate) {
     + '</div>';
 }
 
-function meteoBuildRiskCard(forecast, vigilance, nowDate) {
+function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
   var hourly = forecast.hourly || {};
   var daily = forecast.daily || {};
   var times = hourly.time || [];
   var start = meteoFindFirstFutureIndex(times, nowDate);
-  var items = [];
+  var hasAlert = meteoHasAlert(vigilance);
+  var level = hasAlert ? Number(vigilance.level || 2) : 1;
 
-  if (meteoHasAlert(vigilance)) {
-    items.push('Vigilance ' + esc(vigilance.color_label || 'météo') + ' : ' + esc(vigilance.phenomenon_label || 'phénomène météo') + '.');
-  }
-
+  // Risques prévisionnels — la vigilance n'est PAS répétée ici (affichée dans la section alerte)
+  var riskItems = [];
   var bestRain = null, bestGust = null;
   for (var i = start; i !== -1 && i < Math.min(start + 18, times.length); i++) {
     var prob = Math.round((hourly.precipitation_probability || [])[i] || 0);
@@ -235,76 +234,72 @@ function meteoBuildRiskCard(forecast, vigilance, nowDate) {
     var gust = Math.round((hourly.wind_gusts_10m || [])[i] || 0);
     if (prob >= 40 || mm >= 0.3) {
       if (!bestRain || prob > bestRain.prob || mm > bestRain.mm) {
-        bestRain = { idx:i, prob:prob, mm:mm };
+        bestRain = { idx: i, prob: prob, mm: mm };
       }
     }
     if (gust >= 35) {
-      if (!bestGust || gust > bestGust.gust) bestGust = { idx:i, gust:gust };
+      if (!bestGust || gust > bestGust.gust) bestGust = { idx: i, gust: gust };
     }
   }
-
   if (bestRain) {
     var rainDt = new Date(times[bestRain.idx]);
-    items.push('Précipitations vers ' + rainDt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h') + ' : ' + bestRain.prob + '% · ' + bestRain.mm.toFixed(1) + ' mm.');
+    riskItems.push('Précipitations vers ' + rainDt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h') + ' : ' + bestRain.prob + '% · ' + bestRain.mm.toFixed(1) + ' mm.');
   }
   if (bestGust) {
     var gustDt = new Date(times[bestGust.idx]);
-    items.push('Vent plus soutenu vers ' + gustDt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h') + ' : rafales ' + bestGust.gust + ' km/h.');
+    riskItems.push('Vent plus soutenu vers ' + gustDt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h') + ' : rafales ' + bestGust.gust + ' km/h.');
   }
   if ((daily.uv_index_max || [])[1] != null && Number((daily.uv_index_max || [])[1]) >= 6) {
-    items.push('Demain : UV ' + Number((daily.uv_index_max || [])[1]).toFixed(1) + '.');
-  }
-  if (!items.length) {
-    items.push('Pas de risque météo notable détecté dans les prochaines heures.');
+    riskItems.push('Demain : UV ' + Number((daily.uv_index_max || [])[1]).toFixed(1) + '.');
   }
 
-  return '<div class="meteo-card meteo-risk-card">'
-    + '<div class="meteo-card-kicker">⚡ Prochains risques</div>'
+  var alertHtml;
+  if (!hasAlert) {
+    alertHtml = '<div class="meteo-alert-topline"><span class="meteo-alert-chip">✅ Pas de vigilance météo</span></div>'
+      + '<div class="meteo-alert-text" style="margin-top:4px">' + esc(meteoAlertSummary(vigilance)) + '</div>';
+  } else {
+    var startTxt = meteoFormatAlertDate(vigilance.start, false);
+    var endTxt = meteoFormatAlertDate(vigilance.end, false);
+    alertHtml = '<details open>'
+      + '<summary class="meteo-alert-summary">'
+      + '<div class="meteo-alert-topline">'
+      + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + '</span>'
+      + '<span class="meteo-alert-action">Touchez pour le détail</span>'
+      + '</div>'
+      + '<div class="meteo-alert-head">'
+      + '<div class="meteo-alert-icon">' + meteoPhenomenonIcon(vigilance) + '</div>'
+      + '<div class="meteo-alert-copy">'
+      + '<div class="meteo-alert-title">' + esc(vigilance.phenomenon_label || 'Alerte météo') + '</div>'
+      + '<div class="meteo-alert-text">' + esc(meteoAlertSummary(vigilance)) + '</div>'
+      + '</div>'
+      + '</div>'
+      + '<div class="meteo-alert-periods">'
+      + '<div class="meteo-alert-period"><span>Début</span><strong>' + esc(startTxt) + '</strong></div>'
+      + '<div class="meteo-alert-period"><span>Fin</span><strong>' + esc(endTxt) + '</strong></div>'
+      + '</div>'
+      + '</summary>'
+      + '<div class="meteo-alert-detail">'
+      + '<div class="meteo-alert-detail-line"><strong>Début :</strong> ' + esc(startTxt) + '</div>'
+      + '<div class="meteo-alert-detail-line"><strong>Fin :</strong> ' + esc(endTxt) + '</div>'
+      + '<div class="meteo-alert-detail-line"><strong>Zone :</strong> Loiret (45)</div>'
+      + '<div class="meteo-alert-detail-text">' + esc(meteoAlertSummary(vigilance)).replace(/\n/g, '<br>') + '</div>'
+      + '</div>'
+      + '</details>';
+  }
+
+  var riskHtml = '<div style="border-top:1px solid rgba(0,0,0,0.09);margin-top:10px;padding-top:8px">'
+    + '<div class="meteo-card-kicker" style="padding:0 0 6px">⚡ Prochains risques</div>'
     + '<div class="meteo-risk-list">'
-    + items.slice(0, 3).map(function(txt){ return '<div class="meteo-risk-item">' + txt + '</div>'; }).join('')
+    + (riskItems.length
+        ? riskItems.slice(0, 3).map(function(txt){ return '<div class="meteo-risk-item">' + txt + '</div>'; }).join('')
+        : '<div class="meteo-risk-item">Aucun risque météo notable dans les prochaines heures.</div>')
     + '</div>'
     + '</div>';
-}
 
-function meteoBuildAlertCard(vigilance) {
-  if (!meteoHasAlert(vigilance)) {
-    return '<div class="meteo-card meteo-alert-card level-1">'
-      + '<div class="meteo-alert-topline"><span class="meteo-alert-chip">✅ Situation</span></div>'
-      + '<div class="meteo-alert-title">Aucune vigilance météo en cours</div>'
-      + '<div class="meteo-alert-text">' + esc(meteoAlertSummary(vigilance)) + '</div>'
-      + '</div>';
-  }
-
-  var level = Number(vigilance.level || 2);
-  var startTxt = meteoFormatAlertDate(vigilance.start, false);
-  var endTxt = meteoFormatAlertDate(vigilance.end, false);
-  var summary = meteoAlertSummary(vigilance);
-
-  return '<details class="meteo-card meteo-alert-card level-' + level + '" open>'
-    + '<summary class="meteo-alert-summary">'
-    + '<div class="meteo-alert-topline">'
-    + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + '</span>'
-    + '<span class="meteo-alert-action">Touchez pour le détail</span>'
-    + '</div>'
-    + '<div class="meteo-alert-head">'
-    + '<div class="meteo-alert-icon">' + meteoPhenomenonIcon(vigilance) + '</div>'
-    + '<div class="meteo-alert-copy">'
-    + '<div class="meteo-alert-title">' + esc(vigilance.phenomenon_label || 'Alerte météo') + '</div>'
-    + '<div class="meteo-alert-text">' + esc(summary) + '</div>'
-    + '</div>'
-    + '</div>'
-    + '<div class="meteo-alert-periods">'
-    + '<div class="meteo-alert-period"><span>Début</span><strong>' + esc(startTxt) + '</strong></div>'
-    + '<div class="meteo-alert-period"><span>Fin</span><strong>' + esc(endTxt) + '</strong></div>'
-    + '</div>'
-    + '</summary>'
-    + '<div class="meteo-alert-detail">'
-    + '<div class="meteo-alert-detail-line"><strong>Début :</strong> ' + esc(startTxt) + '</div>'
-    + '<div class="meteo-alert-detail-line"><strong>Fin :</strong> ' + esc(endTxt) + '</div>'
-    + '<div class="meteo-alert-detail-line"><strong>Zone :</strong> Loiret (45)</div>'
-    + '<div class="meteo-alert-detail-text">' + esc(summary).replace(/\n/g, '<br>') + '</div>'
-    + '</div>'
-    + '</details>';
+  return '<div class="meteo-card meteo-alert-card level-' + level + '">'
+    + alertHtml
+    + riskHtml
+    + '</div>';
 }
 
 async function loadMeteo() {
@@ -407,9 +402,8 @@ function loadMeteoDetail() {
   var eRes = fmtNorm(ressenti !== '–' ? ressenti : null, tempNormNow);
 
   var html = '<div class="meteo-premium">';
-  html += meteoBuildAlertCard(vigilance);
+  html += meteoBuildAlertRiskCard(forecast, vigilance, now);
   html += meteoBuildHourlyTimeline(hourly, now);
-  html += meteoBuildRiskCard(forecast, vigilance, now);
 
   html += '<div class="meteo-days-block">'
     + '<div class="meteo-card-kicker">📅 Prochains jours</div>'
