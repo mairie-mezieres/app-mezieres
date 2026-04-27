@@ -28,7 +28,7 @@ There are no tests, no linter config, and no package manager in this repo.
 mat-utils.js → mat-core.js → (other modules) → mat-boot.js  ← ALWAYS LAST
 ```
 
-`mat-boot.js` is the entry point that calls all initialization functions. It also dynamically injects secondary modules after page load: `mat-pwa-notif.js`, `mat-dechets-notif.js`, `mat-jours-feries.js`, `mat-sondages.js`, `mat-associations.js`, `mat-desktop.js`, `mat-eau8.js`.
+`mat-boot.js` is the entry point that calls all initialization functions. It also dynamically injects secondary modules after page load: `mat-pwa-notif.js`, `mat-dechets-notif.js`, `mat-jours-feries.js`, `mat-sondages.js`, `mat-associations.js`, `mat-eau8.js`. Note: `mat-desktop.js` is loaded via a static `<script defer>` in `index.html`, not injected by `mat-boot.js`.
 
 ### Module responsibilities
 
