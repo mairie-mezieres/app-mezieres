@@ -8,7 +8,7 @@ On a tous déjà oublié de sortir les poubelles… Avec MAT, c’est terminé !
 
 **L’application calcule automatiquement :**
 - ⚫ Bac noir (ordures ménagères) : collecte chaque **lundi matin** → à sortir le dimanche soir
-- 🟡 Bac jaune (recyclables) : collecte un **lundi sur deux** (semaines paires) → à sortir le lundi soir précédent
+- 🟡 Bac jaune (recyclables) : collecte un **mardi sur deux** (semaines paires) → à sortir le **lundi soir** précédent
 - 🏭 Horaires de la **déchetterie de Cléry-Saint-André** en temps réel (ouverte ou fermée ?)
 
 **MAT vous affiche en un coup d’œil :**
