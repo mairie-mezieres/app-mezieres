@@ -525,8 +525,8 @@ function loadDechets(){
     else el.textContent=fmtJ(jours);
   }
 
-  const noirConsigne=noirJours===0?'Collecte ce matin':noirJours===1?'Sortir ce soir !':'';
-  const jauneConsigne=jauneJours===0?'Collecte ce matin':jauneJours===1?'Sortir ce soir !':'';
+  const noirConsigne=noirJours===0?'Ce matin !':noirJours===1?'Ce soir !':'';
+  const jauneConsigne=jauneJours===0?'Ce matin !':jauneJours===1?'Ce soir !':'';
   renderInfo(document.getElementById('bac-noir-info'),noirJours,noirConsigne);
   renderInfo(document.getElementById('bac-jaune-info'),jauneJours,jauneConsigne);
 
