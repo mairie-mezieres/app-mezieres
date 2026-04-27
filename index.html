@@ -112,7 +112,16 @@
     </div>
     <div class="top-card top-dechets dechets-strip" onclick="openDechets()">
       <div class="top-title">Déchets</div>
-      <div class="dechet-row" id="dechet-poubelle"><span id="om-text">Chargement…</span></div>
+      <div class="dechet-row">
+        <span class="dechet-dot dechet-dot-noir"></span>
+        <span class="dechet-label dechet-label-noir">Bac noir</span>
+        <span id="bac-noir-info" class="dechet-info-cell">…</span>
+      </div>
+      <div class="dechet-row">
+        <span class="dechet-dot dechet-dot-jaune"></span>
+        <span class="dechet-label dechet-label-jaune">Bac jaune</span>
+        <span id="bac-jaune-info" class="dechet-info-cell">…</span>
+      </div>
       <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
     </div>
     <div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
