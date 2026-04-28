@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.2.3 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.3.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 9 : nav PC accessible (hauteur + police agrandie), Trello sans double-notif
-const CACHE = 'mat-v4.2.3';
+// Phase 10 : Entreprises locales (tuile + overlay + admin)
+const CACHE = 'mat-v4.3.0';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -26,6 +26,7 @@ const PRECACHE_URLS = [
   './js/mat-associations.js?v=4.2.3',
   './js/mat-desktop.js?v=4.2.3',
   './js/mat-eau8.js?v=4.2.3',
+  './js/mat-entreprises.js?v=1.1.0',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
   './mat-header.png',
