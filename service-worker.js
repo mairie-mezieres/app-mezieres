@@ -26,7 +26,7 @@ const PRECACHE_URLS = [
   './js/mat-associations.js?v=4.2.3',
   './js/mat-desktop.js?v=4.1.0',
   './js/mat-eau8.js?v=4.2.3',
-  './js/mat-entreprises.js?v=1.1.0',
+  './js/mat-entreprises.js?v=1.2.0',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
   './mat-header.png',
