@@ -94,6 +94,12 @@
 
 (function(){
   var s = document.createElement('script');
+  s.src = 'js/mat-entreprises.js?v=1.0.0';
+  document.head.appendChild(s);
+})();
+
+(function(){
+  var s = document.createElement('script');
   s.src = 'js/mat-eau8.js?v=4.2.3';
   document.head.appendChild(s);
 })();

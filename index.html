@@ -173,6 +173,7 @@
     </div>
     <nav class="d-nav-links">
       <button onclick="openAssociations()">🤝 Associations</button>
+      <button onclick="openEntreprises()">🏪 Entreprises</button>
       <button onclick="openDocs()">📄 Documents officiels</button>
       <button onclick="openIdees()">💡 Idées</button>
       <button onclick="openSondages()">📊 Sondages citoyens</button>
@@ -264,13 +265,19 @@
     </a>
   </div>
 
-  <div class="sec">Associations &amp; Randonnées</div>
+  <div class="sec">Associations, Entreprises &amp; Randonnées</div>
   <div class="grid2">
     <button class="card" onclick="openAssociations()">
       <div class="ico" style="background:#e8f5e9">🤝</div>
       <div class="ct"><div class="ct-label">Associations</div><div class="ct-sub">Vie associative</div></div>
     </button>
-    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html">
+    <button class="card" onclick="openEntreprises()">
+      <div class="ico" style="background:#e3f2fd">🏪</div>
+      <div class="ct"><div class="ct-label">Entreprises</div><div class="ct-sub">Commerce local</div></div>
+    </button>
+  </div>
+  <div style="margin-top:10px">
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 16px;text-decoration:none;color:inherit">
       <div class="ico ico-rando">🥾</div>
       <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan &amp; Circuits</div></div>
     </a>
@@ -1267,6 +1274,20 @@
     </div>
   </div>
 </div>
+<!-- ═══ OVERLAY ENTREPRISES ═══ -->
+<div class="ov" id="ov-entreprises" onclick="ovClick('entreprises',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e3f2fd">🏪</div>
+      <div class="panel-title">Commerce local</div>
+      <button class="panel-close" onclick="closeOv('entreprises')">✕</button>
+    </div>
+    <div class="panel-body" id="entreprises-panel-body">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
 <script defer src="js/mat-desktop.js?v=4.1.0"></script>
 </body>
 </html>
