@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2308,7 +2309,7 @@ function renderEntreprisesAdmin() {
     + _entreprisesData.map(function(e) {
       return '<tr style="border-top:1px solid var(--border)">'
         + '<td style="padding:10px 14px;font-weight:800;font-size:0.84rem">'
-        + (e.logo ? '<img src="' + safe(e.logo) + '" style="width:28px;height:28px;object-fit:contain;border-radius:6px;vertical-align:middle;margin-right:8px;background:#e3f2fd" onerror="this.style.display='none'">' : '')
+        + (e.logo ? '<img src="' + safe(e.logo) + '" style="width:28px;height:28px;object-fit:contain;border-radius:6px;vertical-align:middle;margin-right:8px;background:#e3f2fd" onerror="this.remove()">' : '')
         + safe(e.nom) + '</td>'
         + '<td style="padding:10px 14px;font-size:0.78rem;color:var(--muted)">' + safe(e.activite || '—') + '</td>'
         + '<td style="padding:10px 14px;font-size:0.78rem;color:var(--muted)">' + safe(e.gerant || '—') + '</td>'
