@@ -8,3 +8,1285 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MAT">
 <title>Mézières Avec Toi</title>
+<!-- VERSION 4.2.3 -->
+<link rel="manifest" href="manifest.webmanifest">
+<link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
+<script>
+(function(){
+  try{
+    var saved = JSON.parse(localStorage.getItem('mat_accessibility') || '{}');
+    var cls = document.documentElement.classList;
+    if(saved.theme === 'bleu') cls.add('theme-bleu');
+    if(saved.theme === 'sombre') cls.add('theme-sombre');
+    if(saved.contrast) cls.add('high-contrast');
+    if(saved.daltonien) cls.add('colorblind-mode');
+    var bg = '#f4f0ea';
+    if(cls.contains('theme-sombre')) bg = '#0f172a';
+    else if(cls.contains('theme-bleu')) bg = '#dbeafe';
+    else if(cls.contains('colorblind-mode')) bg = '#eaf2ff';
+    else if(cls.contains('high-contrast')) bg = '#f0f0f0';
+    document.documentElement.style.background = bg;
+  }catch(e){}
+})();
+</script>
+
+<link rel="stylesheet" href="css/mat.css?v=4.2.4">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.2.4">
+
+<!-- ════════════════════════════════════════════════════════════
+     MAT — Modules JavaScript v3.7.4
+     L'ordre est CRITIQUE : utils → core → reste → init en dernier
+     ════════════════════════════════════════════════════════════ -->
+<script defer src="js/mat-utils.js?v=4.2.4"></script>
+<script defer src="js/mat-core.js?v=4.2.4"></script>
+<script defer src="js/mat-accessibility.js?v=4.2.4"></script>
+<script defer src="js/mat-widgets.js?v=4.2.4"></script>
+<script defer src="js/mat-agenda.js?v=4.2.4"></script>
+<script defer src="js/mat-forms.js?v=4.2.4"></script>
+<script defer src="js/mat-actus.js?v=4.2.4"></script>
+<script defer src="js/mat-trombi.js?v=4.2.4"></script>
+<script defer src="js/mat-mel.js?v=4.2.4"></script>
+<script defer src="js/mat-boot.js?v=4.2.4"></script>
+
+</head>
+
+<body class="preload">
+<!-- Desktop uniquement : barre contact + navigation -->
+<div class="d-topbar">
+  <span>📞 02 38 45 61 76</span>
+  <span class="d-sep">·</span>
+  <span>📍 36 rue du bourg — 45370 Mézières-lez-Cléry</span>
+  <span class="d-sep">·</span>
+  <span>Lun 14h–17h30 · Mer sur RDV · Ven 8h30–11h30</span>
+</div>
+
+<div id="app-splash" class="app-splash" aria-hidden="true">
+  <div class="splash-card">
+    <img src="MAT et MEL.png" alt="MAT et MEL" class="splash-logo" onerror="this.onerror=null;this.src='mat-header.png'">
+    <div class="splash-title">Mézières Avec Toi</div>
+    <div class="splash-sub">Ouverture de l'application</div>
+    <div class="splash-dot-wrap"><span class="splash-dot"></span><span class="splash-dot"></span><span class="splash-dot"></span></div>
+  </div>
+</div>
+
+<!-- Bannière install -->
+<div id="install-banner" class="hidden" onclick="installApp()">
+  <div class="ib-ico">📲</div>
+  <div class="ib-t">
+    <div class="ib-title" id="ib-title-txt">Installez MAT sur votre téléphone !</div>
+    <div class="ib-sub" id="ib-sub-txt">Accès rapide · Fonctionne hors ligne</div>
+  </div>
+  <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
+  <button class="ib-x" onclick="hideBanner(event)">✕</button>
+</div>
+
+<!-- Header MAT -->
+<div class="header">
+  <div class="mat-hero">
+    <!-- Gauche : texte -->
+    <div class="mat-text">
+      <div style="height:1.8em"></div>
+      <div class="mat-badge" id="mat-date-badge">Chargement…</div>
+      <div class="mat-title">Mézières Avec Toi</div>
+      <div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v4.2.3</div>
+      <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
+    </div>
+    <!-- Droite : icône MAT -->
+    <img src="MAT et MEL.png" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.png'" title="Qui suis-je ?">
+  </div>
+  <!-- Encarts accueil -->
+  <div class="header-bottom-grid">
+    <div class="top-card top-mairie mairie-strip" onclick="openContact()">
+      <div class="top-title">Mairie</div>
+      <div class="top-main" id="mairie-status">Chargement…</div>
+      <div class="top-sub" id="mairie-desc"></div>
+      <div class="top-badge" id="mairie-badge">Horaires</div>
+    </div>
+    <div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
+      <div class="top-title">Météo</div>
+      <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
+      <div class="top-sub" id="meteo-desc"></div>
+      <div class="top-badge" id="meteo-alerte">Aucune alerte</div>
+      <div id="meteo-ico" style="position:absolute;right:10px;top:8px;font-size:1.15rem">🌤️</div>
+    </div>
+    <div class="top-card top-dechets dechets-strip" onclick="openDechets()">
+      <div class="top-title">Déchets</div>
+      <div class="dechet-row">
+        <span class="dechet-dot dechet-dot-noir"></span>
+        <span class="dechet-label dechet-label-noir">Bac noir</span>
+        <span id="bac-noir-info" class="dechet-info-cell">…</span>
+      </div>
+      <div class="dechet-row">
+        <span class="dechet-dot dechet-dot-jaune"></span>
+        <span class="dechet-label dechet-label-jaune">Bac jaune</span>
+        <span id="bac-jaune-info" class="dechet-info-cell">…</span>
+      </div>
+      <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
+    </div>
+    <div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
+      <div class="top-title">Prochaine manifestation</div>
+      <div class="event-date" id="next-event-date">Chargement…</div>
+      <div class="event-name" id="next-event-name"></div>
+      <div class="event-days" id="next-event-days"></div>
+    </div>
+    <!-- Ligne bus Rémi pleine largeur -->
+    <div class="bus-strip" onclick="openRemi()" role="button" tabindex="0" aria-label="Voir le détail des prochains bus Rémi" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRemi();}">
+      <div class="bus-strip-head">
+        <span class="bus-strip-ico">🚌</span>
+        <span class="bus-strip-title">Ligne 8 Rémi</span>
+        <span class="bus-strip-periode" id="bus-periode"></span>
+      </div>
+      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
+      <div class="bus-strip-cta">Voir le planning sur 7 jours →</div>
+    </div>
+  </div>
+
+  <div class="header-tools">
+    <button class="header-tool-btn urgent" onclick="openNums()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#b91c1c,#dc2626);box-shadow:0 3px 10px rgba(185,28,28,0.45);border:none;"><span style="font-size:1.1rem;filter:drop-shadow(0 0 3px rgba(255,255,255,0.7))">📞</span><span>Urgences</span></button>
+    <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
+  </div>
+</div>
+
+<!-- Desktop uniquement : photo hero + stats -->
+<div class="d-hero">
+  <div class="d-hero-bg" style="background-image:url('mezieres-site.jpg')"></div>
+  <div class="d-hero-inner">
+    <div class="d-hero-text">
+      <div class="d-hero-badge">🌿 Commune rurale · Loiret · Val de Loire</div>
+      <h1 class="d-hero-title">Bienvenue à<br><em>Mézières-lez-Cléry</em></h1>
+      <p class="d-hero-desc">Retrouvez toutes les informations de votre commune, les événements, les services municipaux et posez vos questions directement à MEL, votre assistante numérique.</p>
+      <div class="d-hero-btns">
+        <button class="d-btn-primary" onclick="openAgenda()">📅 Voir l'agenda communal</button>
+        <button class="d-btn-sec" onclick="openMel()">💬 Parler à MEL</button>
+      </div>
+    </div>
+    <div class="d-hero-meteo" id="d-hero-meteo"></div>
+  </div>
+</div>
+
+<div class="d-nav">
+  <div class="d-nav-inner">
+    <div class="d-nav-logo">
+      <img src="icon-192.png" alt="Mézières" class="d-nav-img">
+      <span class="d-nav-title">Mézières-lez-Cléry</span>
+    </div>
+    <nav class="d-nav-links">
+      <button onclick="openAssociations()">🤝 Associations</button>
+      <button onclick="openEntreprises()">🏪 Entreprises</button>
+      <button onclick="openDocs()">📄 Documents officiels</button>
+      <button onclick="openIdees()">💡 Idées</button>
+      <button onclick="openSondages()">📊 Sondages citoyens</button>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener">🥾 Randonnées</a>
+      <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener">🌐 CCTVL</a>
+    </nav>
+    <button class="d-nav-acc" onclick="openAccessibilite()" title="Accessibilité &amp; thème">♿ Accessibilité</button>
+  </div>
+</div>
+
+
+<!-- Contenu principal -->
+<div class="content">
+
+  <div class="sec">Démarches et Services</div>
+  <div class="grid2">
+    <button class="card simple-card mel-entry" onclick="openMel()">
+      <div class="ico ico-mel mel-wiggle">👩‍💼</div>
+      <div class="ct">
+        <div class="ct-label">MEL</div>
+        <div class="ct-sub">Vos démarches</div>
+      </div>
+    </button>
+    <button class="card" onclick="openDocs()">
+      <div class="ico" style="background:#e8f5e9">📁</div>
+      <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, CR…</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Actualité et Calendrier</div>
+  <div class="grid2">
+    <button class="card simple-card" onclick="openNotifs()">
+      <div class="ico ico-notif ico-notif-wrap">🔔<span class="notif-badge" id="notif-unread-badge">0</span></div>
+      <div class="ct"><div class="ct-label">Notifications</div><div class="ct-sub" id="notif-card-status">Vérification…</div></div>
+    </button>
+    <button class="card simple-card" onclick="openAgenda()">
+      <div class="ico ico-cal">📅</div>
+      <div class="ct"><div class="ct-label">Agenda</div><div class="ct-sub">Manifestations</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Participez</div>
+  <div class="grid2">
+    <button class="card" onclick="openIdees()">
+      <div class="ico ico-ideas">💡</div>
+      <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
+    </button>
+    <button class="card" onclick="openSondages()">
+      <div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+      <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Signalements et Contacts</div>
+  <div class="grid2">
+    <button class="card simple-card" onclick="openSignal()">
+      <div class="ico ico-signal">🚨</div>
+      <div class="ct"><div class="ct-label">Signalement</div><div class="ct-sub">Voirie, déchets…</div></div>
+    </button>
+    <button class="card" id="btn-install-or-bug" onclick="openBug()">
+      <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
+      <div class="ct">
+        <div class="ct-label" id="iob-label">Signaler un bug</div>
+        <div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
+      </div>
+    </button>
+  </div>
+  <hr style="margin:6px 0;border:none;border-top:1px solid var(--border)">
+  <div class="grid2">
+    <button class="card simple-card" onclick="openContact()">
+      <div class="ico ico-hab">💬</div>
+      <div class="ct"><div class="ct-label">Contacter vos élus</div></div>
+    </button>
+    <button class="card" onclick="openRgpd()">
+      <div class="ico ico-rgpd">🔒</div>
+      <div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
+    </button>
+  </div>
+
+  <div class="sec">Réseaux mairie et citoyens</div>
+  <div class="grid2">
+    <a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank">
+      <div class="ico ico-radio">📻</div>
+      <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
+    </a>
+    <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank">
+      <div class="ico ico-communaute">🏘️</div>
+      <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+    </a>
+  </div>
+
+  <div class="sec">Associations, Entreprises &amp; Randonnées</div>
+  <div class="grid2">
+    <button class="card" onclick="openAssociations()">
+      <div class="ico" style="background:#e8f5e9">🤝</div>
+      <div class="ct"><div class="ct-label">Associations</div><div class="ct-sub">Vie associative</div></div>
+    </button>
+    <button class="card" onclick="openEntreprises()">
+      <div class="ico" style="background:#e3f2fd">🏪</div>
+      <div class="ct"><div class="ct-label">Entreprises</div><div class="ct-sub">Commerce local</div></div>
+    </button>
+  </div>
+  <div style="margin-top:10px">
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 16px;text-decoration:none;color:inherit">
+      <div class="ico ico-rando">🥾</div>
+      <div class="ct"><div class="ct-label">Randonnées</div><div class="ct-sub">Plan &amp; Circuits</div></div>
+    </a>
+  </div>
+
+</div>
+<!-- Desktop : grille de panneaux (cachée sur mobile) -->
+<div class="d-main-grid">
+  <!-- Colonne gauche : Actualités + Bus Rémi + Collectes -->
+  <div class="d-col d-col-left">
+    <div class="d-card" id="dsk-actus">
+      <div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
+      <div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card" id="dsk-bus">
+      <div class="d-card-hdr"><span>🚌 Bus Rémi</span><button onclick="openRemi()">Tout voir →</button></div>
+      <div class="d-card-body" id="dsk-bus-body"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🗑️ Collectes</span><button onclick="openDechets()">Calendrier →</button></div>
+      <div class="d-card-body" id="dsk-collectes-body"><div class="d-loading">Chargement…</div></div>
+    </div>
+  </div>
+  <!-- Colonne centre : Prochain évènement -->
+  <div class="d-col d-col-center">
+    <div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
+  </div>
+  <!-- Colonne droite : Mairie + Élus + Signalement + MEL -->
+  <div class="d-col d-col-right">
+    <div class="d-card" id="dsk-mairie">
+      <div class="d-card-hdr"><span>🏛️ Mairie</span><button onclick="openContact()">Contacter →</button></div>
+      <div class="d-card-body" id="dsk-mairie-body"></div>
+    </div>
+    <div class="d-card">
+      <div class="d-card-hdr"><span>🏛️ Élus</span><button onclick="openConseil()">Voir tous →</button></div>
+      <div class="d-card-body" id="dsk-elus-body"><div class="d-loading">Chargement…</div></div>
+    </div>
+    <div class="d-mel-cta-panel">
+      <div class="d-mel-hdr">
+        <img src="MAT et MEL.png" alt="MEL" class="d-mel-img" onerror="this.style.display='none'">
+        <div>
+          <div class="d-mel-name">MEL — Mézières En Ligne <span class="d-mel-online">● En ligne</span></div>
+          <div class="d-mel-sub">Votre assistante numérique communale</div>
+        </div>
+      </div>
+      <button class="d-mel-cta-btn" onclick="openMel()">💬 Parler à MEL</button>
+    </div>
+    <div class="d-card" id="dsk-signal">
+      <div class="d-card-hdr"><span>🚨 Signalement rapide</span></div>
+      <div class="d-signal-grid">
+        <button onclick="openSignal()">🛣️ Voirie</button>
+        <button onclick="openSignal()">💡 Éclairage</button>
+        <button onclick="openSignal()">🌿 Espaces verts</button>
+        <button onclick="openSignal()">🗑️ Propreté</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-rando-banner">
+  <div class="d-rando-inner">
+    <div class="d-rando-left">
+      <div class="d-rando-badge">🥾 HAGE RANDO — MODULE RANDONNÉE</div>
+      <h2 class="d-rando-title">Partez explorer<br>Mézières-lez-Cléry</h2>
+      <p class="d-rando-desc">Sentiers balisés, chemins de terres et routes forestières.<br>Générez votre circuit personnalisé selon votre niveau et vos préférences.</p>
+      <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener" class="d-btn-primary">🗺️ Explorer la carte interactive</a>
+    </div>
+    <div class="d-rando-stats">
+      <div class="d-rando-stat"><strong>12</strong><span>Circuits</span></div>
+      <div class="d-rando-stat"><strong>87</strong><span>Km balisés</span></div>
+      <div class="d-rando-stat"><strong>3</strong><span>Niveaux</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Desktop uniquement : pied de page -->
+<div class="d-footer">
+  <div class="d-footer-bottom">
+    <span>MAT · Application officielle · Mairie de Mézières-lez-Cléry</span>
+    <div class="d-footer-links">
+      <button onclick="openRgpd()">🔒 RGPD</button>
+      <button onclick="openBug()">✉️ Contact admin</button>
+      <button onclick="openAccessibilite()">♿ Accessibilité</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ OVERLAY ACCESSIBILITÉ ═══ -->
+<div class="ov" id="ov-accessibilite" onclick="ovClick('accessibilite',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f0fc">♿</div>
+      <div class="panel-title">♿ Accessibilité &amp; Personnalisation</div>
+      <button class="panel-close" onclick="closeOv('accessibilite')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="acc-preview" id="acc-preview">
+        Exemple de texte — <strong>Mézières-lez-Cléry</strong><br>
+        Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">📏 Taille du texte</div>
+          <div class="acc-option-sub">Choisissez la taille la plus confortable</div>
+        </div>
+        <div class="acc-toggle">
+          <button class="acc-size-btn" id="acc-normal" onclick="setFontSize('normal')">A</button>
+          <button class="acc-size-btn" id="acc-large" onclick="setFontSize('large')">A+</button>
+          <button class="acc-size-btn" id="acc-xl" onclick="setFontSize('xl')">A++</button>
+        </div>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🔆 Contraste élevé</div>
+          <div class="acc-option-sub">Texte plus sombre, couleurs plus nettes</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-contrast-toggle" onchange="toggleContrast(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🌈 Mode daltonien</div>
+          <div class="acc-option-sub">Palette plus différenciée, moins dépendante du rouge et du vert</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-colorblind-toggle" onchange="toggleColorblind(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option d-mobile-only">
+        <div>
+          <div class="acc-option-label">👆 Boutons plus grands</div>
+          <div class="acc-option-sub">Zones tactiles agrandies, plus faciles à appuyer</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-touch-toggle" onchange="toggleTouch(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">↕️ Espacement des lignes</div>
+          <div class="acc-option-sub">Texte plus aéré, plus facile à lire</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-spacing-toggle" onchange="toggleSpacing(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🔊 Lecture vocale</div>
+          <div class="acc-option-sub">Lit les actualités et réponses MEL à voix haute</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-tts-toggle" onchange="toggleTTS(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">💡 Aide contextuelle</div>
+          <div class="acc-option-sub">Conseils utiles dans MEL, signalement et contact</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-ctx-toggle" onchange="toggleContextHelp(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:16px 0 8px">🎨 Personnalisation</div>
+
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🎨 Thème de couleur</div>
+          <div class="acc-option-sub">Apparence générale de l'application</div>
+        </div>
+        <div class="acc-toggle">
+          <button class="acc-size-btn" id="theme-vert" onclick="setTheme('vert')">🌿</button>
+          <button class="acc-size-btn" id="theme-bleu" onclick="setTheme('bleu')">🌊</button>
+          <button class="acc-size-btn" id="theme-sombre" onclick="setTheme('sombre')">🌙</button>
+        </div>
+      </div>
+
+      <div class="acc-option d-mobile-only">
+        <div>
+          <div class="acc-option-label">📐 Masquer l'en-tête</div>
+          <div class="acc-option-sub">Condense l'affichage, plus d'espace pour les boutons</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-noheader-toggle" onchange="toggleNoHeader(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option d-mobile-only">
+        <div>
+          <div class="acc-option-label">🗺️ Masquer la météo &amp; transports</div>
+          <div class="acc-option-sub">Retire les encarts du header</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-nowidgets-toggle" onchange="toggleNoWidgets(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <div class="acc-option" id="opt-badge-notif">
+        <div>
+          <div class="acc-option-label">🔢 Badge sur l'icône</div>
+          <div class="acc-option-sub">Compteur sur l'icône de l'app (si supporté par le téléphone)</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-badge-toggle" checked onchange="toggleBadgeNotif(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+
+      <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
+        &#8635; Réinitialiser les paramètres
+      </button>
+      <button class="submit-btn" style="margin-top:6px;background:linear-gradient(135deg,#dc2626,#b91c1c)" onclick="clearCacheAndReload()">
+        🗑️ Vider le cache &amp; recharger
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Barre TTS -->
+<div class="tts-bar" id="tts-bar" style="display:none">
+  <span style="font-size:1.2rem">🔊</span>
+  <span class="tts-bar-text" id="tts-bar-text">Lecture en cours…</span>
+  <button class="tts-bar-btn" onclick="ttsPause()" id="tts-pause-btn" title="Pause">⏸</button>
+  <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter">⏹</button>
+</div>
+
+<div class="footer">
+  <div>MAT · Application officielle · Mairie de Mézières-lez-Cléry</div>
+</div>
+
+<!-- ═══ OVERLAY MAJORDOME ═══ -->
+<div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
+  <div class="majordome-panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:var(--gold);font-size:22px">🎩</div>
+      <div class="panel-title">Le Majordome de Mézières</div>
+      <button class="panel-close" onclick="closeOv('majordome')">✕</button>
+    </div>
+    <div class="majordome-body">
+      <img src="MAT et MEL.png" alt="MAT et MEL" class="majordome-img" onerror="this.onerror=null;this.src='mat-header.png'">
+      <div class="majordome-name">Bonjour, je suis MAT !</div>
+      <div class="majordome-tagline">Votre majordome numérique communal</div>
+      <div class="majordome-text">
+        🎩 <strong>Permettez-moi de me présenter.</strong><br><br>
+        Je suis <strong>MAT — Mézières Avec Toi</strong>, le majordome numérique officiel de la commune de Mézières-lez-Cléry.<br><br>
+        Tel un majordome digne de ce nom, je veille sur tout : la météo du village, l'état de vos poubelles (oui oui, même ça), les événements à venir, et même les horaires de la mairie — au cas où vous auriez envie de déposer une doléance en bonne et due forme. 🧐<br><br>
+        Mon assistante <strong>MEL</strong> répond à toutes vos questions communales avec le sourire. Elle connaît le PLU, les démarches administratives, la cantine et la fibre mieux que quiconque dans ce village.<br><br>
+        Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire capricieux — je transmets votre signalement à qui de droit, avec la discrétion qui s'impose.<br><br>
+        🌲 <em>Mézières-lez-Cléry mérite le meilleur service. C'est mon devoir.</em>
+      </div>
+      <button class="majordome-btn" onclick="closeOv('majordome')">À votre service !</button>
+      <button class="majordome-btn" onclick="closeOv('majordome');relancerOnboarding();" style="margin-top:8px;background:rgba(255,255,255,0.12);color:var(--sage);border:1px solid rgba(255,255,255,0.2);">🎬 Revoir la présentation</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY MEL ═══ -->
+<div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
+  <div class="mel-panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:var(--gold);font-size:22px">👩</div>
+      <div class="panel-title">MEL — Aide communale</div>
+      <button class="panel-close" onclick="closeOv('mel')">✕</button>
+    </div>
+    <div class="ctx-help" id="ctx-mel"></div>
+    <div id="mel-disclaimer" style="font-size:0.59rem;color:var(--muted);text-align:center;padding:5px 14px 4px;line-height:1.4;border-bottom:1px solid var(--border);background:var(--warm);flex-shrink:0;">⚠️ MEL peut se tromper. Réponses indicatives sous la responsabilité du lecteur.</div>
+    <!-- ── Arbre de décision ── -->
+    <div id="mel-tree" class="mel-tree">
+      <div id="mel-tree-l1">
+        <div class="mel-tree-title">Comment puis-je vous aider ?</div>
+        <div class="mel-cats">
+          <button class="mel-cat-btn" onclick="melSelectCat('urbanisme')"><span class="ico">🏗️</span>Urbanisme &amp; Construction</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('enfance')"><span class="ico">🎒</span>Enfance &amp; Jeunesse</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('administratif')"><span class="ico">📋</span>Démarches Admin.</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('dechets')"><span class="ico">♻️</span>Déchets &amp; Propreté</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('numerique')"><span class="ico">📡</span>Numérique &amp; Internet</button>
+          <button class="mel-cat-btn" onclick="melSelectCat('autre')"><span class="ico">💬</span>Autre question</button>
+        </div>
+      </div>
+      <div id="mel-tree-l2"></div>
+    </div>
+    <!-- ── Chat (caché par défaut) ── -->
+    <div class="msgs" id="msgs" style="display:none"></div>
+    <div class="sugs" id="sugs" style="display:none"></div>
+    <div class="mbar" style="display:none">
+      <textarea class="minp" id="minp" rows="2" placeholder="Votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMel();}"></textarea>
+      <button class="msnd" onclick="sendMel()">➤</button>
+    </div>
+    <div id="mel-privacy-hint" style="display:none;font-size:0.65rem;color:var(--muted);text-align:center;padding:3px 10px 4px;line-height:1.4">🔒 Questions anonymisées — <button onclick="openRgpd()" style="background:none;border:none;padding:0;font-size:0.65rem;color:var(--muted);text-decoration:underline;cursor:pointer">vie privée</button></div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY SIGNALEMENT ═══ -->
+<div class="ov" id="ov-signal" onclick="ovClick('signal',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fde8e8">🚨</div>
+      <div class="panel-title">Signalement citoyen</div>
+      <button class="panel-close" onclick="closeOv('signal')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="signal-form">
+        <div class="ctx-help" id="ctx-signal"></div>
+        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
+        <div class="form-group">
+          <label class="form-label">Catégorie</label>
+          <div class="form-cats" id="signal-cats">
+            <button class="cat-btn" onclick="selCat(this,'🛣️ Voirie')">🛣️ Voirie</button>
+            <button class="cat-btn" onclick="selCat(this,'💡 Éclairage')">💡 Éclairage</button>
+            <button class="cat-btn" onclick="selCat(this,'🗑️ Propreté')">🗑️ Propreté</button>
+            <button class="cat-btn" onclick="selCat(this,'⚠️ Signalisation')">⚠️ Signalisation</button>
+            <button class="cat-btn" onclick="selCat(this,'🌿 Espaces verts')">🌿 Espaces verts</button>
+            <button class="cat-btn" onclick="selCat(this,'🏛️ Bâtiment')">🏛️ Bâtiment</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description (facultatif)</label>
+          <textarea class="form-textarea" id="signal-desc" placeholder="Décrivez le problème en quelques mots…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Photo (facultatif)</label>
+          <input type="file" id="signal-photo-camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto('camera')">
+          <input type="file" id="signal-photo-input" accept="image/*" style="display:none" onchange="previewPhoto('gallery')">
+          <div class="photo-actions" id="signal-photo-actions">
+            <button type="button" class="photo-btn" onclick="document.getElementById('signal-photo-camera-input').click()">📷 Prendre une photo</button>
+            <button type="button" class="photo-btn secondary" onclick="document.getElementById('signal-photo-input').click()">🖼️ Choisir dans la galerie</button>
+          </div>
+          <div class="photo-help">Astuce : vous pouvez envoyer une photo prise sur place ou une image déjà enregistrée.</div>
+          <img id="signal-photo-preview" class="photo-preview">
+          <button type="button" id="signal-photo-remove" class="photo-remove-btn" onclick="removeSignalPhoto()">🗑️ Retirer l'image</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Localisation (facultatif)</label>
+          <button class="cat-btn" id="loc-btn" onclick="getLocation()" style="width:100%;text-align:center">📍 Utiliser ma position GPS</button>
+          <div id="loc-status" style="font-size:0.68rem;color:var(--muted);margin-top:4px"></div>
+        </div>
+        <button class="submit-btn" onclick="submitSignal()">📤 Envoyer le signalement</button>
+      </div>
+      <div class="success-msg" id="signal-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Signalement envoyé !</div>
+        <div class="s-sub">La mairie a bien reçu votre signalement.<br>Merci de votre contribution !</div>
+        <button class="submit-btn" style="margin-top:16px" onclick="resetSignal()">Faire un autre signalement</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY BOÎTE À IDÉES ═══ -->
+<div class="ov" id="ov-idees" onclick="ovClick('idees',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fffbe8">💡</div>
+      <div class="panel-title">Vos idées pour Mézières</div>
+      <button class="panel-close" onclick="closeOv('idees')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="idea-form">
+        <textarea class="idea-input" id="idea-input" placeholder="Proposez une idée pour améliorer la vie dans la commune…"></textarea>
+        <div class="idea-cats">
+          <button class="idea-cat" onclick="selIdeaCat(this,'🛣️ Voirie')">🛣️ Voirie</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🌿 Environnement')">🌿 Environnement</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🎉 Animations')">🎉 Animations</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🏫 Services')">🏫 Services</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'🧒 Enfance')">🧒 Enfance</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'📱 MAT')">📱 MAT</button>
+          <button class="idea-cat" onclick="selIdeaCat(this,'💡 Autre')">💡 Autre</button>
+        </div>
+        <button class="idea-submit" onclick="submitIdee()">💡 Soumettre mon idée</button>
+      </div>
+      <div class="ideas-toolbar">
+        <div class="ideas-sort-group">
+          <button type="button" class="ideas-sort-btn on" id="ideas-sort-pop" onclick="setIdeasSort('popular')">🔥 Populaires</button>
+          <button type="button" class="ideas-sort-btn" id="ideas-sort-recent" onclick="setIdeasSort('recent')">🕒 Récentes</button>
+        </div>
+        <div class="idea-sort-note" id="ideas-sort-note">Tri par votes décroissants</div>
+      </div>
+      <div id="ideas-list" class="ideas-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY NOTIFICATIONS ═══ -->
+<div class="ov" id="ov-notifs" onclick="ovClick('notifs',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f0fc">🔔</div>
+      <div class="panel-title">Actualités communales</div>
+      <button class="panel-close" onclick="closeOv('notifs')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="notif-ideas-callout"></div>
+      <div id="actu-list"><div class="actu-empty">Chargement des actualités…</div></div>
+      <div id="push-notif-info" style="font-size:0.78rem;color:var(--muted);padding:6px 4px 2px;line-height:1.5;"></div>
+      <div class="notif-banner" id="push-banner" style="margin-top:4px">
+        <div class="notif-ico">🔔</div>
+        <div class="notif-text">
+        </div>
+        <button class="notif-btn off" id="push-btn" onclick="togglePush()">Chargement…</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY DÉTAIL ACTUALITÉ ═══ -->
+<div class="ov" id="ov-actu" onclick="ovClick('actu',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fff7ed">📰</div>
+      <div class="panel-title">Détail actualité</div>
+      <button class="panel-close" onclick="closeActuDetail()">✕</button>
+    </div>
+    <div class="panel-body" id="actu-detail-body">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+<!-- ═══ OVERLAY CONTACT ═══ -->
+<div class="ov" id="ov-contact" onclick="ovClick('contact',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#ede8f8">💬</div>
+      <div class="panel-title">Contacter la mairie</div>
+      <button class="panel-close" onclick="closeOv('contact')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="ctx-help" id="ctx-contact"></div>
+      <div class="contact-grid">
+        <!-- V3.5.10 : Conseil > Élus > Signalement -->
+        <div class="contact-card">
+          <div class="contact-ico">🏛️</div>
+          <div style="flex:1">
+            <div class="contact-title">Conseil municipal</div>
+            <div class="contact-sub">Membres &amp; délégations</div>
+          </div>
+          <button class="contact-action" onclick="openConseil()">Voir</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">💬</div>
+          <div style="flex:1">
+            <div class="contact-title">Contacter vos élus</div>
+            <div class="contact-sub">Contact direct via la page Radio Mézières.</div>
+          </div>
+          <button class="contact-action alt" onclick="contactViaMessenger()">Ouvrir</button>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">🚨</div>
+          <div style="flex:1">
+            <div class="contact-title">Faire un signalement</div>
+            <div class="contact-sub">Voirie, éclairage, propreté, signalisation…</div>
+          </div>
+          <button class="contact-action" onclick="closeOv('contact'); openSignal();">Ouvrir</button>
+        </div>
+      </div>
+
+      <div class="contact-note">
+        Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre demande directement à la mairie.
+      </div>
+
+      <div id="contact-form">
+        <div class="form-group">
+          <label class="form-label">Votre nom ou prénom</label>
+          <input class="form-textarea" id="contact-name" style="height:auto" placeholder="Ex. Mme Martin">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Coordonnée de réponse</label>
+          <input class="form-textarea" id="contact-reply" style="height:auto" placeholder="Téléphone ou email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Votre message</label>
+          <textarea class="form-textarea" id="contact-msg" placeholder="Décrivez votre demande…"></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitContactForm()">📤 Envoyer ma demande</button>
+      </div>
+
+      <!-- V3.5.10 — Appel + CCTVL après formulaire -->
+      <div class="contact-grid" style="margin-top:12px">
+        <div class="contact-card">
+          <div class="contact-ico">📞</div>
+          <div style="flex:1">
+            <div class="contact-title">Appeler la mairie</div>
+            <div class="contact-sub">02 38 45 61 76 · Lun 14h-17h30 · Mer sur RDV · Ven 8h30-11h30</div>
+          </div>
+          <a class="contact-action" href="tel:0238456176" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-ico">🏘️</div>
+          <div style="flex:1">
+            <div class="contact-title">Services intercommunaux</div>
+            <div class="contact-sub">CCTVL · Déchets, assainissement, santé, transports…</div>
+          </div>
+          <a class="contact-action" href="tel:0238445935" style="text-decoration:none;display:inline-flex;align-items:center">Appeler</a>
+        </div>
+      </div>
+
+      <div class="success-msg" id="contact-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Demande envoyée !</div>
+        <div class="s-sub">La mairie a bien reçu votre message.<br>Merci pour votre retour.</div>
+        <button class="submit-btn" style="margin-top:16px" onclick="resetContact()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY AGENDA MAT ═══ -->
+<div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fef3e0">📅</div>
+      <div class="panel-title">Agenda &amp; Sorties</div>
+      <button class="panel-close" onclick="closeOv('agenda')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+        <button onclick="agendaNavMonth(-1)" style="background:var(--forest);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;">← Préc.</button>
+        <div id="agenda-month-label" style="font-size:0.9rem;font-weight:900;color:var(--forest);text-align:center;text-transform:capitalize;flex:1"></div>
+        <button onclick="agendaNavMonth(1)" style="background:var(--forest);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:800;cursor:pointer;">Suiv. →</button>
+      </div>
+      <div id="agenda-content"><div class="agenda-empty">Chargement de l'agenda…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY FICHE ÉVÉNEMENT ═══ -->
+<div class="ov" id="ov-event" onclick="ovClick('event',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#fff7ed">🎉</div>
+      <div class="panel-title">Fiche événement</div>
+      <button class="panel-close" onclick="closeOv('event')">✕</button>
+    </div>
+    <div class="panel-body" id="event-detail-body">
+      <div class="agenda-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY BUG ═══ -->
+<div class="ov" id="ov-bug" onclick="ovClick('bug',event)">
+  <div class="panel">
+    <div class="panel-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🐞</div>
+      <div class="panel-title">Un bug ?</div>
+      <button class="panel-close" onclick="closeOv('bug')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="bug-form">
+        <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Un service ne fonctionne pas correctement ? Signalez-le pour nous aider à l'améliorer.</p>
+        <div class="form-group">
+          <label class="form-label">Service concerné</label>
+          <div class="form-cats" id="bug-services">
+            <button class="cat-btn" onclick="selBugService(this,'MEL — Assistante IA')">🤖 MEL</button>
+            <button class="cat-btn" onclick="selBugService(this,'Météo')">🌤️ Météo</button>
+            <button class="cat-btn" onclick="selBugService(this,'Agenda')">📅 Agenda</button>
+            <button class="cat-btn" onclick="selBugService(this,'Signalement citoyen')">🚨 Signalement</button>
+            <button class="cat-btn" onclick="selBugService(this,'Actualités Pocket')">🔔 Actualités</button>
+            <button class="cat-btn" onclick="selBugService(this,'Notifications push')">📲 Notifications</button>
+            <button class="cat-btn" onclick="selBugService(this,'Boîte à idées')">💡 Idées</button>
+            <button class="cat-btn" onclick="selBugService(this,'Contact mairie')">💬 Contact</button>
+            <button class="cat-btn" onclick="selBugService(this,'Application générale')">📱 Général</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description du problème</label>
+          <textarea class="form-textarea" id="bug-desc" placeholder="Décrivez ce qui ne fonctionne pas…"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capture d'écran / photo (facultatif)</label>
+          <input type="file" id="bug-photo-camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewBugPhoto('camera')">
+          <input type="file" id="bug-photo-input" accept="image/*" style="display:none" onchange="previewBugPhoto('gallery')">
+          <div class="photo-actions" id="bug-photo-actions">
+            <button type="button" class="photo-btn" onclick="document.getElementById('bug-photo-camera-input').click()">📷 Prendre une photo</button>
+            <button type="button" class="photo-btn secondary" onclick="document.getElementById('bug-photo-input').click()">🖼️ Choisir une capture</button>
+          </div>
+          <div class="photo-help">Une capture d'écran aide beaucoup pour diagnostiquer le problème.</div>
+          <img id="bug-photo-preview" class="photo-preview">
+          <button type="button" id="bug-photo-remove" class="photo-remove-btn" onclick="removeBugPhoto()">🗑️ Retirer l'image</button>
+        </div>
+        <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
+      </div>
+      <div class="success-msg" id="bug-success">
+        <div class="s-ico">✅</div>
+        <div class="s-title">Rapport envoyé !</div>
+        <div class="s-sub">Merci de contribuer à améliorer MAT.</div>
+        <button class="submit-btn" style="margin-top:16px;background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="resetBug()">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY RGPD ═══ -->
+<div class="ov" id="ov-rgpd" onclick="ovClick('rgpd',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f0f0f0">🔒</div>
+      <div class="panel-title">🔒 Vie privée &amp; RGPD — Politique de confidentialité</div>
+      <button class="panel-close" onclick="closeOv('rgpd')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="rgpd-section">
+        <div class="rgpd-title">📋 Principe général</div>
+        <div class="rgpd-text">L'application MAT est conçue selon le principe de <strong>minimisation des données</strong> : nous collectons uniquement ce qui est strictement nécessaire au fonctionnement des services, conformément au Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679).</div>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">📊 Données collectées par fonctionnalité</div>
+        <table class="rgpd-table">
+          <tr><th>Fonctionnalité</th><th>Données</th><th>Durée</th></tr>
+          <tr><td>MEL — questions prédéfinies</td><td>Catégorie sélectionnée</td><td>Compteurs agrégés anonymes</td></tr>
+          <tr><td>MEL — chat libre</td><td>Texte de la question + catégorie (si activé par l'admin)</td><td>Anonyme, sans IP ni identifiant — 90 jours max</td></tr>
+          <tr><td>Sondages citoyens</td><td>Réponse anonyme, identifiant appareil local</td><td>Local + compteurs agrégés anonymes</td></tr>
+          <tr><td>Signalement citoyen</td><td>Catégorie, description, photo, GPS (tous optionnels)</td><td>Transmis à Trello + Redis, anonyme</td></tr>
+          <tr><td>Rapport de bug</td><td>Service concerné, appareil, description</td><td>Transmis à Trello + Redis, anonyme</td></tr>
+          <tr><td>Demande de contact</td><td>Nom (optionnel), coordonnée (optionnel), message</td><td>Transmis à Trello + Redis</td></tr>
+          <tr><td>Boîte à idées</td><td>Texte de l'idée, catégorie (anonyme)</td><td>Jusqu'à suppression par l'admin</td></tr>
+          <tr><td>Votes idées</td><td>Identifiant appareil local (localStorage)</td><td>Local, jamais transmis</td></tr>
+          <tr><td>Notifications push</td><td>Token d'appareil anonyme</td><td>Jusqu'à désactivation</td></tr>
+          <tr><td>Météo</td><td>Position GPS si autorisée (non stockée)</td><td>Non conservée</td></tr>
+          <tr><td>Statistiques d'usage</td><td>Compteurs anonymes par fonctionnalité</td><td>Historique 13 mois glissants</td></tr>
+        </table>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">🍪 Cookies et stockage local</div>
+        <div class="rgpd-text">L'application utilise uniquement le <strong>localStorage</strong> de votre navigateur pour mémoriser vos votes (boîte à idées), votre préférence d'installation et votre session de navigation. Aucun cookie de traçage ou publicitaire n'est utilisé. Aucune donnée n'est vendue à des tiers.</div>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">🤝 Sous-traitants et services tiers</div>
+        <div class="rgpd-text">Les services suivants sont utilisés dans le cadre du fonctionnement de l'application :</div>
+        <table class="rgpd-table">
+          <tr><th>Service</th><th>Usage</th><th>Localisation</th></tr>
+          <tr><td>Mistral AI</td><td>IA principale — réponses MEL</td><td>France (UE)</td></tr>
+          <tr><td>Anthropic (Claude)</td><td>IA de secours — réponses MEL</td><td>États-Unis</td></tr>
+          <tr><td>Render.com</td><td>Serveur applicatif backend</td><td>UE (Frankfurt)</td></tr>
+          <tr><td>GitHub Pages</td><td>Hébergement de l'application</td><td>États-Unis</td></tr>
+          <tr><td>Upstash Redis</td><td>Stockage données (idées, actus, stats)</td><td>UE</td></tr>
+          <tr><td>Météo-France / Open-Meteo</td><td>Données météorologiques</td><td>France / UE</td></tr>
+          <tr><td>Trello (Atlassian)</td><td>Gestion signalements, bugs et demandes</td><td>États-Unis</td></tr>
+          <tr><td>Facebook (Meta)</td><td>Actualités Radio Mézières (lecture seule)</td><td>États-Unis</td></tr>
+          <tr><td>Google Calendar</td><td>Agenda communal (lecture seule)</td><td>États-Unis</td></tr>
+          <tr><td>Open-Meteo</td><td>Prévisions météo (lecture seule)</td><td>UE (Suisse)</td></tr>
+        </table>
+      </div>
+      <div class="rgpd-section">
+        <div class="rgpd-title">✉️ Exercer vos droits</div>
+        <div class="rgpd-contact">
+          Vous pouvez exercer vos droits d'accès, de rectification et de suppression en contactant la mairie :<br><br>
+          <strong>Mairie de Mézières-lez-Cléry</strong><br>
+          36 rue du bourg — 45370<br>
+          📞 02 38 45 61 76<br>
+          ✉️ <a id="mairie-mail-link" href="#" onclick="this.href='mail'+'to:'+atob('bWFpcmllQG1lemllcmVzLWxlei1jbGVyeS5mcg==');return true;" style="color:var(--leaf);font-weight:800;">Voir l'adresse email →</a>
+          <span id="mairie-mail-txt" style="display:none;color:var(--leaf);font-weight:800;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY CONSEIL MUNICIPAL ═══ -->
+<div class="ov" id="ov-conseil" onclick="ovClick('conseil',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🏛️</div>
+      <div class="panel-title">Conseil municipal</div>
+      <button class="panel-close" onclick="closeOv('conseil')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--mist);border-radius:10px">👆 Cliquez sur une photo pour voir le détail</div>
+      <div class="trombi-grid" id="trombi-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODALE TROMBI ═══ -->
+<div id="trombi-modal" style="display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px" onclick="closeTrombi(event)">
+  <div id="trombi-card" style="background:var(--warm);border-radius:24px;overflow:hidden;width:min(100%,340px);max-height:min(92vh,760px);display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.4);position:relative;transform:scale(0.8);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease">
+    <div id="trombi-img-wrap" style="position:relative;height:250px;overflow:hidden;background:#1a1a1a;flex-shrink:0">
+      <img id="trombi-big-img" src="" alt="" style="width:100%;height:100%;object-fit:contain;object-position:center;background:#1a1a1a;filter:brightness(1)">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 70%,rgba(0,0,0,0.35) 100%)"></div>
+      <div id="trombi-role-badge" style="position:absolute;top:12px;left:12px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;font-size:0.6rem;font-weight:900;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.08em"></div>
+      <button onclick="closeTrombiBtn()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:16px 18px 20px;overflow-y:auto;flex:1">
+      <div id="trombi-nom" style="font-size:1rem;font-weight:900;color:var(--forest);margin-bottom:2px"></div>
+      <div id="trombi-pole" style="font-size:0.68rem;font-weight:700;color:var(--leaf);margin-bottom:10px"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">🎂</span><span id="trombi-age"></span></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">💼</span><span id="trombi-prof"></span></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">🗳️</span><span id="trombi-mandats"></span></div>
+        <div id="trombi-hameau-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text)"><span style="font-size:1rem">📍</span><span id="trombi-hameau"></span></div>
+      </div>
+      <div id="trombi-commissions-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY NUMÉROS UTILES ═══ -->
+<div class="ov" id="ov-nums" onclick="ovClick('nums',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">📞</div>
+      <div class="panel-title">Numéros urgence</div>
+      <button class="panel-close" onclick="closeOv('nums')">✕</button>
+    </div>
+    <div class="panel-body">
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <!-- Urgences -->
+        <div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px rgba(127,29,29,0.22)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:#fee2e2;margin-bottom:10px">🚨 Urgences</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <a href="tel:15" style="background:#dc2626;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🚑 SAMU<br><span style="font-size:1rem">15</span></a>
+            <a href="tel:17" style="background:#1d4ed8;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">👮 Police<br><span style="font-size:1rem">17</span></a>
+            <a href="tel:18" style="background:#ea580c;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🔥 Pompiers<br><span style="font-size:1rem">18</span></a>
+            <a href="tel:112" style="background:#7c3aed;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🆘 Européen<br><span style="font-size:1rem">112</span></a>
+          </div>
+        </div>
+
+        <!-- Santé -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🏥 Santé — Médecins</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">MSP Val d'Ardoux — Cléry</div><div style="font-size:0.68rem;color:var(--muted)">Médecins, kiné, infirmiers…</div></div>
+              <a href="https://www.doctolib.fr/maison-de-sante/clery-saint-andre/maison-de-sante-pluridisciplinaire-du-val-d-ardoux" target="_blank" style="background:var(--mist);color:var(--leaf);border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">Doctolib →</a>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">SOS Médecins Orléans</div><div style="font-size:0.68rem;color:var(--muted)">Urgences médicales non vitales</div></div>
+              <a href="tel:0238772222" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 Appeler</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Numéros nationaux spécialisés -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🆘 Lignes d'aide spécialisées</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+            <a href="tel:3114" style="background:#7c3aed;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">🧠 Prévention suicide<br><span style="font-size:1rem">3114</span></a>
+            <a href="tel:3919" style="background:#be185d;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">💜 Violences femmes<br><span style="font-size:1rem">3919</span></a>
+            <a href="tel:119" style="background:#0369a1;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">🧒 Enfance en danger<br><span style="font-size:1rem">119</span></a>
+            <a href="tel:3977" style="background:#b45309;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">👴 Maltraitance âgés<br><span style="font-size:1rem">3977</span></a>
+            <a href="tel:0800080080" style="background:#166534;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">☎️ Centre anti-poison<br><span style="font-size:0.82rem">0800 08 00 80</span></a>
+            <a href="tel:3114" style="background:#dc2626;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">❤️ Urgences psy<br><span style="font-size:1rem">3114</span></a>
+          </div>
+          <div style="font-size:0.62rem;color:var(--muted);margin-top:8px;text-align:center">Tous ces numéros sont gratuits 24h/24</div>
+        </div>
+
+        <!-- École V3.5.10 -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🏫 École &amp; Périscolaire</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">École de la Forêt</div><div style="font-size:0.68rem;color:var(--muted)">Mézières-lez-Cléry</div></div>
+              <a href="tel:0238456500" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 02 38 45 65 00</a>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">Service périscolaire</div><div style="font-size:0.68rem;color:var(--muted)">Garderie matin/soir</div></div>
+              <a href="tel:0967280120" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 09 67 28 01 20</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services publics -->
+        <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
+          <div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏢 Services publics</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">EDF — Pannes électriques</div></div>
+              <a href="tel:0972675757" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none">📞 09 72 67 57 57</a>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">ENEDIS — Réseau électrique</div></div>
+              <a href="tel:0809404040" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none">📞 08 09 40 40 40</a>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">Gaz — Urgence fuite</div></div>
+              <a href="tel:0800473333" style="background:#dc2626;color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none">📞 0800 47 33 33</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY BUS RÉMI ═══ -->
+<div class="ov" id="ov-remi" onclick="ovClick('remi',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f0fc">🚌</div>
+      <div class="panel-title">Ligne 8 Rémi — Prochains bus</div>
+      <button class="panel-close" onclick="closeOv('remi')">✕</button>
+    </div>
+    <div class="panel-body" id="remi-detail">
+      <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY DÉCHETS ═══ -->
+<div class="ov" id="ov-dechets" onclick="ovClick('dechets',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#eaf8e8">🗑️</div>
+      <div class="panel-title">Déchets &amp; Déchetterie</div>
+      <button class="panel-close" onclick="closeOv('dechets')">✕</button>
+    </div>
+    <div class="panel-body" id="dechets-detail">
+      <div id="dechets-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY MÉTÉO DÉTAIL ═══ -->
+<div class="ov" id="ov-meteo" onclick="ovClick('meteo',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f4f8">🌤️</div>
+      <div class="panel-title">Météo — Mézières-lez-Cléry</div>
+      <button class="panel-close" onclick="closeOv('meteo')">✕</button>
+    </div>
+    <div class="panel-body" id="meteo-detail">
+      <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ── Documents officiels ─────────────────────────────────────────────── -->
+<div class="ov" id="ov-docs" onclick="ovClick('docs',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.15)">📁</div>
+      <div class="panel-title">Documents officiels</div>
+      <button class="panel-close" onclick="closeOv('docs')">✕</button>
+    </div>
+    <div class="panel-body"><div id="docs-featured-container" style="display:none"></div>
+      <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px">Documents permanents</div>
+
+      <a href="https://drive.google.com/drive/folders/1Hl6GN5JxktJkxnQ3WQ2A_2KxnhJhdijD"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📋</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Bulletins municipaux</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Archives et publications communales</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <a href="https://drive.google.com/drive/folders/1Cly3v5rrIo4wAkm2o8kfaWWjgqVsEVXq"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">🏛️</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Comptes rendus du conseil municipal</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Délibérations et procès-verbaux</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <a href="https://drive.google.com/drive/folders/1LpDrIUL3NrMKLxaI_ZkDtGd38gbKi__y"
+         target="_blank" rel="noopener noreferrer"
+         style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">
+        <div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📜</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:900;font-size:0.86rem">Publicité des actes</div>
+          <div style="font-size:0.73rem;color:var(--muted);margin-top:2px">Arrêtés et actes administratifs</div>
+        </div>
+        <div style="color:var(--sage);flex-shrink:0">→</div>
+      </a>
+
+      <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin:18px 0 10px">Documents temporaires</div>
+      <div id="docs-temp-list">
+        <div class="actu-empty">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var CACHE_KEY = 'mat_install_count';
+  var CACHE_TTL = 86400000;
+  var API_URL = 'https://chatbot-mairie-mezieres.onrender.com/api/install-count';
+
+  function showCount(n){
+    if(!n || n < 2) return;
+    var badge = document.getElementById('install-count-badge');
+    var val = document.getElementById('install-count-val');
+    if(badge && val){
+      val.textContent = n;
+      badge.style.display = 'block';
+    }
+  }
+
+  try {
+    var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if(cached && cached.ts && (Date.now() - cached.ts) < CACHE_TTL){
+      showCount(cached.count);
+      return;
+    }
+  } catch(e){}
+
+  fetch(API_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var n = d && d.count ? parseInt(d.count) : 0;
+      if(n > 0){
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({count:n, ts:Date.now()})); } catch(e){}
+        showCount(n);
+      }
+    })
+    .catch(function(){});
+})();
+</script>
+
+<!-- ── Sondage citoyen ── -->
+<div class="ov" id="ov-sondages" onclick="ovClick('sondages',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#f0fdf4">📊</div>
+      <div class="panel-title">Sondage citoyen</div>
+      <button class="panel-close" onclick="closeOv('sondages')">✕</button>
+    </div>
+    <div class="panel-body" id="sondages-container">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OVERLAY ASSOCIATIONS ═══ -->
+<div class="ov" id="ov-assoc" onclick="ovClick('assoc',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f5e9">🤝</div>
+      <div class="panel-title">Vie associative</div>
+      <button class="panel-close" onclick="closeOv('assoc')">✕</button>
+    </div>
+    <div class="panel-body" id="assoc-panel-body">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ OVERLAY SUBVENTION ═══ -->
+<div class="ov" id="ov-subvention" onclick="ovClick('subvention',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e8f5e9">💶</div>
+      <div class="panel-title">Demander une subvention</div>
+      <button class="panel-close" onclick="closeOv('subvention')">✕</button>
+    </div>
+    <div class="panel-body">
+      <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:14px">
+        La demande de subvention doit être complétée via le
+        <strong><a href="https://docs.google.com/forms/d/1JS_5oL1GhfCuXGv9UoQbkxO2E6Bzzkdpl_w9jeLFZw4" target="_blank" rel="noopener" style="color:var(--leaf)">formulaire en ligne de demande de subvention</a></strong>
+        et accompagnée des documents suivants :
+      </p>
+      <ul style="font-size:0.82rem;color:var(--text);line-height:1.9;padding-left:18px;margin-bottom:14px">
+        <li>Fiche INSEE avec le numéro <strong>SIRET</strong> de l'association</li>
+        <li>RIB ou RIP de la structure porteuse du projet</li>
+        <li><strong><a href="https://docs.google.com/spreadsheets/d/1q_rewjKk6T_VSIbQMFYOm9_ODzA6PB3E/edit?usp=drivesdk&ouid=101362074311667560869&rtpof=true&sd=true" target="_blank" rel="noopener" style="color:var(--leaf)">Budget prévisionnel</a></strong> (document à télécharger et à compléter)</li>
+      </ul>
+      <div style="background:#f0f8f3;border-radius:12px;padding:12px 14px;font-size:0.78rem;color:var(--forest);line-height:1.6;margin-bottom:14px">
+        <strong>📧 Envoi du dossier complet à :</strong><br>
+        <a href="mailto:mairie@mezieres-lez-clery.fr" style="color:var(--leaf)">mairie@mezieres-lez-clery.fr</a>
+      </div>
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:10px 14px;font-size:0.78rem;color:#7c5e00;line-height:1.5;margin-bottom:14px">
+        ⚠️ À la suite de l'instruction des dossiers, des documents complémentaires financiers et comptables pourront être demandés.
+      </div>
+      <div style="background:#e8f5e9;border-radius:12px;padding:10px 14px;font-size:0.82rem;font-weight:800;color:var(--forest);text-align:center">
+        📅 Date limite d'envoi des dossiers : <strong>28 février</strong>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ═══ OVERLAY ENTREPRISES ═══ -->
+<div class="ov" id="ov-entreprises" onclick="ovClick('entreprises',event)">
+  <div class="panel">
+    <div class="panel-hdr">
+      <div class="panel-ico" style="background:#e3f2fd">🏪</div>
+      <div class="panel-title">Commerce local</div>
+      <button class="panel-close" onclick="closeOv('entreprises')">✕</button>
+    </div>
+    <div class="panel-body" id="entreprises-panel-body">
+      <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<script defer src="js/mat-desktop.js?v=4.1.0"></script>
+</body>
+</html>
