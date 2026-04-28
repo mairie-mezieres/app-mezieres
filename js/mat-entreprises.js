@@ -1,4 +1,4 @@
-/* MAT — Entreprises v1.0.0 */
+/* MAT — Entreprises v1.1.0 */
 (function(){
 'use strict';
 
@@ -72,18 +72,25 @@ function _e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 function _logo(e,size){
   size=size||72;
   if(e.logo){
-    return '<img src="'+_e(e.logo)+'" alt="'+_e(e.nom)+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;border-radius:10px;background:#e3f2fd" onerror="this.onerror=null;this.style.display=\'none\'">';
+    return '<img src="'+_e(e.logo)+'" alt="'+_e(e.nom)+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;border-radius:10px;background:#e8f0fe" onerror="this.remove()">';
   }
-  return '<div style="width:'+size+'px;height:'+size+'px;border-radius:10px;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:'+(size>80?'2.6':'1.8')+'rem">🏪</div>';
+  return '<div style="width:'+size+'px;height:'+size+'px;border-radius:10px;background:#e8f0fe;display:flex;align-items:center;justify-content:center;font-size:'+(size>80?'2.6':'1.8')+'rem">🛠️</div>';
+}
+
+function _sorted(items){
+  return items.slice().sort(function(a,b){
+    return (a.nom||'').localeCompare(b.nom||'','fr',{sensitivity:'base'});
+  });
 }
 
 function _list(items){
   if(!items||!items.length){
     return '<div style="text-align:center;padding:24px;color:var(--muted);font-size:0.82rem">Aucune entreprise enregistrée pour l\'instant.</div>';
   }
+  var sorted=_sorted(items);
   return '<div style="font-size:0.82rem;font-weight:900;color:var(--forest);text-align:center;padding:6px 0 10px;letter-spacing:0.01em">Entreprises de Mézières-lez-Cléry</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">'
-    +items.map(function(e,i){
+    +sorted.map(function(e,i){
       return '<button onclick="_entrepriseDetail('+i+')" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;width:100%">'
         +_logo(e,72)
         +'<span style="font-size:0.62rem;font-weight:800;color:var(--forest);text-align:center;line-height:1.25">'+_e(e.nom)+'</span>'
@@ -98,7 +105,7 @@ function _detail(e){
     +'<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0">'
     +_logo(e,100).replace('border-radius:10px','border-radius:16px').replace('10px;background','16px;border:1px solid var(--border);background')
     +'<div style="font-size:0.96rem;font-weight:900;color:var(--forest);text-align:center">'+_e(e.nom)+'</div>'
-    +(e.activite?'<div style="font-size:0.74rem;color:var(--muted);text-align:center;font-weight:700;background:#e3f2fd;border-radius:20px;padding:3px 12px">'+_e(e.activite)+'</div>':'')
+    +(e.activite?'<div style="font-size:0.74rem;color:var(--muted);text-align:center;font-weight:700;background:#e8f0fe;border-radius:20px;padding:3px 12px">'+_e(e.activite)+'</div>':'')
     +(e.description?'<p style="font-size:0.80rem;color:var(--text);text-align:center;line-height:1.6;margin:4px 8px">'+_e(e.description)+'</p>':'')
     +(e.gerant?'<div style="font-size:0.76rem;color:var(--text);text-align:center;margin-top:4px"><strong>👤 Gérant :</strong> '+_e(e.gerant)+'</div>':'')
     +'<div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:6px;width:100%">'
@@ -115,8 +122,8 @@ function _load(){
   return fetch(API+'/entreprises')
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
-      var list=d&&Array.isArray(d.entreprises)?d.entreprises:[];
-      _cache=list.length?list:_STATIC;
+      if(!d||!Array.isArray(d.entreprises)){_cache=_STATIC;}
+      else{_cache=d.entreprises;}
       return _cache;
     })
     .catch(function(){_cache=_STATIC;return _cache;});
@@ -128,7 +135,7 @@ window.openEntreprises=function(){
   if(!el)return;
   el.innerHTML='<div class="actu-empty">Chargement…</div>';
   _load().then(function(items){
-    window._entreprisesList=items;
+    window._entreprisesList=_sorted(items);
     if(el)el.innerHTML=_list(items);
   });
 };

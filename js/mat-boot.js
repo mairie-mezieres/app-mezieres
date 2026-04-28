@@ -94,7 +94,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-entreprises.js?v=1.0.0';
+  s.src = 'js/mat-entreprises.js?v=1.1.0';
   document.head.appendChild(s);
 })();
 
