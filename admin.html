@@ -1530,9 +1530,11 @@ async function loadMelQuestions(){
       </div>`).join('');
   }catch(e){if(el) el.innerHTML='<span style="color:var(--red)">❌ '+e.message+'</span>';}
 }
+function _localDateStr(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return`${y}-${m}-${dd}`;}
+function _utcAddDay(dateStr){const d=new Date(dateStr+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+1);return d.toISOString().slice(0,10);}
 async function loadMelQuestionsTab(days){
   const dates=[];
-  for(let i=0;i<days;i++){const d=new Date();d.setDate(d.getDate()-i);dates.push(d.toISOString().slice(0,10));}
+  for(let i=0;i<days;i++){const d=new Date();d.setDate(d.getDate()-i);dates.push(_localDateStr(d));}
   await _renderMelQuestions(dates);
 }
 async function loadMelQuestionsTabRange(){
@@ -1541,7 +1543,7 @@ async function loadMelQuestionsTabRange(){
   if(!from||!to){alert('Sélectionnez une date de début et de fin.');return;}
   if(from>to){alert('La date de début doit être antérieure à la date de fin.');return;}
   const dates=[];
-  for(let d=new Date(from);d<=new Date(to);d.setDate(d.getDate()+1))dates.push(d.toISOString().slice(0,10));
+  for(let cur=from;cur<=to;cur=_utcAddDay(cur))dates.push(cur);
   if(dates.length>90){alert('Plage maximale : 90 jours.');return;}
   await _renderMelQuestions(dates);
 }
@@ -1549,14 +1551,21 @@ async function _renderMelQuestions(dates){
   const el=document.getElementById('mel-tab-melq-list');
   if(el) el.innerHTML='<em>Chargement…</em>';
   try{
-    const results=await Promise.all(dates.map(date=>apiGet('/admin/mel-questions?date='+date).then(r=>({date,...r})).catch(()=>({date,ok:false,questions:[]}))));
+    const results=await Promise.all(dates.map(date=>
+      apiGet('/admin/mel-questions?date='+date)
+        .then(r=>({date,ok:r.ok!==false,questions:r.questions||[],error:r.error||null}))
+        .catch(e=>({date,ok:false,questions:[],error:e.message}))
+    ));
     const catColors={'urbanisme':'#d1fae5','enfance':'#dbeafe','administratif':'#ede9fe','dechets':'#fef9c3','numerique':'#fee2e2','autre':'#f3f4f6'};
     const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    const days=results.filter(r=>r.questions&&r.questions.length);
-    if(!days.length){if(el)el.innerHTML='<em>Aucune question enregistrée sur cette période.</em>';return;}
-    const total=days.reduce((s,r)=>s+r.questions.length,0);
-    if(el) el.innerHTML=`<div style="font-size:0.76rem;font-weight:800;margin-bottom:14px;color:var(--text)">${total} question(s) sur ${days.length} jour(s)</div>`+
-      days.map(r=>`<div style="font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${esc(r.date)} — ${r.questions.length} question(s)</div>`+
+    const failed=results.filter(r=>!r.ok);
+    const withData=results.filter(r=>r.questions.length);
+    const warnHtml=failed.length?`<div style="font-size:0.76rem;background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:8px 12px;color:#991b1b;margin-bottom:12px">⚠️ ${failed.length} jour(s) en erreur : ${failed.map(r=>esc(r.date)+(r.error?` (${esc(r.error)})`:'') ).join(', ')}</div>`:'';
+    if(!withData.length){if(el)el.innerHTML=warnHtml+'<em>Aucune question enregistrée sur cette période.</em>';return;}
+    const total=withData.reduce((s,r)=>s+r.questions.length,0);
+    if(el) el.innerHTML=warnHtml+
+      `<div style="font-size:0.76rem;font-weight:800;margin-bottom:14px;color:var(--text)">${total} question(s) sur ${withData.length} jour(s)</div>`+
+      withData.map(r=>`<div style="font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${esc(r.date)} — ${r.questions.length} question(s)</div>`+
         r.questions.map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;background:${catColors[esc(q.cat)]||'#f3f4f6'};margin-bottom:6px;">
           <span style="font-size:0.68rem;font-weight:900;color:#64748b;min-width:24px;text-align:right">${i+1}.</span>
           <div style="flex:1">
