@@ -36,9 +36,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--warm);color:va
 .admin-header-title{font-size:1rem;font-weight:900;color:var(--cream);}
 .admin-header-sub{font-size:0.7rem;color:rgba(255,255,255,0.6);}
 .logout-btn{background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 12px;font-size:0.76rem;font-weight:700;cursor:pointer;}
-.admin-nav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 16px;}
+.admin-nav{background:white;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 16px;align-items:stretch;}
 .nav-tab{padding:16px 20px;font-size:0.82rem;font-weight:800;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
 .nav-tab.on{color:var(--forest);border-bottom-color:var(--forest);}
+.nav-sep{width:1px;background:var(--border);margin:10px 4px;flex-shrink:0;}
 .admin-body{padding:20px;max-width:1200px;margin:0 auto;}
 .section-title{font-size:0.7rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:20px 0 12px;}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px;}
@@ -223,19 +224,22 @@ tr:hover td{background:#f9fafb;}
 
   <div class="admin-nav">
     <button class="nav-tab on" onclick="showTab('overview',this)">📊 Vue générale</button>
+    <div class="nav-sep"></div>
     <button class="nav-tab" onclick="showTab('actus',this)">🔔 Actualités</button>
     <button class="nav-tab" onclick="showTab('banner',this)">📢 Info/Alerte</button>
-    <button class="nav-tab" onclick="showTab('app',this)">📱 Usage app</button>
-    <button class="nav-tab" onclick="showTab('ia',this)">🤖 IA</button>
-    <button class="nav-tab" onclick="showTab('redis',this)">🗄️ Redis</button>
-    <button class="nav-tab" onclick="showTab('services',this)">🧪 Services</button>
-    <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
     <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
+    <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
+    <button class="nav-tab" onclick="showTab('sondages',this)">🗳️ Sondages</button>
+    <button class="nav-tab" onclick="showTab('docs',this)">📁 Documents</button>
+    <div class="nav-sep"></div>
+    <button class="nav-tab" onclick="showTab('ia',this)">🤖 IA</button>
+    <button class="nav-tab" onclick="showTab('app',this)">📱 Usage app</button>
+    <button class="nav-tab" onclick="showTab('redis',this)">🗄️ Redis</button>
+    <div class="nav-sep"></div>
     <button class="nav-tab" onclick="showTab('mel',this)">👩‍💼 MEL</button>
+    <button class="nav-tab" onclick="showTab('services',this)">🧪 Services</button>
     <button class="nav-tab" onclick="showTab('purge',this)">🗑️ Purge</button>
-  <button class="nav-tab" onclick="showTab('docs',this)">📁 Documents</button>
-  <button class="nav-tab" onclick="showTab('sondages',this)">🗳️ Sondages</button>
-  <button class="nav-tab" onclick="showTab('logs',this)">🪲 Logs</button>
+    <button class="nav-tab" onclick="showTab('logs',this)">🪲 Logs</button>
   </div>
 
   <div class="admin-body">
@@ -538,8 +542,7 @@ function renderOverview() {
   const app    = dash.app   || {};
   const ia     = dash.ia    || {};
   const ov     = app.overview || {};
-  const uniq   = app.uniqueUsers || {};
-  const trends = (dash.iaCategories?.trends || []).slice(0, 8);
+  const redis  = dash.redis  || {};
 
   const today     = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now()-86400000).toISOString().slice(0, 10);
@@ -550,27 +553,55 @@ function renderOverview() {
   let totalEurMonth = 0;
   for (const [prov, d] of Object.entries(monthIa)) { if (prov !== '_total') totalEurMonth += d.costEur || 0; }
 
-  const todayAccess = sumValues((app.parJour||{})[today]);
+  const todayAccess    = sumValues((app.parJour||{})[today]);
   const yesterdayAccess = sumValues((app.parJour||{})[yesterday]);
-  const ideaCount   = _data.ideas.length;
-  const signalCount = _data.signals.length;
-  const pushCount   = dash.redis?.keys?.subs || 0;
+  const ideaCount      = _data.ideas.length;
+  const signalCount    = _data.signals.length;
+  const pushCount      = dash.redis?.keys?.subs || 0;
 
   // Visiteurs uniques
-  const uToday  = ov.uniqueToday    || 0;
-  const uYest   = ov.uniqueYesterday|| 0;
-  const uMonth  = ov.uniqueMonth    || 0;
-  const uPrevM  = ov.uniquePrevMonth|| 0;
-  const uTotal  = uniq.total || 0;
+  const uToday = ov.uniqueToday     || 0;
+  const uYest  = ov.uniqueYesterday || 0;
+  const uMonth = ov.uniqueMonth     || 0;
+  const uPrevM = ov.uniquePrevMonth || 0;
+
+  // Redis Upstash
+  const commands   = redis.commands || {};
+  const redisDay   = commands.day;
+  const redisMonth = commands.month;
+  const pctDay     = Number(commands.pctDay   || 0);
+  const pctMonth   = Number(commands.pctMonth || 0);
+  const redisMem   = Number(redis.pct         || 0);
 
   document.getElementById('overview-content').innerHTML = `
-    <div class="section-title">📊 Résumé d'activité</div>
+    <div class="section-title">🔴 Monitoring — Redis & Coûts</div>
     <div class="cards-grid">
-      <div class="stat-card ok">
-        <div class="stat-card-ico">📲</div>
-        <div class="stat-card-val">${fmt(app.totalInstalls||0)}</div>
-        <div class="stat-card-label">Installations totales</div>
+      <div class="stat-card ${progressClass(pctDay)}">
+        <div class="stat-card-ico">⚡</div>
+        <div class="stat-card-val">${fmt(redisDay)}</div>
+        <div class="stat-card-label">Commandes Redis aujourd'hui</div>
+        <div class="stat-card-sub">${pctDay}% de la limite journalière</div>
       </div>
+      <div class="stat-card ${progressClass(pctMonth)}">
+        <div class="stat-card-ico">📦</div>
+        <div class="stat-card-val">${fmt(redisMonth)}</div>
+        <div class="stat-card-label">Commandes Redis ce mois</div>
+        <div class="stat-card-sub">${pctMonth}% de la limite mensuelle</div>
+      </div>
+      <div class="stat-card ${progressClass(redisMem)}">
+        <div class="stat-card-ico">🗄️</div>
+        <div class="stat-card-val">${redisMem}%</div>
+        <div class="stat-card-label">Mémoire Redis utilisée</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">🤖</div>
+        <div class="stat-card-val">${fmtEurBig(totalEurMonth)}</div>
+        <div class="stat-card-label">Coût IA ce mois</div>
+      </div>
+    </div>
+
+    <div class="section-title">📊 Activité</div>
+    <div class="cards-grid">
       <div class="stat-card">
         <div class="stat-card-ico">🗓️</div>
         <div class="stat-card-val">${fmt(todayAccess)}</div>
@@ -578,9 +609,16 @@ function renderOverview() {
         <div class="stat-card-sub ${trendCls(todayAccess,yesterdayAccess)}">${trendArrow(todayAccess,yesterdayAccess)} vs hier ${pctTrend(todayAccess,yesterdayAccess)}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-ico">🤖</div>
-        <div class="stat-card-val">${fmtEurBig(totalEurMonth)}</div>
-        <div class="stat-card-label">Coût IA ce mois</div>
+        <div class="stat-card-ico">👤</div>
+        <div class="stat-card-val">${fmt(uToday)}</div>
+        <div class="stat-card-label">Visiteurs uniques aujourd'hui</div>
+        <div class="stat-card-sub ${trendCls(uToday,uYest)}">${trendArrow(uToday,uYest)} vs hier : ${fmt(uYest)}${uYest>0?' ('+pctTrend(uToday,uYest)+')':''}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📅</div>
+        <div class="stat-card-val">${fmt(uMonth)}</div>
+        <div class="stat-card-label">Visiteurs uniques ce mois</div>
+        <div class="stat-card-sub ${trendCls(uMonth,uPrevM)}">${trendArrow(uMonth,uPrevM)} vs mois préc. : ${fmt(uPrevM)}${uPrevM>0?' ('+pctTrend(uMonth,uPrevM)+')':''}</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-ico">🔔</div>
@@ -599,60 +637,9 @@ function renderOverview() {
       </div>
     </div>
 
-    <!-- ══ VISITEURS UNIQUES ══ -->
-    <div class="section-title">👥 Visiteurs uniques — appareils distincts</div>
-    <div class="cards-grid">
-      <div class="stat-card ok">
-        <div class="stat-card-ico">📱</div>
-        <div class="stat-card-val">${fmt(uTotal)}</div>
-        <div class="stat-card-label">Total appareils connus</div>
-        <div class="stat-card-sub">Depuis le début des stats</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">🗓️</div>
-        <div class="stat-card-val">${fmt(uToday)}</div>
-        <div class="stat-card-label">Appareils uniques aujourd'hui</div>
-        <div class="stat-card-sub ${trendCls(uToday,uYest)}">
-          ${trendArrow(uToday,uYest)} vs hier : ${fmt(uYest)}
-          ${uYest > 0 ? ' ('+pctTrend(uToday,uYest)+')' : ''}
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-ico">📅</div>
-        <div class="stat-card-val">${fmt(uMonth)}</div>
-        <div class="stat-card-label">Appareils uniques ce mois</div>
-        <div class="stat-card-sub ${trendCls(uMonth,uPrevM)}">
-          ${trendArrow(uMonth,uPrevM)} vs mois précédent : ${fmt(uPrevM)}
-          ${uPrevM > 0 ? ' ('+pctTrend(uMonth,uPrevM)+')' : ''}
-        </div>
-      </div>
-    </div>
-
-    <!-- Breakdown dynamique appareils -->
-    <div class="device-block" id="device-wrap">
-      <div class="device-empty">Chargement…</div>
-    </div>
-
     <div class="section-title">⚡ Usage app aujourd'hui</div>
     ${renderServiceBadges((app.parJour||{})[today] || {})}
-
-    <div class="table-wrap">
-      <div class="table-header"><span class="table-title">MEL — Catégories en tendance (7 derniers jours)</span></div>
-      <table>
-        <tr><th>Catégorie</th><th>7 j. actuels</th><th>7 j. précédents</th><th>Écart</th><th>Évolution</th></tr>
-        ${trends.length
-          ? trends.map(t => `<tr>
-              <td><strong>${t.category}</strong></td><td>${fmt(t.current)}</td><td>${fmt(t.previous)}</td>
-              <td>${t.diff>0?'+':''}${fmt(t.diff)}</td>
-              <td class="${t.pct>0?'trend-up':t.pct<0?'trend-down':'trend-flat'}">${t.pct>0?'↗ +':t.pct<0?'↘ ':'→ '}${t.pct}%</td>
-            </tr>`).join('')
-          : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Aucune tendance disponible</td></tr>'}
-      </table>
-    </div>
   `;
-
-  // Injecter le breakdown après le rendu
-  renderDeviceBreakdown('device-wrap');
 }
 
 function renderServiceBadges(services) {
