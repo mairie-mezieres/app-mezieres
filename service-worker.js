@@ -61,6 +61,8 @@ self.addEventListener('fetch', e => {
   if (
     url.includes('onrender.com') ||
     url.includes('googleapis.com') ||
+    url.includes('clearbit.com') ||
+    url.includes('google.com') ||
     url.includes('open-meteo.com') ||
     url.includes('facebook.com') ||
     url.includes('panneaupocket') ||
@@ -84,7 +86,11 @@ self.addEventListener('fetch', e => {
         return res;
       })
       .catch(() =>
-        caches.match(e.request).then(c => c || (e.request.mode==='navigate'?caches.match('./offline.html'):null))
+        caches.match(e.request).then(c => {
+          if (c) return c;
+          if (e.request.mode === 'navigate') return caches.match('./offline.html');
+          return Promise.reject(new TypeError('not cached'));
+        })
       )
   );
 });
