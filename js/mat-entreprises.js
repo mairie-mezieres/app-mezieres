@@ -70,7 +70,7 @@ var _STATIC=[
 function _e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function _domain(url){
-  try{return new URL(url).hostname.replace(/^www\./, '');}catch(e){return '';}
+  try{return new URL(url).hostname.replace(/^www\./,'');}catch(e){return '';}
 }
 
 function _logo(e,size){
@@ -78,7 +78,6 @@ function _logo(e,size){
   var r='border-radius:10px';
   var bg='background:#e8f0fe';
   var style='width:'+size+'px;height:'+size+'px;object-fit:contain;'+r+';'+bg;
-  var fallback="this.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(this.dataset.domain)+'&sz=64';this.onerror=null;this.style.display='none'";
   if(e.logo){
     return '<img src="'+_e(e.logo)+'" alt="'+_e(e.nom)+'" style="'+style+'" onerror="this.remove()">';
   }
@@ -86,7 +85,8 @@ function _logo(e,size){
     var d=_domain(e.siteWeb);
     if(d){
       var src='https://logo.clearbit.com/'+encodeURIComponent(d);
-      return '<img src="'+src+'" alt="'+_e(e.nom)+'" data-domain="'+_e(d)+'" style="'+style+'" onerror="'+fallback+'">';
+      var fav='https://www.google.com/s2/favicons?domain='+encodeURIComponent(d)+'&sz=64';
+      return '<img src="'+src+'" alt="'+_e(e.nom)+'" style="'+style+'" onerror="this.src=\''+fav+'\';this.onerror=function(){this.remove();}">';
     }
   }
   return '<div style="width:'+size+'px;height:'+size+'px;'+r+';'+bg+';display:flex;align-items:center;justify-content:center;font-size:'+(size>80?'2.6':'1.8')+'rem">🛠️</div>';
