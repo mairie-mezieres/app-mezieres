@@ -76,7 +76,7 @@ function _domain(url){
 function _logo(e,size){
   size=size||72;
   var r='border-radius:10px';
-  var bg='background:#e8f0fe';
+  var bg='background:#fff';
   var style='width:'+size+'px;height:'+size+'px;object-fit:contain;'+r+';'+bg;
   if(e.logo){
     return '<img src="'+_e(e.logo)+'" alt="'+_e(e.nom)+'" style="'+style+'" onerror="this.remove()">';
@@ -118,7 +118,7 @@ function _list(items){
 function _detail(e){
   var h='<button onclick="_entrepriseBack()" style="background:none;border:none;color:var(--leaf);font-family:inherit;font-size:0.82rem;font-weight:800;cursor:pointer;padding:0 0 12px 0">← Retour</button>'
     +'<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0">'
-    +_logo(e,100).replace('border-radius:10px','border-radius:16px').replace('10px;background','16px;border:1px solid var(--border);background')
+    +_logo(e,100).replace('border-radius:10px','border-radius:16px').replace('background:#fff','border:1px solid var(--border);background:#fff')
     +'<div style="font-size:0.96rem;font-weight:900;color:var(--forest);text-align:center">'+_e(e.nom)+'</div>'
     +(e.activite?'<div style="font-size:0.74rem;color:var(--muted);text-align:center;font-weight:700;background:#e8f0fe;border-radius:20px;padding:3px 12px">'+_e(e.activite)+'</div>':'')
     +(e.description?'<p style="font-size:0.80rem;color:var(--text);text-align:center;line-height:1.6;margin:4px 8px">'+_e(e.description)+'</p>':'')
