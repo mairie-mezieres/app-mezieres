@@ -363,8 +363,8 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   width:100%;
   padding:10px 12px;
   border-radius:14px;
-  background:rgba(180,210,255,.10);
-  box-shadow:inset 0 0 0 1px rgba(180,210,255,.18);
+  background:rgba(180,210,255,.16);
+  box-shadow:inset 0 0 0 1px rgba(180,210,255,.30);
   cursor:pointer;
   transition:transform .12s ease, background .12s ease;
   outline:none;
