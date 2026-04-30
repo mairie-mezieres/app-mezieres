@@ -14,6 +14,12 @@ async function loadSondages() {
     var d = await r.json();
     _currentSondages = d.sondages || [];
     _renderSondagesList();
+    var ovEl = document.getElementById('ov-sondages');
+    if (ovEl && ovEl.classList.contains('open')) {
+      _currentSondages.forEach(function(s) {
+        localStorage.setItem('mat_seen_sondage_' + s.id, '1');
+      });
+    }
     refreshSondagesBadge();
   } catch(e) {
     el.innerHTML = '<div class="actu-empty">Impossible de charger les sondages.</div>';
@@ -24,7 +30,7 @@ function _renderSondagesList() {
   var el = document.getElementById('sondages-container');
   if (!el) return;
   if (!_currentSondages.length) {
-    el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:28px 0">&#128202; Aucun sondage en cours.<br><span style="font-size:0.76rem;color:var(--muted)">Revenez bientôt !</span></div>';
+    el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:28px 0">&#128202; Aucun sondage en cours.<br><span style="font-size:0.76rem;color:var(--muted)">Revenez bientôt !</span></div>';
     return;
   }
   el.innerHTML = _currentSondages.map(function(s){ return _renderSondageCard(s); }).join('');
@@ -157,7 +163,7 @@ async function _submitSondage(id) {
       var s2 = _currentSondages[idx] || s;
       el.innerHTML = '<button onclick="_sondageBack()" style="background:none;border:none;color:var(--leaf);font-family:Nunito,sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;padding:0;margin-bottom:16px">← Retour</button>'
         + '<div style="font-weight:900;font-size:1rem;color:var(--text);margin-bottom:12px">' + esc(s2.titre) + '</div>'
-        + '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-size:0.84rem;font-weight:800;color:#166534;margin-bottom:14px">✅ Merci pour votre participation !</div>'
+        + '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;font-size:0.84rem;font-weight:800;color:#166534;margin-bottom:14px">✅ Merci pour votre participation !</div>'
         + _renderSondageResults(s2, d);
     }
     refreshSondagesBadge();
@@ -205,7 +211,7 @@ function refreshSondagesBadge() {
   var badge = document.getElementById('sondages-badge');
   if (!badge) return;
   var count = (_currentSondages || []).filter(function(s) {
-    return !localStorage.getItem('mat_voted_' + s.id);
+    return !localStorage.getItem('mat_voted_' + s.id) && !localStorage.getItem('mat_seen_sondage_' + s.id);
   }).length;
   if (count > 0) {
     badge.textContent = count > 9 ? '9+' : String(count);

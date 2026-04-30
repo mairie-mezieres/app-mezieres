@@ -76,11 +76,11 @@ function getInstallHelpHtml(){
         <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
           <strong>iOS</strong><br>
           1. Touchez le bouton <strong>Partager</strong> dans Safari.<br>
-          2. Faites défiler puis touchez <strong>Sur l’écran d’accueil</strong>.<br>
+          2. Faites défiler puis touchez <strong>Sur l'écran d'accueil</strong>.<br>
           3. Confirmez avec <strong>Ajouter</strong>.
         </div>
         <a href="installer-ios.mp4" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:900">🎬 Voir la vidéo iOS</a>
-        <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)">La vidéo s’ouvrira si le fichier <strong>installer-ios.mp4</strong> est présent à la racine de la PWA.</div>
+        <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)">La vidéo s'ouvrira si le fichier <strong>installer-ios.mp4</strong> est présent à la racine de la PWA.</div>
       </div>`;
   }
 
@@ -90,8 +90,8 @@ function getInstallHelpHtml(){
         <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
           <strong>Android</strong><br>
           1. Ouvrez le menu du navigateur.<br>
-          2. Touchez <strong>Ajouter à l’écran d’accueil</strong> ou <strong>Installer l’application</strong>.<br>
-          3. Confirmez l’installation.
+          2. Touchez <strong>Ajouter à l'écran d'accueil</strong> ou <strong>Installer l'application</strong>.<br>
+          3. Confirmez l'installation.
         </div>
       </div>`;
   }
@@ -100,11 +100,11 @@ function getInstallHelpHtml(){
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="font-size:0.84rem;line-height:1.65;color:var(--text)">
         <strong>PC</strong><br>
-        1. Dans <strong>Chrome</strong> ou <strong>Edge</strong>, cliquez sur l’icône d’installation dans la barre d’adresse.<br>
-        2. Ou ouvrez le menu du navigateur puis cliquez sur <strong>Installer l’application</strong>.<br>
+        1. Dans <strong>Chrome</strong> ou <strong>Edge</strong>, cliquez sur l'icône d'installation dans la barre d'adresse.<br>
+        2. Ou ouvrez le menu du navigateur puis cliquez sur <strong>Installer l'application</strong>.<br>
         3. Validez pour ajouter MAT sur le bureau.
       </div>
-      <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)"><strong>Firefox</strong> ne propose généralement pas l’installation PWA.</div>
+      <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)"><strong>Firefox</strong> ne propose généralement pas l'installation PWA.</div>
     </div>`;
 }
 
@@ -191,6 +191,11 @@ function openDechets(){openOv('dechets'); loadDechetsDetail();}
 function openSondages(){
   openOv('sondages');
   localStorage.setItem('mat_sondages_seen_at', String(Date.now()));
+  if (typeof _currentSondages !== 'undefined') {
+    (_currentSondages || []).forEach(function(s) {
+      localStorage.setItem('mat_seen_sondage_' + s.id, '1');
+    });
+  }
   if (typeof loadSondages === 'function') loadSondages();
   if (typeof refreshSondagesBadge === 'function') refreshSondagesBadge();
 }

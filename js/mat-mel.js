@@ -1083,7 +1083,7 @@ function _renderDirectAnswer(answer){
   if(typeof answer==='string'){
     // Transformer URLs et tél en liens cliquables
     let t=answer
-      .replace(/\n/g,'<br>')
+      .replace(/\r\n|\r|\n/g,'<br>')
       .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" style="color:var(--leaf);font-weight:700;word-break:break-all;">$1</a>')
       .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" style="color:var(--leaf);font-weight:700;">$1</a>')
       .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
