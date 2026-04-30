@@ -1083,14 +1083,14 @@ function _renderDirectAnswer(answer){
   if(typeof answer==='string'){
     // Transformer URLs et tél en liens cliquables
     let t=answer
-      .replace(/\r\n|\r|\n/g,'<br>')
+      .replace(/\n/g,'<br>')
       .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" style="color:var(--leaf);font-weight:700;word-break:break-all;">$1</a>')
       .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" style="color:var(--leaf);font-weight:700;">$1</a>')
       .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
     return '<p style="margin:0 0 8px;line-height:1.6;">'+t+'</p>';
   }
   // Format objet
-  let h='<p style="margin:0 0 10px;line-height:1.6;">'+answer.text+'</p>';
+  let h='<p style="margin:0 0 10px;line-height:1.6;">'+(answer.text||'').replace(/\r\n|\r|\n/g,'<br>')+'</p>';
   if(answer.links&&answer.links.length){
     h+='<div style="display:flex;flex-direction:column;gap:6px;">';
     for(const lk of answer.links){
