@@ -116,6 +116,7 @@ function meteoBuildHourlyTimeline(hourly, nowDate) {
       mm: mmVal,
       wind: Math.round((((hourly || {}).wind_speed_10m || [])[i] || 0)),
       windDir: meteoDir((((hourly || {}).wind_direction_10m || [])[i])),
+      windDeg: (((hourly || {}).wind_direction_10m || [])[i] || 0),
       code: (((hourly || {}).weather_code || [])[i] || 0)
     });
   }
@@ -136,7 +137,7 @@ function meteoBuildHourlyTimeline(hourly, nowDate) {
           + '<div class="meteo-hour-rain-wrap"><div class="meteo-hour-rain-bar" style="height:' + barH + 'px"></div></div>'
           + '<div class="meteo-hour-rain">' + item.prob + '%</div>'
           + '<div class="meteo-hour-mm">' + (item.mm > 0 ? item.mm.toFixed(1) + ' mm' : '—') + '</div>'
-          + '<div class="meteo-hour-wind">➜ ' + item.wind + (item.windDir ? ' ' + item.windDir : '') + '</div>'
+          + '<div class="meteo-hour-wind"><span style="display:inline-block;transform:rotate(' + (item.windDeg - 90) + 'deg)">➜</span> ' + item.wind + (item.windDir ? ' ' + item.windDir : '') + '</div>'
           + '</div>';
       }).join('')
     + '</div>'
@@ -418,6 +419,7 @@ function loadMeteoDetail() {
     var pl = parseFloat((days.precipitation_sum || [])[i] || 0).toFixed(1);
     var uv = (days.uv_index_max || [])[i] != null ? Number((days.uv_index_max || [])[i]).toFixed(1) : '–';
     var wd = meteoDir((days.wind_direction_10m_dominant || [])[i]);
+    var wdDeg = (days.wind_direction_10m_dominant || [])[i] || 0;
     var gust = (days.wind_gusts_10m_max || [])[i] != null ? Math.round((days.wind_gusts_10m_max || [])[i]) : '–';
     html += '<div class="meteo-day-card">'
       + '<div class="meteo-day-title">' + jr + '</div>'
@@ -426,7 +428,7 @@ function loadMeteoDetail() {
       + '<div class="meteo-day-desc">' + (METEO_DESC[co] || '') + '</div>'
       + '<div class="meteo-day-meta">🌧️ ' + pl + ' mm</div>'
       + '<div class="meteo-day-meta">☀️ UV ' + uv + '</div>'
-      + '<div class="meteo-day-meta">➜ ' + gust + (wd ? ' ' + wd : '') + '</div>'
+      + '<div class="meteo-day-meta"><span style="display:inline-block;transform:rotate(' + (wdDeg - 90) + 'deg)">➜</span> ' + gust + (wd ? ' ' + wd : '') + '</div>'
       + '</div>';
   }
   html += '</div></div></div>';
