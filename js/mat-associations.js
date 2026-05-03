@@ -30,8 +30,8 @@ var _D=[
     n:'Pamela & Co',
     l:'pamco.jpg',
     e:'pamelacompagnie@gmail.com',
-    url:'https://pamandco.fr/',
-    desc:"Ferme d'animation pédagogique : éco-pâturage, enrichissement de la biodiversité, ruches pédagogiques, médiation animale et projets éducatifs avec les écoles. Sensibilisation à la préservation de l'environnement pour petits et grands."
+    url:'https://www.facebook.com/profile.php?id=61565106420856',
+    desc:"🐷𝙇𝙚 𝙦𝙪𝙤𝙩𝙞𝙙𝙞𝙚𝙣 𝙙𝙚 𝙈𝙖𝙜𝙣𝙤𝙡𝙞𝙣𝙚 , 𝙉𝙖𝙣𝙤𝙪 , 𝗥𝗮𝗺𝘀𝗲𝘀 𝙚𝙩 𝙗𝙞𝙚𝙣 𝙙’𝙖𝙪𝙩𝙧𝙚𝙨 𝙖𝙣𝙞𝙢𝙖𝙪𝙭 .. 👩🏻‍🌾𝙎𝙪𝙞𝙫𝙚𝙯 𝙣𝙤𝙩𝙧𝙚 𝙚́𝙥𝙤𝙥𝙚́𝙚 𝙙𝙚 𝙧𝙚𝙘𝙤𝙣𝙨𝙩𝙧𝙪𝙘𝙩𝙞𝙤𝙣 𝙖𝙣𝙞𝙢𝙖𝙡𝙞𝙚̀𝙧𝙚!"
   }
 ];
 
