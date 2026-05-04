@@ -462,7 +462,7 @@ window.addEventListener('error', function(e) {
 window.addEventListener('unhandledrejection', function(e) {
   var reason = e && e.reason;
   if (!reason) return;
-  var msg = reason.message || String(reason);
+  var msg = String(reason.message != null ? reason.message : reason);
   // Filtrer les rejections provenant d'extensions navigateur
   if (msg.toLowerCase().includes('cashbackreminder') ||
       msg.toLowerCase() === 'script error.' ||
