@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Utilitaires communs v3.7.4
+   MAT — Utilitaires communs v3.7.5
    Helpers partagés par tous les modules
    ════════════════════════════════════════════════════════════ */
 
@@ -12,7 +12,7 @@ const METEO_URL   = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune'
 const VAPID_PUB   = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 const INSTALL_KEY = 'mat_installed_v3';
 const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
-const MAT_VERSION = 'v3.7.4';
+const MAT_VERSION = 'v3.7.5';
 const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
 
 // ── AbortSignal.timeout polyfill (Safari < 16 / old WebView) ─
@@ -398,20 +398,29 @@ var _matLogFlushTimer = null;
 var _matLogLastSent = {};
 
 function matLogError(module, message, extra) {
-  // Filtrer les erreurs attendues / inoffensives
   var msg = String(message || '').toLowerCase();
+
+  // Erreurs inoffensives (réseau, abort, annulation)
   if (
     msg.includes('aborted') ||
     msg.includes('load failed') ||
     msg.includes('networkerror') ||
-    msg.includes('failed to fetch') && module === 'SW' ||
+    (msg.includes('failed to fetch') && module === 'SW') ||
     msg.includes('signal is aborted') ||
     msg.includes('cancelled')
   ) return;
 
+  // Bruit provenant d'extensions navigateur (cashback, adblock, etc.)
+  // "Script error." = erreur cross-origine sans détail exploitable
+  if (
+    msg.includes('cashbackreminder') ||
+    msg === 'script error.' ||
+    msg === 'script error'
+  ) return;
+
   var key = module + ':' + msg.slice(0, 60);
   var now = Date.now();
-  if (_matLogLastSent[key] && now - _matLogLastSent[key] < 60000) return; // dédoublonnage 1 min
+  if (_matLogLastSent[key] && now - _matLogLastSent[key] < 60000) return;
   _matLogLastSent[key] = now;
 
   var entry = {
@@ -437,16 +446,32 @@ function _matFlushLogs() {
   } catch(_) {}
 }
 
-// Intercepteurs globaux (seulement les erreurs non gérées)
+// Intercepteurs globaux (seulement les erreurs non gérées du code MAT)
 window.addEventListener('error', function(e) {
   if (!e || !e.message) return;
+  // Ignorer les erreurs cross-origine sans contexte (extensions, CDN tiers)
+  if (e.message === 'Script error.' || e.message === 'Script error') return;
+  var origin = typeof location !== 'undefined' ? location.origin : '';
+  if (e.filename && origin && !e.filename.startsWith(origin) &&
+      !e.filename.includes('mezieres') && !e.filename.includes('onrender')) return;
   var src = (e.filename || '').split('/').pop().replace(/\.js.*/, '') || 'global';
-  matLogError(src, e.message, e.lineno ? 'L' + e.lineno : undefined);
+  var extra = e.lineno ? ('L' + e.lineno + (e.colno ? ':' + e.colno : '')) : undefined;
+  matLogError(src, e.message, extra);
 }, true);
 
 window.addEventListener('unhandledrejection', function(e) {
   var reason = e && e.reason;
   if (!reason) return;
   var msg = reason.message || String(reason);
-  matLogError('promise', msg);
+  // Filtrer les rejections provenant d'extensions navigateur
+  if (msg.toLowerCase().includes('cashbackreminder') ||
+      msg.toLowerCase() === 'script error.' ||
+      msg.toLowerCase() === 'script error') return;
+  // Ajouter la ligne de stack comme contexte si disponible
+  var stackLines = reason.stack ? String(reason.stack).split('\n') : [];
+  var stackCtx = stackLines.find(function(l) {
+    return l.includes('mezieres') || l.includes('onrender') || l.includes('mat-');
+  });
+  var extra = stackCtx ? stackCtx.trim().slice(0, 100) : undefined;
+  matLogError('promise', msg, extra);
 });
