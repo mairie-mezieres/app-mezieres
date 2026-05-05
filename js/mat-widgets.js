@@ -456,7 +456,18 @@ function loadMeteoDetail() {
   html += '<div style="margin-top:10px">'
     + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">📊 Cumul et tendances sur 24h</div>'
     + '<div class="meteo-grid-2 meteo-grid-secondary">'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm' + meteoTrendBadge(tPluie) + '</div></div></div>'
+    + (function(){
+        var rate = pluieCur3h != null ? Number(pluieCur3h) : null;
+        var rateBadge = '';
+        if (rate != null) {
+          if (rate >= 0.1) {
+            rateBadge = ' <span class="meteo-trend-inline" style="color:#2563eb" title="Précipitations en cours : ' + rate.toFixed(1) + ' mm/h actuellement">💧 ' + rate.toFixed(1) + ' mm/h</span>';
+          } else if (pluie24h > 0) {
+            rateBadge = ' <span class="meteo-trend-inline" style="color:#6b7280" title="Pluie terminée pour l\'instant">✓ sec</span>';
+          }
+        }
+        return '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul 24h</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm' + rateBadge + '</div></div></div>';
+      })()
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%' + meteoTrendBadge(tHum) + '</div></div></div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + meteoTrendBadge(tRaf) + '</div></div></div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres) + '</div></div></div>'
