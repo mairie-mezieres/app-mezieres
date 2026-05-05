@@ -472,6 +472,7 @@ function handleMatHashRoute(){
     if(!h) return;
     if(h==='#notifs'){ setTimeout(function(){ openNotifs(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
+    if(h==='#meteo'){ setTimeout(function(){ openMeteo(); }, 180); return; }
     if(h.indexOf('#actu=')===0){
       var raw=h.substring(6);
       var id=decodeURIComponent(raw||'').trim();
@@ -486,6 +487,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
   navigator.serviceWorker.addEventListener('message', function(e){
     var data=(e&&e.data)||{};
+    if(data.action==='openMeteo'){ openMeteo(); return; }
     if(data.action==='openNotifs'){ openNotifs(); return; }
     if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
       openActuDetail(String(data.actuId),{ fromHash:false });
