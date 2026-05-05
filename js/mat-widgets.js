@@ -303,45 +303,56 @@ function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
     + '</div>';
 }
 
-async function loadMeteo() {
+let _meteoRetryScheduled = false;
+async function loadMeteo(isRetry) {
   try {
-    const fr = await fetch(METEO_URL, { cache: 'no-store', signal: matAbortTimeout(8000) });
-    if (!fr.ok) throw new Error('HTTP ' + fr.status);
+    const timeout = isRetry ? 25000 : 8000;
+    const fr = await fetch(METEO_URL, { cache: ‘no-store’, signal: matAbortTimeout(timeout) });
+    if (!fr.ok) throw new Error(‘HTTP ‘ + fr.status);
     const d = await fr.json();
+    _meteoRetryScheduled = false;
     const cur = (d.forecast || {}).current || {};
     const vigilance = d.vigilance || null;
     const code = cur.weather_code;
     const temp = Math.round(cur.temperature_2m != null ? cur.temperature_2m : 0);
     const vent = Math.round(cur.wind_speed_10m != null ? cur.wind_speed_10m : 0);
-    const badge = document.getElementById('meteo-alerte');
-    const descEl = document.getElementById('meteo-desc');
-    const baseDesc = (METEO_DESC[code] || 'Météo') + ' · Vent ' + vent + ' km/h';
+    const badge = document.getElementById(‘meteo-alerte’);
+    const descEl = document.getElementById(‘meteo-desc’);
+    const baseDesc = (METEO_DESC[code] || ‘Météo’) + ‘ · Vent ‘ + vent + ‘ km/h’;
 
-    document.getElementById('meteo-ico').textContent = METEO_ICONS[code] || '🌡️';
-    document.getElementById('meteo-temp').innerHTML = '<strong style="font-size:1.2rem;color:var(--cream)">' + temp + '°C</strong>';
+    document.getElementById(‘meteo-ico’).textContent = METEO_ICONS[code] || ‘🌡️’;
+    document.getElementById(‘meteo-temp’).innerHTML = ‘<strong style="font-size:1.2rem;color:var(--cream)">’ + temp + ‘°C</strong>’;
 
     if (meteoHasAlert(vigilance)) {
       const startTxt = meteoFormatAlertDate(vigilance.start, false);
       const endTxt = meteoFormatAlertDate(vigilance.end, false);
-      descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">Début ' + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
-      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo');
-      badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = 'Touchez pour voir le détail de l’alerte';
+      descEl.innerHTML = esc(baseDesc) + ‘<br><span class="meteo-alert-times">Début ‘ + esc(startTxt) + ‘ · Fin ‘ + esc(endTxt) + ‘</span>’;
+      badge.textContent = ‘⚠️ Vigilance ‘ + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || ‘météo’);
+      badge.classList.add(‘meteo-badge-alert’, ‘level-’ + Number(vigilance.level || 2));
+      badge.title = ‘Touchez pour voir le détail de l’alerte’;
     } else {
       descEl.textContent = baseDesc;
-      badge.textContent = '✅ Pas d\'alerte';
-      badge.classList.remove('meteo-badge-alert', 'level-2', 'level-3', 'level-4');
-      badge.title = '';
+      badge.textContent = ‘✅ Pas d\’alerte’;
+      badge.classList.remove(‘meteo-badge-alert’, ‘level-2’, ‘level-3’, ‘level-4’);
+      badge.title = ‘’;
     }
 
-    badge.style.display = 'inline-flex';
+    badge.style.display = ‘inline-flex’;
     window._meteoData = d;
   } catch (e) {
-    if(typeof matLogError==='function' && navigator.onLine) matLogError('meteo','loadMeteo: '+e.message);
+    if(typeof matLogError===’function’ && navigator.onLine) matLogError(‘meteo’,’loadMeteo: ‘+e.message);
     var offline = !navigator.onLine;
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : 'Météo indisponible') + '</span>';
-    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : '';
-    document.getElementById('meteo-alerte').style.display = 'none';
+    if (!offline && !isRetry && !_meteoRetryScheduled) {
+      // Serveur en démarrage à froid (Render) — patienter 22s et réessayer
+      _meteoRetryScheduled = true;
+      document.getElementById(‘meteo-temp’).innerHTML = ‘<span class="meteo-loading">⏳ Démarrage…</span>’;
+      document.getElementById(‘meteo-desc’).textContent = ‘’;
+      setTimeout(function(){ loadMeteo(true); }, 22000);
+      return;
+    }
+    document.getElementById(‘meteo-temp’).innerHTML = ‘<span class="meteo-loading">’ + (offline ? ‘📡 Hors ligne’ : ‘Météo indisponible’) + ‘</span>’;
+    document.getElementById(‘meteo-desc’).textContent = offline ? ‘Reconnectez-vous pour actualiser’ : ‘’;
+    document.getElementById(‘meteo-alerte’).style.display = ‘none’;
   }
 }
 
@@ -689,9 +700,11 @@ function loadBusRemi() {
 // ── Prochain événement (header) ──────────────────────────
 const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 
-async function loadEvents(){
+let _eventsRetryScheduled = false;
+async function loadEvents(isRetry){
   try{
-    var evts=await ensureAgendaEvents();
+    var evts=await ensureAgendaEvents(isRetry);
+    _eventsRetryScheduled = false;
     var first=evts.length?evts[0]:null;
     if(!first){
       document.getElementById('next-event-date').textContent='Aucune date';
@@ -706,6 +719,14 @@ async function loadEvents(){
     document.getElementById('next-event-days').textContent=diffTxt;
   }catch(e){
     var offline = !navigator.onLine;
+    if (!offline && !isRetry && !_eventsRetryScheduled) {
+      _eventsRetryScheduled = true;
+      document.getElementById('next-event-date').textContent = '⏳';
+      document.getElementById('next-event-name').textContent = 'Démarrage…';
+      document.getElementById('next-event-days').textContent = '';
+      setTimeout(function(){ loadEvents(true); }, 22000);
+      return;
+    }
     document.getElementById('next-event-date').textContent = offline?'📡 Hors ligne':'Indisponible';
     document.getElementById('next-event-name').textContent = offline?'Agenda non dispo':'Agenda';
     document.getElementById('next-event-days').textContent = offline?'Reconnectez-vous':'Réessayez plus tard';
