@@ -360,7 +360,13 @@ function loadMeteoDetail() {
   var d = window._meteoData;
   var el = document.getElementById('meteo-detail');
   if (!d) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ Chargement des données météo…</div>';
+    loadMeteo(false).then(function() {
+      if (window._meteoData) loadMeteoDetail();
+      else el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Météo indisponible — réessayez dans quelques secondes.</div>';
+    }).catch(function() {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Météo indisponible.</div>';
+    });
     return;
   }
 
