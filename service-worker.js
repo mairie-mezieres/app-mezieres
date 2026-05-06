@@ -1,7 +1,7 @@
 // SERVICE WORKER v4.3.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 10 : Entreprises locales (tuile + overlay + admin)
-const CACHE = 'mat-v4.3.1';
+const CACHE = 'mat-v4.3.2';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -12,7 +12,7 @@ const PRECACHE_URLS = [
   './js/mat-utils.js?v=4.2.4',
   './js/mat-core.js?v=4.2.4',
   './js/mat-accessibility.js?v=4.2.4',
-  './js/mat-widgets.js?v=4.2.4',
+  './js/mat-widgets.js?v=4.3.2',
   './js/mat-agenda.js?v=4.2.4',
   './js/mat-forms.js?v=4.2.4',
   './js/mat-actus.js?v=4.2.4',
