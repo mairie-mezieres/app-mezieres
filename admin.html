@@ -1446,11 +1446,16 @@ async function pubSubmit() {
     const schedDates = [pushSched1, pushSched2].filter(Boolean);
     for (const dt of schedDates) {
       try {
-        await fetch(`${API}/admin/push/schedule`, {
+        const sr = await fetch(`${API}/admin/push/schedule`, {
           method: 'POST', headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
           body: JSON.stringify({ title, body: description, actuId, scheduledAt: new Date(dt).toISOString() })
         });
-        lines.push(`🕐 Push programmé pour le ${new Date(dt).toLocaleString('fr-FR')}`);
+        if (!sr.ok) {
+          const errBody = await sr.json().catch(() => ({}));
+          lines.push(`⚠️ Push programmé rejeté (${sr.status})${errBody.error ? ' : ' + errBody.error : ''}`);
+        } else {
+          lines.push(`🕐 Push programmé pour le ${new Date(dt).toLocaleString('fr-FR')}`);
+        }
       } catch(se) { lines.push('⚠️ Push programmé : ' + se.message); }
     }
     if (schedDates.length) { status.innerHTML = lines.join('<br>'); }

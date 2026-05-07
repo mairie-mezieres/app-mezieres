@@ -339,9 +339,9 @@ async function loadMeteo() {
   } catch (e) {
     if(typeof matLogError==='function' && navigator.onLine) matLogError('meteo','loadMeteo: '+e.message);
     var offline = !navigator.onLine;
-    if(!offline && isRetry && typeof window.matSignalServerError==='function') window.matSignalServerError();
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : (isRetry ? '☁️ Météo indisponible' : '⏳ Chargement…')) + '</span>';
-    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : (isRetry ? 'Serveur chargé — réessayez dans quelques secondes' : '');
+    if(!offline && typeof window.matSignalServerError==='function') window.matSignalServerError();
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : '☁️ Météo indisponible') + '</span>';
+    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : 'Serveur chargé — réessayez dans quelques secondes';
     document.getElementById('meteo-alerte').style.display = 'none';
   }
 }

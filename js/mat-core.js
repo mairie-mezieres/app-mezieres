@@ -484,6 +484,29 @@ document.addEventListener('keydown', function(e) {
   };
 })();
 
+// ── Mode dégradé Redis (quota 10 000/jour dépassé) ────────────
+(function(){
+  var _checked = false;
+  function _checkRedisMode() {
+    if (_checked || !navigator.onLine) return;
+    _checked = true;
+    fetch('https://chatbot-mairie-mezieres.onrender.com/health', { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if (!data || data.mode !== 'degraded') return;
+        if (document.getElementById('mat-degraded-banner')) return;
+        var b = document.createElement('div');
+        b.id = 'mat-degraded-banner';
+        b.innerHTML = '⚡ Forte affluence aujourd\'hui — l\'app fonctionne en mode simplifié (météo, agenda et actualités disponibles). <span style="text-decoration:underline;cursor:pointer" onclick="this.parentElement.remove()">Fermer</span>';
+        b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#1d4ed8;color:white;font-family:Nunito,sans-serif;font-size:.73rem;font-weight:800;text-align:center;z-index:99996;box-shadow:0 2px 10px rgba(0,0,0,.25)';
+        document.body.prepend(b);
+      })
+      .catch(function(){});
+  }
+  window.addEventListener('load', function(){ setTimeout(_checkRedisMode, 2500); });
+})();
+
+
 // ── Service Worker + hash routing ─────────────────────────────
 function handleMatHashRoute(){
   try{
