@@ -409,10 +409,12 @@ let _melTreeEditor = null;
 let _melTreeLoadedFrom = '';
 
 async function saveStatsSettings() {
-  const detailed  = !!document.getElementById('set-detailed-stats')?.checked;
-  const mel       = !!document.getElementById('set-mel-stats')?.checked;
-  const appOpen   = !!document.getElementById('set-appopen-stats')?.checked;
-  const melQLog   = !!document.getElementById('set-mel-question-log')?.checked;
+  const detailed    = !!document.getElementById('set-detailed-stats')?.checked;
+  const mel         = !!document.getElementById('set-mel-stats')?.checked;
+  const appOpen     = !!document.getElementById('set-appopen-stats')?.checked;
+  const melQLog     = !!document.getElementById('set-mel-question-log')?.checked;
+  const melEnabled  = !!document.getElementById('set-mel-enabled')?.checked;
+  const melDisabledMessage = document.getElementById('set-mel-disabled-msg')?.value?.trim() || '';
   const statusEl = document.getElementById('stats-settings-status');
 
   try {
@@ -425,7 +427,9 @@ async function saveStatsSettings() {
       detailedStatsEnabled:  detailed,
       melUsageStatsEnabled:  mel,
       appOpenStatsEnabled:   appOpen,
-      melQuestionLogEnabled: melQLog
+      melQuestionLogEnabled: melQLog,
+      melEnabled,
+      melDisabledMessage
     });
 
     if (!r.ok) throw new Error(r.error || 'Erreur');
@@ -784,6 +788,8 @@ function renderRedis() {
   const melUsageStatsEnabled   = settings.melUsageStatsEnabled === true;
   const appOpenStatsEnabled    = settings.appOpenStatsEnabled === true;
   const melQuestionLogEnabled  = settings.melQuestionLogEnabled === true;
+  const melEnabled             = settings.melEnabled !== false;
+  const melDisabledMessage     = settings.melDisabledMessage || '';
   
   const pct = Number(redis.pct || 0);
   const cls = progressClass(pct);
@@ -805,6 +811,27 @@ function renderRedis() {
 
   document.getElementById('redis-content').innerHTML = `
   <div class="section-title">Réglages du tracking</div>
+
+  <div class="progress-wrap" style="border:${melEnabled?'1.5px solid #d1fae5':'2px solid #fca5a5'};background:${melEnabled?'':'#fff5f5'}">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">🤖 Chat MEL <span style="font-size:0.7rem;font-weight:700;background:${melEnabled?'#d1fae5':'#fee2e2'};color:${melEnabled?'#065f46':'#991b1b'};border-radius:6px;padding:2px 7px;margin-left:6px">${melEnabled?'Actif':'⚠️ DÉSACTIVÉ'}</span></div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
+          Désactivez le chat IA en cas d'attaque, surcharge ou maintenance. Les utilisateurs voient le message ci-dessous.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-mel-enabled" ${melEnabled?'checked':''}>
+        Chat MEL activé
+      </label>
+      <div style="width:100%">
+        <label style="display:block;font-size:0.72rem;font-weight:800;color:var(--muted);margin-bottom:4px">Message affiché aux utilisateurs si désactivé</label>
+        <input type="text" id="set-mel-disabled-msg" value="${melDisabledMessage.replace(/"/g,'&quot;')}" maxlength="300"
+          placeholder="Le chat MEL est temporairement indisponible. Contactez la mairie au 02 38 45 61 76 😊"
+          style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.8rem;font-family:inherit;background:white;box-sizing:border-box">
+      </div>
+    </div>
+  </div>
 
   <div class="progress-wrap">
     <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
@@ -874,6 +901,11 @@ function renderRedis() {
       💾 Enregistrer les réglages
     </button>
     <div id="stats-settings-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></div>
+  </div>
+
+  <div class="section-title">📧 Email récapitulatif quotidien</div>
+  <div class="progress-wrap" id="email-config-card">
+    <div style="font-size:0.8rem;color:var(--muted)">Chargement…</div>
   </div>
 
   <div class="section-title">Utilisation Upstash Redis</div>
@@ -962,6 +994,72 @@ function renderRedis() {
       </div>
     ` : ''}
   `;
+  loadEmailConfig();
+}
+
+async function loadEmailConfig() {
+  const card = document.getElementById('email-config-card');
+  if (!card) return;
+  try {
+    const cfg = await apiGet('/admin/email-config');
+    const resendBadge = cfg.resendConfigured
+      ? '<span style="background:#d1fae5;color:#065f46;border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.72rem">✓ Configurée</span>'
+      : '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.72rem">✗ Manquante</span>';
+    const emailBadge = cfg.emailConfigured
+      ? `<span style="font-family:monospace;font-size:0.78rem">${cfg.email}</span>`
+      : '<span style="color:var(--red);font-weight:700">Non configurée</span>';
+    const sentBadge = cfg.lastSent
+      ? `<span style="background:#dbeafe;color:#1e40af;border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.72rem">Dernier envoi : ${cfg.lastSent}</span>`
+      : '<span style="color:var(--muted);font-size:0.78rem">Jamais envoyé</span>';
+    card.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">RESEND_API_KEY</span>
+          ${resendBadge}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">Destinataire</span>
+          ${emailBadge}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">Statut</span>
+          ${sentBadge}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+          <button onclick="sendStatsEmail(false)" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">
+            📧 Tester l'envoi
+          </button>
+          <button onclick="sendStatsEmail(true)" style="background:#6b7280;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">
+            🔄 Forcer l'envoi
+          </button>
+          <span id="email-send-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></span>
+        </div>
+        ${!cfg.resendConfigured ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;font-size:0.76rem;color:#92400e;line-height:1.6">
+          ⚠️ <strong>RESEND_API_KEY</strong> absent des variables d'environnement Render. L'email ne peut pas être envoyé.
+          <br>Ajoutez la clé dans Render → Environment → Add Environment Variable.
+        </div>` : ''}
+      </div>`;
+  } catch(e) {
+    card.innerHTML = `<div style="color:var(--red);font-size:0.8rem">Erreur : ${e.message}</div>`;
+  }
+}
+
+async function sendStatsEmail(force) {
+  const status = document.getElementById('email-send-status');
+  if (status) status.textContent = 'Envoi en cours…';
+  try {
+    const r = await apiGet('/admin/stats-email' + (force ? '?force=1' : ''));
+    if (r.skipped) {
+      if (status) status.textContent = 'Déjà envoyé aujourd\'hui (utilisez "Forcer" pour renvoyer)';
+    } else if (r.sent) {
+      if (status) { status.style.color = 'var(--forest)'; status.textContent = '✓ Email envoyé à ' + (r.to || ''); }
+    } else {
+      if (status) status.textContent = JSON.stringify(r);
+    }
+    loadEmailConfig();
+  } catch(e) {
+    if (status) { status.style.color = 'var(--red)'; status.textContent = '✗ ' + e.message; }
+  }
 }
 
 // ── USAGE APP ─────────────────────────
@@ -1011,18 +1109,18 @@ function renderIdeas() {
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">💡 Idées (${ideas.length})</span></div>
       <table>
-        <tr><th>Idée</th><th>Catégorie</th><th>Votes</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
+        <tr><th>Idée</th><th style="white-space:nowrap">Actions</th><th>Catégorie</th><th>Votes</th><th>Date</th><th>Statut</th></tr>
         ${ideas.length ? ideas.map(i=>`
           <tr id="idea-row-${i.id}">
-            <td style="max-width:260px">${safe(i.text)}</td>
+            <td style="max-width:220px">${safe(i.text)}</td>
+            <td style="white-space:nowrap">
+              <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleIdeaEdit(${i.id})">✏️</button>
+              <button class="del-btn" onclick="deleteIdea(${i.id})">🗑️</button>
+            </td>
             <td><span class="badge badge-orange">${safe(i.cat)}</span></td>
             <td><strong>${i.votes||0}</strong></td>
             <td>${i.date||''}</td>
             <td>${_ideaStatusBadge(i.status)}</td>
-            <td style="white-space:nowrap;display:flex;gap:6px;padding:8px 4px">
-              <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleIdeaEdit(${i.id})">✏️</button>
-              <button class="del-btn" onclick="deleteIdea(${i.id})">🗑️</button>
-            </td>
           </tr>
           <tr id="idea-edit-${i.id}" style="display:none;background:#f0f7ff">
             <td colspan="6" style="padding:14px 16px">
@@ -1113,8 +1211,18 @@ function renderActus() {
         <label class="pub-label">Canaux de publication</label>
         <div class="pub-options-grid">
           <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-fb" checked><span>📘 Publier sur Facebook</span></label>
-          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-push" checked><span>🔔 Notification push</span></label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-push" checked><span>🔔 Notifier maintenant</span></label>
           <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-calendar" checked><span>📅 Google Agenda</span></label>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕐 Push programmé 1</label>
+            <input type="datetime-local" id="pub-push-sched-1" class="pub-input" style="flex:1;min-width:180px">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕑 Push programmé 2</label>
+            <input type="datetime-local" id="pub-push-sched-2" class="pub-input" style="flex:1;min-width:180px">
+          </div>
         </div>
       </div>
       <div class="pub-preview" id="pub-preview" style="display:none">
@@ -1129,14 +1237,47 @@ function renderActus() {
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">🔔 Actualités publiées (${actus.length})</span></div>
       <table>
-        <tr><th>Titre</th><th>Description</th><th>Date</th><th>Photo</th><th>Source</th><th></th></tr>
-        ${actus.length ? actus.map(a=>`<tr>
-          <td style="max-width:260px"><strong>${a.title||'—'}</strong></td>
-          <td style="max-width:260px;font-size:0.72rem;color:var(--muted)">${a.description?(a.description.substring(0,100)+(a.description.length>100?'…':'')):' —'}</td>
+        <tr><th>Titre</th><th style="white-space:nowrap">Actions</th><th>Description</th><th>Date</th><th>Photo</th><th>Source</th></tr>
+        ${actus.length ? actus.map(a=>`
+        <tr id="actu-row-${a.id}">
+          <td style="max-width:200px"><strong>${a.title||'—'}</strong></td>
+          <td style="white-space:nowrap">
+            <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleActuEdit(${a.id})">✏️</button>
+            <button class="del-btn" onclick="deleteActu(${a.id})">🗑️</button>
+          </td>
+          <td style="max-width:220px;font-size:0.72rem;color:var(--muted)">${a.description?(a.description.substring(0,100)+(a.description.length>100?'…':'')):' —'}</td>
           <td style="font-size:0.72rem">${a.date}${a.eventDate?'<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>':''}</td>
           <td>${a.photo?'<span class="badge badge-green">✓</span>':'<span class="badge">—</span>'}</td>
           <td>${a.source==='admin'?'<span class="badge badge-blue">Admin</span>':a.source==='facebook'?'<span class="badge badge-orange">FB</span>':'<span class="badge">—</span>'}</td>
-          <td><button class="del-btn" onclick="deleteActu(${a.id})">🗑️</button></td>
+        </tr>
+        <tr id="actu-edit-${a.id}" style="display:none;background:#f0f7ff">
+          <td colspan="6" style="padding:14px 16px">
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:600px">
+              <div style="font-weight:800;font-size:0.82rem;color:var(--forest)">✏️ Modifier l'actualité</div>
+              <input type="text" id="actu-edit-title-${a.id}" value="${(a.title||'').replace(/"/g,'&quot;')}" maxlength="150" placeholder="Titre" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.82rem;font-family:inherit;width:100%;box-sizing:border-box">
+              <textarea id="actu-edit-desc-${a.id}" maxlength="3000" rows="4" placeholder="Description…" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.80rem;font-family:inherit;width:100%;resize:vertical;box-sizing:border-box">${safe(a.description||'')}</textarea>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <div style="flex:1;min-width:180px">
+                  <label style="font-size:0.72rem;font-weight:800;color:var(--muted);display:block;margin-bottom:3px">📅 Date de l'événement</label>
+                  <input type="datetime-local" id="actu-edit-date-${a.id}" value="${a.eventDate?a.eventDate.slice(0,16):''}" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.8rem;font-family:inherit;box-sizing:border-box">
+                </div>
+                <div style="flex:1;min-width:180px">
+                  <label style="font-size:0.72rem;font-weight:800;color:var(--muted);display:block;margin-bottom:3px">📍 Lieu</label>
+                  <input type="text" id="actu-edit-loc-${a.id}" value="${(a.eventLocation||'').replace(/"/g,'&quot;')}" maxlength="200" placeholder="Salle des fêtes…" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.8rem;font-family:inherit;box-sizing:border-box">
+                </div>
+              </div>
+              <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.78rem">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="actu-edit-fb-${a.id}"><span>📘 Re-publier sur Facebook</span></label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="actu-edit-push-${a.id}"><span>🔔 Re-notifier push</span></label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="actu-edit-cal-${a.id}"><span>📅 Remplacer dans Google Agenda</span></label>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button onclick="saveActuEdit(${a.id})" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">💾 Enregistrer</button>
+                <button onclick="toggleActuEdit(${a.id})" style="background:var(--warm);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">Annuler</button>
+                <span id="actu-save-status-${a.id}" style="font-size:0.78rem;font-weight:800"></span>
+              </div>
+            </div>
+          </td>
         </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucune actualité</td></tr>'}
       </table>
     </div>
@@ -1216,6 +1357,8 @@ async function pubSubmit() {
   const eventLocation=(document.getElementById('pub-event-location')?.value||'').trim();
   const publishFacebook=document.getElementById('pub-opt-fb')?.checked||false;
   const sendPush       =document.getElementById('pub-opt-push')?.checked||false;
+  const pushSched1     =(document.getElementById('pub-push-sched-1')?.value||'').trim();
+  const pushSched2     =(document.getElementById('pub-push-sched-2')?.value||'').trim();
   const createCalendar =(document.getElementById('pub-opt-calendar')?.checked||false)&&!!eventDate;
 
   if(!title){alert("Le titre est obligatoire");return;}
@@ -1291,8 +1434,24 @@ async function pubSubmit() {
     document.getElementById('pub-event-date').value='';
     document.getElementById('pub-event-location').value='';
     pubRemoveImage();
+    if(document.getElementById('pub-push-sched-1'))document.getElementById('pub-push-sched-1').value='';
+    if(document.getElementById('pub-push-sched-2'))document.getElementById('pub-push-sched-2').value='';
     document.getElementById('pub-calendar-warn').style.display='none';
     pubUpdate();
+
+    // Notifications push programmées
+    const actuId = d.actu?.id;
+    const schedDates = [pushSched1, pushSched2].filter(Boolean);
+    for (const dt of schedDates) {
+      try {
+        await fetch(`${API}/admin/push/schedule`, {
+          method: 'POST', headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
+          body: JSON.stringify({ title, body: description, actuId, scheduledAt: new Date(dt).toISOString() })
+        });
+        lines.push(`🕐 Push programmé pour le ${new Date(dt).toLocaleString('fr-FR')}`);
+      } catch(se) { lines.push('⚠️ Push programmé : ' + se.message); }
+    }
+    if (schedDates.length) { status.innerHTML = lines.join('<br>'); }
 
     setTimeout(async()=>{
       try{ const actus=await apiGet('/admin/actus'); _data.actus=actus.actus||[]; renderActus(); }catch(e){}
@@ -1306,6 +1465,46 @@ async function pubSubmit() {
 }
 
 async function deleteActu(id) { if(!confirm('Supprimer cette actualité ?'))return; await apiDelete(`/admin/actus/${id}`); _data.actus=_data.actus.filter(a=>a.id!==id); renderActus(); }
+
+function toggleActuEdit(id) {
+  const row = document.getElementById(`actu-edit-${id}`);
+  if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+async function saveActuEdit(id) {
+  const titleEl  = document.getElementById(`actu-edit-title-${id}`);
+  const descEl   = document.getElementById(`actu-edit-desc-${id}`);
+  const dateEl   = document.getElementById(`actu-edit-date-${id}`);
+  const locEl    = document.getElementById(`actu-edit-loc-${id}`);
+  const fbEl     = document.getElementById(`actu-edit-fb-${id}`);
+  const pushEl   = document.getElementById(`actu-edit-push-${id}`);
+  const calEl    = document.getElementById(`actu-edit-cal-${id}`);
+  const statusEl = document.getElementById(`actu-save-status-${id}`);
+  if (statusEl) { statusEl.textContent = 'Enregistrement…'; statusEl.style.color = 'var(--muted)'; }
+  try {
+    const r = await fetch(`${API}/admin/actus/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN },
+      body: JSON.stringify({
+        title:          titleEl?.value?.trim(),
+        description:    descEl?.value?.trim(),
+        eventDate:      dateEl?.value || null,
+        eventLocation:  locEl?.value?.trim() || null,
+        publishFacebook: fbEl?.checked || false,
+        sendPush:        pushEl?.checked || false,
+        createCalendar:  calEl?.checked || false
+      })
+    });
+    const d = await r.json();
+    if (!r.ok || !d.ok) throw new Error(d.error || 'Erreur');
+    const idx = _data.actus.findIndex(a => a.id === id);
+    if (idx >= 0) _data.actus[idx] = d.actu;
+    if (statusEl) { statusEl.textContent = '✅ Enregistré'; statusEl.style.color = 'var(--leaf)'; }
+    setTimeout(() => { toggleActuEdit(id); renderActus(); }, 900);
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = 'var(--red,#dc2626)'; }
+  }
+}
 
 // ── SIGNALEMENTS ─────────────────────
 function renderSignals() {
@@ -1626,7 +1825,8 @@ function melNormalizeForEditor(tree){
         topic: q?.topic || '',
         prompt: q?.prompt || '',
         directAnswerText: typeof q?.directAnswer === 'string' ? q.directAnswer : (q?.directAnswer?.text || ''),
-        linksText: Array.isArray(q?.directAnswer?.links) ? q.directAnswer.links.map(link => `${link.label || ''} | ${link.tel || link.url || ''}`).join('\n') : ''
+        linksText: Array.isArray(q?.directAnswer?.links) ? q.directAnswer.links.map(link => `${link.label || ''} | ${link.tel || link.url || ''}`).join('\
+') : ''
       })) : []
     }))
   };
@@ -1969,7 +2169,13 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_dpAdmin=e;
 window.addEventListener('appinstalled',()=>{localStorage.setItem('mat_admin_installed','1');document.getElementById('admin-install-banner').style.display='none';});
 function installAdmin(){
   if(_dpAdmin){_dpAdmin.prompt();_dpAdmin.userChoice.then(r=>{if(r.outcome==='accepted'){localStorage.setItem('mat_admin_installed','1');document.getElementById('admin-install-banner').style.display='none';}_dpAdmin=null;});}
-  else{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m)alert('Pour installer MAT Admin :\n\niPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\n\nAndroid : menu navigateur → "Ajouter à l\'écran d\'accueil"');else alert('Pour installer MAT Admin sur PC :\n\nChrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');}
+  else{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m)alert('Pour installer MAT Admin :\
+\
+iPhone/iPad : bouton Partager → "Sur l\'écran d\'accueil"\
+\
+Android : menu navigateur → "Ajouter à l\'écran d\'accueil"');else alert('Pour installer MAT Admin sur PC :\
+\
+Chrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');}
 }
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw-admin.js').catch(()=>{});}
 
