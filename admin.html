@@ -1046,15 +1046,17 @@ async function loadEmailConfig() {
 
 async function sendStatsEmail(force) {
   const status = document.getElementById('email-send-status');
-  if (status) status.textContent = 'Envoi en cours…';
+  if (status) { status.style.color = 'var(--muted)'; status.textContent = 'Envoi en cours…'; }
   try {
     const r = await apiGet('/admin/stats-email' + (force ? '?force=1' : ''));
+    if (r.error) {
+      if (status) { status.style.color = 'var(--red)'; status.textContent = '✗ ' + r.error; }
+      return;
+    }
     if (r.skipped) {
-      if (status) status.textContent = 'Déjà envoyé aujourd\'hui (utilisez "Forcer" pour renvoyer)';
+      if (status) { status.style.color = 'var(--muted)'; status.textContent = 'Déjà envoyé aujourd\'hui — utilisez "Forcer l\'envoi" pour renvoyer.'; }
     } else if (r.sent) {
       if (status) { status.style.color = 'var(--forest)'; status.textContent = '✓ Email envoyé à ' + (r.to || ''); }
-    } else {
-      if (status) status.textContent = JSON.stringify(r);
     }
     loadEmailConfig();
   } catch(e) {
