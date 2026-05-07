@@ -1444,11 +1444,16 @@ async function pubSubmit() {
     const schedDates = [pushSched1, pushSched2].filter(Boolean);
     for (const dt of schedDates) {
       try {
-        await fetch(`${API}/admin/push/schedule`, {
+        const sr = await fetch(`${API}/admin/push/schedule`, {
           method: 'POST', headers: {'Content-Type':'application/json','x-admin-token':TOKEN},
           body: JSON.stringify({ title, body: description, actuId, scheduledAt: new Date(dt).toISOString() })
         });
-        lines.push(`🕐 Push programmé pour le ${new Date(dt).toLocaleString('fr-FR')}`);
+        if (!sr.ok) {
+          const errBody = await sr.json().catch(() => ({}));
+          lines.push(`⚠️ Push programmé rejeté (${sr.status})${errBody.error ? ' : ' + errBody.error : ''}`);
+        } else {
+          lines.push(`🕐 Push programmé pour le ${new Date(dt).toLocaleString('fr-FR')}`);
+        }
       } catch(se) { lines.push('⚠️ Push programmé : ' + se.message); }
     }
     if (schedDates.length) { status.innerHTML = lines.join('<br>'); }
@@ -1825,8 +1830,7 @@ function melNormalizeForEditor(tree){
         topic: q?.topic || '',
         prompt: q?.prompt || '',
         directAnswerText: typeof q?.directAnswer === 'string' ? q.directAnswer : (q?.directAnswer?.text || ''),
-        linksText: Array.isArray(q?.directAnswer?.links) ? q.directAnswer.links.map(link => `${link.label || ''} | ${link.tel || link.url || ''}`).join('\
-') : ''
+        linksText: Array.isArray(q?.directAnswer?.links) ? q.directAnswer.links.map(link => `${link.label || ''} | ${link.tel || link.url || ''}`).join('\n') : ''
       })) : []
     }))
   };
