@@ -903,6 +903,11 @@ function renderRedis() {
     <div id="stats-settings-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></div>
   </div>
 
+  <div class="section-title">📧 Email récapitulatif quotidien</div>
+  <div class="progress-wrap" id="email-config-card">
+    <div style="font-size:0.8rem;color:var(--muted)">Chargement…</div>
+  </div>
+
   <div class="section-title">Utilisation Upstash Redis</div>
 
     <div class="progress-wrap">
@@ -989,6 +994,72 @@ function renderRedis() {
       </div>
     ` : ''}
   `;
+  loadEmailConfig();
+}
+
+async function loadEmailConfig() {
+  const card = document.getElementById('email-config-card');
+  if (!card) return;
+  try {
+    const cfg = await apiGet('/admin/email-config');
+    const resendBadge = cfg.resendConfigured
+      ? '<span style="background:#d1fae5;color:#065f46;border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.72rem">✓ Configurée</span>'
+      : '<span style="background:#fee2e2;color:#991b1b;border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.72rem">✗ Manquante</span>';
+    const emailBadge = cfg.emailConfigured
+      ? `<span style="font-family:monospace;font-size:0.78rem">${cfg.email}</span>`
+      : '<span style="color:var(--red);font-weight:700">Non configurée</span>';
+    const sentBadge = cfg.lastSent
+      ? `<span style="background:#dbeafe;color:#1e40af;border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.72rem">Dernier envoi : ${cfg.lastSent}</span>`
+      : '<span style="color:var(--muted);font-size:0.78rem">Jamais envoyé</span>';
+    card.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">RESEND_API_KEY</span>
+          ${resendBadge}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">Destinataire</span>
+          ${emailBadge}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text);min-width:160px">Statut</span>
+          ${sentBadge}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">
+          <button onclick="sendStatsEmail(false)" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">
+            📧 Tester l'envoi
+          </button>
+          <button onclick="sendStatsEmail(true)" style="background:#6b7280;color:white;border:none;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">
+            🔄 Forcer l'envoi
+          </button>
+          <span id="email-send-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></span>
+        </div>
+        ${!cfg.resendConfigured ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px;font-size:0.76rem;color:#92400e;line-height:1.6">
+          ⚠️ <strong>RESEND_API_KEY</strong> absent des variables d'environnement Render. L'email ne peut pas être envoyé.
+          <br>Ajoutez la clé dans Render → Environment → Add Environment Variable.
+        </div>` : ''}
+      </div>`;
+  } catch(e) {
+    card.innerHTML = `<div style="color:var(--red);font-size:0.8rem">Erreur : ${e.message}</div>`;
+  }
+}
+
+async function sendStatsEmail(force) {
+  const status = document.getElementById('email-send-status');
+  if (status) status.textContent = 'Envoi en cours…';
+  try {
+    const r = await apiGet('/admin/stats-email' + (force ? '?force=1' : ''));
+    if (r.skipped) {
+      if (status) status.textContent = 'Déjà envoyé aujourd\'hui (utilisez "Forcer" pour renvoyer)';
+    } else if (r.sent) {
+      if (status) { status.style.color = 'var(--forest)'; status.textContent = '✓ Email envoyé à ' + (r.to || ''); }
+    } else {
+      if (status) status.textContent = JSON.stringify(r);
+    }
+    loadEmailConfig();
+  } catch(e) {
+    if (status) { status.style.color = 'var(--red)'; status.textContent = '✗ ' + e.message; }
+  }
 }
 
 // ── USAGE APP ─────────────────────────
