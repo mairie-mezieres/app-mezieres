@@ -1,7 +1,7 @@
 // SERVICE WORKER v4.3.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 10 : Entreprises locales (tuile + overlay + admin)
-const CACHE = 'mat-v4.3.1';
+const CACHE = 'mat-v4.3.2';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -12,7 +12,7 @@ const PRECACHE_URLS = [
   './js/mat-utils.js?v=4.2.4',
   './js/mat-core.js?v=4.2.4',
   './js/mat-accessibility.js?v=4.2.4',
-  './js/mat-widgets.js?v=4.2.4',
+  './js/mat-widgets.js?v=4.3.2',
   './js/mat-agenda.js?v=4.2.4',
   './js/mat-forms.js?v=4.2.4',
   './js/mat-actus.js?v=4.2.4',
@@ -180,22 +180,18 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
 
   const data = e.notification.data || {};
-  const wantsDetail = e.action === 'detail' || data.open === 'actu' || !e.action;
+  const openType = data.open || 'notifs';
 
-  const targetUrl = wantsDetail
-    ? new URL(
-        normalizeInAppPath(
-          data.url,
-          data.actuId != null
-            ? `./#actu=${encodeURIComponent(String(data.actuId))}`
-            : './#notifs'
-        ),
-        self.registration.scope
-      ).href
-    : new URL(
-        normalizeInAppPath(data.listUrl, './#notifs'),
-        self.registration.scope
-      ).href;
+  // Construire l'URL cible selon le type
+  let fallbackHash;
+  if (openType === 'meteo') fallbackHash = './#meteo';
+  else if (openType === 'actu' && data.actuId != null) fallbackHash = `./#actu=${encodeURIComponent(String(data.actuId))}`;
+  else fallbackHash = './#notifs';
+
+  const targetUrl = new URL(
+    normalizeInAppPath(data.url || fallbackHash, fallbackHash),
+    self.registration.scope
+  ).href;
 
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async cls => {
@@ -203,15 +199,15 @@ self.addEventListener('notificationclick', e => {
 
       if (existing) {
         await existing.focus();
-
         try {
-          if (wantsDetail && data.actuId != null) {
+          if (openType === 'meteo') {
+            existing.postMessage({ action: 'openMeteo' });
+          } else if (openType === 'actu' && data.actuId != null) {
             existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
           } else {
             existing.postMessage({ action: 'openNotifs' });
           }
         } catch (_) {}
-
         return existing;
       }
 

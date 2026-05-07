@@ -506,6 +506,7 @@ document.addEventListener('keydown', function(e) {
   window.addEventListener('load', function(){ setTimeout(_checkRedisMode, 2500); });
 })();
 
+
 // ── Service Worker + hash routing ─────────────────────────────
 function handleMatHashRoute(){
   try{
