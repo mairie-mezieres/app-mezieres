@@ -465,6 +465,25 @@ document.addEventListener('keydown', function(e) {
   if (!navigator.onLine) showOffline();
 })();
 
+// ── Détection surcharge serveur ───────────────────────────────
+(function(){
+  var _srvErrTimes = [];
+  window.matSignalServerError = function() {
+    if (!navigator.onLine) return;
+    var now = Date.now();
+    _srvErrTimes = _srvErrTimes.filter(function(t){ return now - t < 30000; });
+    _srvErrTimes.push(now);
+    if (_srvErrTimes.length >= 2 && !document.getElementById('mat-server-banner')) {
+      var b = document.createElement('div');
+      b.id = 'mat-server-banner';
+      b.textContent = '🌿 Serveur très sollicité — certaines informations chargent lentement, merci de patienter';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#d97706;color:white;font-family:Nunito,sans-serif;font-size:.73rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
+      document.body.prepend(b);
+      setTimeout(function(){ var e=document.getElementById('mat-server-banner'); if(e) e.remove(); }, 20000);
+    }
+  };
+})();
+
 // ── Service Worker + hash routing ─────────────────────────────
 function handleMatHashRoute(){
   try{
@@ -472,7 +491,6 @@ function handleMatHashRoute(){
     if(!h) return;
     if(h==='#notifs'){ setTimeout(function(){ openNotifs(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
-    if(h==='#meteo'){ setTimeout(function(){ openMeteo(); }, 180); return; }
     if(h.indexOf('#actu=')===0){
       var raw=h.substring(6);
       var id=decodeURIComponent(raw||'').trim();
@@ -487,7 +505,6 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
   navigator.serviceWorker.addEventListener('message', function(e){
     var data=(e&&e.data)||{};
-    if(data.action==='openMeteo'){ openMeteo(); return; }
     if(data.action==='openNotifs'){ openNotifs(); return; }
     if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
       openActuDetail(String(data.actuId),{ fromHash:false });
