@@ -744,7 +744,7 @@ async function sendMel(){
         +'</div>';
       c.appendChild(sug); c.scrollTop=99999;
     }
-  }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); }
+  }catch(e){ var _typ=document.getElementById('typ'); if(_typ) _typ.remove(); addMsg('bot','Je ne peux pas répondre pour le moment.\nMairie\u00a0: 02\u00a038\u00a045\u00a061\u00a076 \ud83d\ude0a'); if(navigator.onLine && typeof window.matSignalServerError==='function') window.matSignalServerError(); }
   melBusy=false;
 }
 

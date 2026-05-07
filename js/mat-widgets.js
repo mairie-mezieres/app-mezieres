@@ -339,8 +339,9 @@ async function loadMeteo() {
   } catch (e) {
     if(typeof matLogError==='function' && navigator.onLine) matLogError('meteo','loadMeteo: '+e.message);
     var offline = !navigator.onLine;
-    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : 'Météo indisponible') + '</span>';
-    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : '';
+    if(!offline && isRetry && typeof window.matSignalServerError==='function') window.matSignalServerError();
+    document.getElementById('meteo-temp').innerHTML = '<span class="meteo-loading">' + (offline ? '📡 Hors ligne' : (isRetry ? '☁️ Météo indisponible' : '⏳ Chargement…')) + '</span>';
+    document.getElementById('meteo-desc').textContent = offline ? 'Reconnectez-vous pour actualiser' : (isRetry ? 'Serveur chargé — réessayez dans quelques secondes' : '');
     document.getElementById('meteo-alerte').style.display = 'none';
   }
 }
@@ -706,6 +707,7 @@ async function loadEvents(){
     document.getElementById('next-event-days').textContent=diffTxt;
   }catch(e){
     var offline = !navigator.onLine;
+    if(!offline && typeof window.matSignalServerError==='function') window.matSignalServerError();
     document.getElementById('next-event-date').textContent = offline?'📡 Hors ligne':'Indisponible';
     document.getElementById('next-event-name').textContent = offline?'Agenda non dispo':'Agenda';
     document.getElementById('next-event-days').textContent = offline?'Reconnectez-vous':'Réessayez plus tard';

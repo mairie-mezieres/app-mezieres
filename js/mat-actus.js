@@ -252,6 +252,7 @@ async function loadActus(){
     markActusAsSeen(actus||[]);
   }catch(e){
     var offline = !navigator.onLine;
+    if(!offline && typeof window.matSignalServerError==='function') window.matSignalServerError();
     el.innerHTML='<div class="actu-empty">'+(offline?'📡 <strong>Vous êtes hors ligne</strong><br><br>Les actualités seront à nouveau disponibles dès que votre connexion reviendra.':'Actualités communales indisponibles.<br><a href="https://www.facebook.com/RadioMezieres" target="_blank" style="color:var(--leaf)">Voir Radio Mézières sur Facebook →</a>')+'</div>';
   }
 }
