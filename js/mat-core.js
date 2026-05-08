@@ -53,7 +53,7 @@ function updateInstallBanner() {
 
   if (isIOS) {
     if (titleEl) titleEl.textContent = 'Installez MAT sur votre iPhone / iPad';
-    if (subEl) subEl.textContent = 'Touchez pour voir les étapes d’installation dans Safari';
+    if (subEl) subEl.textContent = 'Touchez pour voir les étapes d\'installation dans Safari';
   } else if (isAndroid) {
     if (titleEl) titleEl.textContent = 'Installez MAT sur votre téléphone';
     if (subEl) subEl.textContent = 'Touchez pour voir les étapes Android';
@@ -157,13 +157,14 @@ function closeOv(id){
 }
 function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
 
-// Bouton retour navigateur ferme le dernier overlay ouvert
+// Bouton retour navigateur : ferme le dernier overlay ouvert,
+// ou reste dans la PWA si aucun overlay n'est ouvert (évite l'écran gris Android).
 window.addEventListener('popstate', function(){
   if(_ovStack.length > 0){
     const last = _ovStack[_ovStack.length-1];
     closeOv(last);
-    history.pushState({mat:'overlay'}, '');
   }
+  history.pushState({mat:'overlay'}, '');
 });
 history.pushState({mat:'overlay'}, '');
 
