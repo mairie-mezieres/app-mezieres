@@ -158,28 +158,13 @@ function closeOv(id){
 function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
 
 // Bouton retour navigateur : ferme le dernier overlay ouvert,
-// ou affiche un toast "appuyez encore pour quitter" depuis l'écran principal.
-// Le double-appui dans les 2 s laisse le navigateur gérer la navigation (quitter).
-let _lastBackPress = 0;
+// ou maintient la PWA ouverte si aucun overlay n'est actif (évite l'écran gris Android).
 window.addEventListener('popstate', function(){
   if(_ovStack.length > 0){
     const last = _ovStack[_ovStack.length-1];
     closeOv(last);
-    history.pushState({mat:'overlay'}, '');
-  } else {
-    const now = Date.now();
-    if(now - _lastBackPress < 2000){
-      _lastBackPress = 0;
-      return;
-    }
-    _lastBackPress = now;
-    history.pushState({mat:'overlay'}, '');
-    const t = document.createElement('div');
-    t.textContent = '← Appuyez encore pour quitter';
-    t.style.cssText = 'position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 22px;border-radius:20px;font-family:Nunito,sans-serif;font-size:.80rem;font-weight:700;z-index:99999;white-space:nowrap;pointer-events:none;animation:fadeOv .2s ease';
-    document.body.appendChild(t);
-    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); _lastBackPress = 0; }, 2000);
   }
+  history.pushState({mat:'overlay'}, '');
 });
 history.pushState({mat:'overlay'}, '');
 

@@ -792,6 +792,14 @@ html.theme-sombre #ov-conseil .panel-body > div[style] { background:#2d3748 !imp
 /* Overlay associations & entreprises — tuiles en mode sombre */
 html.theme-sombre #ov-assoc .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
 html.theme-sombre #ov-entreprises .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
+/* Overlay météo — cartes en mode sombre */
+html.theme-sombre .meteo-card { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .meteo-day-card { background:#2d3748 !important;border-color:#374151 !important; }
+/* Overlay Rémi — cartes en mode sombre */
+html.theme-sombre .remi-intro { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .remi-day-card { background:#2d3748 !important;border-color:#374151 !important; }
+/* Boutons photo — mode sombre */
+html.theme-sombre .photo-btn { background:#2d3748 !important;border-color:#374151 !important;color:#f1f5f9 !important; }
 
 /* Overlay notifs */
 html.theme-sombre .actu-item { background:#2d3748 !important;border-color:#374151 !important; }
