@@ -2,3 +2,475 @@
    MAT — Mézières Avec Toi · Feuille de style v3.7.0
    Extrait depuis index.html v3.6.3 — aucune règle modifiée
    ════════════════════════════════════════════════════════════ */
+
+:root{
+  --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
+  --gold:#d4a843;--amber:#f4a261;--cream:#faf7f2;--warm:#f4f0ea;
+  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.07);
+  --shadow:0 2px 16px rgba(26,61,43,0.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--text);overscroll-behavior:none;}
+body{display:flex;flex-direction:column;min-height:100dvh;}
+
+/* ── Thème sombre ──────────────────────────────────────── */
+html.theme-sombre{
+  --forest:#a8d5b5;--leaf:#6fcf97;--sage:#52b788;--mist:#1a2f1e;
+  --gold:#f6d860;--amber:#f4a261;--cream:#0f1a12;--warm:#141f16;
+  --card:#1e2d22;--text:#d1e8d5;--muted:#7aab87;--border:rgba(255,255,255,0.08);
+  --shadow:0 2px 16px rgba(0,0,0,0.40);
+}
+html.theme-sombre body{background:#0f1a12;}
+
+/* ── Écran de chargement ───────────────────────────────── */
+#splash{position:fixed;inset:0;background:#0e1f14;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s ease;}
+#splash.hidden{opacity:0;pointer-events:none;}
+.splash-logo{font-size:3rem;margin-bottom:12px;animation:splashPulse 1.2s ease-in-out infinite;}
+.splash-text{color:#a8d5b5;font-size:1rem;font-weight:700;letter-spacing:.05em;}
+.splash-sub{color:#6b9e7a;font-size:.78rem;margin-top:4px;}
+@keyframes splashPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+
+/* ── En-tête ───────────────────────────────────────────── */
+header{background:var(--forest);color:#fff;padding:env(safe-area-inset-top,0) 0 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+.header-inner{display:flex;align-items:center;gap:10px;padding:10px 14px 8px;}
+.header-logo{width:36px;height:36px;border-radius:8px;object-fit:contain;background:#fff;flex-shrink:0;}
+.header-title{font-size:1rem;font-weight:900;letter-spacing:.04em;flex:1;}
+.header-subtitle{font-size:.65rem;color:rgba(255,255,255,.7);display:block;font-weight:500;}
+.header-actions{display:flex;gap:6px;align-items:center;}
+.header-btn{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:.8rem;cursor:pointer;transition:background .15s;font-family:inherit;display:flex;align-items:center;gap:4px;font-weight:600;}
+.header-btn:active{background:rgba(255,255,255,.22);}
+#theme-toggle{font-size:1rem;padding:6px 8px;}
+
+/* ── Bande météo (header) ───────────────────────────────── */
+.weather-strip{background:rgba(0,0,0,.18);padding:6px 14px;display:flex;align-items:center;gap:8px;font-size:.75rem;color:rgba(255,255,255,.9);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.weather-strip:active{background:rgba(0,0,0,.28);}
+.meteo-loading{opacity:.6;font-style:italic;}
+#meteo-alerte{display:none;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.15);color:#fff;margin-left:auto;flex-shrink:0;}
+.meteo-badge-alert{background:rgba(239,68,68,.25)!important;color:#fca5a5!important;border:1px solid rgba(239,68,68,.4)!important;animation:badgePulse 2s ease-in-out infinite;}
+@keyframes badgePulse{0%,100%{opacity:1;}50%{opacity:.7;}}
+
+/* ── Bande bus Rémi (header) ─────────────────────────────── */
+.bus-strip{background:rgba(0,0,0,.12);padding:5px 14px;display:flex;align-items:center;gap:8px;font-size:.72rem;color:rgba(255,255,255,.85);overflow:hidden;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.bus-strip:active{background:rgba(0,0,0,.22);}
+.bus-strip-icon{font-size:.9rem;flex-shrink:0;}
+#bus-strip-stops{display:flex;gap:10px;flex-wrap:wrap;flex:1;min-width:0;}
+.bus-stop-row{white-space:nowrap;}
+.bus-stop-name{font-weight:800;}
+.bus-next{font-weight:800;color:#86efac;margin-left:4px;}
+.bus-loading{opacity:.6;font-style:italic;}
+#bus-periode{font-size:.6rem;background:rgba(255,255,255,.12);border-radius:4px;padding:1px 5px;flex-shrink:0;}
+
+/* ── Navigation ────────────────────────────────────────── */
+nav{background:var(--forest);border-bottom:1px solid rgba(255,255,255,.1);}
+.nav-tabs{display:flex;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;color:rgba(255,255,255,.6);border:none;background:none;cursor:pointer;transition:color .15s,border-bottom .15s;font-family:inherit;font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border-bottom:2px solid transparent;min-width:60px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.nav-tab .tab-icon{font-size:1.1rem;}
+.nav-tab.active{color:#fff;border-bottom-color:var(--sage);}
+.nav-tab:active{color:rgba(255,255,255,.9);}
+
+/* ── Contenu principal ─────────────────────────────────── */
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:env(safe-area-inset-bottom,16px);}
+.tab-content{display:none;padding:14px;animation:fadeIn .2s ease;}
+.tab-content.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Cartes & tuiles ───────────────────────────────────── */
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.card-icon{font-size:1.4rem;width:40px;height:40px;background:var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+html.theme-sombre .card-icon{background:#2a3d2e;}
+.card-title{font-size:.95rem;font-weight:900;color:var(--forest);}
+.card-subtitle{font-size:.72rem;color:var(--muted);}
+
+/* ── Grille de tuiles ───────────────────────────────────── */
+.tile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;}
+.tile{background:var(--card);border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;cursor:pointer;border:1px solid var(--border);transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 6px rgba(26,61,43,0.06);}
+.tile:active{transform:scale(.96);box-shadow:none;}
+.tile-icon{font-size:1.6rem;}
+.tile-label{font-size:.72rem;font-weight:800;color:var(--text);letter-spacing:.02em;}
+.tile-sub{font-size:.62rem;color:var(--muted);}
+
+/* ── Déchets ────────────────────────────────────────────── */
+.dechet-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.dechet-row:last-child{border-bottom:none;}
+.dechet-bac{width:36px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.dechet-bac.noir{background:#2d2d2d;}
+.dechet-bac.jaune{background:#f59e0b;}
+.dechet-info{flex:1;}
+.dechet-label{font-size:.82rem;font-weight:800;}
+.dechet-next{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.dechet-consigne-pill{background:#fef3c7;color:#92400e;border-radius:20px;padding:2px 10px;font-size:.7rem;font-weight:900;display:inline-block;}
+html.theme-sombre .dechet-consigne-pill{background:#3d2e00;color:#f6d860;}
+
+/* ── Mairie status ──────────────────────────────────────── */
+.mairie-status-row{display:flex;align-items:center;gap:10px;}
+#mairie-badge{font-size:.65rem;font-weight:800;padding:3px 8px;border-radius:20px;background:var(--mist);color:var(--forest);}
+html.theme-sombre #mairie-badge{background:#2a3d2e;color:#a8d5b5;}
+#mairie-status{font-size:1.1rem;font-weight:900;}
+#mairie-desc{font-size:.75rem;color:var(--muted);margin-top:4px;}
+
+/* ── Événements ─────────────────────────────────────────── */
+.event-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.event-item:last-child{border-bottom:none;}
+.event-date-box{background:var(--forest);color:#fff;border-radius:8px;padding:4px 8px;text-align:center;min-width:44px;flex-shrink:0;}
+.event-day{font-size:1.2rem;font-weight:900;line-height:1;}
+.event-month{font-size:.6rem;font-weight:700;text-transform:uppercase;opacity:.8;}
+.event-info{flex:1;}
+.event-title{font-size:.85rem;font-weight:800;line-height:1.3;}
+.event-meta{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.event-lieu{font-size:.7rem;color:var(--leaf);font-weight:600;margin-top:2px;}
+
+/* ── Agenda – vue calendrier ────────────────────────────── */
+.agenda-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.agenda-nav{background:none;border:none;font-size:1.2rem;cursor:pointer;padding:6px 10px;border-radius:8px;color:var(--forest);transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.agenda-nav:active{background:var(--mist);}
+.agenda-month-title{font-size:1rem;font-weight:900;color:var(--forest);}
+.agenda-days-header{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:.65rem;font-weight:800;color:var(--muted);margin-bottom:4px;text-transform:uppercase;}
+.agenda-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.agenda-day{min-height:40px;border-radius:8px;padding:3px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent;position:relative;}
+.agenda-day:active{background:var(--mist);}
+html.theme-sombre .agenda-day:active{background:#2a3d2e;}
+.agenda-day.other-month{opacity:.3;}
+.agenda-day.today .day-num{background:var(--forest);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.day-num{font-size:.82rem;font-weight:700;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.day-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);margin-top:2px;}
+.agenda-event-list{margin-top:12px;}
+.agenda-event-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);}
+.agenda-event-item:last-child{border-bottom:none;}
+
+/* ── Actus ──────────────────────────────────────────────── */
+.actu-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;display:flex;gap:0;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:box-shadow .15s;}
+.actu-item:active{box-shadow:none;}
+.actu-img{width:90px;min-height:80px;object-fit:cover;flex-shrink:0;background:var(--mist);}
+html.theme-sombre .actu-img{background:#2a3d2e;}
+.actu-body{padding:10px;flex:1;min-width:0;}
+.actu-title{font-size:.85rem;font-weight:900;line-height:1.3;margin-bottom:4px;}
+.actu-excerpt{font-size:.75rem;color:var(--muted);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.actu-date{font-size:.65rem;color:var(--leaf);font-weight:700;margin-top:6px;}
+.actu-source-chip{display:inline-block;font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:10px;background:var(--mist);color:var(--forest);margin-bottom:4px;}
+html.theme-sombre .actu-source-chip{background:#2a3d2e;color:#a8d5b5;}
+
+/* ── Documents officiels ────────────────────────────────── */
+.doc-link{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent;transition:box-shadow .15s;}
+.doc-link:active{box-shadow:none;}
+.doc-icon{font-size:1.4rem;flex-shrink:0;width:36px;text-align:center;}
+.doc-label{font-weight:900;font-size:.86rem;}
+.doc-sub{font-size:.73rem;color:var(--muted);margin-top:2px;}
+.doc-arrow{color:var(--sage);flex-shrink:0;}
+
+/* ── Signaler ──────────────────────────────────────────── */
+.signaler-form{display:flex;flex-direction:column;gap:10px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-label{font-size:.78rem;font-weight:700;color:var(--muted);}
+.form-input,.form-select,.form-textarea{padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:.85rem;background:var(--card);color:var(--text);transition:border-color .15s;-webkit-appearance:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--sage);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-btn{padding:12px;background:var(--forest);color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.form-btn:active{background:var(--leaf);}
+.form-hint{font-size:.7rem;color:var(--muted);}
+
+/* ── Urgences ──────────────────────────────────────────── */
+.urgence-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.urgence-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 10px;border-radius:14px;text-decoration:none;color:#fff;font-weight:800;font-size:.8rem;text-align:center;min-height:90px;-webkit-tap-highlight-color:transparent;transition:filter .1s;}
+.urgence-btn:active{filter:brightness(.85);}
+.urgence-icon{font-size:1.8rem;}
+
+/* ── Overlay (modale plein-écran) ───────────────────────── */
+.overlay{position:fixed;inset:0;background:var(--cream);z-index:200;display:none;flex-direction:column;overscroll-behavior:contain;}
+.overlay.open{display:flex;}
+.ov-header{background:var(--forest);color:#fff;padding:calc(env(safe-area-inset-top,0) + 10px) 14px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.ov-back{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:.85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;font-weight:600;-webkit-tap-highlight-color:transparent;}
+.ov-back:active{background:rgba(255,255,255,.25);}
+.ov-title{font-size:1rem;font-weight:900;flex:1;}
+.ov-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;padding-bottom:calc(env(safe-area-inset-bottom,0) + 20px);}
+
+/* ── Météo overlay ──────────────────────────────────────── */
+.meteo-premium{display:flex;flex-direction:column;gap:10px;}
+.meteo-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:0 1px 6px rgba(26,61,43,0.07);}
+.meteo-card-kicker{font-size:.65rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:0 0 6px;}
+.meteo-card-foot{font-size:.62rem;color:var(--muted);padding-top:6px;border-top:1px solid var(--border);margin-top:8px;}
+.meteo-alert-card{padding:14px;}
+.meteo-alert-card.level-2{border-left:4px solid #facc15;}
+.meteo-alert-card.level-3{border-left:4px solid #f97316;}
+.meteo-alert-card.level-4{border-left:4px solid #ef4444;}
+.meteo-alert-topline{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.meteo-alert-chip{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:800;padding:3px 8px;border-radius:20px;background:var(--mist);color:var(--forest);}
+html.theme-sombre .meteo-alert-chip{background:#2a3d2e;color:#a8d5b5;}
+.meteo-alert-action{font-size:.65rem;color:var(--muted);margin-left:auto;}
+.meteo-alert-summary{list-style:none;cursor:pointer;}
+.meteo-alert-summary::-webkit-details-marker{display:none;}
+.meteo-alert-head{display:flex;align-items:flex-start;gap:10px;margin:8px 0;}
+.meteo-alert-icon{font-size:1.8rem;flex-shrink:0;}
+.meteo-alert-title{font-size:.9rem;font-weight:900;margin-bottom:4px;}
+.meteo-alert-text{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.meteo-alert-periods{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.meteo-alert-period{font-size:.72rem;}
+.meteo-alert-period span{color:var(--muted);display:block;}
+.meteo-alert-period strong{color:var(--text);}
+.meteo-alert-detail{padding-top:10px;border-top:1px solid var(--border);margin-top:8px;}
+.meteo-alert-detail-line{font-size:.78rem;margin-bottom:4px;}
+.meteo-alert-detail-text{font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.5;}
+.meteo-risk-list{display:flex;flex-direction:column;gap:4px;}
+.meteo-risk-item{font-size:.76rem;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);}
+.meteo-risk-item:last-child{border-bottom:none;}
+.meteo-current-main{padding:6px 0;}
+.meteo-current-main-tight{padding:4px 0 2px;}
+.meteo-current-value{font-size:1.6rem;font-weight:900;color:var(--forest);}
+.meteo-current-value span{font-size:.85rem;color:var(--muted);font-weight:500;}
+.meteo-current-norms-inline{font-size:.72rem;color:var(--muted);margin-top:2px;display:flex;gap:8px;align-items:baseline;}
+.meteo-current-norms-inline strong{color:var(--text);font-weight:800;}
+.meteo-days-block{margin-top:4px;}
+.meteo-days-scroll{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.meteo-days-scroll::-webkit-scrollbar{display:none;}
+.meteo-days-track{display:flex;gap:8px;padding-bottom:4px;}
+.meteo-day-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;min-width:90px;flex-shrink:0;text-align:center;}
+.meteo-day-title{font-size:.7rem;font-weight:900;color:var(--muted);margin-bottom:4px;}
+.meteo-day-icon{font-size:1.4rem;margin-bottom:4px;}
+.meteo-day-temp{display:flex;justify-content:center;gap:8px;font-size:.82rem;font-weight:800;margin-bottom:4px;}
+.meteo-day-temp span:first-child{color:var(--muted);}
+.meteo-day-desc{font-size:.62rem;color:var(--muted);margin-bottom:4px;line-height:1.3;}
+.meteo-day-meta{font-size:.62rem;color:var(--muted);margin-top:2px;}
+.meteo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.meteo-grid-secondary{margin-top:4px;}
+.meteo-stat-card{padding:10px 12px;}
+.meteo-stat-compact{padding:8px 10px;}
+.meteo-stat-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px;}
+.meteo-stat-value{font-size:.95rem;font-weight:900;color:var(--text);}
+.meteo-inline-soft{color:var(--muted);font-size:.8rem;font-weight:500;}
+.meteo-trend-inline{font-size:.75rem;}
+.meteo-sun-card{}
+.meteo-sun-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.meteo-moon-chip{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;color:var(--muted);background:var(--mist);border-radius:20px;padding:2px 8px;}
+html.theme-sombre .meteo-moon-chip{background:#2a3d2e;}
+.meteo-sun-row{display:flex;align-items:center;gap:8px;}
+.meteo-mini-label{font-size:.62rem;color:var(--muted);font-weight:700;}
+.meteo-sun-time{font-size:.9rem;font-weight:900;}
+.meteo-sun-progress{flex:1;height:6px;background:var(--mist);border-radius:3px;position:relative;overflow:visible;}
+html.theme-sombre .meteo-sun-progress{background:#2a3d2e;}
+.meteo-sun-progress-bar{height:100%;background:linear-gradient(90deg,#f59e0b,#f97316);border-radius:3px;transition:width .3s;}
+.meteo-sun-progress-dot{position:absolute;top:-4px;width:14px;height:14px;background:#f59e0b;border-radius:50%;box-shadow:0 0 6px rgba(245,158,11,.5);}
+.meteo-hourly-card{padding:10px 8px;}
+.meteo-hourly-track{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.meteo-hourly-track::-webkit-scrollbar{display:none;}
+.meteo-hour-col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:46px;flex-shrink:0;font-size:.62rem;color:var(--muted);}
+.meteo-hour-time{font-weight:800;color:var(--text);}
+.meteo-hour-icon{font-size:1rem;}
+.meteo-hour-temp{font-weight:900;color:var(--text);font-size:.72rem;}
+.meteo-hour-rain-wrap{height:34px;display:flex;align-items:flex-end;}
+.meteo-hour-rain-bar{width:6px;background:linear-gradient(180deg,#60a5fa,#3b82f6);border-radius:3px 3px 0 0;min-height:2px;}
+.meteo-hour-rain{font-size:.62rem;color:#60a5fa;font-weight:700;}
+.meteo-hour-mm{font-size:.58rem;color:var(--muted);}
+.meteo-hour-wind{font-size:.58rem;color:var(--muted);text-align:center;}
+.meteo-alert-times{font-size:.7rem;color:rgba(255,255,255,.75);}
+
+/* ── Overlay météo premium ── */
+.meteo-alert-times{display:inline-block;margin-top:2px;font-size:.6rem;font-weight:800;color:#fff7d6;opacity:.96;}
+.meteo-badge-alert.level-2{background:rgba(250,204,21,.22);color:#fff7cc;border:1px solid rgba(250,204,21,.36);}
+.meteo-badge-alert.level-3{background:rgba(249,115,22,.28);color:#fed7aa;border:1px solid rgba(249,115,22,.4);}
+.meteo-badge-alert.level-4{background:rgba(239,68,68,.30);color:#fca5a5;border:1px solid rgba(239,68,68,.45);}
+
+/* ── Overlay Déchets ─────────────────────────────────────── */
+/* (styles inline dans loadDechetsDetail) */
+
+/* ── Overlay Bus Rémi ────────────────────────────────────── */
+.remi-intro{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+.remi-intro-title{font-size:.9rem;font-weight:900;margin-bottom:6px;}
+.remi-intro-text{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+.remi-link-btn{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--forest);background:var(--mist);border-radius:10px;padding:7px 12px;text-decoration:none;-webkit-tap-highlight-color:transparent;}
+html.theme-sombre .remi-link-btn{background:#2a3d2e;color:#a8d5b5;}
+.remi-week{display:flex;flex-direction:column;gap:10px;}
+.remi-day-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;}
+.remi-day-card.today{border-color:var(--sage);border-width:2px;}
+.remi-day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.remi-day-title{font-size:.85rem;font-weight:900;text-transform:capitalize;}
+.remi-day-badge{font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:20px;background:var(--mist);color:var(--forest);}
+html.theme-sombre .remi-day-badge{background:#2a3d2e;color:#a8d5b5;}
+.remi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.remi-stop-box{background:var(--mist);border-radius:10px;padding:8px;}
+html.theme-sombre .remi-stop-box{background:#1e2d22;}
+.remi-stop-title{font-size:.7rem;font-weight:900;color:var(--forest);margin-bottom:4px;}
+html.theme-sombre .remi-stop-title{color:#a8d5b5;}
+.remi-line{display:flex;justify-content:space-between;align-items:baseline;gap:4px;font-size:.68rem;padding:2px 0;border-bottom:1px solid var(--border);}
+.remi-line:last-child{border-bottom:none;}
+.remi-line span{color:var(--muted);}
+.remi-line strong{font-size:.72rem;}
+
+/* ── Overlay Notifs ──────────────────────────────────────── */
+.actu-overlay-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.actu-overlay-img{width:100%;max-height:180px;object-fit:cover;background:var(--mist);}
+html.theme-sombre .actu-overlay-img{background:#2a3d2e;}
+.actu-overlay-body{padding:12px;}
+.actu-overlay-title{font-size:.95rem;font-weight:900;line-height:1.3;margin-bottom:6px;}
+.actu-overlay-excerpt{font-size:.8rem;color:var(--muted);line-height:1.5;}
+.actu-overlay-date{font-size:.7rem;color:var(--leaf);font-weight:700;margin-top:8px;}
+
+/* ── Overlay Mairie ──────────────────────────────────────── */
+.mairie-info-block{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.mairie-info-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.mairie-info-row:last-child{border-bottom:none;}
+.mairie-info-icon{font-size:1.2rem;width:32px;text-align:center;flex-shrink:0;padding-top:2px;}
+.mairie-info-label{font-size:.72rem;color:var(--muted);margin-bottom:2px;}
+.mairie-info-value{font-size:.88rem;font-weight:700;line-height:1.4;}
+a.mairie-info-value{color:var(--forest);text-decoration:underline;}
+html.theme-sombre a.mairie-info-value{color:#6fcf97;}
+
+/* ── Overlay Agenda ──────────────────────────────────────── */
+.agenda-ov-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+.agenda-ov-item:last-child{border-bottom:none;}
+.agenda-ov-date{background:var(--mist);border-radius:8px;padding:4px 8px;text-align:center;min-width:44px;flex-shrink:0;}
+html.theme-sombre .agenda-ov-date{background:#2a3d2e;}
+.agenda-ov-day{font-size:1.1rem;font-weight:900;line-height:1;}
+.agenda-ov-month{font-size:.6rem;font-weight:700;text-transform:uppercase;color:var(--muted);}
+.agenda-ov-title{font-size:.85rem;font-weight:800;line-height:1.3;margin-bottom:3px;}
+.agenda-ov-meta{font-size:.72rem;color:var(--muted);}
+
+/* ── Overlay Entreprises ─────────────────────────────────── */
+.panel-header{position:sticky;top:0;background:var(--card);z-index:10;padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
+.panel-search{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-size:.85rem;font-family:inherit;background:var(--card);color:var(--text);}
+.panel-search:focus{outline:none;border-color:var(--sage);}
+.panel-filters{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0 2px;}
+.panel-filters::-webkit-scrollbar{display:none;}
+.filter-chip{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.filter-chip.active{background:var(--forest);color:#fff;border-color:var(--forest);}
+.panel-results-count{font-size:.7rem;color:var(--muted);margin:4px 0 8px;}
+.panel-body{display:flex;flex-direction:column;gap:8px;}
+.entreprise-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:flex-start;}
+.entreprise-logo{width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--mist);flex-shrink:0;border:1px solid var(--border);}
+html.theme-sombre .entreprise-logo{background:#2a3d2e;}
+.entreprise-name{font-size:.88rem;font-weight:900;margin-bottom:2px;}
+.entreprise-category{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.entreprise-desc{font-size:.75rem;color:var(--muted);line-height:1.4;}
+.entreprise-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.entreprise-btn{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:700;padding:5px 10px;border-radius:8px;border:none;background:var(--mist);color:var(--forest);cursor:pointer;font-family:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent;}
+html.theme-sombre .entreprise-btn{background:#2a3d2e;color:#a8d5b5;}
+.entreprise-btn:active{opacity:.75;}
+.panel-body button { background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+
+/* ── Overlay Questions ────────────────────────────────── */
+.mel-form-wrap { display:flex;flex-direction:column;gap:10px; }
+.mel-intro { font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:4px; }
+.mel-textarea { width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:.85rem;background:var(--card);color:var(--text);resize:vertical; }
+.mel-textarea:focus { outline:none;border-color:var(--sage); }
+.mel-submit { width:100%;padding:12px;background:var(--forest);color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit; }
+.mel-submit:active { opacity:.8; }
+.mel-history { margin-top:16px; }
+.mel-history-title { font-size:.78rem;font-weight:900;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em; }
+.mel-item { background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px; }
+.mel-item-q { font-size:.82rem;font-weight:700;margin-bottom:4px; }
+.mel-item-date { font-size:.68rem;color:var(--muted); }
+.mel-item-status { display:inline-block;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:10px;background:var(--mist);color:var(--forest);margin-top:4px; }
+html.theme-sombre .mel-item-status { background:#2a3d2e;color:#a8d5b5; }
+.mel-item-answer { font-size:.78rem;color:var(--text);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);line-height:1.5; }
+
+/* ── Infos widget header ─────────────────────────────────── */
+.info-widget{background:var(--card);border-radius:14px;padding:12px 14px;border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.info-widget:active{opacity:.85;}
+.info-widget-icon{font-size:1.4rem;flex-shrink:0;}
+.info-widget-content{flex:1;min-width:0;}
+.info-widget-label{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.info-widget-value{font-size:.95rem;font-weight:900;color:var(--text);}
+.info-widget-sub{font-size:.72rem;color:var(--muted);}
+
+/* ── Server error banner ─────────────────────────────────── */
+#server-error-banner{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:.75rem;color:#dc2626;font-weight:600;}
+html.theme-sombre #server-error-banner{background:#3b1515;border-color:#7f1d1d;color:#fca5a5;}
+
+/* ── Loading states ─────────────────────────────────────── */
+.loading-placeholder{text-align:center;padding:30px;color:var(--muted);}
+.loading-spin{display:inline-block;animation:spin 1s linear infinite;font-size:1.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-state{text-align:center;padding:20px;color:var(--muted);font-size:.85rem;}
+
+/* ── Toast ──────────────────────────────────────────────── */
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0) + 70px);left:50%;transform:translateX(-50%);background:#1a3d2b;color:#fff;padding:8px 16px;border-radius:20px;font-size:.78rem;font-weight:700;opacity:0;transition:opacity .3s;z-index:500;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ── Bouton PWA install ─────────────────────────────────── */
+#install-btn{display:none;width:100%;margin-bottom:10px;padding:12px;background:var(--forest);color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:800;cursor:pointer;font-family:inherit;}
+
+/* ── Mode sombre — overrides globaux ────────────────────── */
+html.theme-sombre .card{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .tile{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .form-input,
+html.theme-sombre .form-select,
+html.theme-sombre .form-textarea{background:#1e2d22;border-color:rgba(255,255,255,0.1);color:#d1e8d5;}
+html.theme-sombre .panel-search{background:#1e2d22;border-color:rgba(255,255,255,0.1);color:#d1e8d5;}
+html.theme-sombre .actu-item{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .agenda-day:hover{background:#1e2d22;}
+html.theme-sombre .doc-link{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .mel-item{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .meteo-card{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .meteo-day-card{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .remi-day-card{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .remi-intro{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .info-widget{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .entreprise-card{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .actu-overlay-item{background:#1e2d22;border-color:rgba(255,255,255,0.06);}
+html.theme-sombre .mel-textarea{background:#1e2d22;border-color:rgba(255,255,255,0.1);}
+html.theme-sombre #server-error-banner{background:#3b1515;border-color:#7f1d1d;color:#fca5a5;}
+html.theme-sombre .agenda-ov-date{background:#2a3d2e;}
+html.theme-sombre .filter-chip{background:#1e2d22;border-color:rgba(255,255,255,0.1);color:#7aab87;}
+html.theme-sombre .filter-chip.active{background:#2d6a4f;color:#fff;border-color:#2d6a4f;}
+html.theme-sombre .panel-header{background:#0f1a12;}
+
+/* ── Mode sombre — overrides spécifiques overlays ───────── */
+html.theme-sombre #ov-meteo .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-dechets .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-remi .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-mairie .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-agenda .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-notifs .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-entreprises .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-questions .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-documents .ov-body { background:#0f1a12; }
+html.theme-sombre #ov-entreprises .panel-header { background:#0f1a12; border-color:rgba(255,255,255,0.08); }
+html.theme-sombre #ov-entreprises .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
+/* Overlay météo — cartes en mode sombre */
+html.theme-sombre .meteo-card { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .meteo-day-card { background:#2d3748 !important;border-color:#374151 !important; }
+/* Overlay Rémi — cartes en mode sombre */
+html.theme-sombre .remi-intro { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .remi-day-card { background:#2d3748 !important;border-color:#374151 !important; }
+
+/* Overlay notifs */
+html.theme-sombre .actu-item { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .actu-title { color:#f1f5f9 !important; }
+html.theme-sombre .actu-overlay-item { background:#2d3748 !important;border-color:#374151 !important; }
+
+/* Overlay agenda */
+html.theme-sombre .agenda-ov-item { border-color:#374151 !important; }
+
+/* Overlay mairie */
+html.theme-sombre .mairie-info-row { border-color:#374151 !important; }
+
+/* Overlay entreprises */
+html.theme-sombre .entreprise-card { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .entreprise-btn { background:#374151 !important;color:#a8d5b5 !important; }
+html.theme-sombre .filter-chip { background:#1e2d22 !important;border-color:#374151 !important; }
+html.theme-sombre .filter-chip.active { background:#2d6a4f !important;color:#fff !important; }
+html.theme-sombre .entreprise-logo { background:#374151 !important;border-color:#4b5563 !important; }
+html.theme-sombre .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
+
+/* Overlay questions */
+html.theme-sombre .mel-item { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .mel-item-status { background:#374151 !important;color:#a8d5b5 !important; }
+html.theme-sombre .mel-textarea { background:#2d3748 !important;border-color:#374151 !important;color:#f1f5f9 !important; }
+html.theme-sombre .mel-item-answer { border-color:#374151 !important; }
+
+/* Overlay documents */
+html.theme-sombre #ov-documents .doc-link { background:#2d3748 !important;border-color:#374151 !important; }
+
+/* ── PC / desktop ────────────────────────────────────────── */
+@media(min-width:640px){
+  body{max-width:480px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.15);}
+}
+
+/* ── Animation logo mairie ───────────────────────────────── */
+@keyframes melWiggle{
+  0%, 85%, 100% { transform:rotate(0deg); }
+  88% { transform:rotate(12deg); }
+  91% { transform:rotate(-10deg); }
+  94% { transform:rotate(8deg); }
+  97% { transform:rotate(-4deg); }
+}
