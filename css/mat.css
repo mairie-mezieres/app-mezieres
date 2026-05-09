@@ -789,6 +789,10 @@ html.theme-sombre #ov-nums .panel-body > div > div { background:#2d3748 !importa
 /* Overlay conseil municipal */
 html.theme-sombre #ov-conseil .panel-body > div[style] { background:#2d3748 !important;border-color:#374151 !important; }
 
+/* Overlay associations & entreprises — tuiles en mode sombre */
+html.theme-sombre #ov-assoc .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre #ov-entreprises .panel-body button { background:#2d3748 !important;border-color:#374151 !important; }
+
 /* Overlay notifs */
 html.theme-sombre .actu-item { background:#2d3748 !important;border-color:#374151 !important; }
 html.theme-sombre .actu-title { color:#f1f5f9 !important; }
@@ -1012,7 +1016,7 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
   box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-/* animation wiggle de l’icône */
+/* animation wiggle de l'icône */
 .mel-wiggle{
   display:inline-flex;
   transform-origin:70% 70%;

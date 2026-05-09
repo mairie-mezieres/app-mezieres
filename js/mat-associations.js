@@ -31,7 +31,7 @@ var _D=[
     l:'pamco.jpg',
     e:'pamelacompagnie@gmail.com',
     url:'https://www.facebook.com/profile.php?id=61565106420856',
-    desc:"🐷𝙇𝙚 𝙦𝙪𝙤𝙩𝙞𝙙𝙞𝙚𝙣 𝙙𝙚 𝙈𝙖𝙜𝙣𝙤𝙡𝙞𝙣𝙚 , 𝙉𝙖𝙣𝙤𝙪 , 𝗥𝗮𝗺𝘀𝗲𝘀 𝙚𝙩 𝙗𝙞𝙚𝙣 𝙙’𝙖𝙪𝙩𝙧𝙚𝙨 𝙖𝙣𝙞𝙢𝙖𝙪𝙭 .. 👩🏻‍🌾𝙎𝙪𝙞𝙫𝙚𝙯 𝙣𝙤𝙩𝙧𝙚 𝙚́𝙥𝙤𝙥𝙚́𝙚 𝙙𝙚 𝙧𝙚𝙘𝙤𝙣𝙨𝙩𝙧𝙪𝙘𝙩𝙞𝙤𝙣 𝙖𝙣𝙞𝙢𝙖𝙡𝙞𝙚̀𝙧𝙚!"
+    desc:"🐷𝙇𝙚 𝙦𝙪𝙤𝙩𝙞𝙙𝙞𝙚𝙣 𝙙𝙚 𝙈𝙖𝙜𝙣𝙤𝙡𝙞𝙣𝙚 , 𝙉𝙖𝙣𝙤𝙪 , 𝗥𝗮𝗺𝘀𝗲𝘀 𝙚𝙩 𝙗𝙞𝙚𝙣 𝙙'𝙖𝙪𝙩𝙧𝙚𝙨 𝙖𝙣𝙞𝙢𝙖𝙪𝙭 .. 👩🏻‍🌾𝙎𝙪𝙞𝙫𝙚𝙯 𝙣𝙤𝙩𝙧𝙚 𝙚́𝙥𝙤𝙥𝙚́𝙚 𝙙𝙚 𝙧𝙚𝙘𝙤𝙣𝙨𝙩𝙧𝙪𝙘𝙩𝙞𝙤𝙣 𝙖𝙣𝙞𝙢𝙖𝙡𝙞𝙚̀𝙧𝙚!"
   }
 ];
 
@@ -41,7 +41,7 @@ function _list(){
   return '<div style="font-size:0.82rem;font-weight:900;color:var(--forest);text-align:center;padding:6px 0 10px;letter-spacing:0.01em">Associations domiciliées à Mézières</div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">'
     +_D.map(function(a,i){
-      return '<button onclick="_assocDetail('+i+')" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;width:100%">'
+      return '<button onclick="_assocDetail('+i+')" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;width:100%">'
         +'<img src="'+_e(a.l)+'" alt="'+_e(a.n)+'" style="width:72px;height:72px;object-fit:contain;border-radius:10px;background:#e8f5ee" onerror="this.onerror=null;this.style.display=\'none\'">'
         +'<span style="font-size:0.62rem;font-weight:800;color:var(--forest);text-align:center;line-height:1.25">'+_e(a.n)+'</span>'
         +'</button>';
