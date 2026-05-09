@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -685,9 +684,26 @@ function renderOverview() {
       </div>
     </div>
 
+    <div class="section-title">👤 Visiteurs uniques par jour (30 derniers jours)</div>
+    <div class="chart-wrap"><canvas id="chart-unique-daily"></canvas></div>
+
     <div class="section-title">⚡ Usage app aujourd'hui</div>
     ${renderServiceBadges((app.parJour||{})[today] || {})}
   `;
+
+  // Graphique visiteurs uniques par jour
+  const byDay = dash.app?.uniqueUsers?.byDay || {};
+  const last30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    last30.push({ key, val: byDay[key] || 0 });
+  }
+  renderLineChart('chart-unique-daily',
+    last30.map(x => x.key.slice(5)),
+    [{ label: 'Visiteurs uniques', data: last30.map(x => x.val), color: '#2563eb' }],
+    { stacked: false, yTitle: 'Visiteurs' }
+  );
 }
 
 function renderServiceBadges(services) {
@@ -1763,6 +1779,7 @@ async function loadMelQuestions(){
         <div style="flex:1">
           <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${esc(q.cat)}</span>
           <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${esc(q.q)}</div>
+          ${q.a ? `<div style="font-size:0.75rem;color:var(--muted);margin-top:5px;padding:6px 8px;background:rgba(0,0,0,0.04);border-radius:6px;border-left:2px solid #52b788">🤖 ${esc(q.a)}</div>` : ''}
         </div>
       </div>`).join('');
   }catch(e){if(el) el.innerHTML='<span style="color:var(--red)">❌ '+e.message+'</span>';}

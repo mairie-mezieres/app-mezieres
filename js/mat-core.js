@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Core v3.7.0
+   MAT — Core v3.7.1
    Overlays, installation PWA, splash, init
    ════════════════════════════════════════════════════════════ */
 
@@ -53,7 +53,7 @@ function updateInstallBanner() {
 
   if (isIOS) {
     if (titleEl) titleEl.textContent = 'Installez MAT sur votre iPhone / iPad';
-    if (subEl) subEl.textContent = 'Touchez pour voir les étapes d’installation dans Safari';
+    if (subEl) subEl.textContent = 'Touchez pour voir les étapes d\'installation dans Safari';
   } else if (isAndroid) {
     if (titleEl) titleEl.textContent = 'Installez MAT sur votre téléphone';
     if (subEl) subEl.textContent = 'Touchez pour voir les étapes Android';
@@ -157,11 +157,15 @@ function closeOv(id){
 }
 function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
 
-// Bouton retour navigateur ferme le dernier overlay ouvert
+// Bouton retour navigateur : ferme le dernier overlay ouvert,
+// ou maintient la PWA ouverte en mode standalone (évite l'écran gris Android).
+// En onglet navigateur normal sans overlay, laisse la navigation se poursuivre.
 window.addEventListener('popstate', function(){
   if(_ovStack.length > 0){
     const last = _ovStack[_ovStack.length-1];
     closeOv(last);
+    history.pushState({mat:'overlay'}, '');
+  } else if(isStandaloneMode()){
     history.pushState({mat:'overlay'}, '');
   }
 });
