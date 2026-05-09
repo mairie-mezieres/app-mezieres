@@ -548,12 +548,12 @@ function loadDechets(){
 
 function loadDechetsDetail(){
   var el=document.getElementById('dechets-content');
-  el.innerHTML='<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+  el.innerHTML='<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🗑️ Collecte des ordures</div>'
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Bac noir (ordures ménagères) : chaque <strong>lundi matin</strong>. Sortez-le le dimanche soir.<br>'
     +'Bac jaune (recyclables) : un <strong>lundi sur deux</strong> (semaines paires). Sortez-le le lundi soir précédent.</div>'
     +'</div>'
-    +'<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+    +'<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🏭 Réseau des déchetteries</div>'
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
     +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
