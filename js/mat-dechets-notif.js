@@ -58,21 +58,21 @@ function _triToggle(id) {
 }
 
 function _buildTriCard() {
-  var html = '<div style="background:#fff;border-radius:14px;padding:14px;border:1px solid rgba(0,0,0,0.08);margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+  var html = '<div class="dechets-tri-card" style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
     + '<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:10px">♻️ Guide du tri sélectif</div>';
   _TRI_DATA.forEach(function(b) {
     html += '<div style="border:1px solid ' + b.border + ';border-radius:10px;margin-bottom:8px;overflow:hidden">'
-      + '<button onclick="_triToggle(\'' + b.id + '\')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + b.bg + ';border:none;cursor:pointer;font-family:Nunito,sans-serif;text-align:left">'
+      + '<button onclick="_triToggle(\'' + b.id + '\')" class="tri-bac-btn tri-bac-btn-' + b.id + '" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + b.bg + ';border:none;cursor:pointer;font-family:Nunito,sans-serif;text-align:left">'
       + '<span style="font-size:1rem">' + b.emoji + '</span>'
-      + '<span style="flex:1;font-size:0.82rem;font-weight:900;color:#1e293b">' + b.label + ' <span style="font-weight:600;color:#64748b">· ' + b.subtitle + '</span></span>'
+      + '<span style="flex:1;font-size:0.82rem;font-weight:900;color:var(--text)">' + b.label + ' <span style="font-weight:600;color:var(--muted)">· ' + b.subtitle + '</span></span>'
       + '<span id="tri-chev-' + b.id + '" style="font-size:0.65rem;color:#94a3b8">▼</span>'
       + '</button>'
-      + '<div id="tri-body-' + b.id + '" style="display:none;padding:10px 12px;background:#fff">'
+      + '<div id="tri-body-' + b.id + '" class="tri-bac-body" style="display:none;padding:10px 12px;background:var(--card)">'
       + '<ul style="margin:0 0 8px 0;padding-left:18px;list-style:none">';
     b.items.forEach(function(item) {
-      html += '<li style="font-size:0.77rem;color:#334155;line-height:1.7;padding-left:0;margin-left:-4px">' + item + '</li>';
+      html += '<li style="font-size:0.77rem;color:var(--text);line-height:1.7;padding-left:0;margin-left:-4px">' + item + '</li>';
     });
-    html += '</ul><div style="font-size:0.72rem;color:#64748b;background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5">💡 ' + b.tip + '</div>'
+    html += '</ul><div class="tri-bac-tip" style="font-size:0.72rem;color:var(--muted);background:#f8fafc;border-radius:6px;padding:6px 8px;line-height:1.5">💡 ' + b.tip + '</div>'
       + '</div></div>';
   });
   html += '</div>';
@@ -91,6 +91,7 @@ function _buildTriCard() {
 
     // Carte rappels collecte — juste sous "Collecte des ordures"
     var card = document.createElement('div');
+    card.className = 'dechets-rappels-card';
     card.style.cssText = 'background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;padding:14px;border:1px solid rgba(34,197,94,0.25);margin-bottom:12px';
     card.innerHTML = '<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:4px">🔔 Rappels collecte</div>'
       + '<div style="font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:10px">Recevez une notification à 18h la veille de chaque collecte (bac noir et bac jaune).</div>'
