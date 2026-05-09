@@ -60,14 +60,14 @@ async function _loadEauSection() {
   var restCol    = '#16a34a';
 
   function render() {
-    s.innerHTML = '<div style="margin-top:10px;border-radius:14px;border:1px solid #e2e8f0;background:#fff">'
-      + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:#1a3d2b;border-bottom:1px solid #f1f5f9">\uD83D\uDCA7 Eau</div>'
+    s.innerHTML = '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
+      + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">\uD83D\uDCA7 Eau</div>'
       + '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem">'
-      +   '<span style="color:#64748b">\uD83C\uDF0A Nappe \u00b7 ' + _EAU_LABEL + '</span>'
+      +   '<span style="color:var(--muted)">\uD83C\uDF0A Nappe \u00b7 ' + _EAU_LABEL + '</span>'
       +   '<span style="text-align:right">' + nappeHtml + '</span>'
       + '</div>'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem;border-top:1px solid #f1f5f9">'
-      +   '<span style="color:#64748b">\uD83D\uDEB0 Restrictions</span>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem;border-top:1px solid var(--border)">'
+      +   '<span style="color:var(--muted)">\uD83D\uDEB0 Restrictions</span>'
       +   '<span style="font-weight:700;color:' + restCol + '">' + restric + '</span>'
       + '</div></div>';
   }
