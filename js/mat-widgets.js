@@ -30,7 +30,8 @@ function meteoFormatAlertDate(iso, withYear) {
 function meteoAlertSummary(vigilance) {
   if (vigilance && vigilance.main_text) return vigilance.main_text;
   if (meteoHasAlert(vigilance)) {
-    return 'Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + ' en cours sur le Loiret.';
+    var statusLabel = vigilance.upcoming ? 'prévue' : 'en cours';
+    return 'Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + ' ' + statusLabel + ' sur le Loiret.';
   }
   return 'Situation météo normale sur la commune.';
 }
@@ -264,7 +265,7 @@ function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
     alertHtml = '<details open>'
       + '<summary class="meteo-alert-summary">'
       + '<div class="meteo-alert-topline">'
-      + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + '</span>'
+      + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + (vigilance.upcoming ? ' · À venir' : '') + '</span>'
       + '<span class="meteo-alert-action">Touchez pour le détail</span>'
       + '</div>'
       + '<div class="meteo-alert-head">'
@@ -323,10 +324,11 @@ async function loadMeteo() {
     if (meteoHasAlert(vigilance)) {
       const startTxt = meteoFormatAlertDate(vigilance.start, false);
       const endTxt = meteoFormatAlertDate(vigilance.end, false);
-      descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">Début ' + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
-      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo');
+      const upcomingLabel = vigilance.upcoming ? ' · À venir' : '';
+      descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">' + (vigilance.upcoming ? 'Prévu ' : 'Début ') + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
+      badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + upcomingLabel;
       badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = 'Touchez pour voir le détail de l’alerte';
+      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : 'Touchez pour voir le détail de l’alerte';
     } else {
       descEl.textContent = baseDesc;
       badge.textContent = '✅ Pas d\'alerte';
@@ -548,12 +550,12 @@ function loadDechets(){
 
 function loadDechetsDetail(){
   var el=document.getElementById('dechets-content');
-  el.innerHTML='<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+  el.innerHTML='<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🗑️ Collecte des ordures</div>'
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Bac noir (ordures ménagères) : chaque <strong>lundi matin</strong>. Sortez-le le dimanche soir.<br>'
     +'Bac jaune (recyclables) : un <strong>lundi sur deux</strong> (semaines paires). Sortez-le le lundi soir précédent.</div>'
     +'</div>'
-    +'<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+    +'<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🏭 Réseau des déchetteries</div>'
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
     +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
