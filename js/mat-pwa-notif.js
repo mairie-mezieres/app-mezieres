@@ -14,7 +14,20 @@ async function checkAndRenewPushSubscription() {
   try {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
-    if (sub) { localStorage.setItem(PUSH_ACTIVE_KEY, '1'); return; }
+    if (sub) {
+      localStorage.setItem(PUSH_ACTIVE_KEY, '1');
+      // Re-synchroniser avec le serveur au cas où il a perdu la souscription (redémarrage Render/Redis)
+      fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub),
+        keepalive: true
+      }).then(function(r) {
+        if (r.ok) localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+        else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
+      }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
+      return;
+    }
     if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
     var newSub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
@@ -72,7 +85,7 @@ async function showPostInstallNotifPrompt() {
 
   var accepted = await confirmMAT(
     'Voulez-vous recevoir les actualités communales et alertes directement sur votre téléphone ?',
-    '\u2705 MAT est installé !', '\uD83D\uDD14', 'Activer les alertes', 'Plus tard'
+    '✅ MAT est installé !', '🔔', 'Activer les alertes', 'Plus tard'
   );
 
   if (!accepted) return;
@@ -81,7 +94,7 @@ async function showPostInstallNotifPrompt() {
     if (!('Notification' in window)) return;
     var perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      if (perm === 'denied') await alertMAT('Notifications bloquées. Modifiez les réglages de votre navigateur.', 'Notifications', '\uD83D\uDD14');
+      if (perm === 'denied') await alertMAT('Notifications bloquées. Modifiez les réglages de votre navigateur.', 'Notifications', '🔔');
       return;
     }
     var reg2 = await navigator.serviceWorker.ready;
@@ -108,9 +121,9 @@ async function showPostInstallNotifPrompt() {
       var btn = document.getElementById('push-btn');
       if (btn) { btn.textContent = 'Ne pas être alerté'; btn.classList.remove('on'); btn.classList.add('off'); }
     } catch(_) {}
-    await alertMAT('Alertes activées ! Vous recevrez les actualités communales.', '\u2705 Notifications', '\uD83D\uDD14');
+    await alertMAT('Alertes activées ! Vous recevrez les actualités communales.', '✅ Notifications', '🔔');
   } catch(e) {
-    await alertMAT('Activation impossible pour l\'instant. Réessayez depuis le menu Notifications.', 'Notifications', '\u26A0\uFE0F');
+    await alertMAT('Activation impossible pour l\'instant. Réessayez depuis le menu Notifications.', 'Notifications', '⚠️');
   }
 }
 
