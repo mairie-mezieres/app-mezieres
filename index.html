@@ -699,6 +699,13 @@
         </div>
         <button class="notif-btn off" id="push-btn" onclick="togglePush()">Chargement…</button>
       </div>
+      <div id="push-diag-wrap" style="display:none">
+        <div style="margin-top:8px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:1.3rem">📡</div>
+          <div id="push-diag-text" style="flex:1;font-size:0.82rem;color:var(--muted)">Abonné sur ce navigateur</div>
+          <button id="push-test-btn" onclick="testPushNotification()" style="border:none;border-radius:8px;padding:7px 11px;font-size:0.78rem;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;flex-shrink:0;white-space:nowrap">Tester 🔔</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

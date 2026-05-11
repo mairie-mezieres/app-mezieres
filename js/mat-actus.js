@@ -304,9 +304,43 @@ async function checkPushStatus(){
   try{
     const reg=await navigator.serviceWorker.ready;
     const sub=await reg.pushManager.getSubscription();
-    if(sub){pushRegistered=true;if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}updateNotifCardStatus(true);}
-    else{pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);}
-  }catch(e){pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);}
+    if(sub){pushRegistered=true;if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}updateNotifCardStatus(true);_showPushDiag();}
+    else{pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);_hidePushDiag();}
+  }catch(e){pushRegistered=false;if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}updateNotifCardStatus(false);_hidePushDiag();}
+}
+
+function _showPushDiag() {
+  var w=document.getElementById('push-diag-wrap'),t=document.getElementById('push-diag-text'),b=document.getElementById('push-test-btn');
+  if(w) w.style.display='';
+  if(t) t.textContent='Abonné sur ce navigateur';
+  if(b){b.textContent='Tester 🔔';b.disabled=false;}
+}
+function _hidePushDiag() {
+  var w=document.getElementById('push-diag-wrap');
+  if(w) w.style.display='none';
+}
+async function testPushNotification() {
+  var btn=document.getElementById('push-test-btn'),txt=document.getElementById('push-diag-text');
+  if(btn){btn.textContent='Envoi…';btn.disabled=true;}
+  try {
+    var reg=await navigator.serviceWorker.ready;
+    var sub=await reg.pushManager.getSubscription();
+    if(!sub){if(txt)txt.textContent='⚠️ Aucun abonnement local trouvé';if(btn){btn.textContent='Tester 🔔';btn.disabled=false;}return;}
+    var r=await fetch('https://chatbot-mairie-mezieres.onrender.com/push/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true});
+    if(r.ok){
+      if(txt)txt.textContent='✅ Notification envoyée — vérifiez votre appareil';
+    } else {
+      var data=await r.json().catch(function(){return{};});
+      var msg=data.error||('Erreur '+r.status);
+      if(txt)txt.textContent='❌ '+msg;
+      try{matLogError('push-test','Échec test push: '+msg);}catch(_){}
+    }
+  } catch(e) {
+    var em=(e&&e.message)||'inconnue';
+    if(txt)txt.textContent='❌ Erreur réseau: '+em;
+    try{matLogError('push-test','Exception test push: '+em);}catch(_){}
+  }
+  if(btn){btn.textContent='Tester 🔔';btn.disabled=false;}
 }
 
 async function togglePush(){
@@ -316,6 +350,7 @@ async function togglePush(){
       if(!localStorage.getItem('mat_dechets_notif_v1')) await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
     updateNotifCardStatus(false);
+    _hidePushDiag();
     localStorage.removeItem('mat_push_active');
     pushRegistered=false; return;
   }
@@ -331,6 +366,7 @@ async function togglePush(){
       if(localStorage.getItem('mat_dechets_notif_v1')){fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});}
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);
+      _showPushDiag();
       pushRegistered=true;
       localStorage.setItem('mat_push_active','1');
       await alertMAT('Notifications activées !','Notifications','✅');
