@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.3.3 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.3.4 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 10 : Entreprises locales (tuile + overlay + admin)
-const CACHE = 'mat-v4.3.3';
+const CACHE = 'mat-v4.3.4';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -229,4 +229,25 @@ self.addEventListener('message', e => {
       } catch (_) {}
     })());
   }
+});
+
+// Rotation de subscription par le navigateur : re-synchronise avec le backend
+self.addEventListener('pushsubscriptionchange', e => {
+  e.waitUntil((async () => {
+    const newSub = e.newSubscription;
+    if (newSub) {
+      try {
+        await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newSub),
+          keepalive: true
+        });
+      } catch (_) {}
+    } else {
+      // Demander à la page de se ré-abonner (la page connaît la clé VAPID)
+      const cls = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      cls.forEach(c => c.postMessage({ action: 'pushsubscriptionchange' }));
+    }
+  })());
 });

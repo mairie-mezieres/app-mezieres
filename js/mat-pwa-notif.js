@@ -1,5 +1,5 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Prompt notifications post-installation v3.7.8
+   MAT — Prompt notifications post-installation v3.7.9
    Propose d'activer les alertes juste après l'installation PWA.
    Chargé dynamiquement par mat-init.js.
    ╔════════════════════════════════════════════════════════════ */
@@ -164,6 +164,15 @@ function checkFirstStandaloneRun() {
 window.addEventListener('appinstalled', function() {
   setTimeout(showPostInstallNotifPrompt, 800);
 });
+
+// Re-sync si le service worker signale une rotation de subscription
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', function(e) {
+    if (e.data && e.data.action === 'pushsubscriptionchange') {
+      checkAndRenewPushSubscription();
+    }
+  });
+}
 
 // Re-sync au retour au premier plan (ex: app en arrière-plan puis rouverte)
 document.addEventListener('visibilitychange', function() {
