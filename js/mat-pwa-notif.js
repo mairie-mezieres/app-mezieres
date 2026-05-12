@@ -1,11 +1,13 @@
-/* ════════════════════════════════════════════════════════════
-   MAT — Prompt notifications post-installation v3.7.7
+/* ╔════════════════════════════════════════════════════════════
+   MAT — Prompt notifications post-installation v3.7.8
    Propose d'activer les alertes juste après l'installation PWA.
    Chargé dynamiquement par mat-init.js.
-   ════════════════════════════════════════════════════════════ */
+   ╔════════════════════════════════════════════════════════════ */
 
 var PUSH_PENDING_SYNC_KEY = 'mat_push_pending_sync';
 var PUSH_ACTIVE_KEY = 'mat_push_active';
+var _lastPushSync = 0;
+var PUSH_SYNC_COOLDOWN = 5 * 60 * 1000; // 5 minutes entre deux syncs visibilité
 
 // Renouvelle silencieusement l'abonnement push si le navigateur l'a invalidé
 async function checkAndRenewPushSubscription() {
@@ -23,7 +25,7 @@ async function checkAndRenewPushSubscription() {
         body: JSON.stringify(sub),
         keepalive: true
       }).then(function(r) {
-        if (r.ok) localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+        if (r.ok) { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); _lastPushSync = Date.now(); }
         else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
       }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
       return;
@@ -39,7 +41,8 @@ async function checkAndRenewPushSubscription() {
       body: JSON.stringify(newSub),
       keepalive: true
     }).then(function(r) {
-      if (!r.ok) localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
+      if (r.ok) _lastPushSync = Date.now();
+      else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
   } catch(e) {}
 }
@@ -58,7 +61,7 @@ async function retryPendingPushSync() {
       body: JSON.stringify(sub),
       keepalive: true
     });
-    if (r.ok) localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+    if (r.ok) { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); _lastPushSync = Date.now(); }
   } catch(_) {}
 }
 
@@ -110,7 +113,7 @@ async function showPostInstallNotifPrompt() {
       keepalive: true
     }).then(function(r) {
       if (!r.ok) localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
-      else localStorage.removeItem(PUSH_PENDING_SYNC_KEY);
+      else { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); _lastPushSync = Date.now(); }
     }).catch(function() {
       localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     });
@@ -162,15 +165,23 @@ window.addEventListener('appinstalled', function() {
   setTimeout(showPostInstallNotifPrompt, 800);
 });
 
+// Re-sync au retour au premier plan (ex: app en arrière-plan puis rouverte)
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState !== 'visible') return;
+  if (Date.now() - _lastPushSync < PUSH_SYNC_COOLDOWN) return;
+  retryPendingPushSync();
+  checkAndRenewPushSubscription();
+});
+
 // Détection premier démarrage standalone — compatible chargement dynamique
 if (document.readyState === 'complete') {
   setTimeout(checkFirstStandaloneRun, 1500);
-  setTimeout(retryPendingPushSync, 3000);
-  setTimeout(checkAndRenewPushSubscription, 5000);
+  setTimeout(retryPendingPushSync, 2000);
+  setTimeout(checkAndRenewPushSubscription, 2000);
 } else {
   window.addEventListener('load', function() {
     setTimeout(checkFirstStandaloneRun, 1500);
-    setTimeout(retryPendingPushSync, 3000);
-    setTimeout(checkAndRenewPushSubscription, 5000);
+    setTimeout(retryPendingPushSync, 2000);
+    setTimeout(checkAndRenewPushSubscription, 2000);
   });
 }
