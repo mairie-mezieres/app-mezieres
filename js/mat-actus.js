@@ -1,8 +1,8 @@
-/* ════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.7.3
-   ════════════════════════════════════════════════════════════ */
+/* ╔════════════════════════════════════════════════════════════
+   MAT — Actualités & Notifications Push v3.7.4
+   ╔════════════════════════════════════════════════════════════ */
 
-// ── Actualités ──────────────────────────────────────────
+// ── Actualités ──────────────────────────────────────────────────────
 const ACTUS_SEEN_KEY='mat_actus_seen_v1';
 const IDEAS_SEEN_BADGE_KEY='mat_ideas_seen_v1';
 const ACTUS_ROUTE_PREFIX='#actu=';
@@ -188,7 +188,7 @@ function formatEventDate(iso){
 function renderActuListItem(a){
   const id=getActuId(a);
   const jsId=JSON.stringify(id).replace(/"/g,'&quot;');
-  const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:'';
+  const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:''
   const titre=esc(getActuDisplayTitle(a));
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
@@ -268,7 +268,7 @@ function handleActuHashRoute(){
 window.addEventListener('hashchange', handleActuHashRoute);
 window.addEventListener('load', function(){ setTimeout(handleActuHashRoute, 700); });
 
-// ── Notifications Push ────────────────────────────────
+// ── Notifications Push ────────────────────────────────────
 let pushRegistered=false;
 
 function updateNotifCardStatus(enabled){
@@ -326,6 +326,7 @@ async function testPushNotification() {
     var reg=await navigator.serviceWorker.ready;
     var sub=await reg.pushManager.getSubscription();
     if(!sub){if(txt)txt.textContent='⚠️ Aucun abonnement local trouvé';if(btn){btn.textContent='Tester 🔔';btn.disabled=false;}return;}
+    try{await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true});}catch(_){}
     var r=await fetch('https://chatbot-mairie-mezieres.onrender.com/push/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true});
     if(r.ok){
       if(txt)txt.textContent='✅ Notification envoyée — vérifiez votre appareil';
@@ -374,7 +375,7 @@ async function togglePush(){
   }
 }
 
-// ── Encart info/alerte dans le header ────────────────
+// ── Encart info/alerte dans le header ────────────
 const MAT_BANNER_DISMISS_KEY = 'mat_banner_dismissed_v3_';
 
 async function loadMatInfoBanner() {
