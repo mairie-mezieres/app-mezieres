@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.3.1 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.3.3 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 10 : Entreprises locales (tuile + overlay + admin)
-const CACHE = 'mat-v4.3.2';
+const CACHE = 'mat-v4.3.3';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -141,7 +141,8 @@ function normalizePushPayload(raw) {
     badge: raw.badge || './icon-192.png',
     image: raw.image || undefined,
     actions,
-    tag: actuId ? `actu-${actuId}` : 'mat-notif',
+    tag: raw.tag || (actuId ? `actu-${actuId}` : 'mat-notif'),
+    renotify: raw.renotify !== undefined ? !!raw.renotify : false,
     data: {
       url,
       listUrl,
@@ -164,7 +165,7 @@ self.addEventListener('push', e => {
       vibrate: [200, 100, 200],
       actions: notif.actions,
       tag: notif.tag,
-      renotify: false,
+      renotify: notif.renotify,
       data: notif.data
     });
 
