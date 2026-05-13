@@ -1,8 +1,16 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Prompt notifications post-installation v3.7.9
+   MAT — Prompt notifications post-installation v3.8.0
    Propose d'activer les alertes juste après l'installation PWA.
    Chargé dynamiquement par mat-init.js.
    ╔════════════════════════════════════════════════════════════ */
+
+// Stocke la clé VAPID publique dans le Cache API pour que le service worker
+// puisse se ré-abonner lui-même lors d'un pushsubscriptionchange sans onglet ouvert.
+if ('caches' in window && typeof VAPID_PUB !== 'undefined') {
+  caches.open('mat-config-v1').then(function(cache) {
+    cache.put('mat-vapid-public-key', new Response(VAPID_PUB, { headers: { 'Content-Type': 'text/plain' } }));
+  }).catch(function() {});
+}
 
 var PUSH_PENDING_SYNC_KEY = 'mat_push_pending_sync';
 var PUSH_ACTIVE_KEY = 'mat_push_active';
@@ -164,15 +172,6 @@ function checkFirstStandaloneRun() {
 window.addEventListener('appinstalled', function() {
   setTimeout(showPostInstallNotifPrompt, 800);
 });
-
-// Re-sync si le service worker signale une rotation de subscription
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', function(e) {
-    if (e.data && e.data.action === 'pushsubscriptionchange') {
-      checkAndRenewPushSubscription();
-    }
-  });
-}
 
 // Re-sync au retour au premier plan (ex: app en arrière-plan puis rouverte)
 document.addEventListener('visibilitychange', function() {
