@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.3.4 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.3.5 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 10 : Entreprises locales (tuile + overlay + admin)
-const CACHE = 'mat-v4.3.4';
+const CACHE = 'mat-v4.3.5';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -231,23 +231,43 @@ self.addEventListener('message', e => {
   }
 });
 
-// Rotation de subscription par le navigateur : re-synchronise avec le backend
+function _urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+// Rotation de subscription par le navigateur : re-synchronise avec le backend.
+// Fonctionne même quand aucun onglet n'est ouvert (cas le plus fréquent).
 self.addEventListener('pushsubscriptionchange', e => {
   e.waitUntil((async () => {
-    const newSub = e.newSubscription;
-    if (newSub) {
+    let sub = e.newSubscription;
+
+    if (!sub) {
+      // Relire la clé VAPID stockée par le client dans le Cache API
       try {
-        await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newSub),
-          keepalive: true
-        });
+        const cache = await caches.open('mat-config-v1');
+        const resp  = await cache.match('mat-vapid-public-key');
+        if (resp) {
+          const vapidKey = await resp.text();
+          sub = await self.registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: _urlBase64ToUint8Array(vapidKey)
+          });
+        }
       } catch (_) {}
-    } else {
-      // Demander à la page de se ré-abonner (la page connaît la clé VAPID)
-      const cls = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-      cls.forEach(c => c.postMessage({ action: 'pushsubscriptionchange' }));
     }
+
+    if (!sub) return; // impossible de se ré-abonner sans clé VAPID
+
+    try {
+      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sub),
+        keepalive: true
+      });
+    } catch (_) {}
   })());
 });
