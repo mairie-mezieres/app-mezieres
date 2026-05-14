@@ -447,7 +447,8 @@ function loadMeteoDetail() {
     var aqiV = env.aqi.valeur;
     var aqiSeuil = _envSeuil(aqiV, [20, 40, 60, 80, 100]);
     aqiLabel = esc(env.aqi.label);
-    if (aqiV != null) aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiV + (aqiSeuil ? ' · ⚠️ seuil ' + aqiSeuil : '') + '</span>';
+    var aqiN = aqiV != null ? Math.round(+aqiV) : NaN;
+    if (!isNaN(aqiN)) aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiN + (aqiSeuil ? ' · ⚠️ seuil ' + aqiSeuil : '') + '</span>';
   }
   var pollenLabel = '–';
   if (env.pollen) {
