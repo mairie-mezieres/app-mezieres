@@ -45,6 +45,8 @@
   setTimeout(function(){
     try { if (typeof loadMelData === 'function') loadMelData(); }
     catch(e){ console.warn('[init] loadMelData', e); }
+    try { if (typeof loadEventsLocaux === 'function') loadEventsLocaux(); }
+    catch(e){ console.warn('[init] loadEventsLocaux', e); }
   }, 150);
 
   // 10) Onboarding (décalé pour ne pas bloquer l'affichage initial)
