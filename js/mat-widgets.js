@@ -448,6 +448,8 @@ function loadMeteoDetail() {
       + '</div>';
   }
 
+  html += meteoBuildSunBlock(days, now);
+
   html += '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
     + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">🌿 Air</div>'
     + _airRow('🏭 Qualité de l\'air', aqiLabel, false)
@@ -455,8 +457,6 @@ function loadMeteoDetail() {
     + _airRow('💨 Rafales max · 24h', rafaleMax24 + ' km/h' + (ventDirCur ? ' ' + ventDirCur : '') + meteoTrendBadge(tRaf), true)
     + _airRow('📊 Pression', (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres), true)
     + '</div>';
-
-  html += meteoBuildSunBlock(days, now);
 
   html += '</div>';
   el.innerHTML = html;
@@ -671,12 +671,10 @@ function loadRemiDetail() {
     + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande" target="_blank" rel="noopener">Réserver · En savoir plus →</a>'
     + '</div>'
     + '<hr class="remi-tad-divider">'
-    + '<div class="remi-intro">'
-    + '<div class="remi-intro-title">Ligne 8 — Planning 7 jours</div>'
-    + '<div class="remi-intro-text">Affichage basé sur les horaires intégrés dans MAT, avec distinction <strong>scolaire</strong> / <strong>vacances</strong>. En cas de doute, vérifiez la fiche officielle Rémi.</div>'
-    + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/" target="_blank" rel="noopener">🌐 Ouvrir le site Rémi</a>'
-    + '</div>'
-    + '<div class="remi-week">' + cards + '</div>';
+    + '<div style="padding:4px 2px 10px;font-size:.86rem;font-weight:900;color:var(--forest)">🚌 Ligne 8 Rémi · Planning 7 jours</div>'
+    + '<div class="remi-week">' + cards + '</div>'
+    + '<div style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.5">Horaires intégrés dans MAT · distinction <strong>scolaire</strong> / <strong>vacances</strong> · vérifiez la fiche officielle en cas de doute.</div>'
+    + '<a class="remi-link-btn" style="margin-top:8px" href="https://www.remi-centrevaldeloire.fr/" target="_blank" rel="noopener">🌐 Fiche officielle Rémi</a>';
 }
 
 function openRemi(){
@@ -775,7 +773,26 @@ async function loadEnvLocal() {
     if (_envLocalCache && Date.now() - (_envLocalCache._ts || 0) < 15 * 60000) return;
     var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/env-local', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    _envLocalCache = await r.json();
+    var d = await r.json();
+
+    // Loire depuis Hubeau directement (le serveur Render est bloqué en 403)
+    try {
+      var stR = await fetch('https://hubeau.eaufrance.fr/api/v1/hydrometrie/referentiel/stations?code_commune_station=45028&format=json&fields=code_station&size=1');
+      if (stR.ok) {
+        var stD  = await stR.json();
+        var code = ((stD.data || [])[0] || {}).code_station;
+        if (code) {
+          var obR = await fetch('https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=' + code + '&grandeur_hydro=H&size=1&fields=date_obs,resultat_obs');
+          if (obR.ok) {
+            var obD = await obR.json();
+            var obs = (obD.data || [])[0];
+            if (obs) d.loire = { hauteur: obs.resultat_obs != null ? Math.round(obs.resultat_obs * 100) / 100 : null };
+          }
+        }
+      }
+    } catch(_) {}
+
+    _envLocalCache = d;
     _envLocalCache._ts = Date.now();
     window._envLocalData = _envLocalCache;
   } catch(e) {
