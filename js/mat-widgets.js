@@ -437,8 +437,25 @@ function loadMeteoDetail() {
   html += '</div></div></div>';
 
   var env = window._envLocalData || {};
-  var aqiLabel = env.aqi ? esc(env.aqi.label) : '–';
-  var pollenLabel = env.pollen ? esc(env.pollen.label) : '–';
+  function _envSeuil(val, seuils) {
+    if (val == null) return null;
+    for (var i = 0; i < seuils.length; i++) { if (val < seuils[i]) return seuils[i]; }
+    return null;
+  }
+  var aqiLabel = '–';
+  if (env.aqi) {
+    var aqiV = env.aqi.valeur;
+    var aqiSeuil = _envSeuil(aqiV, [20, 40, 60, 80, 100]);
+    aqiLabel = esc(env.aqi.label);
+    if (aqiV != null) aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiV + (aqiSeuil ? ' · ⚠️ seuil ' + aqiSeuil : '') + '</span>';
+  }
+  var pollenLabel = '–';
+  if (env.pollen) {
+    var polV = env.pollen.niveau;
+    var polSeuil = _envSeuil(polV, [1, 10, 50, 100]);
+    pollenLabel = esc(env.pollen.label);
+    if (polV != null) pollenLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">' + (Math.round(polV * 10) / 10) + ' grains/m³' + (polSeuil ? ' · ⚠️ seuil ' + polSeuil : '') + '</span>';
+  }
 
   function _airRow(label, val, border) {
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem'

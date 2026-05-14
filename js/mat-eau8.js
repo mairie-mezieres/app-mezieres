@@ -98,7 +98,7 @@ async function _loadEauSection() {
       + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">\uD83D\uDCA7 Eau</div>'
       + row('\uD83C\uDF27\uFE0F Cumul pluie \u00b7 24h', '<span style="font-weight:700">' + pluie24h + '</span>' + badge(trend(pluieCur, pluieBef, 2, 0.5)), false)
       + row('\uD83D\uDCA7 Humidit\u00E9', '<span style="font-weight:700">' + humStr + '</span>' + badge(trend(humCur, humBef, 15, 5)), true)
-      + row('\uD83C\uDFDE\uFE0F Loire \u00b7 Beaugency', '<span style="font-weight:700">' + loireStr + '</span>', true)
+      + row('\uD83C\uDFDE\uFE0F Loire \u00b7 Meung-sur-Loire', '<span style="font-weight:700">' + loireStr + '</span>', true)
       + row('\uD83C\uDF0A Nappe \u00b7 ' + _EAU_LABEL, '<span style="text-align:right">' + nappeHtml + '</span>', true)
       + row('\uD83D\uDEB0 Restrictions', '<span style="font-weight:700;color:' + restCol + '">' + restric + '</span>', true)
       + '</div>';
