@@ -105,6 +105,6 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-eau8.js?v=4.2.4';
+  s.src = 'js/mat-eau8.js?v=4.2.5';
   document.head.appendChild(s);
 })();

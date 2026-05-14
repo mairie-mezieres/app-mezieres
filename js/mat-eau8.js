@@ -83,8 +83,22 @@ async function _loadEauSection() {
     var trend   = typeof meteoTrend === 'function' ? meteoTrend : function(){ return 0; };
 
     var env     = window._envLocalData || {};
-    var loireStr = env.loire && env.loire.hauteur != null
-      ? parseFloat(env.loire.hauteur).toFixed(2) + '\u00A0m' : '\u2013';
+    var loireStr = '\u2013';
+    if (env.loire && env.loire.hauteur != null) {
+      var _lh = parseFloat(env.loire.hauteur);
+      loireStr = _lh.toFixed(2) + '\u00A0m';
+      var _ls = env.loire.seuils;
+      if (_ls) {
+        var _seuilLabels = ['vigilance', 'alerte', 'alerte renforc\u00E9e', 'crise'];
+        var _seuilVals   = [_ls.seuil1, _ls.seuil2, _ls.seuil3, _ls.seuil4];
+        for (var _si = 0; _si < _seuilVals.length; _si++) {
+          if (_seuilVals[_si] != null && _lh < _seuilVals[_si]) {
+            loireStr += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">\u26A0\uFE0F seuil\u00A0' + _seuilLabels[_si] + '\u00A0' + parseFloat(_seuilVals[_si]).toFixed(2) + '\u00A0m</span>';
+            break;
+          }
+        }
+      }
+    }
 
     function row(label, val, border) {
       return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem'
