@@ -1,4 +1,4 @@
-<svg viewBox="0 0 280 390" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans">
+<svg viewBox="0 0 280 404" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans">
   <defs>
     <style>
       .stop-name { font: 700 12.5px Nunito, Arial, sans-serif; fill: #1a2535; }
@@ -11,7 +11,7 @@
   </defs>
 
   <!-- Fond -->
-  <rect width="280" height="390" rx="14" fill="#f4f7fb"/>
+  <rect width="280" height="404" rx="14" fill="#f4f7fb"/>
 
   <!-- En-tête -->
   <rect x="0" y="0" width="280" height="48" rx="14" fill="#1a6b8a"/>
@@ -22,7 +22,7 @@
   <text x="136" y="38" text-anchor="middle" font-size="9" fill="#9fd4ec" font-family="Nunito,Arial,sans-serif">Orléans ↔ Saint-Laurent-Nouan</text>
 
   <!-- Colonne verticale : trait de ligne -->
-  <line x1="56" y1="72" x2="56" y2="358" stroke="#1a6b8a" stroke-width="5" stroke-linecap="round"/>
+  <line x1="56" y1="72" x2="56" y2="372" stroke="#1a6b8a" stroke-width="5" stroke-linecap="round"/>
 
   <!-- ── ORLÉANS (terminus) ── y=72 -->
   <circle cx="56" cy="72" r="12" fill="#1a6b8a" stroke="white" stroke-width="2.5"/>
@@ -36,32 +36,32 @@
   <text x="74" y="146" class="stop-sub">Abbatiale · Centre</text>
 
   <!-- ── MÉZIÈRES-LEZ-CLÉRY (ici) ── y=204 -->
-  <rect x="30" y="190" width="220" height="36" rx="8" fill="#fff3e0" stroke="#f39c12" stroke-width="1.5"/>
-  <circle cx="56" cy="208" r="11" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="56" y="212" text-anchor="middle" font-size="11" font-weight="900" fill="white" font-family="Arial,sans-serif">★</text>
+  <rect x="30" y="188" width="220" height="50" rx="8" fill="#fff3e0" stroke="#f39c12" stroke-width="1.5"/>
+  <circle cx="56" cy="213" r="11" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="56" y="217" text-anchor="middle" font-size="11" font-weight="900" fill="white" font-family="Arial,sans-serif">★</text>
   <text x="76" y="202" class="ici-name">Mézières-lez-Cléry</text>
-  <text x="76" y="215" class="ici-sub">Arrêts : Mairie · Le Bréau</text>
+  <text x="76" y="214" class="ici-sub">Arrêts : Mairie · Le Bréau</text>
 
-  <!-- ── MEUNG-SUR-LOIRE ── y=272 -->
-  <circle cx="56" cy="272" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
-  <text x="74" y="268" class="stop-name">Meung-sur-Loire</text>
-  <text x="74" y="280" class="stop-sub">Centre · Gare SNCF</text>
+  <!-- ── MEUNG-SUR-LOIRE ── y=286 -->
+  <circle cx="56" cy="286" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
+  <text x="74" y="282" class="stop-name">Meung-sur-Loire</text>
+  <text x="74" y="294" class="stop-sub">Centre · Gare SNCF</text>
 
-  <!-- ── BEAUGENCY ── y=320 -->
-  <circle cx="56" cy="320" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
-  <text x="74" y="316" class="stop-name">Beaugency</text>
-  <text x="74" y="328" class="stop-sub">Gare routière</text>
+  <!-- ── BEAUGENCY ── y=334 -->
+  <circle cx="56" cy="334" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
+  <text x="74" y="330" class="stop-name">Beaugency</text>
+  <text x="74" y="342" class="stop-sub">Gare routière</text>
 
-  <!-- ── SAINT-LAURENT-NOUAN (terminus) ── y=358 -->
-  <circle cx="56" cy="358" r="12" fill="#1a6b8a" stroke="white" stroke-width="2.5"/>
-  <polygon points="56,366 60,356 56,359 52,356" fill="white"/>
-  <text x="78" y="354" class="term-name">Saint-Laurent-Nouan</text>
-  <text x="78" y="366" class="term-sub">Terminus · direction Blois</text>
+  <!-- ── SAINT-LAURENT-NOUAN (terminus) ── y=372 -->
+  <circle cx="56" cy="372" r="12" fill="#1a6b8a" stroke="white" stroke-width="2.5"/>
+  <polygon points="56,380 60,370 56,373 52,370" fill="white"/>
+  <text x="78" y="368" class="term-name">Saint-Laurent-Nouan</text>
+  <text x="78" y="380" class="term-sub">Terminus · direction Blois</text>
 
-  <!-- Badge "Vous êtes ici" -->
-  <rect x="204" y="193" width="66" height="14" rx="5" fill="#f39c12"/>
-  <text x="237" y="203" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Nunito,Arial,sans-serif">Vous êtes ici</text>
+  <!-- Badge "Vous êtes ici" sous le nom -->
+  <rect x="76" y="218" width="68" height="13" rx="5" fill="#f39c12"/>
+  <text x="110" y="228" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Nunito,Arial,sans-serif">Vous êtes ici</text>
 
   <!-- Note bas -->
-  <text x="140" y="382" text-anchor="middle" font-size="8" fill="#aab" font-family="Nunito,Arial,sans-serif">★ Arrêts desservis dans Mézières-lez-Cléry</text>
+  <text x="140" y="399" text-anchor="middle" font-size="8" fill="#aab" font-family="Nunito,Arial,sans-serif">★ Arrêts desservis dans Mézières-lez-Cléry</text>
 </svg>
