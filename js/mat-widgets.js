@@ -436,36 +436,27 @@ function loadMeteoDetail() {
   }
   html += '</div></div></div>';
 
-  html += '<div class="meteo-card meteo-current-card">'
-    + '<div class="meteo-current-main meteo-current-main-tight">'
-    + '<div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div>'
-    + '</div>'
-    + '</div>';
-
   var env = window._envLocalData || {};
-  var loireH = env.loire && env.loire.hauteur != null ? parseFloat(env.loire.hauteur).toFixed(2) + ' m' : '–';
   var aqiLabel = env.aqi ? esc(env.aqi.label) : '–';
   var pollenLabel = env.pollen ? esc(env.pollen.label) : '–';
 
-  html += '<div style="margin-top:10px">'
-    + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">🌊 Eau</div>'
-    + '<div class="meteo-grid-2 meteo-grid-secondary">'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm' + meteoTrendBadge(tPluie) + '</div></div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%' + meteoTrendBadge(tHum) + '</div></div></div>'
-    + '</div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact" style="margin-top:6px"><div class="meteo-card-kicker">🏞️ Loire à Beaugency</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + loireH + '</div></div></div>'
+  function _airRow(label, val, border) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:0.77rem'
+      + (border ? ';border-top:1px solid var(--border)' : '') + '">'
+      + '<span style="color:var(--muted)">' + label + '</span>'
+      + '<span style="font-weight:700">' + val + '</span>'
+      + '</div>';
+  }
+
+  html += '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
+    + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">🌿 Air</div>'
+    + _airRow('🏭 Qualité de l\'air', aqiLabel, false)
+    + _airRow('🌸 Pollens', pollenLabel, true)
+    + _airRow('💨 Rafales max · 24h', rafaleMax24 + ' km/h' + (ventDirCur ? ' ' + ventDirCur : '') + meteoTrendBadge(tRaf), true)
+    + _airRow('📊 Pression', (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres), true)
     + '</div>';
 
-  html += '<div style="margin-top:10px">'
-    + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">🌿 Air</div>'
-    + '<div class="meteo-grid-2 meteo-grid-secondary">'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🏭 Qualité de l\'air</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + aqiLabel + '</div></div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌸 Pollens</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pollenLabel + '</div></div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + meteoTrendBadge(tRaf) + '</div></div></div>'
-    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres) + '</div></div></div>'
-    + '</div>'
-    + meteoBuildSunBlock(days, now)
-    + '</div>';
+  html += meteoBuildSunBlock(days, now);
 
   html += '</div>';
   el.innerHTML = html;
