@@ -670,7 +670,14 @@ function loadRemiDetail() {
     + '</div>'
     + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande" target="_blank" rel="noopener">Réserver · En savoir plus →</a>'
     + '</div>'
-    + '<hr class="remi-tad-divider">'
+    + '<details style="margin:8px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden">'
+    + '<summary style="cursor:pointer;padding:10px 14px;font-size:.82rem;font-weight:800;color:#1a6b8a;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">'
+    + '<span style="font-size:1rem">🗺️</span> Plan de la ligne <span style="margin-left:auto">▼</span>'
+    + '</summary>'
+    + '<div style="padding:0 12px 12px;display:flex;justify-content:center">'
+    + '<img src="./ligne8-plan.svg" alt="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans" style="width:100%;max-width:320px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)">'
+    + '</div>'
+    + '</details>'
     + '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px">'
     + '<div style="padding:9px 14px;font-size:.88rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">🚌 Ligne 8 Rémi · Planning 7 jours</div>'
     + '<div class="remi-week" style="padding:8px">' + cards + '</div>'
@@ -861,12 +868,14 @@ async function loadEventsLocaux() {
         var tb = b.nextTiming && b.nextTiming.begin ? new Date(b.nextTiming.begin).getTime() : Infinity;
         return ta - tb;
       });
-      // Dédoublonnage : uid d'abord, puis titre+date pour les cas sans uid commun
+      // Dédoublonnage strict : titre normalisé + date (les uids diffèrent entre agendas)
       var _seen = {};
       all = all.filter(function(e) {
-        var titleKey = ((e.title && (e.title.fr || e.title.en)) || '').toLowerCase().trim();
+        var raw = (e.title && (e.title.fr || e.title.en)) || '';
+        var titleKey = raw.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '').trim();
         var dateKey  = (e.nextTiming && e.nextTiming.begin) ? e.nextTiming.begin.slice(0, 10) : '';
-        var key = e.uid ? String(e.uid) : (titleKey + '|' + dateKey);
+        if (!titleKey || !dateKey) return true;
+        var key = titleKey + '|' + dateKey;
         if (_seen[key]) return false;
         _seen[key] = true;
         return true;
