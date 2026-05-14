@@ -774,6 +774,11 @@ async function loadEnvLocal() {
     var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/env-local', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
+    d._ts = Date.now();
+
+    // Publier AQI/pollen immédiatement — Loire viendra en enrichissement async
+    _envLocalCache = d;
+    window._envLocalData = d;
 
     // Loire depuis Hubeau directement (le serveur Render est bloqué en 403)
     try {
@@ -791,10 +796,6 @@ async function loadEnvLocal() {
         }
       }
     } catch(_) {}
-
-    _envLocalCache = d;
-    _envLocalCache._ts = Date.now();
-    window._envLocalData = _envLocalCache;
   } catch(e) {
     _envLocalCache = { _ts: Date.now() };
   }
@@ -875,6 +876,16 @@ async function loadEventsLocaux() {
         var ta = a.nextTiming && a.nextTiming.begin ? new Date(a.nextTiming.begin).getTime() : Infinity;
         var tb = b.nextTiming && b.nextTiming.begin ? new Date(b.nextTiming.begin).getTime() : Infinity;
         return ta - tb;
+      });
+      // Dédoublonnage : uid d'abord, puis titre+date pour les cas sans uid commun
+      var _seen = {};
+      all = all.filter(function(e) {
+        var titleKey = ((e.title && (e.title.fr || e.title.en)) || '').toLowerCase().trim();
+        var dateKey  = (e.nextTiming && e.nextTiming.begin) ? e.nextTiming.begin.slice(0, 10) : '';
+        var key = e.uid ? String(e.uid) : (titleKey + '|' + dateKey);
+        if (_seen[key]) return false;
+        _seen[key] = true;
+        return true;
       });
       events = all.slice(0, 15).map(function(e) {
         return {
