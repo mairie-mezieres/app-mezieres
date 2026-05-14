@@ -517,6 +517,7 @@ function handleMatHashRoute(){
     var h=(location.hash||'').trim();
     if(!h) return;
     if(h==='#notifs'){ setTimeout(function(){ openNotifs(); }, 180); return; }
+    if(h==='#meteo'){ setTimeout(function(){ if(typeof openMeteo==='function') openMeteo(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
     if(h.indexOf('#actu=')===0){
       var raw=h.substring(6);
@@ -533,6 +534,7 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('message', function(e){
     var data=(e&&e.data)||{};
     if(data.action==='openNotifs'){ openNotifs(); return; }
+    if(data.action==='openMeteo'){ if(typeof openMeteo==='function') openMeteo(); return; }
     if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
       openActuDetail(String(data.actuId),{ fromHash:false });
       return;
