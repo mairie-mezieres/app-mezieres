@@ -1099,8 +1099,20 @@
       <div class="panel-title">Ligne 8 Rémi — Prochains bus</div>
       <button class="panel-close" onclick="closeOv('remi')">✕</button>
     </div>
-    <div class="panel-body" id="remi-detail">
-      <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+    <div class="panel-body">
+      <!-- Plan de la ligne -->
+      <details id="remi-plan-toggle" style="margin:0 0 4px">
+        <summary style="cursor:pointer;padding:10px 16px;font-size:0.82rem;font-weight:700;color:#1a6b8a;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">
+          <span style="font-size:1rem">🗺️</span> Plan de la ligne <span id="remi-plan-chevron" style="margin-left:auto;transition:transform .2s">▼</span>
+        </summary>
+        <div style="padding:0 12px 12px;display:flex;justify-content:center">
+          <img src="./ligne8-plan.svg" alt="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans" style="width:100%;max-width:320px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+        </div>
+      </details>
+      <!-- Horaires -->
+      <div id="remi-detail">
+        <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
+      </div>
     </div>
   </div>
 </div>
