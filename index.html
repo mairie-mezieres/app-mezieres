@@ -131,15 +131,25 @@
       <div class="event-name" id="next-event-name"></div>
       <div class="event-days" id="next-event-days"></div>
     </div>
-    <!-- Ligne bus Rémi pleine largeur -->
-    <div class="bus-strip" onclick="openRemi()" role="button" tabindex="0" aria-label="Voir le détail des prochains bus Rémi" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRemi();}">
-      <div class="bus-strip-head">
-        <span class="bus-strip-ico">🚌</span>
-        <span class="bus-strip-title">Ligne 8 Rémi</span>
-        <span class="bus-strip-periode" id="bus-periode"></span>
+    <!-- Ligne bus Rémi + Carburant (pleine largeur, 2 moitiés) -->
+    <div class="bus-fuel-row">
+      <div class="bus-strip bus-half" onclick="openRemi()" role="button" tabindex="0" aria-label="Voir le détail des prochains bus Rémi" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRemi();}">
+        <div class="bus-strip-head">
+          <span class="bus-strip-ico">🚌</span>
+          <span class="bus-strip-title">Ligne 8 Rémi</span>
+          <span class="bus-strip-periode" id="bus-periode"></span>
+        </div>
+        <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
+        <div class="bus-strip-cta">Planning 7 j. →</div>
       </div>
-      <div id="bus-strip-stops"><span class="bus-loading">Chargement…</span></div>
-      <div class="bus-strip-cta">Voir le planning sur 7 jours →</div>
+      <div class="fuel-strip" onclick="openCarburant()" role="button" tabindex="0" aria-label="Prix des carburants locaux" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCarburant();}">
+        <div class="fuel-strip-head">
+          <span class="fuel-strip-ico">⛽</span>
+          <span class="fuel-strip-title">Carburant</span>
+        </div>
+        <div id="fuel-prices"><span class="bus-loading">Chargement…</span></div>
+        <div class="fuel-strip-cta">3 stations →</div>
+      </div>
     </div>
   </div>
 
@@ -278,12 +288,16 @@
     </button>
   </div>
 
-  <div class="sec" style="margin-top:18px">Les chemins de Mézières</div>
-  <div style="margin-top:4px">
-    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#2d6a4f,#40916c);border:none;border-radius:16px;padding:16px 18px;text-decoration:none;color:#fff">
-      <div class="ico" style="background:rgba(255,255,255,0.18)">🥾</div>
+  <div class="sec" style="margin-top:18px">Sorties locales</div>
+  <div style="margin-top:4px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2d6a4f,#40916c);border:none;border-radius:16px;padding:14px 12px;text-decoration:none;color:#fff">
+      <div class="ico" style="background:rgba(255,255,255,0.18);flex-shrink:0">🥾</div>
       <div class="ct"><div class="ct-label" style="color:#fff">Randonnées</div><div class="ct-sub" style="color:rgba(255,255,255,0.82)">Plans &amp; Circuits</div></div>
     </a>
+    <button class="card" onclick="openEventsLocaux()" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:16px;padding:14px 12px;cursor:pointer;text-align:left;color:#fff;width:100%">
+      <div class="ico" style="background:rgba(255,255,255,0.18);flex-shrink:0">🎭</div>
+      <div class="ct"><div class="ct-label" style="color:#fff">Événements</div><div class="ct-sub" style="color:rgba(255,255,255,0.82)">Sorties à 20 km</div></div>
+    </button>
   </div>
 
 </div>
@@ -340,9 +354,10 @@
   </div>
 </div>
 <div class="d-rando-banner">
-  <div class="d-rando-inner">
+  <div class="d-rando-inner d-sorties-inner">
+    <!-- Gauche : Randonnées -->
     <div class="d-rando-left">
-      <div class="d-rando-badge">🥾 HAGE RANDO — MODULE RANDONNÉE</div>
+      <div class="d-rando-badge">🥾 RANDONNÉE — CIRCUITS PÉDESTRES</div>
       <h2 class="d-rando-title">Partez explorer<br>Mézières-lez-Cléry</h2>
       <p class="d-rando-desc">Sentiers balisés, chemins de terres et routes forestières.<br>Générez votre circuit personnalisé selon votre niveau et vos préférences.</p>
       <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener" class="d-btn-primary">🗺️ Explorer la carte interactive</a>
@@ -351,6 +366,18 @@
       <div class="d-rando-stat"><strong>12</strong><span>Circuits</span></div>
       <div class="d-rando-stat"><strong>87</strong><span>Km balisés</span></div>
       <div class="d-rando-stat"><strong>3</strong><span>Niveaux</span></div>
+    </div>
+    <!-- Séparateur -->
+    <div class="d-sorties-sep"></div>
+    <!-- Droite : Événements locaux -->
+    <div class="d-events-left">
+      <div class="d-rando-badge" style="color:rgba(221,214,254,0.7)">🎭 SORTIES LOCALES — RAYON 20 KM</div>
+      <h2 class="d-rando-title" style="font-style:normal">Ce qui se passe<br>près de chez vous</h2>
+      <p class="d-rando-desc">Concerts, expos, marchés, fêtes de village…<br>Tous les événements à moins de 20 km, mis à jour en continu.</p>
+      <button onclick="openEventsLocaux()" class="d-btn-primary" style="background:rgba(139,92,246,0.7);border:1px solid rgba(255,255,255,0.2)">🗓️ Voir les événements →</button>
+    </div>
+    <div class="d-events-preview" id="dsk-events-preview">
+      <div class="d-loading" style="color:rgba(255,255,255,0.5)">Chargement…</div>
     </div>
   </div>
 </div>
@@ -1306,6 +1333,36 @@
     </div>
     <div class="panel-body" id="entreprises-panel-body">
       <div class="actu-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Carburant ──────────────────────────────────────────────────── -->
+<div class="ov" id="ov-carburant" onclick="ovClick('carburant',event)">
+  <div class="panel">
+    <div class="panel-hdr" style="background:linear-gradient(135deg,#92400e,#d97706)">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">⛽</div>
+      <div class="panel-title" style="color:#fff">Prix carburant</div>
+      <button class="panel-close" onclick="closeOv('carburant')" style="color:#fff">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="carburant-panel-body"><div class="actu-empty">Chargement…</div></div>
+      <p style="font-size:0.68rem;color:var(--muted);margin-top:12px;text-align:center">Source : données officielles gouvernementales<br>Mise à jour selon déclaration des stations</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Événements locaux ──────────────────────────────────────────── -->
+<div class="ov" id="ov-events-locaux" onclick="ovClick('events-locaux',event)">
+  <div class="panel">
+    <div class="panel-hdr" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
+      <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🎭</div>
+      <div class="panel-title" style="color:#fff">Événements locaux</div>
+      <button class="panel-close" onclick="closeOv('events-locaux')" style="color:#fff">✕</button>
+    </div>
+    <div class="panel-body">
+      <p style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">Sorties et événements dans un rayon de 20 km autour de Mézières-lez-Cléry.</p>
+      <div id="events-locaux-body"><div class="actu-empty">Chargement…</div></div>
     </div>
   </div>
 </div>

@@ -20,6 +20,7 @@
   try { loadDechets(); }       catch(e){ console.warn('[init] loadDechets', e); }
   try { loadMairieStatus(); }  catch(e){ console.warn('[init] loadMairieStatus', e); }
   try { loadBusRemi(); }       catch(e){ console.warn('[init] loadBusRemi', e); }
+  try { loadCarburant(); }     catch(e){ console.warn('[init] loadCarburant', e); }
   try { loadDateBadge(); }     catch(e){}
 
   // 4) Bouton install / bug
