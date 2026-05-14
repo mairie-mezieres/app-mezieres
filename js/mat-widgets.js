@@ -754,7 +754,7 @@ function renderCarburantPanel(el, d) {
 // ── Événements locaux ────────────────────────────────────
 async function _fetchOAAgendaEvents(key, uid, now) {
   var url = 'https://api.openagenda.com/v2/agendas/' + uid
-    + '/events?size=10&lang=fr&filters%5Btimings%5D%5Bgte%5D=' + encodeURIComponent(now);
+    + '/events?size=10&lang=fr&relative%5B%5D=upcoming&timings%5Bgte%5D=' + encodeURIComponent(now);
   var r = await fetch(url, { headers: { 'key': key } });
   if (!r.ok) return [];
   var d = await r.json();
