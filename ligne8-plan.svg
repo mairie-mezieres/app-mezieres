@@ -1,67 +1,144 @@
-<svg viewBox="0 0 280 404" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans">
+<svg viewBox="0 0 280 736" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Plan ligne 8 Rémi — Orléans ↔ Saint-Laurent-Nouan, liste complète des arrêts">
   <defs>
     <style>
-      .stop-name { font: 700 12.5px Nunito, Arial, sans-serif; fill: #1a2535; }
-      .stop-sub  { font: 400 9px Nunito, Arial, sans-serif;  fill: #8a9bb0; }
-      .term-name { font: 800 13px Nunito, Arial, sans-serif; fill: #1a6b8a; }
-      .term-sub  { font: 400 9px Nunito, Arial, sans-serif;  fill: #8a9bb0; }
-      .ici-name  { font: 800 13px Nunito, Arial, sans-serif; fill: #c0620a; }
-      .ici-sub   { font: 600 9px Nunito, Arial, sans-serif;  fill: #d4813a; }
+      .com  { font: 700 8px Nunito,Arial,sans-serif; fill: #7a8fa6; letter-spacing:.06em; }
+      .stop { font: 600 11.5px Nunito,Arial,sans-serif; fill: #1a2535; }
+      .acc  { font: 600 11.5px Nunito,Arial,sans-serif; fill: #1a2535; }
+      .ici-stop { font: 700 12px Nunito,Arial,sans-serif; fill: #c0620a; }
+      .ici-com  { font: 700 8px Nunito,Arial,sans-serif; fill: #e67e22; letter-spacing:.06em; }
+      .sep  { stroke: #dde3ec; stroke-width:1; }
     </style>
   </defs>
 
   <!-- Fond -->
-  <rect width="280" height="404" rx="14" fill="#f4f7fb"/>
+  <rect width="280" height="736" rx="14" fill="#f4f7fb"/>
 
   <!-- En-tête -->
-  <rect x="0" y="0" width="280" height="48" rx="14" fill="#1a6b8a"/>
-  <rect x="0" y="36" width="280" height="12" fill="#1a6b8a"/>
-  <rect x="10" y="10" width="32" height="28" rx="6" fill="white" fill-opacity="0.2"/>
-  <text x="26" y="29" text-anchor="middle" font="900 17px Arial" font-size="17" font-weight="900" fill="white">8</text>
-  <text x="136" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="white" font-family="Nunito,Arial,sans-serif">Ligne 8 — Rémi 45</text>
-  <text x="136" y="38" text-anchor="middle" font-size="9" fill="#9fd4ec" font-family="Nunito,Arial,sans-serif">Orléans ↔ Saint-Laurent-Nouan</text>
+  <rect x="0" y="0" width="280" height="50" rx="14" fill="#1a6b8a"/>
+  <rect x="0" y="38" width="280" height="12" fill="#1a6b8a"/>
+  <rect x="10" y="10" width="30" height="28" rx="6" fill="white" fill-opacity="0.2"/>
+  <text x="25" y="29" text-anchor="middle" font-size="17" font-weight="900" fill="white" font-family="Arial,sans-serif">8</text>
+  <text x="145" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="white" font-family="Nunito,Arial,sans-serif">Ligne 8 — Rémi 45</text>
+  <text x="145" y="38" text-anchor="middle" font-size="8.5" fill="#9fd4ec" font-family="Nunito,Arial,sans-serif">Orléans ↔ Saint-Laurent-Nouan</text>
 
-  <!-- Colonne verticale : trait de ligne -->
-  <line x1="56" y1="72" x2="56" y2="372" stroke="#1a6b8a" stroke-width="5" stroke-linecap="round"/>
+  <!-- Ligne verticale x=40 -->
+  <line x1="40" y1="72" x2="40" y2="706" class="sep" stroke="#1a6b8a" stroke-width="4" stroke-linecap="round"/>
 
-  <!-- ── ORLÉANS (terminus) ── y=72 -->
-  <circle cx="56" cy="72" r="12" fill="#1a6b8a" stroke="white" stroke-width="2.5"/>
-  <polygon points="56,64 60,74 56,71 52,74" fill="white"/>
-  <text x="78" y="68" class="term-name">Orléans</text>
-  <text x="78" y="80" class="term-sub">Gare routière · Tram A / B</text>
+  <!-- ══ ORLÉANS ══ -->
+  <text x="57" y="68" class="com">ORLÉANS</text>
+  <!-- Gare Routière (terminus) -->
+  <circle cx="40" cy="80" r="10" fill="#1a6b8a" stroke="white" stroke-width="2"/>
+  <polygon points="40,72 44,82 40,79 36,82" fill="white"/>
+  <text x="57" y="78" class="stop">Gare Routière</text><text x="218" y="78" font-size="10" fill="#1a6b8a">♿</text>
+  <text x="57" y="89" style="font:400 8.5px Nunito,Arial,sans-serif;fill:#8a9bb0">Tram A / B · Cars interurbains</text>
+  <!-- Les Turbulences -->
+  <circle cx="40" cy="106" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="110" class="stop">Les Turbulences</text>
+  <!-- Jardin des Plantes -->
+  <circle cx="40" cy="124" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="128" class="stop">Jardin des Plantes</text>
+  <!-- Candolle-Charles Péguy -->
+  <circle cx="40" cy="142" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="146" class="stop">Candolle-Charles Péguy</text>
 
-  <!-- ── CLÉRY-SAINT-ANDRÉ ── y=138 -->
-  <circle cx="56" cy="138" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
-  <text x="74" y="134" class="stop-name">Cléry-Saint-André</text>
-  <text x="74" y="146" class="stop-sub">Abbatiale · Centre</text>
+  <!-- ══ ST-PRYVÉ-ST-MESMIN ══ -->
+  <line x1="57" y1="158" x2="268" y2="158" class="sep"/>
+  <text x="57" y="169" class="com">ST-PRYVÉ-ST-MESMIN</text>
+  <!-- Quinze Pierres -->
+  <circle cx="40" cy="181" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="185" class="stop">Quinze Pierres</text>
+  <!-- Place du Marché -->
+  <circle cx="40" cy="199" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="203" class="stop">Place du Marché</text>
 
-  <!-- ── MÉZIÈRES-LEZ-CLÉRY (ici) ── y=204 -->
-  <rect x="30" y="188" width="220" height="50" rx="8" fill="#fff3e0" stroke="#f39c12" stroke-width="1.5"/>
-  <circle cx="56" cy="213" r="11" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="56" y="217" text-anchor="middle" font-size="11" font-weight="900" fill="white" font-family="Arial,sans-serif">★</text>
-  <text x="76" y="202" class="ici-name">Mézières-lez-Cléry</text>
-  <text x="76" y="214" class="ici-sub">Arrêts : Mairie · Le Bréau</text>
+  <!-- ══ MAREAU-AUX-PRÉS ══ -->
+  <line x1="57" y1="215" x2="268" y2="215" class="sep"/>
+  <text x="57" y="226" class="com">MAREAU-AUX-PRÉS</text>
+  <!-- Église ♿ -->
+  <circle cx="40" cy="238" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="242" class="stop">Église</text><text x="94" y="242" font-size="10" fill="#1a6b8a">♿</text>
 
-  <!-- ── MEUNG-SUR-LOIRE ── y=286 -->
-  <circle cx="56" cy="286" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
-  <text x="74" y="282" class="stop-name">Meung-sur-Loire</text>
-  <text x="74" y="294" class="stop-sub">Centre · Gare SNCF</text>
+  <!-- ══ ST-HILAIRE-ST-MESMIN ══ -->
+  <line x1="57" y1="254" x2="268" y2="254" class="sep"/>
+  <text x="57" y="265" class="com">ST-HILAIRE-ST-MESMIN</text>
+  <!-- Cas Rouge -->
+  <circle cx="40" cy="277" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="281" class="stop">Cas Rouge</text>
 
-  <!-- ── BEAUGENCY ── y=334 -->
-  <circle cx="56" cy="334" r="8" fill="white" stroke="#1a6b8a" stroke-width="3"/>
-  <text x="74" y="330" class="stop-name">Beaugency</text>
-  <text x="74" y="342" class="stop-sub">Gare routière</text>
+  <!-- ══ MÉZIÈRES-LEZ-CLÉRY (highlighted) ══ -->
+  <rect x="24" y="291" width="244" height="60" rx="8" fill="#fff3e0" stroke="#f39c12" stroke-width="1.5"/>
+  <line x1="57" y1="293" x2="256" y2="293" stroke="#f8d9a0" stroke-width="1"/>
+  <text x="57" y="303" class="ici-com">MÉZIÈRES-LEZ-CLÉRY</text>
+  <rect x="198" y="294" width="62" height="12" rx="4" fill="#f39c12"/>
+  <text x="229" y="303" text-anchor="middle" font-size="7" font-weight="700" fill="white" font-family="Nunito,Arial,sans-serif">Vous êtes ici ★</text>
+  <!-- Le Bréau -->
+  <circle cx="40" cy="315" r="7" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="57" y="319" class="ici-stop">Le Bréau</text>
+  <!-- Mairie -->
+  <circle cx="40" cy="337" r="7" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="57" y="341" class="ici-stop">Mairie</text>
 
-  <!-- ── SAINT-LAURENT-NOUAN (terminus) ── y=372 -->
-  <circle cx="56" cy="372" r="12" fill="#1a6b8a" stroke="white" stroke-width="2.5"/>
-  <polygon points="56,380 60,370 56,373 52,370" fill="white"/>
-  <text x="78" y="368" class="term-name">Saint-Laurent-Nouan</text>
-  <text x="78" y="380" class="term-sub">Terminus · direction Blois</text>
+  <!-- ══ CLÉRY-SAINT-ANDRÉ ══ -->
+  <line x1="57" y1="358" x2="268" y2="358" class="sep"/>
+  <text x="57" y="369" class="com">CLÉRY-SAINT-ANDRÉ</text>
+  <!-- Gué du Roi -->
+  <circle cx="40" cy="381" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="385" class="stop">Gué du Roi</text>
+  <!-- Château d'Eau -->
+  <circle cx="40" cy="399" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="403" class="stop">Château d'Eau</text>
+  <!-- Mairie -->
+  <circle cx="40" cy="417" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="421" class="stop">Mairie</text>
+  <!-- Ardoux -->
+  <circle cx="40" cy="435" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="439" class="stop">Ardoux</text>
 
-  <!-- Badge "Vous êtes ici" sous le nom -->
-  <rect x="76" y="218" width="68" height="13" rx="5" fill="#f39c12"/>
-  <text x="110" y="228" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Nunito,Arial,sans-serif">Vous êtes ici</text>
+  <!-- ══ DRY ══ -->
+  <line x1="57" y1="451" x2="268" y2="451" class="sep"/>
+  <text x="57" y="462" class="com">DRY</text>
+  <!-- Maison de retraite -->
+  <circle cx="40" cy="474" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="478" class="stop">Maison de retraite</text>
+  <!-- Mairie ♿ -->
+  <circle cx="40" cy="492" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="496" class="stop">Mairie</text><text x="93" y="496" font-size="10" fill="#1a6b8a">♿</text>
+  <!-- Rue Francis Carret -->
+  <circle cx="40" cy="510" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="514" class="stop">Rue Francis Carret</text>
+  <!-- Bel Air -->
+  <circle cx="40" cy="528" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="532" class="stop">Bel Air</text>
+
+  <!-- ══ LAILLY-EN-VAL ══ -->
+  <line x1="57" y1="544" x2="268" y2="544" class="sep"/>
+  <text x="57" y="555" class="com">LAILLY-EN-VAL</text>
+  <!-- Porteau -->
+  <circle cx="40" cy="567" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="571" class="stop">Porteau</text>
+  <!-- Route de Blois ♿ -->
+  <circle cx="40" cy="585" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="589" class="stop">Route de Blois</text><text x="160" y="589" font-size="10" fill="#1a6b8a">♿</text>
+  <!-- Clos de la Cave -->
+  <circle cx="40" cy="603" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="607" class="stop">Clos de la Cave</text>
+
+  <!-- ══ ST-LAURENT-NOUAN ══ -->
+  <line x1="57" y1="619" x2="268" y2="619" class="sep"/>
+  <text x="57" y="630" class="com">ST-LAURENT-NOUAN</text>
+  <!-- La Boulaie -->
+  <circle cx="40" cy="642" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="646" class="stop">La Boulaie</text>
+  <!-- Le Bois Roger -->
+  <circle cx="40" cy="660" r="5.5" fill="white" stroke="#1a6b8a" stroke-width="2.5"/>
+  <text x="57" y="664" class="stop">Le Bois Roger</text>
+  <!-- Le Verger (terminus) -->
+  <circle cx="40" cy="678" r="10" fill="#1a6b8a" stroke="white" stroke-width="2"/>
+  <polygon points="40,686 44,676 40,679 36,676" fill="white"/>
+  <text x="57" y="674" class="stop" style="fill:#1a6b8a;font-weight:800">Le Verger</text>
+  <text x="57" y="686" style="font:400 8.5px Nunito,Arial,sans-serif;fill:#8a9bb0">Terminus · direction Blois</text>
 
   <!-- Note bas -->
-  <text x="140" y="399" text-anchor="middle" font-size="8" fill="#aab" font-family="Nunito,Arial,sans-serif">★ Arrêts desservis dans Mézières-lez-Cléry</text>
+  <text x="140" y="723" text-anchor="middle" font-size="8" fill="#aab" font-family="Nunito,Arial,sans-serif">♿ Arrêt accessible aux personnes à mobilité réduite</text>
+  <text x="140" y="733" text-anchor="middle" font-size="8" fill="#f39c12" font-family="Nunito,Arial,sans-serif">★ Arrêts dans Mézières-lez-Cléry</text>
 </svg>
