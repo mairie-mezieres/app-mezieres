@@ -671,12 +671,10 @@ function openRemi(){
 
 function loadBusRemi() {
   var el  = document.getElementById('bus-strip-stops');
-  var pel = document.getElementById('bus-periode');
   if (!el) return;
 
   var vac = isVacancesScolaires();
   var H   = BUS_HORAIRES;
-  if (pel) pel.textContent = vac ? 'Vacances' : 'Scolaire';
 
   var mOrl = getNextBus(vac ? H.mairie.orleans_vacances : H.mairie.orleans_scolaire);
   var bOrl = getNextBus(vac ? H.breau.orleans_vacances  : H.breau.orleans_scolaire);
@@ -701,16 +699,14 @@ async function loadCarburant() {
       _carburantCache = await r.json();
     }
     var d = _carburantCache;
-    var keys = ['clery', 'meung', 'olivet'];
+    var s = d['clery'];
     var html = '';
-    for (var i = 0; i < keys.length; i++) {
-      var s = d[keys[i]];
-      if (!s) continue;
+    if (s) {
       var sp  = s.sp95   != null ? '<span class="fuel-val">' + parseFloat(s.sp95).toFixed(3)   + '</span> SP95' : '';
       var go  = s.gazole != null ? '<span class="fuel-val">' + parseFloat(s.gazole).toFixed(3) + '</span> GO'   : '';
       var line = [sp, go].filter(Boolean).join('<span class="fuel-sep">·</span>');
-      if (!line) line = '<span style="color:rgba(255,255,255,.4)">N/D</span>';
-      html += '<span class="fuel-price-row">' + line + '</span>';
+      html = '<span class="fuel-price-row fuel-station-name">Intermarché Cléry</span>';
+      html += '<span class="fuel-price-row">' + (line || '<span style="color:rgba(255,255,255,.4)">N/D</span>') + '</span>';
     }
     if (!html) html = '<span class="bus-loading">Données indisponibles</span>';
     el.innerHTML = html;
