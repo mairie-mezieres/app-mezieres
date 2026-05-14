@@ -827,12 +827,15 @@ function _renderEventsLocaux(el, events) {
   }
   var html = '<div style="display:flex;flex-direction:column;gap:10px">';
   events.forEach(function(ev) {
-    html += '<div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
+    var tag   = ev.url ? 'a' : 'div';
+    var attrs = ev.url ? ' href="' + esc(ev.url) + '" target="_blank" rel="noopener"' : '';
+    var cardStyle = 'display:block;background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04);text-decoration:none;color:inherit'
+      + (ev.url ? ';cursor:pointer' : '');
+    html += '<' + tag + attrs + ' style="' + cardStyle + '">'
           + '<div style="font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#7c3aed;margin-bottom:4px">📅 ' + esc(ev.date || '') + ' — ' + esc(ev.city || '') + '</div>'
           + '<div style="font-size:.86rem;font-weight:800;color:var(--forest);line-height:1.3">' + esc(ev.title) + '</div>'
           + (ev.place ? '<div style="font-size:.68rem;color:var(--muted);margin-top:2px">📍 ' + esc(ev.place) + '</div>' : '')
-          + (ev.url   ? '<a href="' + esc(ev.url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:#7c3aed;text-decoration:none">En savoir plus →</a>' : '')
-          + '</div>';
+          + '</' + tag + '>';
   });
   html += '</div>';
   el.innerHTML = html;
@@ -840,11 +843,13 @@ function _renderEventsLocaux(el, events) {
   var preview = document.getElementById('dsk-events-preview');
   if (preview) {
     preview.innerHTML = events.slice(0, 3).map(function(ev) {
-      return '<div class="d-event-card">'
+      var tag   = ev.url ? 'a' : 'div';
+      var attrs = ev.url ? ' href="' + esc(ev.url) + '" target="_blank" rel="noopener"' : '';
+      return '<' + tag + attrs + ' class="d-event-card"' + (ev.url ? ' style="cursor:pointer;text-decoration:none;color:inherit"' : '') + '>'
         + '<div class="d-event-card-date">' + esc(ev.date || '') + '</div>'
         + '<div class="d-event-card-title">' + esc(ev.title) + '</div>'
         + '<div class="d-event-card-place">📍 ' + esc(ev.city || ev.place || '') + '</div>'
-        + '</div>';
+        + '</' + tag + '>';
     }).join('');
   }
 }
@@ -906,7 +911,9 @@ async function loadEventsLocaux() {
           date:  e.nextTiming && e.nextTiming.begin
                    ? new Date(e.nextTiming.begin).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' })
                    : '',
-          url:   (e.links && e.links[0] && e.links[0].link) || null,
+          url:   (e.originAgenda && e.originAgenda.slug && e.slug)
+                   ? 'https://openagenda.com/' + e.originAgenda.slug + '/events/' + e.slug
+                   : (e.links && e.links[0] && e.links[0].link) || null,
           image: (e.image && e.image.base) || null,
         };
       });
