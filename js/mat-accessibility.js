@@ -212,7 +212,7 @@ const OB_KEY = 'mat_onboarded_v3';
 const OB_FEATURES = [
   { ico:'🏛️', title:`Mairie & Contact`, desc:`Accédez aux coordonnées de la mairie, aux horaires d'ouverture et contactez vos élus directement.`, sel:'.top-mairie', selDesktop:'#dsk-mairie' },
   { ico:'🌤️', title:`Météo locale`, desc:`Météo en temps réel pour Mézières avec alertes Météo-France intégrées.`, sel:'.top-meteo', selDesktop:'.d-meteo-card' },
-  { ico:'🚌', title:`Bus & Carburant`, desc:`Horaires en temps réel du bus Rémi ligne 8, et prix des carburants SP95 et Diesel dans les 3 stations les plus proches.`, sel:'.bus-fuel-row', selDesktop:'#dsk-bus' },
+  { ico:'🚌', title:`Bus & Carburant`, desc:`Horaires en temps réel du bus Rémi ligne 8, et prix des carburants SP95 et Diesel dans les 3 stations les plus proches.`, sel:'.bus-strip.bus-half', selDesktop:'#dsk-bus' },
   { ico:'👩‍💼', title:`MEL — Assistante IA`, desc:`Posez toutes vos questions : démarches, urbanisme, école, déchets, horaires… MEL répond 24h/24.`, sel:'button[onclick="openMel()"]', selDesktop:'.d-mel-cta-panel' },
   { ico:'🔔', title:`Actualités communales`, desc:`Recevez les dernières infos de la mairie et abonnez-vous aux notifications push pour ne rien manquer.`, sel:'button[onclick="openNotifs()"]', selDesktop:'#dsk-actus' },
   { ico:'💡', title:`Vos idées`, desc:`Partagez vos idées pour améliorer la commune. Votez pour les propositions des habitants !`, sel:'button[onclick="openIdees()"]' },

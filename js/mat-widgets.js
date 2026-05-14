@@ -752,9 +752,55 @@ function renderCarburantPanel(el, d) {
 }
 
 // ── Événements locaux ────────────────────────────────────
+async function _fetchOAAgendaEvents(key, uid, now) {
+  var url = 'https://api.openagenda.com/v2/agendas/' + uid
+    + '/events?size=10&lang=fr&relative%5B%5D=upcoming&timings%5Bgte%5D=' + encodeURIComponent(now);
+  var r = await fetch(url, { headers: { 'key': key } });
+  if (!r.ok) return [];
+  var d = await r.json();
+  return d.events || [];
+}
+
+function _renderEventsLocaux(el, events) {
+  if (!events.length) {
+    el.innerHTML = '<div class="actu-empty">Aucun événement trouvé prochainement.</div>';
+    return;
+  }
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+  events.forEach(function(ev) {
+    html += '<div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
+          + '<div style="font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#7c3aed;margin-bottom:4px">📅 ' + esc(ev.date || '') + ' — ' + esc(ev.city || '') + '</div>'
+          + '<div style="font-size:.86rem;font-weight:800;color:var(--forest);line-height:1.3">' + esc(ev.title) + '</div>'
+          + (ev.place ? '<div style="font-size:.68rem;color:var(--muted);margin-top:2px">📍 ' + esc(ev.place) + '</div>' : '')
+          + (ev.url   ? '<a href="' + esc(ev.url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:#7c3aed;text-decoration:none">En savoir plus →</a>' : '')
+          + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+
+  var preview = document.getElementById('dsk-events-preview');
+  if (preview) {
+    preview.innerHTML = events.slice(0, 3).map(function(ev) {
+      return '<div class="d-event-card">'
+        + '<div class="d-event-card-date">' + esc(ev.date || '') + '</div>'
+        + '<div class="d-event-card-title">' + esc(ev.title) + '</div>'
+        + '<div class="d-event-card-place">📍 ' + esc(ev.city || ev.place || '') + '</div>'
+        + '</div>';
+    }).join('');
+  }
+}
+
 async function loadEventsLocaux() {
   var el = document.getElementById('events-locaux-body');
   if (!el) return;
+
+  var CACHE_KEY = 'mat_evtloc_v1';
+  var CACHE_TTL = 30 * 60 * 1000;
+  try {
+    var cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached._ts < CACHE_TTL) { _renderEventsLocaux(el, cached.events); return; }
+  } catch(_) {}
+
   try {
     var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/events-locaux', { cache: 'no-store' });
     var d = await r.json();
@@ -766,36 +812,39 @@ async function loadEventsLocaux() {
         + '</div>';
       return;
     }
-    var events = d.events || [];
-    if (!events.length) {
-      el.innerHTML = '<div class="actu-empty">Aucun événement trouvé dans les 20 km prochainement.</div>';
-      return;
-    }
-    var html = '<div style="display:flex;flex-direction:column;gap:10px">';
-    events.forEach(function(ev) {
-      html += '<div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
-            + '<div style="font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#7c3aed;margin-bottom:4px">📅 ' + (ev.date || '') + ' — ' + (ev.city || '') + '</div>'
-            + '<div style="font-size:.86rem;font-weight:800;color:var(--forest);line-height:1.3">' + esc(ev.title) + '</div>'
-            + (ev.place ? '<div style="font-size:.68rem;color:var(--muted);margin-top:2px">📍 ' + esc(ev.place) + '</div>' : '')
-            + (ev.url   ? '<a href="' + esc(ev.url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:#7c3aed;text-decoration:none">En savoir plus →</a>' : '')
-            + '</div>';
-    });
-    html += '</div>';
-    el.innerHTML = html;
 
-    // Aperçu desktop
-    var preview = document.getElementById('dsk-events-preview');
-    if (preview) {
-      var previewHtml = '';
-      events.slice(0, 3).forEach(function(ev) {
-        previewHtml += '<div class="d-event-card">'
-          + '<div class="d-event-card-date">' + (ev.date || '') + '</div>'
-          + '<div class="d-event-card-title">' + esc(ev.title) + '</div>'
-          + '<div class="d-event-card-place">📍 ' + esc(ev.city || ev.place || '') + '</div>'
-          + '</div>';
+    var events;
+    if (d.clientSide && d.key && d.agendas) {
+      var now = new Date().toISOString();
+      var results = await Promise.all(d.agendas.map(function(uid) {
+        return _fetchOAAgendaEvents(d.key, uid, now).catch(function(){ return []; });
+      }));
+      var all = [];
+      results.forEach(function(evts) { evts.forEach(function(e){ all.push(e); }); });
+      all.sort(function(a, b) {
+        var ta = a.nextTiming && a.nextTiming.begin ? new Date(a.nextTiming.begin).getTime() : Infinity;
+        var tb = b.nextTiming && b.nextTiming.begin ? new Date(b.nextTiming.begin).getTime() : Infinity;
+        return ta - tb;
       });
-      preview.innerHTML = previewHtml;
+      events = all.slice(0, 15).map(function(e) {
+        return {
+          uid:   e.uid,
+          title: (e.title && (e.title.fr || e.title.en)) || '',
+          place: (e.location && e.location.name) || '',
+          city:  (e.location && e.location.city) || '',
+          date:  e.nextTiming && e.nextTiming.begin
+                   ? new Date(e.nextTiming.begin).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' })
+                   : '',
+          url:   (e.links && e.links[0] && e.links[0].link) || null,
+          image: (e.image && e.image.base) || null,
+        };
+      });
+    } else {
+      events = d.events || [];
     }
+
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ events: events, _ts: Date.now() })); } catch(_) {}
+    _renderEventsLocaux(el, events);
   } catch(e) {
     if (el) el.innerHTML = '<div class="actu-empty">Impossible de charger les événements.</div>';
   }
