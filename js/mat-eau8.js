@@ -120,7 +120,7 @@ async function _loadEauSection() {
   }
 
   try {
-    var r2 = await _eauFetch('https://api.vigieau.gouv.fr/communes/45204/restrictions');
+    var r2 = await _eauFetch('https://api.vigieau.gouv.fr/communes/45203/restrictions');
     if (r2) {
       var d2 = await r2.json();
       if (Array.isArray(d2) && d2.length > 0) {
