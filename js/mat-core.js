@@ -228,6 +228,8 @@ async function loadFeaturedDoc() {
   } catch(e) { el.style.display = 'none'; }
 }
 
+function openCarburant(){ openOv('carburant'); loadCarburantPanel(); }
+function openEventsLocaux(){ openOv('events-locaux'); loadEventsLocaux(); }
 function openDocs(){openOv('docs'); loadFeaturedDoc(); loadTempDocs();}
 function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }

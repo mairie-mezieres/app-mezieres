@@ -689,6 +689,122 @@ function loadBusRemi() {
   el.innerHTML = html;
 }
 
+// ── Prix carburant ───────────────────────────────────────
+var _carburantCache = null;
+
+async function loadCarburant() {
+  var el = document.getElementById('fuel-prices');
+  if (!el) return;
+  try {
+    if (!_carburantCache) {
+      var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' });
+      _carburantCache = await r.json();
+    }
+    var d = _carburantCache;
+    var keys = ['clery', 'meung', 'olivet'];
+    var html = '';
+    for (var i = 0; i < keys.length; i++) {
+      var s = d[keys[i]];
+      if (!s) continue;
+      var sp  = s.sp95   != null ? '<span class="fuel-val">' + parseFloat(s.sp95).toFixed(3)   + '</span> SP95' : '';
+      var go  = s.gazole != null ? '<span class="fuel-val">' + parseFloat(s.gazole).toFixed(3) + '</span> GO'   : '';
+      var line = [sp, go].filter(Boolean).join('<span class="fuel-sep">·</span>');
+      if (!line) line = '<span style="color:rgba(255,255,255,.4)">N/D</span>';
+      html += '<span class="fuel-price-row">' + line + '</span>';
+    }
+    if (!html) html = '<span class="bus-loading">Données indisponibles</span>';
+    el.innerHTML = html;
+  } catch(e) {
+    if (el) el.innerHTML = '<span class="bus-loading">Indisponible</span>';
+  }
+}
+
+function loadCarburantPanel() {
+  var el = document.getElementById('carburant-panel-body');
+  if (!el) return;
+  if (!_carburantCache) {
+    fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ _carburantCache = d; renderCarburantPanel(el, d); })
+      .catch(function(){ el.innerHTML = '<p style="color:var(--muted);text-align:center">Données temporairement indisponibles.</p>'; });
+  } else {
+    renderCarburantPanel(el, _carburantCache);
+  }
+}
+
+function renderCarburantPanel(el, d) {
+  var stations = [
+    { key: 'clery',  emoji: '🛒' },
+    { key: 'meung',  emoji: '🏪' },
+    { key: 'olivet', emoji: '🏬' },
+  ];
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+  stations.forEach(function(s) {
+    var info = d[s.key];
+    if (!info) return;
+    var sp  = info.sp95   != null ? '<span style="font-size:.88rem;font-weight:900;color:var(--leaf)">SP95 ' + parseFloat(info.sp95).toFixed(3)   + ' €</span>' : '';
+    var go  = info.gazole != null ? '<span style="font-size:.88rem;font-weight:900;color:var(--forest)">Diesel ' + parseFloat(info.gazole).toFixed(3) + ' €</span>' : '';
+    var maj = info.maj ? '<div style="font-size:.64rem;color:var(--muted);margin-top:4px">Mis à jour le ' + info.maj + '</div>' : '';
+    html += '<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
+          + '<div style="font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--sage);margin-bottom:8px">' + s.emoji + ' ' + (info.label || s.key) + '</div>'
+          + '<div style="display:flex;gap:14px;flex-wrap:wrap">' + [sp, go].filter(Boolean).join('') + '</div>'
+          + maj
+          + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── Événements locaux ────────────────────────────────────
+async function loadEventsLocaux() {
+  var el = document.getElementById('events-locaux-body');
+  if (!el) return;
+  try {
+    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/events-locaux', { cache: 'no-store' });
+    var d = await r.json();
+    if (d.nokey) {
+      el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:24px 16px">'
+        + '<div style="font-size:2rem;margin-bottom:8px">🎭</div>'
+        + '<div style="font-weight:800;color:var(--forest);margin-bottom:6px">Fonctionnalité à configurer</div>'
+        + '<div style="font-size:.78rem;color:var(--muted);line-height:1.6">Ajoutez la variable <code>OPENAGENDA_API_KEY</code> dans les paramètres du serveur pour activer l\'affichage des événements locaux.</div>'
+        + '</div>';
+      return;
+    }
+    var events = d.events || [];
+    if (!events.length) {
+      el.innerHTML = '<div class="actu-empty">Aucun événement trouvé dans les 20 km prochainement.</div>';
+      return;
+    }
+    var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+    events.forEach(function(ev) {
+      html += '<div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
+            + '<div style="font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#7c3aed;margin-bottom:4px">📅 ' + (ev.date || '') + ' — ' + (ev.city || '') + '</div>'
+            + '<div style="font-size:.86rem;font-weight:800;color:var(--forest);line-height:1.3">' + esc(ev.title) + '</div>'
+            + (ev.place ? '<div style="font-size:.68rem;color:var(--muted);margin-top:2px">📍 ' + esc(ev.place) + '</div>' : '')
+            + (ev.url   ? '<a href="' + esc(ev.url) + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:.68rem;font-weight:800;color:#7c3aed;text-decoration:none">En savoir plus →</a>' : '')
+            + '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+
+    // Aperçu desktop
+    var preview = document.getElementById('dsk-events-preview');
+    if (preview) {
+      var previewHtml = '';
+      events.slice(0, 3).forEach(function(ev) {
+        previewHtml += '<div class="d-event-card">'
+          + '<div class="d-event-card-date">' + (ev.date || '') + '</div>'
+          + '<div class="d-event-card-title">' + esc(ev.title) + '</div>'
+          + '<div class="d-event-card-place">📍 ' + esc(ev.city || ev.place || '') + '</div>'
+          + '</div>';
+      });
+      preview.innerHTML = previewHtml;
+    }
+  } catch(e) {
+    if (el) el.innerHTML = '<div class="actu-empty">Impossible de charger les événements.</div>';
+  }
+}
+
 // ── Prochain événement (header) ──────────────────────────
 const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
 
