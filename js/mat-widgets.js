@@ -439,20 +439,34 @@ function loadMeteoDetail() {
   html += '<div class="meteo-card meteo-current-card">'
     + '<div class="meteo-current-main meteo-current-main-tight">'
     + '<div class="meteo-current-value">' + tempCur + '°C <span>(ressenti ' + ressenti + '°)</span></div>'
-    + '<div class="meteo-current-norms-inline"><span>Écart saison</span><strong>' + eTemp + '</strong></div>'
     + '</div>'
     + '</div>';
 
-  html += meteoBuildSunBlock(days, now);
+  var env = window._envLocalData || {};
+  var loireH = env.loire && env.loire.hauteur != null ? parseFloat(env.loire.hauteur).toFixed(2) + ' m' : '–';
+  var aqiLabel = env.aqi ? esc(env.aqi.label) : '–';
+  var pollenLabel = env.pollen ? esc(env.pollen.label) : '–';
 
   html += '<div style="margin-top:10px">'
-    + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">📊 Cumul et tendances sur 24h</div>'
+    + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">🌊 Eau</div>'
     + '<div class="meteo-grid-2 meteo-grid-secondary">'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌧️ Cumul pluie</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pluie24h + ' mm' + meteoTrendBadge(tPluie) + '</div></div></div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💧 Humidité</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (humCur != null ? Math.round(humCur) : '–') + '%' + meteoTrendBadge(tHum) + '</div></div></div>'
+    + '</div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact" style="margin-top:6px"><div class="meteo-card-kicker">🏞️ Loire à Beaugency</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + loireH + '</div></div></div>'
+    + '</div>';
+
+  html += '<div style="margin-top:10px">'
+    + '<div class="meteo-card-kicker" style="padding:6px 14px 4px">🌿 Air</div>'
+    + '<div class="meteo-grid-2 meteo-grid-secondary">'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🏭 Qualité de l\'air</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + aqiLabel + '</div></div></div>'
+    + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">🌸 Pollens</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + pollenLabel + '</div></div></div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">💨 Rafales</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + rafaleMax24 + ' km/h' + (ventDirCur ? ' <span class="meteo-inline-soft">' + ventDirCur + '</span>' : '') + meteoTrendBadge(tRaf) + '</div></div></div>'
     + '<div class="meteo-card meteo-stat-card meteo-stat-compact"><div class="meteo-card-kicker">📊 Pression</div><div class="meteo-stat-line"><div class="meteo-stat-value">' + (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres) + '</div></div></div>'
-    + '</div></div>';
+    + '</div>'
+    + meteoBuildSunBlock(days, now)
+    + '</div>';
+
   html += '</div>';
   el.innerHTML = html;
 }
@@ -656,9 +670,19 @@ function loadRemiDetail() {
     cards += buildRemiWeekCard(day, i === 0);
   }
 
-  el.innerHTML = '<div class="remi-intro">'
-    + '<div class="remi-intro-title">Planning sur 7 jours</div>'
-    + '<div class="remi-intro-text">Affichage basé sur les horaires actuellement intégrés dans MAT, avec distinction <strong>scolaire</strong> / <strong>vacances</strong>. En cas de doute, vérifiez la fiche officielle Rémi.</div>'
+  el.innerHTML = '<div class="remi-tad-block">'
+    + '<div class="remi-tad-title">🚐 Transport à la demande</div>'
+    + '<p class="remi-tad-text">Service Rémi TAD desservant les communes rurales — réservation obligatoire avant 17h la veille.</p>'
+    + '<div class="remi-tad-rows">'
+    + '<div class="remi-tad-row"><span class="remi-tad-day">Mardi</span><span class="remi-tad-zone">Secteur Meung-sur-Loire</span></div>'
+    + '<div class="remi-tad-row"><span class="remi-tad-day">Jeudi</span><span class="remi-tad-zone">Secteur Beaugency</span></div>'
+    + '</div>'
+    + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande" target="_blank" rel="noopener">Réserver · En savoir plus →</a>'
+    + '</div>'
+    + '<hr class="remi-tad-divider">'
+    + '<div class="remi-intro">'
+    + '<div class="remi-intro-title">Ligne 8 — Planning 7 jours</div>'
+    + '<div class="remi-intro-text">Affichage basé sur les horaires intégrés dans MAT, avec distinction <strong>scolaire</strong> / <strong>vacances</strong>. En cas de doute, vérifiez la fiche officielle Rémi.</div>'
     + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/" target="_blank" rel="noopener">🌐 Ouvrir le site Rémi</a>'
     + '</div>'
     + '<div class="remi-week">' + cards + '</div>';
@@ -730,9 +754,11 @@ function loadCarburantPanel() {
 
 function renderCarburantPanel(el, d) {
   var stations = [
-    { key: 'clery',  emoji: '🛒' },
-    { key: 'meung',  emoji: '🏪' },
-    { key: 'olivet', emoji: '🏬' },
+    { key: 'clery',      emoji: '🛒' },
+    { key: 'meung',      emoji: '🏪' },
+    { key: 'olivet',     emoji: '🏬' },
+    { key: 'beaugency',  emoji: '🛒' },
+    { key: 'saintpryve', emoji: '🏪' },
   ];
   var html = '<div style="display:flex;flex-direction:column;gap:10px">';
   stations.forEach(function(s) {
@@ -749,6 +775,21 @@ function renderCarburantPanel(el, d) {
   });
   html += '</div>';
   el.innerHTML = html;
+}
+
+// ── Environnement local ────────────────────────────────────
+var _envLocalCache = null;
+async function loadEnvLocal() {
+  try {
+    if (_envLocalCache && Date.now() - (_envLocalCache._ts || 0) < 15 * 60000) return;
+    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/env-local', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    _envLocalCache = await r.json();
+    _envLocalCache._ts = Date.now();
+    window._envLocalData = _envLocalCache;
+  } catch(e) {
+    _envLocalCache = { _ts: Date.now() };
+  }
 }
 
 // ── Événements locaux ────────────────────────────────────

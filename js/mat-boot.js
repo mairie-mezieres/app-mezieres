@@ -47,6 +47,8 @@
     catch(e){ console.warn('[init] loadMelData', e); }
     try { if (typeof loadEventsLocaux === 'function') loadEventsLocaux(); }
     catch(e){ console.warn('[init] loadEventsLocaux', e); }
+    try { if (typeof loadEnvLocal === 'function') loadEnvLocal(); }
+    catch(e){ console.warn('[init] loadEnvLocal', e); }
   }, 150);
 
   // 10) Onboarding (décalé pour ne pas bloquer l'affichage initial)

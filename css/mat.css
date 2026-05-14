@@ -547,6 +547,14 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 }
 
 /* ── Overlay Rémi ── */
+.remi-tad-block{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #86efac;border-radius:16px;padding:14px;margin-bottom:4px;box-shadow:var(--shadow);}
+.remi-tad-title{font-size:.9rem;font-weight:900;color:#15803d;margin-bottom:6px;}
+.remi-tad-text{font-size:.76rem;color:var(--muted);line-height:1.5;margin:0 0 8px;}
+.remi-tad-rows{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.remi-tad-row{display:flex;align-items:center;gap:10px;padding:6px 10px;background:white;border-radius:10px;border:1px solid #bbf7d0;}
+.remi-tad-day{font-size:.8rem;font-weight:900;color:#15803d;min-width:48px;}
+.remi-tad-zone{font-size:.8rem;color:var(--forest);}
+.remi-tad-divider{border:none;border-top:2px solid var(--border);margin:12px 0;}
 .remi-intro{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
 .remi-intro-title{font-size:.9rem;font-weight:900;color:var(--forest);margin-bottom:6px;}
 .remi-intro-text{font-size:.76rem;color:var(--muted);line-height:1.6;}
