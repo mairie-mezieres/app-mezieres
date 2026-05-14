@@ -785,6 +785,7 @@ async function loadEnvLocal() {
     var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/env-local', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     _envLocalCache = await r.json();
+    _envLocalCache._ts = Date.now();
     window._envLocalData = _envLocalCache;
   } catch(e) {
     _envLocalCache = { _ts: Date.now() };
