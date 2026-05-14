@@ -859,7 +859,7 @@ async function loadEventsLocaux() {
   var el = document.getElementById('events-locaux-body');
   if (!el) return;
 
-  var CACHE_KEY = 'mat_evtloc_v1';
+  var CACHE_KEY = 'mat_evtloc_v2';
   var CACHE_TTL = 30 * 60 * 1000;
   try {
     var cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
@@ -885,7 +885,10 @@ async function loadEventsLocaux() {
         return _fetchOAAgendaEvents(d.key, uid, now).catch(function(){ return []; });
       }));
       var all = [];
-      results.forEach(function(evts) { evts.forEach(function(e){ all.push(e); }); });
+      results.forEach(function(evts, i) {
+        var agendaUid = d.agendas[i];
+        evts.forEach(function(e) { e._agendaUid = agendaUid; all.push(e); });
+      });
       all.sort(function(a, b) {
         var ta = a.nextTiming && a.nextTiming.begin ? new Date(a.nextTiming.begin).getTime() : Infinity;
         var tb = b.nextTiming && b.nextTiming.begin ? new Date(b.nextTiming.begin).getTime() : Infinity;
@@ -914,7 +917,9 @@ async function loadEventsLocaux() {
                    : '',
           url:   (e.originAgenda && e.originAgenda.slug && e.slug)
                    ? 'https://openagenda.com/' + e.originAgenda.slug + '/events/' + e.slug
-                   : (e.links && e.links[0] && e.links[0].link) || null,
+                   : (e._agendaUid && e.uid)
+                     ? 'https://openagenda.com/agendas/' + e._agendaUid + '/events/' + e.uid
+                     : (e.links && e.links[0] && e.links[0].link) || null,
           image: (e.image && e.image.base) || null,
         };
       });
