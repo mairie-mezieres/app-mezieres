@@ -671,8 +671,10 @@ function loadRemiDetail() {
     + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande" target="_blank" rel="noopener">Réserver · En savoir plus →</a>'
     + '</div>'
     + '<hr class="remi-tad-divider">'
-    + '<div style="padding:4px 2px 10px;font-size:.86rem;font-weight:900;color:var(--forest)">🚌 Ligne 8 Rémi · Planning 7 jours</div>'
-    + '<div class="remi-week">' + cards + '</div>'
+    + '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px">'
+    + '<div style="padding:9px 14px;font-size:.88rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">🚌 Ligne 8 Rémi · Planning 7 jours</div>'
+    + '<div class="remi-week" style="padding:8px">' + cards + '</div>'
+    + '</div>'
     + '<div style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.5">Horaires intégrés dans MAT · distinction <strong>scolaire</strong> / <strong>vacances</strong> · vérifiez la fiche officielle en cas de doute.</div>'
     + '<a class="remi-link-btn" style="margin-top:8px" href="https://www.remi-centrevaldeloire.fr/" target="_blank" rel="noopener">🌐 Fiche officielle Rémi</a>';
 }
@@ -776,26 +778,8 @@ async function loadEnvLocal() {
     var d = await r.json();
     d._ts = Date.now();
 
-    // Publier AQI/pollen immédiatement — Loire viendra en enrichissement async
     _envLocalCache = d;
     window._envLocalData = d;
-
-    // Loire depuis Hubeau directement (le serveur Render est bloqué en 403)
-    try {
-      var stR = await fetch('https://hubeau.eaufrance.fr/api/v1/hydrometrie/referentiel/stations?code_commune_station=45028&format=json&fields=code_station&size=1');
-      if (stR.ok) {
-        var stD  = await stR.json();
-        var code = ((stD.data || [])[0] || {}).code_station;
-        if (code) {
-          var obR = await fetch('https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?code_entite=' + code + '&grandeur_hydro=H&size=1&fields=date_obs,resultat_obs');
-          if (obR.ok) {
-            var obD = await obR.json();
-            var obs = (obD.data || [])[0];
-            if (obs) d.loire = { hauteur: obs.resultat_obs != null ? Math.round(obs.resultat_obs * 100) / 100 : null };
-          }
-        }
-      }
-    } catch(_) {}
   } catch(e) {
     _envLocalCache = { _ts: Date.now() };
   }
