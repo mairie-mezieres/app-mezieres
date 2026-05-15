@@ -235,6 +235,7 @@ function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }
 
 function openAgendaFromTopEvent(){
+  trackStat('agenda');
   openOv('agenda');
   ensureAgendaEvents().then(function(evts){
     if(!evts||!evts.length)return;
