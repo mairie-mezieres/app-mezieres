@@ -371,8 +371,21 @@ tr:hover td{background:#f9fafb;}
             style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
           <input id="entr-siteweb" type="url" placeholder="Site web (https://...)" maxlength="500"
             style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
-          <input id="entr-logo" type="url" placeholder="URL du logo (optionnel)" maxlength="500"
-            style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+        </div>
+        <div style="margin-top:10px;max-width:720px">
+          <div style="font-size:0.72rem;font-weight:800;color:var(--muted);margin-bottom:6px">Logo</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <label style="background:var(--forest);color:white;border:none;border-radius:10px;padding:8px 14px;font-size:0.8rem;font-weight:800;cursor:pointer;white-space:nowrap">
+              📷 Choisir une image
+              <input type="file" id="entr-logo-file" accept="image/*" style="display:none" onchange="onEntrLogoFile(this)">
+            </label>
+            <span id="entr-logo-preview-wrap" style="display:none;align-items:center;gap:8px">
+              <img id="entr-logo-preview" alt="preview" style="height:40px;width:40px;object-fit:contain;border-radius:8px;background:#e8f0fe;border:1px solid var(--border)">
+              <button onclick="clearEntrLogo()" style="background:var(--red);color:white;border:none;border-radius:8px;padding:4px 10px;font-size:0.76rem;font-weight:800;cursor:pointer">✕ Supprimer</button>
+            </span>
+            <span id="entr-logo-current" style="font-size:0.72rem;color:var(--muted)"></span>
+          </div>
+          <input type="hidden" id="entr-logo">
         </div>
         <div style="margin-top:10px;max-width:720px">
           <textarea id="entr-description" placeholder="Description de l'activité" rows="3" maxlength="1000"
@@ -387,6 +400,16 @@ tr:hover td{background:#f9fafb;}
             Annuler
           </button>
           <span id="entr-status" style="font-size:0.78rem;min-height:1.2em"></span>
+        </div>
+      </div>
+      <div style="background:var(--card);border-radius:14px;padding:14px 18px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:2px">🔧 Réparer les logos Facebook</div>
+          <div style="font-size:0.71rem;color:var(--muted);line-height:1.4">Les logos stockés comme URLs fbcdn.net expirent et sont bloqués. Ce bouton les réimporte dans Cloudinary.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onclick="fixEntreprisesLogos()" style="background:#f59e0b;color:white;border:none;border-radius:10px;padding:9px 16px;font-size:0.8rem;font-weight:800;cursor:pointer;white-space:nowrap">🔧 Réparer</button>
+          <span id="entr-fix-status" style="font-size:0.76rem;min-width:120px"></span>
         </div>
       </div>
       <div class="table-wrap">
@@ -2615,6 +2638,51 @@ async function viewSondageResults(id) {
 // ── Entreprises ───────────────────────────────────────────────
 let _entreprisesData = [];
 let _entrepriseEditId = null;
+let _entrLogoBase64 = null;
+let _entrLogoClear = false;
+
+function onEntrLogoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    _entrLogoBase64 = e.target.result;
+    _entrLogoClear = false;
+    const img = document.getElementById('entr-logo-preview');
+    if (img) img.src = _entrLogoBase64;
+    const wrap = document.getElementById('entr-logo-preview-wrap');
+    if (wrap) wrap.style.display = 'flex';
+    const cur = document.getElementById('entr-logo-current');
+    if (cur) cur.textContent = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearEntrLogo() {
+  _entrLogoBase64 = null;
+  _entrLogoClear = true;
+  const fileInput = document.getElementById('entr-logo-file');
+  if (fileInput) fileInput.value = '';
+  const wrap = document.getElementById('entr-logo-preview-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const cur = document.getElementById('entr-logo-current');
+  if (cur) cur.textContent = '';
+  const hidden = document.getElementById('entr-logo');
+  if (hidden) hidden.value = '';
+}
+
+async function fixEntreprisesLogos() {
+  const st = document.getElementById('entr-fix-status');
+  if (st) { st.textContent = '⏳ Réparation…'; st.style.color = 'var(--muted)'; }
+  try {
+    const r = await apiPost('/admin/entreprises/fix-logos', {});
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+    if (st) { st.textContent = `✅ ${r.fixed} logo(s) réparé(s)${r.skipped ? ', '+r.skipped+' ignoré(s)' : ''}`; st.style.color = 'var(--forest)'; }
+    await loadEntreprisesAdmin();
+  } catch(e) {
+    if (st) { st.textContent = '❌ ' + safe(e.message || ''); st.style.color = 'var(--red)'; }
+  }
+}
 
 async function loadEntreprisesAdmin() {
   const el = document.getElementById('entreprises-admin-list');
@@ -2667,6 +2735,8 @@ function editEntreprise(id) {
   const e = _entreprisesData.find(x => x.id === id);
   if (!e) return;
   _entrepriseEditId = id;
+  _entrLogoBase64 = null;
+  _entrLogoClear = false;
   document.getElementById('entr-nom').value         = e.nom || '';
   document.getElementById('entr-activite').value    = e.activite || '';
   document.getElementById('entr-gerant').value      = e.gerant || '';
@@ -2675,6 +2745,17 @@ function editEntreprise(id) {
   document.getElementById('entr-siteweb').value     = e.siteWeb || '';
   document.getElementById('entr-logo').value        = e.logo || '';
   document.getElementById('entr-description').value = e.description || '';
+  const wrap = document.getElementById('entr-logo-preview-wrap');
+  const preview = document.getElementById('entr-logo-preview');
+  const cur = document.getElementById('entr-logo-current');
+  if (e.logo) {
+    if (preview) preview.src = e.logo;
+    if (wrap) wrap.style.display = 'flex';
+    if (cur) cur.textContent = '';
+  } else {
+    if (wrap) wrap.style.display = 'none';
+    if (cur) cur.textContent = 'Aucun logo';
+  }
   document.getElementById('entr-form-title').textContent = 'Modifier l\'entreprise';
   document.getElementById('entr-save-label').textContent = '💾 Enregistrer';
   document.getElementById('entr-cancel-btn').style.display = 'inline-block';
@@ -2683,9 +2764,15 @@ function editEntreprise(id) {
 
 function cancelEditEntreprise() {
   _entrepriseEditId = null;
-  ['entr-nom','entr-activite','entr-gerant','entr-telephone','entr-email','entr-siteweb','entr-logo','entr-description'].forEach(id => {
+  _entrLogoBase64 = null;
+  _entrLogoClear = false;
+  ['entr-nom','entr-activite','entr-gerant','entr-telephone','entr-email','entr-siteweb','entr-description'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
+  const hidden = document.getElementById('entr-logo'); if(hidden) hidden.value = '';
+  const fileInput = document.getElementById('entr-logo-file'); if(fileInput) fileInput.value = '';
+  const wrap = document.getElementById('entr-logo-preview-wrap'); if(wrap) wrap.style.display = 'none';
+  const cur = document.getElementById('entr-logo-current'); if(cur) cur.textContent = '';
   document.getElementById('entr-form-title').textContent = 'Ajouter une entreprise';
   document.getElementById('entr-save-label').textContent = '+ Ajouter';
   document.getElementById('entr-cancel-btn').style.display = 'none';
@@ -2703,9 +2790,10 @@ async function saveEntreprise() {
     telephone:   (document.getElementById('entr-telephone').value   || '').trim(),
     email:       (document.getElementById('entr-email').value       || '').trim(),
     siteWeb:     (document.getElementById('entr-siteweb').value     || '').trim(),
-    logo:        (document.getElementById('entr-logo').value        || '').trim(),
+    logo:        _entrLogoClear ? '' : (document.getElementById('entr-logo').value || '').trim(),
     description: (document.getElementById('entr-description').value || '').trim(),
   };
+  if (_entrLogoBase64) body.logoBase64 = _entrLogoBase64;
   if(st){st.textContent='Enregistrement…';st.style.color='var(--muted)';}
   try {
     let r;
