@@ -348,13 +348,20 @@ async function loadMeteo() {
   }
 }
 
-function loadMeteoDetail() {
-  var d = window._meteoData;
+async function loadMeteoDetail() {
   var el = document.getElementById('meteo-detail');
-  if (!d) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.</div>';
-    return;
+  if (!el) return;
+
+  if (!window._meteoData) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ Chargement de la météo…</div>';
+    try { await loadMeteo(); } catch(_) {}
+    if (!window._meteoData) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Données météo non disponibles.<br>Vérifiez votre connexion puis réessayez.</div>';
+      return;
+    }
   }
+
+  var d = window._meteoData;
 
   var forecast = d.forecast || {};
   var cur = forecast.current || {};

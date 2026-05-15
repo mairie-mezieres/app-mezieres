@@ -235,6 +235,7 @@ tr:hover td{background:#f9fafb;}
     <div class="nav-sep"></div>
     <button class="nav-tab" onclick="showTab('ia',this)">🤖 IA</button>
     <button class="nav-tab" onclick="showTab('app',this)">📱 Usage app</button>
+    <button class="nav-tab" onclick="showTab('push',this)">🔔 Push</button>
     <button class="nav-tab" onclick="showTab('redis',this)">🗄️ Redis</button>
     <div class="nav-sep"></div>
     <button class="nav-tab" onclick="showTab('mel',this)">👩‍💼 MEL</button>
@@ -256,6 +257,7 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel" id="tab-banner"><div id="banner-content"></div></div>
     <div class="tab-panel" id="tab-purge"><div id="purge-content"></div></div>
     <div class="tab-panel" id="tab-logs"><div id="logs-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-push"><div id="push-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
   <div class="tab-panel" id="tab-docs">
     <div class="admin-body">
       <div style="background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px">
@@ -2112,7 +2114,101 @@ async function saveMelAdmin(){
 }
 
 // ── Tabs ──────────────────────────────
-function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();if(id==='docs')loadDocsAdmin();if(id==='sondages')loadSondagesAdmin();if(id==='logs')loadLogsAdmin();if(id==='entreprises')loadEntreprisesAdmin();}
+function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));document.getElementById('tab-'+id).classList.add('on');if(btn)btn.classList.add('on');if(id==='mel')loadMelAdmin();if(id==='docs')loadDocsAdmin();if(id==='sondages')loadSondagesAdmin();if(id==='logs')loadLogsAdmin();if(id==='entreprises')loadEntreprisesAdmin();if(id==='push')loadPushAdmin();}
+
+// ── Push : historique des envois ──────────────────────────────
+async function loadPushAdmin(){
+  const el = document.getElementById('push-content');
+  el.innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>Chargement…</div>';
+  try {
+    const d = await apiGet('/admin/push/history');
+    const history = d.history || [];
+    const alive = d.aliveSubs || 0;
+
+    const TYPE_META = {
+      meteo: { ico: '🌩️', label: 'Vigilance météo',  color: '#dc2626' },
+      actu:  { ico: '📰', label: 'Actu mairie',      color: '#7c3aed' },
+      fb:    { ico: '📘', label: 'Mirror Facebook',   color: '#1d4ed8' },
+    };
+
+    if (!history.length) {
+      el.innerHTML = `
+        <div class="section-title">🔔 Notifications push</div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px">
+          <div style="font-size:.86rem;font-weight:800;color:var(--forest)">${alive} abonné${alive>1?'s':''} actif${alive>1?'s':''}</div>
+        </div>
+        <div style="text-align:center;padding:24px;color:var(--muted);font-size:.86rem">Aucun envoi enregistré.</div>`;
+      return;
+    }
+
+    const totalSent = history.reduce((s, h) => s + (h.sent || 0), 0);
+    const totalDead = history.reduce((s, h) => s + (h.dead || 0), 0);
+    const totalAttempts = history.reduce((s, h) => s + (h.total || 0), 0);
+    const successRate = totalAttempts ? Math.round((totalSent / totalAttempts) * 100) : 0;
+
+    const fmtDate = (ts) => {
+      const dt = new Date(ts);
+      return dt.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) + ' ' + dt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    };
+
+    const rows = history.map(h => {
+      const meta = TYPE_META[h.type] || { ico: '🔔', label: h.type, color: 'var(--muted)' };
+      const rate = h.total ? Math.round((h.sent / h.total) * 100) : 0;
+      const rateColor = rate >= 90 ? '#16a34a' : rate >= 70 ? '#ea580c' : '#dc2626';
+      return `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:10px 8px;white-space:nowrap;font-size:.74rem;color:var(--muted)">${fmtDate(h.ts)}</td>
+        <td style="padding:10px 8px;white-space:nowrap"><span style="color:${meta.color};font-weight:800;font-size:.78rem">${meta.ico} ${meta.label}</span></td>
+        <td style="padding:10px 8px;font-size:.82rem;color:var(--forest)">${(h.title || '—').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</td>
+        <td style="padding:10px 8px;text-align:right;white-space:nowrap;font-size:.78rem"><span style="color:${rateColor};font-weight:900">${h.sent}/${h.total}</span> <span style="color:var(--muted)">(${rate}%)</span></td>
+        <td style="padding:10px 8px;text-align:right;white-space:nowrap;font-size:.78rem">${h.dead ? '<span style="color:#dc2626">🗑️ ' + h.dead + '</span>' : '<span style="color:var(--muted)">0</span>'}</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="section-title">🔔 Notifications push</div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px">
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Abonnés actifs</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--forest);margin-top:4px">${alive}</div>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Envois (${history.length})</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--forest);margin-top:4px">${totalSent} <span style="font-size:.8rem;color:var(--muted);font-weight:700">/ ${totalAttempts}</span></div>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Taux de réussite</div>
+          <div style="font-size:1.6rem;font-weight:900;color:${successRate>=90?'#16a34a':successRate>=70?'#ea580c':'#dc2626'};margin-top:4px">${successRate}%</div>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Abonnés purgés</div>
+          <div style="font-size:1.6rem;font-weight:900;color:#dc2626;margin-top:4px">${totalDead}</div>
+        </div>
+      </div>
+
+      <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:0;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:600px">
+          <thead>
+            <tr style="background:var(--warm);border-bottom:2px solid var(--border)">
+              <th style="padding:10px 8px;text-align:left;font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Date</th>
+              <th style="padding:10px 8px;text-align:left;font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Type</th>
+              <th style="padding:10px 8px;text-align:left;font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Titre</th>
+              <th style="padding:10px 8px;text-align:right;font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Envoyés</th>
+              <th style="padding:10px 8px;text-align:right;font-size:.7rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em">Purgés</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+
+      <p style="font-size:.72rem;color:var(--muted);margin-top:14px;line-height:1.5">
+        <strong>Lecture</strong> : « Envoyés » = nombre de pushes acceptés par les serveurs Apple/Google/Mozilla. « Purgés » = abonnements morts (app désinstallée, notifs révoquées) supprimés automatiquement.<br>
+        Le Web Push ne permet pas de vérifier que l'OS a bien affiché la notification (économie de batterie, focus, etc.). Un taux de réussite ≥ 90 % est normal.
+      </p>`;
+  } catch(e) {
+    el.innerHTML = `<div style="text-align:center;padding:24px;color:#dc2626">Erreur : ${e.message}</div>`;
+  }
+}
 
 // ── Logs PWA ──────────────────────────────────────────────────
 async function loadLogsAdmin(){
