@@ -712,6 +712,7 @@ function loadRemiDetail() {
 }
 
 function openRemi(){
+  trackStat('remi');
   openOv('remi');
   loadRemiDetail();
 }
