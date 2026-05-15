@@ -1837,6 +1837,7 @@ async function _renderMelQuestions(dates){
           <div style="flex:1">
             <span style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em">${esc(q.cat)}</span>
             <div style="font-size:0.8rem;color:var(--text);margin-top:2px">${esc(q.q)}</div>
+            ${q.a ? `<div style="font-size:0.75rem;color:var(--muted);margin-top:5px;padding:6px 8px;background:rgba(0,0,0,0.04);border-radius:6px;border-left:2px solid #52b788">🤖 ${esc(q.a)}</div>` : ''}
           </div>
         </div>`).join('')
       ).join('');
