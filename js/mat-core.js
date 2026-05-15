@@ -277,19 +277,35 @@ async function loadTempDocs() {
 
 // Mapping tracking sur ouvertures
 (function(){
-  const _origOpenMel = openMel,
-        _origOpenSignal = openSignal,
-        _origOpenIdees = openIdees,
-        _origOpenNotifs = openNotifs,
-        _origOpenMeteo = openMeteo,
-        _origOpenContact = openContact;
+  const _origOpenMel          = openMel,
+        _origOpenSignal       = openSignal,
+        _origOpenIdees        = openIdees,
+        _origOpenNotifs       = openNotifs,
+        _origOpenMeteo        = openMeteo,
+        _origOpenContact      = openContact,
+        _origOpenCarburant    = openCarburant,
+        _origOpenEventsLocaux = openEventsLocaux,
+        _origOpenAgenda       = openAgenda,
+        _origOpenDechets      = openDechets,
+        _origOpenSondages     = openSondages,
+        _origOpenDocs         = openDocs,
+        _origOpenNums         = openNums,
+        _origOpenConseil      = openConseil;
 
-  window.openMel = () => { trackStat('mel'); _origOpenMel(); };
-  window.openSignal = () => { trackStat('signalement'); _origOpenSignal(); };
-  window.openIdees = () => { trackStat('idees'); _origOpenIdees(); };
-  window.openNotifs = () => { trackStat('actualites'); _origOpenNotifs(); };
-  window.openMeteo = () => { trackStat('meteo'); _origOpenMeteo(); };
-  window.openContact = () => { trackStat('contact'); _origOpenContact(); };
+  window.openMel          = () => { trackStat('mel');           _origOpenMel(); };
+  window.openSignal       = () => { trackStat('signalement');   _origOpenSignal(); };
+  window.openIdees        = () => { trackStat('idees');         _origOpenIdees(); };
+  window.openNotifs       = () => { trackStat('actualites');    _origOpenNotifs(); };
+  window.openMeteo        = () => { trackStat('meteo');         _origOpenMeteo(); };
+  window.openContact      = () => { trackStat('contact');       _origOpenContact(); };
+  window.openCarburant    = () => { trackStat('carburant');     _origOpenCarburant(); };
+  window.openEventsLocaux = () => { trackStat('events_locaux'); _origOpenEventsLocaux(); };
+  window.openAgenda       = () => { trackStat('agenda');        _origOpenAgenda(); };
+  window.openDechets      = () => { trackStat('dechets');       _origOpenDechets(); };
+  window.openSondages     = () => { trackStat('sondages');      _origOpenSondages(); };
+  window.openDocs         = () => { trackStat('docs');          _origOpenDocs(); };
+  window.openNums         = () => { trackStat('nums');          _origOpenNums(); };
+  window.openConseil      = () => { trackStat('conseil');       _origOpenConseil(); };
 })();
 
 // ── Bouton install / bug ──────────────────────────────────────

@@ -715,7 +715,7 @@ function renderOverview() {
 }
 
 function renderServiceBadges(services) {
-  const icons = {mel:'🤖',signalement:'🚨',actualites:'🔔',meteo:'🌤️',contact:'💬',idees:'💡',installation:'📲',bug:'🐞',agenda:'📅',transport:'🚌'};
+  const icons = {mel:'🤖',signalement:'🚨',actualites:'🔔',meteo:'🌤️',contact:'💬',idees:'💡',installation:'📲',bug:'🐞',agenda:'📅',transport:'🚌',carburant:'⛽',events_locaux:'🎭',dechets:'🗑️',sondages:'📊',docs:'📄',nums:'📞',conseil:'🏛️',remi:'🚌',app_open:'🟢',app_resume:'↩️'};
   const HIDDEN = ['installation','conseil_municipal'];
   const entries = Object.entries(services).filter(([k])=>!HIDDEN.includes(k)&&!k.startsWith('elu_')).sort((a,b)=>b[1]-a[1]);
   if (!entries.length) return '<div style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucun accès aujourd\'hui.</div>';
@@ -862,7 +862,7 @@ function renderRedis() {
       <div>
         <div class="progress-label">Stats détaillées</div>
         <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
-          Active ou coupe les stats de services secondaires : météo, contact, actualités, signalement, idées, reprise d’application, etc.
+          Active ou coupe les stats d’ouverture de chaque encart/overlay : météo, carburant, événements, agenda, déchets, sondages, bus Rémi, documents, conseil municipal, contact, actualités, signalement, idées, retours en avant-plan, etc. Désactiver réduit la consommation Redis.
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
@@ -1097,11 +1097,15 @@ function renderApp() {
   for (const [day,svcs] of Object.entries(parJour)) { const m=day.slice(0,7); if(!parMois[m])parMois[m]={}; for(const[svc,cnt]of Object.entries(svcs))parMois[m][svc]=(parMois[m][svc]||0)+cnt; }
   const source  = appView==='daily'?parJour:parMois;
   const periods = Object.keys(source).sort().slice(-30);
-  const services= ['mel','signalement','actualites','meteo','contact','idees','installation'];
-  const colors  = ['#2563eb','#dc2626','#f59e0b','#38bdf8','#8b5cf6','#d4a843','#16a34a'];
-  const datasets = services.map((svc,i)=>({label:svc, data:periods.map(p=>source[p]?.[svc]||0), color:colors[i]}));
+  const SVC_LABELS = {mel:'🤖 MEL chat',signalement:'🚨 Signalement',actualites:'🔔 Actualités',meteo:'🌤️ Météo',contact:'💬 Contact',idees:'💡 Idées',installation:'📲 Installation',carburant:'⛽ Carburant',events_locaux:'🎭 Événements',agenda:'📅 Agenda',dechets:'🗑️ Déchets',sondages:'📊 Sondages',docs:'📄 Documents',nums:'📞 Numéros utiles',conseil:'🏛️ Conseil municipal',remi:'🚌 Bus Rémi',app_open:'🟢 Ouvertures / jour',app_resume:'↩️ Retours en avant-plan'};
+  const services= ['mel','meteo','actualites','carburant','events_locaux','agenda','dechets','sondages','docs','nums','remi','conseil','contact','signalement','idees'];
+  const colors  = ['#2563eb','#38bdf8','#f59e0b','#f97316','#8b5cf6','#0891b2','#16a34a','#ec4899','#d4a843','#6b7280','#64748b','#1e40af','#7c3aed','#dc2626','#a16207'];
+  const allSvcs = Object.keys(Object.assign({}, ...(periods.map(p=>source[p]||{})))).filter(k=>!k.startsWith('elu_'));
+  const chartSvcs = services.filter(s=>allSvcs.includes(s)||periods.some(p=>source[p]?.[s]));
+  const datasets = chartSvcs.map((svc,i)=>({label:SVC_LABELS[svc]||svc, data:periods.map(p=>source[p]?.[svc]||0), color:colors[i%colors.length]}));
   const month = new Date().toISOString().slice(0,7);
   const monthSvcs = parMois[month]||{};
+  const allSvcsForTable = [...new Set([...services,...allSvcs])].filter(k=>!['installation','app_open','app_resume'].includes(k)&&!k.startsWith('elu_'));
   document.getElementById('app-content').innerHTML = `
     <div class="chart-wrap">
       <div class="chart-title">Accès par fonctionnalité
@@ -1115,7 +1119,7 @@ function renderApp() {
     <div class="section-title">Détail par service — ce mois</div>
     <div class="table-wrap"><table>
       <tr><th>Service</th><th>Ce mois</th><th>Total</th></tr>
-      ${services.map(svc=>({svc,month:monthSvcs[svc]||0,total:app.parService?.[svc]||0})).sort((a,b)=>b.month-a.month).map(({svc,month,total})=>`<tr><td>${svc}</td><td>${fmt(month)}</td><td>${fmt(total)}</td></tr>`).join('')}
+      ${allSvcsForTable.map(svc=>({svc,m:monthSvcs[svc]||0,tot:app.parService?.[svc]||0})).filter(x=>x.m||x.tot).sort((a,b)=>b.m-a.m).map(({svc,m,tot})=>`<tr><td>${SVC_LABELS[svc]||svc}</td><td>${fmt(m)}</td><td>${fmt(tot)}</td></tr>`).join('')}
     </table></div>
   `;
   renderLineChart('chart-app', periods, datasets, {stacked:true, yTitle:'Accès'});
