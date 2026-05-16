@@ -174,6 +174,7 @@ function openAccessibilite() {
   if (nh) nh.checked = html2.classList.contains('no-header');
   if (nw) nw.checked = html2.classList.contains('no-widgets');
   if (cb) cb.checked = html2.classList.contains('colorblind-mode');
+  try { if (typeof checkMeteoNotifStatus === 'function') checkMeteoNotifStatus(); } catch(_) {}
 }
 
 function resetAccessibilite() {
