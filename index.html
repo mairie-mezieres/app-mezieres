@@ -45,7 +45,7 @@
 <script defer src="js/mat-widgets.js?v=4.3.8"></script>
 <script defer src="js/mat-agenda.js?v=4.2.4"></script>
 <script defer src="js/mat-forms.js?v=4.2.4"></script>
-<script defer src="js/mat-actus.js?v=4.2.4"></script>
+<script defer src="js/mat-actus.js?v=4.2.5"></script>
 <script defer src="js/mat-trombi.js?v=4.2.4"></script>
 <script defer src="js/mat-mel.js?v=4.3.1"></script>
 <script defer src="js/mat-boot.js?v=4.2.4"></script>
@@ -728,6 +728,26 @@
           <div style="font-size:1.3rem">📡</div>
           <div id="push-diag-text" style="flex:1;font-size:0.82rem;color:var(--muted)">Abonné sur ce navigateur</div>
           <button id="push-test-btn" onclick="testPushNotification()" style="border:none;border-radius:8px;padding:7px 11px;font-size:0.78rem;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;flex-shrink:0;white-space:nowrap">Tester 🔔</button>
+        </div>
+      <div id="push-battery-tip" style="display:none;margin-top:10px">
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;overflow:hidden">
+          <button onclick="toggleBatteryTip()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;background:none;border:none;cursor:pointer;text-align:left">
+            <span style="font-size:1.2rem">🔋</span>
+            <span style="flex:1;font-size:0.83rem;font-weight:600;color:#92400e">Vous ne recevez pas toutes les notifications ?</span>
+            <span id="push-battery-chevron" style="font-size:0.8rem;color:#92400e;transition:transform .2s">▼</span>
+          </button>
+          <div id="push-battery-body" style="display:none;padding:0 14px 12px">
+            <p style="margin:0 0 8px;font-size:0.8rem;color:#78350f">Certains constructeurs bloquent les notifications en arrière-plan pour économiser la batterie. Vérifiez ces paramètres :</p>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:0.79rem">
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>📱 Tous Android</b> — Paramètres → Applications → MAT → Batterie → <i>Sans restriction</i></div>
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>🟠 Xiaomi / HyperOS</b> — Paramètres → Applications → MAT → cocher <i>Démarrage auto</i> + désactiver <i>Interrompre l'activité si inutilisée</i></div>
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>🔵 Samsung One UI</b> — Paramètres → Batterie → Optimisation batterie → MAT → <i>Non optimisée</i></div>
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>🟢 Oppo / ColorOS</b> — Paramètres → Gestion des applications → MAT → Démarrage auto → <i>Autoriser</i></div>
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>🔴 Huawei / EMUI</b> — Paramètres → Applications → MAT → Gestion batterie → <i>Sans restrictions</i></div>
+              <div style="background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #fde68a"><b>🍎 iPhone (iOS 16.4+)</b> — Installez via Safari → Partager → Sur l'écran d'accueil, puis activez les notifs dans les Réglages</div>
+            </div>
+            <button onclick="dismissBatteryTip()" style="margin-top:10px;width:100%;padding:7px;border:none;border-radius:8px;background:#d97706;color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer">✓ J'ai vérifié, ne plus afficher</button>
+          </div>
         </div>
       </div>
     </div>
