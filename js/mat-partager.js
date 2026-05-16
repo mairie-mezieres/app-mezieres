@@ -192,6 +192,7 @@ Page dédiée avec :
       pill: 'opt', cost: 5, backend: false, def: false,
       desc: 'Artisans et services locaux.',
       jsonTemplate: 'entreprises.json',
+      cost: 5, costMin: 0, costMax: 8,
       instructions: `### Annuaire des entreprises / commerces
 Similaire à l\u2019annuaire associations mais orienté économie locale.
 - Fichier JSON \`entreprises.json\`.
@@ -256,7 +257,7 @@ Carte Leaflet centrée sur la commune :
     {
       id: 'chatbot',
       label: 'Chatbot IA "assistant"',
-      pill: 'opt', cost: 20, backend: true, def: false,
+      pill: 'opt', cost: 20, costMin: 5, costMax: 200, backend: true, def: false,
       desc: 'LLM Claude ou Mistral, réponses 24/7.',
       instructions: `### Chatbot IA "assistant" — uniquement profil intermédiaire
 **Architecture recommandée :**
@@ -302,6 +303,16 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 - Cas d\u2019usage : publier automatiquement une vigilance météo sévère, ou un événement urgent.
 - Documentation Meta : https://developers.facebook.com/docs/graph-api
 - Sécurité : valider la signature des webhooks entrants.`
+    },
+    {
+      id: 'ia_dev',
+      label: 'Assistance IA pour développer et maintenir',
+      pill: 'reco', cost: 17, costMin: 17, costMax: 20, backend: false, def: true,
+      desc: 'Claude Code, Cursor ou ChatGPT Plus — pour cr\u00e9er et faire \u00e9voluer le site.',
+      // Pas de jsonTemplate ni d'instructions : ce n'est pas une fonctionnalit\u00e9 du site,
+      // c'est un outil que la commune utilise pour cr\u00e9er et maintenir le site.
+      isCommune: true,
+      noPromptInjection: true
     }
   ];
 
@@ -359,8 +370,17 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
                       : feat.pill === 'reco' ? 'Recommand\u00e9e'
                       : 'Optionnelle';
       const pillClass = 'pill-' + feat.pill;
-      const costStr = feat.cost === 0 ? 'Gratuit' : '~' + feat.cost + ' \u20ac/mois';
+
+      // Affichage co\u00fbt : fourchette si costMin/costMax, sinon valeur unique
+      let costStr;
+      const fMin = (feat.costMin !== undefined) ? feat.costMin : feat.cost;
+      const fMax = (feat.costMax !== undefined) ? feat.costMax : feat.cost;
+      if (fMax === 0) costStr = 'Gratuit';
+      else if (fMin === fMax) costStr = '~' + fMax + ' \u20ac/mois';
+      else costStr = '~' + fMin + '\u2013' + fMax + ' \u20ac/mois';
+
       const backendNote = feat.backend ? ' \u00b7 n\u00e9cessite un backend' : '';
+      const communeNote = feat.isCommune ? ' \u00b7 outil pour vous (non publi\u00e9 sur le site)' : '';
 
       const div = document.createElement('label');
       div.className = 'feat' + (isChecked ? ' checked' : '');
@@ -371,7 +391,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
             ' <span class="feat-pill ' + pillClass + '">' + pillLabel + '</span>' +
           '</div>' +
           '<div class="feat-desc">' + feat.desc + '</div>' +
-          '<div class="feat-cost">' + costStr + backendNote + '</div>' +
+          '<div class="feat-cost">' + costStr + backendNote + communeNote + '</div>' +
         '</div>';
 
       div.querySelector('input').addEventListener('change', e => {
@@ -385,17 +405,88 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     });
   }
 
+  // ─── Co\u00fbts mensuels de l'h\u00e9bergement choisi en \u00e9tape 1 ───
+  // Fourchettes r\u00e9alistes v\u00e9rifi\u00e9es en mai 2026.
+  const HOSTING_COSTS = {
+    'netlify':       { min: 0, max: 0,  label: 'Netlify free (100 Go BP/mois)' },
+    'vercel':        { min: 0, max: 0,  label: 'Vercel free (100 Go BP/mois)' },
+    'render':        { min: 0, max: 7,  label: 'Render free \u2192 Starter (7 \u20ac/mois si pas de sleep)' },
+    'github-pages':  { min: 0, max: 0,  label: 'GitHub Pages (gratuit)' },
+    'ovh':           { min: 4, max: 5,  label: 'OVH Perso (~4 \u20ac/mois)' },
+    'autre':         { min: 0, max: 10, label: 'H\u00e9bergeur \u00e0 choisir' }
+  };
+  // Coût d'un nom de domaine .fr lissé sur l'année (~8 €/an)
+  const DOMAIN_MONTHLY = 1;
+  // Coût d'un backend mutualisé Render Starter (recommandé en production)
+  const BACKEND_STARTER = 7;
+
   function updateCost() {
-    let total = 0;
+    let minTotal = 0;
+    let maxTotal = 0;
     let needsBackend = false;
+    const breakdown = [];
+
     FEATURES.forEach(f => {
-      if (state.features.has(f.id)) {
-        total += f.cost;
-        if (f.backend) needsBackend = true;
+      if (!state.features.has(f.id)) return;
+      const fMin = (f.costMin !== undefined) ? f.costMin : f.cost;
+      const fMax = (f.costMax !== undefined) ? f.costMax : f.cost;
+      minTotal += fMin;
+      maxTotal += fMax;
+      if (f.backend) needsBackend = true;
+      if (fMax > 0) {
+        const range = (fMin === fMax) ? (fMin + ' \u20ac') : (fMin + '\u2013' + fMax + ' \u20ac');
+        breakdown.push({ label: f.label, range });
       }
     });
-    if (needsBackend) total += 7; // ligne backend mutualisée
-    document.getElementById('cost-display').textContent = total + ' \u20ac/mois';
+
+    // H\u00e9bergement de l'\u00e9tape 1
+    const h = HOSTING_COSTS[state.host] || HOSTING_COSTS['autre'];
+    minTotal += h.min;
+    maxTotal += h.max;
+    if (h.max > 0) {
+      breakdown.unshift({
+        label: 'H\u00e9bergement (' + h.label + ')',
+        range: (h.min === h.max) ? (h.min + ' \u20ac') : (h.min + '\u2013' + h.max + ' \u20ac')
+      });
+    }
+
+    // Backend mutualis\u00e9 si une fonctionnalit\u00e9 le n\u00e9cessite et qu'on n'est pas d\u00e9j\u00e0 sur Render
+    if (needsBackend && state.host !== 'render') {
+      minTotal += BACKEND_STARTER;
+      maxTotal += BACKEND_STARTER;
+      breakdown.push({ label: 'Backend Render Starter (requis)', range: BACKEND_STARTER + ' \u20ac' });
+    } else if (needsBackend && state.host === 'render') {
+      // d\u00e9j\u00e0 pris en compte plus haut via HOSTING_COSTS.render
+    }
+
+    // Nom de domaine .fr (toujours recommand\u00e9 pour un service public)
+    minTotal += DOMAIN_MONTHLY;
+    maxTotal += DOMAIN_MONTHLY;
+    breakdown.push({ label: 'Nom de domaine .fr (~8 \u20ac/an)', range: '~1 \u20ac' });
+
+    // Affichage de la fourchette
+    const display = document.getElementById('cost-display');
+    if (minTotal === maxTotal) {
+      display.textContent = minTotal + ' \u20ac/mois';
+    } else {
+      display.textContent = minTotal + '\u2013' + maxTotal + ' \u20ac/mois';
+    }
+
+    // Affichage du d\u00e9tail (si l'\u00e9l\u00e9ment existe dans la page)
+    const detailEl = document.getElementById('cost-breakdown');
+    if (detailEl) {
+      if (breakdown.length === 0) {
+        detailEl.innerHTML = '';
+      } else {
+        const lines = breakdown.map(b =>
+          '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-size:.74rem">' +
+            '<span style="color:rgba(216,243,220,.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\u25b8 ' + escapeHtml(b.label) + '</span>' +
+            '<span style="font-weight:800;flex-shrink:0">' + b.range + '</span>' +
+          '</div>'
+        );
+        detailEl.innerHTML = lines.join('');
+      }
+    }
   }
 
   // ─── Navigation entre étapes (exposé en global) ─────────
@@ -410,6 +501,8 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       bar.classList.toggle('active', i === n);
       bar.classList.toggle('done', i < n);
     }
+    // Recalculer le co\u00fbt si on entre en \u00e9tape 2 (l'h\u00e9bergeur a pu changer en \u00e9tape 1)
+    if (n === 2) updateCost();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -544,7 +637,9 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
   }
 
   function featuresSection() {
-    const checkedFeatures = FEATURES.filter(f => state.features.has(f.id));
+    const checkedFeatures = FEATURES.filter(f =>
+      state.features.has(f.id) && !f.noPromptInjection && f.instructions
+    );
     const lines = [
       '# FONCTIONNALIT\u00c9S \u00c0 INT\u00c9GRER',
       '',
