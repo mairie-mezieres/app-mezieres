@@ -24,7 +24,7 @@
     { id: 15, level: 'opt',  defaultOn: false, cost: 0,    title: 'Transports locaux',                desc: 'Horaires bus, prix carburants.' },
     { id: 16, level: 'opt',  defaultOn: false, cost: 0,    title: 'Sentiers & randonnées',            desc: 'Fiches balades avec traces GPX.' },
     { id: 17, level: 'opt',  defaultOn: false, cost: 0,    title: 'Visualiseur PLU / cadastre',       desc: 'Cartes IGN + données data.gouv.' },
-    { id: 18, level: 'opt',  defaultOn: false, cost: 10,   title: 'Chatbot IA « assistant »',         desc: 'Répond aux questions des administrés (Mistral). Coût réel : 10 à 240 €/mois selon le trafic. Réservé aux profils intermédiaires.' },
+    { id: 18, level: 'opt',  defaultOn: false, cost: 10,   title: 'Chatbot IA « assistant »',         desc: 'Répond aux questions des administrés (Claude ou Mistral). Coût réel : 10 à 240 €/mois selon le trafic. Réservé aux profils intermédiaires.' },
     { id: 19, level: 'opt',  defaultOn: false, cost: 0,    title: 'Interface d\'administration',      desc: 'Gérer le contenu sans toucher au code.' },
     { id: 20, level: 'opt',  defaultOn: false, cost: 0,    title: 'Publication automatique Facebook', desc: 'Relai des actualités vers la page Facebook.' }
   ];
@@ -128,11 +128,11 @@
     if (niveau === 'debutant' && advancedPicked.length > 0) {
       notice.textContent = '⚠ Vous avez coché des fonctionnalités avancées (' +
         advancedPicked.map(function (f) { return f.title; }).join(', ') +
-        ') alors que vous avez choisi le profil débutant. Le Chat vous proposera des versions simplifiées.';
+        ') alors que vous avez choisi le profil débutant. Claude vous proposera des versions simplifiées.';
     } else if (total > parseInt(budget, 10)) {
       notice.textContent = 'ℹ Le coût estimé (~' + total + ' €/mois) dépasse votre budget (' + budget + ' €). Décochez certaines options ou augmentez le budget.';
     } else {
-      notice.textContent = 'Prompt prêt. Cliquez sur « Copier le prompt » puis ouvrez Le Chat.';
+      notice.textContent = 'Prompt prêt. Cliquez sur « Copier le prompt » puis ouvrez Claude.';
       notice.className = 'notice success';
     }
 
@@ -211,7 +211,7 @@
       '- Responsive mobile-first.',
       '- Performance : chargement initial < 1 Mo.',
       '- RGPD : AUCUN cookie tiers, AUCUN tracker (pas de Google Analytics, pas de Meta Pixel). Pour la mesure d\'audience, propose Plausible ou Matomo.',
-      '- Souveraineté : services européens / open-source. open-meteo.com plutôt qu\'OpenWeatherMap, api-adresse.data.gouv.fr plutôt que Google Maps, Mistral pour toute fonction IA.',
+      '- Privilégier les services publics et open-source quand c\'est possible : open-meteo.com plutôt qu\'OpenWeatherMap, api-adresse.data.gouv.fr plutôt que Google Maps. Pour toute fonction IA générative côté backend, Claude (Anthropic) ou Mistral.',
       '- Génère un gabarit de mentions légales conformes.',
       '',
       '## Format de sortie attendu',
@@ -241,7 +241,7 @@
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(ta.value).then(
-        function () { feedback(true, '✓ Prompt copié. Collez-le dans une nouvelle conversation Le Chat.'); },
+        function () { feedback(true, '✓ Prompt copié. Collez-le dans une nouvelle conversation Claude.'); },
         function () { fallbackCopy(ta, feedback); }
       );
     } else {

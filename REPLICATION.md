@@ -1,18 +1,18 @@
-# Kit de réplication — Site municipal type « MAT »
+# Kit de réplication — Application / site municipal type « MAT »
 
-Ce document permet à n'importe quelle commune ou administration de créer son propre site municipal (et son chatbot facultatif) en partant d'une feuille blanche, à l'aide d'une intelligence artificielle conversationnelle. Il est inspiré de l'application « MAT — Mézières Avec Toi », partagée gratuitement par la commune de Mézières-lez-Cléry.
+Ce document permet à n'importe quelle commune ou administration de créer sa propre application ou son site municipal (et son chatbot facultatif) en partant d'une feuille blanche, à l'aide d'une intelligence artificielle conversationnelle. Il est inspiré de l'application « MAT — Mézières Avec Toi », partagée gratuitement par la commune de Mézières-lez-Cléry.
 
-> **Vous préférez une interface visuelle ?** Ouvrez la page `partager.html` du site (ou rendez-vous sur la rubrique « Partager ce projet ») : un questionnaire interactif génère automatiquement le prompt personnalisé à coller dans Le Chat.
+> **Vous préférez une interface visuelle ?** Ouvrez la page `partager.html` du site : un questionnaire interactif génère automatiquement le prompt personnalisé à coller dans Claude.
 
 ---
 
 ## 1. Mode d'emploi (à lire avant tout)
 
-1. Créez un compte gratuit sur **[Le Chat de Mistral](https://chat.mistral.ai)** (IA française, hébergée en Europe).
+1. Créez un compte gratuit sur **[Claude](https://claude.ai)** (Anthropic).
 2. **Remplissez les sections 2, 3 et 4 ci-dessous** directement dans ce fichier (en supprimant ce qui ne vous concerne pas).
 3. Copiez **tout le contenu situé entre les marqueurs `--- DÉBUT DU PROMPT ---` et `--- FIN DU PROMPT ---`** (sections 5 à 10).
-4. Collez-le dans une nouvelle conversation Le Chat et envoyez. L'IA produira un site adapté à vos réponses.
-5. Suivez les instructions de déploiement données par Le Chat. La FAQ en fin de document répond aux questions les plus fréquentes.
+4. Collez-le dans une nouvelle conversation Claude et envoyez. L'IA produira un site adapté à vos réponses.
+5. Suivez les instructions de déploiement données par Claude. La FAQ en fin de document répond aux questions les plus fréquentes.
 
 Temps estimé : **30 minutes** pour remplir, **1 à 3 heures** pour ajuster et publier la première version.
 
@@ -144,7 +144,7 @@ Tu intègres uniquement les fonctionnalités cochées `[x]` dans la section « C
 - **Responsive** : mobile-first, testé du smartphone au grand écran.
 - **Performance** : chargement initial inférieur à 1 Mo, aucune librairie externe lourde.
 - **RGPD** : **aucun cookie tiers**, **aucun tracker** (pas de Google Analytics, pas de Meta Pixel). Si une mesure d'audience est souhaitée, propose **Plausible** ou **Matomo** en auto-hébergé.
-- **Souveraineté** : favoriser les services européens / open-source. Préfère `open-meteo.com` à OpenWeatherMap, `api-adresse.data.gouv.fr` à Google Maps Geocoding, **Mistral** pour toute fonction IA.
+- **Données publiques** : privilégier les services publics et open-source. Préfère `open-meteo.com` à OpenWeatherMap, `api-adresse.data.gouv.fr` à Google Maps Geocoding. Pour toute fonction IA générative côté backend, **Claude (Anthropic)** ou **Mistral**.
 - **Mentions légales** : génère un gabarit conforme (éditeur, hébergeur, responsable de publication).
 - **Pas d'emojis dans les titres officiels**, sauf si l'utilisateur le demande explicitement.
 
@@ -206,7 +206,7 @@ Carte Leaflet centrée sur la commune, tuiles **Géoportail IGN** (gratuit), cou
 ### 18. Chatbot IA « assistant »
 Architecture recommandée (à ne proposer **que pour le profil intermédiaire**) :
 - Backend Node.js Express déployé sur **Render** (~10 €/mois plan starter).
-- LLM principal : **Mistral Small** via `api.mistral.ai` (0,10 € / million de tokens entrée, 0,30 € / million sortie).
+- LLM principal au choix : **Claude Haiku** via `api.anthropic.com` (rapide, économique, prompt caching natif) ou **Mistral Small** via `api.mistral.ai` (souverain européen, ~0,10 € / million de tokens entrée).
 - Optionnel fallback : Claude Haiku 4.5 d'Anthropic.
 - Pas d'embeddings ni de base vectorielle au démarrage : injecter les pages du site dans le prompt système (RAG syntaxique).
 - Rate limiting : 5 questions / jour / appareil pour maîtriser les coûts.
@@ -214,7 +214,7 @@ Architecture recommandée (à ne proposer **que pour le profil intermédiaire**)
 - Stockage cache : **Upstash Redis** (gratuit jusqu'à 10 000 requêtes/jour).
 - Code de référence open-source : https://github.com/mairie-mezieres/chatbot-mairie-mezieres
 
-Pour le profil débutant : propose plutôt un lien direct vers Le Chat de Mistral avec un prompt système pré-rempli (zéro infrastructure à gérer).
+Pour le profil débutant : propose plutôt un lien direct vers Claude (claude.ai) avec un prompt système pré-rempli — zéro infrastructure à gérer.
 
 ### 19. Interface d'administration intégrée
 Page `admin.html` protégée par mot de passe simple (côté client suffisant pour une petite commune). Formulaires pour ajouter / modifier / supprimer actualités, événements, etc. Export du contenu en JSON téléchargeable.
@@ -253,9 +253,9 @@ Renvoie ta réponse en trois parties :
 Non pour le profil débutant. Recommandé pour le chatbot et les fonctionnalités avancées.
 
 **Q : Mes données restent-elles en France / en Europe ?**
-Oui si vous suivez les recommandations : Mistral (FR), Netlify/Vercel ont des datacenters européens, open-meteo (Allemagne), data.gouv (FR), Upstash (région EU sélectionnable).
+La plupart des services recommandés sont européens : Netlify/Vercel proposent des datacenters EU, open-meteo (Allemagne), data.gouv (FR), Upstash (région EU sélectionnable). Pour l'IA générative, Anthropic (Claude) offre une option de résidence des données européenne via son offre Enterprise ; Mistral est nativement français si la souveraineté est un critère bloquant.
 
-**Q : Le Chat me donne un résultat incomplet, que faire ?**
+**Q : Claude me donne un résultat incomplet, que faire ?**
 Renvoyez simplement : « Continue le fichier `[nom]` à partir d'où tu t'es arrêté » ou « Génère maintenant le fichier suivant ».
 
 **Q : Comment mettre à jour le site après publication ?**
@@ -274,6 +274,7 @@ Un simple lien en pied de page suffit : « Inspiré de MAT — Mairie de Méziè
 
 - Code source du site : https://github.com/mairie-mezieres/app-mezieres
 - Code source du chatbot : https://github.com/mairie-mezieres/chatbot-mairie-mezieres
-- Documentation Mistral / Le Chat : https://docs.mistral.ai
+- Documentation Claude : https://docs.claude.com
+- Documentation Mistral (alternative) : https://docs.mistral.ai
 - Référentiel d'accessibilité (RGAA) : https://accessibilite.numerique.gouv.fr
 - API publiques françaises : https://api.gouv.fr
