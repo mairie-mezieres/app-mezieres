@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.4.6 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.4.7 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 12 : Notifications push par type (météo / déchets) + niveau configurable
-const CACHE = 'mat-v4.4.6';
+// Phase 13 : Toggles notifications refaits (acc-switch, actus/météo/déchets)
+const CACHE = 'mat-v4.4.7';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -15,7 +15,7 @@ const PRECACHE_URLS = [
   './js/mat-widgets.js?v=4.3.8',
   './js/mat-agenda.js?v=4.2.4',
   './js/mat-forms.js?v=4.2.4',
-  './js/mat-actus.js?v=4.2.9',
+  './js/mat-actus.js?v=4.3.0',
   './js/mat-trombi.js?v=4.2.4',
   './js/mat-mel.js?v=4.3.1',
   './js/mat-boot.js?v=4.2.4',

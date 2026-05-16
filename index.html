@@ -45,7 +45,7 @@
 <script defer src="js/mat-widgets.js?v=4.3.8"></script>
 <script defer src="js/mat-agenda.js?v=4.2.4"></script>
 <script defer src="js/mat-forms.js?v=4.2.4"></script>
-<script defer src="js/mat-actus.js?v=4.2.9"></script>
+<script defer src="js/mat-actus.js?v=4.3.0"></script>
 <script defer src="js/mat-trombi.js?v=4.2.4"></script>
 <script defer src="js/mat-mel.js?v=4.3.1"></script>
 <script defer src="js/mat-boot.js?v=4.2.4"></script>
@@ -534,16 +534,29 @@
       <div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:16px 0 8px">🔔 Notifications push</div>
       <div class="acc-option">
         <div>
-          <div class="acc-option-label">🌦️ Alertes météo</div>
-          <div class="acc-option-sub">Recevoir les vigilances météo Loiret</div>
+          <div class="acc-option-label">📰 Actualités</div>
+          <div class="acc-option-sub">Nouvelles publications de la mairie</div>
         </div>
-        <button id="meteo-notif-btn" onclick="toggleMeteoNotif()" style="border:none;border-radius:8px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:#fff;background:var(--primary,#2d6a4f)">…</button>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-actus-notif-toggle" onchange="toggleActusNotifFromAcc(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
+      </div>
+      <div class="acc-option">
+        <div>
+          <div class="acc-option-label">🌦️ Alertes météo</div>
+          <div class="acc-option-sub">Vigilances météo Loiret</div>
+        </div>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-meteo-notif-toggle" onchange="toggleMeteoNotif(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
       </div>
       <div id="meteo-notif-level-wrap" style="display:none;padding:4px 0 10px 0">
-        <div style="font-size:0.74rem;color:var(--muted);margin-bottom:7px">Niveau minimum d'alerte :</div>
+        <div style="font-size:0.74rem;color:var(--muted);margin-bottom:7px">Niveau minimum :</div>
         <div style="display:flex;gap:6px">
-          <button id="meteo-lvl-2" onclick="setMeteoNotifLevel(2)" style="flex:1;border:2px solid #fde68a;border-radius:8px;padding:7px 4px;font-size:0.78rem;font-weight:600;cursor:pointer;background:#fffbeb;color:#92400e">🟡 Toutes</button>
-          <button id="meteo-lvl-3" onclick="setMeteoNotifLevel(3)" style="flex:1;border:2px solid #fed7aa;border-radius:8px;padding:7px 4px;font-size:0.78rem;font-weight:600;cursor:pointer;background:#fff7ed;color:#9a3412">🟠 Orange+</button>
+          <button id="meteo-lvl-2" onclick="setMeteoNotifLevel(2)" style="flex:1;border:2px solid #fde68a;border-radius:8px;padding:7px 4px;font-size:0.78rem;font-weight:600;cursor:pointer;background:#fffbeb;color:#92400e">🟡 Jaune</button>
+          <button id="meteo-lvl-3" onclick="setMeteoNotifLevel(3)" style="flex:1;border:2px solid #fed7aa;border-radius:8px;padding:7px 4px;font-size:0.78rem;font-weight:600;cursor:pointer;background:#fff7ed;color:#9a3412">🟠 Orange</button>
           <button id="meteo-lvl-4" onclick="setMeteoNotifLevel(4)" style="flex:1;border:2px solid #fecaca;border-radius:8px;padding:7px 4px;font-size:0.78rem;font-weight:600;cursor:pointer;background:#fff1f2;color:#9f1239">🔴 Rouge</button>
         </div>
       </div>
@@ -552,7 +565,10 @@
           <div class="acc-option-label">🗑️ Rappels collecte</div>
           <div class="acc-option-sub">Notification la veille de chaque collecte</div>
         </div>
-        <button onclick="openDechets()" style="border:none;border-radius:8px;padding:6px 12px;font-size:0.78rem;font-weight:700;cursor:pointer;color:var(--primary,#2d6a4f);background:var(--bg2,#f0fdf4)">Configurer →</button>
+        <label class="acc-switch">
+          <input type="checkbox" id="acc-dechets-notif-toggle" onchange="toggleDechetsNotifFromAcc(this.checked)">
+          <span class="acc-slider"></span>
+        </label>
       </div>
 
       <button class="submit-btn" style="margin-top:8px;background:linear-gradient(135deg,#64748b,#475569)" onclick="resetAccessibilite()">
