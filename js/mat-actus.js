@@ -1,5 +1,5 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.7.4
+   MAT — Actualités & Notifications Push v3.7.5
    ╔════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────────────────
@@ -314,10 +314,26 @@ function _showPushDiag() {
   if(w) w.style.display='';
   if(t) t.textContent='Abonné sur ce navigateur';
   if(b){b.textContent='Tester 🔔';b.disabled=false;}
+  var tip=document.getElementById('push-battery-tip');
+  if(tip && !localStorage.getItem('mat_push_battery_tip_dismissed')) tip.style.display='';
 }
 function _hidePushDiag() {
   var w=document.getElementById('push-diag-wrap');
   if(w) w.style.display='none';
+  var tip=document.getElementById('push-battery-tip');
+  if(tip) tip.style.display='none';
+}
+function toggleBatteryTip() {
+  var body=document.getElementById('push-battery-body'),chevron=document.getElementById('push-battery-chevron');
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'';
+  if(chevron) chevron.style.transform=open?'':'rotate(180deg)';
+}
+function dismissBatteryTip() {
+  localStorage.setItem('mat_push_battery_tip_dismissed','1');
+  var tip=document.getElementById('push-battery-tip');
+  if(tip) tip.style.display='none';
 }
 async function testPushNotification() {
   var btn=document.getElementById('push-test-btn'),txt=document.getElementById('push-diag-text');
