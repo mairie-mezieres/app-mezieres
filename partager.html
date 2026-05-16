@@ -102,9 +102,9 @@ button.btn:active{transform:translateY(1px)}
 <body>
 
 <header class="hd">
-  <a href="./" class="hd-back">← Retour à MAT</a>
-  <div class="hd-title">Créez votre propre application / site municipal</div>
-  <div class="hd-sub">Un questionnaire en 3 étapes pour générer un prompt personnalisé à coller dans Claude. Aucune compétence technique n'est requise pour commencer.</div>
+  <a href="./" class="hd-back">&larr; Retour &agrave; MAT</a>
+  <div class="hd-title">Cr&eacute;ez votre propre application / site municipal</div>
+  <div class="hd-sub">Un questionnaire en 3 &eacute;tapes pour g&eacute;n&eacute;rer un prompt personnalis&eacute; &agrave; coller dans Claude. Aucune comp&eacute;tence technique n&rsquo;est requise pour commencer.</div>
 </header>
 
 <main class="wrap">
@@ -115,10 +115,10 @@ button.btn:active{transform:translateY(1px)}
     <div class="step" id="step-bar-3"></div>
   </div>
 
-  <!-- ÉTAPE 1 -->
+  <!-- &Eacute;TAPE 1 -->
   <section class="card" id="step-1">
     <h2>1. Votre profil</h2>
-    <div class="sub">Ces informations adaptent le prompt à votre commune et à votre niveau technique.</div>
+    <div class="sub">Ces informations adaptent le prompt &agrave; votre commune et &agrave; votre niveau technique.</div>
 
     <div class="field">
       <label for="f-commune">Nom de la commune ou administration</label>
@@ -135,13 +135,13 @@ button.btn:active{transform:translateY(1px)}
       <div class="radio-row" role="radiogroup" aria-label="Niveau informatique">
         <label class="radio-card selected" data-level="debutant">
           <input type="radio" name="niveau" value="debutant" checked>
-          <div class="rc-title">Débutant</div>
-          <div class="rc-desc">Je sais utiliser un navigateur et glisser-déposer un fichier. Pas de code.</div>
+          <div class="rc-title">D&eacute;butant</div>
+          <div class="rc-desc">Je sais utiliser un navigateur et glisser-d&eacute;poser un fichier. Pas de code.</div>
         </label>
         <label class="radio-card" data-level="intermediaire">
           <input type="radio" name="niveau" value="intermediaire">
-          <div class="rc-title">Intermédiaire</div>
-          <div class="rc-desc">Je connais GitHub, j'édite du HTML, je peux configurer un hébergement.</div>
+          <div class="rc-title">Interm&eacute;diaire</div>
+          <div class="rc-desc">Je connais GitHub, j&rsquo;&eacute;dite du HTML, je peux configurer un h&eacute;bergement.</div>
         </label>
       </div>
     </div>
@@ -149,39 +149,39 @@ button.btn:active{transform:translateY(1px)}
     <div class="field" style="background:var(--mist);border:1px solid var(--sage);border-radius:12px;padding:12px 14px">
       <label for="f-sovereign" style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:800;font-size:.9rem;color:var(--forest);margin:0">
         <input type="checkbox" id="f-sovereign" style="width:18px;height:18px;accent-color:var(--leaf);margin:0">
-        <span>🇫🇷 Mode « 100 % français » (souveraineté numérique)</span>
+        <span>&#127467;&#127479; Mode &laquo;&nbsp;100&nbsp;% fran&ccedil;ais&nbsp;&raquo; (souverainet&eacute; num&eacute;rique)</span>
       </label>
       <div style="font-size:.74rem;color:var(--muted);margin-top:6px;margin-left:28px">
-        Recommande OVH plutôt que Netlify/Vercel, Mistral plutôt que Claude, Bunny.net plutôt que Cloudinary. Donnée stockée en France / EU uniquement.
+        Recommande OVH plut&ocirc;t que Netlify/Vercel, Mistral plut&ocirc;t que Claude Haiku pour le chatbot int&eacute;gr&eacute;, Bunny.net plut&ocirc;t que Cloudinary. Donn&eacute;e stock&eacute;e en France&nbsp;/ EU uniquement.
       </div>
     </div>
 
     <div class="field">
-      <label for="f-budget">Budget mensuel souhaité</label>
+      <label for="f-budget">Budget mensuel souhait&eacute;</label>
       <div class="slider-row">
         <input type="range" id="f-budget" min="0" max="300" step="10" value="20" aria-label="Budget mensuel en euros">
-        <div class="slider-val" id="f-budget-val" aria-live="polite">20 €/mois</div>
+        <div class="slider-val" id="f-budget-val" aria-live="polite">20 &euro;/mois</div>
       </div>
     </div>
 
     <div class="field">
-      <label for="f-host">Hébergeur préféré</label>
+      <label for="f-host">H&eacute;bergeur pr&eacute;f&eacute;r&eacute;</label>
       <select id="f-host">
-        <option value="netlify">Netlify (gratuit, recommandé débutant)</option>
-        <option value="vercel">Vercel (gratuit, recommandé intermédiaire)</option>
+        <option value="netlify">Netlify (gratuit, recommand&eacute; d&eacute;butant)</option>
+        <option value="vercel">Vercel (gratuit, recommand&eacute; interm&eacute;diaire)</option>
         <option value="render">Render (gratuit, requis pour le chatbot)</option>
         <option value="github-pages">GitHub Pages (gratuit)</option>
-        <option value="ovh">OVH (français, payant)</option>
+        <option value="ovh">OVH (fran&ccedil;ais, payant)</option>
         <option value="autre">Autre / je ne sais pas encore</option>
       </select>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" type="button" onclick="goTo(2)">Étape suivante →</button>
+      <button class="btn btn-primary" type="button" onclick="goTo(2)">&Eacute;tape suivante &rarr;</button>
     </div>
   </section>
 
-  <!-- ÉTAPE 2 -->
+  <!-- &Eacute;TAPE 2 -->
   <section class="card hidden" id="step-2">
     <h2>2. Vos fonctionnalit&eacute;s</h2>
     <div class="sub">Cochez ce que vous voulez int&eacute;grer. Les essentielles sont pr&eacute;-coch&eacute;es. Le co&ucirc;t mensuel s&rsquo;affiche en fourchette min&ndash;max selon le trafic, avec d&eacute;tail et alertes sur les paliers gratuits.</div>
@@ -203,49 +203,49 @@ button.btn:active{transform:translateY(1px)}
           &#9888;&#65039; Paliers gratuits &rarr; payants &agrave; surveiller
         </summary>
         <div style="font-size:.72rem;color:rgba(216,243,220,.82);padding:10px 4px 2px;line-height:1.55">
-          <div style="margin-bottom:6px"><strong>&bull; Render Free</strong> : sleep 15 min, cold-start 30&ndash;60 s. <strong>Migration auto vers les nouveaux plans le 1<sup>er</sup> ao&ucirc;t 2026</strong>. Pour un service citoyen s&eacute;rieux, pr&eacute;voir Starter (~7 &euro;/mois).</div>
-          <div style="margin-bottom:6px"><strong>&bull; Upstash Redis</strong> : 10 000 commandes/jour gratuites. Au-del&agrave; : ~10 &euro;/mois.</div>
-          <div style="margin-bottom:6px"><strong>&bull; Cloudinary</strong> : 25 Go gratuits. Au-del&agrave; : ~5 &euro;/mois.</div>
-          <div style="margin-bottom:6px"><strong>&bull; Netlify / Vercel</strong> : 100 Go BP/mois. Suffit pour 95 % des mairies, surveillez les pics (&eacute;lections, &eacute;v&eacute;nements viraux).</div>
-          <div style="margin-bottom:6px"><strong>&bull; Chatbot IA</strong> : ~5 &euro;/mois pour ~50 questions/jour, peut monter &agrave; 200 &euro;+/mois en cas de viralisation. Rate limiting fortement recommand&eacute;.</div>
-          <div style="margin-bottom:0"><strong>&bull; Nom de domaine .fr</strong> : ~8 &euro;/an, renouvellement annuel. Inclus la 1<sup>re</sup> ann&eacute;e chez OVH.</div>
+          <div style="margin-bottom:6px"><strong>&bull; Render Free</strong> : sleep 15 min, cold-start 30&ndash;60&nbsp;s. <strong>Migration auto vers les nouveaux plans le 1<sup>er</sup> ao&ucirc;t 2026</strong>. Pour un service citoyen s&eacute;rieux, pr&eacute;voir Starter (~7&nbsp;&euro;/mois).</div>
+          <div style="margin-bottom:6px"><strong>&bull; Upstash Redis</strong> : 10&nbsp;000 commandes/jour gratuites. Au-del&agrave;&nbsp;: ~10&nbsp;&euro;/mois.</div>
+          <div style="margin-bottom:6px"><strong>&bull; Cloudinary</strong> : 25&nbsp;Go gratuits. Au-del&agrave;&nbsp;: ~5&nbsp;&euro;/mois.</div>
+          <div style="margin-bottom:6px"><strong>&bull; Netlify&nbsp;/ Vercel</strong> : 100&nbsp;Go BP/mois. Suffit pour 95&nbsp;% des mairies, surveillez les pics (&eacute;lections, &eacute;v&eacute;nements viraux).</div>
+          <div style="margin-bottom:6px"><strong>&bull; Chatbot IA</strong> : avec Mistral Small ou Claude Haiku, environ 0,001&nbsp;&euro;/question &mdash; soit ~1&nbsp;&euro;/mois pour 30&nbsp;q/jour, ~3&nbsp;&euro;/mois pour 100&nbsp;q/jour. Le rate limiting (5 questions/jour/appareil) pr&eacute;vient tout d&eacute;rapage. Co&ucirc;t principal&nbsp;: backend Render Starter (~7&nbsp;&euro;/mois).</div>
+          <div style="margin-bottom:0"><strong>&bull; Nom de domaine .fr</strong> : ~8&nbsp;&euro;/an, renouvellement annuel. Inclus la 1<sup>re</sup> ann&eacute;e chez OVH.</div>
         </div>
       </details>
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-ghost" type="button" onclick="goTo(1)">← Retour</button>
-      <button class="btn btn-primary" type="button" onclick="generate()">Générer mon prompt →</button>
+      <button class="btn btn-ghost" type="button" onclick="goTo(1)">&larr; Retour</button>
+      <button class="btn btn-primary" type="button" onclick="generate()">G&eacute;n&eacute;rer mon prompt &rarr;</button>
     </div>
   </section>
 
-  <!-- ÉTAPE 3 -->
+  <!-- &Eacute;TAPE 3 -->
   <section class="card hidden" id="step-3">
-    <h2>3. Votre prompt personnalisé</h2>
-    <div class="sub">Copiez ce texte et collez-le dans une nouvelle conversation Claude. L'IA produira votre site.</div>
+    <h2>3. Votre prompt personnalis&eacute;</h2>
+    <div class="sub">Copiez ce texte et collez-le dans une nouvelle conversation Claude. L&rsquo;IA produira votre site.</div>
 
     <div class="summary" id="summary"></div>
 
     <div class="prompt-box">
-      <textarea id="prompt-output" readonly aria-label="Prompt généré"></textarea>
+      <textarea id="prompt-output" readonly aria-label="Prompt g&eacute;n&eacute;r&eacute;"></textarea>
     </div>
 
     <div class="notice" id="copy-notice"></div>
 
     <div class="btn-row">
-      <button class="btn btn-ghost" type="button" onclick="goTo(2)">← Modifier</button>
-      <button class="btn btn-secondary" type="button" onclick="copyPrompt()">📋 Copier le prompt</button>
-      <a class="btn btn-primary" id="llm-open-btn" href="https://claude.ai" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Ouvrir Claude ↗</a>
+      <button class="btn btn-ghost" type="button" onclick="goTo(2)">&larr; Modifier</button>
+      <button class="btn btn-secondary" type="button" onclick="copyPrompt()">&#128203; Copier le prompt</button>
+      <a class="btn btn-primary" id="llm-open-btn" href="https://claude.ai" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Ouvrir Claude &#8599;</a>
     </div>
 
     <div class="notice success" style="margin-top:14px">
-      Le prompt vous semble trop long ou trop complexe ? Vous pouvez aussi télécharger le fichier
-      <a href="REPLICATION.md" download>REPLICATION.md</a> et l'envoyer en pièce jointe à Claude.
+      Le prompt vous semble trop long ou trop complexe&nbsp;? Vous pouvez aussi t&eacute;l&eacute;charger le fichier
+      <a href="REPLICATION.md" download>REPLICATION.md</a> et l&rsquo;envoyer en pi&egrave;ce jointe &agrave; Claude.
     </div>
   </section>
 
 </main>
 
-<script src="js/mat-partager.js?v=1.4.0"></script>
+<script src="js/mat-partager.js?v=1.5.0"></script>
 </body>
 </html>
