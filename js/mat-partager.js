@@ -24,7 +24,7 @@
     { id: 15, level: 'opt',  defaultOn: false, cost: 0,    title: 'Transports locaux',                desc: 'Horaires bus, prix carburants.' },
     { id: 16, level: 'opt',  defaultOn: false, cost: 0,    title: 'Sentiers & randonnées',            desc: 'Fiches balades avec traces GPX.' },
     { id: 17, level: 'opt',  defaultOn: false, cost: 0,    title: 'Visualiseur PLU / cadastre',       desc: 'Cartes IGN + données data.gouv.' },
-    { id: 18, level: 'opt',  defaultOn: false, cost: 50,   title: 'Chatbot IA « assistant »',         desc: 'Répond aux questions des administrés (Mistral). Réservé aux profils intermédiaires.' },
+    { id: 18, level: 'opt',  defaultOn: false, cost: 10,   title: 'Chatbot IA « assistant »',         desc: 'Répond aux questions des administrés (Mistral). Coût réel : 10 à 240 €/mois selon le trafic. Réservé aux profils intermédiaires.' },
     { id: 19, level: 'opt',  defaultOn: false, cost: 0,    title: 'Interface d\'administration',      desc: 'Gérer le contenu sans toucher au code.' },
     { id: 20, level: 'opt',  defaultOn: false, cost: 0,    title: 'Publication automatique Facebook', desc: 'Relai des actualités vers la page Facebook.' }
   ];
