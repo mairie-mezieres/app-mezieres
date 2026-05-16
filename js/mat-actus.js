@@ -315,7 +315,7 @@ function _showPushDiag() {
   if(t) t.textContent='Abonné sur ce navigateur';
   if(b){b.textContent='Tester 🔔';b.disabled=false;}
   var tip=document.getElementById('push-battery-tip');
-  if(tip && !localStorage.getItem('mat_push_battery_tip_dismissed')) tip.style.display='';
+  try { if(tip && !localStorage.getItem('mat_push_battery_tip_dismissed')) tip.style.display=''; } catch(_) {}
 }
 function _hidePushDiag() {
   var w=document.getElementById('push-diag-wrap');
@@ -331,7 +331,7 @@ function toggleBatteryTip() {
   if(chevron) chevron.style.transform=open?'':'rotate(180deg)';
 }
 function dismissBatteryTip() {
-  localStorage.setItem('mat_push_battery_tip_dismissed','1');
+  try { localStorage.setItem('mat_push_battery_tip_dismissed','1'); } catch(_) {}
   var tip=document.getElementById('push-battery-tip');
   if(tip) tip.style.display='none';
 }
