@@ -146,6 +146,16 @@ button.btn:active{transform:translateY(1px)}
       </div>
     </div>
 
+    <div class="field" style="background:var(--mist);border:1px solid var(--sage);border-radius:12px;padding:12px 14px">
+      <label for="f-sovereign" style="display:flex;align-items:center;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:800;font-size:.9rem;color:var(--forest);margin:0">
+        <input type="checkbox" id="f-sovereign" style="width:18px;height:18px;accent-color:var(--leaf);margin:0">
+        <span>🇫🇷 Mode « 100 % français » (souveraineté numérique)</span>
+      </label>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:6px;margin-left:28px">
+        Recommande OVH plutôt que Netlify/Vercel, Mistral plutôt que Claude, Bunny.net plutôt que Cloudinary. Donnée stockée en France / EU uniquement.
+      </div>
+    </div>
+
     <div class="field">
       <label for="f-budget">Budget mensuel souhaité</label>
       <div class="slider-row">
@@ -207,7 +217,7 @@ button.btn:active{transform:translateY(1px)}
     <div class="btn-row">
       <button class="btn btn-ghost" type="button" onclick="goTo(2)">← Modifier</button>
       <button class="btn btn-secondary" type="button" onclick="copyPrompt()">📋 Copier le prompt</button>
-      <a class="btn btn-primary" href="https://claude.ai" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Ouvrir Claude ↗</a>
+      <a class="btn btn-primary" id="llm-open-btn" href="https://claude.ai" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Ouvrir Claude ↗</a>
     </div>
 
     <div class="notice success" style="margin-top:14px">
@@ -218,6 +228,6 @@ button.btn:active{transform:translateY(1px)}
 
 </main>
 
-<script src="js/mat-partager.js?v=1.0.0"></script>
+<script src="js/mat-partager.js?v=1.1.0"></script>
 </body>
 </html>

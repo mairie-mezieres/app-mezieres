@@ -29,7 +29,10 @@ Remplacez les `[crochets]` par vos informations. Supprimez les lignes inutiles.
 - **Votre niveau en informatique** :
   - [ ] **Débutant** — je sais ouvrir un navigateur, télécharger un fichier, glisser-déposer. Je ne veux pas écrire de code.
   - [ ] **Intermédiaire** — j'utilise GitHub, je sais éditer un fichier HTML, je peux configurer un hébergement type Render ou Vercel.
-- **Budget mensuel total souhaité** : [ex. 0 € / 20 € / 80 €]
+- **Préférence souveraineté française (« 100 % FR »)** :
+  - [ ] **Oui** — hébergement OVH, IA Mistral, services européens uniquement. Budget légèrement supérieur en moyenne, mais données 100 % en France/EU.
+  - [ ] **Non** — solutions internationales acceptées (Netlify/Vercel/Render, Claude, Cloudinary). Datacenters EU recommandés pour le RGPD.
+- **Budget mensuel total souhaité** : [ex. 0 € / 30 € / 80 €]
 - **Hébergeur préféré** : [Netlify · Vercel · Render · OVH · GitHub Pages · autre]
 - **Nom de domaine déjà acheté ?** : [oui : monsite.fr / non]
 
@@ -41,30 +44,41 @@ Conservez les fonctionnalités souhaitées, supprimez ou commentez les autres. L
 
 > 🟢 Essentielle · 🟡 Recommandée · 🔵 Optionnelle
 
-| # | Fonctionnalité | Reco | Coût/mois | Conserver ? |
-|---|---|---|---|---|
-| 1 | **Actualités municipales** — fil de news, photos, dates | 🟢 | 0 € | [x] |
-| 2 | **Agenda événements** — calendrier des manifestations | 🟢 | 0 € | [x] |
-| 3 | **Trombinoscope des élus** — photos, fonctions, mandats | 🟢 | 0 € | [x] |
-| 4 | **Horaires & jours fériés** — ouverture mairie, fermetures | 🟢 | 0 € | [x] |
-| 5 | **Formulaire de contact** — message vers la mairie | 🟢 | 0 € | [x] |
-| 6 | **Signalements citoyens** — voirie, éclairage, dépôts sauvages | 🟡 | 0 € | [ ] |
-| 7 | **Météo locale** — via open-meteo.com (gratuit, sans clé) | 🟡 | 0 € | [ ] |
-| 8 | **Calendrier collecte des déchets** — avec rappels | 🟡 | 0 € | [ ] |
-| 9 | **Notifications push web** — alertes envoyées au téléphone | 🟡 | 0 € | [ ] |
-| 10 | **Application installable (PWA)** — fonctionne hors-ligne | 🟡 | 0 € | [ ] |
-| 11 | **Mode accessibilité** — contraste, gros texte, daltonisme | 🟡 | 0 € | [ ] |
-| 12 | **Annuaire des associations** — fiche par asso | 🔵 | 0 € | [ ] |
-| 13 | **Annuaire des entreprises / commerces** | 🔵 | 0 à 5 € | [ ] |
-| 14 | **Sondages citoyens** — enquêtes simples | 🔵 | 0 € | [ ] |
-| 15 | **Transports locaux** — horaires bus, prix carburants | 🔵 | 0 € | [ ] |
-| 16 | **Sentiers & randonnées** — fiches balades | 🔵 | 0 € | [ ] |
-| 17 | **Visualiseur PLU / cadastre** — données IGN, data.gouv | 🔵 | 0 € | [ ] |
-| 18 | **Chatbot IA « assistant »** — répond aux questions des administrés | 🔵 | 10 à 240 € | [ ] |
-| 19 | **Interface d'administration intégrée** — gérer le contenu sans code | 🔵 | 0 € | [ ] |
-| 20 | **Publication automatique Facebook** — relai des actus | 🔵 | 0 € | [ ] |
+Les coûts indiqués sont des **estimations médianes prudentes** (mairie de 1 000 à 5 000 habitants, trafic modéré). La colonne « Backend ? » signale les fonctionnalités qui nécessitent un serveur — une seule ligne « Hébergement backend » couvre l'ensemble, pas un serveur par fonctionnalité.
 
-**Coût total mensuel estimé** : [faites la somme des cases cochées]
+| # | Fonctionnalité | Reco | Coût moyen | Backend ? | Conserver ? |
+|---|---|---|---|---|---|
+| 1 | **Actualités municipales** — fil de news, photos, dates | 🟢 | 0 € | — | [x] |
+| 2 | **Agenda événements** — calendrier des manifestations | 🟢 | 0 € | — | [x] |
+| 3 | **Trombinoscope des élus** — photos, fonctions, mandats | 🟢 | 0 € | — | [x] |
+| 4 | **Horaires & jours fériés** | 🟢 | 0 € | — | [x] |
+| 5 | **Formulaire de contact** | 🟢 | 0 € | — | [x] |
+| 6 | **Signalements citoyens** — voirie, éclairage, dépôts | 🟡 | 0 € | — | [ ] |
+| 7 | **Météo locale** — open-meteo (gratuit, sans clé) | 🟡 | 0 € | — | [ ] |
+| 8 | **Calendrier collecte des déchets** | 🟡 | 0 € | — | [ ] |
+| 9 | **Notifications push web** (VAPID) | 🟡 | 0 € | oui | [ ] |
+| 10 | **Application installable (PWA)** — hors-ligne | 🟡 | 0 € | — | [ ] |
+| 11 | **Mode accessibilité** — contraste, gros texte, daltonisme | 🟡 | 0 € | — | [ ] |
+| 12 | **Annuaire des associations** | 🔵 | 0 € | — | [ ] |
+| 13 | **Annuaire entreprises / commerces** — logos Cloudinary ou Bunny.net (EU) | 🔵 | ~5 € | — | [ ] |
+| 14 | **Sondages citoyens** | 🔵 | 0 € | oui | [ ] |
+| 15 | **Transports locaux** — horaires bus, prix carburants | 🔵 | 0 € | — | [ ] |
+| 16 | **Sentiers & randonnées** | 🔵 | 0 € | — | [ ] |
+| 17 | **Visualiseur PLU / cadastre** — IGN, data.gouv | 🔵 | 0 € | — | [ ] |
+| 18 | **Chatbot IA « assistant »** — LLM seul, trafic modéré | 🔵 | ~20 € (10–240) | oui | [ ] |
+| 19 | **Interface d'administration intégrée** (côté client) | 🔵 | 0 € | — | [ ] |
+| 20 | **Publication automatique Facebook** | 🔵 | 0 € | oui | [ ] |
+| **100** | **Hébergement backend** — Render Starter ou OVH VPS d'entrée | 🟡 | ~7 € | — | [ ] (auto-coché si une ligne « oui » est cochée ci-dessus) |
+
+**Pourquoi une ligne backend séparée ?** Plusieurs fonctionnalités (push, sondages, chatbot, Facebook) nécessitent un serveur, mais **un seul serveur suffit** pour les héberger toutes ensemble. Cette ligne évite le double comptage.
+
+**Coût total mensuel estimé** : [faites la somme des cases cochées en ajoutant la ligne 100 si applicable]
+
+**Attention paliers gratuits → payants** :
+- Render Free : tombe en veille après 15 min d'inactivité (30 s de latence au réveil) → inadapté à un service public. Préférer Render Starter (~7 €/mois).
+- Netlify / Vercel free : 100 Go de bande passante/mois — suffit pour 95 % des mairies, mais surveillez les pics (élections, événements).
+- Cloudinary free : 25 Go — au-delà ~5 €/mois.
+- LLM (chatbot) : ~20 €/mois pour ~50 questions/jour, peut monter à 200 €+/mois en cas de viralisation.
 
 ---
 
