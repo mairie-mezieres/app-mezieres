@@ -1,5 +1,5 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.7.7
+   MAT — Actualités & Notifications Push v3.7.8
    ╔════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────────────────
@@ -322,6 +322,24 @@ function _showPushDiag() {
   if(b){b.textContent='Tester 🔔';b.disabled=false;}
   var tip=document.getElementById('push-battery-tip');
   try { if(tip && !localStorage.getItem('mat_push_battery_tip_dismissed')) tip.style.display=''; } catch(_) {}
+  // Vérification silencieuse que l'endpoint est bien dans Redis
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription();
+  }).then(function(sub){
+    if(!sub || !t) return;
+    fetch('https://chatbot-mairie-mezieres.onrender.com/push/status',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true
+    }).then(function(r){return r.json();}).then(function(d){
+      if(!t) return;
+      if(d.found){
+        t.textContent='✅ Synchronisé avec le serveur';
+      } else {
+        t.textContent='⚠️ Non synchronisé — cliquez Tester pour corriger';
+      }
+    }).catch(function(){});
+  }).catch(function(){});
+}
 }
 function _hidePushDiag() {
   var w=document.getElementById('push-diag-wrap');
