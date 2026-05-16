@@ -2,7 +2,7 @@
 
 Ce document permet à n'importe quelle commune ou administration de créer sa propre application ou son site municipal (et son chatbot facultatif) en partant d'une feuille blanche, à l'aide d'une intelligence artificielle conversationnelle. Il est inspiré de l'application « MAT — Mézières Avec Toi », partagée gratuitement par la commune de Mézières-lez-Cléry.
 
-> **Vous préférez une interface visuelle ?** Ouvrez la page `partager.html` du site : un questionnaire interactif génère automatiquement le prompt personnalisé à coller dans Claude.
+> **🎯 Canal recommandé : ouvrez d'abord `partager.html`** — un questionnaire visuel en 3 étapes génère votre prompt personnalisé, affiche le coût mensuel estimé (fourchette min–max) et alerte sur les paliers gratuits → payants. Ce document `.md` reste utile comme référence auditable et version manuelle pour les profils techniques.
 
 ---
 
@@ -48,6 +48,7 @@ Les coûts indiqués sont des **estimations médianes prudentes** (mairie de 1 0
 
 | # | Fonctionnalité | Reco | Coût moyen | Backend ? | Conserver ? |
 |---|---|---|---|---|---|
+| 0 | **Hébergement front** (Netlify, Vercel, GitHub Pages, OVH Perso, etc.) | 🟢 | 0–5 € | — | [x] |
 | 1 | **Actualités municipales** — fil de news, photos, dates | 🟢 | 0 € | — | [x] |
 | 2 | **Agenda événements** — calendrier des manifestations | 🟢 | 0 € | — | [x] |
 | 3 | **Trombinoscope des élus** — photos, fonctions, mandats | 🟢 | 0 € | — | [x] |
@@ -60,25 +61,32 @@ Les coûts indiqués sont des **estimations médianes prudentes** (mairie de 1 0
 | 10 | **Application installable (PWA)** — hors-ligne | 🟡 | 0 € | — | [ ] |
 | 11 | **Mode accessibilité** — contraste, gros texte, daltonisme | 🟡 | 0 € | — | [ ] |
 | 12 | **Annuaire des associations** | 🔵 | 0 € | — | [ ] |
-| 13 | **Annuaire entreprises / commerces** — logos Cloudinary ou Bunny.net (EU) | 🔵 | ~5 € | — | [ ] |
+| 13 | **Annuaire entreprises / commerces** — logos Cloudinary ou Bunny.net (EU) | 🔵 | 0–8 € | — | [ ] |
 | 14 | **Sondages citoyens** | 🔵 | 0 € | oui | [ ] |
 | 15 | **Transports locaux** — horaires bus, prix carburants | 🔵 | 0 € | — | [ ] |
 | 16 | **Sentiers & randonnées** | 🔵 | 0 € | — | [ ] |
 | 17 | **Visualiseur PLU / cadastre** — IGN, data.gouv | 🔵 | 0 € | — | [ ] |
-| 18 | **Chatbot IA « assistant »** — LLM seul, trafic modéré | 🔵 | ~20 € (10–240) | oui | [ ] |
+| 18 | **Chatbot IA « assistant »** — LLM seul, trafic modéré | 🔵 | ~5–200 € | oui | [ ] |
 | 19 | **Interface d'administration intégrée** (côté client) | 🔵 | 0 € | — | [ ] |
 | 20 | **Publication automatique Facebook** | 🔵 | 0 € | oui | [ ] |
+| **21** | **Assistance IA développeur** — Claude Code, Cursor ou ChatGPT Plus, pour créer **et maintenir** le site dans le temps | 🟡 | ~17–20 € | — | [x] |
 | **100** | **Hébergement backend** — Render Starter ou OVH VPS d'entrée | 🟡 | ~7 € | — | [ ] (auto-coché si une ligne « oui » est cochée ci-dessus) |
+| **101** | **Nom de domaine .fr** — ~8 €/an (~1 €/mois lissé) | 🟡 | ~1 € | — | [x] |
+
+> ⚠️ **La ligne 21 est cochée par défaut** : créer un site municipal demande quelques heures d'aller-retours avec une IA développeur, et la maintenance (changement d'élu, nouvelle fonctionnalité) tout autant. Décochez si vous avez déjà un abonnement Cursor ou ChatGPT Plus.
 
 **Pourquoi une ligne backend séparée ?** Plusieurs fonctionnalités (push, sondages, chatbot, Facebook) nécessitent un serveur, mais **un seul serveur suffit** pour les héberger toutes ensemble. Cette ligne évite le double comptage.
 
-**Coût total mensuel estimé** : [faites la somme des cases cochées en ajoutant la ligne 100 si applicable]
+**Coût total mensuel estimé** : faites la somme des cases cochées en ajoutant les lignes 0, 100 et 101 si applicables. Le simulateur `partager.html` calcule cette fourchette automatiquement.
 
 **Attention paliers gratuits → payants** :
-- Render Free : tombe en veille après 15 min d'inactivité (30 s de latence au réveil) → inadapté à un service public. Préférer Render Starter (~7 €/mois).
-- Netlify / Vercel free : 100 Go de bande passante/mois — suffit pour 95 % des mairies, mais surveillez les pics (élections, événements).
+- Render Free : tombe en veille après 15 min d'inactivité (cold-start 30–60 s) → inadapté à un service public. Préférer Render Starter (~7 €/mois). ⚠️ **Migration auto des plans légacy vers les nouveaux plans le 1er août 2026.**
+- Netlify / Vercel free : 100 Go de bande passante/mois — suffit pour 95 % des mairies, mais surveillez les pics (élections, événements viraux).
 - Cloudinary free : 25 Go — au-delà ~5 €/mois.
-- LLM (chatbot) : ~20 €/mois pour ~50 questions/jour, peut monter à 200 €+/mois en cas de viralisation.
+- Upstash Redis free : 10 000 commandes/jour — au-delà ~10 €/mois.
+- LLM (chatbot) : ~5 €/mois pour ~50 questions/jour, peut monter à 200 €+/mois en cas de viralisation. Un rate limiting est indispensable.
+
+> 💡 **Conseil** : aucun hébergeur n'est réellement « gratuit » dès qu'on a besoin d'un service citoyen sérieux. Un site municipal qui fonctionne bien coûte typiquement **20 à 45 €/mois tout compris** (hébergement + domaine + assistance IA pour la maintenance). Mieux vaut le savoir d'entrée que le découvrir après.
 
 ---
 
@@ -236,15 +244,40 @@ Page `admin.html` protégée par mot de passe simple (côté client suffisant po
 ### 20. Publication automatique Facebook
 Webhook entre le backend du chatbot et l'API Graph de Meta. Nécessite une page Facebook officielle et un token d'accès longue durée. **À déconseiller** au profil débutant.
 
-## 9. Format de sortie attendu
+## 9. Format de sortie attendu — en deux temps
 
-Renvoie ta réponse en trois parties :
+### TEMPS 1 — Construire la structure complète du site
+
+Renvoie immédiatement dans ta première réponse :
 
 1. **Résumé de ce que tu as construit** (5 lignes max).
 2. **Le code complet**, organisé par fichier, chaque fichier dans son propre bloc ` ``` ` avec le nom du fichier en commentaire d'en-tête.
 3. **Instructions de déploiement** numérotées, adaptées au niveau et à l'hébergeur choisi.
 
-À la fin, propose **2 ou 3 améliorations possibles** que l'utilisateur pourrait demander dans un second tour.
+**Gabarits JSON à produire systématiquement** (un fichier par jeu de données coché en section 3) : `actus.json`, `agenda.json`, `elus.json`, `mairie.json` (horaires), `dechets.json`, `associations.json`, `entreprises.json`, `transports.json`, `circuits.json`. Chaque fichier contient **2 ou 3 exemples fictifs réalistes** (« Prénom NOM », `[À COMPLÉTER]`) avec un commentaire d'en-tête expliquant en français comment le modifier.
+
+Si la réponse complète ne tient pas en un seul message, **annonce-le clairement** et propose : « Dis `continue` pour le fichier suivant. »
+
+### TEMPS 2 — Recueillir les données réelles de la commune (dialogue guidé)
+
+Termine ta première réponse par cette phrase exacte :
+
+> « Votre site est prêt ! Pour personnaliser le contenu, je vais maintenant vous poser quelques questions une par une. Vous pouvez aussi remplir vous-même les fichiers JSON à votre rythme. Répondez `commencer` pour démarrer, ou `plus tard` si vous préférez le faire seul. »
+
+Si l'utilisateur répond `commencer`, pose **une seule question par message**, dans l'ordre suivant (et uniquement pour les contenus cochés) :
+
+1. **Coordonnées de la mairie** (adresse, téléphone, email officiel).
+2. **Horaires d'ouverture** (jour par jour).
+3. **Le maire** (prénom, nom, fonction, mandats, brève bio).
+4. **Les adjoints et conseillers**, un par un.
+5. **Les associations** (nom, type, contact public uniquement).
+6. **Les entreprises locales** (nom, activité, téléphone, horaires).
+7. **Le calendrier des déchets** (bacs, semaines paires/impaires).
+8. **Coordonnées GPS de la mairie** (si météo ou cartes cochées).
+
+Après chaque réponse, **régénère uniquement le JSON concerné** (pas tout le site), en montrant un bloc ` ``` ` prêt à être copié.
+
+À la fin de la conversation, propose **2 ou 3 améliorations possibles** que l'utilisateur pourrait demander dans une nouvelle conversation.
 
 ## 10. Garde-fous
 
@@ -252,6 +285,8 @@ Renvoie ta réponse en trois parties :
 - Si une fonctionnalité nécessite une clé API ou un compte tiers, **liste-les explicitement** avant le code, avec les liens d'inscription.
 - Ne jamais inventer de coordonnées : si une information manque dans la section « Contenu de votre commune », laisse un `[À COMPLÉTER]` visible plutôt qu'un faux contenu.
 - Si tu détectes une demande contraire à l'éthique d'une publication municipale (contenu politique partisan, données nominatives sensibles, etc.), refuse poliment et explique pourquoi.
+- **Données nominatives** : lors du TEMPS 2, si l'utilisateur cite un élu, un président d'association ou un tiers, ne demande jamais de numéro de téléphone personnel ni d'email personnel. Renvoie toujours vers la mairie comme point de contact unique. Rappelle, **une seule fois** et avec bienveillance, que toute personne citée nommément doit avoir donné son accord préalable.
+- **Photos d'élus** : ne génère jamais d'URL de photo réelle. Utilise un placeholder neutre (initiales sur fond coloré, ou icône générique) que le maire remplacera par une photo officielle pour laquelle il a recueilli l'accord.
 
 --- FIN DU PROMPT ---
 
@@ -260,11 +295,14 @@ Renvoie ta réponse en trois parties :
 ## 11. FAQ & dépannage
 
 **Q : Combien ça coûte au total ?**
-- Site simple, profil débutant : **0 €/mois** (Netlify gratuit + nom de domaine ~10 €/an).
-- Site complet avec chatbot : entre **20 € et 250 €/mois** selon le trafic.
+Il n'existe pas de site municipal sérieux à 0 €/mois. Une estimation honnête :
+- Site simple, profil débutant, Netlify : **18–21 €/mois** (dont ~17–20 € pour l'assistance IA développeur, indispensable pour créer et maintenir).
+- Site simple en mode souverain (OVH français) : **22–26 €/mois**.
+- Site complet (avec signalement, météo, déchets, push, chatbot) : **23–230 €/mois** selon le trafic du chatbot.
+- Le simulateur `partager.html` affiche cette fourchette en temps réel selon vos choix.
 
 **Q : Faut-il un développeur ?**
-Non pour le profil débutant. Recommandé pour le chatbot et les fonctionnalités avancées.
+Non pour le profil débutant, **mais une assistance IA développeur (Claude Code, Cursor, ou ChatGPT Plus à ~17–20 €/mois) reste nécessaire**, autant pour créer le site que pour le maintenir (changement d'élu, ajout d'une fonctionnalité, mise à jour d'une API). C'est la ligne 21 du catalogue.
 
 **Q : Mes données restent-elles en France / en Europe ?**
 La plupart des services recommandés sont européens : Netlify/Vercel proposent des datacenters EU, open-meteo (Allemagne), data.gouv (FR), Upstash (région EU sélectionnable). Pour l'IA générative, Anthropic (Claude) offre une option de résidence des données européenne via son offre Enterprise ; Mistral est nativement français si la souveraineté est un critère bloquant.
