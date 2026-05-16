@@ -183,16 +183,34 @@ button.btn:active{transform:translateY(1px)}
 
   <!-- ÉTAPE 2 -->
   <section class="card hidden" id="step-2">
-    <h2>2. Vos fonctionnalités</h2>
-    <div class="sub">Cochez ce que vous voulez intégrer. Les essentielles sont pré-cochées. Le coût mensuel se met à jour en temps réel.</div>
+    <h2>2. Vos fonctionnalit&eacute;s</h2>
+    <div class="sub">Cochez ce que vous voulez int&eacute;grer. Les essentielles sont pr&eacute;-coch&eacute;es. Le co&ucirc;t mensuel s&rsquo;affiche en fourchette min&ndash;max selon le trafic, avec d&eacute;tail et alertes sur les paliers gratuits.</div>
 
     <div class="feat-list" id="feat-list"></div>
 
-    <div class="cost-bar" role="status" aria-live="polite">
-      <div>
-        <div class="lbl">Coût mensuel estimé</div>
+    <div class="cost-bar" role="status" aria-live="polite" style="flex-direction:column;align-items:stretch;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div>
+          <div class="lbl">Co&ucirc;t mensuel estim&eacute;</div>
+          <div style="font-size:.7rem;color:rgba(216,243,220,.65);margin-top:2px">selon trafic et choix d&rsquo;h&eacute;bergement</div>
+        </div>
+        <div class="val" id="cost-display">0 &euro;/mois</div>
       </div>
-      <div class="val" id="cost-display">0 €</div>
+      <div id="cost-breakdown" style="border-top:1px solid rgba(255,255,255,.12);padding-top:8px"></div>
+      <details style="margin-top:4px">
+        <summary style="cursor:pointer;font-size:.78rem;color:rgba(216,243,220,.85);font-weight:700;list-style:none;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;transition:transform .15s">&#9656;</span>
+          &#9888;&#65039; Paliers gratuits &rarr; payants &agrave; surveiller
+        </summary>
+        <div style="font-size:.72rem;color:rgba(216,243,220,.82);padding:10px 4px 2px;line-height:1.55">
+          <div style="margin-bottom:6px"><strong>&bull; Render Free</strong> : sleep 15 min, cold-start 30&ndash;60 s. <strong>Migration auto vers les nouveaux plans le 1<sup>er</sup> ao&ucirc;t 2026</strong>. Pour un service citoyen s&eacute;rieux, pr&eacute;voir Starter (~7 &euro;/mois).</div>
+          <div style="margin-bottom:6px"><strong>&bull; Upstash Redis</strong> : 10 000 commandes/jour gratuites. Au-del&agrave; : ~10 &euro;/mois.</div>
+          <div style="margin-bottom:6px"><strong>&bull; Cloudinary</strong> : 25 Go gratuits. Au-del&agrave; : ~5 &euro;/mois.</div>
+          <div style="margin-bottom:6px"><strong>&bull; Netlify / Vercel</strong> : 100 Go BP/mois. Suffit pour 95 % des mairies, surveillez les pics (&eacute;lections, &eacute;v&eacute;nements viraux).</div>
+          <div style="margin-bottom:6px"><strong>&bull; Chatbot IA</strong> : ~5 &euro;/mois pour ~50 questions/jour, peut monter &agrave; 200 &euro;+/mois en cas de viralisation. Rate limiting fortement recommand&eacute;.</div>
+          <div style="margin-bottom:0"><strong>&bull; Nom de domaine .fr</strong> : ~8 &euro;/an, renouvellement annuel. Inclus la 1<sup>re</sup> ann&eacute;e chez OVH.</div>
+        </div>
+      </details>
     </div>
 
     <div class="btn-row">
@@ -228,6 +246,6 @@ button.btn:active{transform:translateY(1px)}
 
 </main>
 
-<script src="js/mat-partager.js?v=1.3.0"></script>
+<script src="js/mat-partager.js?v=1.4.0"></script>
 </body>
 </html>
