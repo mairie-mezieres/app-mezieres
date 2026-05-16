@@ -1,7 +1,7 @@
 // SERVICE WORKER v4.4.1 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
 // Phase 11 : Tracking ouvertures encarts/overlays
-const CACHE = 'mat-v4.4.1';
+const CACHE = 'mat-v4.4.2';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -29,6 +29,9 @@ const PRECACHE_URLS = [
   './js/mat-entreprises.js?v=1.2.0',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
+  './partager.html',
+  './js/mat-partager.js?v=1.0.0',
+  './REPLICATION.md',
   './mat-header.png',
   './icon-192.png'
 ];
