@@ -340,7 +340,6 @@ function _showPushDiag() {
     }).catch(function(){});
   }).catch(function(){});
 }
-}
 function _hidePushDiag() {
   var w=document.getElementById('push-diag-wrap');
   if(w) w.style.display='none';
