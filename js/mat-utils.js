@@ -33,6 +33,20 @@ function matAbortTimeout(ms) {
   return c.signal;
 }
 
+// ── fetch() avec timeout intégré ─────────────────────────────
+// Helper unifié : si opts.signal n'est pas fourni, on attache un
+// matAbortTimeout(timeoutMs) (défaut 8 s). N'ajoute PAS de gestion
+// d'erreur — le caller reste responsable de son try/catch et de la
+// lecture du body. Préserve l'API native de fetch() sinon (Response,
+// rejets, etc.).
+function matFetch(url, opts, timeoutMs) {
+  opts = opts || {};
+  if (!opts.signal) {
+    opts.signal = matAbortTimeout(timeoutMs || 8000);
+  }
+  return fetch(url, opts);
+}
+
 // ── Échappement HTML (sécurité caractères spéciaux) ─────────
 function esc(str) {
   if (!str) return '';
