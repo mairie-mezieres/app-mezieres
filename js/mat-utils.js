@@ -479,9 +479,21 @@ function matLogError(module, message, extra) {
     extra: extra ? String(extra).slice(0, 100) : undefined
   };
   _matLogQueue.push(entry);
+  // Plafond doux : évite la croissance illimitée si le backend logs est
+  // injoignable et que les erreurs s'accumulent. On garde les 100 plus
+  // récentes en jetant la plus ancienne (FIFO).
+  while (_matLogQueue.length > 100) _matLogQueue.shift();
 
   if (_matLogFlushTimer) clearTimeout(_matLogFlushTimer);
   _matLogFlushTimer = setTimeout(_matFlushLogs, 3000);
+}
+
+// Flush des logs en attente quand l'utilisateur quitte la page — sendBeacon
+// reste valable même après pagehide. Évite la perte des derniers messages
+// (la plupart du temps, ceux qui décrivent justement le contexte du départ).
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', _matFlushLogs);
+  window.addEventListener('beforeunload', _matFlushLogs);
 }
 
 function _matFlushLogs() {

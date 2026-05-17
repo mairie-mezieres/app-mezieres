@@ -1,7 +1,7 @@
 /* ╔════════════════════════════════════════════════════════════
    MAT — Prompt notifications post-installation v3.8.0
    Propose d'activer les alertes juste après l'installation PWA.
-   Chargé dynamiquement par mat-init.js.
+   Chargé dynamiquement par mat-boot.js.
    ╔════════════════════════════════════════════════════════════ */
 
 // Stocke la clé VAPID publique dans le Cache API pour que le service worker
