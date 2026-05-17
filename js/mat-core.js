@@ -549,7 +549,8 @@ function handleMatHashRoute(){
 }
 
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  // SW déjà enregistré inline en <head> (cf. index.html) pour qu'il soit
+  // disponible dès les premiers fetches du chargement initial.
   navigator.serviceWorker.addEventListener('message', function(e){
     var data=(e&&e.data)||{};
     if(data.action==='openNotifs'){ openNotifs(); return; }
