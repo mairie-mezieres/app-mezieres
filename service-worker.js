@@ -1,16 +1,30 @@
-// SERVICE WORKER v4.5.0 — MAT Mézières Avec Toi
-// Network First — mises à jour automatiques garanties
+// SERVICE WORKER v4.5.2 — MAT Mézières Avec Toi
+// Network First
 // Phase 16 : Fix P2 — updateNotifCardStatus après désactivation actus
-const CACHE = 'mat-v4.5.0';
+// J4.a : install échoue si un fichier critique manque (l'ancienne version
+//         reste alors active, plutôt que d'installer un cache cassé).
+// J4.b : skipWaiting() déclenché uniquement sur postMessage('SKIP_WAITING')
+//         côté PWA après confirmation utilisateur (cf. mat-core.js).
+const CACHE = 'mat-v4.5.2';
+
+// Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
+// doit faire échouer l'install entière. Tout le reste est best-effort.
+const CRITICAL_PRECACHE = [
+  './index.html',
+  './offline.html',
+  './css/mat.css?v=4.3.2',
+  './js/mat-utils.js?v=4.2.7',
+  './js/mat-core.js?v=4.2.7'
+];
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.3.1',
+  './css/mat.css?v=4.3.2',
   './css/mat-desktop.css?v=4.2.4',
   './js/mat-utils.js?v=4.2.7',
-  './js/mat-core.js?v=4.2.5',
+  './js/mat-core.js?v=4.2.7',
   './js/mat-accessibility.js?v=4.3.6',
   './js/mat-widgets.js?v=4.3.8',
   './js/mat-agenda.js?v=4.2.4',
@@ -34,16 +48,26 @@ const PRECACHE_URLS = [
 ];
 
 self.addEventListener('install', e => {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then(c =>
-      Promise.all(PRECACHE_URLS.map(url =>
-        c.add(url).catch(err => {
-          console.warn('[SW] precache skip:', url, err.message);
-        })
-      ))
-    )
-  );
+  // J4.b — skipWaiting() retiré : la nouvelle version reste en 'waiting'
+  // tant que la PWA n'a pas envoyé postMessage('SKIP_WAITING') après
+  // confirmation utilisateur. Cf. listener 'message' plus bas.
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    const results = await Promise.allSettled(PRECACHE_URLS.map(url => c.add(url)));
+    const failed = [];
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        const url = PRECACHE_URLS[i];
+        console.warn('[SW] precache skip:', url, r.reason && r.reason.message);
+        if (CRITICAL_PRECACHE.includes(url)) failed.push(url);
+      }
+    });
+    if (failed.length) {
+      // L'install échoue → l'ancienne version reste active, l'utilisateur
+      // garde une app fonctionnelle (vs. un cache nouveau mais cassé).
+      throw new Error('[SW] precache critique échoué: ' + failed.join(', '));
+    }
+  })());
 });
 
 self.addEventListener('activate', e => {
@@ -81,7 +105,10 @@ self.addEventListener('fetch', e => {
       .then(res => {
         if (res && res.ok && res.status !== 206 && e.request.method === 'GET') {
           const resClone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, resClone));
+          caches.open(CACHE).then(c => {
+            c.put(e.request, resClone);
+            trimCacheSoft(c);
+          });
         }
         return res;
       })
@@ -94,6 +121,33 @@ self.addEventListener('fetch', e => {
       )
   );
 });
+
+// LRU douce sur le cache runtime : si on dépasse MAX_CACHE_ENTRIES, on
+// supprime les entrées les plus anciennes (FIFO via cache.keys()) jusqu'à
+// retomber sous le seuil. Pas d'await dans le caller : la purge est
+// best-effort et silencieuse. Évite la croissance illimitée du cache
+// (qui peut faire éjecter brutalement tout le storage par le navigateur
+// sous pression mémoire).
+// Les URLs de PRECACHE_URLS (app shell + offline.html) sont protégées
+// de l'éviction — sinon la navigation offline finirait par échouer une
+// fois la file FIFO ayant rattrapé les entrées précachées à l'install.
+const MAX_CACHE_ENTRIES = 250;
+const _PRECACHE_SET = new Set(PRECACHE_URLS.map(u => new URL(u, self.location.href).href));
+let _trimming = false;
+async function trimCacheSoft(c) {
+  if (_trimming) return;
+  _trimming = true;
+  try {
+    const keys = await c.keys();
+    if (keys.length > MAX_CACHE_ENTRIES) {
+      const evictable = keys.filter(req => !_PRECACHE_SET.has(req.url));
+      const excess = keys.length - MAX_CACHE_ENTRIES;
+      const toDelete = Math.min(excess, evictable.length);
+      for (let i = 0; i < toDelete; i++) await c.delete(evictable[i]);
+    }
+  } catch (_) {}
+  _trimming = false;
+}
 
 function normalizeInAppPath(input, fallback) {
   const raw = String(input || '').trim();
@@ -219,6 +273,13 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('message', e => {
   if (!e.data) return;
+
+  // J4.b — La PWA déclenche le passage à la nouvelle version après que
+  // l'utilisateur a confirmé via le prompt 'Mise à jour disponible'.
+  if (e.data === 'SKIP_WAITING' || (typeof e.data === 'object' && e.data.action === 'SKIP_WAITING')) {
+    self.skipWaiting();
+    return;
+  }
 
   if (e.data === 'clearBadge' || (typeof e.data === 'object' && e.data.action === 'clearBadge')) {
     e.waitUntil((async () => {

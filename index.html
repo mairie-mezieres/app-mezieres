@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -12,6 +11,16 @@
 <title>Mézières Avec Toi</title>
 <!-- VERSION 4.2.3 -->
 <link rel="manifest" href="manifest.webmanifest">
+<!-- Enregistrement Service Worker au plus tôt (avant les modules defer)
+     pour qu'il soit disponible dès les premiers fetches du chargement initial.
+     Pas d'attente sur 'load' : register() est non-bloquant et on veut que
+     la vérification d'update se déclenche même si le visiteur ferme la
+     page avant la fin du chargement. -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js').catch(function () {});
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
 <script>
 (function(){
@@ -32,7 +41,7 @@
 })();
 </script>
 
-<link rel="stylesheet" href="css/mat.css?v=4.3.1">
+<link rel="stylesheet" href="css/mat.css?v=4.3.2">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.4">
 
 <!-- ════════════════════════════════════════════════════════════
@@ -40,7 +49,7 @@
      L'ordre est CRITIQUE : utils → core → reste → init en dernier
      ════════════════════════════════════════════════════════════ -->
 <script defer src="js/mat-utils.js?v=4.2.7"></script>
-<script defer src="js/mat-core.js?v=4.2.5"></script>
+<script defer src="js/mat-core.js?v=4.2.7"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.6"></script>
 <script defer src="js/mat-widgets.js?v=4.3.8"></script>
 <script defer src="js/mat-agenda.js?v=4.2.4"></script>
@@ -602,7 +611,7 @@
       <button class="panel-close" onclick="closeOv('majordome')">✕</button>
     </div>
     <div class="majordome-body">
-      <img src="MAT et MEL.png" alt="MAT et MEL" class="majordome-img" onerror="this.onerror=null;this.src='mat-header.png'">
+      <img src="MAT et MEL.png" alt="MAT et MEL" class="majordome-img" loading="lazy" onerror="this.onerror=null;this.src='mat-header.png'">
       <div class="majordome-name">Bonjour, je suis MAT !</div>
       <div class="majordome-tagline">Votre majordome numérique communal</div>
       <div class="majordome-text">

@@ -549,7 +549,8 @@ function handleMatHashRoute(){
 }
 
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  // SW déjà enregistré inline en <head> (cf. index.html) pour qu'il soit
+  // disponible dès les premiers fetches du chargement initial.
   navigator.serviceWorker.addEventListener('message', function(e){
     var data=(e&&e.data)||{};
     if(data.action==='openNotifs'){ openNotifs(); return; }
@@ -568,6 +569,60 @@ if('serviceWorker' in navigator){
       }catch(_e){}
     }
   });
+
+  // J4.b — Détection des mises à jour SW et prompt utilisateur.
+  // Le SW retire skipWaiting() automatique : la nouvelle version reste
+  // en 'waiting' jusqu'à ce que la PWA envoie postMessage('SKIP_WAITING')
+  // suite à un accord explicite de l'utilisateur. controllerchange
+  // recharge ensuite la page pour que le nouveau code soit utilisé.
+  (function setupSwUpdatePrompt(){
+    var _updateOffered = false;
+    var _refreshing = false;
+
+    function offerUpdate(waiting){
+      if(_updateOffered || !waiting) return;
+      _updateOffered = true;
+      var p;
+      if(typeof confirmMAT === 'function'){
+        p = confirmMAT(
+          'Une nouvelle version de MAT est disponible. Recharger pour mettre à jour ?',
+          '🔄 Mise à jour', '🆕', 'Recharger', 'Plus tard'
+        );
+      } else {
+        try { p = Promise.resolve(window.confirm('Nouvelle version MAT disponible. Recharger ?')); }
+        catch(_){ p = Promise.resolve(false); }
+      }
+      p.then(function(accepted){
+        if(accepted){
+          try { waiting.postMessage('SKIP_WAITING'); }
+          catch(_){ try { waiting.postMessage({ action:'SKIP_WAITING' }); } catch(__){} }
+        } else {
+          // L'utilisateur reprendra la main au prochain chargement.
+          _updateOffered = false;
+        }
+      });
+    }
+
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(_refreshing) return;
+      _refreshing = true;
+      try { window.location.reload(); } catch(_){}
+    });
+
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(!reg) return;
+      if(reg.waiting && navigator.serviceWorker.controller) offerUpdate(reg.waiting);
+      reg.addEventListener('updatefound', function(){
+        var installing = reg.installing;
+        if(!installing) return;
+        installing.addEventListener('statechange', function(){
+          if(installing.state === 'installed' && navigator.serviceWorker.controller) {
+            offerUpdate(reg.waiting || installing);
+          }
+        });
+      });
+    }).catch(function(){});
+  })();
 }
 handleMatHashRoute();
 window.addEventListener('hashchange', handleMatHashRoute);
