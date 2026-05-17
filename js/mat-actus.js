@@ -1,5 +1,5 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.8.1
+   MAT — Actualités & Notifications Push v3.8.2
    ╔════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────────────────
@@ -283,9 +283,11 @@ function updateNotifCardStatus(enabled){
     el.classList.add('notif-status-loading');
     return;
   }
-  el.textContent=enabled ? 'ACTIVÉ' : 'DÉSACTIVÉ';
+  // La carte représente les Actualités : activé seulement si push actif ET actus non désactivées
+  const actusOn=enabled && localStorage.getItem(ACTUS_NOTIF_KEY)!=='0';
+  el.textContent=actusOn ? 'ACTIVÉ' : 'DÉSACTIVÉ';
   el.classList.remove('notif-status-on','notif-status-off','notif-status-loading');
-  el.classList.add(enabled ? 'notif-status-on' : 'notif-status-off');
+  el.classList.add(actusOn ? 'notif-status-on' : 'notif-status-off');
 }
 
 function _getIOSVersion(){const ua=navigator.userAgent;if(!/iPhone|iPad|iPod/.test(ua))return null;const m=ua.match(/OS (\d+)[_\d]*/);return m?parseInt(m[1],10):null;}
