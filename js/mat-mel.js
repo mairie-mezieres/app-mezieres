@@ -624,11 +624,17 @@ async function loadMelData() {
   const V = '3.7.4';
 
   try {
-    const [pluRes, treeRes, serverTreeRes] = await Promise.all([
-      fetch('./data/plu-data.json?v=' + V, { cache: 'no-cache' }),
-      fetch('./data/mel-tree.json?v=' + V, { cache: 'no-cache' }),
-      fetch(MEL_BACKEND + '/mel/tree', { cache: 'no-cache' }).catch(() => null)
+    // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,
+    // contrairement à Promise.all() où le 1er reject coupait toute la chaîne
+    // (le .catch sur le 3e fetch n'était qu'un cataplasme partiel).
+    const settled = await Promise.allSettled([
+      matFetch('./data/plu-data.json?v=' + V, { cache: 'no-cache' }, 6000),
+      matFetch('./data/mel-tree.json?v=' + V, { cache: 'no-cache' }, 6000),
+      matFetch(MEL_BACKEND + '/mel/tree',     { cache: 'no-cache' }, 6000)
     ]);
+    const pluRes        = settled[0].status === 'fulfilled' ? settled[0].value : null;
+    const treeRes       = settled[1].status === 'fulfilled' ? settled[1].value : null;
+    const serverTreeRes = settled[2].status === 'fulfilled' ? settled[2].value : null;
 
     if (pluRes && pluRes.ok) {
       const plu = await pluRes.json();
