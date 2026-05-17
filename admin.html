@@ -2331,7 +2331,27 @@ Android : menu navigateur → "Ajouter à l\'écran d\'accueil"');else alert('Po
 \
 Chrome / Edge : cliquez sur l\'icône ⊕ dans la barre d\'adresse');}
 }
-if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw-admin.js').catch(()=>{});}
+// SW : on enregistre service-worker.js (le SW unique de la PWA). L'ancien
+// sw-admin.js volait le scope racine via skipWaiting()+clients.claim() et,
+// n'ayant aucun handler push, faisait disparaître silencieusement les
+// notifications (rappels collecte, alertes météo). On nettoie aussi toute
+// registration existante de sw-admin.js sur les appareils déjà infectés.
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadAdminSW = false;
+    regs.forEach(function(reg){
+      var s = (reg.active && reg.active.scriptURL) || (reg.waiting && reg.waiting.scriptURL) || (reg.installing && reg.installing.scriptURL) || '';
+      if (s.indexOf('/sw-admin.js') !== -1) { hadAdminSW = true; reg.unregister().catch(function(){}); }
+    });
+    // Si on vient de purger sw-admin, on recharge pour repartir sans SW
+    // fantôme dans la page courante (sinon service-worker.js reste en
+    // 'waiting' tant que cet onglet est ouvert).
+    if (hadAdminSW) { setTimeout(function(){ location.reload(); }, 300); return; }
+    navigator.serviceWorker.register('./service-worker.js').catch(function(){});
+  }).catch(function(){
+    navigator.serviceWorker.register('./service-worker.js').catch(function(){});
+  });
+}
 
 // ── Documents temporaires admin ───────────────────────────
 async function loadDocsAdmin() {
