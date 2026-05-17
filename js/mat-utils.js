@@ -47,6 +47,22 @@ function matFetch(url, opts, timeoutMs) {
   return fetch(url, opts);
 }
 
+// ── Validation URL pour href ─────────────────────────────────
+// esc() échappe HTML mais PAS javascript:/data: URLs. safeHref valide
+// que le protocole est http(s) avant d'autoriser l'injection dans un
+// attribut href. Évite l'XSS si le backend retourne une URL malveillante
+// (lien doc admin compromis, événement iCal externe altéré, etc.).
+// Retourne '#' en cas d'URL invalide pour ne pas casser le HTML.
+function safeHref(url) {
+  if (!url) return '#';
+  try {
+    var u = new URL(String(url), location.href);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? esc(u.href) : '#';
+  } catch (_) {
+    return '#';
+  }
+}
+
 // ── localStorage safe-wrap ───────────────────────────────────
 // Garde-fous contre : mode privé Safari (setItem throw), quota
 // dépassé (QuotaExceededError), JSON corrompu (SyntaxError sur

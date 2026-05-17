@@ -837,7 +837,7 @@ function _renderEventsLocaux(el, events) {
   var html = '<div style="display:flex;flex-direction:column;gap:10px">';
   events.forEach(function(ev) {
     var tag   = ev.url ? 'a' : 'div';
-    var attrs = ev.url ? ' href="' + esc(ev.url) + '" target="_blank" rel="noopener"' : '';
+    var attrs = ev.url ? ' href="' + safeHref(ev.url) + '" target="_blank" rel="noopener noreferrer"' : '';
     var cardStyle = 'display:block;background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04);text-decoration:none;color:inherit'
       + (ev.url ? ';cursor:pointer' : '');
     html += '<' + tag + attrs + ' style="' + cardStyle + '">'
@@ -853,7 +853,7 @@ function _renderEventsLocaux(el, events) {
   if (preview) {
     preview.innerHTML = events.slice(0, 3).map(function(ev) {
       var tag   = ev.url ? 'a' : 'div';
-      var attrs = ev.url ? ' href="' + esc(ev.url) + '" target="_blank" rel="noopener"' : '';
+      var attrs = ev.url ? ' href="' + safeHref(ev.url) + '" target="_blank" rel="noopener noreferrer"' : '';
       return '<' + tag + attrs + ' class="d-event-card"' + (ev.url ? ' style="cursor:pointer;text-decoration:none;color:inherit"' : '') + '>'
         + '<div class="d-event-card-date">' + esc(ev.date || '') + '</div>'
         + '<div class="d-event-card-title">' + esc(ev.title) + '</div>'
