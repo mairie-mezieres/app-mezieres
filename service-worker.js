@@ -1,11 +1,12 @@
-// SERVICE WORKER v4.5.2 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.5.3 — MAT Mézières Avec Toi
 // Network First
-// Phase 16 : Fix P2 — updateNotifCardStatus après désactivation actus
 // J4.a : install échoue si un fichier critique manque (l'ancienne version
 //         reste alors active, plutôt que d'installer un cache cassé).
 // J4.b : skipWaiting() déclenché uniquement sur postMessage('SKIP_WAITING')
 //         côté PWA après confirmation utilisateur (cf. mat-core.js).
-const CACHE = 'mat-v4.5.2';
+// J5.d : retrait de la ligne url.includes('panneaupocket') morte
+//         (aucun lien PanneauPocket dans la PWA).
+const CACHE = 'mat-v4.5.3';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -13,7 +14,7 @@ const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
   './css/mat.css?v=4.3.2',
-  './js/mat-utils.js?v=4.2.7',
+  './js/mat-utils.js?v=4.2.8',
   './js/mat-core.js?v=4.2.7'
 ];
 
@@ -23,7 +24,7 @@ const PRECACHE_URLS = [
   './offline.html',
   './css/mat.css?v=4.3.2',
   './css/mat-desktop.css?v=4.2.4',
-  './js/mat-utils.js?v=4.2.7',
+  './js/mat-utils.js?v=4.2.8',
   './js/mat-core.js?v=4.2.7',
   './js/mat-accessibility.js?v=4.3.6',
   './js/mat-widgets.js?v=4.3.8',
@@ -33,8 +34,8 @@ const PRECACHE_URLS = [
   './js/mat-trombi.js?v=4.2.5',
   './js/mat-mel.js?v=4.3.2',
   './js/mat-boot.js?v=4.2.5',
-  './js/mat-pwa-notif.js?v=4.2.3',
-  './js/mat-dechets-notif.js?v=4.2.4',
+  './js/mat-pwa-notif.js?v=4.2.4',
+  './js/mat-dechets-notif.js?v=4.2.5',
   './js/mat-jours-feries.js?v=4.2.3',
   './js/mat-sondages.js?v=4.2.3',
   './js/mat-associations.js?v=4.2.3',
@@ -89,7 +90,6 @@ self.addEventListener('fetch', e => {
     url.includes('google.com') ||
     url.includes('open-meteo.com') ||
     url.includes('facebook.com') ||
-    url.includes('panneaupocket') ||
     url.includes('api-adresse.data.gouv.fr') ||
     url.includes('apicarto.ign.fr') ||
     url.includes('data.geopf.fr') ||

@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Déchets v3.7.9
    Guide tri sélectif + rappels collecte push (18h la veille).
-   Chargé dynamiquement par mat-init.js.
+   Chargé dynamiquement par mat-boot.js.
    ════════════════════════════════════════════════════════════ */
 
 var DECHETS_NOTIF_KEY = 'mat_dechets_notif_v1';

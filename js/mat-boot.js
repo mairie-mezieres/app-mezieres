@@ -81,13 +81,13 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=4.2.3';
+  s.src = 'js/mat-pwa-notif.js?v=4.2.4';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-dechets-notif.js?v=4.2.4';
+  s.src = 'js/mat-dechets-notif.js?v=4.2.5';
   document.head.appendChild(s);
 })();
 
