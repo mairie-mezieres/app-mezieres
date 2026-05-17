@@ -1,7 +1,7 @@
-// SERVICE WORKER v4.4.9 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.5.0 — MAT Mézières Avec Toi
 // Network First — mises à jour automatiques garanties
-// Phase 15 : Carte Actualités — état ACTIVÉ dépend des actus, pas du push global
-const CACHE = 'mat-v4.4.9';
+// Phase 16 : Fix P2 — updateNotifCardStatus après désactivation actus
+const CACHE = 'mat-v4.5.0';
 
 // Fichiers critiques précachés à l'installation
 const PRECACHE_URLS = [
@@ -15,7 +15,7 @@ const PRECACHE_URLS = [
   './js/mat-widgets.js?v=4.3.8',
   './js/mat-agenda.js?v=4.2.4',
   './js/mat-forms.js?v=4.2.4',
-  './js/mat-actus.js?v=4.3.2',
+  './js/mat-actus.js?v=4.3.3',
   './js/mat-trombi.js?v=4.2.4',
   './js/mat-mel.js?v=4.3.1',
   './js/mat-boot.js?v=4.2.4',

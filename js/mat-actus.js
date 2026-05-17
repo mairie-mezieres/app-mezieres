@@ -1,5 +1,5 @@
 /* ╔════════════════════════════════════════════════════════════
-   MAT — Actualités & Notifications Push v3.8.2
+   MAT — Actualités & Notifications Push v3.8.3
    ╔════════════════════════════════════════════════════════════ */
 
 // ── Actualités ──────────────────────────────────────────────────────
@@ -605,6 +605,7 @@ async function toggleActusNotifFromAcc(enabled) {
       if(sub2) fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
     }catch(e){}
     await _unsubscribeIfAllOff();
+    updateNotifCardStatus(pushRegistered); // rafraîchit la carte même si d'autres types restent actifs
   }
   checkNotifToggles();
 }
