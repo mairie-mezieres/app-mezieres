@@ -33,6 +33,45 @@ function matAbortTimeout(ms) {
   return c.signal;
 }
 
+// ── fetch() avec timeout intégré ─────────────────────────────
+// Helper unifié : si opts.signal n'est pas fourni, on attache un
+// matAbortTimeout(timeoutMs) (défaut 8 s). N'ajoute PAS de gestion
+// d'erreur — le caller reste responsable de son try/catch et de la
+// lecture du body. Préserve l'API native de fetch() sinon (Response,
+// rejets, etc.).
+function matFetch(url, opts, timeoutMs) {
+  opts = opts || {};
+  if (!opts.signal) {
+    opts.signal = matAbortTimeout(timeoutMs || 8000);
+  }
+  return fetch(url, opts);
+}
+
+// ── localStorage safe-wrap ───────────────────────────────────
+// Garde-fous contre : mode privé Safari (setItem throw), quota
+// dépassé (QuotaExceededError), JSON corrompu (SyntaxError sur
+// getItem). Tente un removeItem si le parse échoue, pour éviter
+// que la même clé re-cause le bug à chaque lancement.
+var matStore = {
+  get: function (key, dflt) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (raw == null) return dflt;
+      try { return JSON.parse(raw); }
+      catch (_) { try { localStorage.removeItem(key); } catch (__) {} return dflt; }
+    } catch (_) { return dflt; }
+  },
+  set: function (key, value) {
+    try {
+      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+      return true;
+    } catch (_) { return false; }
+  },
+  del: function (key) {
+    try { localStorage.removeItem(key); } catch (_) {}
+  }
+};
+
 // ── Échappement HTML (sécurité caractères spéciaux) ─────────
 function esc(str) {
   if (!str) return '';
