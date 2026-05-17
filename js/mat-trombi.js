@@ -154,7 +154,8 @@ function openTrombi(idx){
   const e = ELUS[idx];
   try{
     const eluKey='elu_'+(e.nom||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').substring(0,25);
-    fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json','x-device-id':getMatDeviceId()},body:JSON.stringify({service:eluKey})});
+    // Stats tracking fire-and-forget : timeout 5 s, on ignore les rejets.
+    matFetch('https://chatbot-mairie-mezieres.onrender.com/stats/track',{method:'POST',headers:{'Content-Type':'application/json','x-device-id':getMatDeviceId()},body:JSON.stringify({service:eluKey})}, 5000).catch(function(){});
   }catch(_){ }
   const modal = document.getElementById('trombi-modal');
   const card = document.getElementById('trombi-card');
