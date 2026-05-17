@@ -54,12 +54,29 @@
   // 10) Onboarding (décalé pour ne pas bloquer l'affichage initial)
   setTimeout(function(){ try { initOnboarding(); } catch(e){} }, 800);
 
-  // 11) Intervalles périodiques
-  setInterval(function(){ try { loadDechets(); }      catch(e){} },  60000);
-  setInterval(function(){ try { loadMairieStatus(); } catch(e){} },  60000);
-  setInterval(function(){ try { loadBusRemi(); }      catch(e){} },  60000);
-  setInterval(function(){ try { loadMeteo(); }        catch(e){} }, 600000);
-  setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000);
+  // 11) Intervalles périodiques — suspendus en arrière-plan pour ménager
+  //     batterie et data mobile (la PWA installée garderait sinon ses
+  //     setInterval actifs même app en background).
+  window._matTimers = window._matTimers || {};
+  function _matStartTimers(){
+    if (window._matTimers.dechets)     return; // déjà démarrés
+    window._matTimers.dechets       = setInterval(function(){ try { loadDechets(); }       catch(e){} },  60000);
+    window._matTimers.mairieStatus  = setInterval(function(){ try { loadMairieStatus(); }  catch(e){} },  60000);
+    window._matTimers.busRemi       = setInterval(function(){ try { loadBusRemi(); }       catch(e){} },  60000);
+    window._matTimers.meteo         = setInterval(function(){ try { loadMeteo(); }         catch(e){} }, 600000);
+    window._matTimers.actusBadge    = setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000);
+  }
+  function _matStopTimers(){
+    Object.keys(window._matTimers).forEach(function(k){
+      clearInterval(window._matTimers[k]);
+      delete window._matTimers[k];
+    });
+  }
+  _matStartTimers();
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') _matStopTimers();
+    else _matStartTimers();
+  });
 })();
 
 (function(){
