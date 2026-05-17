@@ -6,8 +6,10 @@
 const ACC_KEY = 'mat_accessibility';
 
 function loadAccessibilite() {
+  // matStore.get : parse safe, removeItem auto si JSON corrompu (évite que
+  // la même clé bloque le chargement à chaque lancement).
+  const saved = matStore.get(ACC_KEY, {}) || {};
   try {
-    const saved = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
     if (saved.fontSize)  applyFontSize(saved.fontSize, false);
     if (saved.contrast)  applyContrast(true, false);
     if (saved.touch)     applyTouch(true, false);

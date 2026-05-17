@@ -47,6 +47,31 @@ function matFetch(url, opts, timeoutMs) {
   return fetch(url, opts);
 }
 
+// ── localStorage safe-wrap ───────────────────────────────────
+// Garde-fous contre : mode privé Safari (setItem throw), quota
+// dépassé (QuotaExceededError), JSON corrompu (SyntaxError sur
+// getItem). Tente un removeItem si le parse échoue, pour éviter
+// que la même clé re-cause le bug à chaque lancement.
+var matStore = {
+  get: function (key, dflt) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (raw == null) return dflt;
+      try { return JSON.parse(raw); }
+      catch (_) { try { localStorage.removeItem(key); } catch (__) {} return dflt; }
+    } catch (_) { return dflt; }
+  },
+  set: function (key, value) {
+    try {
+      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+      return true;
+    } catch (_) { return false; }
+  },
+  del: function (key) {
+    try { localStorage.removeItem(key); } catch (_) {}
+  }
+};
+
 // ── Échappement HTML (sécurité caractères spéciaux) ─────────
 function esc(str) {
   if (!str) return '';
