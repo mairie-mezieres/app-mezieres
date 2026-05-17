@@ -10,7 +10,7 @@ const CACHE = 'mat-v4.5.1';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.3.1',
+  './css/mat.css?v=4.3.2',
   './js/mat-utils.js?v=4.2.7',
   './js/mat-core.js?v=4.2.6'
 ];
@@ -19,7 +19,7 @@ const CRITICAL_PRECACHE = [
 const PRECACHE_URLS = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.3.1',
+  './css/mat.css?v=4.3.2',
   './css/mat-desktop.css?v=4.2.4',
   './js/mat-utils.js?v=4.2.7',
   './js/mat-core.js?v=4.2.6',

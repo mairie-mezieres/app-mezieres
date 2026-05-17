@@ -1124,3 +1124,15 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
   94% { transform:rotate(8deg); }
   97% { transform:rotate(-4deg); }
 }
+
+/* WCAG 2.1 — Respect du paramètre système "Réduire les animations".
+   Court-circuite toutes les keyframes et transitions pour les utilisateurs
+   sensibles au mouvement (vestibulaire, motion sickness). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
