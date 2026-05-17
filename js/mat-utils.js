@@ -10,6 +10,16 @@ const ACTU_URL    = 'https://chatbot-mairie-mezieres.onrender.com/actus';
 const ICAL_URL    = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
 const METEO_URL   = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
 const VAPID_PUB   = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
+
+// Met la clé VAPID publique dans le Cache API au plus tôt, indépendamment du
+// chargement de mat-pwa-notif.js : permet au Service Worker de se ré-abonner
+// lors d'un pushsubscriptionchange même sans onglet ouvert.
+if (typeof window !== 'undefined' && 'caches' in window) {
+  caches.open('mat-config-v1').then(function (c) {
+    return c.put('mat-vapid-public-key', new Response(VAPID_PUB, { headers: { 'Content-Type': 'text/plain' } }));
+  }).catch(function () {});
+}
+
 const INSTALL_KEY = 'mat_installed_v3';
 const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
 const MAT_VERSION = 'v3.7.5';

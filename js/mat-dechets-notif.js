@@ -80,7 +80,11 @@ function _buildTriCard() {
 }
 
 // Patch loadDechetsDetail — ordre : collecte → rappels → tri → déchetterie
+// Idempotent : si le script est exécuté plusieurs fois (race de chargement
+// dynamique + cache), on évite d'enchaîner les patches et de dupliquer la carte.
 (function() {
+  if (window._dechetsNotifPatched) return;
+  window._dechetsNotifPatched = true;
   var _orig = window.loadDechetsDetail;
   window.loadDechetsDetail = function() {
     if (typeof _orig === 'function') _orig();
