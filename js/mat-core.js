@@ -216,7 +216,7 @@ async function loadFeaturedDoc() {
     el.style.display = '';
     el.innerHTML = '<div style="margin-bottom:16px">'
       + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
-      + '<a href="' + esc(doc.url) + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
+      + '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
       + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
       + '<div style="flex:1;min-width:0">'
       + '<div style="font-weight:900;font-size:0.9rem;line-height:1.3">' + esc(doc.title) + '</div>'
@@ -262,7 +262,7 @@ async function loadTempDocs() {
       return;
     }
     el.innerHTML = docs.map(function(doc) {
-      return '<a href="' + esc(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">'
+      return '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">'
         + '<div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📄</div>'
         + '<div style="flex:1;min-width:0">'
         + '<div style="font-weight:900;font-size:0.86rem">' + esc(doc.title) + '</div>'
