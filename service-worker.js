@@ -128,7 +128,11 @@ self.addEventListener('fetch', e => {
 // best-effort et silencieuse. Évite la croissance illimitée du cache
 // (qui peut faire éjecter brutalement tout le storage par le navigateur
 // sous pression mémoire).
+// Les URLs de PRECACHE_URLS (app shell + offline.html) sont protégées
+// de l'éviction — sinon la navigation offline finirait par échouer une
+// fois la file FIFO ayant rattrapé les entrées précachées à l'install.
 const MAX_CACHE_ENTRIES = 250;
+const _PRECACHE_SET = new Set(PRECACHE_URLS.map(u => new URL(u, self.location.href).href));
 let _trimming = false;
 async function trimCacheSoft(c) {
   if (_trimming) return;
@@ -136,8 +140,10 @@ async function trimCacheSoft(c) {
   try {
     const keys = await c.keys();
     if (keys.length > MAX_CACHE_ENTRIES) {
+      const evictable = keys.filter(req => !_PRECACHE_SET.has(req.url));
       const excess = keys.length - MAX_CACHE_ENTRIES;
-      for (let i = 0; i < excess; i++) await c.delete(keys[i]);
+      const toDelete = Math.min(excess, evictable.length);
+      for (let i = 0; i < toDelete; i++) await c.delete(evictable[i]);
     }
   } catch (_) {}
   _trimming = false;

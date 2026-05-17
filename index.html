@@ -12,12 +12,13 @@
 <!-- VERSION 4.2.3 -->
 <link rel="manifest" href="manifest.webmanifest">
 <!-- Enregistrement Service Worker au plus tôt (avant les modules defer)
-     pour qu'il soit disponible dès les premiers fetches du chargement initial. -->
+     pour qu'il soit disponible dès les premiers fetches du chargement initial.
+     Pas d'attente sur 'load' : register() est non-bloquant et on veut que
+     la vérification d'update se déclenche même si le visiteur ferme la
+     page avant la fin du chargement. -->
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('./service-worker.js').catch(function () {});
-  });
+  navigator.serviceWorker.register('./service-worker.js').catch(function () {});
 }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Playfair+Display:ital,wght@1,700&family=Nunito:wght@400;600;700;800;900&family=Fraunces:opsz,wght@9..144,300;9..144,600&display=swap" rel="stylesheet">
