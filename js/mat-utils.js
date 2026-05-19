@@ -412,7 +412,7 @@ function urlToLabel(url) {
 const KNOWN_DOMAINS = [
   'mezieres-lez-clery.fr','ccterresduvaldeloire.fr','portail-usagers.ccterresduvaldeloire.fr',
   'valdeloire-fibre.fr','service-public.fr','doctolib.fr','remi-centrevaldeloire.fr',
-  'mairie-clery-saint-andre.fr','mairie-mezieres.github.io'
+  'mairie-clery-saint-andre.fr'
 ];
 
 function formatPhone(num) {
