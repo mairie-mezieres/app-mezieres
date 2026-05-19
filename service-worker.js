@@ -7,7 +7,7 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.6.0';
+const CACHE = 'mat-v4.6.1';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
