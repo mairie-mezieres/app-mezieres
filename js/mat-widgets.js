@@ -449,20 +449,37 @@ async function loadMeteoDetail() {
     for (var i = 0; i < seuils.length; i++) { if (val < seuils[i]) return seuils[i]; }
     return null;
   }
+  // Retourne un texte lisible sur le palier suivant :
+  // sans icône si on est au niveau le plus bas (sûr), avec ⚠️ si on est dans une zone intermédiaire.
+  function _envSeuilInfo(val, seuils, niveaux, unit) {
+    if (val == null) return '';
+    for (var i = 0; i < seuils.length; i++) {
+      if (val < seuils[i]) {
+        var icon = i === 0 ? '' : '⚠️ ';
+        var nextLabel = niveaux && niveaux[i + 1] ? ' (' + niveaux[i + 1] + ')' : '';
+        return icon + 'palier suivant : ' + seuils[i] + (unit || '') + nextLabel;
+      }
+    }
+    return '';
+  }
   var aqiLabel = '–';
   if (env.aqi) {
     var aqiV = env.aqi.valeur;
-    var aqiSeuil = _envSeuil(aqiV, [20, 40, 60, 80, 100]);
     aqiLabel = esc(env.aqi.label);
     var aqiN = aqiV != null ? Math.round(+aqiV) : NaN;
-    if (!isNaN(aqiN)) aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiN + (aqiSeuil ? ' · ⚠️ seuil ' + aqiSeuil : '') + '</span>';
+    if (!isNaN(aqiN)) {
+      var aqiInfo = _envSeuilInfo(aqiN, [20, 40, 60, 80, 100], ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauvais', 'Extrêmement mauvais']);
+      aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiN + (aqiInfo ? ' · ' + aqiInfo : '') + '</span>';
+    }
   }
   var pollenLabel = '–';
   if (env.pollen) {
     var polV = env.pollen.niveau;
-    var polSeuil = _envSeuil(polV, [1, 10, 50, 100]);
     pollenLabel = esc(env.pollen.label);
-    if (polV != null) pollenLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">' + (Math.round(polV * 10) / 10) + ' grains/m³' + (polSeuil ? ' · ⚠️ seuil ' + polSeuil : '') + '</span>';
+    if (polV != null) {
+      var polInfo = _envSeuilInfo(polV, [1, 10, 50, 100], ['Nul', 'Très faible', 'Faible', 'Modéré', 'Élevé'], ' gr/m³');
+      pollenLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">' + (Math.round(polV * 10) / 10) + ' grains/m³' + (polInfo ? ' · ' + polInfo : '') + '</span>';
+    }
   }
 
   function _airRow(label, val, border) {
