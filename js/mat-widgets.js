@@ -462,24 +462,45 @@ async function loadMeteoDetail() {
     }
     return '';
   }
-  var aqiLabel = '–';
-  if (env.aqi) {
-    var aqiV = env.aqi.valeur;
-    aqiLabel = esc(env.aqi.label);
-    var aqiN = aqiV != null ? Math.round(+aqiV) : NaN;
-    if (!isNaN(aqiN)) {
-      var aqiInfo = _envSeuilInfo(+aqiV, [20, 40, 60, 80, 100], ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauvais', 'Extrêmement mauvais']);
-      aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiN + (aqiInfo ? ' · ' + aqiInfo : '') + '</span>';
+  function _pollenPct(val) {
+    var zones = [0, 1, 10, 50, 100];
+    for (var i = 0; i < zones.length - 1; i++) {
+      if (val <= zones[i + 1])
+        return (i + (val - zones[i]) / (zones[i + 1] - zones[i])) * 20;
+
     }
+    return 100;
   }
-  var pollenLabel = '–';
-  if (env.pollen) {
-    var polV = env.pollen.niveau;
-    pollenLabel = esc(env.pollen.label);
-    if (polV != null) {
-      var polInfo = _envSeuilInfo(polV, [1, 10, 50, 100], ['Nul', 'Très faible', 'Faible', 'Modéré', 'Élevé'], ' gr/m³');
-      pollenLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">' + (Math.round(polV * 10) / 10) + ' grains/m³' + (polInfo ? ' · ' + polInfo : '') + '</span>';
-    }
+  function _envBar(icon, label, valDisplay, levelLabel, pct, legendItems, border) {
+    var p = Math.max(0, Math.min(100, +pct || 0));
+    var grad = 'linear-gradient(90deg,#22c55e 0%,#a3e635 20%,#fde047 40%,#fb923c 60%,#ef4444 80%,#b91c1c 100%)';
+    return '<div style="padding:10px 14px' + (border ? ';border-top:1px solid var(--border)' : '') + '">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'
+      + '<span style="font-size:.77rem;color:var(--muted)">' + icon + ' ' + label + '</span>'
+      + '<span style="font-size:.77rem;font-weight:800">' + levelLabel + (valDisplay ? ' <span style="font-weight:400;color:var(--muted)">· ' + valDisplay + '</span>' : '') + '</span>'
+      + '</div>'
+      + '<div style="height:9px;border-radius:999px;background:' + grad + ';position:relative;border:1px solid rgba(0,0,0,.08)">'
+      + '<div style="position:absolute;top:50%;left:calc(' + p + '% - 7px);width:14px;height:14px;border-radius:50%;transform:translateY(-50%);background:#fff;border:2.5px solid #1f2937;box-shadow:0 1px 6px rgba(0,0,0,.25)"></div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:.58rem;color:var(--muted)">'
+      + legendItems.map(function(l){ return '<span>' + esc(l) + '</span>'; }).join('')
+      + '</div>'
+      + '</div>';
+  }
+  var aqiBarHtml = '';
+  if (env.aqi && env.aqi.valeur != null) {
+    var aqiV = env.aqi.valeur;
+    var aqiN = Math.round(+aqiV);
+    aqiBarHtml = _envBar('🏭', 'Qualité de l\'air', 'IQA ' + aqiN, esc(env.aqi.label || '–'),
+      Math.min(100, Math.max(0, +aqiV)),
+      ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauv.'], false);
+  }
+  var pollenBarHtml = '';
+  if (env.pollen && env.pollen.niveau != null) {
+    var polV = +env.pollen.niveau;
+    pollenBarHtml = _envBar('🌸', 'Pollens', (Math.round(polV * 10) / 10) + ' gr/m³', esc(env.pollen.label || '–'),
+      _pollenPct(polV),
+      ['Nul', 'Très faible', 'Faible', 'Modéré', 'Élevé'], true);
   }
 
   function _airRow(label, val, border) {
@@ -494,8 +515,8 @@ async function loadMeteoDetail() {
 
   html += '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
     + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">🌿 Air</div>'
-    + _airRow('🏭 Qualité de l\'air', aqiLabel, false)
-    + _airRow('🌸 Pollens', pollenLabel, true)
+    + (aqiBarHtml || _airRow('🏭 Qualité de l\'air', '–', false))
+    + (pollenBarHtml || _airRow('🌸 Pollens', '–', true))
     + _airRow('💨 Rafales max · 24h', rafaleMax24 + ' km/h' + (ventDirCur ? ' ' + ventDirCur : '') + meteoTrendBadge(tRaf), true)
     + _airRow('📊 Pression', (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres), true)
     + '</div>';
