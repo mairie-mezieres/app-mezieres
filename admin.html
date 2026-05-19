@@ -1686,8 +1686,17 @@ async function saveBanner() {
 
 // ── BASCULE MIGRATION DNS ────────────────
 let _migrationActive = false;
+let _migrationKnown = false;
 async function renderMigration() {
-  try{const r=await fetch(`${API}/migration-status`);if(r.ok){const d=await r.json();_migrationActive=!!d.active;}}catch(e){}
+  _migrationKnown = false;
+  try{const r=await fetch(`${API}/migration-status`);if(r.ok){const d=await r.json();_migrationActive=!!d.active;_migrationKnown=true;}}catch(e){}
+  const stateHtml = _migrationKnown
+    ? (_migrationActive
+        ? '<span style="color:#dc3545;">🔴 Overlay ACTIF</span>'
+        : '<span style="color:var(--muted);">⚫ Overlay inactif</span>')
+    : '<span style="color:#b45309;">⚠️ État inconnu (serveur injoignable)</span>';
+  const activateDisabled = _migrationKnown && _migrationActive;
+  const deactivateDisabled = _migrationKnown && !_migrationActive;
   document.getElementById('migration-content').innerHTML=`
     <div class="section-title">🚨 Overlay de bascule DNS</div>
     <div style="background:#fff3cd;border:1.5px solid #ffc107;border-radius:14px;padding:16px;margin-bottom:16px;">
@@ -1695,16 +1704,16 @@ async function renderMigration() {
       <p style="font-size:0.78rem;color:#664d03;line-height:1.6;margin:0;">Quand cet overlay est <strong>actif</strong>, les visiteurs encore présents sur l&rsquo;ancienne URL <code>mairie-mezieres.github.io</code> verront un message plein écran les invitant à rejoindre <code>mezieres-lez-clery.fr</code>. Le service worker et les caches de l&rsquo;ancienne version seront désinscrits en arrière-plan.</p>
     </div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
-        <div style="flex:1;">
-          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:4px;">État actuel</div>
-          <div style="font-size:1rem;font-weight:900;">${_migrationActive?'<span style="color:#dc3545;">🔴 Overlay ACTIF</span>':'<span style="color:var(--muted);">⚫ Overlay inactif</span>'}</div>
-        </div>
-        <button onclick="toggleMigration()" style="background:${_migrationActive?'linear-gradient(135deg,#6c757d,#495057)':'linear-gradient(135deg,#dc3545,#b02a37)'};color:white;border:none;border-radius:10px;padding:12px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;white-space:nowrap;">
-          ${_migrationActive?'⏸️ Désactiver':'▶️ Activer'}
-        </button>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:4px;">État actuel</div>
+        <div style="font-size:1rem;font-weight:900;">${stateHtml}</div>
       </div>
-      <div id="migration-save-msg" style="display:none;color:var(--leaf);font-weight:800;font-size:0.8rem;"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button onclick="setMigration(true)" ${activateDisabled?'disabled':''} style="background:linear-gradient(135deg,#dc3545,#b02a37);color:white;border:none;border-radius:10px;padding:12px 20px;font-size:0.84rem;font-weight:800;cursor:${activateDisabled?'not-allowed':'pointer'};opacity:${activateDisabled?'.4':'1'};">▶️ Activer l&rsquo;overlay</button>
+        <button onclick="setMigration(false)" ${deactivateDisabled?'disabled':''} style="background:linear-gradient(135deg,#6c757d,#495057);color:white;border:none;border-radius:10px;padding:12px 20px;font-size:0.84rem;font-weight:800;cursor:${deactivateDisabled?'not-allowed':'pointer'};opacity:${deactivateDisabled?'.4':'1'};">⏸️ Désactiver l&rsquo;overlay</button>
+        ${!_migrationKnown?'<button onclick="renderMigration()" style="background:linear-gradient(135deg,#0d6efd,#0a58ca);color:white;border:none;border-radius:10px;padding:12px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;">🔄 Réessayer</button>':''}
+      </div>
+      <div id="migration-save-msg" style="display:none;color:var(--leaf);font-weight:800;font-size:0.8rem;margin-top:12px;"></div>
     </div>
     <div class="section-title">Procédure recommandée</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);">
@@ -1717,11 +1726,16 @@ async function renderMigration() {
       </ol>
     </div>`;
 }
-async function toggleMigration() {
+async function setMigration(active) {
+  if(!_migrationKnown){
+    const label = active ? 'ACTIF' : 'INACTIF';
+    if(!confirm("État serveur inconnu (dernier check a échoué). Forcer l'overlay à "+label+' ?')) return;
+  }
   try{
-    const r=await fetch(`${API}/admin/migration-toggle`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN}});
+    const r=await fetch(`${API}/admin/migration`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({active})});
     const d=await r.json();
-    if(d.ok){_migrationActive=!!d.active;const msg=document.getElementById('migration-save-msg');msg.textContent=_migrationActive?'✅ Overlay activé':'✅ Overlay désactivé';msg.style.display='block';setTimeout(()=>renderMigration(),800);}
+    if(d.ok){_migrationActive=!!d.active;_migrationKnown=true;const msg=document.getElementById('migration-save-msg');msg.textContent=_migrationActive?'✅ Overlay activé':'✅ Overlay désactivé';msg.style.display='block';setTimeout(()=>renderMigration(),800);}
+    else{alert('Erreur : '+(d.error||'inconnue'));}
   }catch(e){alert('Erreur lors de la bascule : '+e.message);}
 }
 
