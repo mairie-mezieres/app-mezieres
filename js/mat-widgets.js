@@ -468,7 +468,7 @@ async function loadMeteoDetail() {
     aqiLabel = esc(env.aqi.label);
     var aqiN = aqiV != null ? Math.round(+aqiV) : NaN;
     if (!isNaN(aqiN)) {
-      var aqiInfo = _envSeuilInfo(aqiN, [20, 40, 60, 80, 100], ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauvais', 'Extrêmement mauvais']);
+      var aqiInfo = _envSeuilInfo(+aqiV, [20, 40, 60, 80, 100], ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauvais', 'Extrêmement mauvais']);
       aqiLabel += '<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">IQA ' + aqiN + (aqiInfo ? ' · ' + aqiInfo : '') + '</span>';
     }
   }
