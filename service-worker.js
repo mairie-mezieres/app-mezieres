@@ -1,4 +1,4 @@
-// SERVICE WORKER v4.5.5 — MAT Mézières Avec Toi
+// SERVICE WORKER v4.6.0 — MAT Mézières Avec Toi - Site WEB officiel
 // Network First
 // J4.a : install échoue si un fichier critique manque (l'ancienne version
 //         reste alors active, plutôt que d'installer un cache cassé).
@@ -7,7 +7,7 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.5.5';
+const CACHE = 'mat-v4.6.0';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
