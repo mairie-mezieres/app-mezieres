@@ -62,6 +62,59 @@ if ('serviceWorker' in navigator) {
 </head>
 
 <body class="preload">
+
+<!-- ╔════════════════════════════════════════════════════════════╗
+     ║ Migration DNS — overlay piloté par le panel admin          ║
+     ║ Affiché UNIQUEMENT sur mairie-mezieres.github.io quand     ║
+     ║ le toggle Redis migration:overlay:active est à true.       ║
+     ╚════════════════════════════════════════════════════════════╝ -->
+<style>
+.mat-migration-overlay{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(160deg,#1a3d2b,#2d6a4f);display:none;align-items:center;justify-content:center;padding:24px;font-family:'Nunito',system-ui,sans-serif;animation:matMigrationFadeIn .4s ease}
+.mat-migration-overlay.on{display:flex}
+.mat-migration-overlay .mat-migration-card{background:#fff;border-radius:24px;padding:40px 32px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.mat-migration-overlay .mat-migration-emoji{font-size:4rem;line-height:1;margin-bottom:16px}
+.mat-migration-overlay h2{font-family:'Grape Nuts',cursive;font-size:2.4rem;color:#2d5a27;margin:0 0 20px;line-height:1.1;font-weight:400}
+.mat-migration-overlay p{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:1.1rem;color:#1a3d2b;margin:0 0 16px;line-height:1.5}
+.mat-migration-overlay p strong{color:#2d5a27;font-style:normal;background:#e6f0e1;padding:2px 10px;border-radius:6px;display:inline-block}
+.mat-migration-overlay .mat-migration-cta{margin-top:24px;background:linear-gradient(135deg,#2d5a27,#1a3d2b);color:#fff;border:none;border-radius:16px;padding:18px 28px;font-size:1.15rem;font-weight:800;cursor:pointer;width:100%;box-shadow:0 8px 20px rgba(45,90,39,.4);transition:transform .15s,box-shadow .15s;font-family:'Nunito',sans-serif}
+.mat-migration-overlay .mat-migration-cta:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(45,90,39,.5)}
+.mat-migration-overlay .mat-migration-cta:active{transform:translateY(0)}
+@keyframes matMigrationFadeIn{from{opacity:0}to{opacity:1}}
+</style>
+<div id="mat-migration-overlay" class="mat-migration-overlay" aria-hidden="true" role="dialog" aria-labelledby="mat-migration-title">
+  <div class="mat-migration-card">
+    <div class="mat-migration-emoji">🏘️</div>
+    <h2 id="mat-migration-title">MAT a une nouvelle adresse !</h2>
+    <p>Votre application municipale est désormais disponible sur <strong>mezieres-lez-clery.fr</strong></p>
+    <p>Cliquez ci-dessous pour accéder à la nouvelle version et l&rsquo;installer sur votre téléphone.</p>
+    <button class="mat-migration-cta" onclick="matOpenNewSite()">🚀 Découvrir la nouvelle version</button>
+  </div>
+</div>
+<script>
+(function(){
+  if (location.hostname !== 'mairie-mezieres.github.io') return;
+  fetch('https://chatbot-mairie-mezieres.onrender.com/migration-status')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !d.active) return;
+      var el = document.getElementById('mat-migration-overlay');
+      if (el) { el.classList.add('on'); el.setAttribute('aria-hidden','false'); }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(rs){
+          rs.forEach(function(r){ r.unregister().catch(function(){}); });
+        }).catch(function(){});
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(ks){
+          ks.forEach(function(k){ caches.delete(k).catch(function(){}); });
+        }).catch(function(){});
+      }
+    })
+    .catch(function(){});
+})();
+function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank'); }
+</script>
+
 <!-- Desktop uniquement : barre contact + navigation -->
 <div class="d-topbar">
   <span>📞 02 38 45 61 76</span>
