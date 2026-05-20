@@ -424,6 +424,68 @@
             }
           ]
         }
+      },
+      {
+        "id": "rgpd_dpo",
+        "ico": "🔒",
+        "label": "RGPD / Protection des données / DPO",
+        "directAnswer": {
+          "text": "Pour toute question relative au RGPD et à la protection des données personnelles, la commune de Mézières-lez-Cléry est accompagnée par le GIP RECIA (Groupement d&rsquo;Intérêt Public &mdash; Ressources numériques publiques en Centre-Val de Loire). Pour contacter le Délégué à la Protection des Données (DPD), adressez-vous à la mairie qui transmettra votre demande.",
+          "links": [
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            },
+            {
+              "label": "✉️ mairie@mezieres-lez-clery.fr",
+              "url": "mailto:mairie@mezieres-lez-clery.fr"
+            },
+            {
+              "label": "🌐 gip-recia.fr",
+              "url": "https://www.gip-recia.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cnil_definition",
+        "ico": "🛡️",
+        "label": "CNIL — Commission nationale de l&rsquo;informatique et des libertés",
+        "directAnswer": {
+          "text": "La CNIL (Commission nationale de l&rsquo;informatique et des libertés) est l&rsquo;autorité française indépendante qui protège vos données personnelles. À ne pas confondre avec la carte nationale d&rsquo;identité (CNI). Pour toute réclamation ou information : cnil.fr. Pour les questions de protection des données concernant la mairie de Mézières-lez-Cléry, contactez directement la mairie.",
+          "links": [
+            {
+              "label": "🌐 cnil.fr",
+              "url": "https://www.cnil.fr"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
+      },
+      {
+        "id": "cni_clarification",
+        "ico": "🪪",
+        "label": "Carte nationale d&rsquo;identité (CNI)",
+        "directAnswer": {
+          "text": "La carte nationale d&rsquo;identité (CNI) ne se fait plus à Mézières-lez-Cléry. Il faut se rendre dans une mairie équipée d&rsquo;une station biométrique : Meung-sur-Loire, Ardon ou Orléans. Remarque : CNI (carte d&rsquo;identité) est différent de CNIL (Commission nationale de l&rsquo;informatique et des libertés). Prenez rendez-vous en ligne via le site ANTS.",
+          "links": [
+            {
+              "label": "🌐 Démarche CNI sur ANTS",
+              "url": "https://ants.gouv.fr"
+            },
+            {
+              "label": "📅 Prendre rendez-vous",
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R63715"
+            },
+            {
+              "label": "📞 Mairie : 02 38 45 61 76",
+              "tel": "0238456176"
+            }
+          ]
+        }
       }
     ]
   },
