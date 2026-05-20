@@ -94,10 +94,7 @@ async function showPostInstallNotifPrompt() {
 
   await new Promise(function(r){ setTimeout(r, 1200); });
 
-  var accepted = await confirmMAT(
-    'Voulez-vous recevoir les actualités communales et alertes directement sur votre téléphone ?',
-    '✅ MAT est installé !', '🔔', 'Activer les alertes', 'Plus tard'
-  );
+  var accepted = await _showNotifSheet();
 
   if (!accepted) return;
 
@@ -136,6 +133,32 @@ async function showPostInstallNotifPrompt() {
   } catch(e) {
     await alertMAT('Activation impossible pour l\'instant. Réessayez depuis le menu Notifications.', 'Notifications', '⚠️');
   }
+}
+
+// Bottom sheet notifications : gros bouton CTA en haut pour accessibilité seniors
+function _showNotifSheet() {
+  return new Promise(function(resolve) {
+    var sheet = document.createElement('div');
+    sheet.id = 'mat-notif-sheet';
+    sheet.style.cssText = 'position:fixed;top:0;right:0;bottom:0;left:0;z-index:9998;background:rgba(26,61,43,.55);backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;animation:fadeOv .2s ease;';
+    sheet.innerHTML =
+      '<div style="background:var(--warm,#f4f0ea);border-radius:20px 20px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;box-shadow:0 -8px 40px rgba(0,0,0,.22);">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">'
+      +   '<span style="font-size:1.4rem;">🔔</span>'
+      +   '<span style="font-size:.94rem;font-weight:900;color:var(--text,#1a1a1a);flex:1;">MAT est installé !</span>'
+      +   '<button id="_nsBtnClose" style="border:none;background:rgba(0,0,0,.08);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.9rem;flex-shrink:0;">✕</button>'
+      + '</div>'
+      + '<button id="_nsBtnOk" style="display:block;width:100%;background:linear-gradient(135deg,var(--forest,#1a3d2b),var(--leaf,#52b788));color:#fff;border:none;border-radius:14px;padding:17px;font-size:1.05rem;font-weight:900;cursor:pointer;margin-bottom:14px;font-family:\'Nunito\',sans-serif;">🔔  Activer les alertes</button>'
+      + '<p style="font-size:.82rem;color:var(--muted,#64748b);line-height:1.6;text-align:center;margin:0 0 4px;">Recevez les actualités communales et alertes directement sur votre téléphone.</p>'
+      + '<button id="_nsBtnLater" style="display:block;width:100%;background:none;border:none;color:var(--muted,#64748b);font-size:.82rem;padding:10px 0 0;cursor:pointer;font-family:\'Nunito\',sans-serif;">Plus tard</button>'
+      + '</div>';
+    document.body.appendChild(sheet);
+    function done(result) { sheet.remove(); resolve(result); }
+    document.getElementById('_nsBtnOk').onclick    = function() { done(true);  };
+    document.getElementById('_nsBtnLater').onclick = function() { done(false); };
+    document.getElementById('_nsBtnClose').onclick = function() { done(false); };
+    sheet.onclick = function(e) { if (e.target === sheet) done(false); };
+  });
 }
 
 function checkFirstStandaloneRun() {
