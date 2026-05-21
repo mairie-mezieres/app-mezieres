@@ -218,7 +218,7 @@ async function voteIdee(id){
 function _ideaStatusBadgePublic(status){
   if(!status) return '';
   const map={
-    studying:['🔍 En cours d’étude','#2563eb'],
+    studying:['🔍 En cours d'étude','#2563eb'],
     accepted:['✅ Retenue','#16a34a'],
     rejected:['❌ Non retenue','#dc2626']
   };
