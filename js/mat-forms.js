@@ -218,9 +218,9 @@ async function voteIdee(id){
 function _ideaStatusBadgePublic(status){
   if(!status) return '';
   const map={
-    studying:['🔍 En cours d'étude','#2563eb'],
-    accepted:['✅ Retenue','#16a34a'],
-    rejected:['❌ Non retenue','#dc2626']
+    studying:["🔍 En cours d’étude","#2563eb"],
+    accepted:["✅ Retenue","#16a34a"],
+    rejected:["❌ Non retenue","#dc2626"]
   };
   const entry=map[status]; if(!entry) return '';
   return `<div style="display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 9px;font-size:0.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:white;background:${entry[1]}">${entry[0]}</div>`;
