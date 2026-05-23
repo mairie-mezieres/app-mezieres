@@ -328,7 +328,7 @@ async function loadMeteo() {
       descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">' + (vigilance.upcoming ? 'Prévu ' : 'Début ') + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
       badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + upcomingLabel;
       badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : 'Touchez pour voir le détail de l’alerte';
+      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : 'Touchez pour voir le détail de l'alerte';
     } else {
       descEl.textContent = baseDesc;
       badge.textContent = '✅ Pas d\'alerte';
@@ -457,7 +457,7 @@ async function loadMeteoDetail() {
       if (val < seuils[i]) {
         var icon = i === 0 ? '' : '⚠️ ';
         var nextLabel = niveaux && niveaux[i + 1] ? ' (' + niveaux[i + 1] + ')' : '';
-        return icon + 'palier suivant : ' + seuils[i] + (unit || '') + nextLabel;
+        return icon + 'palier suivant : ' + seuils[i] + (unit || '') + nextLabel;
       }
     }
     return '';
@@ -476,8 +476,8 @@ async function loadMeteoDetail() {
     var grad = 'linear-gradient(90deg,#22c55e 0%,#a3e635 20%,#fde047 40%,#fb923c 60%,#ef4444 80%,#b91c1c 100%)';
     return '<div style="padding:10px 14px' + (border ? ';border-top:1px solid var(--border)' : '') + '">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">'
-      + '<span style="font-size:.77rem;color:var(--muted)">' + icon + ' ' + label + '</span>'
-      + '<span style="font-size:.77rem;font-weight:800">' + levelLabel + (valDisplay ? ' <span style="font-weight:400;color:var(--muted)">· ' + valDisplay + '</span>' : '') + '</span>'
+      + '<span style="font-size:.77rem;color:var(--muted)">' + icon + ' ' + label + '</span>'
+      + '<span style="font-size:.77rem;font-weight:800">' + levelLabel + (valDisplay ? ' <span style="font-weight:400;color:var(--muted)">· ' + valDisplay + '</span>' : '') + '</span>'
       + '</div>'
       + '<div style="height:9px;border-radius:999px;background:' + grad + ';position:relative;border:1px solid rgba(0,0,0,.08)">'
       + '<div style="position:absolute;top:50%;left:calc(' + p + '% - 7px);width:14px;height:14px;border-radius:50%;transform:translateY(-50%);background:#fff;border:2.5px solid #1f2937;box-shadow:0 1px 6px rgba(0,0,0,.25)"></div>'
@@ -491,16 +491,16 @@ async function loadMeteoDetail() {
   if (env.aqi && env.aqi.valeur != null) {
     var aqiV = env.aqi.valeur;
     var aqiN = Math.round(+aqiV);
-    aqiBarHtml = _envBar('🏭', 'Qualité de l\'air', 'IQA ' + aqiN, esc(env.aqi.label || '–'),
+    aqiBarHtml = _envBar('🏭', 'Qualité de l\'air', 'IQA ' + aqiN, esc(env.aqi.label || '–'),
       Math.min(100, Math.max(0, +aqiV)),
-      ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauv.'], false);
+      ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauv.'], false);
   }
   var pollenBarHtml = '';
   if (env.pollen && env.pollen.niveau != null) {
     var polV = +env.pollen.niveau;
-    pollenBarHtml = _envBar('🌸', 'Pollens', (Math.round(polV * 10) / 10) + ' gr/m³', esc(env.pollen.label || '–'),
+    pollenBarHtml = _envBar('🌸', 'Pollens', (Math.round(polV * 10) / 10) + ' gr/m³', esc(env.pollen.label || '–'),
       _pollenPct(polV),
-      ['Nul', 'Très faible', 'Faible', 'Modéré', 'Élevé'], true);
+      ['Nul', 'Très faible', 'Faible', 'Modéré', 'Élevé'], true);
   }
 
   function _airRow(label, val, border) {
@@ -525,6 +525,15 @@ async function loadMeteoDetail() {
   el.innerHTML = html;
 }
 
+// ── Jours fériés ──────────────────────────────────────────
+const FERIES_FIXES=['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
+const FERIES_DATES=['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25','2027-03-29','2027-05-17'];
+function isFerieDate(d){
+  const mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
+  const iso=d.getFullYear()+'-'+mm+'-'+dd;
+  return FERIES_FIXES.includes(mm+'-'+dd)||FERIES_DATES.includes(iso);
+}
+
 // ── Mairie ────────────────────────────────────────────────
 function loadMairieStatus(){
   var nowParis=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
@@ -534,6 +543,7 @@ function loadMairieStatus(){
     document.getElementById('mairie-desc').textContent=sub;
     document.getElementById('mairie-badge').textContent=badge;
   }
+  if(isFerieDate(nowParis)) return setStatus('Fermée','Fermée pour jour férié','Mairie');
   if(day===1){
     if(mins>=14*60&&mins<17*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 17h30','Lundi');
     if(mins<14*60) return setStatus('Fermée','Ouvre aujourd\'hui à 14h','Lundi');
@@ -581,6 +591,14 @@ function loadDechets(){
     }
   }
 
+  // Décalage si le jour de collecte tombe un jour férié
+  {
+    const noirDate=new Date(annee,moisP-1,jour); noirDate.setDate(noirDate.getDate()+noirJours);
+    if(isFerieDate(noirDate)) noirJours++;
+    const jauneDate=new Date(annee,moisP-1,jour); jauneDate.setDate(jauneDate.getDate()+jauneJours);
+    if(isFerieDate(jauneDate)) jauneJours++;
+  }
+
   function fmtJ(j){
     if(j===0) return "aujourd'hui";
     if(j===1) return 'demain';
@@ -597,8 +615,6 @@ function loadDechets(){
   renderInfo(document.getElementById('bac-noir-info'),noirJours,noirConsigne);
   renderInfo(document.getElementById('bac-jaune-info'),jauneJours,jauneConsigne);
 
-  const FERIES_FIXES=['01-01','05-01','05-08','07-14','08-15','11-01','11-11','12-25'];
-  const FERIES_DATES=['2025-04-21','2025-05-29','2025-06-09','2026-04-06','2026-05-14','2026-05-25'];
   const mmdd=String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
   const iso=annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
   const ferie=FERIES_FIXES.includes(mmdd)||FERIES_DATES.includes(iso);
