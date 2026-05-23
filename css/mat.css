@@ -252,8 +252,8 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .ideas-list{display:flex;flex-direction:column;gap:9px;}
 .idea-card{background:white;border-radius:14px;padding:13px 14px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
 .idea-card--studying{background:#fefce8;border-color:#fde047;}
-.idea-card--accepted{background:#f0fdf4;border-color:#86efac;}
-.idea-card--rejected{background:#f9fafb;border-color:#d1d5db;}
+.idea-card--accepted{background:#dcfce7;border-color:#4ade80;}
+.idea-card--rejected{background:#e5e7eb;border-color:#9ca3af;}
 .idea-votes{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
 .vote-btn{background:none;border:2px solid var(--border);border-radius:10px;width:38px;height:38px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .vote-btn.voted{background:var(--mist);border-color:var(--sage);}
