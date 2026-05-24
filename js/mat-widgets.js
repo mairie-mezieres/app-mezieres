@@ -328,7 +328,7 @@ async function loadMeteo() {
       descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">' + (vigilance.upcoming ? 'Prévu ' : 'Début ') + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
       badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + upcomingLabel;
       badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : 'Touchez pour voir le détail de l'alerte';
+      badge.title = vigilance.upcoming ? "Alerte météo prévue — touchez pour le détail" : "Touchez pour voir le détail de l'alerte";
     } else {
       descEl.textContent = baseDesc;
       badge.textContent = '✅ Pas d\'alerte';
