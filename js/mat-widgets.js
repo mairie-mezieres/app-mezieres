@@ -328,7 +328,7 @@ async function loadMeteo() {
       descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">' + (vigilance.upcoming ? 'Prévu ' : 'Début ') + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
       badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + upcomingLabel;
       badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : 'Touchez pour voir le détail de l'alerte';
+      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : "Touchez pour voir le détail de l'alerte";
     } else {
       descEl.textContent = baseDesc;
       badge.textContent = '✅ Pas d\'alerte';
@@ -543,21 +543,27 @@ function loadMairieStatus(){
     document.getElementById('mairie-desc').textContent=sub;
     document.getElementById('mairie-badge').textContent=badge;
   }
-  if(isFerieDate(nowParis)) return setStatus('Fermée','Fermée pour jour férié','Mairie');
+  function nextOpen(from){
+    var map={1:['lundi','à 14h'],3:['mercredi','sur RDV'],5:['vendredi','à 8h30']};
+    var d=new Date(from); d.setDate(d.getDate()+1);
+    for(var i=0;i<14;i++){var dow=d.getDay();if(map[dow]&&!isFerieDate(d))return map[dow][0]+' '+map[dow][1];d.setDate(d.getDate()+1);}
+    return 'prochainement';
+  }
+  if(isFerieDate(nowParis)) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
   if(day===1){
-    if(mins>=14*60&&mins<17*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 17h30','Lundi');
-    if(mins<14*60) return setStatus('Fermée','Ouvre aujourd\'hui à 14h','Lundi');
+    if(mins>=14*60&&mins<17*60+30) return setStatus('Ouverte',"Accueil ouvert jusqu'à 17h30",'Lundi');
+    if(mins<14*60) return setStatus('Fermée',"Ouvre aujourd'hui à 14h",'Lundi');
   }
   if(day===5){
-    if(mins>=8*60+30&&mins<11*60+30) return setStatus('Ouverte','Accueil ouvert jusqu\'à 11h30','Vendredi');
-    if(mins<8*60+30) return setStatus('Fermée','Ouvre aujourd\'hui à 8h30','Vendredi');
+    if(mins>=8*60+30&&mins<11*60+30) return setStatus('Ouverte',"Accueil ouvert jusqu'à 11h30",'Vendredi');
+    if(mins<8*60+30) return setStatus('Fermée',"Ouvre aujourd'hui à 8h30",'Vendredi');
   }
   if(day===3) return setStatus('Sur RDV','Mercredi uniquement sur rendez-vous','Mercredi');
-  if(day===0||day===6) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Week-end');
-  if(day===1&&mins>=17*60+30) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
-  if(day===2) return setStatus('Fermée','Prochaine ouverture mercredi sur RDV','Mairie');
-  if(day===4) return setStatus('Fermée','Prochaine ouverture vendredi à 8h30','Mairie');
-  if(day===5&&mins>=11*60+30) return setStatus('Fermée','Prochaine ouverture lundi à 14h','Mairie');
+  if(day===0||day===6) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Week-end');
+  if(day===1&&mins>=17*60+30) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
+  if(day===2) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
+  if(day===4) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
+  if(day===5&&mins>=11*60+30) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
   setStatus('Fermée','Horaires : lun 14h-17h30 · mer sur RDV · ven 8h30-11h30','Horaires');
 }
 
@@ -597,6 +603,10 @@ function loadDechets(){
     if(isFerieDate(noirDate)) noirJours++;
     const jauneDate=new Date(annee,moisP-1,jour); jauneDate.setDate(jauneDate.getDate()+jauneJours);
     if(isFerieDate(jauneDate)) jauneJours++;
+    // Si le noir décalé tombe le même jour que le jaune, le jaune décale aussi
+    const noirFinal=new Date(annee,moisP-1,jour); noirFinal.setDate(noirFinal.getDate()+noirJours);
+    const jauneFinal=new Date(annee,moisP-1,jour); jauneFinal.setDate(jauneFinal.getDate()+jauneJours);
+    if(noirFinal.getTime()===jauneFinal.getTime()) jauneJours++;
   }
 
   function fmtJ(j){
