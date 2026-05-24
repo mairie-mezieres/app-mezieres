@@ -328,7 +328,7 @@ async function loadMeteo() {
       descEl.innerHTML = esc(baseDesc) + '<br><span class="meteo-alert-times">' + (vigilance.upcoming ? 'Prévu ' : 'Début ') + esc(startTxt) + ' · Fin ' + esc(endTxt) + '</span>';
       badge.textContent = '⚠️ Vigilance ' + (vigilance.color_label || METEO_ALERT_COLORS[Number(vigilance.level || 0)] || 'météo') + upcomingLabel;
       badge.classList.add('meteo-badge-alert', 'level-' + Number(vigilance.level || 2));
-      badge.title = vigilance.upcoming ? "Alerte météo prévue — touchez pour le détail" : "Touchez pour voir le détail de l'alerte";
+      badge.title = vigilance.upcoming ? 'Alerte météo prévue — touchez pour le détail' : "Touchez pour voir le détail de l'alerte";
     } else {
       descEl.textContent = baseDesc;
       badge.textContent = '✅ Pas d\'alerte';
@@ -597,6 +597,10 @@ function loadDechets(){
     if(isFerieDate(noirDate)) noirJours++;
     const jauneDate=new Date(annee,moisP-1,jour); jauneDate.setDate(jauneDate.getDate()+jauneJours);
     if(isFerieDate(jauneDate)) jauneJours++;
+    // Si le noir décalé tombe le même jour que le jaune, le jaune décale aussi
+    const noirFinal=new Date(annee,moisP-1,jour); noirFinal.setDate(noirFinal.getDate()+noirJours);
+    const jauneFinal=new Date(annee,moisP-1,jour); jauneFinal.setDate(jauneFinal.getDate()+jauneJours);
+    if(noirFinal.getTime()===jauneFinal.getTime()) jauneJours++;
   }
 
   function fmtJ(j){
