@@ -3,7 +3,7 @@
    Signalement, contact, bug, idées
    ════════════════════════════════════════════════════════════ */
 
-// ── Signalement → Trello ─────────────────────────────────
+// ── Signalement → Trello ───────────────────────────────────────
 let sigCat='',sigLat='',sigLon='';
 function selCat(btn,cat){
   document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
@@ -104,7 +104,7 @@ function resetSignal(){
   restoreSignalFormState();
 }
 
-// ── Boîte à idées ─────────────────────────────────────────
+// ── Boîte à idées ───────────────────────────────────────────────────
 const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3', IDEAS_SEEN_KEY='mat_ideas_seen_v1';
 const IDEAS_URL='https://chatbot-mairie-mezieres.onrender.com/idees';
 const IDEAS_SORT_KEY='mat_ideas_sort_v1';
@@ -218,7 +218,7 @@ async function voteIdee(id){
 function _ideaStatusBadgePublic(status){
   if(!status) return '';
   const map={
-    studying:["🔍 En cours d’étude","#2563eb"],
+    studying:["🔍 En cours d'étude","#2563eb"],
     accepted:["✅ Retenue","#16a34a"],
     rejected:["❌ Non retenue","#dc2626"]
   };
@@ -238,7 +238,8 @@ async function loadIdees(){
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
     const statusBadge = _ideaStatusBadgePublic(idea.status);
     const commentHtml = idea.adminComment && idea.status ? `<div style="margin-top:7px;padding:7px 10px;background:var(--warm);border-left:3px solid var(--sage);border-radius:0 8px 8px 0;font-size:0.78rem;color:var(--text);line-height:1.45;font-style:italic">🏛️ ${esc(idea.adminComment)}</div>` : '';
-    const statusClass = idea.status ? ` idea-card--${idea.status}` : '';
+    const safeStatus = ['studying','accepted','rejected'].includes(idea.status) ? idea.status : '';
+    const statusClass = safeStatus ? ` idea-card--${safeStatus}` : '';
     return `<div class="idea-card${statusClass}"><div class="idea-votes"><button class="vote-btn ${votes[idea.id]?'voted':''}" onclick="voteIdee(${idea.id})">👍</button><div class="vote-count">${idea.votes||0}</div></div><div class="idea-content"><div class="idea-topline"><div class="idea-badges"><div class="idea-cat-badge">${esc(idea.cat)}</div>${hot?'<div class="idea-hot" title="Idée récente qui reçoit des votes rapidement">🔥 Tendance</div>':''}${statusBadge}</div></div><div class="idea-text">${esc(idea.text)}</div>${commentHtml}<div class="idea-date">${esc(metaDate)}</div></div></div>`;
   }).join('');
   markIdeasAsSeen(ideas);
@@ -285,7 +286,7 @@ function resetContact(){
   closeOv('contact');
 }
 
-// ── Bug report ───────────────────────────────────────────
+// ── Bug report ───────────────────────────────────────────────
 let bugService='';
 function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugService=val;}
 function previewBugPhoto(source){
