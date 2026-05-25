@@ -579,13 +579,13 @@ function loadDechets(){
 
   // Bac noir : collecte lundi matin (avant 8h) — sortir dimanche soir
   let noirJours=(1-dowP+7)%7;
-  if(noirJours===0&&hP>=8) noirJours=7;
+  if(noirJours===0&&hP>=8&&!isFerieDate(new Date(annee,moisP-1,jour))) noirJours=7;
 
   // Bac jaune : collecte mardi matin (semaines paires ISO, avant 8h) — sortir lundi soir
   let jauneJours;
   {
     const d=new Date(annee,moisP-1,jour);
-    if(dowP===2&&hP<8&&getWeekNumber(d)%2===0){jauneJours=0;}
+    if(dowP===2&&(hP<8||isFerieDate(d))&&getWeekNumber(d)%2===0){jauneJours=0;}
     else{
       const candidate=new Date(annee,moisP-1,jour);
       candidate.setDate(candidate.getDate()+1);
