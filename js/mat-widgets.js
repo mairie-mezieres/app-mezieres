@@ -138,7 +138,7 @@ function meteoBuildHourlyTimeline(hourly, nowDate) {
           + '<div class="meteo-hour-rain-wrap"><div class="meteo-hour-rain-bar" style="height:' + barH + 'px"></div></div>'
           + '<div class="meteo-hour-rain">' + item.prob + '%</div>'
           + '<div class="meteo-hour-mm">' + (item.mm > 0 ? item.mm.toFixed(1) + ' mm' : '—') + '</div>'
-          + '<div class="meteo-hour-wind"><span style="display:inline-block;transform:rotate(' + (item.windDeg - 90) + 'deg)">➜</span> ' + item.wind + (item.windDir ? ' ' + item.windDir : '') + '</div>'
+          + '<div class="meteo-hour-wind"><span style="display:inline-block;transform:rotate(' + (item.windDeg + 90) + 'deg)">➜</span> ' + item.wind + (item.windDir ? ' ' + item.windDir : '') + '</div>'
           + '</div>';
       }).join('')
     + '</div>'
@@ -438,7 +438,7 @@ async function loadMeteoDetail() {
       + '<div class="meteo-day-desc">' + (METEO_DESC[co] || '') + '</div>'
       + '<div class="meteo-day-meta">🌧️ ' + pl + ' mm</div>'
       + '<div class="meteo-day-meta">☀️ UV ' + uv + '</div>'
-      + '<div class="meteo-day-meta"><span style="display:inline-block;transform:rotate(' + (wdDeg - 90) + 'deg)">➜</span> ' + gust + (wd ? ' ' + wd : '') + '</div>'
+      + '<div class="meteo-day-meta"><span style="display:inline-block;transform:rotate(' + (wdDeg + 90) + 'deg)">➜</span> ' + gust + (wd ? ' ' + wd : '') + '</div>'
       + '</div>';
   }
   html += '</div></div></div>';
