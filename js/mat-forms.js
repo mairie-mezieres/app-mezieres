@@ -387,7 +387,7 @@ async function loadSuivi(type){
       const d=new Date(s.date);
       const ds=isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
       const descHtml=s.desc?`<div style="font-size:.72rem;color:var(--muted);margin:.4rem 0;line-height:1.5;white-space:pre-wrap">${esc(s.desc)}</div>`:'';
-      const photosHtml=(s.photos||[]).map(p=>`<img src="${esc(p.url)}" loading="lazy" style="width:80px;height:60px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open(this.src)">`).join('');
+      const photosHtml=(s.photos||[]).map(p=>`<img src="${esc(p.url)}" loading="lazy" style="width:100%;max-height:320px;object-fit:contain;border-radius:8px;display:block;margin:.4rem 0;background:#f3f4f6">`).join('');
       const commentsHtml=(s.comments||[]).map(c=>{
         const cd=new Date(c.date);
         const cds=isNaN(cd)?'':cd.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
@@ -400,7 +400,7 @@ async function loadSuivi(type){
 </div>
 <div style="font-size:.65rem;color:var(--muted);margin-bottom:6px">${esc(ds)}</div>
 ${descHtml}
-${photosHtml?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:.5rem 0">${photosHtml}</div>`:''}
+${photosHtml}
 ${commentsHtml}
 </div>`;
     }
