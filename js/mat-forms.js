@@ -348,10 +348,22 @@ function resetBug(){
   closeOv('bug');
 }
 
-// ── Suivi public des signalements ────────────────────────────
-function openSuivi(){openOv('suivi');loadSuivi();}
+// ── Suivi public des signalements ─────────────────────────────
+function openSuivi(type){
+  const titleEl=document.querySelector('#ov-suivi .panel-title');
+  const icoEl=document.querySelector('#ov-suivi .panel-ico');
+  if(type==='bugs'){
+    if(titleEl) titleEl.textContent='Suivi des bugs';
+    if(icoEl) icoEl.textContent='🐞';
+  } else {
+    if(titleEl) titleEl.textContent='Suivi des signalements';
+    if(icoEl) icoEl.textContent='📋';
+  }
+  openOv('suivi');
+  loadSuivi(type);
+}
 
-async function loadSuivi(){
+async function loadSuivi(type){
   const body=document.getElementById('suivi-body');
   if(!body) return;
   body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
@@ -359,12 +371,9 @@ async function loadSuivi(){
     const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
-    const all=[
-      ...(data.signalements||[]).map(s=>({...s,_type:'Signalement'})),
-      ...(data.bugs||[]).map(s=>({...s,_type:'Bug'})),
-    ].sort((a,b)=>b.date.localeCompare(a.date));
+    const all=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[]));
     if(!all.length){
-      body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Aucun signalement pour l\'instant.</div>';
+      body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Aucun élément pour l\'instant.</div>';
       return;
     }
     const stCfg={
@@ -387,10 +396,7 @@ async function loadSuivi(){
       html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card-bg)">
 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
 <div style="font-weight:700;font-size:.82rem">${esc(s.cat)}</div>
-<div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap">
-<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:#f1f5f9;color:#64748b">${s._type}</span>
-<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700">${esc(s.statusLabel||'À traiter')}</span>
-</div>
+<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700;flex-shrink:0">${esc(s.statusLabel||'À traiter')}</span>
 </div>
 <div style="font-size:.65rem;color:var(--muted);margin-bottom:6px">${esc(ds)}</div>
 ${descHtml}
@@ -400,6 +406,6 @@ ${commentsHtml}
     }
     body.innerHTML=html;
   }catch(e){
-    body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les signalements.</div>';
+    body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
   }
 }
