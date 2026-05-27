@@ -144,13 +144,18 @@ function hideBanner(e){
 // ── Overlays + gestion bouton retour ─────────────────────────
 const _ovStack = [];
 
+const _OV_BASE_Z = 200;
 function openOv(id){
-  document.getElementById('ov-'+id).classList.add('open');
+  const el = document.getElementById('ov-'+id);
+  el.classList.add('open');
+  el.style.zIndex = String(_OV_BASE_Z + _ovStack.length + 1);
   document.body.style.overflow='hidden';
   _ovStack.push(id);
 }
 function closeOv(id){
-  document.getElementById('ov-'+id).classList.remove('open');
+  const el = document.getElementById('ov-'+id);
+  el.classList.remove('open');
+  el.style.zIndex = '';
   const idx = _ovStack.lastIndexOf(id);
   if(idx !== -1) _ovStack.splice(idx,1);
   if(_ovStack.length === 0) document.body.style.overflow='';
