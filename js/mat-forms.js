@@ -422,7 +422,7 @@ async function loadSuivi(type){
     const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
-    _suiviItems=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[]));
+    _suiviItems=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[])).map(s=>({...s,status:(s.status in _suiviStCfg)?s.status:'pending'}));
     if(!_suiviItems.length){
       body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Aucun élément pour l\'instant.</div>';
       return;
