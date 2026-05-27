@@ -347,3 +347,59 @@ function resetBug(){
   restoreBugFormState();
   closeOv('bug');
 }
+
+// ── Suivi public des signalements ────────────────────────────
+function openSuivi(){openOv('suivi');loadSuivi();}
+
+async function loadSuivi(){
+  const body=document.getElementById('suivi-body');
+  if(!body) return;
+  body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
+  try{
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    const all=[
+      ...(data.signalements||[]).map(s=>({...s,_type:'Signalement'})),
+      ...(data.bugs||[]).map(s=>({...s,_type:'Bug'})),
+    ].sort((a,b)=>b.date.localeCompare(a.date));
+    if(!all.length){
+      body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Aucun signalement pour l\'instant.</div>';
+      return;
+    }
+    const stCfg={
+      pending:     {bg:'#fef3c7',color:'#92400e'},
+      in_progress: {bg:'#dbeafe',color:'#1e40af'},
+      resolved:    {bg:'#d1fae5',color:'#065f46'},
+    };
+    let html='';
+    for(const s of all){
+      const st=stCfg[s.status]||stCfg.pending;
+      const d=new Date(s.date);
+      const ds=isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+      const descHtml=s.desc?`<div style="font-size:.72rem;color:var(--muted);margin:.4rem 0;line-height:1.5;white-space:pre-wrap">${esc(s.desc)}</div>`:'';
+      const photosHtml=(s.photos||[]).map(p=>`<img src="${esc(p.url)}" loading="lazy" style="width:80px;height:60px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open(this.src)">`).join('');
+      const commentsHtml=(s.comments||[]).map(c=>{
+        const cd=new Date(c.date);
+        const cds=isNaN(cd)?'':cd.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+        return `<div style="border-left:3px solid #4f46e5;padding:.4rem .6rem;margin:.4rem 0;font-size:.7rem;background:#f5f3ff;border-radius:0 6px 6px 0"><span style="font-weight:700;color:#4f46e5">Mairie · ${esc(cds)}</span><br>${esc(c.text)}</div>`;
+      }).join('');
+      html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card-bg)">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+<div style="font-weight:700;font-size:.82rem">${esc(s.cat)}</div>
+<div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap">
+<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:#f1f5f9;color:#64748b">${s._type}</span>
+<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700">${esc(s.statusLabel||'À traiter')}</span>
+</div>
+</div>
+<div style="font-size:.65rem;color:var(--muted);margin-bottom:6px">${esc(ds)}</div>
+${descHtml}
+${photosHtml?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:.5rem 0">${photosHtml}</div>`:''}
+${commentsHtml}
+</div>`;
+    }
+    body.innerHTML=html;
+  }catch(e){
+    body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les signalements.</div>';
+  }
+}
