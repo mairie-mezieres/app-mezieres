@@ -646,7 +646,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-body">
 <div id="signal-form">
 <div class="ctx-help" id="ctx-signal"></div>
-<button type="button" onclick="openSuivi('signalements')" style="display:block;width:100%;padding:9px 12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;color:#1e40af;font-size:.8rem;cursor:pointer;font-family:inherit;margin-bottom:10px;text-align:left">📋 Voir les signalements en cours →</button>
+<button type="button" onclick="openSuivi('signalements')" class="suivi-link-btn">📋 Voir les signalements en cours →</button>
 <p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
 <div class="form-group">
 <label class="form-label">Catégorie</label>
@@ -687,7 +687,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="s-title">Signalement envoyé !</div>
 <div class="s-sub">La mairie a bien reçu votre signalement.<br>Merci de votre contribution !</div>
 <button class="submit-btn" style="margin-top:16px" onclick="resetSignal()">Faire un autre signalement</button>
-<button type="button" style="width:100%;margin-top:8px;padding:10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;color:#1e40af;font-size:.8rem;cursor:pointer;font-family:inherit" onclick="openSuivi('signalements')">📋 Voir l'avancement des signalements</button>
+<button type="button" class="suivi-link-btn" style="margin-top:8px" onclick="openSuivi('signalements')">📋 Voir l'avancement des signalements</button>
 </div>
 </div>
 </div>
