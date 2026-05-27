@@ -212,7 +212,6 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDocs()">📄 Documents officiels</button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
-<button onclick="openSuivi()">📋 Suivi signalements</button>
 <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener noreferrer">🥾 Randonnées</a>
 <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener noreferrer">🌐 CCTVL</a>
 </nav>
@@ -268,12 +267,6 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct-label" id="iob-label">Signaler un bug</div>
 <div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
 </div>
-</button>
-</div>
-<div class="grid2" style="grid-template-columns:1fr">
-<button class="card simple-card" onclick="openSuivi()">
-<div class="ico" style="background:#eff6ff">📋</div>
-<div class="ct"><div class="ct-label">Suivi signalements</div><div class="ct-sub">État de traitement →</div></div>
 </button>
 </div>
 <hr style="margin:6px 0;border:none;border-top:1px solid var(--border)">
@@ -686,12 +679,14 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div id="loc-status" style="font-size:0.68rem;color:var(--muted);margin-top:4px"></div>
 </div>
 <button class="submit-btn" onclick="submitSignal()">📤 Envoyer le signalement</button>
+<div style="text-align:center;margin-top:8px"><button type="button" onclick="openSuivi('signalements')" style="background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;text-decoration:underline;padding:4px">📋 Voir les signalements en cours</button></div>
 </div>
 <div class="success-msg" id="signal-success">
 <div class="s-ico">✅</div>
 <div class="s-title">Signalement envoyé !</div>
 <div class="s-sub">La mairie a bien reçu votre signalement.<br>Merci de votre contribution !</div>
 <button class="submit-btn" style="margin-top:16px" onclick="resetSignal()">Faire un autre signalement</button>
+<button type="button" style="width:100%;margin-top:8px;padding:10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;color:#1e40af;font-size:.8rem;cursor:pointer;font-family:inherit" onclick="openSuivi('signalements')">📋 Voir l'avancement des signalements</button>
 </div>
 </div>
 </div>
@@ -950,12 +945,14 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <button type="button" id="bug-photo-remove" class="photo-remove-btn" onclick="removeBugPhoto()">🗑️ Retirer l'image</button>
 </div>
 <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
+<div style="text-align:center;margin-top:8px"><button type="button" onclick="openSuivi('bugs')" style="background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;text-decoration:underline;padding:4px">📋 Voir les bugs en cours</button></div>
 </div>
 <div class="success-msg" id="bug-success">
 <div class="s-ico">✅</div>
 <div class="s-title">Rapport envoyé !</div>
 <div class="s-sub">Merci de contribuer à améliorer MAT.</div>
 <button class="submit-btn" style="margin-top:16px;background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="resetBug()">Fermer</button>
+<button type="button" style="width:100%;margin-top:8px;padding:10px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;color:#4f46e5;font-size:.8rem;cursor:pointer;font-family:inherit" onclick="openSuivi('bugs')">📋 Voir le suivi des bugs</button>
 </div>
 </div>
 </div>
