@@ -349,6 +349,56 @@ function resetBug(){
 }
 
 // ── Suivi public des signalements ─────────────────────────────
+let _suiviItems=[], _suiviFilter='all';
+const _suiviStCfg={
+  pending:     {bg:'#fef3c7',color:'#92400e',label:'À traiter',ico:'🟡'},
+  in_progress: {bg:'#dbeafe',color:'#1e40af',label:'En cours', ico:'🔵'},
+  resolved:    {bg:'#d1fae5',color:'#065f46',label:'Résolu',   ico:'🟢'},
+};
+
+function filterSuivi(f){
+  _suiviFilter=f;
+  document.querySelectorAll('#suivi-filter-bar button').forEach(b=>{
+    const on=b.dataset.f===f;
+    b.style.fontWeight=on?'800':'600';
+    b.style.opacity=on?'1':'0.6';
+    b.style.borderWidth=on?'2px':'1px';
+  });
+  _renderSuiviCards();
+}
+
+function _renderSuiviCards(){
+  const el=document.getElementById('suivi-cards');
+  if(!el) return;
+  const items=_suiviFilter==='all'?_suiviItems:_suiviItems.filter(s=>s.status===_suiviFilter);
+  if(!items.length){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Aucun élément pour ce statut.</div>';
+    return;
+  }
+  let html='';
+  for(const s of items){
+    const st=_suiviStCfg[s.status]||_suiviStCfg.pending;
+    const d=new Date(s.date);
+    const ds=isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+    const descHtml=s.desc?`<div style="font-size:.72rem;color:var(--muted);margin:.4rem 0;line-height:1.5;white-space:pre-wrap">${esc(s.desc)}</div>`:'';
+    const photosHtml=(s.photos||[]).map(p=>`<img src="${esc(p.url)}" loading="lazy" style="width:100%;max-height:320px;object-fit:contain;border-radius:8px;display:block;margin:.4rem 0;background:#f3f4f6">`).join('');
+    const commentsHtml=(s.comments||[]).map(c=>{
+      const cd=new Date(c.date);
+      const cds=isNaN(cd)?'':cd.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+      return `<div style="border-left:3px solid #4f46e5;padding:.4rem .6rem;margin:.4rem 0;font-size:.7rem;background:#f5f3ff;border-radius:0 6px 6px 0"><span style="font-weight:700;color:#4f46e5">Mairie · ${esc(cds)}</span><br>${esc(c.text)}</div>`;
+    }).join('');
+    html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+<div style="font-weight:700;font-size:.82rem">${esc(s.cat)}</div>
+<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700;flex-shrink:0">${esc(s.statusLabel||'À traiter')}</span>
+</div>
+<div style="font-size:.65rem;color:var(--muted);margin-bottom:6px">${esc(ds)}</div>
+${descHtml}${photosHtml}${commentsHtml}
+</div>`;
+  }
+  el.innerHTML=html;
+}
+
 function openSuivi(type){
   const titleEl=document.querySelector('#ov-suivi .panel-title');
   const icoEl=document.querySelector('#ov-suivi .panel-ico');
@@ -364,6 +414,7 @@ function openSuivi(type){
 }
 
 async function loadSuivi(type){
+  _suiviFilter='all';
   const body=document.getElementById('suivi-body');
   if(!body) return;
   body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
@@ -371,40 +422,17 @@ async function loadSuivi(type){
     const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
-    const all=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[]));
-    if(!all.length){
+    _suiviItems=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[]));
+    if(!_suiviItems.length){
       body.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">Aucun élément pour l\'instant.</div>';
       return;
     }
-    const stCfg={
-      pending:     {bg:'#fef3c7',color:'#92400e'},
-      in_progress: {bg:'#dbeafe',color:'#1e40af'},
-      resolved:    {bg:'#d1fae5',color:'#065f46'},
-    };
-    let html='';
-    for(const s of all){
-      const st=stCfg[s.status]||stCfg.pending;
-      const d=new Date(s.date);
-      const ds=isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
-      const descHtml=s.desc?`<div style="font-size:.72rem;color:var(--muted);margin:.4rem 0;line-height:1.5;white-space:pre-wrap">${esc(s.desc)}</div>`:'';
-      const photosHtml=(s.photos||[]).map(p=>`<img src="${esc(p.url)}" loading="lazy" style="width:100%;max-height:320px;object-fit:contain;border-radius:8px;display:block;margin:.4rem 0;background:#f3f4f6">`).join('');
-      const commentsHtml=(s.comments||[]).map(c=>{
-        const cd=new Date(c.date);
-        const cds=isNaN(cd)?'':cd.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
-        return `<div style="border-left:3px solid #4f46e5;padding:.4rem .6rem;margin:.4rem 0;font-size:.7rem;background:#f5f3ff;border-radius:0 6px 6px 0"><span style="font-weight:700;color:#4f46e5">Mairie · ${esc(cds)}</span><br>${esc(c.text)}</div>`;
-      }).join('');
-      html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
-<div style="font-weight:700;font-size:.82rem">${esc(s.cat)}</div>
-<span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700;flex-shrink:0">${esc(s.statusLabel||'À traiter')}</span>
-</div>
-<div style="font-size:.65rem;color:var(--muted);margin-bottom:6px">${esc(ds)}</div>
-${descHtml}
-${photosHtml}
-${commentsHtml}
-</div>`;
-    }
-    body.innerHTML=html;
+    const cnt={all:_suiviItems.length,pending:0,in_progress:0,resolved:0};
+    for(const s of _suiviItems){ if(s.status in cnt) cnt[s.status]++; }
+    const btnBase='border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;border:1px solid;font-family:inherit;';
+    const mkBtn=(f,ico,lbl,n)=>n===0?'':`<button data-f="${f}" onclick="filterSuivi('${f}')" style="${btnBase}background:${f==='all'?'var(--forest)':_suiviStCfg[f].bg};color:${f==='all'?'white':_suiviStCfg[f].color};font-weight:${f==='all'?'800':'600'};border-color:${f==='all'?'var(--forest)':_suiviStCfg[f].color};opacity:${f==='all'?'1':'0.6'}">${ico} ${lbl} <strong>${n}</strong></button>`;
+    body.innerHTML=`<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div>`;
+    _renderSuiviCards();
   }catch(e){
     body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
   }
