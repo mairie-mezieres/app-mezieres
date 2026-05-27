@@ -393,7 +393,7 @@ async function loadSuivi(type){
         const cds=isNaN(cd)?'':cd.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
         return `<div style="border-left:3px solid #4f46e5;padding:.4rem .6rem;margin:.4rem 0;font-size:.7rem;background:#f5f3ff;border-radius:0 6px 6px 0"><span style="font-weight:700;color:#4f46e5">Mairie · ${esc(cds)}</span><br>${esc(c.text)}</div>`;
       }).join('');
-      html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card-bg)">
+      html+=`<div style="border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">
 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
 <div style="font-weight:700;font-size:.82rem">${esc(s.cat)}</div>
 <span style="font-size:.62rem;padding:2px 8px;border-radius:999px;background:${st.bg};color:${st.color};font-weight:700;flex-shrink:0">${esc(s.statusLabel||'À traiter')}</span>
