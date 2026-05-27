@@ -212,6 +212,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDocs()">📄 Documents officiels</button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
+<button onclick="openSuivi()">📋 Suivi signalements</button>
 <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener noreferrer">🥾 Randonnées</a>
 <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener noreferrer">🌐 CCTVL</a>
 </nav>
@@ -686,6 +687,18 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="s-sub">La mairie a bien reçu votre signalement.<br>Merci de votre contribution !</div>
 <button class="submit-btn" style="margin-top:16px" onclick="resetSignal()">Faire un autre signalement</button>
 </div>
+</div>
+</div>
+</div>
+<div class="ov" id="ov-suivi" onclick="ovClick('suivi',event)">
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:#eff6ff">📋</div>
+<div class="panel-title">Suivi des signalements</div>
+<button class="panel-close" onclick="closeOv('suivi')">✕</button>
+</div>
+<div class="panel-body" id="suivi-body">
+<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>
 </div>
 </div>
 </div>
