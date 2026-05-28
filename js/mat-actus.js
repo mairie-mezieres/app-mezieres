@@ -28,15 +28,15 @@ function getActuId(a){
 
 function getActuPlainDescription(a){
   if(a && a.description && String(a.description).trim()) return String(a.description).trim();
-  const fullText=((a && (a.text||a.title))||'').replace(/#app-mezieres/gi,'').trim();
+  const fullText=((a && (a.text||a.title))||'').replace(/#(MAT|app-mezieres)/gi,'').trim();
   const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   return lines.length>1 ? lines.slice(1).join('\n') : '';
 }
 
 function getActuDisplayTitle(a){
   if(!a) return 'Actualité';
-  if(a.title && String(a.title).trim()) return String(a.title).replace(/#app-mezieres/gi,'').trim();
-  const fullText=((a.text||'')+'').replace(/#app-mezieres/gi,'').trim();
+  if(a.title && String(a.title).trim()) return String(a.title).replace(/#(MAT|app-mezieres)/gi,'').trim();
+  const fullText=((a.text||'')+'').replace(/#(MAT|app-mezieres)/gi,'').trim();
   const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   return lines[0] || 'Actualité';
 }
@@ -251,7 +251,7 @@ async function loadActus(){
   try{
     const actus=await fetchActus(true);
     await renderNotifIdeasCallout();
-    if(!actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#app-mezieres</strong> pour faire remonter vos publications ici.</div>';return;}
+    if(!actus.length){el.innerHTML='<div class="actu-empty">Aucune actualité communale récente.<br><br>Publiez sur Radio Mézières avec <strong>#MAT</strong> pour faire remonter vos publications ici.</div>';return;}
     el.innerHTML=actus.map(renderActuListItem).join('');
     markActusAsSeen(actus||[]);
   }catch(e){
