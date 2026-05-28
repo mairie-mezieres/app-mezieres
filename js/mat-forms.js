@@ -1,6 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Formulaires v3.7.3
    Signalement, contact, bug, idées
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 // ── Signalement → Trello ───────────────────────────────────────

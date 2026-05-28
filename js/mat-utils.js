@@ -1,6 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Utilitaires communs v3.7.5
    Helpers partagés par tous les modules
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 // ── Constantes globales ──────────────────────────────────────

@@ -1,4 +1,5 @@
 // SERVICE WORKER v4.7.0 — MAT Mézières Avec Toi - Site WEB officiel
+// Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
 // Network First
 // J4.a : install échoue si un fichier critique manque (l'ancienne version
 //         reste alors active, plutôt que d'installer un cache cassé).
