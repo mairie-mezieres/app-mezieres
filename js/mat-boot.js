@@ -3,6 +3,7 @@
    Séquence d'amorçage appelée au chargement de la page.
    DOIT Être CHARGÉ EN DERNIER — tous les autres modules doivent
    déjà avoir défini leurs fonctions globales.
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 (function matInit(){

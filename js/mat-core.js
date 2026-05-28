@@ -1,6 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Core v3.7.1
    Overlays, installation PWA, splash, init
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 // ── Installation PWA ──────────────────────────────────────

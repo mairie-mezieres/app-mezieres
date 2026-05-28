@@ -23,6 +23,7 @@
    sur GitHub directement — AUCUN changement de code nécessaire.
    Le fallback embarqué ci-dessous garantit que MEL fonctionne même si
    les fichiers JSON ne sont pas accessibles (offline, 404, etc.).
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 // ════════════════════════════════════════════════════════

@@ -1,6 +1,7 @@
 /* ════════════════════════════════════════════════════════════
    MAT — Widgets header v3.7.0
    Météo, déchets, bus Rémi, mairie, prochain événement
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
 // ── Météo ─────────────────────────────────────────────────
