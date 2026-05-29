@@ -427,8 +427,8 @@ function _matchMySig(s){
 function _renderSuiviCards(){
   const el=document.getElementById('suivi-cards');
   if(!el) return;
-  const mySignalIds=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>k.replace('mat:notify:signal:',''));}catch(_){return[];}})());
-  const items=_suiviFilter==='all'?_suiviItems:_suiviFilter==='mine'?_suiviItems.filter(s=>mySignalIds.has(String(s.id||''))||_matchMySig(s)):_suiviItems.filter(s=>s.status===_suiviFilter);
+  const myTokens=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>localStorage.getItem(k)).filter(Boolean);}catch(_){return[];}})());
+  const items=_suiviFilter==='all'?_suiviItems:_suiviFilter==='mine'?_suiviItems.filter(s=>(s.matRef&&myTokens.has(s.matRef))||_matchMySig(s)):_suiviItems.filter(s=>s.status===_suiviFilter);
   if(!items.length){
     el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Aucun élément pour ce statut.</div>';
     return;
@@ -488,8 +488,8 @@ async function loadSuivi(type){
     const cnt={all:_suiviItems.length,pending:0,in_progress:0,resolved:0};
     for(const s of _suiviItems){ if(s.status in cnt) cnt[s.status]++; }
     const btnBase='border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;border:1px solid;font-family:inherit;';
-    const mySignalIds=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>k.replace('mat:notify:signal:',''));}catch(_){return[];}})());
-    const myCount=_suiviItems.filter(s=>mySignalIds.has(String(s.id||''))||_matchMySig(s)).length||0;
+    const myTokens=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>localStorage.getItem(k)).filter(Boolean);}catch(_){return[];}})());
+    const myCount=_suiviItems.filter(s=>(s.matRef&&myTokens.has(s.matRef))||_matchMySig(s)).length||0;
     const mkBtn=(f,ico,lbl,n)=>n===0&&f!=='all'&&f!=='mine'?'':`<button data-f="${f}" onclick="filterSuivi('${f}')" style="${btnBase}background:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.bg||'#f3f4f6'};color:${f==='all'||f==='mine'?'white':_suiviStCfg[f]?.color||'#374151'};font-weight:${f==='all'||f==='mine'?'800':'600'};border-color:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.color||'#9ca3af'};opacity:${f==='all'||f==='mine'?'1':'0.6'}">${ico} ${lbl}${n>0?' <strong>'+n+'</strong>':''}</button>`;
     body.innerHTML=`<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('mine','👤','Mes signalements',myCount)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div>`;
     _renderSuiviCards();
