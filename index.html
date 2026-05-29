@@ -37,11 +37,11 @@ document.documentElement.style.background = bg;
 <link rel="stylesheet" href="css/mat.css?v=4.3.2">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.4">
 <script defer src="js/mat-utils.js?v=4.2.9"></script>
-<script defer src="js/mat-core.js?v=4.2.8"></script>
+<script defer src="js/mat-core.js?v=4.2.9"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.6"></script>
 <script defer src="js/mat-widgets.js?v=4.4.0"></script>
 <script defer src="js/mat-agenda.js?v=4.2.4"></script>
-<script defer src="js/mat-forms.js?v=4.3.0"></script>
+<script defer src="js/mat-forms.js?v=4.3.1"></script>
 <script defer src="js/mat-actus.js?v=4.3.3"></script>
 <script defer src="js/mat-trombi.js?v=4.2.5"></script>
 <script defer src="js/mat-mel.js?v=4.3.2"></script>
@@ -645,9 +645,9 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </div>
 <div class="panel-body">
 <div id="signal-form">
+<div id="signal-map" style="height:240px;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;background:#eef2f7"></div>
+<button type="button" onclick="openSuivi('signalements')" class="suivi-link-btn">📋 Voir le détail des signalements en cours →</button>
 <div class="ctx-help" id="ctx-signal"></div>
-<button type="button" onclick="openSuivi('signalements')" class="suivi-link-btn">📋 Voir les signalements en cours →</button>
-<p style="font-size:0.76rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Signalez un problème anonymement. Aucune donnée personnelle n'est collectée.</p>
 <div class="form-group">
 <label class="form-label">Catégorie</label>
 <div class="form-cats" id="signal-cats">

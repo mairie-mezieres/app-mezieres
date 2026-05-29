@@ -185,7 +185,7 @@ function openMel(){
   renderContextHelp('mel');
   melShowTree();
 }
-function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal');}
+function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal'); if(typeof loadSignalMap==='function') loadSignalMap();}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}

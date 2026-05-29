@@ -455,6 +455,36 @@ async function setSuiviView(v){
   }
 }
 
+// Carte affichée en haut de l'overlay de signalement (tous les signalements)
+let _signalMap=null, _signalMarkers=[];
+async function loadSignalMap(){
+  const el=document.getElementById('signal-map');
+  if(!el) return;
+  let items=[];
+  try{
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
+    if(r.ok){ const d=await r.json(); items=(d.signalements||[]).filter(s=>typeof s.lat==='number'&&typeof s.lon==='number'); }
+  }catch(_){}
+  try{ await _loadLeaflet(); }
+  catch(_){ el.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.8rem;text-align:center;padding:16px">Carte indisponible.<br>Vérifiez votre connexion.</div>'; return; }
+  if(!_signalMap){
+    _signalMap=L.map(el,{scrollWheelZoom:false}).setView([47.822,1.808],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_signalMap);
+  }
+  _signalMarkers.forEach(m=>_signalMap.removeLayer(m));
+  _signalMarkers=[];
+  const bounds=[];
+  for(const s of items){
+    const color=s.status==='resolved'?'#10b981':s.status==='in_progress'?'#3b82f6':'#f59e0b';
+    const mk=L.circleMarker([s.lat,s.lon],{radius:9,color:'#fff',weight:2,fillColor:color,fillOpacity:0.9}).addTo(_signalMap);
+    const photo=(s.photos&&s.photos[0])?`<img src="${esc(s.photos[0].url)}" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-top:6px">`:'';
+    mk.bindPopup(`<strong>${esc(s.cat)}</strong><br><span style="color:#666;font-size:.85em">${esc(s.statusLabel||'À traiter')}</span>${photo}`);
+    _signalMarkers.push(mk); bounds.push([s.lat,s.lon]);
+  }
+  if(bounds.length) _signalMap.fitBounds(bounds,{padding:[30,30],maxZoom:16});
+  setTimeout(()=>{ try{ _signalMap.invalidateSize(); }catch(_){} },150);
+}
+
 async function _renderSuiviMap(){
   const el=document.getElementById('suivi-map');
   if(!el) return;
