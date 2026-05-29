@@ -28,15 +28,15 @@ function getActuId(a){
 
 function getActuPlainDescription(a){
   if(a && a.description && String(a.description).trim()) return String(a.description).trim();
-  const fullText=((a && (a.text||a.title))||'').replace(/#(MAT\b|app-mezieres)/gi,'').trim();
+  const fullText=((a && (a.text||a.title))||'').replace(/#(?:MAT(?![a-zA-ZÀ-ÿ0-9_])|app-mezieres)/gi,'').trim();
   const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   return lines.length>1 ? lines.slice(1).join('\n') : '';
 }
 
 function getActuDisplayTitle(a){
   if(!a) return 'Actualité';
-  if(a.title && String(a.title).trim()) return String(a.title).replace(/#(MAT\b|app-mezieres)/gi,'').trim();
-  const fullText=((a.text||'')+'').replace(/#(MAT\b|app-mezieres)/gi,'').trim();
+  if(a.title && String(a.title).trim()) return String(a.title).replace(/#(?:MAT(?![a-zA-ZÀ-ÿ0-9_])|app-mezieres)/gi,'').trim();
+  const fullText=((a.text||'')+'').replace(/#(?:MAT(?![a-zA-ZÀ-ÿ0-9_])|app-mezieres)/gi,'').trim();
   const lines=fullText.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
   return lines[0] || 'Actualité';
 }
