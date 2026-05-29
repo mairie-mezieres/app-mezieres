@@ -431,6 +431,8 @@ let _charts = {};
 let _purgeDateValue = new Date().toISOString().slice(0, 10);
 let _serviceDiag = null;
 let _serviceDiagRunning = false;
+let _trelloHookBusy = false;
+let _trelloHookMsg = '';
 let _melTreeEditor = null;
 let _melTreeLoadedFrom = '';
 
@@ -1827,6 +1829,15 @@ function renderServices(){
       <button type="button" class="pub-publish-btn" style="width:auto;min-width:240px;margin-top:0" onclick="runServicesTest()" ${_serviceDiagRunning?'disabled':''}>${_serviceDiagRunning?'⏳ Test en cours…':'🧪 Lancer le test automatique'}</button>
       <div style="font-size:0.76rem;color:var(--muted);font-weight:700;">Dernier test : ${safe(checkedAt)}</div>
     </div>
+    <div class="service-card" style="margin-bottom:14px">
+      <div class="service-head"><div class="service-name">🔗 Webhook Trello → notifications statut</div></div>
+      <div class="service-msg">Permet d'envoyer une notification push au citoyen quand vous déplacez sa carte dans Trello (ex. « À traiter » → « En cours »). À activer <strong>une seule fois</strong>.</div>
+      <div class="service-actions" style="margin-top:10px">
+        <button type="button" class="pub-publish-btn" style="width:auto;min-width:220px;margin-top:0" onclick="registerTrelloWebhook()" ${_trelloHookBusy?'disabled':''}>${_trelloHookBusy?'⏳ Activation…':'🔗 Activer le webhook Trello'}</button>
+        <button type="button" class="pub-publish-btn" style="width:auto;min-width:160px;margin-top:0;background:#6b7280" onclick="listTrelloWebhooks()" ${_trelloHookBusy?'disabled':''}>📋 Vérifier l'état</button>
+      </div>
+      ${_trelloHookMsg?`<div class="service-log" style="margin-top:10px;white-space:pre-wrap">${safe(_trelloHookMsg)}</div>`:''}
+    </div>
     ${data?`<div class="service-summary cards-grid">
       <div class="stat-card ok"><div class="stat-card-ico">✅</div><div class="stat-card-val">${summary.ok||0}</div><div class="stat-card-label">Services OK</div></div>
       <div class="stat-card warn"><div class="stat-card-ico">⚠️</div><div class="stat-card-val">${summary.warn||0}</div><div class="stat-card-label">Alertes</div></div>
@@ -1851,6 +1862,37 @@ async function runServicesTest(){
   }finally{
     _serviceDiagRunning=false;
     renderServices();
+  }
+}
+
+async function registerTrelloWebhook(){
+  if(_trelloHookBusy) return;
+  _trelloHookBusy=true; _trelloHookMsg=''; renderServices();
+  try{
+    const d=await apiPost('/admin/trello/register-webhook', {});
+    if(d.error) throw new Error(typeof d.error==='string'?d.error:JSON.stringify(d.error));
+    const lines=(d.results||[]).map(r=>`• Board ${r.idModel} : ${r.ok?(r.alreadyExists?'déjà actif ✅':'activé ✅'):('échec ❌ '+(typeof r.error==='string'?r.error:JSON.stringify(r.error)))}`);
+    _trelloHookMsg=`URL de callback : ${d.callbackURL}\nSignature vérifiée : ${d.signatureCheck?'oui':'non (TRELLO_WEBHOOK_SECRET absent)'}\n${lines.join('\n')}`;
+  }catch(e){
+    _trelloHookMsg='Erreur : '+(e.message||'inconnue');
+  }finally{
+    _trelloHookBusy=false; renderServices();
+  }
+}
+
+async function listTrelloWebhooks(){
+  if(_trelloHookBusy) return;
+  _trelloHookBusy=true; _trelloHookMsg=''; renderServices();
+  try{
+    const d=await apiGet('/admin/trello/webhooks');
+    const hooks=d.webhooks||[];
+    _trelloHookMsg=hooks.length
+      ? hooks.map(h=>`• ${h.active?'🟢':'⚪'} ${h.callbackURL}\n   board: ${h.idModel} (id ${h.id})`).join('\n')
+      : 'Aucun webhook enregistré pour le moment.';
+  }catch(e){
+    _trelloHookMsg='Erreur : '+(e.message||'inconnue');
+  }finally{
+    _trelloHookBusy=false; renderServices();
   }
 }
 
