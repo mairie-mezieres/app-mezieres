@@ -8,7 +8,7 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.7.0';
+const CACHE = 'mat-v4.7.1';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -47,7 +47,8 @@ const PRECACHE_URLS = [
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
   './mat-header.png',
-  './icon-192.png'
+  './icon-192.png',
+  './icon-badge.png'
 ];
 
 self.addEventListener('install', e => {
@@ -195,7 +196,7 @@ function normalizePushPayload(raw) {
     title: raw.title || 'MAT — Mézières Avec Toi',
     body: raw.body || '',
     icon: raw.icon || './icon-192.png',
-    badge: raw.badge || './icon-192.png',
+    badge: raw.badge || './icon-badge.png',
     image: raw.image || undefined,
     actions,
     tag: raw.tag || (actuId ? `actu-${actuId}` : 'mat-notif'),
