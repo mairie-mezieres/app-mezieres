@@ -396,6 +396,89 @@ function resetBug(){
 
 // ── Suivi public des signalements ─────────────────────────────
 let _suiviItems=[], _suiviFilter='all';
+let _suiviView='list', _suiviMap=null, _suiviMarkers=[], _leafletPromise=null;
+
+// Chargement paresseux de Leaflet (CDN, uniquement à l'ouverture de la carte)
+function _loadLeaflet(){
+  if(window.L) return Promise.resolve();
+  if(_leafletPromise) return _leafletPromise;
+  _leafletPromise=new Promise((resolve,reject)=>{
+    const css=document.createElement('link');
+    css.rel='stylesheet';
+    css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    css.integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+    css.crossOrigin='';
+    document.head.appendChild(css);
+    const s=document.createElement('script');
+    s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+    s.crossOrigin='';
+    s.onload=()=>resolve();
+    s.onerror=()=>{ _leafletPromise=null; reject(new Error('leaflet load failed')); };
+    document.head.appendChild(s);
+  });
+  return _leafletPromise;
+}
+
+function _suiviToggleHtml(){
+  const b='border:1px solid var(--border);background:var(--card);border-radius:999px;padding:4px 14px;font-size:.72rem;cursor:pointer;font-family:inherit;font-weight:700';
+  return `<div id="suivi-viewtoggle" style="display:flex;gap:6px;margin-bottom:10px">
+    <button data-v="list" onclick="setSuiviView('list')" style="${b}">📋 Liste</button>
+    <button data-v="map" onclick="setSuiviView('map')" style="${b}">🗺️ Carte</button>
+  </div>`;
+}
+
+function _suiviFilteredItems(){
+  const myTokens=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>localStorage.getItem(k)).filter(Boolean);}catch(_){return[];}})());
+  if(_suiviFilter==='all') return _suiviItems;
+  if(_suiviFilter==='mine') return _suiviItems.filter(s=>(s.matRef&&myTokens.has(s.matRef))||_matchMySig(s));
+  return _suiviItems.filter(s=>s.status===_suiviFilter);
+}
+
+async function setSuiviView(v){
+  _suiviView=v;
+  const cards=document.getElementById('suivi-cards');
+  const map=document.getElementById('suivi-map');
+  document.querySelectorAll('#suivi-viewtoggle button').forEach(btn=>{
+    const on=btn.dataset.v===v;
+    btn.style.background=on?'var(--forest)':'var(--card)';
+    btn.style.color=on?'#fff':'var(--text)';
+    btn.style.borderColor=on?'var(--forest)':'var(--border)';
+  });
+  if(v==='map'){
+    if(cards) cards.style.display='none';
+    if(map) map.style.display='block';
+    await _renderSuiviMap();
+  } else {
+    if(map) map.style.display='none';
+    if(cards){ cards.style.display='block'; _renderSuiviCards(); }
+  }
+}
+
+async function _renderSuiviMap(){
+  const el=document.getElementById('suivi-map');
+  if(!el) return;
+  try{ await _loadLeaflet(); }
+  catch(_){ el.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.8rem;text-align:center;padding:16px">Carte indisponible.<br>Vérifiez votre connexion.</div>'; return; }
+  const items=_suiviFilteredItems().filter(s=>typeof s.lat==='number'&&typeof s.lon==='number');
+  if(!_suiviMap){
+    _suiviMap=L.map(el,{scrollWheelZoom:false}).setView([47.822,1.808],14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(_suiviMap);
+  }
+  _suiviMarkers.forEach(m=>_suiviMap.removeLayer(m));
+  _suiviMarkers=[];
+  const bounds=[];
+  for(const s of items){
+    const color=s.status==='resolved'?'#10b981':s.status==='in_progress'?'#3b82f6':'#f59e0b';
+    const mk=L.circleMarker([s.lat,s.lon],{radius:9,color:'#fff',weight:2,fillColor:color,fillOpacity:0.9}).addTo(_suiviMap);
+    const photo=(s.photos&&s.photos[0])?`<img src="${esc(s.photos[0].url)}" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin-top:6px">`:'';
+    mk.bindPopup(`<strong>${esc(s.cat)}</strong><br><span style="color:#666;font-size:.85em">${esc(s.statusLabel||'À traiter')}</span>${photo}`);
+    _suiviMarkers.push(mk); bounds.push([s.lat,s.lon]);
+  }
+  if(bounds.length) _suiviMap.fitBounds(bounds,{padding:[30,30],maxZoom:16});
+  // recalcul de taille après l'animation d'ouverture de l'overlay
+  setTimeout(()=>{ try{ _suiviMap.invalidateSize(); }catch(_){} },120);
+}
 const _suiviStCfg={
   pending:     {bg:'#fef3c7',color:'#92400e',label:'À traiter',ico:'🟡'},
   in_progress: {bg:'#dbeafe',color:'#1e40af',label:'En cours', ico:'🔵'},
@@ -410,7 +493,7 @@ function filterSuivi(f){
     b.style.opacity=on?'1':'0.6';
     b.style.borderWidth=on?'2px':'1px';
   });
-  _renderSuiviCards();
+  if(_suiviView==='map') _renderSuiviMap(); else _renderSuiviCards();
 }
 
 function _matchMySig(s){
@@ -473,6 +556,8 @@ function openSuivi(type){
 
 async function loadSuivi(type){
   _suiviFilter='all';
+  _suiviView='list';
+  if(_suiviMap){ try{ _suiviMap.remove(); }catch(_){} _suiviMap=null; _suiviMarkers=[]; }
   const body=document.getElementById('suivi-body');
   if(!body) return;
   body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
@@ -491,8 +576,8 @@ async function loadSuivi(type){
     const myTokens=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>localStorage.getItem(k)).filter(Boolean);}catch(_){return[];}})());
     const myCount=_suiviItems.filter(s=>(s.matRef&&myTokens.has(s.matRef))||_matchMySig(s)).length||0;
     const mkBtn=(f,ico,lbl,n)=>n===0&&f!=='all'&&f!=='mine'?'':`<button data-f="${f}" onclick="filterSuivi('${f}')" style="${btnBase}background:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.bg||'#f3f4f6'};color:${f==='all'||f==='mine'?'white':_suiviStCfg[f]?.color||'#374151'};font-weight:${f==='all'||f==='mine'?'800':'600'};border-color:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.color||'#9ca3af'};opacity:${f==='all'||f==='mine'?'1':'0.6'}">${ico} ${lbl}${n>0?' <strong>'+n+'</strong>':''}</button>`;
-    body.innerHTML=`<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('mine','👤','Mes signalements',myCount)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div>`;
-    _renderSuiviCards();
+    body.innerHTML=`${_suiviToggleHtml()}<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('mine','👤','Mes signalements',myCount)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div><div id="suivi-map" style="display:none;height:340px;border-radius:12px;overflow:hidden;border:1px solid var(--border)"></div>`;
+    setSuiviView('list');
   }catch(e){
     body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
   }
