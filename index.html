@@ -46,6 +46,21 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.5"></script>
 <script defer src="js/mat-mel.js?v=4.3.2"></script>
 <script defer src="js/mat-boot.js?v=4.2.5"></script>
+<!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
+     Créez un projet sur https://sentry.io puis collez le DSN ici -->
+<script>
+(function(){
+  var dsn = ''; /* ex: 'https://abc123@o123.ingest.sentry.io/456' */
+  if (!dsn) return;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@8/build/bundle.min.js';
+  s.crossOrigin = 'anonymous';
+  s.onload = function() {
+    window.Sentry && Sentry.init({ dsn: dsn, environment: 'production', sampleRate: 1.0, tracesSampleRate: 0 });
+  };
+  document.head.appendChild(s);
+})();
+</script>
 </head>
 <body class="preload">
 <style>

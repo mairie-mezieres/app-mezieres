@@ -189,6 +189,20 @@ tr:hover td{background:#f9fafb;}
 @media(max-width:640px){.mel-admin-toolbar{align-items:flex-start;}.mel-admin-actions{width:100%;}.mel-admin-btn{flex:1;justify-content:center;text-align:center;padding:10px 12px;}}
 
 </style>
+<!-- Sentry — remplacez la chaîne vide par votre DSN admin pour activer le suivi d'erreurs -->
+<script>
+(function(){
+  var dsn = ''; /* ex: 'https://abc123@o123.ingest.sentry.io/456' */
+  if (!dsn) return;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@8/build/bundle.min.js';
+  s.crossOrigin = 'anonymous';
+  s.onload = function() {
+    window.Sentry && Sentry.init({ dsn: dsn, environment: 'production', sampleRate: 1.0, tracesSampleRate: 0 });
+  };
+  document.head.appendChild(s);
+})();
+</script>
 </head>
 <body>
 
