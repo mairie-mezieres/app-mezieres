@@ -561,6 +561,8 @@ if('serviceWorker' in navigator){
     var data=(e&&e.data)||{};
     if(data.action==='openNotifs'){ openNotifs(); return; }
     if(data.action==='openMeteo'){ if(typeof openMeteo==='function') openMeteo(); return; }
+    if(data.action==='openIdees'){ if(typeof openOv==='function') openOv('idees'); return; }
+    if(data.action==='openSignalements'){ if(typeof openOv==='function') openOv('signal'); return; }
     if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
       openActuDetail(String(data.actuId),{ fromHash:false });
       return;

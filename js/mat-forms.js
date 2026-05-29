@@ -53,6 +53,22 @@ function getLocation(){
   },()=>{document.getElementById('loc-btn').textContent='❌ Position refusée';document.getElementById('loc-status').textContent='Activez la localisation dans les paramètres';});
 }
 
+async function _getPushSubForNotify(){
+  try{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)) return null;
+    const reg=await navigator.serviceWorker.ready;
+    return await reg.pushManager.getSubscription();
+  }catch(e){return null;}
+}
+
+function _saveMySig(id, cat, type){
+  try{
+    const list=JSON.parse(localStorage.getItem('mat_my_signals_v1')||'[]');
+    list.unshift({id,cat,type:type||'signalement',date:new Date().toISOString()});
+    localStorage.setItem('mat_my_signals_v1',JSON.stringify(list.slice(0,50)));
+  }catch(_){}
+}
+
 async function submitSignal(){
   const desc=document.getElementById('signal-desc').value.trim();
   const photoEl=document.getElementById('signal-photo-preview');
@@ -66,19 +82,28 @@ async function submitSignal(){
     catch(e){ photoB64 = photoEl.src.substring(0, 80000); }
   }
 
+  const signalId = Date.now();
+  const notifyToken = (typeof crypto!=='undefined'&&crypto.randomUUID) ? crypto.randomUUID() : null;
+  const pushSub = notifyToken ? await _getPushSubForNotify() : null;
+
   const _dev = detectDevice();
   const descWithDevice = desc + (desc ? '\n\n' : '') + '📱 ' + _dev.type + ' · ' + _dev.os + ' · ' + _dev.browser + ' · ' + _dev.pwa;
-  const body={cat:sigCat||'Non précisé',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64};
+  const body={cat:sigCat||'Non précisé',desc:descWithDevice,lat:sigLat,lon:sigLon,photoB64,
+    ...(notifyToken?{notifyToken,sub:pushSub||undefined}:{})};
   const controller = new AbortController();
   const timer = setTimeout(()=>controller.abort(), 35000);
   try{
     const r = await fetch(SIGNAL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
     clearTimeout(timer);
+    if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+signalId,notifyToken);}catch(_){}}
+    _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
   }catch(e){
     clearTimeout(timer);
     if(e.name==='AbortError'){
+      if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+signalId,notifyToken);}catch(_){}}
+      _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
     } else {
@@ -182,16 +207,22 @@ function sortIdeasList(ideas, mode){
   return list.sort((a,b)=>(b.votes||0)-(a.votes||0) || _ideaTimestamp(b)-_ideaTimestamp(a));
 }
 function refreshIdeasSortUi(){
-  const mode=_ideasSort==='recent'?'recent':'popular';
+  const mode=_ideasSort;
   const pop=document.getElementById('ideas-sort-pop');
   const recent=document.getElementById('ideas-sort-recent');
+  const mine=document.getElementById('ideas-sort-mine');
   if(pop) pop.classList.toggle('on', mode==='popular');
   if(recent) recent.classList.toggle('on', mode==='recent');
+  if(mine) mine.classList.toggle('on', mode==='mine');
   const note=document.getElementById('ideas-sort-note');
-  if(note) note.textContent = mode==='recent' ? 'Tri par date la plus récente' : 'Tri par votes décroissants';
+  if(note){
+    if(mode==='mine') note.textContent='Vos idées soumises depuis cet appareil';
+    else if(mode==='recent') note.textContent='Tri par date la plus récente';
+    else note.textContent='Tri par votes décroissants';
+  }
 }
 function setIdeasSort(mode){
-  _ideasSort = mode==='recent' ? 'recent' : 'popular';
+  _ideasSort = mode==='recent' ? 'recent' : mode==='mine' ? 'mine' : 'popular';
   try{ localStorage.setItem(IDEAS_SORT_KEY,_ideasSort); }catch(e){}
   refreshIdeasSortUi();
   loadIdees();
@@ -203,7 +234,11 @@ async function submitIdee(){
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
   const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
   rememberSeenIdeas([idea]);
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(idea)});}catch(e){}
+  const notifyToken=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():null;
+  const pushSub=notifyToken?await _getPushSubForNotify():null;
+  const ideaBody=Object.assign({},idea,notifyToken?{notifyToken,sub:pushSub||undefined}:{});
+  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ideaBody)});}catch(e){}
+  if(notifyToken){try{localStorage.setItem('mat:notify:idea:'+idea.id,notifyToken);}catch(_){}}
   try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
   loadIdees();
@@ -232,8 +267,13 @@ async function loadIdees(){
   if(!el) return;
   refreshIdeasSortUi();
   el.innerHTML='<div class="no-ideas">Chargement…</div>';
-  const ideas=sortIdeasList(await fetchIdeasList(), _ideasSort);
-  if(!ideas.length){el.innerHTML=`<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>`; markIdeasAsSeen([]); return;}
+  const allIdeas=sortIdeasList(await fetchIdeasList(), _ideasSort==='mine'?'popular':_ideasSort);
+  const localIds=new Set(getIdeas().map(i=>String(i.id)));
+  const ideas=_ideasSort==='mine'?allIdeas.filter(i=>localIds.has(String(i.id))):allIdeas;
+  if(!ideas.length){
+    el.innerHTML=_ideasSort==='mine'?'<div class="no-ideas">Aucune idée soumise depuis cet appareil.</div>':`<div class="no-ideas">Aucune idée pour l'instant.<br>Soyez le premier à proposer !</div>`;
+    markIdeasAsSeen([]); return;
+  }
   el.innerHTML=ideas.map(idea=>{
     const hot = isIdeaTrending(idea);
     const metaDate = idea.createdAt ? new Date(idea.createdAt).toLocaleDateString('fr-FR') : (idea.date||'');
@@ -308,22 +348,27 @@ async function submitBug(){
     try{ photoB64 = await compressImage(photoEl.src, 1200, 0.75); }
     catch(e){ photoB64 = photoEl.src.substring(0, 120000); }
   }
+  const signalId=Date.now();
+  const notifyToken=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():null;
+  const pushSub=notifyToken?await _getPushSubForNotify():null;
   try{
+    const dev = detectDevice();
+    const descFull = 'Appareil : '+dev.type
+      +'\nModèle : '+dev.model
+      +'\nOS : '+dev.os
+      +'\nNavigateur : '+dev.browser
+      +'\nÉcran : '+dev.screen
+      +'\nPWA : '+dev.pwa
+      +'\nMAT : '+dev.matVersion
+      +'\n\nDescription :\n'+desc;
+    const bugBody={cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug',photoB64,
+      ...(notifyToken?{notifyToken,sub:pushSub||undefined}:{})};
     await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:(()=>{
-        const dev = detectDevice();
-        const descFull = 'Appareil : '+dev.type
-          +'\nModèle : '+dev.model
-          +'\nOS : '+dev.os
-          +'\nNavigateur : '+dev.browser
-          +'\nÉcran : '+dev.screen
-          +'\nPWA : '+dev.pwa
-          +'\nMAT : '+dev.matVersion
-          +'\n\nDescription :\n'+desc;
-        return JSON.stringify({cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug',photoB64});
-      })()
+      body:JSON.stringify(bugBody)
     });
+    if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+signalId,notifyToken);}catch(_){}}
+    _saveMySig(signalId, bugService||'Non précisé', 'bug');
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
@@ -368,10 +413,22 @@ function filterSuivi(f){
   _renderSuiviCards();
 }
 
+function _matchMySig(s){
+  try{
+    const myList=JSON.parse(localStorage.getItem('mat_my_signals_v1')||'[]');
+    const sd=new Date(s.date).getTime();
+    return myList.some(m=>{
+      const md=new Date(m.date).getTime();
+      return Math.abs(sd-md)<300000;
+    });
+  }catch(_){return false;}
+}
+
 function _renderSuiviCards(){
   const el=document.getElementById('suivi-cards');
   if(!el) return;
-  const items=_suiviFilter==='all'?_suiviItems:_suiviItems.filter(s=>s.status===_suiviFilter);
+  const mySignalIds=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>k.replace('mat:notify:signal:',''));}catch(_){return[];}})());
+  const items=_suiviFilter==='all'?_suiviItems:_suiviFilter==='mine'?_suiviItems.filter(s=>mySignalIds.has(String(s.id||''))||_matchMySig(s)):_suiviItems.filter(s=>s.status===_suiviFilter);
   if(!items.length){
     el.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Aucun élément pour ce statut.</div>';
     return;
@@ -431,8 +488,10 @@ async function loadSuivi(type){
     const cnt={all:_suiviItems.length,pending:0,in_progress:0,resolved:0};
     for(const s of _suiviItems){ if(s.status in cnt) cnt[s.status]++; }
     const btnBase='border-radius:999px;padding:4px 12px;font-size:.7rem;cursor:pointer;border:1px solid;font-family:inherit;';
-    const mkBtn=(f,ico,lbl,n)=>n===0?'':`<button data-f="${f}" onclick="filterSuivi('${f}')" style="${btnBase}background:${f==='all'?'var(--forest)':_suiviStCfg[f].bg};color:${f==='all'?'white':_suiviStCfg[f].color};font-weight:${f==='all'?'800':'600'};border-color:${f==='all'?'var(--forest)':_suiviStCfg[f].color};opacity:${f==='all'?'1':'0.6'}">${ico} ${lbl} <strong>${n}</strong></button>`;
-    body.innerHTML=`<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div>`;
+    const mySignalIds=new Set((()=>{try{return Object.keys(localStorage).filter(k=>k.startsWith('mat:notify:signal:')).map(k=>k.replace('mat:notify:signal:',''));}catch(_){return[];}})());
+    const myCount=_suiviItems.filter(s=>mySignalIds.has(String(s.id||''))||_matchMySig(s)).length||0;
+    const mkBtn=(f,ico,lbl,n)=>n===0&&f!=='all'&&f!=='mine'?'':`<button data-f="${f}" onclick="filterSuivi('${f}')" style="${btnBase}background:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.bg||'#f3f4f6'};color:${f==='all'||f==='mine'?'white':_suiviStCfg[f]?.color||'#374151'};font-weight:${f==='all'||f==='mine'?'800':'600'};border-color:${f==='all'||f==='mine'?'var(--forest)':_suiviStCfg[f]?.color||'#9ca3af'};opacity:${f==='all'||f==='mine'?'1':'0.6'}">${ico} ${lbl}${n>0?' <strong>'+n+'</strong>':''}</button>`;
+    body.innerHTML=`<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('mine','👤','Mes signalements',myCount)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div>`;
     _renderSuiviCards();
   }catch(e){
     body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
