@@ -419,6 +419,7 @@ async function togglePush(){
       if(localStorage.getItem(ACTUS_NOTIF_KEY)!=='0') await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
       if(localStorage.getItem('mat_dechets_notif_v1')==='1'){fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});}
       try{if(localStorage.getItem(METEO_NOTIF_KEY)!=='0'){var lvlA=parseInt(localStorage.getItem(METEO_NOTIF_LEVEL_KEY))||2;var subMA=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:lvlA});fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subMA),keepalive:true}).catch(function(){});}}catch(_){}
+      _registerPendingNotifyTokens(sub).catch(function(){});
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);
       _showPushDiag();
@@ -427,6 +428,23 @@ async function togglePush(){
       await alertMAT('Notifications activées !','Notifications','✅');
     }catch(e){await alertMAT('Erreur lors de l\'activation des notifications.','Notifications','⚠️');}
   }
+}
+
+async function _registerPendingNotifyTokens(sub){
+  if(!sub) return;
+  try{
+    const keys=Object.keys(localStorage).filter(function(k){return k.startsWith('mat:notify:idea:')||k.startsWith('mat:notify:signal:');});
+    for(var i=0;i<keys.length;i++){
+      var token=localStorage.getItem(keys[i]);
+      if(!token) continue;
+      try{
+        fetch('https://chatbot-mairie-mezieres.onrender.com/notify/register-token',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({token:token,sub:sub}),keepalive:true
+        }).catch(function(){});
+      }catch(_){}
+    }
+  }catch(_){}
 }
 
 // ── Encart info/alerte dans le header ────────────

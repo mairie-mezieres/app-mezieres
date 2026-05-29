@@ -1567,20 +1567,68 @@ async function saveActuEdit(id) {
 }
 
 // ── SIGNALEMENTS ─────────────────────
+const _sigStatusCfg={
+  pending:     {label:'À traiter',    color:'#92400e', bg:'#fef3c7'},
+  in_progress: {label:'En cours',     color:'#1e40af', bg:'#dbeafe'},
+  resolved:    {label:'Résolu',       color:'#065f46', bg:'#d1fae5'}
+};
+function _sigStatusBadge(status){
+  const cfg=_sigStatusCfg[status]||_sigStatusCfg.pending;
+  return `<span style="font-size:.65rem;padding:2px 8px;border-radius:999px;background:${cfg.bg};color:${cfg.color};font-weight:700">${cfg.label}</span>`;
+}
+function toggleSignalEdit(id){
+  const row=document.getElementById(`sig-edit-${id}`);
+  if(row) row.style.display=row.style.display==='none'?'table-row':'none';
+}
+async function saveSignalStatus(id){
+  const selEl=document.getElementById(`sig-status-sel-${id}`);
+  const msgEl=document.getElementById(`sig-save-msg-${id}`);
+  const status=selEl?selEl.value:'pending';
+  if(msgEl){msgEl.textContent='Enregistrement…';msgEl.style.color='var(--muted)';}
+  try{
+    const r=await apiPatch(`/admin/signals/${id}`,{status});
+    if(!r.ok) throw new Error(r.error||'Erreur');
+    const idx=_data.signals.findIndex(s=>s.id===id);
+    if(idx>=0) _data.signals[idx].status=status;
+    if(msgEl){msgEl.textContent='✅ Enregistré';msgEl.style.color='var(--leaf)';}
+    setTimeout(()=>{toggleSignalEdit(id);renderSignals();},900);
+  }catch(e){
+    if(msgEl){msgEl.textContent='❌ '+e.message;msgEl.style.color='var(--red,#dc2626)';}
+  }
+}
 function renderSignals() {
   const signals=_data.signals;
   document.getElementById('signals-content').innerHTML=`
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">🚨 Signalements (${signals.length})</span></div>
-      <table><tr><th>Catégorie</th><th>Description</th><th>GPS</th><th>Photo</th><th>Date</th><th></th></tr>
-        ${signals.length?signals.map(s=>`<tr>
+      <table><tr><th>Catégorie</th><th>Description</th><th>GPS</th><th>Photo</th><th>Date</th><th>Statut</th><th></th></tr>
+        ${signals.length?signals.map(s=>`<tr id="sig-row-${s.id}">
           <td><span class="badge badge-red">${safe(s.cat||'—')}</span></td>
-          <td style="max-width:220px;font-size:0.74rem">${safe((s.desc||'—').substring(0,80))}</td>
+          <td style="max-width:200px;font-size:0.74rem">${safe((s.desc||'—').substring(0,80))}</td>
           <td>${s.mapsLink?`<a href="${safeUrl(s.mapsLink)}" target="_blank" style="color:var(--blue);font-size:0.72rem">📍 Voir</a>`:'—'}</td>
           <td>${s.hasPhoto?'<span class="badge badge-green">✓</span>':'—'}</td>
           <td style="font-size:0.72rem">${s.date}</td>
-          <td><button class="del-btn" onclick="deleteSignal(${s.id})">🗑️</button></td>
-        </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucun signalement</td></tr>'}
+          <td>${_sigStatusBadge(s.status)}</td>
+          <td style="white-space:nowrap">
+            <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleSignalEdit(${s.id})">✏️</button>
+            <button class="del-btn" onclick="deleteSignal(${s.id})">🗑️</button>
+          </td>
+        </tr>
+        <tr id="sig-edit-${s.id}" style="display:none;background:#f0f7ff">
+          <td colspan="7" style="padding:14px 16px">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:500px">
+              <span style="font-weight:800;font-size:0.82rem;color:var(--forest)">✏️ Statut</span>
+              <select id="sig-status-sel-${s.id}" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;font-family:inherit">
+                <option value="pending" ${(s.status||'pending')==='pending'?'selected':''}>🟡 À traiter</option>
+                <option value="in_progress" ${s.status==='in_progress'?'selected':''}>🔵 En cours</option>
+                <option value="resolved" ${s.status==='resolved'?'selected':''}>🟢 Résolu</option>
+              </select>
+              <button onclick="saveSignalStatus(${s.id})" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">💾 Enregistrer</button>
+              <button onclick="toggleSignalEdit(${s.id})" style="background:var(--warm);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">Annuler</button>
+              <span id="sig-save-msg-${s.id}" style="font-size:0.78rem;font-weight:800"></span>
+            </div>
+          </td>
+        </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Aucun signalement</td></tr>'}
       </table>
     </div>`;
 }

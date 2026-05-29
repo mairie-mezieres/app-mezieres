@@ -186,6 +186,7 @@ function normalizePushPayload(raw) {
   );
 
   const open = nested.open || (actuId ? 'actu' : 'notifs');
+  // open peut valoir: 'actu', 'notifs', 'meteo', 'idees', 'signalements'
   const actions = Array.isArray(raw.actions) && raw.actions.length
     ? raw.actions
     : (actuId ? [{ action: 'detail', title: 'Détail' }] : []);
@@ -242,6 +243,8 @@ self.addEventListener('notificationclick', e => {
   // Construire l'URL cible selon le type
   let fallbackHash;
   if (openType === 'meteo') fallbackHash = './#meteo';
+  else if (openType === 'idees') fallbackHash = './#idees';
+  else if (openType === 'signalements') fallbackHash = './#signalements';
   else if (openType === 'actu' && data.actuId != null) fallbackHash = `./#actu=${encodeURIComponent(String(data.actuId))}`;
   else fallbackHash = './#notifs';
 
@@ -259,6 +262,10 @@ self.addEventListener('notificationclick', e => {
         try {
           if (openType === 'meteo') {
             existing.postMessage({ action: 'openMeteo' });
+          } else if (openType === 'idees') {
+            existing.postMessage({ action: 'openIdees' });
+          } else if (openType === 'signalements') {
+            existing.postMessage({ action: 'openSignalements' });
           } else if (openType === 'actu' && data.actuId != null) {
             existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
           } else {
