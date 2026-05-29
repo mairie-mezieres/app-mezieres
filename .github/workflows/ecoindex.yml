@@ -1,0 +1,50 @@
+name: EcoIndex
+
+# Audit de sobriété numérique de la PWA via GreenIT-Analysis (Collectif
+# Numérique Responsable). Produit la note EcoIndex (A→G), le poids de page,
+# le nombre de requêtes et la taille du DOM.
+#
+# Tourne sur l'infra GitHub (Chrome headless + accès réseau), comme
+# Lighthouse — impossible depuis l'environnement de dev (réseau restreint).
+#   - manuellement (bouton "Run workflow")
+#   - automatiquement chaque lundi matin
+# Le rapport HTML complet est uploadé en artifact (téléchargeable depuis le
+# run). Étape purement informative : n'échoue jamais le dépôt.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 6 * * 1'  # lundis 06:15 UTC (après Lighthouse)
+
+jobs:
+  ecoindex:
+    name: Sobriété (EcoIndex)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Installer greenit-cli
+        run: npm install -g greenit-cli
+
+      - name: Préparer la liste des URLs
+        run: |
+          cat > urls.yml <<'YML'
+          - name: Accueil MAT
+            url: https://mezieres-lez-clery.fr/
+          YML
+
+      - name: Lancer l'analyse EcoIndex
+        run: greenit analyse urls.yml --output rapport-ecoindex.html
+        continue-on-error: true
+
+      - name: Publier le rapport (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-ecoindex
+          path: rapport-ecoindex.html
+          if-no-files-found: warn
