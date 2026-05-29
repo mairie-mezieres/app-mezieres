@@ -1612,8 +1612,8 @@ function renderSignals() {
           <td style="font-size:0.72rem">${s.date}</td>
           <td>${_sigStatusBadge(s.status)}</td>
           <td style="white-space:nowrap">
-            <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleSignalEdit(${s.id})">✏️</button>
-            <button class="del-btn" onclick="deleteSignal(${s.id})">🗑️</button>
+            <button class="del-btn" style="background:var(--blue,#2563eb);color:white;border-color:transparent" onclick="toggleSignalEdit('${s.id}')">✏️</button>
+            <button class="del-btn" onclick="deleteSignal('${s.id}')">🗑️</button>
           </td>
         </tr>
         <tr id="sig-edit-${s.id}" style="display:none;background:#f0f7ff">
@@ -1625,8 +1625,8 @@ function renderSignals() {
                 <option value="in_progress" ${s.status==='in_progress'?'selected':''}>🔵 En cours</option>
                 <option value="resolved" ${s.status==='resolved'?'selected':''}>🟢 Résolu</option>
               </select>
-              <button onclick="saveSignalStatus(${s.id})" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">💾 Enregistrer</button>
-              <button onclick="toggleSignalEdit(${s.id})" style="background:var(--warm);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">Annuler</button>
+              <button onclick="saveSignalStatus('${s.id}')" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">💾 Enregistrer</button>
+              <button onclick="toggleSignalEdit('${s.id}')" style="background:var(--warm);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">Annuler</button>
               <span id="sig-save-msg-${s.id}" style="font-size:0.78rem;font-weight:800"></span>
             </div>
           </td>
