@@ -1,0 +1,13 @@
+{
+  "name": "mat-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tests E2E smoke (UI, sans backend) de l'application MAT — Mézières Avec Toi",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.49.0"
+  }
+}
