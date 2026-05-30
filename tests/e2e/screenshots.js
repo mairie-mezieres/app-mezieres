@@ -129,6 +129,18 @@ const SCREENS = [
 
   // Chargement initial
   await page.goto(BASE_URL, { waitUntil: 'load', timeout: 60000 });
+
+  // Pré-remplir le localStorage pour sauter l'onboarding "Découvrir l'appli"
+  // et la bannière d'installation PWA
+  await page.evaluate(() => {
+    localStorage.setItem('mat_onboarded_v3', '1');
+    localStorage.setItem('mat_installed_v3', 'dismissed');
+    localStorage.setItem('mat_install_tracked', '1');
+  });
+
+  // Recharger avec ces préférences en place
+  await page.reload({ waitUntil: 'load' });
+
   // Attendre que les scripts JS soient bien disponibles sur window
   await page.waitForFunction(() => typeof window.openMeteo === 'function', { timeout: 20000 })
     .catch(() => console.log('  ⚠️  Scripts pas encore prêts, on continue quand même'));
