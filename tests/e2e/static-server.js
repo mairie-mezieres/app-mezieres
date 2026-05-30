@@ -29,8 +29,9 @@ const server = http.createServer((req, res) => {
   if (pathname === '/' || pathname === '') pathname = '/index.html';
 
   const filePath = path.normalize(path.join(ROOT, pathname));
-  // Garde-fou anti-traversée de répertoire
-  if (!filePath.startsWith(ROOT)) {
+  // Garde-fou anti-traversée : frontière de répertoire réelle (ROOT + séparateur),
+  // sinon un dossier voisin partageant le préfixe (ex. « <root>-secrets ») passerait.
+  if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) {
     res.writeHead(403);
     return res.end('403');
   }
