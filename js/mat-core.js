@@ -377,9 +377,10 @@ function loadDateBadge() {
   const j = JOURS[now.getDay()];
   const d = now.getDate();
   const m = now.getMonth();
+  const y = now.getFullYear();
   const suf = d === 1 ? 'er' : '';
   const saint = (SAINTS[m] && SAINTS[m][d-1] && SAINTS[m][d-1] !== '--') ? SAINTS[m][d-1] : null;
-  el.innerHTML = esc(j) + ' ' + d + suf + ' ' + esc(MOIS[m])
+  el.innerHTML = esc(j) + ' ' + d + suf + ' ' + esc(MOIS[m]) + ' ' + y
     + (saint ? '<br><span style="font-style:italic;font-weight:500;font-size:0.62rem;opacity:0.95">Ste/St ' + esc(saint) + '</span>' : '');
 }
 

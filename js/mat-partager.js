@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.0 — Prompt volumineux et guidant
+// Version 2.1 — Cloudflare Pages, WebP/0-CDN, CI/axe-core
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -408,6 +408,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
   // Fourchettes réalistes vérifiées en mai 2026.
   const HOSTING_COSTS = {
+    'cloudflare-pages': { min: 0, max: 0,  label: 'Cloudflare Pages (gratuit, CDN mondial)' },
     'netlify':       { min: 0, max: 0,  label: 'Netlify free (100 Go BP/mois)' },
     'vercel':        { min: 0, max: 0,  label: 'Vercel free (100 Go BP/mois)' },
     'render':        { min: 0, max: 7,  label: 'Render free → Starter (7 €/mois si pas de sleep)' },
@@ -660,7 +661,10 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '- **Pas de jQuery, pas de Bootstrap, pas de Tailwind compilé** : CSS écrit à la main.',
       '- **Mobile-first** : tout est pensé d’abord pour smartphone, puis adapté desktop.',
       '- **HTML sémantique** : header, nav, main, section, article, footer.',
-      '- **Standards web modernes** : pas de polyfills inutiles, navigateurs récents supportés.'
+      '- **Standards web modernes** : pas de polyfills inutiles, navigateurs récents supportés.',
+      '- **Images en WebP** : convertir systématiquement les PNG/JPEG en WebP (économie typique −86 % JPEG, −95 % PNG). Toujours fournir un attribut `alt`. Pas d’image dépassant 200 Ko.',
+      '- **Zéro CDN tiers au runtime** : polices et Leaflet auto-hébergés dans le dépôt (sous-répertoire `vendor/`). Aucune requête vers Google Fonts, jsDelivr ou unpkg au chargement de l’application citoyenne.',
+      '- **Intégration continue** (si profil intermédiaire) : un workflow GitHub Actions pour vérifier la syntaxe et lancer les tests à chaque push.'
     ].join('\n');
   }
 
@@ -711,7 +715,12 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '- **Navigation clavier** complète (Tab, Enter, Espace, Escape).',
       '',
       '## Panneau de réglages utilisateur (si fonctionnalité access cochée)',
-      'Trois tailles de texte (A, A+, A++), contraste élevé, mode daltonien, lecture vocale, espacement des lignes. Préférences sauvegardées en localStorage.'
+      'Trois tailles de texte (A, A+, A++), contraste élevé, mode daltonien, lecture vocale, espacement des lignes. Préférences sauvegardées en localStorage.',
+      '',
+      '## Vérification automatique WCAG AA (profil intermédiaire)',
+      '- Utilise **axe-core** (npm `axe-core` ou `@axe-core/playwright`) dans le pipeline CI pour détecter automatiquement toute régression de contraste ou d’attribut ARIA manquant.',
+      '- Ratio de contraste cible : ≥ 4.5:1 pour le texte courant, ≥ 3:1 pour les grands titres.',
+      '- Publie une **déclaration RGAA** synthétique dans l’application (page dédiée ou section dans la page RGPD).'
     ].join('\n');
   }
 
