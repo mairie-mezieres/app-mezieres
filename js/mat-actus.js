@@ -192,7 +192,7 @@ function formatEventDate(iso){
 function renderActuListItem(a){
   const id=getActuId(a);
   const jsId=JSON.stringify(id).replace(/"/g,'&quot;');
-  const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'">`:''
+  const imgHTML=a.photo?`<img class="actu-img" src="${a.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.webp'">`:''
   const titre=esc(getActuDisplayTitle(a));
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
@@ -210,7 +210,7 @@ function renderActuDetail(actu){
   const title=esc(getActuDisplayTitle(actu));
   const desc=getActuPlainDescription(actu);
   const descHTML=desc?`<div class="actu-detail-text">${esc(desc).replace(/\n/g,'<br>')}</div>`:'';
-  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${actu.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.png'"></div>`:'';
+  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${actu.photo}" alt="" onerror="this.onerror=null;this.src='mat-header.webp'"></div>`:'';
   const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
   const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
   el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a></div></div>`;
