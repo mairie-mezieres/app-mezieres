@@ -8,7 +8,7 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.12.0';
+const CACHE = 'mat-v4.13.0';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -17,7 +17,7 @@ const CRITICAL_PRECACHE = [
   './offline.html',
   './css/mat.css?v=4.3.4',
   './js/mat-utils.js?v=4.2.9',
-  './js/mat-core.js?v=4.2.11'
+  './js/mat-core.js?v=4.2.12'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -28,7 +28,7 @@ const PRECACHE_URLS = [
   './css/mat-desktop.css?v=4.2.5',
   './css/fonts.css?v=1',
   './js/mat-utils.js?v=4.2.9',
-  './js/mat-core.js?v=4.2.11',
+  './js/mat-core.js?v=4.2.12',
   './js/mat-accessibility.js?v=4.3.7',
   './js/mat-widgets.js?v=4.4.0',
   './js/mat-agenda.js?v=4.2.4',
