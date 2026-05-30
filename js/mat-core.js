@@ -506,7 +506,7 @@ document.addEventListener('keydown', function(e) {
       var b = document.createElement('div');
       b.id = 'mat-server-banner';
       b.textContent = '🌿 Serveur très sollicité — certaines informations chargent lentement, merci de patienter';
-      b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#d97706;color:white;font-family:Nunito,sans-serif;font-size:.73rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#b45309;color:white;font-family:Nunito,sans-serif;font-size:.73rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
       document.body.prepend(b);
       setTimeout(function(){ var e=document.getElementById('mat-server-banner'); if(e) e.remove(); }, 20000);
     }
