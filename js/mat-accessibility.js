@@ -250,7 +250,7 @@ function buildOnboardingDOM() {
   const dots = Array.from({length:total},(_,i)=>`<div id="ob-dot-${i}" style="width:7px;height:7px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.35)'};transition:all 0.3s;flex-shrink:0;"></div>`).join('');
   ob.innerHTML = `
     <div id="ob-step-0" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:28px 24px;text-align:center;gap:18px;">
-      <img src="MAT-explique.png" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.png'">
+      <img src="MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.webp'">
       <div style="color:#fff;font-family:'Grape Nuts',cursive;font-size:2.2rem;">Bienvenue !</div>
       <div style="color:rgba(255,255,255,0.88);font-size:0.88rem;line-height:1.7;max-width:320px;">
         Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.<br><br>
