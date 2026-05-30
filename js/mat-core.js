@@ -380,7 +380,7 @@ function loadDateBadge() {
   const suf = d === 1 ? 'er' : '';
   const saint = (SAINTS[m] && SAINTS[m][d-1] && SAINTS[m][d-1] !== '--') ? SAINTS[m][d-1] : null;
   el.innerHTML = esc(j) + ' ' + d + suf + ' ' + esc(MOIS[m])
-    + (saint ? '<br><span style="font-style:italic;font-weight:400;font-size:0.52rem;opacity:0.8">Ste/St ' + esc(saint) + '</span>' : '');
+    + (saint ? '<br><span style="font-style:italic;font-weight:500;font-size:0.62rem;opacity:0.95">Ste/St ' + esc(saint) + '</span>' : '');
 }
 
 // ── Déprotection email mairie ─────────────────────────────────

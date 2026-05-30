@@ -1,11 +1,39 @@
 # MAT — Mézières Avec Toi (frontend)
 
+[![CI](https://github.com/mairie-mezieres/app-mezieres/actions/workflows/ci.yml/badge.svg)](https://github.com/mairie-mezieres/app-mezieres/actions/workflows/ci.yml)
+[![E2E](https://github.com/mairie-mezieres/app-mezieres/actions/workflows/e2e.yml/badge.svg)](https://github.com/mairie-mezieres/app-mezieres/actions/workflows/e2e.yml)
+[![Licence MIT](https://img.shields.io/badge/licence-MIT-2d6a4f)](LICENSE)
+[![Souveraineté : 0 CDN tiers](https://img.shields.io/badge/souverainet%C3%A9-0%20CDN%20tiers-1a3d2b)](#souverainet%C3%A9--sobri%C3%A9t%C3%A9--accessibilit%C3%A9)
+[![Écoconception : EcoIndex](https://img.shields.io/badge/%C3%A9coconception-EcoIndex-2d6a4f)](https://www.ecoindex.fr/resultat/?url=https://mezieres-lez-clery.fr)
+[![PWA installable](https://img.shields.io/badge/PWA-installable%20%C2%B7%20hors--ligne-5a67d8)](https://mezieres-lez-clery.fr)
+
 Application web progressive (PWA) officielle de la commune de
 [Mézières-lez-Cléry](https://mezieres-lez-clery.fr).  
 Interface citoyenne : météo, agenda, actualités, signalements, chatbot IA,
 notifications push, déchets, trombinoscope et bien plus.
 
 > Démo live : **[mezieres-lez-clery.fr](https://mezieres-lez-clery.fr)**
+
+---
+
+## Souveraineté · sobriété · accessibilité
+
+Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
+
+- 🔒 **Souveraineté — 0 dépendance CDN tierce au runtime** : polices, cartographie
+  (Leaflet), suivi d'erreurs (Sentry) et scripts sont **auto-hébergés**. Aucune
+  requête vers Google, jsDelivr, unpkg… depuis l'app citoyenne.
+- 🇫🇷 **IA souveraine** : l'assistante MEL s'appuie en priorité sur **Mistral AI**
+  (France) ; données applicatives hébergées en **Union européenne**.
+- 🌱 **Sobriété** : images optimisées (**−86 %** JPG, **−95 %** PNG→WebP), polices
+  sous-ensemblées, chargement paresseux ; empreinte suivie en continu via
+  [EcoIndex](.github/workflows/ecoindex.yml) et [Lighthouse](.github/workflows/lighthouse.yml).
+- ♿ **Accessibilité** : démarche RGAA documentée, contrastes **WCAG 2.1 AA
+  vérifiés automatiquement** (axe-core, dans la CI E2E).
+- 🛡️ **Sécurité** : politique de divulgation responsable ([SECURITY.md](SECURITY.md)),
+  en-têtes HTTP durcis, secrets hors dépôt.
+- 📖 **100 % open source (MIT)** — réplicable par toute commune
+  (voir [REPLICATION.md](REPLICATION.md)).
 
 ---
 
