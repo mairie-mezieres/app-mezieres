@@ -398,21 +398,19 @@ function resetBug(){
 let _suiviItems=[], _suiviFilter='all';
 let _suiviView='list', _suiviMap=null, _suiviMarkers=[], _leafletPromise=null;
 
-// Chargement paresseux de Leaflet (CDN, uniquement à l'ouverture de la carte)
+// Chargement paresseux de Leaflet (auto-hébergé, uniquement à l'ouverture
+// de la carte). Fichiers servis depuis ./vendor/leaflet/ (souveraineté :
+// plus de dépendance au CDN unpkg) — byte-identiques à Leaflet 1.9.4.
 function _loadLeaflet(){
   if(window.L) return Promise.resolve();
   if(_leafletPromise) return _leafletPromise;
   _leafletPromise=new Promise((resolve,reject)=>{
     const css=document.createElement('link');
     css.rel='stylesheet';
-    css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    css.integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-    css.crossOrigin='';
+    css.href='./vendor/leaflet/leaflet.css';
     document.head.appendChild(css);
     const s=document.createElement('script');
-    s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-    s.crossOrigin='';
+    s.src='./vendor/leaflet/leaflet.js';
     s.onload=()=>resolve();
     s.onerror=()=>{ _leafletPromise=null; reject(new Error('leaflet load failed')); };
     document.head.appendChild(s);
