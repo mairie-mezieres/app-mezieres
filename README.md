@@ -37,6 +37,37 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
 
 ---
 
+## Documentation
+
+| Document | Audience | Contenu |
+|----------|----------|---------|
+| [Guide utilisateur](docs/guide-utilisateur.md) | Habitants | Installation PWA, toutes les fonctionnalités, RGPD |
+| [Guide technique](docs/guide-technique.md) | Développeurs | Architecture, variables d'env, MEL, CI/CD, déploiement |
+| [Kit de réplication](REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
+| [Politique de sécurité](SECURITY.md) | Tous | Divulgation responsable, périmètre |
+
+---
+
+## Fonctionnalités
+
+| Module | Description |
+|--------|-------------|
+| 📰 **Actualités** | Publications Facebook automatiques (webhook `#MAT` → stockage → push) |
+| 📅 **Agenda** | Événements Google Calendar synchronisés |
+| 🤖 **MEL** | Assistante IA (Mistral Small) avec règles directes pour les questions fréquentes |
+| 🗺️ **Signalements** | Carte Leaflet auto-hébergée, transmission Trello |
+| 💡 **Boîte à idées** | Soumission et vote citoyen |
+| 🔔 **Push notifications** | Actualités et rappels collecte (Web Push / VAPID) |
+| 🌤️ **Météo** | Open-Meteo + vigilances Météo-France |
+| 🚌 **Bus Rémi** | Prochains passages ligne 8 |
+| ⛽ **Carburants** | Prix en temps réel (data.gouv.fr) |
+| ♿ **Accessibilité** | RGAA 4 — taille texte, contraste, daltonien, TTS, thèmes |
+| 📴 **Hors-ligne** | Service worker Network-First, cache versionné |
+| 🏛️ **Trombinoscope** | Élus et conseil municipal |
+| 🏢 **Admin** | Interface protégée : gestion actus, stats, push, purge |
+
+---
+
 ## Architecture
 
 Application entièrement statique (HTML / CSS / JS vanilla) — aucun bundler,
