@@ -236,8 +236,8 @@ function renderHoraires(){
   html+='</tbody></table>';
   var btnStyle='flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--forest);color:#fff;text-decoration:none;border-radius:10px;padding:9px 8px;font-family:inherit;font-size:0.74rem;font-weight:800';
   html+='<div style="display:flex;gap:8px;margin-top:10px">'+
-    '<a href="tel:+33238457028" style="'+btnStyle+'">📞 02 38 45 70 28</a>'+
-    '<a href="mailto:mairie.mezieres@wanadoo.fr" style="'+btnStyle+'">✉️ Écrire</a>'+
+    '<a href="tel:+33238456176" style="'+btnStyle+'">📞 02 38 45 61 76</a>'+
+    '<a href="mailto:mairie@mezieres-lez-clery.fr" style="'+btnStyle+'">✉️ Écrire</a>'+
   '</div>';
   el.innerHTML=html;
 }
