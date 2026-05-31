@@ -199,7 +199,7 @@ function renderFeatured(e){
       (photo?'<img class="d-featured-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'')+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">Prochain évènement</div>'+
-        '<h3 class="d-featured-title">'+escHtml(e.summary||'')+'</h3>'+
+        '<h2 class="d-featured-title">'+escHtml(e.summary||'')+'</h2>'+
         (e.location?'<p class="d-featured-lieu">📍 '+escHtml(e.location)+'</p>':'')+
         '<div class="d-featured-meta">'+
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
