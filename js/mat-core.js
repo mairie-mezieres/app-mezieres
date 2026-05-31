@@ -189,6 +189,7 @@ function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextH
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
 function openRgpd(){openOv('rgpd');}
+function openChangelog(){openOv('changelog');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
 function openContact(){openOv('contact'); restoreContactFormState(); renderContextHelp('contact');}
 function openAgenda(){

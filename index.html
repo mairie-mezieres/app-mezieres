@@ -140,7 +140,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px">v4.2.3</div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.3);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.2.3</div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='mat-header.webp'" title="Qui suis-je ?">
@@ -412,6 +412,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.15</button>
 </div>
 </div>
 </div>
@@ -1421,5 +1422,54 @@ et accompagnée des documents suivants :
 </div>
 </div>
 <script defer src="js/mat-desktop.js?v=4.1.0"></script>
+<div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:#e8f0fc">🆕</div>
+<div class="panel-title">Nouveautés — Mézières Avec Toi</div>
+<button class="panel-close" onclick="closeOv('changelog')">✕</button>
+</div>
+<div class="panel-body">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ Mai 2026 — v4.15</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Règle MEL directe pour les horaires de bruit et bricolage</li>
+<li>Badges de certification en tête du panneau RGPD</li>
+<li>Guide utilisateur et guide technique publiés</li>
+<li>Coordonnées mairie corrigées</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ Mai 2026 — v4.13</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Suivi public des signalements avec statuts (reçu, en cours, résolu)</li>
+<li>Notifications push quand votre signalement ou idée est traité(e)</li>
+<li>Carte interactive dans l'overlay de signalement</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ Mai 2026 — v4.12</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Couleurs des idées selon leur statut (acceptée, en cours, refusée…)</li>
+<li>Polices, cartes et scripts 100 % auto-hébergés — aucun CDN tiers</li>
+<li>Déclaration d'accessibilité RGAA v4 dans l'overlay</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ Mai 2026 — v4.10</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Alertes météo push (vigilances orange/rouge) avec niveau configurable</li>
+<li>Qualité de l'air et pollen avec barres de progression</li>
+<li>Kit de réplication pour d'autres communes</li>
+</ul>
+</div>
+</div>
+<div style="text-align:center;padding:14px 0 2px">
+<a href="https://github.com/mairie-mezieres/app-mezieres/blob/main/CHANGELOG.md" target="_blank" rel="noopener" style="font-size:0.75rem;color:var(--leaf);font-weight:700">Voir l'historique complet →</a>
+</div>
+</div>
+</div>
+</div>
 </body>
 </html>
