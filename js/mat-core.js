@@ -595,7 +595,16 @@ if('serviceWorker' in navigator){
       if(_updateOffered || !waiting) return;
       _updateOffered = true;
       var p;
-      if(typeof confirmMAT === 'function'){
+      if(typeof openMatModal === 'function'){
+        p = openMatModal({
+          type:'confirm',
+          title:'🔄 Mise à jour disponible',
+          icon:'🆕',
+          html:'Une nouvelle version de MAT est disponible.<br><br><a href="#" onclick="event.preventDefault();closeMatModal(false);openChangelog();" style="color:var(--leaf);font-weight:700;text-decoration:underline">Voir les nouveautés →</a><br><br>Recharger maintenant ?',
+          okText:'Recharger',
+          cancelText:'Plus tard'
+        });
+      } else if(typeof confirmMAT === 'function'){
         p = confirmMAT(
           'Une nouvelle version de MAT est disponible. Recharger pour mettre à jour ?',
           '🔄 Mise à jour', '🆕', 'Recharger', 'Plus tard'
