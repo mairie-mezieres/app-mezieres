@@ -394,7 +394,7 @@ La paire de clés VAPID identifie le serveur émetteur. Générée une fois avec
 
 La clé publique est présente en **deux endroits** :
 - Variable d'env `VAPID_PUBLIC_KEY` côté backend
-- Dans `js/mat-pwa-notif.js` côté frontend (variable `VAPID_PUBLIC_KEY`)
+- Dans `js/mat-utils.js` côté frontend (constante `VAPID_PUB` ligne 13) — consommée par `mat-pwa-notif.js`, `mat-dechets-notif.js` et `mat-actus.js`
 
 ### Abonnements expirés
 
