@@ -765,7 +765,7 @@ function loadRemiDetail() {
     + '<span style="font-size:1rem">🗺️</span> Plan de la ligne <span style="margin-left:auto">▼</span>'
     + '</summary>'
     + '<div style="padding:0 12px 12px;display:flex;justify-content:center">'
-    + '<img src="./ligne8-plan.svg" alt="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans" style="width:100%;max-width:320px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)">'
+    + '<img src="./img/ligne8-plan.svg" alt="Plan ligne 8 Rémi — Saint-Laurent-Nouan ↔ Orléans" style="width:100%;max-width:320px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)">'
     + '</div>'
     + '</details>'
     + '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px">'

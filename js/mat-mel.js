@@ -742,7 +742,7 @@ async function sendMel(){
       const sug=document.createElement('div'); sug.className='msg bot';
       sug.innerHTML='<div class="mav">👩</div><div class="bub" style="background:var(--mist);border:1px solid rgba(0,0,0,0.06);padding:10px 12px;">'
         +'<div style="font-size:0.72rem;font-weight:900;color:var(--forest);margin-bottom:6px">🏗️ Schéma des autorisations d\'urbanisme</div>'
-         +'<img src="./autorisation-urbanisme.jpg?v=3.7.4" '
+         +'<img src="./img/autorisation-urbanisme.jpg?v=3.7.4" '
          +'alt="Autorisations urbanisme" '
          +'style="width:100%;border-radius:8px;display:block;margin-bottom:6px;cursor:zoom-in" '
          +'onclick="openMelImageModal(this.src, \'Schéma des autorisations d\\\'urbanisme\')" '
@@ -872,7 +872,7 @@ function _buildSubLevel(cat,def){
     h+=`<div class="mel-schema-block">
   <div class="mel-schema-label">📋 Schéma des autorisations</div>
   <img
-    src="./autorisation-urbanisme.jpg?v=3.7.4"
+    src="./img/autorisation-urbanisme.jpg?v=3.7.4"
     alt="Autorisations urbanisme"
     class="mel-schema-img"
     onclick="openMelImageModal(this.src, 'Schéma des autorisations d\\'urbanisme')"

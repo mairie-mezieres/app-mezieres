@@ -80,7 +80,7 @@ function getInstallHelpHtml(){
           2. Faites défiler puis touchez <strong>Sur l'écran d'accueil</strong>.<br>
           3. Confirmez avec <strong>Ajouter</strong>.
         </div>
-        <a href="installer-ios.mp4" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:900">🎬 Voir la vidéo iOS</a>
+        <a href="img/installer-ios.mp4" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;text-decoration:none;border-radius:12px;padding:12px 14px;font-weight:900">🎬 Voir la vidéo iOS</a>
         <div style="font-size:0.68rem;line-height:1.55;color:var(--muted)">La vidéo s'ouvrira si le fichier <strong>installer-ios.mp4</strong> est présent à la racine de la PWA.</div>
       </div>`;
   }
