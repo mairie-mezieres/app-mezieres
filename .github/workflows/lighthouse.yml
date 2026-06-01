@@ -1,17 +1,9 @@
 name: Lighthouse
 
-# Audit Lighthouse de la PWA sur le site en production (mezieres-lez-clery.fr).
-# Tourne sur l'infra GitHub (Chrome headless + accès réseau) :
-#   - manuellement (bouton "Run workflow")
-#   - automatiquement chaque lundi matin (cron)
-# Le rapport complet est uploadé sur un stockage public temporaire ; le lien
-# apparaît dans les logs du job. Les seuils sont en "warn" : un score faible
-# n'échoue pas le workflow, il est juste signalé.
-
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'  # tous les lundis à 06:00 UTC
+    - cron: '0 6 * * 1'
 
 jobs:
   lighthouse:
@@ -26,6 +18,10 @@ jobs:
         with:
           urls: |
             https://mezieres-lez-clery.fr/
-          configPath: ./lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
+          runs: 3
+
+      - name: Résumé
+        run: |
+          echo "Audit Lighthouse terminé"
