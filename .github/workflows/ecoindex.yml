@@ -1,20 +1,10 @@
 name: EcoIndex
 
-# Audit de sobriété numérique de la PWA via GreenIT-Analysis (Collectif
-# Numérique Responsable). Produit la note EcoIndex (A→G), le poids de page,
-# le nombre de requêtes et la taille du DOM.
-#
-# Tourne sur l'infra GitHub (Chrome headless + accès réseau), comme
-# Lighthouse — impossible depuis l'environnement de dev (réseau restreint).
-#   - manuellement (bouton "Run workflow")
-#   - automatiquement chaque lundi matin
-# Le rapport HTML complet est uploadé en artifact (téléchargeable depuis le
-# run). Étape purement informative : n'échoue jamais le dépôt.
-
 on:
   workflow_dispatch:
+
   schedule:
-    - cron: '15 6 * * 1'  # lundis 06:15 UTC (après Lighthouse)
+    - cron: '15 6 * * 1'
 
 jobs:
   ecoindex:
@@ -22,27 +12,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Récupération du dépôt
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: 22
 
-      - name: Installer greenit-cli
-        run: npm install -g greenit-cli
+      - name: Installer GreenIT Analysis
+        run: npm install -g github:cnumr/GreenIT-Analysis-cli
 
       - name: Préparer la liste des URLs
         run: |
-          cat > urls.yml <<'YML'
+          cat > urls.yml <<'EOF'
           - name: Accueil MAT
             url: https://mezieres-lez-clery.fr/
-          YML
+          EOF
 
       - name: Lancer l'analyse EcoIndex
-        run: greenit analyse urls.yml --output rapport-ecoindex.html
+        run: |
+          greenit analyse urls.yml rapport-ecoindex.html --format html --ci
         continue-on-error: true
 
-      - name: Publier le rapport (artifact)
+      - name: Publier le rapport
         uses: actions/upload-artifact@v4
         with:
           name: rapport-ecoindex
