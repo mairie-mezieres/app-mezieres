@@ -62,7 +62,7 @@ function normalizeEluName(v){
 }
 
 function buildImgSrc(filename){
-  return encodeURIComponent(filename || '').replace(/%20/g,' ');
+  return 'img/' + encodeURIComponent(filename || '').replace(/%20/g,' ');
 }
 
 function ensureCommissionBuckets(elu){
@@ -142,7 +142,7 @@ function buildTrombi(){
     const nomCourt = prenomNom.slice(1).join(' ');
     return `<div class="trombi-item" onclick="openTrombi(${i})" role="button" tabindex="0">`
       + `<div class="trombi-photo-wrap">`
-      + `<img class="trombi-photo" src="${buildImgSrc(e.img)}" alt="${e.nom}" onerror="this.onerror=null;this.src='mat-header.webp'">`
+      + `<img class="trombi-photo" src="${buildImgSrc(e.img)}" alt="${e.nom}" onerror="this.onerror=null;this.src='img/mat-header.webp'">`
       + `<div class="${badgeClass}">${badgeLabel}</div>`
       + `</div>`
       + `<div class="trombi-name" title="${e.nom}">${prenom}<br><span style="font-weight:700;color:var(--muted)">${nomCourt}</span></div>`

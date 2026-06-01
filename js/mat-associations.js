@@ -3,32 +3,32 @@
 var _D=[
   {
     n:'Comité des fêtes',
-    l:'cfetes.jpg',
+    l:'img/cfetes.jpg',
     e:'ulrichbaudin1@aol.com',
     desc:"Organisation et animation des fêtes locales et événements festifs de la commune. Rassemble les habitants autour de manifestations conviviales tout au long de l'année."
   },
   {
     n:'GERM de Mézières',
-    l:'germ.jpeg',
+    l:'img/germ.jpeg',
     e:'martine.baudoin.goyer@orange.fr',
     desc:"Groupe d'Études et de Réflexion Municipales. Participe à la réflexion et au débat sur la vie locale, les projets d'avenir et l'environnement de la commune."
   },
   {
     n:"Les Trialistes de l'Ardoux",
-    l:'trail.jpeg',
+    l:'img/trail.jpeg',
     e:'lestrialistesdelardoux@gmail.com',
     url:'https://trialistes-de-lardoux.jimdosite.com/',
     desc:"Fondé en 1994, un des clubs régionaux de Trial les plus importants. A formé des dizaines de pilotes de renommée régionale, nationale et internationale. Affilié UFOLEP — organise chaque année une compétition régionale à Mézières-lez-Cléry."
   },
   {
     n:"Association des Parents d'élèves",
-    l:'ape.jpg',
+    l:'img/ape.jpg',
     e:'apemezieres@gmail.com',
     desc:"Représente les familles auprès de l'équipe enseignante. Participe activement à la vie scolaire et soutient les projets éducatifs de l'école de Mézières-lez-Cléry."
   },
   {
     n:'Pamela & Co',
-    l:'pamco.jpg',
+    l:'img/pamco.jpg',
     e:'pamelacompagnie@gmail.com',
     url:'https://www.facebook.com/profile.php?id=61565106420856',
     desc:"🐷𝙇𝙚 𝙦𝙪𝙤𝙩𝙞𝙙𝙞𝙚𝙣 𝙙𝙚 𝙈𝙖𝙜𝙣𝙤𝙡𝙞𝙣𝙚 , 𝙉𝙖𝙣𝙤𝙪 , 𝗥𝗮𝗺𝘀𝗲𝘀 𝙚𝙩 𝙗𝙞𝙚𝙣 𝙙'𝙖𝙪𝙩𝙧𝙚𝙨 𝙖𝙣𝙞𝙢𝙖𝙪𝙭 .. 👩🏻‍🌾𝙎𝙪𝙞𝙫𝙚𝙯 𝙣𝙤𝙩𝙧𝙚 𝙚́𝙥𝙤𝙥𝙚́𝙚 𝙙𝙚 𝙧𝙚𝙘𝙤𝙣𝙨𝙩𝙧𝙪𝙘𝙩𝙞𝙤𝙣 𝙖𝙣𝙞𝙢𝙖𝙡𝙞𝙚̀𝙧𝙚!"

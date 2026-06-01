@@ -47,8 +47,8 @@ const PRECACHE_URLS = [
   './js/mat-entreprises.js?v=1.2.0',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
-  './mat-header.webp',
-  './MAT et MEL.webp',
+  './img/mat-header.webp',
+  './img/MAT et MEL.webp',
   './icon-192.png',
   './icon-badge.png'
 ];
