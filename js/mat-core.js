@@ -600,7 +600,7 @@ if('serviceWorker' in navigator){
           type:'confirm',
           title:'🔄 Mise à jour disponible',
           icon:'🆕',
-          html:'Une nouvelle version de MAT est disponible.<br><br><a href="#" onclick="event.preventDefault();closeMatModal(false);openChangelog();" style="color:var(--leaf);font-weight:700;text-decoration:underline">Voir les nouveautés →</a><br><br>Recharger maintenant ?',
+          html:'Une nouvelle version de MAT est disponible.<br><br><a href="#" onclick="event.preventDefault();openChangelog();" style="color:var(--leaf);font-weight:700;text-decoration:underline">Voir les nouveautés →</a><br><br>Recharger maintenant ?',
           okText:'Recharger',
           cancelText:'Plus tard'
         });
