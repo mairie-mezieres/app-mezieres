@@ -296,14 +296,19 @@ async function submitContactForm(){
   if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi…'; btn.disabled=true;
+  const contactId=Date.now();
+  const notifyToken=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():null;
+  const pushSub=notifyToken?await _getPushSubForNotify():null;
   try{
     await fetch(SIGNAL_URL,{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         cat:'[Demande] Contact mairie',
-        desc:'Nom/prénom : '+(name||'Non précisé')+'\nRéponse : '+(reply||'Non précisée')+'\n\nMessage : '+msg
+        desc:'Nom/prénom : '+(name||'Non précisé')+'\nRéponse : '+(reply||'Non précisée')+'\n\nMessage : '+msg,
+        ...(notifyToken?{notifyToken,sub:pushSub||undefined}:{})
       })
     });
+    if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+contactId,notifyToken);}catch(_){}}
     trackStat('contact');
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
