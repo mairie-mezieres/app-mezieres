@@ -1,9 +1,9 @@
 {
-  "date": null,
-  "ecoindex": null,
-  "grade": null,
-  "performance": null,
-  "accessibility": null,
-  "seo": null,
-  "bestPractices": null
+  "date": "2026-06-02",
+  "ecoindex": 23,
+  "grade": "F",
+  "performance": 70,
+  "accessibility": 94,
+  "seo": 100,
+  "bestPractices": 100
 }
