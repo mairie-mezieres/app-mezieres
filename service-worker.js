@@ -178,18 +178,24 @@ function normalizePushPayload(raw) {
   const nested = raw && raw.data && typeof raw.data === 'object' ? raw.data : {};
   const actuId = nested.actuId != null ? String(nested.actuId) : null;
 
-  const url = normalizeInAppPath(
-    nested.url || raw.url,
-    actuId ? `./#actu=${encodeURIComponent(actuId)}` : './#notifs'
-  );
+  // Calculer open en premier pour en déduire l'URL par défaut correcte.
+  // open peut valoir: 'actu', 'notifs', 'meteo', 'idees', 'signalements', 'contact'
+  const open = nested.open || (actuId ? 'actu' : 'notifs');
+
+  let defaultUrl;
+  if (actuId)                    defaultUrl = `./#actu=${encodeURIComponent(actuId)}`;
+  else if (open === 'meteo')     defaultUrl = './#meteo';
+  else if (open === 'idees')     defaultUrl = './#idees';
+  else if (open === 'signalements') defaultUrl = './#signalements';
+  else if (open === 'contact')   defaultUrl = './#contact';
+  else                           defaultUrl = './#notifs';
+
+  const url = normalizeInAppPath(nested.url || raw.url, defaultUrl);
 
   const listUrl = normalizeInAppPath(
     nested.listUrl,
     './#notifs'
   );
-
-  const open = nested.open || (actuId ? 'actu' : 'notifs');
-  // open peut valoir: 'actu', 'notifs', 'meteo', 'idees', 'signalements'
   const actions = Array.isArray(raw.actions) && raw.actions.length
     ? raw.actions
     : (actuId ? [{ action: 'detail', title: 'Détail' }] : []);
