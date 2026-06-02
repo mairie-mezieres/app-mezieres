@@ -61,6 +61,73 @@ async function _getPushSubForNotify(){
   }catch(e){return null;}
 }
 
+const _CHATBOT='https://chatbot-mairie-mezieres.onrender.com';
+
+function _injectNotifBox(el,html){
+  const old=document.getElementById('_notif-ask-box');
+  if(old) old.remove();
+  const box=document.createElement('div');
+  box.id='_notif-ask-box';
+  box.style.cssText='margin-top:16px;padding:14px;background:var(--mist,#f0f4f8);border-radius:12px;border:1px solid var(--sage,#a3b899);text-align:left';
+  box.innerHTML=html;
+  el.appendChild(box);
+}
+
+async function _askPushForNotify(notifyToken,successElId){
+  if(!notifyToken) return;
+  const el=document.getElementById(successElId);
+  if(!el) return;
+  // iOS non installée : les Push nécessitent l'installation PWA
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!('MSStream' in window);
+  const isStandalone=('standalone' in navigator)&&navigator.standalone;
+  if(isIOS&&!isStandalone){
+    _injectNotifBox(el,'<div style="font-size:.82rem;color:var(--muted,#6b7280);line-height:1.5">'
+      +'📱 <strong>Sur iPhone</strong>, installez l\'appli sur votre écran d\'accueil (Safari ➜ Partager ➜ Sur l\'écran d\'accueil) '
+      +'pour recevoir les réponses de la mairie par notification.'
+      +'<div style="text-align:center;margin-top:8px"><button onclick="this.closest(\'#_notif-ask-box\').remove()" '
+      +'style="background:none;border:none;color:var(--muted,#6b7280);font-size:.8rem;cursor:pointer;font-family:inherit">Fermer</button></div></div>');
+    return;
+  }
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)) return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(sub){
+      fetch(_CHATBOT+'/notify/register-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:notifyToken,sub})}).catch(()=>{});
+      return;
+    }
+    if(Notification.permission==='denied') return;
+    if(Notification.permission==='granted'){
+      sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
+      fetch(_CHATBOT+'/notify/register-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:notifyToken,sub})}).catch(()=>{});
+      return;
+    }
+    _injectNotifBox(el,'<div style="font-weight:700;font-size:.9rem;margin-bottom:4px">🔔 Recevoir une réponse ?</div>'
+      +'<div style="font-size:.8rem;color:var(--muted,#6b7280);margin-bottom:12px">La mairie peut vous notifier directement dès qu\'elle traite votre demande.</div>'
+      +'<button onclick="_doAskPush(this,\''+notifyToken+'\')" style="width:100%;padding:10px;background:var(--forest,#2d6a4f);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">Activer les notifications</button>'
+      +'<div style="text-align:center;margin-top:8px"><button onclick="this.closest(\'#_notif-ask-box\').remove()" style="background:none;border:none;color:var(--muted,#6b7280);font-size:.8rem;cursor:pointer;font-family:inherit">Non merci</button></div>');
+  }catch(e){}
+}
+
+async function _doAskPush(btn,notifyToken){
+  const box=document.getElementById('_notif-ask-box');
+  if(btn) btn.disabled=true;
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){
+      if(box) box.innerHTML='<div style="text-align:center;color:var(--muted,#6b7280);font-size:.82rem;padding:4px 0">Notifications non autorisées.</div>';
+      return;
+    }
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
+    await fetch(_CHATBOT+'/notify/register-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:notifyToken,sub})});
+    if(box) box.innerHTML='<div style="text-align:center;color:var(--forest,#2d6a4f);font-size:.85rem;font-weight:700;padding:4px 0">✅ Vous recevrez une notification dès que la mairie répondra.</div>';
+  }catch(e){
+    if(box) box.innerHTML='<div style="text-align:center;color:var(--muted,#6b7280);font-size:.82rem;padding:4px 0">⚠️ Impossible d\'activer les notifications pour l\'instant.</div>';
+  }
+}
+
 function _saveMySig(id, cat, type){
   try{
     const list=JSON.parse(localStorage.getItem('mat_my_signals_v1')||'[]');
@@ -99,6 +166,7 @@ async function submitSignal(){
     _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
+    _askPushForNotify(notifyToken,'signal-success');
   }catch(e){
     clearTimeout(timer);
     if(e.name==='AbortError'){
@@ -106,6 +174,7 @@ async function submitSignal(){
       _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
+      _askPushForNotify(notifyToken,'signal-success');
     } else {
       alertMAT('Erreur d\'envoi. Vérifiez votre connexion.','Signalement','⚠️');
       btn.textContent='📤 Envoyer le signalement'; btn.disabled=false;
@@ -241,6 +310,7 @@ async function submitIdee(){
   if(notifyToken){try{localStorage.setItem('mat:notify:idea:'+idea.id,notifyToken);}catch(_){}}
   try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  _askPushForNotify(notifyToken,'idea-form');
   loadIdees();
 }
 
@@ -312,6 +382,7 @@ async function submitContactForm(){
     trackStat('contact');
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
+    _askPushForNotify(notifyToken,'contact-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
     btn.textContent='📤 Envoyer ma demande'; btn.disabled=false;
@@ -377,6 +448,7 @@ async function submitBug(){
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
+    _askPushForNotify(notifyToken,'bug-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
     btn.textContent='📤 Envoyer le rapport'; btn.disabled=false;
