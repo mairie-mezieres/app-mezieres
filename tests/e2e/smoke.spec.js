@@ -59,6 +59,20 @@ test('overlay Accessibilité : la déclaration RGAA est présente', async ({ pag
   ).toBeVisible();
 });
 
+test('overlay lazy (Majordome) : absent du DOM au chargement, hydraté à l’ouverture', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.openOv === 'function');
+  // Avant ouverture : le contenu vit dans un <template> inerte → pas dans le DOM
+  // rendu (c'est le gain eco-index). Le shell #ov-majordome existe, mais vide.
+  expect(await page.locator('#ov-majordome .majordome-name').count()).toBe(0);
+  // Ouverture → hydratation du template
+  await expect(async () => {
+    await page.evaluate(() => window.openOv('majordome'));
+    await expect(page.locator('#ov-majordome')).toHaveClass(/open/, { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
+  await expect(page.getByText('Bonjour, je suis MAT !')).toBeVisible();
+});
+
 test('accueil : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle').catch(() => {});

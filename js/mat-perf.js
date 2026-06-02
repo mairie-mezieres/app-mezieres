@@ -13,9 +13,11 @@ async function loadPerfBadge() {
     const d = await r.json();
     if (!d.grade) return;
 
+    // Tons clairs : contraste ≥ 4.5:1 sur le footer --forest (#1a3d2b), RGAA AA.
+    // Les couleurs saturées (rouge/orange foncés) échouent sur fond sombre.
     const gradeColors = {
-      A: '#52b788', B: '#74c69d', C: '#f4d35e',
-      D: '#f9a03f', E: '#ee6c4d', F: '#e63946', G: '#9d0208'
+      A: '#74c69d', B: '#95d5b2', C: '#ffe08a',
+      D: '#ffd166', E: '#ffb38a', F: '#ff9999', G: '#ff9999'
     };
     const col = gradeColors[d.grade] || 'var(--sage)';
     const dateStr = d.date ? d.date.split('-').reverse().join('/') : '';
