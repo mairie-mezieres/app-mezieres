@@ -598,17 +598,35 @@ if('serviceWorker' in navigator){
   (function setupSwUpdatePrompt(){
     var _updateOffered = false;
     var _refreshing = false;
+    var _swWaiting = null;
+
+    function applyUpdate(){
+      var w = _swWaiting;
+      if(!w) return;
+      try { w.postMessage('SKIP_WAITING'); }
+      catch(_){ try { w.postMessage({ action:'SKIP_WAITING' }); } catch(__){} }
+    }
+
+    // « Voir les nouveautés » : on mémorise l'intention, on applique la MAJ,
+    // puis controllerchange recharge la page. Au prochain chargement, le
+    // changelog s'ouvre automatiquement (cf. bloc 'mat_changelog_pending').
+    // Évite que le changelog s'affiche sous la modale puis disparaisse au reload.
+    window.matSeeWhatsNew = function(){
+      try { localStorage.setItem('mat_changelog_pending', '1'); } catch(_){}
+      applyUpdate();
+    };
 
     function offerUpdate(waiting){
       if(_updateOffered || !waiting) return;
       _updateOffered = true;
+      _swWaiting = waiting;
       var p;
       if(typeof openMatModal === 'function'){
         p = openMatModal({
           type:'confirm',
           title:'🔄 Mise à jour disponible',
           icon:'🆕',
-          html:'Une nouvelle version de MAT est disponible.<br><br><a href="#" onclick="event.preventDefault();openChangelog();" style="color:var(--leaf);font-weight:700;text-decoration:underline">Voir les nouveautés →</a><br><br>Recharger maintenant ?',
+          html:'Une nouvelle version de MAT est disponible.<br><br><a href="#" onclick="event.preventDefault();matSeeWhatsNew();" style="color:var(--leaf);font-weight:700;text-decoration:underline">Voir les nouveautés →</a><br><br>Recharger maintenant ?',
           okText:'Recharger',
           cancelText:'Plus tard'
         });
@@ -623,8 +641,7 @@ if('serviceWorker' in navigator){
       }
       p.then(function(accepted){
         if(accepted){
-          try { waiting.postMessage('SKIP_WAITING'); }
-          catch(_){ try { waiting.postMessage({ action:'SKIP_WAITING' }); } catch(__){} }
+          applyUpdate();
         } else {
           // L'utilisateur reprendra la main au prochain chargement.
           _updateOffered = false;
@@ -659,6 +676,14 @@ window.addEventListener('hashchange', handleMatHashRoute);
 window.addEventListener('load', function(){
   setTimeout(checkPushStatus, 250);
   setTimeout(refreshActusBadge, 300);
+  // Après une mise à jour où l'utilisateur a cliqué « Voir les nouveautés »,
+  // on ouvre le changelog une fois la nouvelle version chargée (cf. matSeeWhatsNew).
+  try {
+    if(localStorage.getItem('mat_changelog_pending') === '1'){
+      localStorage.removeItem('mat_changelog_pending');
+      setTimeout(function(){ try { openChangelog(); } catch(_){} }, 700);
+    }
+  } catch(_){}
 });
 window.addEventListener('pageshow', function(){
   setTimeout(checkPushStatus, 150);
