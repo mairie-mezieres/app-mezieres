@@ -194,7 +194,7 @@ function openMel(){
 function openSignal(){openOv('signal'); restoreSignalFormState(); renderContextHelp('signal'); if(typeof loadSignalMap==='function') loadSignalMap();}
 function openIdees(){openOv('idees'); loadIdees();}
 function openNotifs(){openOv('notifs'); loadActus(); checkPushStatus();}
-function openRgpd(){openOv('rgpd');}
+function openRgpd(){openOv('rgpd'); initMailProtection();}
 function openChangelog(){openOv('changelog');}
 function openMeteo(){openOv('meteo'); loadMeteoDetail();}
 function openContact(){openOv('contact'); restoreContactFormState(); renderContextHelp('contact');}
