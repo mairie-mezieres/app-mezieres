@@ -1,9 +1,18 @@
 name: Lighthouse
 
+# Audit Lighthouse de la PWA sur le site en production (mezieres-lez-clery.fr).
+# Tourne sur l'infra GitHub (Chrome headless + accès réseau) :
+#   - manuellement (bouton "Run workflow")
+#   - automatiquement chaque lundi matin (cron)
+# Le rapport complet est uploadé sur un stockage public temporaire ; le lien
+# apparaît dans les logs du job. Les seuils sont en "warn" : un score faible
+# n'échoue pas le workflow, il est juste signalé.
+# ?_lh=1 bypass l'onboarding pour que Lighthouse mesure l'app réelle.
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 6 * * 1'  # tous les lundis à 06:00 UTC
 
 jobs:
   lighthouse:
@@ -14,14 +23,29 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Lighthouse CI
+        id: lhci
         uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
-            https://mezieres-lez-clery.fr/
+            https://mezieres-lez-clery.fr/?_lh=1
+          configPath: ./lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
-          runs: 3
+
+      - name: Installer Node.js pour eco-index
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Calculer l'Eco-index depuis les résultats Lighthouse
+        run: node scripts/compute-ecoindex.js
+
+      - name: Publier le rapport Eco-index
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-ecoindex
+          path: rapport-ecoindex.md
+          if-no-files-found: warn
 
       - name: Résumé
-        run: |
-          echo "Audit Lighthouse terminé"
+        run: echo "Audit Lighthouse + Eco-index terminé"

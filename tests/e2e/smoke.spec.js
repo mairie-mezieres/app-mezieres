@@ -14,6 +14,10 @@ const EXTERNAL_HOSTS = [
 ];
 
 test.beforeEach(async ({ page }) => {
+  // Bypass onboarding : localStorage pré-rempli avant le premier script de la page
+  await page.addInitScript(() => {
+    localStorage.setItem('mat_onboarded_v3', '1');
+  });
   await page.route('**/*', (route) => {
     const url = route.request().url();
     if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
