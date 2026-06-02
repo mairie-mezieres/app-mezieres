@@ -4,15 +4,18 @@ name: Lighthouse
 # Tourne sur l'infra GitHub (Chrome headless + accès réseau) :
 #   - manuellement (bouton "Run workflow")
 #   - automatiquement chaque lundi matin (cron)
-# Le rapport complet est uploadé sur un stockage public temporaire ; le lien
-# apparaît dans les logs du job. Les seuils sont en "warn" : un score faible
-# n'échoue pas le workflow, il est juste signalé.
 # ?_lh=1 bypass l'onboarding pour que Lighthouse mesure l'app réelle.
+# Après l'audit : data/ecoindex.json est commité sur main (badge footer PWA)
+# et un commentaire est posté sur l'issue #190 (suivi mobile GitHub).
 
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 6 * * 1'  # tous les lundis à 06:00 UTC
+
+permissions:
+  contents: write
+  issues: write
 
 jobs:
   lighthouse:
@@ -37,8 +40,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Calculer l'Eco-index depuis les résultats Lighthouse
+      - name: Calculer l'Eco-index et mettre à jour data/ecoindex.json
         run: node scripts/compute-ecoindex.js
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
 
       - name: Publier le rapport Eco-index
         uses: actions/upload-artifact@v4
@@ -46,6 +51,40 @@ jobs:
           name: rapport-ecoindex
           path: rapport-ecoindex.md
           if-no-files-found: warn
+
+      - name: Commiter data/ecoindex.json sur main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ecoindex.json
+          git diff --cached --quiet && echo "Aucun changement" && exit 0
+          git commit -m "chore(ci): mise à jour eco-index $(date +%Y-%m-%d) [skip ci]"
+          git push
+
+      - name: Mettre à jour l'issue de suivi #190
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ECO=$(jq .ecoindex data/ecoindex.json)
+          GRADE=$(jq -r .grade data/ecoindex.json)
+          PERF=$(jq .performance data/ecoindex.json)
+          ACC=$(jq .accessibility data/ecoindex.json)
+          SEO=$(jq .seo data/ecoindex.json)
+          BP=$(jq .bestPractices data/ecoindex.json)
+          DATE=$(jq -r .date data/ecoindex.json)
+          gh issue comment 190 \
+            --repo "${{ github.repository }}" \
+            --body "**Audit du $DATE**
+
+          | Métrique | Score |
+          |---|---|
+          | 🚀 Performance | $PERF/100 |
+          | ♿ Accessibilité | $ACC/100 |
+          | 🔍 SEO | $SEO/100 |
+          | ✅ Bonnes pratiques | $BP/100 |
+          | 🌿 Eco-index | $ECO/100 — Grade $GRADE |"
 
       - name: Résumé
         run: echo "Audit Lighthouse + Eco-index terminé"

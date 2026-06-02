@@ -588,6 +588,11 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 /* ── Footer ── */
 .footer{background:var(--forest);padding:12px 16px;text-align:center;font-size:0.6rem;color:var(--sage);letter-spacing:0.05em;}
+.footer-perf{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:5px;font-size:0.55rem;opacity:0.75;letter-spacing:0.03em;}
+.footer-perf:empty{display:none;}
+.fp-eco{font-weight:900;}
+.fp-sep{opacity:0.4;}
+.fp-date{opacity:0.6;}
 
 /* ══ ACCESSIBILITÉ ══════════════════════════════════════════════
    Tout fonctionne via des multiplicateurs sur font-size de base.

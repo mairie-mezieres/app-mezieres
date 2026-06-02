@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Calcule un score Eco-index depuis les métriques d'un rapport Lighthouse CI.
+// Calcule un score Eco-index + extrait les scores Lighthouse depuis les rapports LHCI.
 // Formule officielle GreenIT (tables de quantiles) — cf.
 //   https://github.com/cnumr/GreenIT-Analysis/blob/master/script/ecoIndex.js
 //   score = 100 - 5 * (3*q_dom + 2*q_req + q_size) / 6
 // Grade : A > 80 · B > 70 · C > 55 · D > 40 · E > 25 · F > 10 · G ≤ 10
 //
-// Entrée : fichiers *.report.json dans .lighthouseci/ (produits par LHCI)
-// Sortie : rapport-ecoindex.md (artefact CI)
+// Produit :
+//   data/ecoindex.json   — lu par l'app (badge footer)
+//   rapport-ecoindex.md  — artefact CI détaillé
 
 const fs = require('fs');
 const path = require('path');
@@ -58,13 +59,21 @@ function gradeEmoji(g) {
 
 function extractMetrics(report) {
   const audits = report.audits || {};
+  const cats = report.categories || {};
+  const lh = (key) => cats[key] ? Math.round(cats[key].score * 100) : null;
+
   const dom = audits['dom-size']?.numericValue ?? null;
   const requests = audits['network-requests']?.details?.items?.length ?? null;
   const weightBytes = audits['total-byte-weight']?.numericValue ?? null;
+
   return {
     dom: dom !== null ? Math.round(dom) : null,
     requests,
     weightKb: weightBytes !== null ? Math.round(weightBytes / 1024) : null,
+    performance: lh('performance'),
+    accessibility: lh('accessibility'),
+    seo: lh('seo'),
+    bestPractices: lh('best-practices'),
   };
 }
 
@@ -86,16 +95,39 @@ function run() {
     try {
       const report = JSON.parse(fs.readFileSync(file, 'utf8'));
       const url = report.finalUrl || report.requestedUrl || 'URL inconnue';
-      const { dom, requests, weightKb } = extractMetrics(report);
-      if (dom === null || requests === null || weightKb === null) continue;
-      const score = computeEcoindex(dom, requests, weightKb);
-      const g = grade(score);
-      results.push({ url, dom, requests, weightKb, score, grade: g });
+      const m = extractMetrics(report);
+      if (m.dom === null || m.requests === null || m.weightKb === null) continue;
+      const ecoindex = computeEcoindex(m.dom, m.requests, m.weightKb);
+      const g = grade(ecoindex);
+      results.push({ url, ...m, ecoindex, grade: g });
     } catch (_) {}
   }
 
   const date = new Date().toISOString().slice(0, 10);
 
+  // Moyenne des runs (LHCI lance 3 runs par défaut)
+  const avg = (key) => results.length
+    ? Math.round(results.reduce((s, r) => s + (r[key] ?? 0), 0) / results.length)
+    : null;
+
+  // data/ecoindex.json — lu par l'app PWA
+  const dataDir = path.join(process.env.GITHUB_WORKSPACE || '.', 'data');
+  if (fs.existsSync(dataDir)) {
+    const json = {
+      date,
+      ecoindex: avg('ecoindex'),
+      grade: results.length ? grade(avg('ecoindex')) : null,
+      performance: avg('performance'),
+      accessibility: avg('accessibility'),
+      seo: avg('seo'),
+      bestPractices: avg('bestPractices'),
+    };
+    const jsonPath = path.join(dataDir, 'ecoindex.json');
+    fs.writeFileSync(jsonPath, JSON.stringify(json, null, 2) + '\n', 'utf8');
+    console.log('[eco-index] data/ecoindex.json mis à jour');
+  }
+
+  // rapport-ecoindex.md — artefact CI détaillé
   let md = `# Rapport Eco-index — ${date}\n\n`;
   md += `> Formule : [GreenIT Reference](https://github.com/cnumr/GreenIT-Analysis) — `;
   md += `tables de quantiles DOM/requêtes/poids, score = 100 − 5×(3×q_dom + 2×q_req + q_size)/6\n\n`;
@@ -103,17 +135,25 @@ function run() {
   if (!results.length) {
     md += '> ⚠️ Aucun rapport Lighthouse trouvé. Vérifier que le step LHCI a bien produit des fichiers `.report.json`.\n';
   } else {
+    md += '### Scores Lighthouse\n\n';
+    md += `| Métrique | Score |\n|---|---|\n`;
+    md += `| 🚀 Performance | ${avg('performance')}/100 |\n`;
+    md += `| ♿ Accessibilité | ${avg('accessibility')}/100 |\n`;
+    md += `| 🔍 SEO | ${avg('seo')}/100 |\n`;
+    md += `| ✅ Bonnes pratiques | ${avg('bestPractices')}/100 |\n\n`;
+
+    md += '### Eco-index\n\n';
     md += '| URL | DOM | Requêtes | Poids (Ko) | Score | Grade |\n';
     md += '|-----|-----|----------|------------|-------|-------|\n';
     for (const r of results) {
       const cleanUrl = r.url.replace('?_lh=1', '');
-      md += `| ${cleanUrl} | ${r.dom} | ${r.requests} | ${r.weightKb} | ${r.score}/100 | ${gradeEmoji(r.grade)} **${r.grade}** |\n`;
+      md += `| ${cleanUrl} | ${r.dom} | ${r.requests} | ${r.weightKb} | ${r.ecoindex}/100 | ${gradeEmoji(r.grade)} **${r.grade}** |\n`;
     }
     md += '\n';
 
-    const avg = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
-    const avgGrade = grade(avg);
-    md += `**Score moyen : ${avg}/100 — Grade ${gradeEmoji(avgGrade)} ${avgGrade}**\n\n`;
+    const avgEco = avg('ecoindex');
+    const avgGrade = grade(avgEco);
+    md += `**Score moyen : ${avgEco}/100 — Grade ${gradeEmoji(avgGrade)} ${avgGrade}**\n\n`;
     md += `| Grade | Seuil | Signification |\n`;
     md += `|-------|-------|---------------|\n`;
     md += `| 🟢 A | > 80 | Excellent |\n`;
@@ -125,11 +165,10 @@ function run() {
     md += `| 🔴 G | ≤ 10 | Très mauvais |\n`;
   }
 
-  const out = 'rapport-ecoindex.md';
-  fs.writeFileSync(out, md, 'utf8');
-  console.log(`[eco-index] Rapport écrit : ${out}`);
+  fs.writeFileSync('rapport-ecoindex.md', md, 'utf8');
+  console.log('[eco-index] rapport-ecoindex.md écrit');
   for (const r of results) {
-    console.log(`[eco-index] ${r.url.replace('?_lh=1', '')} → ${r.score}/100 grade ${r.grade} (DOM:${r.dom} req:${r.requests} ${r.weightKb}Ko)`);
+    console.log(`[eco-index] ${r.url.replace('?_lh=1', '')} → éco:${r.ecoindex}/100 ${r.grade} perf:${r.performance} a11y:${r.accessibility} seo:${r.seo}`);
   }
 }
 

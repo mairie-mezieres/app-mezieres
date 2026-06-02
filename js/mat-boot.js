@@ -52,10 +52,13 @@
     catch(e){ console.warn('[init] loadEnvLocal', e); }
   }, 150);
 
-  // 10) Onboarding (décalé pour ne pas bloquer l'affichage initial)
+  // 10) Badge performances footer (non bloquant)
+  try { if (typeof loadPerfBadge === 'function') loadPerfBadge(); } catch(e){}
+
+  // 11) Onboarding (décalé pour ne pas bloquer l'affichage initial)
   setTimeout(function(){ try { initOnboarding(); } catch(e){} }, 800);
 
-  // 11) Intervalles périodiques — suspendus en arrière-plan pour ménager
+  // 12) Intervalles périodiques — suspendus en arrière-plan pour ménager
   //     batterie et data mobile (la PWA installée garderait sinon ses
   //     setInterval actifs même app en background).
   window._matTimers = window._matTimers || {};
