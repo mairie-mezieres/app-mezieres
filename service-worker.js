@@ -248,6 +248,7 @@ self.addEventListener('notificationclick', e => {
   if (openType === 'meteo') fallbackHash = './#meteo';
   else if (openType === 'idees') fallbackHash = './#idees';
   else if (openType === 'signalements') fallbackHash = './#signalements';
+  else if (openType === 'contact') fallbackHash = './#contact';
   else if (openType === 'actu' && data.actuId != null) fallbackHash = `./#actu=${encodeURIComponent(String(data.actuId))}`;
   else fallbackHash = './#notifs';
 
@@ -261,21 +262,23 @@ self.addEventListener('notificationclick', e => {
       const existing = cls.find(c => c.url.startsWith(self.registration.scope));
 
       if (existing) {
-        await existing.focus();
+        try { await existing.focus(); } catch (_) {}
+        // navigate() est plus fiable que postMessage depuis un écran verrouillé
+        // (l'app suspendue peut ne pas répondre au postMessage immédiatement).
         try {
-          if (openType === 'meteo') {
-            existing.postMessage({ action: 'openMeteo' });
-          } else if (openType === 'idees') {
-            existing.postMessage({ action: 'openIdees' });
-          } else if (openType === 'signalements') {
-            existing.postMessage({ action: 'openSignalements' });
-          } else if (openType === 'actu' && data.actuId != null) {
-            existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
-          } else {
-            existing.postMessage({ action: 'openNotifs' });
-          }
+          await existing.navigate(targetUrl);
+          return;
         } catch (_) {}
-        return existing;
+        // Fallback postMessage si navigate() n'est pas supporté
+        try {
+          if (openType === 'meteo') existing.postMessage({ action: 'openMeteo' });
+          else if (openType === 'idees') existing.postMessage({ action: 'openIdees' });
+          else if (openType === 'signalements') existing.postMessage({ action: 'openSignalements' });
+          else if (openType === 'contact') existing.postMessage({ action: 'openContact' });
+          else if (openType === 'actu' && data.actuId != null) existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
+          else existing.postMessage({ action: 'openNotifs' });
+        } catch (_) {}
+        return;
       }
 
       return clients.openWindow(targetUrl);

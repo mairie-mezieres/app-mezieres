@@ -546,6 +546,7 @@ function handleMatHashRoute(){
     if(h==='#notifs'){ setTimeout(function(){ openNotifs(); }, 180); return; }
     if(h==='#idees'){ setTimeout(function(){ if(typeof openIdees==='function') openIdees(); }, 180); return; }
     if(h==='#signalements'){ setTimeout(function(){ if(typeof openSuivi==='function') openSuivi('signals'); }, 180); return; }
+    if(h==='#contact'){ setTimeout(function(){ if(typeof openContact==='function') openContact(); }, 180); return; }
     if(h==='#meteo'){ setTimeout(function(){ if(typeof openMeteo==='function') openMeteo(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
     if(h.indexOf('#actu=')===0){
@@ -567,6 +568,7 @@ if('serviceWorker' in navigator){
     if(data.action==='openMeteo'){ if(typeof openMeteo==='function') openMeteo(); return; }
     if(data.action==='openIdees'){ if(typeof openIdees==='function') openIdees(); return; }
     if(data.action==='openSignalements'){ if(typeof openSuivi==='function') openSuivi('signals'); return; }
+    if(data.action==='openContact'){ if(typeof openContact==='function') openContact(); return; }
     if(data.action==='openActu' && data.actuId!=null && typeof openActuDetail==='function'){
       openActuDetail(String(data.actuId),{ fromHash:false });
       return;
