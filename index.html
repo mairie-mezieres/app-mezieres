@@ -41,7 +41,7 @@ document.documentElement.style.background = bg;
 <link rel="stylesheet" href="css/mat.css?v=4.3.4">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.5">
 <script defer src="js/mat-utils.js?v=4.2.9"></script>
-<script defer src="js/mat-core.js?v=4.2.12"></script>
+<script defer src="js/mat-core.js?v=4.2.13"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.7"></script>
 <script defer src="js/mat-widgets.js?v=4.4.0"></script>
 <script defer src="js/mat-agenda.js?v=4.2.4"></script>
@@ -627,6 +627,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div id="footer-perf" class="footer-perf"></div>
 </div>
 <div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
+<template data-lazy-ov>
 <div class="majordome-panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:var(--gold);font-size:22px">🎩</div>
@@ -649,6 +650,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <button class="majordome-btn" onclick="closeOv('majordome');relancerOnboarding();" style="margin-top:8px;background:rgba(255,255,255,0.12);color:var(--sage);border:1px solid rgba(255,255,255,0.2);">🎬 Revoir la présentation</button>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
 <div class="mel-panel">
@@ -1129,6 +1131,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </div>
 </div>
 <div class="ov" id="ov-nums" onclick="ovClick('nums',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">📞</div>
@@ -1204,6 +1207,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-remi" onclick="ovClick('remi',event)">
 <div class="panel">
@@ -1357,6 +1361,7 @@ showCount(n);
 </div>
 </div>
 <div class="ov" id="ov-subvention" onclick="ovClick('subvention',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f5e9">💶</div>
@@ -1386,6 +1391,7 @@ et accompagnée des documents suivants :
 </div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-entreprises" onclick="ovClick('entreprises',event)">
 <div class="panel">
@@ -1427,6 +1433,7 @@ et accompagnée des documents suivants :
 </div>
 <script defer src="js/mat-desktop.js?v=4.1.0"></script>
 <div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">🆕</div>
@@ -1474,6 +1481,7 @@ et accompagnée des documents suivants :
 </div>
 </div>
 </div>
+</template>
 </div>
 </body>
 </html>

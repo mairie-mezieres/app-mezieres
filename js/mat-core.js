@@ -148,6 +148,12 @@ const _ovStack = [];
 const _OV_BASE_Z = 200;
 function openOv(id){
   const el = document.getElementById('ov-'+id);
+  // Lazy-hydratation : certains overlays au contenu purement statique sont
+  // différés via <template data-lazy-ov> dans index.html pour alléger le DOM
+  // initial (eco-index). On injecte leur contenu réel à la 1re ouverture.
+  // openOv reste le seul point d'entrée, le comportement est inchangé.
+  const tpl = el.querySelector(':scope > template[data-lazy-ov]');
+  if(tpl){ el.appendChild(tpl.content.cloneNode(true)); tpl.remove(); }
   el.classList.add('open');
   el.style.zIndex = String(_OV_BASE_Z + _ovStack.length + 1);
   document.body.style.overflow='hidden';
