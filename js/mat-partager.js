@@ -583,7 +583,10 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     // 8. Stack technique recommandée
     sections.push(stackSection());
 
-    // 9. Format de sortie attendu
+    // 9. Prérequis et création de comptes
+    sections.push(prerequisitesSection());
+
+    // 10. Format de sortie attendu
     sections.push(outputFormatSection());
 
     // 10. Garde-fous
@@ -771,6 +774,81 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     ].join('\n');
   }
 
+  function prerequisitesSection() {
+    const backendIds = ['chatbot', 'push', 'signal', 'sondages'];
+    const hasBackend = backendIds.some(f => state.features.has(f));
+    const hasChatbot = state.features.has('chatbot');
+    const hasPush    = state.features.has('push');
+    const hasSignal  = state.features.has('signal');
+    const hasActus   = state.features.has('actus');
+
+    const accounts = [];
+    accounts.push('- **GitHub** (https://github.com/signup) : pour héberger et versionner le code. Gratuit. Indispensable même si vous n’utilisez pas GitHub Pages.');
+
+    const hostLinks = {
+      'netlify':         '- **Netlify** (https://app.netlify.com/signup) : déploiement automatique du site. Gratuit.',
+      'vercel':          '- **Vercel** (https://vercel.com/signup) : déploiement automatique du site. Gratuit.',
+      'cloudflare-pages':'- **Cloudflare** (https://dash.cloudflare.com/sign-up) : déploiement via Cloudflare Pages. Gratuit.',
+      'render':          '- **Render** (https://dashboard.render.com/register) : hébergement du site et du backend Node.js. Gratuit (limites free tier).',
+      'ovh':             '- **OVH** (https://www.ovhcloud.com/fr/) : hébergement français. Payant selon la formule choisie.',
+      'github-pages':    '- (GitHub Pages est inclus dans votre compte GitHub — pas de compte séparé.)'
+    };
+    if (hostLinks[state.host]) accounts.push(hostLinks[state.host]);
+
+    if (hasBackend && state.host !== 'render') {
+      accounts.push('- **Render** (https://dashboard.render.com/register) : backend Node.js pour le chatbot, les notifications push et les signalements citoyens. Gratuit (limites free tier).');
+    }
+    if (hasBackend || hasPush) {
+      accounts.push('- **Upstash** (https://console.upstash.com/) : base de données Redis pour le cache et les notifications push. Gratuit jusqu’à 10 000 commandes/jour.');
+    }
+    if (hasChatbot) {
+      accounts.push(state.sovereign
+        ? '- **Mistral AI** (https://console.mistral.ai/) : moteur d’IA pour le chatbot. Facturation à l’usage (≈1–3 €/mois en usage courant).'
+        : '- **Mistral AI** (https://console.mistral.ai/) ou **Anthropic** (https://console.anthropic.com/) : moteur d’IA pour le chatbot. Facturation à l’usage (≈1–3 €/mois en usage courant).');
+    }
+    if (!state.sovereign && (hasActus || hasSignal)) {
+      accounts.push('- **Cloudinary** (https://cloudinary.com/users/register_free) : stockage et optimisation des images (actualités, photos de signalements). Gratuit jusqu’à 25 Go.');
+    }
+    if (hasSignal) {
+      accounts.push('- **Trello** (https://trello.com/signup) : tableau de suivi des signalements citoyens. Gratuit.');
+    }
+
+    return [
+      '# PRÉREQUIS — À FAIRE AVANT LE CODE',
+      '',
+      '**Avant de générer la moindre ligne de code**, guide l’utilisateur dans la création de ses comptes. Sans ces accès, le site ne peut ni être déployé ni fonctionner.',
+      '',
+      '## ① Adresse e-mail générique — recommandation prioritaire',
+      '',
+      'Commence impérativement par cette recommandation, en gras et bien visible :',
+      '',
+      '> "📧 **Créez d’abord une adresse e-mail générique pour votre commune**, distincte de toute adresse personnelle.',
+      '> Exemple : `numerique.mairie.nomdeville@gmail.com` ou, si vous avez un nom de domaine, `mairie@nomdeville.fr`.',
+      '>',
+      '> **Pourquoi c’est important :**',
+      '> 1. Cette adresse sera partagée avec vos collègues et successeurs — la mairie reste propriétaire des outils, même en cas de changement d’équipe.',
+      '> 2. Vos outils numériques restent séparés de votre vie privée.',
+      '> 3. Vous évitez tout blocage si l’adresse personnelle change ou est fermée.',
+      '> Si vous disposez déjà d’une adresse officielle de mairie (ex. `contact@mairie-nomdeville.fr`), vous pouvez l’utiliser directement."',
+      '',
+      'Attends la confirmation de l’utilisateur avant de continuer.',
+      '',
+      '## ② Comptes à créer (listés selon les fonctionnalités choisies)',
+      '',
+      ...accounts,
+      '',
+      '## ③ Processus de guidage pas à pas',
+      '',
+      'Pour **chaque compte** listé ci-dessus, procède dans cet ordre :',
+      '1. Demande : « Avez-vous déjà un compte [NOM DU SERVICE] ? »',
+      '2. Si **non** : donne le lien d’inscription, explique en 2–3 phrases simples ce qu’il faut faire (nom, e-mail générique, mot de passe fort). Attends sa confirmation avant de passer au suivant.',
+      '3. Si **oui** : demande-lui de confirmer qu’il a accès, puis passe au compte suivant.',
+      '4. Une fois **tous** les comptes confirmés : « Parfait ! Tous les prérequis sont prêts. Je vais maintenant construire votre site. »',
+      '',
+      '> ⚠️ Ne commence à générer du code qu’une fois que l’utilisateur a confirmé avoir créé tous les comptes nécessaires, ou qu’il a explicitement demandé à sauter cette étape.'
+    ].join('\n');
+  }
+
   function outputFormatSection() {
     // Liste dynamique des gabarits JSON à produire selon les features cochées
     const checkedJsons = FEATURES
@@ -858,12 +936,15 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '',
       'L’utilisateur posera sûrement ces questions après ta première réponse. Prépare-toi à y répondre.',
       '',
-      '- **"Ça coûte combien réellement ?"** → détaille les coûts fixes (hébergement, domaine) et variables (chatbot selon usage).',
-      '- **"Comment je mets à jour le contenu ?"** → explique le workflow JSON pour chaque type de contenu.',
-      '- **"Et si Claude est saturé / mon site est en panne ?"** → PWA = fonctionnement hors ligne ; service worker.',
-      '- **"Mes données restent en France ?"** → réponds précisément selon la stack choisie.',
-      '- **"Comment créer les icônes PWA ?"** → propose des générateurs gratuits (favicon.io, pwabuilder.com).',
-      '- **"Comment j’obtiens un nom de domaine ?"** → OVH, Gandi, Namecheap selon la souveraineté.',
+      '- **"Ça coûte combien réellement ?»** → détaille les coûts fixes (hébergement, domaine) et variables (chatbot selon usage).',
+      '- **"Comment je mets à jour le contenu ?»** → explique le workflow JSON pour chaque type de contenu.',
+      '- **"Et si Claude est saturé / mon site est en panne ?»** → PWA = fonctionnement hors ligne ; service worker.',
+      '- **"Mes données restent en France ?»** → réponds précisément selon la stack choisie.',
+      '- **"Comment créer les icônes PWA ?»** → propose des générateurs gratuits (favicon.io, pwabuilder.com).',
+      '- **"Comment j’obtiens un nom de domaine ?»** → OVH, Gandi, Namecheap selon la souveraineté.',
+      '- **"Pourquoi créer une adresse mail spéciale ?»** → explique que si le maire ou l’agent utilise son adresse personnelle, la commune perd l’accès à ses outils en cas de départ. L’adresse générique garantit la continuité.',
+      '- **"Je n’arrive pas à créer mon compte GitHub / Render»** → guide pas à pas : aller sur le site, cliquer sur «Sign up», renseigner l’adresse générique, valider l’e-mail de confirmation, puis revenir.',
+      '- **"J’ai oublié de noter mon mot de passe»** → recommande un gestionnaire de mots de passe simple (Bitwarden gratuit) ou un document partagé sécurisé en interne (pas un post-it).',
       '',
       '---',
       '',
