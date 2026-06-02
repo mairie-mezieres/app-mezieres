@@ -1,36 +1,59 @@
 #!/usr/bin/env node
 // Calcule un score Eco-index depuis les métriques d'un rapport Lighthouse CI.
-// Utilise la formule officielle ecoindex.fr (v5) :
-//   ecoindex = 100 - (5/3) * (dom/10 + requests + weight_kb/100)
-// Grade : A ≥ 90 · B ≥ 80 · C ≥ 70 · D ≥ 55 · E ≥ 40 · F ≥ 25 · G < 25
+// Formule officielle GreenIT (tables de quantiles) — cf.
+//   https://github.com/cnumr/GreenIT-Analysis/blob/master/script/ecoIndex.js
+//   score = 100 - 5 * (3*q_dom + 2*q_req + q_size) / 6
+// Grade : A > 80 · B > 70 · C > 55 · D > 40 · E > 25 · F > 10 · G ≤ 10
 //
-// Usage (depuis le workflow Lighthouse CI) :
-//   node scripts/compute-ecoindex.js
-//
-// Entrée : variable d'env LHCI_LINKS (JSON produit par treosh/lighthouse-ci-action)
-//          ou fichiers *.report.json dans .lighthouseci/
+// Entrée : fichiers *.report.json dans .lighthouseci/ (produits par LHCI)
 // Sortie : rapport-ecoindex.md (artefact CI)
 
 const fs = require('fs');
 const path = require('path');
 
+// Tables de quantiles issues de l'implémentation de référence GreenIT
+const Q_DOM = [
+  0, 47, 75, 159, 233, 298, 358, 417, 476, 537,
+  603, 674, 753, 843, 949, 1076, 1237, 1459, 1801, 2479, 594601
+];
+const Q_REQ = [
+  0, 2, 15, 25, 34, 42, 49, 56, 63, 70,
+  78, 86, 95, 105, 117, 130, 147, 170, 205, 281, 3920
+];
+const Q_SIZE = [ // Ko
+  0, 1.37, 144.7, 319.53, 479.46, 631.97, 783.38, 937.91, 1098.31, 1276.58,
+  1481.96, 1716.64, 1993.79, 2337.54, 2783.42, 3401.97, 4240.69, 5565.92, 8037.54, 14710.01, 223212.26
+];
+
+function getQuantile(table, value) {
+  for (let i = 1; i < table.length; i++) {
+    if (value < table[i]) {
+      return (i - 1) + (value - table[i - 1]) / (table[i] - table[i - 1]);
+    }
+  }
+  return 20;
+}
+
+function computeEcoindex(dom, requests, weightKb) {
+  const q1 = getQuantile(Q_DOM, dom);
+  const q2 = getQuantile(Q_REQ, requests);
+  const q3 = getQuantile(Q_SIZE, weightKb);
+  const raw = 100 - 5 * (3 * q1 + 2 * q2 + q3) / 6;
+  return Math.max(0, Math.min(100, Math.round(raw)));
+}
+
 function grade(score) {
-  if (score >= 90) return 'A';
-  if (score >= 80) return 'B';
-  if (score >= 70) return 'C';
-  if (score >= 55) return 'D';
-  if (score >= 40) return 'E';
-  if (score >= 25) return 'F';
+  if (score > 80) return 'A';
+  if (score > 70) return 'B';
+  if (score > 55) return 'C';
+  if (score > 40) return 'D';
+  if (score > 25) return 'E';
+  if (score > 10) return 'F';
   return 'G';
 }
 
 function gradeEmoji(g) {
   return { A: '🟢', B: '🟢', C: '🟡', D: '🟡', E: '🟠', F: '🔴', G: '🔴' }[g] || '⚪';
-}
-
-function computeEcoindex(dom, requests, weightKb) {
-  const raw = 100 - (5 / 3) * (dom / 10 + requests + weightKb / 100);
-  return Math.max(0, Math.min(100, Math.round(raw)));
 }
 
 function extractMetrics(report) {
@@ -74,8 +97,8 @@ function run() {
   const date = new Date().toISOString().slice(0, 10);
 
   let md = `# Rapport Eco-index — ${date}\n\n`;
-  md += `> Formule : [ecoindex.fr v5](https://www.ecoindex.fr/comment-ca-marche/) — `;
-  md += `Score = 100 − (5/3) × (DOM/10 + Requêtes + Poids(Ko)/100)\n\n`;
+  md += `> Formule : [GreenIT Reference](https://github.com/cnumr/GreenIT-Analysis) — `;
+  md += `tables de quantiles DOM/requêtes/poids, score = 100 − 5×(3×q_dom + 2×q_req + q_size)/6\n\n`;
 
   if (!results.length) {
     md += '> ⚠️ Aucun rapport Lighthouse trouvé. Vérifier que le step LHCI a bien produit des fichiers `.report.json`.\n';
@@ -93,22 +116,20 @@ function run() {
     md += `**Score moyen : ${avg}/100 — Grade ${gradeEmoji(avgGrade)} ${avgGrade}**\n\n`;
     md += `| Grade | Seuil | Signification |\n`;
     md += `|-------|-------|---------------|\n`;
-    md += `| 🟢 A | ≥ 90 | Excellent |\n`;
-    md += `| 🟢 B | ≥ 80 | Très bon |\n`;
-    md += `| 🟡 C | ≥ 70 | Bon |\n`;
-    md += `| 🟡 D | ≥ 55 | Moyen |\n`;
-    md += `| 🟠 E | ≥ 40 | Médiocre |\n`;
-    md += `| 🔴 F | ≥ 25 | Mauvais |\n`;
-    md += `| 🔴 G | < 25 | Très mauvais |\n`;
+    md += `| 🟢 A | > 80 | Excellent |\n`;
+    md += `| 🟢 B | > 70 | Très bon |\n`;
+    md += `| 🟡 C | > 55 | Bon |\n`;
+    md += `| 🟡 D | > 40 | Moyen |\n`;
+    md += `| 🟠 E | > 25 | Médiocre |\n`;
+    md += `| 🔴 F | > 10 | Mauvais |\n`;
+    md += `| 🔴 G | ≤ 10 | Très mauvais |\n`;
   }
 
   const out = 'rapport-ecoindex.md';
   fs.writeFileSync(out, md, 'utf8');
   console.log(`[eco-index] Rapport écrit : ${out}`);
-  if (results.length) {
-    for (const r of results) {
-      console.log(`[eco-index] ${r.url.replace('?_lh=1', '')} → score ${r.score}/100 grade ${r.grade} (DOM:${r.dom} req:${r.requests} ${r.weightKb}Ko)`);
-    }
+  for (const r of results) {
+    console.log(`[eco-index] ${r.url.replace('?_lh=1', '')} → ${r.score}/100 grade ${r.grade} (DOM:${r.dom} req:${r.requests} ${r.weightKb}Ko)`);
   }
 }
 
