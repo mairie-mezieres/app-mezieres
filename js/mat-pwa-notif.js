@@ -25,7 +25,9 @@ async function checkAndRenewPushSubscription() {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
     if (sub) {
-      localStorage.setItem(PUSH_ACTIVE_KEY, '1');
+      // Ne ré-inscrire aux alertes générales que si l'utilisateur a explicitement opté
+      // (évite d'inscrire les abonnements "réponse uniquement" créés via les formulaires)
+      if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
       // Re-synchroniser avec le serveur au cas où il a perdu la souscription (redémarrage Render/Redis)
       fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
         method: 'POST',
