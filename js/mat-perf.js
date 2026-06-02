@@ -1,7 +1,8 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Badge performances footer v1.0.2
+   MAT — Badge performances footer v1.0.3
    Charge data/ecoindex.json (mis à jour chaque lundi par CI)
    et affiche les scores Lighthouse + Eco-index dans le footer.
+   Le badge n'est affiché que si l'éco-index atteint la note D (≥ 40).
    ════════════════════════════════════════════════════════════ */
 
 async function loadPerfBadge() {
@@ -12,6 +13,9 @@ async function loadPerfBadge() {
     if (!r.ok) return;
     const d = await r.json();
     if (!d.grade) return;
+    // N'afficher qu'à partir de la note D (éco-index ≥ 40) pour éviter
+    // d'exposer un score médiocre avant que les optimisations portent leurs fruits.
+    if (d.ecoindex < 40) return;
 
     // Tons clairs : contraste ≥ 4.5:1 sur le footer --forest (#1a3d2b), RGAA AA.
     // Les couleurs saturées (rouge/orange foncés) échouent sur fond sombre.
