@@ -229,6 +229,7 @@ let _obStep = 0;
 function initOnboarding() {
   if (localStorage.getItem(OB_KEY)) return;
   if (localStorage.getItem('mat_accessibility')) { localStorage.setItem(OB_KEY, '1'); return; }
+  if (new URLSearchParams(location.search).get('_lh') === '1') { localStorage.setItem(OB_KEY, '1'); return; }
   _obStep = 0;
   buildOnboardingDOM();
   document.getElementById('mat-onboarding').style.display = 'flex';
@@ -250,7 +251,7 @@ function buildOnboardingDOM() {
   const dots = Array.from({length:total},(_,i)=>`<div id="ob-dot-${i}" style="width:7px;height:7px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.35)'};transition:all 0.3s;flex-shrink:0;"></div>`).join('');
   ob.innerHTML = `
     <div id="ob-step-0" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:28px 24px;text-align:center;gap:18px;">
-      <img src="img/MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='img/MAT et MEL.webp'">
+      <img src="MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.webp'">
       <div style="color:#fff;font-family:'Grape Nuts',cursive;font-size:2.2rem;">Bienvenue !</div>
       <div style="color:rgba(255,255,255,0.88);font-size:0.88rem;line-height:1.7;max-width:320px;">
         Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.<br><br>
@@ -258,6 +259,7 @@ function buildOnboardingDOM() {
         <em style="color:rgba(255,255,255,0.5);font-size:0.76rem;">Laissez-moi vous présenter l'application.</em>
       </div>
       <button onclick="obNext()" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:16px;padding:15px 36px;font-family:'Nunito',sans-serif;font-size:0.94rem;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.3);">Découvrir l'appli →</button>
+      <button onclick="obSkip()" style="background:none;border:none;color:rgba(255,255,255,0.45);font-family:'Nunito',sans-serif;font-size:0.78rem;cursor:pointer;padding:4px 12px;text-decoration:underline;text-underline-offset:3px;">Passer</button>
     </div>
     <div id="ob-feature-card" style="display:none;position:fixed;bottom:0;left:0;right:0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,rgba(13,43,26,0.97) 70%,transparent);z-index:10002;text-align:center;">
       <div id="ob-feat-ico" style="font-size:2.8rem;margin-bottom:8px;"></div>
