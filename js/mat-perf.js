@@ -1,13 +1,14 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Badge performances footer v1.0.5
+   MAT — Badge performances footer v1.0.6
    Charge data/ecoindex.json (mis à jour chaque lundi par CI)
    et affiche les scores Lighthouse + Eco-index dans le footer.
    La note Éco n'est affichée que si l'éco-index atteint D (≥ 40).
+   Peuplé dans tous les éléments .footer-perf (mobile + desktop).
    ════════════════════════════════════════════════════════════ */
 
 async function loadPerfBadge() {
-  const el = document.getElementById('footer-perf');
-  if (!el) return;
+  const els = document.querySelectorAll('.footer-perf');
+  if (!els.length) return;
   try {
     const r = await fetch('./data/ecoindex.json', { cache: 'no-cache' });
     if (!r.ok) return;
@@ -23,7 +24,7 @@ async function loadPerfBadge() {
     const showEco = d.grade && d.ecoindex >= 40;
     const col = gradeColors[d.grade] || 'var(--sage)';
 
-    el.innerHTML =
+    const html =
       (showEco
         ? `<span class="fp-eco" style="color:${col}" title="Éco-index : sobriété numérique (poids, DOM, requêtes) — ${d.ecoindex}/100, note ${d.grade}">🌿&nbsp;Éco&nbsp;${d.grade}&nbsp;${d.ecoindex}</span><span class="fp-sep">·</span>`
         : '') +
@@ -33,5 +34,7 @@ async function loadPerfBadge() {
       `<span class="fp-sep">·</span>` +
       `<span title="Référencement (SEO) — ${d.seo}/100">🔍&nbsp;Référencement&nbsp;${d.seo}</span>` +
       (dateStr ? `<span class="fp-sep">·</span><span class="fp-date">${dateStr}</span>` : '');
+
+    els.forEach(el => { el.innerHTML = html; });
   } catch (_) {}
 }
