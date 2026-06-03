@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Badge performances footer v1.0.4
+   MAT — Badge performances footer v1.0.5
    Charge data/ecoindex.json (mis à jour chaque lundi par CI)
    et affiche les scores Lighthouse + Eco-index dans le footer.
    La note Éco n'est affichée que si l'éco-index atteint D (≥ 40).
@@ -27,11 +27,11 @@ async function loadPerfBadge() {
       (showEco
         ? `<span class="fp-eco" style="color:${col}" title="Éco-index : sobriété numérique (poids, DOM, requêtes) — ${d.ecoindex}/100, note ${d.grade}">🌿&nbsp;Éco&nbsp;${d.grade}&nbsp;${d.ecoindex}</span><span class="fp-sep">·</span>`
         : '') +
-      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Perf&nbsp;${d.performance}</span>` +
+      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Performance&nbsp;${d.performance}</span>` +
       `<span class="fp-sep">·</span>` +
-      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Accès&nbsp;${d.accessibility}</span>` +
+      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Accessibilité&nbsp;${d.accessibility}</span>` +
       `<span class="fp-sep">·</span>` +
-      `<span title="Référencement (SEO) — ${d.seo}/100">🔍&nbsp;SEO&nbsp;${d.seo}</span>` +
+      `<span title="Référencement (SEO) — ${d.seo}/100">🔍&nbsp;Référencement&nbsp;${d.seo}</span>` +
       (dateStr ? `<span class="fp-sep">·</span><span class="fp-date">${dateStr}</span>` : '');
   } catch (_) {}
 }
