@@ -61,7 +61,7 @@
   .d-bus-dir{flex:1;color:var(--sage-ink);font-weight:600}
   .d-bus-time{font-weight:900;color:var(--forest);background:var(--mist);border-radius:6px;padding:2px 8px;font-size:.76rem}
   .d-bus-soon{background:#fef3c7;color:#92400e}
-  .d-bus-empty{font-size:.75rem;color:#aaa;padding:8px 0;text-align:center}
+  .d-bus-empty{font-size:.75rem;color:#6b7280;padding:8px 0;text-align:center}
   .d-bus-periode{font-size:.62rem;background:var(--mist);color:var(--sage-ink);border-radius:6px;padding:2px 7px;font-weight:800}
 
   /* Accessibility btn in nav */
