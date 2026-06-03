@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.3 — trafic par population + souveraineté numérique active
+// Version 2.4 — coût global estimatif ancré sur le trafic réel MAT
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -426,27 +426,27 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     });
   }
 
-  // ─── Paliers de trafic selon la population ───────────────
-  function getPopulationTier() {
+  // ─── Estimation de trafic ancrée sur le constat MAT ──────
+  // Observation réelle sur MAT : ~30 questions chatbot/jour pour ~700 hab.
+  // On extrapole proportionnellement à la population de la commune.
+  const MAT_REF_POP = 700;   // habitants de référence (Mézières-lez-Cléry)
+  const MAT_REF_QPD = 30;    // questions chatbot/jour observées
+  const COST_PER_Q_MIN = 0.001; // €/question (Mistral Small / Haiku + cache)
+  const COST_PER_Q_MAX = 0.003; // €/question (sans cache, prompt long)
+  const UPSTASH_FREE_CMD_DAY = 10000; // palier gratuit Upstash Redis
+  const CMD_PER_Q = 3;       // commandes Redis par question (lecture + écriture cache)
+
+  function estimateTraffic() {
     const pop = parseInt(state.population, 10) || 0;
-    if (pop >= 10000) return {
-      label: '> 10 000 hab.', visitors: '~1 000–3 000 visiteurs/mois',
-      chatbotMin: 5, chatbotMax: 30,
-      warning: 'À cette échelle, Upstash Redis et Render peuvent dépasser leur palier gratuit.'
-    };
-    if (pop >= 2000) return {
-      label: '2 000–10 000 hab.', visitors: '~200–1 000 visiteurs/mois',
-      chatbotMin: 3, chatbotMax: 15, warning: null
-    };
-    if (pop >= 500) return {
-      label: '500–2 000 hab.', visitors: '~50–200 visiteurs/mois',
-      chatbotMin: 1, chatbotMax: 5, warning: null
-    };
-    return {
-      label: pop > 0 ? '< 500 hab.' : '',
-      visitors: pop > 0 ? '< 50 visiteurs/mois' : '',
-      chatbotMin: 0, chatbotMax: 2, warning: null
-    };
+    const qPerDay = pop > 0 ? Math.round(pop * MAT_REF_QPD / MAT_REF_POP) : 0;
+    const qPerMonth = qPerDay * 30;
+    const chatMin = Math.round(qPerMonth * COST_PER_Q_MIN);
+    const chatMax = Math.ceil(qPerMonth * COST_PER_Q_MAX);
+    // Avertissement si le palier gratuit Upstash risque d'être dépassé
+    const warning = (qPerDay * CMD_PER_Q > UPSTASH_FREE_CMD_DAY * 0.8)
+      ? 'À ce volume, le palier gratuit Upstash Redis (10 000 cmd/jour) peut être dépassé (~10 €/mois).'
+      : null;
+    return { pop, qPerDay, qPerMonth, chatMin, chatMax, warning };
   }
 
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
@@ -470,14 +470,15 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     let maxTotal = 0;
     let needsBackend = false;
     const breakdown = [];
-    const tier = getPopulationTier();
+    const traffic = estimateTraffic();
+    const hasChatbot = state.features.has('chatbot');
 
     FEATURES.forEach(f => {
       if (!state.features.has(f.id)) return;
       let fMin = (f.costMin !== undefined) ? f.costMin : f.cost;
       let fMax = (f.costMax !== undefined) ? f.costMax : f.cost;
-      // Coût du chatbot ajusté selon le trafic estimé par la population
-      if (f.id === 'chatbot') { fMin = tier.chatbotMin; fMax = tier.chatbotMax; }
+      // Coût du chatbot calculé sur le trafic estimé (questions/mois × €/question)
+      if (f.id === 'chatbot') { fMin = traffic.chatMin; fMax = traffic.chatMax; }
       minTotal += fMin;
       maxTotal += fMax;
       if (f.backend) needsBackend = true;
@@ -487,13 +488,19 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       }
     });
 
-    // Badge trafic estimé
+    // Badge trafic estimé (basé sur le constat MAT : 30 q/jour pour 700 hab.)
     const trafficEl = document.getElementById('traffic-indicator');
-    if (trafficEl && tier.visitors) {
-      trafficEl.innerHTML = '👥 ' + tier.label + ' · ' + tier.visitors
-        + (tier.warning ? ' · <span style="color:#ffb38a">' + tier.warning + '</span>' : '');
-    } else if (trafficEl) {
-      trafficEl.innerHTML = '';
+    if (trafficEl) {
+      if (traffic.pop <= 0) {
+        trafficEl.innerHTML = '👥 Renseignez la population (étape 1) pour estimer le coût selon le trafic.';
+      } else if (hasChatbot) {
+        trafficEl.innerHTML = '👥 ~' + traffic.qPerDay + ' questions/jour estimées ('
+          + traffic.qPerMonth.toLocaleString('fr-FR') + '/mois · base MAT : 30/j pour 700 hab.)'
+          + (traffic.warning ? '<br><span style="color:#ffb38a">⚠️ ' + traffic.warning + '</span>' : '');
+      } else {
+        trafficEl.innerHTML = '👥 Population ' + traffic.pop.toLocaleString('fr-FR')
+          + ' hab. · trafic web absorbé par les paliers gratuits (cochez le chatbot pour le coût IA).';
+      }
     }
 
     // Hébergement de l'étape 1
