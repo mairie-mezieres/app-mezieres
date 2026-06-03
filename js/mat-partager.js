@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.8 — backend séparé facturé seulement si l'hébergeur est statique
+// Version 2.9 — OVH front+back (VPS), coût Bunny.net souverain, libellé Mistral clarifié
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -480,23 +480,31 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
   // Fourchettes réalistes vérifiées en mai 2026.
-  // canBackend : la plateforme peut héberger le backend elle-même.
+  // canBackend  : la plateforme peut héberger le backend elle-même.
+  // serverless  : le backend tourne en fonctions, absorbé par le palier gratuit.
+  // backendMin/Max : coût de la plateforme quand elle doit AUSSI porter le
+  //                  backend (ex. OVH passe de mutualisé statique à VPS).
   //   • Render          → service web (front + back au même endroit)
   //   • CF Pages/Netlify/Vercel → front + fonctions serverless (palier gratuit)
-  //   • GitHub Pages / OVH Perso → STATIQUE uniquement → backend séparé requis
+  //   • OVH             → Perso (~4 € statique) OU VPS (~5-8 € front + back)
+  //   • GitHub Pages    → STATIQUE uniquement → backend Render séparé requis
   const HOSTING_COSTS = {
-    'cloudflare-pages': { min: 0, max: 0,  canBackend: true,  label: 'Cloudflare Pages (gratuit, CDN + Workers)' },
-    'netlify':       { min: 0, max: 0,  canBackend: true,  label: 'Netlify free (100 Go BP/mois + Functions)' },
-    'vercel':        { min: 0, max: 0,  canBackend: true,  label: 'Vercel free (100 Go BP/mois + Functions)' },
+    'cloudflare-pages': { min: 0, max: 0,  canBackend: true,  serverless: true, label: 'Cloudflare Pages (gratuit, CDN + Workers)' },
+    'netlify':       { min: 0, max: 0,  canBackend: true,  serverless: true, label: 'Netlify free (100 Go BP/mois + Functions)' },
+    'vercel':        { min: 0, max: 0,  canBackend: true,  serverless: true, label: 'Vercel free (100 Go BP/mois + Functions)' },
     'render':        { min: 0, max: 7,  canBackend: true,  label: 'Render free → Starter (7 €/mois, front + backend)' },
     'github-pages':  { min: 0, max: 0,  canBackend: false, label: 'GitHub Pages (gratuit, statique uniquement)' },
-    'ovh':           { min: 4, max: 5,  canBackend: false, label: 'OVH Perso (~4 €/mois, statique/PHP)' },
+    'ovh':           { min: 4, max: 5,  backendMin: 5, backendMax: 8, canBackend: true, label: 'OVH (Perso ~4 € statique / VPS ~5-8 € front + back)' },
     'autre':         { min: 0, max: 10, canBackend: false, label: 'Hébergeur à choisir' }
   };
   // Coût d'un nom de domaine .fr lissé sur l'année (~8 €/an)
   const DOMAIN_MONTHLY = 1;
   // Coût d'un backend mutualisé Render Starter (recommandé en production)
   const BACKEND_STARTER = 7;
+  // CDN images Bunny.net EU (mode souverain) : pas de palier gratuit, ~1 €/mois
+  // minimum, jusqu'à ~2 € avec le trafic d'une commune.
+  const BUNNY_MIN = 1;
+  const BUNNY_MAX = 2;
 
   function updateCost() {
     let minTotal = 0;
@@ -555,17 +563,22 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
     // Hébergement de l'étape 1
     const h = HOSTING_COSTS[state.host] || HOSTING_COSTS['autre'];
-    // On ne facture un backend SÉPARÉ que si l'hébergeur choisi ne peut pas
-    // l'héberger lui-même (GitHub Pages, OVH Perso = statique uniquement).
-    // Render/Vercel/Netlify/CF hébergent front + backend au même endroit.
+    // On ne facture un backend SÉPARÉ que si l'hébergeur ne peut pas l'héberger
+    // lui-même (GitHub Pages = statique uniquement). Render/Vercel/Netlify/CF
+    // et OVH (en VPS) hébergent front + backend au même endroit.
     const needsSeparateBackend = needsBackend && !h.canBackend;
-    minTotal += h.min;
-    maxTotal += h.max;
-    if (h.max > 0) {
-      breakdown.unshift({
-        label: (needsSeparateBackend ? 'Hébergement front (' : 'Hébergement (') + h.label + ')',
-        range: rangeEur(h.min, h.max)
-      });
+    // Certains hébergeurs (OVH) ont un tarif plus élevé quand ils portent aussi
+    // le backend (Perso statique → VPS). On bascule sur ce palier le cas échéant.
+    const useBackendTier = needsBackend && h.canBackend && h.backendMin !== undefined;
+    const hMin = useBackendTier ? h.backendMin : h.min;
+    const hMax = useBackendTier ? h.backendMax : h.max;
+    minTotal += hMin;
+    maxTotal += hMax;
+    if (hMax > 0) {
+      let prefix = 'Hébergement (';
+      if (needsSeparateBackend) prefix = 'Hébergement front (';
+      else if (needsBackend && h.canBackend) prefix = 'Hébergement front + backend (';
+      breakdown.unshift({ label: prefix + h.label + ')', range: rangeEur(hMin, hMax) });
     }
 
     if (needsSeparateBackend) {
@@ -573,10 +586,19 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       minTotal += BACKEND_STARTER;
       maxTotal += BACKEND_STARTER;
       breakdown.push({ label: 'Hébergement backend (Render Starter, requis)', range: BACKEND_STARTER + ' €' });
-    } else if (needsBackend && state.host !== 'render') {
+    } else if (needsBackend && h.serverless) {
       // Plateforme serverless (Vercel/Netlify/CF) : le backend tourne en
       // fonctions sur la même plateforme, absorbé par le palier gratuit.
       breakdown.push({ label: 'Backend serverless (inclus, palier gratuit)', range: '0 €' });
+    }
+
+    // CDN images : en mode souverain, Bunny.net EU remplace Cloudinary mais
+    // n'a PAS de palier gratuit (~1 €/mois minimum). Hors souverain, Cloudinary
+    // (25 Go gratuits) suffit → coût nul, pas de ligne.
+    if (state.sovereign) {
+      minTotal += BUNNY_MIN;
+      maxTotal += BUNNY_MAX;
+      breakdown.push({ label: 'CDN images (Bunny.net EU, souverain)', range: rangeEur(BUNNY_MIN, BUNNY_MAX) });
     }
 
     // Nom de domaine .fr (toujours recommandé pour un service public)
