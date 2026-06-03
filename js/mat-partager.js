@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.6 — correction calibrage LLM : ~40 questions/MOIS (pas /jour) pour 900 hab.
+// Version 2.8 — backend séparé facturé seulement si l'hébergeur est statique
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -480,14 +480,18 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
   // Fourchettes réalistes vérifiées en mai 2026.
+  // canBackend : la plateforme peut héberger le backend elle-même.
+  //   • Render          → service web (front + back au même endroit)
+  //   • CF Pages/Netlify/Vercel → front + fonctions serverless (palier gratuit)
+  //   • GitHub Pages / OVH Perso → STATIQUE uniquement → backend séparé requis
   const HOSTING_COSTS = {
-    'cloudflare-pages': { min: 0, max: 0,  label: 'Cloudflare Pages (gratuit, CDN mondial)' },
-    'netlify':       { min: 0, max: 0,  label: 'Netlify free (100 Go BP/mois)' },
-    'vercel':        { min: 0, max: 0,  label: 'Vercel free (100 Go BP/mois)' },
-    'render':        { min: 0, max: 7,  label: 'Render free → Starter (7 €/mois si pas de sleep)' },
-    'github-pages':  { min: 0, max: 0,  label: 'GitHub Pages (gratuit)' },
-    'ovh':           { min: 4, max: 5,  label: 'OVH Perso (~4 €/mois)' },
-    'autre':         { min: 0, max: 10, label: 'Hébergeur à choisir' }
+    'cloudflare-pages': { min: 0, max: 0,  canBackend: true,  label: 'Cloudflare Pages (gratuit, CDN + Workers)' },
+    'netlify':       { min: 0, max: 0,  canBackend: true,  label: 'Netlify free (100 Go BP/mois + Functions)' },
+    'vercel':        { min: 0, max: 0,  canBackend: true,  label: 'Vercel free (100 Go BP/mois + Functions)' },
+    'render':        { min: 0, max: 7,  canBackend: true,  label: 'Render free → Starter (7 €/mois, front + backend)' },
+    'github-pages':  { min: 0, max: 0,  canBackend: false, label: 'GitHub Pages (gratuit, statique uniquement)' },
+    'ovh':           { min: 4, max: 5,  canBackend: false, label: 'OVH Perso (~4 €/mois, statique/PHP)' },
+    'autre':         { min: 0, max: 10, canBackend: false, label: 'Hébergeur à choisir' }
   };
   // Coût d'un nom de domaine .fr lissé sur l'année (~8 €/an)
   const DOMAIN_MONTHLY = 1;
@@ -551,22 +555,28 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
     // Hébergement de l'étape 1
     const h = HOSTING_COSTS[state.host] || HOSTING_COSTS['autre'];
+    // On ne facture un backend SÉPARÉ que si l'hébergeur choisi ne peut pas
+    // l'héberger lui-même (GitHub Pages, OVH Perso = statique uniquement).
+    // Render/Vercel/Netlify/CF hébergent front + backend au même endroit.
+    const needsSeparateBackend = needsBackend && !h.canBackend;
     minTotal += h.min;
     maxTotal += h.max;
     if (h.max > 0) {
       breakdown.unshift({
-        label: 'Hébergement (' + h.label + ')',
+        label: (needsSeparateBackend ? 'Hébergement front (' : 'Hébergement (') + h.label + ')',
         range: rangeEur(h.min, h.max)
       });
     }
 
-    // Backend mutualisé si une fonctionnalité le nécessite et qu'on n'est pas déjà sur Render
-    if (needsBackend && state.host !== 'render') {
+    if (needsSeparateBackend) {
+      // Hébergeur statique → un backend Node distinct (Render Starter) est requis.
       minTotal += BACKEND_STARTER;
       maxTotal += BACKEND_STARTER;
-      breakdown.push({ label: 'Backend Render Starter (requis)', range: BACKEND_STARTER + ' €' });
-    } else if (needsBackend && state.host === 'render') {
-      // déjà pris en compte plus haut via HOSTING_COSTS.render
+      breakdown.push({ label: 'Hébergement backend (Render Starter, requis)', range: BACKEND_STARTER + ' €' });
+    } else if (needsBackend && state.host !== 'render') {
+      // Plateforme serverless (Vercel/Netlify/CF) : le backend tourne en
+      // fonctions sur la même plateforme, absorbé par le palier gratuit.
+      breakdown.push({ label: 'Backend serverless (inclus, palier gratuit)', range: '0 €' });
     }
 
     // Nom de domaine .fr (toujours recommandé pour un service public)
@@ -600,7 +610,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       }
     }
 
-    // Comparaison coût estimé vs budget déclaré à l'étape 1
+    // Jauge coût estimé vs budget déclaré à l'étape 1
     const budgetEl = document.getElementById('budget-indicator');
     if (budgetEl) {
       if (!state.budget) {
@@ -608,19 +618,34 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       } else {
         const overMin = dispMin - state.budget;
         const overMax = dispMax - state.budget;
-        let bHtml;
-        if (overMax <= 0) {
-          const margin = state.budget - dispMax;
-          bHtml = '<span style="color:#74c69d;font-weight:800">✅ Dans votre budget (' + state.budget + ' €/mois'
-                + (margin > 0 ? ' — marge de ' + margin + ' €' : '') + ')</span>';
-        } else if (overMin <= 0) {
-          bHtml = '<span style="color:#ffd166;font-weight:800">⚠️ Peut dépasser votre budget de ' + overMax
-                + ' € en pic de trafic (budget cible : ' + state.budget + ' €/mois)</span>';
-        } else {
-          bHtml = '<span style="color:#ffb38a;font-weight:800">⛔ Dépasse votre budget de ' + overMin
-                + ' à ' + overMax + ' €/mois (budget cible : ' + state.budget + ' €)</span>';
-        }
-        budgetEl.innerHTML = bHtml;
+        const status = overMax <= 0 ? 'ok' : (overMin <= 0 ? 'warn' : 'over');
+        const color = status === 'ok' ? '#74c69d' : status === 'warn' ? '#ffd166' : '#ff8b6a';
+        // Échelle de la jauge : le budget, ou le coût max s'il le dépasse
+        // (+5 % de marge visuelle pour que le repère ne colle pas au bord).
+        const scale = Math.max(state.budget, dispMax) * 1.05;
+        const budgetPct = Math.min(100, state.budget / scale * 100);
+        const minPct = Math.min(100, dispMin / scale * 100);
+        const maxPct = Math.min(100, dispMax / scale * 100);
+        const costLabel = (dispMin === dispMax ? String(dispMin) : dispMin + '–' + dispMax) + ' €';
+        let msg;
+        if (status === 'ok')        msg = '✅ Dans le budget — marge de ' + (state.budget - dispMax) + ' €/mois';
+        else if (status === 'warn') msg = '⚠️ Atteint le budget en pic de trafic (jusqu’à +' + overMax + ' €)';
+        else                        msg = '⛔ Dépasse le budget de ' + overMin + ' à ' + overMax + ' €/mois';
+        budgetEl.innerHTML =
+          '<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px">'
+            + '<span>Coût estimé&nbsp;: <strong>' + costLabel + '</strong></span>'
+            + '<span>Budget&nbsp;: <strong>' + state.budget + ' €/mois</strong></span>'
+          + '</div>'
+          + '<div style="position:relative;height:12px;background:rgba(255,255,255,.14);border-radius:7px;overflow:hidden">'
+            // plage estimée min→max
+            + '<div style="position:absolute;top:0;bottom:0;left:0;width:' + maxPct + '%;background:' + color + ';opacity:.4"></div>'
+            + '<div style="position:absolute;top:0;bottom:0;left:' + minPct + '%;width:' + Math.max(1.5, maxPct - minPct) + '%;background:' + color + ';transition:all .4s"></div>'
+          + '</div>'
+          // repère du budget cible sous la barre
+          + '<div style="position:relative;height:0">'
+            + '<div style="position:absolute;left:' + budgetPct + '%;transform:translateX(-50%);font-size:.62rem;color:rgba(216,243,220,.7);margin-top:2px;white-space:nowrap">▲ ' + state.budget + ' €</div>'
+          + '</div>'
+          + '<div style="font-size:.72rem;margin-top:16px;color:' + color + ';font-weight:800">' + msg + '</div>';
       }
     }
   }
@@ -935,7 +960,9 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     };
     if (hostLinks[state.host]) accounts.push(hostLinks[state.host]);
 
-    if (hasBackend && state.host !== 'render') {
+    const hostCanBackend = (HOSTING_COSTS[state.host] || {}).canBackend;
+    if (hasBackend && !hostCanBackend) {
+      // Hébergeur statique (GitHub Pages, OVH Perso) → backend Node distinct requis.
       accounts.push('- **Render** (https://dashboard.render.com/register) : backend Node.js pour le chatbot, les notifications push et les signalements citoyens. Gratuit (limites free tier).');
     }
     if (hasBackend || hasPush) {
