@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.7 — jauge budget visuelle + hébergement front/backend clarifié
+// Version 2.8 — backend séparé facturé seulement si l'hébergeur est statique
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -480,14 +480,18 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
   // Fourchettes réalistes vérifiées en mai 2026.
+  // canBackend : la plateforme peut héberger le backend elle-même.
+  //   • Render          → service web (front + back au même endroit)
+  //   • CF Pages/Netlify/Vercel → front + fonctions serverless (palier gratuit)
+  //   • GitHub Pages / OVH Perso → STATIQUE uniquement → backend séparé requis
   const HOSTING_COSTS = {
-    'cloudflare-pages': { min: 0, max: 0,  label: 'Cloudflare Pages (gratuit, CDN mondial)' },
-    'netlify':       { min: 0, max: 0,  label: 'Netlify free (100 Go BP/mois)' },
-    'vercel':        { min: 0, max: 0,  label: 'Vercel free (100 Go BP/mois)' },
-    'render':        { min: 0, max: 7,  label: 'Render free → Starter (7 €/mois si pas de sleep)' },
-    'github-pages':  { min: 0, max: 0,  label: 'GitHub Pages (gratuit)' },
-    'ovh':           { min: 4, max: 5,  label: 'OVH Perso (~4 €/mois)' },
-    'autre':         { min: 0, max: 10, label: 'Hébergeur à choisir' }
+    'cloudflare-pages': { min: 0, max: 0,  canBackend: true,  label: 'Cloudflare Pages (gratuit, CDN + Workers)' },
+    'netlify':       { min: 0, max: 0,  canBackend: true,  label: 'Netlify free (100 Go BP/mois + Functions)' },
+    'vercel':        { min: 0, max: 0,  canBackend: true,  label: 'Vercel free (100 Go BP/mois + Functions)' },
+    'render':        { min: 0, max: 7,  canBackend: true,  label: 'Render free → Starter (7 €/mois, front + backend)' },
+    'github-pages':  { min: 0, max: 0,  canBackend: false, label: 'GitHub Pages (gratuit, statique uniquement)' },
+    'ovh':           { min: 4, max: 5,  canBackend: false, label: 'OVH Perso (~4 €/mois, statique/PHP)' },
+    'autre':         { min: 0, max: 10, canBackend: false, label: 'Hébergeur à choisir' }
   };
   // Coût d'un nom de domaine .fr lissé sur l'année (~8 €/an)
   const DOMAIN_MONTHLY = 1;
@@ -549,11 +553,12 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       }
     }
 
-    // Hébergement de l'étape 1 (front statique)
+    // Hébergement de l'étape 1
     const h = HOSTING_COSTS[state.host] || HOSTING_COSTS['autre'];
-    // S'il faut aussi un backend séparé, on précise « front » pour lever
-    // l'ambiguïté : Render (backend) est lui aussi de l'hébergement.
-    const needsSeparateBackend = needsBackend && state.host !== 'render';
+    // On ne facture un backend SÉPARÉ que si l'hébergeur choisi ne peut pas
+    // l'héberger lui-même (GitHub Pages, OVH Perso = statique uniquement).
+    // Render/Vercel/Netlify/CF hébergent front + backend au même endroit.
+    const needsSeparateBackend = needsBackend && !h.canBackend;
     minTotal += h.min;
     maxTotal += h.max;
     if (h.max > 0) {
@@ -563,13 +568,15 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       });
     }
 
-    // Hébergement backend (Render) si une fonctionnalité le nécessite et qu'on
-    // n'est pas déjà hébergé sur Render. OVH/Cloudflare/etc. = front statique
-    // uniquement, donc un hébergeur backend distinct est requis pour le Node.
     if (needsSeparateBackend) {
+      // Hébergeur statique → un backend Node distinct (Render Starter) est requis.
       minTotal += BACKEND_STARTER;
       maxTotal += BACKEND_STARTER;
       breakdown.push({ label: 'Hébergement backend (Render Starter, requis)', range: BACKEND_STARTER + ' €' });
+    } else if (needsBackend && state.host !== 'render') {
+      // Plateforme serverless (Vercel/Netlify/CF) : le backend tourne en
+      // fonctions sur la même plateforme, absorbé par le palier gratuit.
+      breakdown.push({ label: 'Backend serverless (inclus, palier gratuit)', range: '0 €' });
     }
 
     // Nom de domaine .fr (toujours recommandé pour un service public)
@@ -953,7 +960,9 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     };
     if (hostLinks[state.host]) accounts.push(hostLinks[state.host]);
 
-    if (hasBackend && state.host !== 'render') {
+    const hostCanBackend = (HOSTING_COSTS[state.host] || {}).canBackend;
+    if (hasBackend && !hostCanBackend) {
+      // Hébergeur statique (GitHub Pages, OVH Perso) → backend Node distinct requis.
       accounts.push('- **Render** (https://dashboard.render.com/register) : backend Node.js pour le chatbot, les notifications push et les signalements citoyens. Gratuit (limites free tier).');
     }
     if (hasBackend || hasPush) {
