@@ -159,6 +159,14 @@ button.btn:active{transform:translateY(1px)}
       <div style="font-size:.74rem;color:var(--muted);margin-top:6px;margin-left:28px">
         Recommande OVH plut&ocirc;t que Netlify/Vercel, Mistral plut&ocirc;t que Claude Haiku pour le chatbot int&eacute;gr&eacute;, Bunny.net plut&ocirc;t que Cloudinary. Donn&eacute;e stock&eacute;e en France&nbsp;/ EU uniquement.
       </div>
+      <div id="sovereign-info" style="display:none;margin-top:10px;margin-left:28px;font-size:.74rem;line-height:1.6;color:var(--forest);background:rgba(45,106,79,.12);border-radius:8px;padding:8px 10px">
+        <strong style="display:block;margin-bottom:4px">&#127467;&#127479; Outils substitu&eacute;s automatiquement&nbsp;:</strong>
+        <span>&#127968; H&eacute;bergeur &rarr; <strong>OVH</strong> (Netlify / Cloudflare remplac&eacute;s)</span><br>
+        <span>&#129302; IA chatbot &rarr; <strong>Mistral AI</strong> (Claude Haiku remplac&eacute;)</span><br>
+        <span>&#128444;&#65039; CDN images &rarr; <strong>Bunny.net EU</strong> (Cloudinary remplac&eacute;)</span><br>
+        <span>&#127956;&#65039; M&eacute;t&eacute;o &rarr; <strong>M&eacute;t&eacute;o-France</strong> (Open-Meteo remplac&eacute;)</span><br>
+        <span>&#128190; Cache &rarr; <strong>Upstash r&eacute;gion EU</strong> uniquement</span>
+      </div>
     </div>
 
     <div class="field">
@@ -202,6 +210,7 @@ button.btn:active{transform:translateY(1px)}
         </div>
         <div class="val" id="cost-display">0 &euro;/mois</div>
       </div>
+      <div id="traffic-indicator" style="font-size:.72rem;color:rgba(216,243,220,.75);min-height:1em"></div>
       <div id="budget-indicator" style="font-size:.74rem;min-height:1.2em"></div>
       <div id="cost-breakdown" style="border-top:1px solid rgba(255,255,255,.12);padding-top:8px"></div>
       <details style="margin-top:4px">
@@ -253,6 +262,6 @@ button.btn:active{transform:translateY(1px)}
 
 </main>
 
-<script src="js/mat-partager.js?v=2.2.0"></script>
+<script src="js/mat-partager.js?v=2.3.0"></script>
 </body>
 </html>
