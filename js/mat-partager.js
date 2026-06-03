@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.2 — budget-aware : comparaison coût/budget + stack adaptée
+// Version 2.3 — trafic par population + souveraineté numérique active
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -357,6 +357,27 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
     document.getElementById('f-sovereign').addEventListener('change', e => {
       state.sovereign = e.target.checked;
+      const hostSel = document.getElementById('f-host');
+      const info = document.getElementById('sovereign-info');
+      if (e.target.checked) {
+        hostSel.value = 'ovh';
+        state.host = 'ovh';
+        if (info) info.style.display = '';
+      } else {
+        hostSel.value = 'cloudflare-pages';
+        state.host = 'cloudflare-pages';
+        if (info) info.style.display = 'none';
+      }
+    });
+
+    document.getElementById('f-host').addEventListener('change', e => {
+      state.host = e.target.value;
+      if (e.target.value !== 'ovh' && state.sovereign) {
+        state.sovereign = false;
+        document.getElementById('f-sovereign').checked = false;
+        const info = document.getElementById('sovereign-info');
+        if (info) info.style.display = 'none';
+      }
     });
   }
 
@@ -405,6 +426,29 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     });
   }
 
+  // ─── Paliers de trafic selon la population ───────────────
+  function getPopulationTier() {
+    const pop = parseInt(state.population, 10) || 0;
+    if (pop >= 10000) return {
+      label: '> 10 000 hab.', visitors: '~1 000–3 000 visiteurs/mois',
+      chatbotMin: 5, chatbotMax: 30,
+      warning: 'À cette échelle, Upstash Redis et Render peuvent dépasser leur palier gratuit.'
+    };
+    if (pop >= 2000) return {
+      label: '2 000–10 000 hab.', visitors: '~200–1 000 visiteurs/mois',
+      chatbotMin: 3, chatbotMax: 15, warning: null
+    };
+    if (pop >= 500) return {
+      label: '500–2 000 hab.', visitors: '~50–200 visiteurs/mois',
+      chatbotMin: 1, chatbotMax: 5, warning: null
+    };
+    return {
+      label: pop > 0 ? '< 500 hab.' : '',
+      visitors: pop > 0 ? '< 50 visiteurs/mois' : '',
+      chatbotMin: 0, chatbotMax: 2, warning: null
+    };
+  }
+
   // ─── Coûts mensuels de l'hébergement choisi en étape 1 ───
   // Fourchettes réalistes vérifiées en mai 2026.
   const HOSTING_COSTS = {
@@ -426,11 +470,14 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     let maxTotal = 0;
     let needsBackend = false;
     const breakdown = [];
+    const tier = getPopulationTier();
 
     FEATURES.forEach(f => {
       if (!state.features.has(f.id)) return;
-      const fMin = (f.costMin !== undefined) ? f.costMin : f.cost;
-      const fMax = (f.costMax !== undefined) ? f.costMax : f.cost;
+      let fMin = (f.costMin !== undefined) ? f.costMin : f.cost;
+      let fMax = (f.costMax !== undefined) ? f.costMax : f.cost;
+      // Coût du chatbot ajusté selon le trafic estimé par la population
+      if (f.id === 'chatbot') { fMin = tier.chatbotMin; fMax = tier.chatbotMax; }
       minTotal += fMin;
       maxTotal += fMax;
       if (f.backend) needsBackend = true;
@@ -439,6 +486,15 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
         breakdown.push({ label: f.label, range });
       }
     });
+
+    // Badge trafic estimé
+    const trafficEl = document.getElementById('traffic-indicator');
+    if (trafficEl && tier.visitors) {
+      trafficEl.innerHTML = '👥 ' + tier.label + ' · ' + tier.visitors
+        + (tier.warning ? ' · <span style="color:#ffb38a">' + tier.warning + '</span>' : '');
+    } else if (trafficEl) {
+      trafficEl.innerHTML = '';
+    }
 
     // Hébergement de l'étape 1
     const h = HOSTING_COSTS[state.host] || HOSTING_COSTS['autre'];
