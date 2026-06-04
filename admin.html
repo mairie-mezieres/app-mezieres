@@ -732,6 +732,30 @@ function renderOverview() {
       </div>
     </div>
 
+    <div class="section-title">🔗 Page Partager (partager.html)</div>
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-card-ico">👁️</div>
+        <div class="stat-card-val">${fmt((app.parJour||{})[today]?.partager_visite||0)}</div>
+        <div class="stat-card-label">Visites aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📋</div>
+        <div class="stat-card-val">${fmt((app.parJour||{})[today]?.partager_prompt||0)}</div>
+        <div class="stat-card-label">Prompts générés aujourd'hui</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">📅</div>
+        <div class="stat-card-val">${fmt(Object.values(app.parJour||{}).reduce((s,d)=>s+(d?.partager_visite||0),0))}</div>
+        <div class="stat-card-label">Visites totales (historique)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-ico">✅</div>
+        <div class="stat-card-val">${fmt(Object.values(app.parJour||{}).reduce((s,d)=>s+(d?.partager_prompt||0),0))}</div>
+        <div class="stat-card-label">Prompts générés (historique)</div>
+      </div>
+    </div>
+
     <div class="section-title">👤 Visiteurs uniques par jour (30 derniers jours)</div>
     <div class="chart-wrap"><canvas id="chart-unique-daily"></canvas></div>
 
@@ -1137,9 +1161,9 @@ function renderApp() {
   for (const [day,svcs] of Object.entries(parJour)) { const m=day.slice(0,7); if(!parMois[m])parMois[m]={}; for(const[svc,cnt]of Object.entries(svcs))parMois[m][svc]=(parMois[m][svc]||0)+cnt; }
   const source  = appView==='daily'?parJour:parMois;
   const periods = Object.keys(source).sort().slice(-30);
-  const SVC_LABELS = {mel:'🤖 MEL chat',signalement:'🚨 Signalement',actualites:'🔔 Actualités',meteo:'🌤️ Météo',contact:'💬 Contact',idees:'💡 Idées',installation:'📲 Installation',carburant:'⛽ Carburant',events_locaux:'🎭 Événements',agenda:'📅 Agenda',dechets:'🗑️ Déchets',sondages:'📊 Sondages',docs:'📄 Documents',nums:'📞 Numéros utiles',conseil:'🏛️ Conseil municipal',remi:'🚌 Bus Rémi',app_open:'🟢 Ouvertures / jour',app_resume:'↩️ Retours en avant-plan'};
-  const services= ['mel','meteo','actualites','carburant','events_locaux','agenda','dechets','sondages','docs','nums','remi','conseil','contact','signalement','idees'];
-  const colors  = ['#2563eb','#38bdf8','#f59e0b','#f97316','#8b5cf6','#0891b2','#16a34a','#ec4899','#d4a843','#6b7280','#64748b','#1e40af','#7c3aed','#dc2626','#a16207'];
+  const SVC_LABELS = {mel:'🤖 MEL chat',signalement:'🚨 Signalement',actualites:'🔔 Actualités',meteo:'🌤️ Météo',contact:'💬 Contact',idees:'💡 Idées',installation:'📲 Installation',carburant:'⛽ Carburant',events_locaux:'🎭 Événements',agenda:'📅 Agenda',dechets:'🗑️ Déchets',sondages:'📊 Sondages',docs:'📄 Documents',nums:'📞 Numéros utiles',conseil:'🏛️ Conseil municipal',remi:'🚌 Bus Rémi',app_open:'🟢 Ouvertures / jour',app_resume:'↩️ Retours en avant-plan',partager_visite:'🔗 Partager — visites',partager_prompt:'🔗 Partager — prompts générés'};
+  const services= ['mel','meteo','actualites','carburant','events_locaux','agenda','dechets','sondages','docs','nums','remi','conseil','contact','signalement','idees','partager_visite','partager_prompt'];
+  const colors  = ['#2563eb','#38bdf8','#f59e0b','#f97316','#8b5cf6','#0891b2','#16a34a','#ec4899','#d4a843','#6b7280','#64748b','#1e40af','#7c3aed','#dc2626','#a16207','#059669','#10b981'];
   const allSvcs = Object.keys(Object.assign({}, ...(periods.map(p=>source[p]||{})))).filter(k=>!k.startsWith('elu_'));
   const chartSvcs = services.filter(s=>allSvcs.includes(s)||periods.some(p=>source[p]?.[s]));
   const datasets = chartSvcs.map((svc,i)=>({label:SVC_LABELS[svc]||svc, data:periods.map(p=>source[p]?.[svc]||0), color:colors[i%colors.length]}));

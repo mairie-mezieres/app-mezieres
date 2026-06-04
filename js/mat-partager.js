@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 2.9 — OVH front+back (VPS), coût Bunny.net souverain, libellé Mistral clarifié
+// Version 3.0 — Suivi des visites et prompts dans la console admin
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -328,6 +328,24 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     features: new Set(FEATURES.filter(f => f.def).map(f => f.id))
   };
 
+  // ─── Suivi stats admin (même endpoint que mat-utils.js) ──
+  function _trackPartager(service) {
+    try {
+      const KEY = 'mat_device_id_v1';
+      let id = localStorage.getItem(KEY);
+      if (!id) {
+        id = 'mat-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10);
+        try { localStorage.setItem(KEY, id); } catch(_e) {}
+      }
+      fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-device-id': id },
+        body: JSON.stringify({ service, deviceId: id }),
+        keepalive: true
+      }).catch(() => {});
+    } catch(_e) {}
+  }
+
   // ─── Initialisation au chargement ──────────────────────
   document.addEventListener('DOMContentLoaded', init);
 
@@ -335,6 +353,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     bindStep1();
     renderFeatures();
     updateCost();
+    _trackPartager('partager_visite');
   }
 
   function bindStep1() {
@@ -700,6 +719,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
 
     renderSummary(prompt);
     setOpenButton();
+    _trackPartager('partager_prompt');
     goTo(3);
   };
 
