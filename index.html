@@ -143,7 +143,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.45);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.17 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.45);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.18 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -418,7 +418,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.17</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.18</button>
 </div>
 </div>
 </div>
@@ -628,7 +628,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter">⏹</button>
 </div>
 <div class="footer">
-<div>MAT · Application officielle · Mairie de Mézières-lez-Cléry</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left">
+<span>MAT · Application officielle · Mézières-lez-Cléry</span>
+<a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;flex-shrink:0;letter-spacing:0">🔗 Partager</a>
+</div>
 <div id="footer-perf" class="footer-perf"></div>
 </div>
 <div class="ov" id="ov-majordome" onclick="ovClick('majordome',event)">
@@ -1458,6 +1461,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 4 juin 2026 — v4.18</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Lien &laquo;&nbsp;Partager&nbsp;&raquo; ajout&eacute; dans le pied de page mobile pour acc&eacute;der au g&eacute;n&eacute;rateur de prompt</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 2 juin 2026 — v4.17</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Application plus rapide : chargement allégé de 50 % (moins d'éléments en mémoire au démarrage)</li>
