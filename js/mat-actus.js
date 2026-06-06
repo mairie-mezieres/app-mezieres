@@ -253,7 +253,13 @@ function renderActuDetail(actu){
   const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${actu.photo}" alt="" onerror="this.onerror=null;this.src='img/mat-header.webp'"></div>`:'';
   const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
   const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a></div></div>`;
+  const id = getActuId(actu);
+  const jsId = JSON.stringify(id).replace(/"/g,'&quot;');
+  const reactionsEnabled = !(window._matFeatures && window._matFeatures.reactionsEnabled === false);
+  const likeCount = actu.likes || 0;
+  const likedLS = _isActuLikedLocally(id);
+  const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a>${likeBtn}</div></div>`;
 }
 
 async function openActuDetail(id, opts){
