@@ -131,8 +131,39 @@ function openEventDetail(uid){
   }
   var photoHTML=photo?'<img class="event-detail-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'';
   var body=document.getElementById('event-detail-body');
-  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+evt.uid.replace(/'/g,"\\'")+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+evt.uid.replace(/'/g,"\\'")+'\')">Voir le lieu</button>':'')+'</div></div>';
+  var uidSafe=evt.uid.replace(/'/g,"\\'");
+  var reactionsEnabled=!(window._matFeatures&&window._matFeatures.reactionsEnabled===false);
+  var rsvpOn=_isEventRsvpLocally(uid);
+  var rsvpBtn=reactionsEnabled?'<button id="rsvp-btn-'+uid+'" class="event-btn-rsvp'+(rsvpOn?' rsvp-on':'')+'" onclick="toggleRsvpEvent(\''+uidSafe+'\')" aria-label="'+(rsvpOn?'Retirer mon inscription':'J’y serai')+'" aria-pressed="'+rsvpOn+'">'+(rsvpOn?'✅ J’y serai':'📅 J’y serai')+'</button>':'';
+  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+uidSafe+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+uidSafe+'\')">Voir le lieu</button>':'')+rsvpBtn+'</div></div>';
   openOv('event');
+}
+
+var _RSVP_KEY = 'mat_rsvp_events_v1';
+function _getRsvpEvents(){ try{ return JSON.parse(localStorage.getItem(_RSVP_KEY)||'{}'); }catch(e){ return {}; } }
+function _isEventRsvpLocally(uid){ return !!_getRsvpEvents()[uid]; }
+function _setEventRsvpLocally(uid, val){ try{ var m=_getRsvpEvents(); if(val) m[uid]=1; else delete m[uid]; localStorage.setItem(_RSVP_KEY,JSON.stringify(m)); }catch(e){} }
+
+async function toggleRsvpEvent(uid){
+  if(window._matFeatures&&window._matFeatures.reactionsEnabled===false) return;
+  var rsvp=_isEventRsvpLocally(uid);
+  _setEventRsvpLocally(uid,!rsvp);
+  var btn=document.getElementById('rsvp-btn-'+uid);
+  if(btn){ btn.classList.toggle('rsvp-on',!rsvp); btn.setAttribute('aria-pressed',String(!rsvp)); btn.setAttribute('aria-label',!rsvp?'Retirer mon inscription':'J’y serai'); btn.textContent=!rsvp?'✅ J’y serai':'📅 J’y serai'; }
+  try{
+    var resp=await matFetch('https://chatbot-mairie-mezieres.onrender.com/event/'+encodeURIComponent(uid)+'/rsvp',{
+      method:'POST', headers:{'x-device-id':getMatDeviceId()}
+    },8000);
+    var d=await resp.json();
+    if(btn){
+      btn.classList.toggle('rsvp-on',!!d.rsvp);
+      btn.setAttribute('aria-pressed',String(!!d.rsvp));
+      btn.setAttribute('aria-label',d.rsvp?'Retirer mon inscription':'J’y serai');
+      var countLabel=d.count?' ('+d.count+')':'';
+      btn.textContent=(d.rsvp?'✅':'📅')+' J’y serai'+countLabel;
+      _setEventRsvpLocally(uid,!!d.rsvp);
+    }
+  }catch(e){ _setEventRsvpLocally(uid,rsvp); if(btn){ btn.classList.toggle('rsvp-on',rsvp); btn.setAttribute('aria-pressed',String(rsvp)); } }
 }
 
 function downloadEventIcs(uid){
