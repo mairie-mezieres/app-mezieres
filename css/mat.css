@@ -298,9 +298,7 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:10px 14px;border-radius:11px;border:none;text-decoration:none;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:900;cursor:pointer;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;box-shadow:0 4px 12px rgba(26,61,43,.12);}
 .actu-btn:hover{filter:brightness(1.03);}
 .actu-btn:active{transform:scale(.98);}
-.actu-btn-detail{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
-.actu-btn-fb{background:linear-gradient(135deg,#1877f2,#2563eb);color:#fff;}
-.actu-btn-like{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);min-height:44px;}
+.actu-btn-detail{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}.actu-btn-like{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);min-height:44px;}
 .actu-btn-like.liked{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#92400e;border-color:#f59e0b;}
 .actu-btn-like .like-count{font-size:0.7rem;opacity:0.85;}
 .event-btn-rsvp{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;transition:transform .12s ease,filter .12s ease;}

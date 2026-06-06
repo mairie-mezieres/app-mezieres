@@ -201,7 +201,7 @@ function renderActuListItem(a){
   const likeCount = a.likes || 0;
   const likedLS = _isActuLikedLocally(id);
   const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
-  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a>${likeBtn}</div></div></div>`;
+  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button>${likeBtn}</div></div></div>`;
 }
 
 const _LIKES_KEY = 'mat_liked_actus_v1';
@@ -259,7 +259,7 @@ function renderActuDetail(actu){
   const likeCount = actu.likes || 0;
   const likedLS = _isActuLikedLocally(id);
   const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a>${likeBtn}</div></div>`;
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${likeBtn}</div></div>`;
 }
 
 async function openActuDetail(id, opts){
