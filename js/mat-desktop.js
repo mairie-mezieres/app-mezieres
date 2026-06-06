@@ -1,7 +1,9 @@
-/* mat-desktop.js v4.0.5 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.1.1 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
-if(window.innerWidth<1024)return;
+
+var _initialized = false;
+var _mq = window.matchMedia('(min-width:1024px)');
 
 var API='https://chatbot-mairie-mezieres.onrender.com';
 
@@ -276,6 +278,8 @@ function escHtml(s){
 
 /* ── boot ────────────────────────────────────────────────────── */
 function init(){
+  if(_initialized) return;
+  _initialized = true;
   loadMeteo();
   loadActus().then(function(){loadAgenda();});
   loadBusDesktop();
@@ -284,10 +288,27 @@ function init(){
   renderElus();
 }
 
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',init);
-}else{
-  setTimeout(init,100);
+function _onBreakpoint(e){
+  if(!e.matches) return;
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}
+
+if(_mq.addEventListener){
+  _mq.addEventListener('change', _onBreakpoint);
+} else {
+  _mq.addListener(_onBreakpoint);
+}
+
+if(_mq.matches){
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 100);
+  }
 }
 
 })();
