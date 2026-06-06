@@ -39,7 +39,7 @@ document.documentElement.style.background = bg;
 })();
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.3.5">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.2.6">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.2.7">
 <script defer src="js/mat-utils.js?v=4.2.9"></script>
 <script defer src="js/mat-core.js?v=4.2.15"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.7"></script>
@@ -67,7 +67,9 @@ document.documentElement.style.background = bg;
 </script>
 </head>
 <body class="preload">
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
 <style>
+.skip-link{position:absolute;top:-40px;left:0;background:var(--forest,#1a3d2b);color:#fff;padding:8px 12px;z-index:10000;font-size:.9rem;font-weight:700;border-radius:0 0 8px 0;transition:top .2s}.skip-link:focus{top:0}
 .mat-migration-overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:2147483647;background:linear-gradient(160deg,#1a3d2b,#2d6a4f);display:none;align-items:center;justify-content:center;padding:24px;font-family:'Nunito',system-ui,sans-serif;animation:matMigrationFadeIn .4s ease}
 .mat-migration-overlay.on{display:flex}
 .mat-migration-overlay .mat-migration-card{background:#fff;border-radius:24px;padding:40px 32px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
@@ -135,7 +137,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ib-sub" id="ib-sub-txt">Accès rapide · Fonctionne hors ligne</div>
 </div>
 <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
-<button class="ib-x" onclick="hideBanner(event)">✕</button>
+<button class="ib-x" onclick="hideBanner(event)" aria-label="Fermer">✕</button>
 </div>
 <div class="header">
 <div class="mat-hero">
@@ -143,7 +145,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.45);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.19 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.19 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -333,6 +335,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </button>
 </div>
 </div>
+<main id="main-content">
 <div class="d-main-grid">
 <div class="d-col d-col-left">
 <div class="d-card" id="dsk-actus">
@@ -397,16 +400,17 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 <div class="d-sorties-sep"></div>
 <div class="d-events-left">
-<div class="d-rando-badge" style="color:rgba(221,214,254,0.7)">🎭 SORTIES LOCALES — RAYON 20 KM</div>
+<div class="d-rando-badge" style="color:rgba(221,214,254,0.95)">🎭 SORTIES LOCALES — RAYON 20 KM</div>
 <h2 class="d-rando-title" style="font-style:normal">Ce qui se passe<br>près de chez vous</h2>
 <p class="d-rando-desc">Concerts, expos, marchés, fêtes de village…<br>Tous les événements à moins de 20 km, mis à jour en continu.</p>
 <button onclick="openEventsLocaux()" class="d-btn-primary" style="background:rgba(139,92,246,0.7);border:1px solid rgba(255,255,255,0.2)">🗓️ Voir les événements →</button>
 </div>
 <div class="d-events-preview" id="dsk-events-preview">
-<div class="d-loading" style="color:rgba(255,255,255,0.5)">Chargement…</div>
+<div class="d-loading" style="color:rgba(255,255,255,0.85)">Chargement…</div>
 </div>
 </div>
 </div>
+</main>
 <div class="d-footer">
 <div class="d-footer-bottom">
 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -417,8 +421,8 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openRgpd()">🔒 RGPD</button>
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
-<a href="partager.html" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.19</button>
+<a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.19</button>
 </div>
 </div>
 </div>
@@ -428,7 +432,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">♿</div>
 <div class="panel-title">♿ Accessibilité &amp; Personnalisation</div>
-<button class="panel-close" onclick="closeOv('accessibilite')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('accessibilite')">✕</button>
 </div>
 <div class="panel-body">
 <div class="acc-preview" id="acc-preview">
@@ -624,8 +628,8 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div class="tts-bar" id="tts-bar" style="display:none">
 <span style="font-size:1.2rem">🔊</span>
 <span class="tts-bar-text" id="tts-bar-text">Lecture en cours…</span>
-<button class="tts-bar-btn" onclick="ttsPause()" id="tts-pause-btn" title="Pause">⏸</button>
-<button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter">⏹</button>
+<button class="tts-bar-btn" onclick="ttsPause()" id="tts-pause-btn" title="Pause" aria-label="Pause">⏸</button>
+<button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter" aria-label="Arrêter la lecture">⏹</button>
 </div>
 <div class="footer">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left">
@@ -640,7 +644,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div class="panel-hdr">
 <div class="panel-ico" style="background:var(--gold);font-size:22px">🎩</div>
 <div class="panel-title">Le Majordome de Mézières</div>
-<button class="panel-close" onclick="closeOv('majordome')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('majordome')">✕</button>
 </div>
 <div class="majordome-body">
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="majordome-img" loading="lazy" onerror="this.onerror=null;this.src='img/mat-header.webp'">
@@ -665,7 +669,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:var(--gold);font-size:22px">👩</div>
 <div class="panel-title">MEL — Aide communale</div>
-<button class="panel-close" onclick="closeOv('mel')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('mel')">✕</button>
 </div>
 <div class="ctx-help" id="ctx-mel"></div>
 <div id="mel-disclaimer" style="font-size:0.59rem;color:var(--muted);text-align:center;padding:5px 14px 4px;line-height:1.4;border-bottom:1px solid var(--border);background:var(--warm);flex-shrink:0;">⚠️ MEL peut se tromper. Réponses indicatives sous la responsabilité du lecteur.</div>
@@ -686,8 +690,8 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="msgs" id="msgs" style="display:none"></div>
 <div class="sugs" id="sugs" style="display:none"></div>
 <div class="mbar" style="display:none">
-<textarea class="minp" id="minp" rows="2" placeholder="Votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMel();}"></textarea>
-<button class="msnd" onclick="sendMel()">➤</button>
+<textarea class="minp" id="minp" rows="2" placeholder="Votre question…" aria-label="Votre question" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMel();}"></textarea>
+<button class="msnd" onclick="sendMel()" aria-label="Envoyer le message">➤</button>
 </div>
 <div id="mel-privacy-hint" style="display:none;font-size:0.65rem;color:var(--muted);text-align:center;padding:3px 10px 4px;line-height:1.4">🔒 Questions anonymisées — <button onclick="openRgpd()" style="background:none;border:none;padding:0;font-size:0.65rem;color:var(--muted);text-decoration:underline;cursor:pointer">vie privée</button></div>
 </div>
@@ -698,7 +702,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fde8e8">🚨</div>
 <div class="panel-title">Signalement citoyen</div>
-<button class="panel-close" onclick="closeOv('signal')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('signal')">✕</button>
 </div>
 <div class="panel-body">
 <div id="signal-form">
@@ -755,7 +759,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#eff6ff">📋</div>
 <div class="panel-title">Suivi des signalements</div>
-<button class="panel-close" onclick="closeOv('suivi')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('suivi')">✕</button>
 </div>
 <div class="panel-body" id="suivi-body">
 <div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>
@@ -767,7 +771,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fffbe8">💡</div>
 <div class="panel-title">Vos idées pour Mézières</div>
-<button class="panel-close" onclick="closeOv('idees')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('idees')">✕</button>
 </div>
 <div class="panel-body">
 <div class="idea-form" id="idea-form">
@@ -801,7 +805,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">🔔</div>
 <div class="panel-title">Actualités communales</div>
-<button class="panel-close" onclick="closeOv('notifs')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('notifs')">✕</button>
 </div>
 <div class="panel-body">
 <div id="notif-ideas-callout"></div>
@@ -850,7 +854,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fff7ed">📰</div>
 <div class="panel-title">Détail actualité</div>
-<button class="panel-close" onclick="closeActuDetail()">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeActuDetail()">✕</button>
 </div>
 <div class="panel-body" id="actu-detail-body">
 <div class="actu-empty">Chargement…</div>
@@ -863,7 +867,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#ede8f8">💬</div>
 <div class="panel-title">Contacter la mairie</div>
-<button class="panel-close" onclick="closeOv('contact')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('contact')">✕</button>
 </div>
 <div class="panel-body">
 <div class="ctx-help" id="ctx-contact"></div>
@@ -944,7 +948,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fef3e0">📅</div>
 <div class="panel-title">Agenda &amp; Sorties</div>
-<button class="panel-close" onclick="closeOv('agenda')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('agenda')">✕</button>
 </div>
 <div class="panel-body">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
@@ -961,7 +965,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fff7ed">🎉</div>
 <div class="panel-title">Fiche événement</div>
-<button class="panel-close" onclick="closeOv('event')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('event')">✕</button>
 </div>
 <div class="panel-body" id="event-detail-body">
 <div class="agenda-empty">Chargement…</div>
@@ -974,7 +978,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div class="panel-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🐞</div>
 <div class="panel-title">Un bug ?</div>
-<button class="panel-close" onclick="closeOv('bug')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('bug')">✕</button>
 </div>
 <div class="panel-body">
 <div id="bug-form">
@@ -1029,7 +1033,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#f0f0f0">🔒</div>
 <div class="panel-title">🔒 Vie privée &amp; RGPD — Politique de confidentialité</div>
-<button class="panel-close" onclick="closeOv('rgpd')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('rgpd')">✕</button>
 </div>
 <div class="panel-body">
 <div style="background:var(--mist);border-radius:14px;padding:14px 14px 10px;margin-bottom:4px">
@@ -1119,7 +1123,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🏛️</div>
 <div class="panel-title">Conseil municipal</div>
-<button class="panel-close" onclick="closeOv('conseil')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('conseil')">✕</button>
 </div>
 <div class="panel-body">
 <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--mist);border-radius:10px">👆 Cliquez sur une photo pour voir le détail</div>
@@ -1154,7 +1158,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">📞</div>
 <div class="panel-title">Numéros urgence</div>
-<button class="panel-close" onclick="closeOv('nums')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('nums')">✕</button>
 </div>
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:8px;">
@@ -1232,7 +1236,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">🚌</div>
 <div class="panel-title">Ligne 8 Rémi — Prochains bus</div>
-<button class="panel-close" onclick="closeOv('remi')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('remi')">✕</button>
 </div>
 <div class="panel-body">
 <div id="remi-detail">
@@ -1246,7 +1250,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#eaf8e8">🗑️</div>
 <div class="panel-title">Déchets &amp; Déchetterie</div>
-<button class="panel-close" onclick="closeOv('dechets')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('dechets')">✕</button>
 </div>
 <div class="panel-body" id="dechets-detail">
 <div id="dechets-content"></div>
@@ -1258,7 +1262,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f4f8">🌤️</div>
 <div class="panel-title">Météo — Mézières-lez-Cléry</div>
-<button class="panel-close" onclick="closeOv('meteo')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('meteo')">✕</button>
 </div>
 <div class="panel-body" id="meteo-detail">
 <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
@@ -1270,7 +1274,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.15)">📁</div>
 <div class="panel-title">Documents officiels</div>
-<button class="panel-close" onclick="closeOv('docs')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('docs')">✕</button>
 </div>
 <div class="panel-body"><div id="docs-featured-container" style="display:none"></div>
 <div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px">Documents permanents</div>
@@ -1359,7 +1363,7 @@ showCount(n);
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#f0fdf4">📊</div>
 <div class="panel-title">Sondage citoyen</div>
-<button class="panel-close" onclick="closeOv('sondages')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('sondages')">✕</button>
 </div>
 <div class="panel-body" id="sondages-container">
 <div class="actu-empty">Chargement…</div>
@@ -1371,7 +1375,7 @@ showCount(n);
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f5e9">🤝</div>
 <div class="panel-title">Vie associative</div>
-<button class="panel-close" onclick="closeOv('assoc')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('assoc')">✕</button>
 </div>
 <div class="panel-body" id="assoc-panel-body">
 <div class="actu-empty">Chargement…</div>
@@ -1384,7 +1388,7 @@ showCount(n);
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f5e9">💶</div>
 <div class="panel-title">Demander une subvention</div>
-<button class="panel-close" onclick="closeOv('subvention')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('subvention')">✕</button>
 </div>
 <div class="panel-body">
 <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:14px">
@@ -1416,7 +1420,7 @@ et accompagnée des documents suivants :
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fe">🛠️</div>
 <div class="panel-title">Entreprises locales</div>
-<button class="panel-close" onclick="closeOv('entreprises')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('entreprises')">✕</button>
 </div>
 <div class="panel-body" id="entreprises-panel-body">
 <div class="actu-empty">Chargement…</div>
@@ -1428,7 +1432,7 @@ et accompagnée des documents suivants :
 <div class="panel-hdr" style="background:linear-gradient(135deg,#92400e,#d97706)">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">⛽</div>
 <div class="panel-title" style="color:#fff">Prix carburant</div>
-<button class="panel-close" onclick="closeOv('carburant')" style="color:#fff">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('carburant')" style="color:#fff">✕</button>
 </div>
 <div class="panel-body">
 <div id="carburant-panel-body"><div class="actu-empty">Chargement…</div></div>
@@ -1441,7 +1445,7 @@ et accompagnée des documents suivants :
 <div class="panel-hdr" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🎭</div>
 <div class="panel-title" style="color:#fff">Événements locaux</div>
-<button class="panel-close" onclick="closeOv('events-locaux')" style="color:#fff">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('events-locaux')" style="color:#fff">✕</button>
 </div>
 <div class="panel-body">
 <p style="font-size:0.72rem;color:var(--muted);margin-bottom:12px">Sorties et événements dans un rayon de 20 km autour de Mézières-lez-Cléry.</p>
@@ -1456,7 +1460,7 @@ et accompagnée des documents suivants :
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">🆕</div>
 <div class="panel-title">Nouveautés — Mézières Avec Toi</div>
-<button class="panel-close" onclick="closeOv('changelog')">✕</button>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('changelog')">✕</button>
 </div>
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
