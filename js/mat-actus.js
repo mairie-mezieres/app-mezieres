@@ -213,25 +213,25 @@ async function toggleLikeActu(id){
   if(window._matFeatures && window._matFeatures.reactionsEnabled===false) return;
   const liked = _isActuLikedLocally(id);
   _setActuLikedLocally(id, !liked);
-  const btn = document.getElementById(‘like-btn-’+id);
-  if(btn){ btn.classList.toggle(‘liked’,!liked); btn.setAttribute(‘aria-pressed’,String(!liked)); }
+  const btn = document.getElementById('like-btn-'+id);
+  if(btn){ btn.classList.toggle('liked',!liked); btn.setAttribute('aria-pressed',String(!liked)); }
   try{
-    const resp = await matFetch(‘https://chatbot-mairie-mezieres.onrender.com/actu/’+id+’/like’,{
-      method:’POST’, headers:{‘x-device-id’: getMatDeviceId()}
+    const resp = await matFetch('https://chatbot-mairie-mezieres.onrender.com/actu/'+id+'/like',{
+      method:'POST', headers:{'x-device-id': getMatDeviceId()}
     }, 8000);
     const d = await resp.json();
     if(btn && d.count!=null){
-      const sp = btn.querySelector(‘.like-count’);
+      const sp = btn.querySelector('.like-count');
       btn.setAttribute('aria-label', 'J’aime'+(d.count?' · '+d.count:''));
       if(d.count){
         if(sp) sp.textContent=d.count;
-        else btn.insertAdjacentHTML(‘beforeend’,’<span class="like-count">’+d.count+’</span>’);
+        else btn.insertAdjacentHTML('beforeend','<span class="like-count">'+d.count+'</span>');
       } else if(sp) sp.remove();
-      btn.classList.toggle(‘liked’, !!d.liked);
-      btn.setAttribute(‘aria-pressed’,String(!!d.liked));
+      btn.classList.toggle('liked', !!d.liked);
+      btn.setAttribute('aria-pressed',String(!!d.liked));
       _setActuLikedLocally(id, !!d.liked);
     }
-  }catch(e){ _setActuLikedLocally(id, liked); if(btn){ btn.classList.toggle(‘liked’,liked); btn.setAttribute(‘aria-pressed’,String(liked)); } }
+  }catch(e){ _setActuLikedLocally(id, liked); if(btn){ btn.classList.toggle('liked',liked); btn.setAttribute('aria-pressed',String(liked)); } }
 }
 
 function renderActuDetail(actu){
