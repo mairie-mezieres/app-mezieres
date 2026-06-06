@@ -353,8 +353,6 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .event-detail-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
 .event-btn{border:none;border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;}
 .event-btn.primary{background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;}
-.event-btn.secondary{background:var(--mist);color:var(--leaf);}
-
 /* ── Overlay Majordome MAT ── */
 .majordome-panel{background:var(--warm);width:100%;max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;max-height:min(85vh,calc(var(--vvh,100dvh) - env(safe-area-inset-top,0px) - 8px));display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -8px 40px rgba(26,61,43,0.25);animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1);}
 .majordome-body{padding:24px 20px;overflow-y:auto;text-align:center;}
