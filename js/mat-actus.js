@@ -219,6 +219,12 @@ async function toggleLikeActu(id){
     const resp = await matFetch('https://chatbot-mairie-mezieres.onrender.com/actu/'+id+'/like',{
       method:'POST', headers:{'x-device-id': getMatDeviceId()}
     }, 8000);
+    if(!resp.ok){
+      // Réactions désactivées (503) ou autre refus serveur → on annule l'état optimiste
+      _setActuLikedLocally(id, liked);
+      if(btn){ btn.classList.toggle('liked',liked); btn.setAttribute('aria-pressed',String(liked)); }
+      return;
+    }
     const d = await resp.json();
     if(btn && d.count!=null){
       const sp = btn.querySelector('.like-count');
