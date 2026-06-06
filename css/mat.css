@@ -299,7 +299,6 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-btn:hover{filter:brightness(1.03);}
 .actu-btn:active{transform:scale(.98);}
 .actu-btn-detail{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
-.actu-btn-fb{background:linear-gradient(135deg,#1877f2,#2563eb);color:#fff;}
 .actu-btn-like{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);min-height:44px;}
 .actu-btn-like.liked{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#92400e;border-color:#f59e0b;}
 .actu-btn-like .like-count{font-size:0.7rem;opacity:0.85;}
