@@ -39,6 +39,12 @@
   // 7) Encart d'information / alerte
   try { loadMatInfoBanner(); } catch(e){}
 
+  // 7b) Config fonctionnalités (réactions, RSVP…)
+  fetch('https://chatbot-mairie-mezieres.onrender.com/config/features',{signal:matAbortTimeout(5000)})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ window._matFeatures = d; })
+    .catch(function(){}); // dégradé : window._matFeatures reste undefined → réactions activées
+
   // 8) Protection email mairie (déobfuscation)
   try { initMailProtection(); } catch(e){}
 
@@ -103,7 +109,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-sondages.js?v=4.2.3';
+  s.src = 'js/mat-sondages.js?v=4.3.0';
   s.onload = function() {
     setTimeout(function() {
       try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}

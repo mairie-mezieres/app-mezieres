@@ -454,7 +454,8 @@ async function saveStatsSettings() {
   const mel         = !!document.getElementById('set-mel-stats')?.checked;
   const appOpen     = !!document.getElementById('set-appopen-stats')?.checked;
   const melQLog     = !!document.getElementById('set-mel-question-log')?.checked;
-  const melEnabled  = !!document.getElementById('set-mel-enabled')?.checked;
+  const melEnabled       = !!document.getElementById('set-mel-enabled')?.checked;
+  const reactionsEnabled = !!document.getElementById('set-reactions-enabled')?.checked;
   const melDisabledMessage = document.getElementById('set-mel-disabled-msg')?.value?.trim() || '';
   const statusEl = document.getElementById('stats-settings-status');
 
@@ -470,6 +471,7 @@ async function saveStatsSettings() {
       appOpenStatsEnabled:   appOpen,
       melQuestionLogEnabled: melQLog,
       melEnabled,
+      reactionsEnabled,
       melDisabledMessage
     });
 
@@ -877,6 +879,7 @@ function renderRedis() {
   const appOpenStatsEnabled    = settings.appOpenStatsEnabled === true;
   const melQuestionLogEnabled  = settings.melQuestionLogEnabled === true;
   const melEnabled             = settings.melEnabled !== false;
+  const reactionsEnabled       = settings.reactionsEnabled !== false;
   const melDisabledMessage     = settings.melDisabledMessage || '';
   
   const pct = Number(redis.pct || 0);
@@ -980,6 +983,21 @@ function renderRedis() {
       <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
         <input type="checkbox" id="set-mel-question-log" ${melQuestionLogEnabled ? 'checked' : ''}>
         Activer
+      </label>
+    </div>
+  </div>
+
+  <div class="progress-wrap" style="border:${reactionsEnabled?'1.5px solid #d1fae5':'2px solid #fca5a5'};background:${reactionsEnabled?'':'#fff5f5'}">
+    <div class="progress-header" style="align-items:flex-start;gap:16px;flex-direction:column">
+      <div>
+        <div class="progress-label">❤️ Réactions &amp; RSVP <span style="font-size:0.7rem;font-weight:700;background:${reactionsEnabled?'#d1fae5':'#fee2e2'};color:${reactionsEnabled?'#065f46':'#991b1b'};border-radius:6px;padding:2px 7px;margin-left:6px">${reactionsEnabled?'Actif':'⚠️ DÉSACTIVÉ'}</span></div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;line-height:1.5">
+          Désactivez en cas de forte affluence ou abus : les boutons J'aime / J'y serai / Vote idée sont masqués et les routes d'écriture retournent 503. Impact Redis : 0 requête.
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;color:var(--text);cursor:pointer">
+        <input type="checkbox" id="set-reactions-enabled" ${reactionsEnabled?'checked':''}>
+        Réactions activées
       </label>
     </div>
   </div>

@@ -178,13 +178,13 @@
   .d-rando-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:32px}
   .d-sorties-inner{flex-wrap:wrap}
   .d-rando-left{flex:1;min-width:200px;color:#fff}
-  .d-rando-badge{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.6);margin-bottom:10px}
+  .d-rando-badge{font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.85);margin-bottom:10px}
   .d-rando-title{font-family:'Playfair Display',Georgia,serif;font-size:2rem;font-weight:700;font-style:italic;margin:0 0 10px;color:#fff;line-height:1.15}
   .d-rando-desc{font-size:.82rem;color:rgba(255,255,255,.8);line-height:1.6;margin:0 0 20px}
   .d-rando-stats{display:flex;gap:32px;flex-shrink:0}
   .d-rando-stat{text-align:center;color:#fff}
   .d-rando-stat strong{display:block;font-size:2rem;font-weight:900;color:#a7f3d0}
-  .d-rando-stat span{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6)}
+  .d-rando-stat span{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.85)}
   .d-sorties-sep{width:1px;background:rgba(255,255,255,.2);align-self:stretch;flex-shrink:0;margin:0 8px}
   .d-events-left{flex:1;min-width:200px;color:#fff}
   .d-events-preview{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
@@ -196,9 +196,9 @@
   /* FOOTER */
   .footer{display:none}
   .d-footer{display:flex;background:#1a3d2b;border-top:1px solid rgba(255,255,255,.1)}
-  .d-footer-bottom{max-width:1400px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:5px 32px;font-size:.65rem;color:rgba(255,255,255,.6);flex-wrap:wrap;gap:6px}
+  .d-footer-bottom{max-width:1400px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:5px 32px;font-size:.65rem;color:rgba(255,255,255,.8);flex-wrap:wrap;gap:6px}
   .d-footer-links{display:flex;gap:14px;align-items:center}
-  .d-footer-links button{background:none;border:none;color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;padding:0}
+  .d-footer-links button{background:none;border:none;color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;padding:0}
   .d-footer-links button:hover{color:rgba(255,255,255,.95)}
 
   .app-splash{position:fixed!important}

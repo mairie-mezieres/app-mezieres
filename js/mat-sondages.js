@@ -149,11 +149,17 @@ async function _submitSondage(id) {
 
   if (statusEl) { statusEl.textContent = 'Envoi…'; statusEl.style.color = 'var(--muted)'; }
   try {
-    var resp = await fetch(_SONDAGES_API + '/sondages/' + id + '/vote', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
+    var resp = await matFetch(_SONDAGES_API + '/sondages/' + id + '/vote', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'x-device-id': getMatDeviceId()},
       body: JSON.stringify({reponse: reponse})
-    });
+    }, 8000);
     var d = await resp.json();
+    if (resp.status === 409) {
+      localStorage.setItem('mat_voted_' + id, '1');
+      if (statusEl) { statusEl.textContent = '⚠️ Vous avez déjà participé à ce sondage.'; statusEl.style.color = '#92400e'; }
+      return;
+    }
     if (!resp.ok) throw new Error(d.error || 'Erreur');
     localStorage.setItem('mat_voted_' + id, '1');
     var idx = _currentSondages.findIndex(function(x){ return x.id === id; });

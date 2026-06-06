@@ -197,7 +197,47 @@ function renderActuListItem(a){
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
   const eventHTML = a.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(a.eventDate))}${a.eventLocation?' · 📍 '+esc(a.eventLocation):''}</div>` : '';
-  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a></div></div></div>`;
+  const reactionsEnabled = !(window._matFeatures && window._matFeatures.reactionsEnabled === false);
+  const likeCount = a.likes || 0;
+  const likedLS = _isActuLikedLocally(id);
+  const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
+  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button><a class="actu-btn actu-btn-fb" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">📘 Voir Facebook</a>${likeBtn}</div></div></div>`;
+}
+
+const _LIKES_KEY = 'mat_liked_actus_v1';
+function _getLikedActus(){ try{ return JSON.parse(localStorage.getItem(_LIKES_KEY)||'{}'); }catch(e){ return {}; } }
+function _isActuLikedLocally(id){ return !!_getLikedActus()[id]; }
+function _setActuLikedLocally(id, val){ try{ const m=_getLikedActus(); if(val) m[id]=1; else delete m[id]; localStorage.setItem(_LIKES_KEY,JSON.stringify(m)); }catch(e){} }
+
+async function toggleLikeActu(id){
+  if(window._matFeatures && window._matFeatures.reactionsEnabled===false) return;
+  const liked = _isActuLikedLocally(id);
+  _setActuLikedLocally(id, !liked);
+  const btn = document.getElementById('like-btn-'+id);
+  if(btn){ btn.classList.toggle('liked',!liked); btn.setAttribute('aria-pressed',String(!liked)); }
+  try{
+    const resp = await matFetch('https://chatbot-mairie-mezieres.onrender.com/actu/'+id+'/like',{
+      method:'POST', headers:{'x-device-id': getMatDeviceId()}
+    }, 8000);
+    if(!resp.ok){
+      // Réactions désactivées (503) ou autre refus serveur → on annule l'état optimiste
+      _setActuLikedLocally(id, liked);
+      if(btn){ btn.classList.toggle('liked',liked); btn.setAttribute('aria-pressed',String(liked)); }
+      return;
+    }
+    const d = await resp.json();
+    if(btn && d.count!=null){
+      const sp = btn.querySelector('.like-count');
+      btn.setAttribute('aria-label', 'J’aime'+(d.count?' · '+d.count:''));
+      if(d.count){
+        if(sp) sp.textContent=d.count;
+        else btn.insertAdjacentHTML('beforeend','<span class="like-count">'+d.count+'</span>');
+      } else if(sp) sp.remove();
+      btn.classList.toggle('liked', !!d.liked);
+      btn.setAttribute('aria-pressed',String(!!d.liked));
+      _setActuLikedLocally(id, !!d.liked);
+    }
+  }catch(e){ _setActuLikedLocally(id, liked); if(btn){ btn.classList.toggle('liked',liked); btn.setAttribute('aria-pressed',String(liked)); } }
 }
 
 function renderActuDetail(actu){

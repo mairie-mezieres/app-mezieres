@@ -315,9 +315,20 @@ async function submitIdee(){
 }
 
 async function voteIdee(id){
-  const votes=getVotes(); if(votes[id]) return;
-  votes[id]=1; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote',{method:'POST'});}catch(e){}
+  if(window._matFeatures&&window._matFeatures.reactionsEnabled===false) return;
+  const votes=getVotes();
+  const alreadyVoted=!!votes[id];
+  const url='https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote';
+  if(alreadyVoted){
+    delete votes[id]; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
+    try{ await matFetch(url,{method:'DELETE',headers:{'x-device-id':getMatDeviceId()}},8000); }catch(e){}
+  } else {
+    votes[id]=1; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
+    try{
+      const resp=await matFetch(url,{method:'POST',headers:{'x-device-id':getMatDeviceId()}},8000);
+      if(resp.status===409){ votes[id]=1; localStorage.setItem(VOTES_KEY,JSON.stringify(votes)); }
+    }catch(e){}
+  }
   loadIdees();
 }
 

@@ -300,6 +300,14 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-btn:active{transform:scale(.98);}
 .actu-btn-detail{background:linear-gradient(135deg,var(--forest),var(--leaf));color:#fff;}
 .actu-btn-fb{background:linear-gradient(135deg,#1877f2,#2563eb);color:#fff;}
+.actu-btn-like{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);min-height:44px;}
+.actu-btn-like.liked{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#92400e;border-color:#f59e0b;}
+.actu-btn-like .like-count{font-size:0.7rem;opacity:0.85;}
+.event-btn-rsvp{background:var(--mist);color:var(--forest);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;transition:transform .12s ease,filter .12s ease;}
+.event-btn-rsvp.rsvp-on{background:linear-gradient(135deg,#bbf7d0,#4ade80);color:#14532d;border-color:#4ade80;}
+.event-btn-rsvp .rsvp-count{font-size:0.7rem;opacity:0.85;}
+.event-btn-rsvp:hover{filter:brightness(1.03);}
+.event-btn-rsvp:active{transform:scale(.98);}
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-detail-card{background:white;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow);}
 .actu-detail-media{margin:-14px -14px 12px;}
@@ -717,6 +725,8 @@ html.theme-sombre .panel-body .event-detail-card { background:#2d3748;border-col
 html.theme-sombre .panel-body .event-detail-title { color:#f1f5f9; }
 html.theme-sombre .panel-body .event-detail-meta { color:#94a3b8; }
 html.theme-sombre .panel-body .event-detail-desc { color:#e2e8f0; }
+html.theme-sombre .actu-btn-like { background:#2d3748;color:#e2e8f0;border-color:#374151; }
+html.theme-sombre .event-btn-rsvp { background:#2d3748;color:#e2e8f0;border-color:#374151; }
 html.theme-sombre .panel-body .contact-card { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .contact-title { color:#f1f5f9; }
 html.theme-sombre .panel-body .contact-sub { color:#94a3b8; }
