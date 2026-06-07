@@ -6,6 +6,7 @@ var _initialized = false;
 var _mq = window.matchMedia('(min-width:1024px)');
 
 var API='https://chatbot-mairie-mezieres.onrender.com';
+var _retryScheduled=false;
 
 /* ── helpers ─────────────────────────────────────────────────── */
 function qs(id){return document.getElementById(id);}
@@ -24,12 +25,29 @@ function daysUntil(d){
   return Math.round((dt-now)/86400000);
 }
 function safeSet(id,html){var el=qs(id);if(el)el.innerHTML=html;}
+// Timeout sur les fetch desktop (réutilise le helper global de mat-utils.js si présent)
+function _to(ms){return (typeof matAbortTimeout==='function')?matAbortTimeout(ms):undefined;}
+// Cold start backend : affiche le bandeau « patientez » (comme le mobile) et
+// reprogramme UN seul rechargement des panneaux réseau ~25 s plus tard, le temps
+// que Render se réveille. Sans ça, les panneaux PC restaient vides jusqu'à un F5.
+function _onLoadError(){
+  if(navigator.onLine && typeof window.matSignalServerError==='function'){try{window.matSignalServerError();}catch(e){}}
+  if(_retryScheduled) return;
+  _retryScheduled=true;
+  setTimeout(function(){
+    _retryScheduled=false;
+    if(!navigator.onLine) return;
+    loadMeteo();
+    loadActus().then(function(){loadAgenda();});
+    loadBusDesktop();
+  },25000);
+}
 
 /* ── météo ───────────────────────────────────────────────────── */
 function loadMeteo(){
   var el=qs('d-hero-meteo');
   if(!el)return;
-  fetch(API+'/meteo/commune')
+  fetch(API+'/meteo/commune',{signal:_to(8000)})
     .then(function(r){return r.ok?r.json():null;})
     .then(function(d){
       if(!d){el.innerHTML='';return;}
@@ -50,14 +68,14 @@ function loadMeteo(){
         (wind?'<div class="d-meteo-row"><span>💨 Vent</span><strong>'+wind+'</strong></div>':'')+
       '</div>';
     })
-    .catch(function(){el.innerHTML='';});
+    .catch(function(){el.innerHTML='';_onLoadError();});
 }
 
 /* ── actualités ──────────────────────────────────────────────── */
 function loadActus(){
   var el=qs('dsk-actus-list');
   if(!el)return Promise.resolve();
-  return fetch(API+'/actus')
+  return fetch(API+'/actus',{signal:_to(8000)})
     .then(function(r){return r.ok?r.json():[];})
     .then(function(data){
       var items=Array.isArray(data)?data:(data&&Array.isArray(data.actus)?data.actus:[]);
@@ -68,22 +86,25 @@ function loadActus(){
       }
       var html='';
       items.slice(0,5).forEach(function(a){
-        var img=a.photo?'<img src="'+a.photo+'" alt="" onerror="this.style.display=\'none\'">':'';
+        var img=a.photo?'<img src="'+escHtml(a.photo)+'" alt="" onerror="this.style.display=\'none\'">':'';
         var rawDate=a.date||a.createdAt||'';
         var dateStr=rawDate?fmtShort(rawDate):'';
         var actuId=encodeURIComponent(a.id||a._id||'');
+        // Les actus de l'API exposent description/text (et non contenu/content).
+        var excerptTxt=(a.description||a.text||a.contenu||a.content||'').replace(/\s+/g,' ').trim();
+        var excerpt=excerptTxt?'<p class="d-actu-excerpt" style="font-size:.72rem;color:#666;margin:2px 0 0;line-height:1.4">'+escHtml(excerptTxt.substring(0,90))+(excerptTxt.length>90?'…':'')+'</p>':'';
         html+='<div class="d-actu-item" onclick="(typeof openActuDetail===\'function\'?openActuDetail:function(){openNotifs&&openNotifs()})(\''+actuId+'\')" role="button">'+
           (img?'<div class="d-actu-thumb" style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0">'+img+'</div>':'')+
           '<div class="d-actu-body">'+
             (dateStr?'<span class="d-actu-date">'+dateStr+'</span>':'')+
             '<strong class="d-actu-title">'+escHtml(a.titre||a.title||'')+'</strong>'+
-            '<p class="d-actu-excerpt" style="font-size:.72rem;color:#666;margin:2px 0 0;line-height:1.4">'+escHtml((a.contenu||a.content||'').substring(0,90))+'…</p>'+
+            excerpt+
           '</div>'+
         '</div>';
       });
       el.innerHTML=html;
     })
-    .catch(function(){safeSet('dsk-actus-list','<p class="d-empty">Chargement impossible</p>');});
+    .catch(function(){safeSet('dsk-actus-list','<p class="d-empty">Chargement impossible</p>');_onLoadError();});
 }
 
 /* ── bus rémi ─────────────────────────────────────────────────── */
@@ -198,7 +219,7 @@ function renderFeatured(e){
   }
   el.innerHTML=
     '<div class="d-featured" onclick="openAgenda&&openAgenda()" title="Voir l\'agenda complet">'+
-      (photo?'<img class="d-featured-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'')+
+      (photo?'<img class="d-featured-img" src="'+escHtml(photo)+'" alt="" onerror="this.style.display=\'none\'">':'')+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">Prochain évènement</div>'+
         '<h2 class="d-featured-title">'+escHtml(e.summary||'')+'</h2>'+
@@ -249,8 +270,8 @@ function renderCollectes(){
   var el=qs('dsk-collectes-body');
   if(!el)return;
   el.innerHTML='<p style="font-size:0.78rem;color:var(--text);line-height:1.6;margin:0">'
-    +'🗑️ Ordures ménag. — semaines impaires<br>'
-    +'♻️ Tri sélectif — semaines paires<br>'
+    +'🗑️ Bac noir (ordures ménagères) — chaque lundi<br>'
+    +'♻️ Bac jaune (recyclables) — un mardi sur deux (semaines paires)<br>'
     +'🫙 Verre — en déchetterie'
     +'</p>'
     +'<button onclick="openDechets()" style="margin-top:10px;width:100%;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:8px;font-family:inherit;font-size:0.76rem;font-weight:800;cursor:pointer">📅 Voir le calendrier complet</button>';
