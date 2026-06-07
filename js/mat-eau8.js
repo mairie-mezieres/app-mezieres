@@ -1,4 +1,4 @@
-/* MAT — Eau v3.8.9 — Niveau nappe en % (min/max sur 365 mesures) */
+/* MAT — Eau v3.9.0 — Niveau nappe + restrictions VigiEau (endpoint /api/zones) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
 
@@ -56,8 +56,11 @@ async function _loadEauSection() {
   if (!s) return;
 
   var nappeHtml  = '<span style="color:#94a3b8">\u2014</span>';
-  var restric    = '\uD83D\uDFE2\u00a0Aucune restriction';
-  var restCol    = '#16a34a';
+  // \u00C9tat neutre par d\u00E9faut : on n'affiche \u00AB Aucune restriction \u00BB (vert) QUE si
+  // l'API VigiEau confirme explicitement l'absence de zone active. Tant qu'on ne
+  // sait pas (chargement, API injoignable), on reste neutre \u2014 jamais de faux vert.
+  var restric    = '\u26AA\u00a0V\u00E9rification\u2026';
+  var restCol    = '#94a3b8';
 
   function render() {
     var meteo   = window._meteoData || {};
@@ -133,22 +136,54 @@ async function _loadEauSection() {
     render();
   }
 
+  // Restrictions s\u00e9cheresse \u2014 API officielle VigiEau (zones de restriction de la
+  // commune 45203). _eauFetch renvoie null si l'appel \u00e9choue (404, r\u00e9seau, non-OK).
+  // Endpoint migr\u00e9 : l'ancien /communes/{insee}/restrictions renvoie d\u00e9sormais 404.
   try {
-    var r2 = await _eauFetch('https://api.vigieau.gouv.fr/communes/45203/restrictions');
-    if (r2) {
-      var d2 = await r2.json();
-      if (Array.isArray(d2) && d2.length > 0) {
-        var niv = d2.map(function(x) {
-          return (x.niveauAlerte || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    var r2 = await _eauFetch('https://api.vigieau.gouv.fr/api/zones?commune=45203&profil=particulier');
+    if (!r2) {
+      // Injoignable : surtout PAS de faux \u00AB Aucune restriction \u00BB. \u00C9tat neutre + log.
+      restric = '\u26AA\u00A0Info indisponible';
+      restCol = '#94a3b8';
+      if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau injoignable (/api/zones)');
+      render();
+    } else {
+      var txt = await r2.text();
+      var d2;
+      try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { d2 = []; }
+      var zones = Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.zones) ? d2.zones : []);
+      if (zones.length === 0) {
+        // L'API confirme explicitement l'absence de zone de restriction active.
+        restric = '\uD83D\uDFE2\u00A0Aucune restriction';
+        restCol = '#16a34a';
+      } else {
+        // Au moins une zone active \u2192 jamais \u00AB aucune \u00BB. On lit le niveau de gravit\u00e9
+        // en tol\u00e9rant plusieurs noms de champs possibles c\u00F4t\u00e9 VigiEau.
+        var sev = 0; // 1=vigilance 2=alerte 3=renforc\u00e9e 4=crise
+        zones.forEach(function(z) {
+          var raw = [z.niveauGravite, z.niveauAlerte, z.niveau, z.niveauRestriction, z.type]
+            .filter(Boolean).join(' ')
+            .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if      (raw.indexOf('crise') >= 0)     sev = Math.max(sev, 4);
+          else if (raw.indexOf('renforc') >= 0)   sev = Math.max(sev, 3);
+          else if (raw.indexOf('alerte') >= 0)    sev = Math.max(sev, 2);
+          else if (raw.indexOf('vigilance') >= 0) sev = Math.max(sev, 1);
         });
-        if      (niv.indexOf('crise') >= 0)                                    { restric = '\uD83D\uDFE3 Crise';              restCol = '#7c3aed'; }
-        else if (niv.some(function(n){ return n.indexOf('renforcee') >= 0; }))  { restric = '\uD83D\uDD34 Alerte renforc\u00e9e'; restCol = '#dc2626'; }
-        else if (niv.indexOf('alerte') >= 0)                                    { restric = '\uD83D\uDFE0 Alerte';             restCol = '#ea580c'; }
-        else if (niv.indexOf('vigilance') >= 0)                                 { restric = '\uD83D\uDFE1 Vigilance';          restCol = '#d97706'; }
-        render();
+        if      (sev === 4) { restric = '\uD83D\uDFE3 Crise';                 restCol = '#7c3aed'; }
+        else if (sev === 3) { restric = '\uD83D\uDD34 Alerte renforc\u00e9e'; restCol = '#dc2626'; }
+        else if (sev === 2) { restric = '\uD83D\uDFE0 Alerte';                restCol = '#ea580c'; }
+        else if (sev === 1) { restric = '\uD83D\uDFE1 Vigilance';             restCol = '#d97706'; }
+        else                { restric = '\uD83D\uDFE0 Restriction en vigueur'; restCol = '#ea580c'; }
       }
+      render();
     }
-  } catch(_) {}
+  } catch (_) {
+    // Erreur inattendue : neutre, jamais de faux \u00AB Aucune restriction \u00BB.
+    restric = '\u26AA\u00A0Info indisponible';
+    restCol = '#94a3b8';
+    if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau: ' + ((_ && _.message) || 'err'));
+    render();
+  }
 }
 
 (function() {
