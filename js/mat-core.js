@@ -513,6 +513,7 @@ document.addEventListener('keydown', function(e) {
 // ── Détection surcharge serveur ───────────────────────────────
 (function(){
   var _srvErrTimes = [];
+  var _retryScheduled = false;
   window.matSignalServerError = function() {
     if (!navigator.onLine) return;
     var now = Date.now();
@@ -525,6 +526,22 @@ document.addEventListener('keydown', function(e) {
       b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#b45309;color:white;font-family:Nunito,sans-serif;font-size:.73rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
       document.body.prepend(b);
       setTimeout(function(){ var e=document.getElementById('mat-server-banner'); if(e) e.remove(); }, 20000);
+    }
+    // Cold start probable : le backend Render se réveille (30–60 s) et toutes les
+    // lectures de l'en-tête ont échoué d'un coup. Sans le keep-alive ce cas est
+    // rare, mais il survient après un redéploiement. On reprogramme UN seul
+    // rechargement des widgets ~25 s plus tard pour que le contenu réapparaisse
+    // sans rafraîchissement manuel. Ne se déclenche qu'en ligne et qu'une fois
+    // par épisode (≥2 erreurs en 30 s) → aucun impact quand le serveur est sain.
+    if (_srvErrTimes.length >= 2 && !_retryScheduled) {
+      _retryScheduled = true;
+      setTimeout(function(){
+        _retryScheduled = false;
+        if (!navigator.onLine) return;
+        [refreshActusBadge, loadMeteo, loadEvents, loadDechets,
+         loadMairieStatus, loadBusRemi, loadCarburant, loadMatInfoBanner
+        ].forEach(function(fn){ try { if (typeof fn === 'function') fn(); } catch(e){} });
+      }, 25000);
     }
   };
 })();
