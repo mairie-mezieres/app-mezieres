@@ -8,7 +8,7 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.25.0';
+const CACHE = 'mat-v4.26.0';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -105,10 +105,21 @@ self.addEventListener('fetch', e => {
     url.includes('data.education.gouv.fr')
   ) return;
 
-  e.respondWith(
-    fetch(e.request.clone())
+  // Hors-GET : laisser passer sans interception (POST same-origin éventuels)
+  if (e.request.method !== 'GET') return;
+
+  // Stale-while-revalidate : on sert la version en cache immédiatement (chargement
+  // quasi instantané pour les visites récurrentes) et on rafraîchit le cache en
+  // arrière-plan. Les assets JS/CSS étant versionnés (?v=), un changement = nouvelle
+  // URL = cache miss = re-téléchargement → aucun risque de servir du périmé pour eux.
+  // index.html (non versionné) peut n'être à jour qu'au lancement suivant : le prompt
+  // de mise à jour du SW (skipWaiting) couvre déjà ce cas.
+  e.respondWith((async () => {
+    const cached = await caches.match(e.request);
+
+    const network = fetch(e.request.clone())
       .then(res => {
-        if (res && res.ok && res.status !== 206 && e.request.method === 'GET') {
+        if (res && res.ok && res.status !== 206) {
           const resClone = res.clone();
           caches.open(CACHE).then(c => {
             c.put(e.request, resClone);
@@ -117,14 +128,18 @@ self.addEventListener('fetch', e => {
         }
         return res;
       })
-      .catch(() =>
-        caches.match(e.request).then(c => {
-          if (c) return c;
-          if (e.request.mode === 'navigate') return caches.match('./offline.html');
-          return Promise.reject(new TypeError('not cached'));
-        })
-      )
-  );
+      .catch(() => null);
+
+    if (cached) {
+      e.waitUntil(network); // rafraîchissement en arrière-plan, sans bloquer la réponse
+      return cached;
+    }
+
+    const fresh = await network;
+    if (fresh) return fresh;
+    if (e.request.mode === 'navigate') return (await caches.match('./offline.html')) || Response.error();
+    return Response.error();
+  })());
 });
 
 // LRU douce sur le cache runtime : si on dépasse MAX_CACHE_ENTRIES, on
