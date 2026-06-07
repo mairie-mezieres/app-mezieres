@@ -809,7 +809,12 @@ async function loadCarburant() {
   try {
     if (!_carburantCache) {
       var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' });
-      _carburantCache = await r.json();
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var fetched = await r.json();
+      if (!fetched || fetched.error) throw new Error('payload carburant invalide');
+      // Ne met en cache QUE sur succès : un hoquet backend transitoire ne fige
+      // plus le widget sur « indisponible » pour toute la session.
+      _carburantCache = fetched;
     }
     var d = _carburantCache;
     var s = d['clery'];
@@ -833,8 +838,8 @@ function loadCarburantPanel() {
   if (!el) return;
   if (!_carburantCache) {
     fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ _carburantCache = d; renderCarburantPanel(el, d); })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(d){ if (!d || d.error) throw new Error('payload'); _carburantCache = d; renderCarburantPanel(el, d); })
       .catch(function(){ el.innerHTML = '<p style="color:var(--muted);text-align:center">Données temporairement indisponibles.</p>'; });
   } else {
     renderCarburantPanel(el, _carburantCache);
@@ -941,6 +946,7 @@ async function loadEventsLocaux() {
 
   try {
     var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/events-locaux', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
     if (d.nokey) {
       el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:24px 16px">'
