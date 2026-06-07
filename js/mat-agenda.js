@@ -135,7 +135,7 @@ function openEventDetail(uid){
   var reactionsEnabled=!(window._matFeatures&&window._matFeatures.reactionsEnabled===false);
   var rsvpOn=_isEventRsvpLocally(uid);
   var rsvpBtn=reactionsEnabled?'<button id="rsvp-btn-'+esc(uid)+'" class="event-btn-rsvp'+(rsvpOn?' rsvp-on':'')+'" onclick="toggleRsvpEvent(\''+uidSafe+'\')" aria-label="'+(rsvpOn?'Retirer mon inscription':'J’y serai')+'" aria-pressed="'+rsvpOn+'">'+(rsvpOn?'✅ J’y serai':'📅 J’y serai')+'</button>':'';
-  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+uidSafe+'\')">Ajouter à mon agenda</button>'+(evt.location?'<button class="event-btn secondary" onclick="openEventMap(\''+uidSafe+'\')">Voir le lieu</button>':'')+rsvpBtn+'</div></div>';
+  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+uidSafe+'\')">Ajouter à mon agenda</button>'+rsvpBtn+'</div></div>';
   openOv('event');
   // Charge le compteur RSVP réel (1 requête ponctuelle à l'ouverture du détail)
   if(reactionsEnabled) _loadRsvpCount(uid);
