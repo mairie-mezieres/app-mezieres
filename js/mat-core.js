@@ -184,6 +184,14 @@ window.addEventListener('popstate', function(){
 history.pushState({mat:'overlay'}, '');
 
 // ── Ouvertures d'overlays ────────────────────────────────────
+// Stubs défensifs remplacés par mat-forms.js si ce fichier charge correctement.
+// Évite les ReferenceError si mat-forms.js est indisponible (ex. Render cold start).
+function selIdeaCat(){}
+function loadIdees(){}
+function submitIdee(){}
+function submitSignal(){}
+function submitContact(){}
+function submitBug(){}
 function openMajordome(){ openOv('majordome'); }
 function openConseil(){ openOv('conseil'); buildTrombi(); }
 function openMel(){
