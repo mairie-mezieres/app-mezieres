@@ -160,8 +160,16 @@ async function _loadEauSection() {
       render();
     } else {
       var txt = await r2.text();
-      var d2;
-      try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { d2 = []; }
+      var d2, _parseOk = true;
+      try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { d2 = null; _parseOk = false; }
+      if (!_parseOk) {
+        // 200 OK mais corps non-JSON (page d'erreur HTML d'un proxy/CDN) :
+        // surtout PAS de faux « Aucune restriction ». État neutre + log.
+        restric = '⚪ Info indisponible';
+        restCol = '#94a3b8';
+        if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau: réponse 200 non-JSON');
+        render();
+      } else {
       var zones = Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.zones) ? d2.zones : []);
       if (zones.length === 0) {
         // L'API confirme explicitement l'absence de zone de restriction active.
@@ -187,6 +195,7 @@ async function _loadEauSection() {
         else                { restric = '\uD83D\uDFE0 Restriction en vigueur'; restCol = '#ea580c'; }
       }
       render();
+      }
     }
   } catch (_) {
     // Erreur inattendue : neutre, jamais de faux \u00AB Aucune restriction \u00BB.
