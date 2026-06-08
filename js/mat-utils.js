@@ -422,6 +422,13 @@ function formatPhone(num) {
 function formatMelText(text) {
   const linkStyle = 'color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);';
 
+  // Échappement HTML PRÉALABLE : le texte vient de la réponse IA (MEL) ou de la
+  // saisie utilisateur. On neutralise tout HTML brut (<img onerror>, <script>…)
+  // AVANT d'ajouter les liens. Les regexes ci-dessous opèrent sur des caractères
+  // alphanumériques et :/.@- que esc() ne modifie pas, donc la détection des
+  // emails/URLs/téléphones reste fonctionnelle.
+  text = esc(text);
+
   // 0. Emails avant URLs
   let result = text.replace(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g, (email) => {
     return `<a href="mailto:${email}" style="${linkStyle}">✉️ ${email}</a>`;
