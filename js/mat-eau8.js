@@ -1,4 +1,4 @@
-/* MAT — Eau v3.9.0 — Niveau nappe + restrictions VigiEau (endpoint /api/zones) */
+/* MAT — Eau v3.9.1 — Niveau nappe + restrictions VigiEau (endpoint /api/zones) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
 
@@ -7,7 +7,7 @@ function _eauFetch(url) {
     var c = new AbortController();
     var t = setTimeout(function() { c.abort(); }, 9000);
     fetch(url, { signal: c.signal })
-      .then(function(r) { clearTimeout(t); resolve(r.ok ? r : null); })
+      .then(function(r) { clearTimeout(t); resolve(r); })
       .catch(function() { clearTimeout(t); resolve(null); });
   });
 }
@@ -146,6 +146,17 @@ async function _loadEauSection() {
       restric = '\u26AA\u00A0Info indisponible';
       restCol = '#94a3b8';
       if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau injoignable (/api/zones)');
+      render();
+    } else if (r2.status === 409) {
+      // La commune comporte plusieurs zones d'alerte de m\u00EAme type \u2192 restrictions
+      // actives mais niveau ind\u00E9terminable via API. On affiche une alerte orange.
+      restric = '\u26A0\uFE0F\u00A0Restrictions \u2014 voir vigieau.gouv.fr';
+      restCol = '#ea580c';
+      render();
+    } else if (!r2.ok) {
+      restric = '\u26AA\u00A0Info indisponible';
+      restCol = '#94a3b8';
+      if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau HTTP ' + r2.status);
       render();
     } else {
       var txt = await r2.text();
