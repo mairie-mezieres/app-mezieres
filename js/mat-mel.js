@@ -680,6 +680,13 @@ function _melEsc(v){
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// Argument sûr pour un onclick="fn(…)" : JSON.stringify gère la couche JS
+// (quotes, backslash, retours ligne), puis " est encodé pour la couche
+// attribut HTML. À insérer SANS quotes additionnelles autour.
+function _melJsArg(v){
+  return JSON.stringify(v == null ? '' : String(v)).replace(/"/g,'&quot;');
+}
+
 // ════════════════════════════════════════════════════════
 // MEL — État global du module
 // ════════════════════════════════════════════════════════
@@ -832,8 +839,7 @@ function melShowTree(){
     l1.style.flexDirection='column';
     l1.innerHTML = Object.entries(MEL_TREE || {}).map(function(entry){
       var cat = entry[0], def = entry[1] || {};
-      var catSafe = String(cat).replace(/'/g, "\'");
-      return '<button class="mel-cat-btn" onclick="melSelectCat(\'' + catSafe + '\')"><span class="ico">'
+      return '<button class="mel-cat-btn" onclick="melSelectCat(' + _melJsArg(cat) + ')"><span class="ico">'
         + _melEsc(def.ico || '💬') + '</span>'
         + _melEsc(def.label || cat) + '</button>';
     }).join('');
@@ -870,7 +876,7 @@ function melSelectCat(cat){
 }
 
 function _buildSubLevel(cat,def){
-  let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${def.ico} ${def.label}</span></div>`;
+  let h=`<div class="mel-sub"><div class="mel-sub-hdr"><button class="mel-sub-back" onclick="melResetTree()">← Retour</button><span>${_melEsc(def.ico)} ${_melEsc(def.label)}</span></div>`;
   if(def.needZone){
     h+=`<div class="mel-zone-block"><label>📍 Votre adresse ou position GPS (pour identifier votre zone PLU)</label><div class="mel-zone-row"><input type="text" id="mel-addr-input" class="mel-addr-input" placeholder="Ex : 12 rue du Bourg" oninput="this.style.borderColor='';document.getElementById('mel-addr-warn')?.remove()" onkeydown="if(event.key==='Enter')melFindZoneByAddr()"/><button class="mel-addr-btn" onclick="melFindZoneByAddr()">🔍</button><button class="mel-gps-btn" onclick="melFindZoneByGPS()" title="Utiliser mon GPS">📍</button></div><div id="mel-zone-result" class="mel-zone-result"></div></div>`;
     h+=`<div class="mel-schema-block">
@@ -885,9 +891,9 @@ function _buildSubLevel(cat,def){
 </div>`;
   }
   for(const q of def.questions){
-    h+=`<button class="mel-q-btn" onclick="melSelectQuestion('${cat}','${q.id}')"><span class="q-ico">${q.ico}</span><span>${q.label}</span></button>`;
+    h+=`<button class="mel-q-btn" onclick="melSelectQuestion(${_melJsArg(cat)},${_melJsArg(q.id)})"><span class="q-ico">${_melEsc(q.ico)}</span><span>${_melEsc(q.label)}</span></button>`;
   }
-  h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion('${cat}','__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button>`;
+  h+=`<button class="mel-q-btn mel-autre" onclick="melSelectQuestion(${_melJsArg(cat)},'__autre__')"><span class="q-ico">💬</span><span>Autre question ou cas particulier…</span></button>`;
   h+=`</div>`;
   return h;
 }
@@ -1049,11 +1055,9 @@ function _showPluAnswer(pluHtml, questionLabel, cat, qid, zoneCtx){
   }
   fullHtml += '<div class="plu-tab-content" id="plu-tab-interdits" style="display:none">'+interditsHtml+'</div>';
 
-  const ctxSafe = ctx.replace(/'/g, '%27');
-
   // Bouton MEL + bouton retour en bas
   fullHtml += '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
-    +'<button class="mel-open-chat-btn" onclick="melOpenChatFromDirect(\''+cat+'\',\'urbanisme\',decodeURIComponent(\''+ctxSafe+'\'))">💬 Question complémentaire ? Parler à MEL</button>'
+    +'<button class="mel-open-chat-btn" onclick="melOpenChatFromDirect('+_melJsArg(cat)+',\'urbanisme\','+_melJsArg(ctx)+')">💬 Question complémentaire ? Parler à MEL</button>'
     +'<button class="plu-back-bottom-btn" onclick="pluCloseAnswer()">← Retour aux questions</button>'
     +'</div>';
 
@@ -1107,14 +1111,14 @@ function _renderDirectAnswer(answer){
     for(const lk of answer.links){
       if(lk.action){
         var safeAct=lk.action.replace(/[^a-zA-Z0-9_]/g,'');
-        h+='<button onclick="event.stopPropagation();melRunAction(\''+safeAct+'\')" style="display:block;width:100%;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;text-align:left;">'+lk.label+'</button>';
+        h+='<button onclick="event.stopPropagation();melRunAction(\''+safeAct+'\')" style="display:block;width:100%;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;border:none;cursor:pointer;font-family:inherit;text-align:left;">'+_melEsc(lk.label)+'</button>';
         continue;
       }
       const href=lk.tel?'tel:'+lk.tel:lk.url;
       const target=lk.tel?'':'target="_blank"';
       const isLocal=href.startsWith('tel:')||href.startsWith('mailto:');
-      const clickHandler=isLocal?' onclick="event.stopPropagation();window.location.href=\''+href.replace(/'/g,"\\'")+'\';return false;"':'';
-      h+='<a href="'+href+'" '+target+clickHandler+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+lk.label+'</a>';
+      const clickHandler=isLocal?' onclick="event.stopPropagation();window.location.href='+_melJsArg(href)+';return false;"':'';
+      h+='<a href="'+_melEsc(href)+'" '+target+clickHandler+' style="display:block;padding:10px 13px;background:var(--forest);color:white;border-radius:9px;text-decoration:none;font-weight:700;font-size:.84rem;">'+_melEsc(lk.label)+'</a>';
     }
     h+='</div>';
   }
@@ -1131,10 +1135,9 @@ function _showDirectAnswer(answer,cat,topic,ctxForMel,questionLabel){
   div.className='mel-direct-answer';
   // Enrichir le contexte avec le libellé de la question posée
   const fullCtx = (questionLabel ? 'Question initiale : '+questionLabel+'. ' : '') + (ctxForMel||'');
-  const ctx=encodeURIComponent(fullCtx.substring(0,400)).replace(/'/g,'%27');
   div.innerHTML='<span class="da-label">Réponse</span>'
     +_renderDirectAnswer(answer)
-    +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect(\''+cat+'\',\''+topic+'\',decodeURIComponent(\''+ctx+'\'))">💬 Question complémentaire ? Parler à MEL</button>';
+    +'<button class="mel-open-chat-btn" style="margin-top:10px;" onclick="melOpenChatFromDirect('+_melJsArg(cat)+','+_melJsArg(topic)+','+_melJsArg(fullCtx.substring(0,400))+')">💬 Question complémentaire ? Parler à MEL</button>';
   container.appendChild(div);
   setTimeout(()=>div.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }

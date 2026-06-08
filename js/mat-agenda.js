@@ -9,6 +9,11 @@ var _agendaYear  = new Date().getFullYear();
 var _agendaMonth = new Date().getMonth();
 var _agendaTargetMonth = null;
 
+// Argument sûr pour un onclick="fn(…)" : JSON.stringify gère la couche JS
+// (quotes, backslash, retours ligne), puis " est encodé pour la couche
+// attribut HTML. À insérer SANS quotes additionnelles autour.
+function _agJsArg(v){ return JSON.stringify(v == null ? '' : String(v)).replace(/"/g,'&quot;'); }
+
 function decodeIcalText(v){ return (v||'').replace(/\\n/g,'\n').replace(/\\,/g,',').replace(/\\;/g,';').trim(); }
 function parseIcalDateLine(line){
   if(!line) return null;
@@ -107,7 +112,7 @@ function renderAgenda(){
     var cur=new Date(_agendaYear,_agendaMonth,d);
     var hasEvt=list.some(function(e){return sameDay(e.start,cur);});
     var cls='agenda-month-day'+(hasEvt?' has-event':'')+(sameDay(cur,now)?' today':'');
-    if(hasEvt){var dayEvts=list.filter(function(e){return sameDay(e.start,cur);});html+='<div class="'+cls+'" onclick="openEventDetail(\''+dayEvts[0].uid.replace(/'/g,"\\'")+'\')" >'+d+'</div>';}
+    if(hasEvt){var dayEvts=list.filter(function(e){return sameDay(e.start,cur);});html+='<div class="'+cls+'" onclick="openEventDetail('+_agJsArg(dayEvts[0].uid)+')" >'+d+'</div>';}
     else html+='<div class="'+cls+'">'+d+'</div>';
   }
   html+='</div>';
@@ -117,7 +122,7 @@ function renderAgenda(){
 
 function renderAgendaItem(evt){
   var dayName=evt.start.toLocaleDateString('fr-FR',{weekday:'short'});
-  return '<div class="agenda-item" onclick="openEventDetail(\''+evt.uid.replace(/'/g,"\\'")+'\')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+esc(evt.summary)+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+esc(evt.description)+'</div>':'')+'</div></div></div>';
+  return '<div class="agenda-item" onclick="openEventDetail('+_agJsArg(evt.uid)+')"><div class="agenda-item-head"><div class="agenda-date-badge"><div class="agenda-date-day">'+dayName+'</div><div class="agenda-date-num">'+evt.start.getDate()+'</div></div><div style="flex:1;min-width:0"><div class="agenda-title">'+esc(evt.summary)+'</div><div class="agenda-meta">'+formatEventMeta(evt)+'</div>'+(evt.description?'<div class="agenda-desc">'+esc(evt.description)+'</div>':'')+'</div></div></div>';
 }
 
 function openEventDetail(uid){
@@ -129,13 +134,13 @@ function openEventDetail(uid){
     var match=window._matActusList.find(function(a){return a.eventDate&&new Date(a.eventDate).toDateString()===eDay;});
     if(match&&match.photo) photo=match.photo;
   }
-  var photoHTML=photo?'<img class="event-detail-img" src="'+photo+'" alt="" onerror="this.style.display=\'none\'">':'';
+  var photoHTML=photo?'<img class="event-detail-img" src="'+esc(photo)+'" alt="" onerror="this.style.display=\'none\'">':'';
   var body=document.getElementById('event-detail-body');
-  var uidSafe=evt.uid.replace(/'/g,"\\'");
+  var uidSafe=_agJsArg(evt.uid);
   var reactionsEnabled=!(window._matFeatures&&window._matFeatures.reactionsEnabled===false);
   var rsvpOn=_isEventRsvpLocally(uid);
-  var rsvpBtn=reactionsEnabled?'<button id="rsvp-btn-'+esc(uid)+'" class="event-btn-rsvp'+(rsvpOn?' rsvp-on':'')+'" onclick="toggleRsvpEvent(\''+uidSafe+'\')" aria-label="'+(rsvpOn?'Retirer mon inscription':'J’y serai')+'" aria-pressed="'+rsvpOn+'">'+(rsvpOn?'✅ J’y serai':'📅 J’y serai')+'</button>':'';
-  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs(\''+uidSafe+'\')">Ajouter à mon agenda</button>'+rsvpBtn+'</div></div>';
+  var rsvpBtn=reactionsEnabled?'<button id="rsvp-btn-'+esc(uid)+'" class="event-btn-rsvp'+(rsvpOn?' rsvp-on':'')+'" onclick="toggleRsvpEvent('+uidSafe+')" aria-label="'+(rsvpOn?'Retirer mon inscription':'J’y serai')+'" aria-pressed="'+rsvpOn+'">'+(rsvpOn?'✅ J’y serai':'📅 J’y serai')+'</button>':'';
+  body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs('+uidSafe+')">Ajouter à mon agenda</button>'+rsvpBtn+'</div></div>';
   openOv('event');
   // Charge le compteur RSVP réel (1 requête ponctuelle à l'ouverture du détail)
   if(reactionsEnabled) _loadRsvpCount(uid);

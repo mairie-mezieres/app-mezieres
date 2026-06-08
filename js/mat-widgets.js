@@ -569,7 +569,20 @@ function loadMairieStatus(){
 }
 
 // ── Déchets ───────────────────────────────────────────────
-function getWeekNumber(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
+// Numéro de semaine ISO 8601 (lundi = 1er jour, semaine 1 = celle du 1er jeudi).
+// Calcul en UTC pour ne dépendre que de la date calendaire (robuste aux
+// changements d'heure). La parité « semaines paires ISO » pilote le bac jaune ;
+// l'ancienne formule simplifiée divergeait de l'ISO aux frontières d'année
+// (ex. toute l'année 2027 inversée car 1er janv. = vendredi).
+function getWeekNumber(d){
+  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dayNum=(t.getUTCDay()+6)%7;          // lundi=0 … dimanche=6
+  t.setUTCDate(t.getUTCDate()-dayNum+3);     // jeudi de la semaine courante
+  const firstThu=new Date(Date.UTC(t.getUTCFullYear(),0,4)); // le 4 janv. ∈ S1
+  const firstThuDayNum=(firstThu.getUTCDay()+6)%7;
+  firstThu.setUTCDate(firstThu.getUTCDate()-firstThuDayNum+3);
+  return 1+Math.round((t-firstThu)/(7*86400000));
+}
 function loadDechets(){
   const now=new Date(), tz={timeZone:'Europe/Paris'};
   const hP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
