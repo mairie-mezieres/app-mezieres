@@ -699,8 +699,12 @@ const hist=[];
 function addMsg(role,text){
   const c=document.getElementById('msgs');
   const d=document.createElement('div'); d.className='msg '+role;
+  // Double contexte : chaîne JS ('...') imbriquée dans un attribut HTML ("...").
+  // 1) échappement JS (antislash, apostrophe, saut de ligne) ; 2) échappement
+  // HTML via _melEsc pour empêcher tout " ou < de casser l'attribut onclick.
+  const ttsArg = _melEsc(text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' '));
   const ttsBtn = (role==='bot' && _ttsEnabled)
-    ? '<button class="tts-btn" onclick="ttsRead(\''+text.replace(/'/g,"\\'").replace(/\n/g,' ')+'\',\'MEL\')">🔊 Écouter</button>'
+    ? '<button class="tts-btn" onclick="ttsRead(\''+ttsArg+'\',\'MEL\')">🔊 Écouter</button>'
     : '';
   const formatted = formatMelText(text);
   d.innerHTML='<div class="mav">'+(role==='bot'?'\ud83d\udc69':'\ud83d\udc64')+'</div><div class="bub">'+formatted+ttsBtn+'</div>';
