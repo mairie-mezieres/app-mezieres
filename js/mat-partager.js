@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
-// Version 3.0 — Suivi des visites et prompts dans la console admin
+// Version 3.1 — Option « collez vos documents » (PLU, élus…) dans le prompt généré
 // ════════════════════════════════════════════════════════════
 //
 // Stratégie : au lieu d'un prompt squelette de 2-3 Ko,
@@ -1101,9 +1101,15 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '',
       'Après avoir livré le code complet avec ses gabarits JSON, tu termines ta réponse par cette phrase exacte :',
       '',
-      '> "Votre site est prêt ! Pour personnaliser le contenu, je vais maintenant vous poser quelques questions une par une. Vous pouvez aussi remplir vous-même les fichiers JSON à votre rythme. Répondez `commencer` pour démarrer, ou `plus tard` si vous préférez le faire seul."',
+      '> "Votre site est prêt ! Pour personnaliser le contenu, vous avez deux options. **Option rapide** : si vous disposez déjà de documents (règlement du PLU, liste des élus, calendrier des déchets, annuaire des associations ou des entreprises, coordonnées de la mairie…), collez-les ici ou joignez-les — je les lirai et remplirai les fichiers à votre place. **Option guidée** : je vous pose les questions une par une. Répondez `commencer` pour l’option guidée, collez directement vos documents pour l’option rapide, ou `plus tard` si vous préférez le faire seul."',
       '',
-      'Si l’utilisateur répond `commencer`, tu poses **une seule question par message**, dans l’ordre suivant (et uniquement pour les contenus cochés) :',
+      'Gestion des documents fournis par l’utilisateur (option rapide) :',
+      '- Quand l’utilisateur colle ou joint un document, **extrais-en uniquement les informations réellement présentes** et remplis les fichiers JSON concernés. Montre chaque bloc \`​`​`​\` prêt à copier.',
+      '- **N’invente jamais** une donnée absente du document : laisse \`[À COMPLÉTER]\` et signale précisément ce qui manque.',
+      '- Pour un **règlement de PLU** : reprends fidèlement les règles par zone (hauteurs, emprises, reculs, types de toiture…) **sans extrapoler ni compléter** ; ajoute systématiquement la mention "informations indicatives, à vérifier en mairie avant tout dépôt de dossier".',
+      '- Après extraction, récapitule ce que tu as rempli et ce qui reste à compléter, puis propose d’enchaîner en mode guidé pour le reste.',
+      '',
+      'Si l’utilisateur répond `commencer` (ou après avoir traité ses documents), tu poses **une seule question par message**, dans l’ordre suivant (et uniquement pour les contenus cochés, en sautant ce qui a déjà été fourni) :',
       '',
       '1. **Coordonnées de la mairie** : adresse postale complète, téléphone, email officiel.',
       '2. **Horaires d’ouverture** : jour par jour, avec mention "sur rendez-vous" si applicable.',
