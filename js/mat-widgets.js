@@ -668,6 +668,10 @@ function loadDechetsDetail(){
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
     +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
     +'🕐 <strong>Été (avr-sep)</strong> : 9h-12h et 14h-18h</div>'
+    +'<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'
+    +'<a href="https://portail-usagers.ccterresduvaldeloire.fr/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;font-weight:700;color:var(--forest);text-decoration:none;background:var(--mist);border-radius:8px;padding:6px 11px">🔗 S\'inscrire à la déchetterie →</a>'
+    +'<div style="font-size:0.72rem;color:var(--muted);margin-top:5px">Accès soumis à inscription (déclaration de plaque d\'immatriculation)</div>'
+    +'</div>'
     +'</div>';
 }
 
