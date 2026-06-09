@@ -48,6 +48,19 @@ function matFetch(url, opts, timeoutMs) {
   return fetch(url, opts);
 }
 
+// ── Optimisation des images Cloudinary ───────────────────────
+// Insère une transformation à la volée dans l'URL Cloudinary : format auto
+// (WebP/AVIF selon le navigateur), qualité auto, et redimensionnement borné
+// à la largeur d'affichage (c_limit = jamais d'agrandissement). Divise par
+// ~30 le poids des photos d'actualités servies en pleine résolution.
+// Sans effet sur les URLs non-Cloudinary ou déjà transformées.
+function matCloudImg(url, width) {
+  if (!url || url.indexOf('res.cloudinary.com') < 0 || url.indexOf('/image/upload/') < 0) return url;
+  if (/\/image\/upload\/(?:[a-z]+_[^/]*\/)?(?:f_auto|q_auto|w_)/.test(url)) return url; // déjà transformé
+  var t = 'f_auto,q_auto' + (width ? ',w_' + width + ',c_limit' : '');
+  return url.replace('/image/upload/', '/image/upload/' + t + '/');
+}
+
 // ── Validation URL pour href ─────────────────────────────────
 // esc() échappe HTML mais PAS javascript:/data: URLs. safeHref valide
 // que le protocole est http(s) avant d'autoriser l'injection dans un

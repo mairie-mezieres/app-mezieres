@@ -192,7 +192,7 @@ function formatEventDate(iso){
 function renderActuListItem(a){
   const id=getActuId(a);
   const jsId=JSON.stringify(id).replace(/"/g,'&quot;');
-  const imgHTML=a.photo?`<img class="actu-img" src="${esc(a.photo)}" alt="" onerror="this.onerror=null;this.src='img/mat-header.webp'">`:''
+  const imgHTML=a.photo?`<img class="actu-img" src="${esc(matCloudImg(a.photo,700))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='img/mat-header.webp'">`:''
   const titre=esc(getActuDisplayTitle(a));
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
@@ -250,7 +250,7 @@ function renderActuDetail(actu){
   const title=esc(getActuDisplayTitle(actu));
   const desc=getActuPlainDescription(actu);
   const descHTML=desc?`<div class="actu-detail-text">${esc(desc).replace(/\n/g,'<br>')}</div>`:'';
-  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${esc(actu.photo)}" alt="" onerror="this.onerror=null;this.src='img/mat-header.webp'"></div>`:'';
+  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${esc(matCloudImg(actu.photo,1000))}" alt="" onerror="this.onerror=null;this.src='img/mat-header.webp'"></div>`:'';
   const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
   const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
   const id = getActuId(actu);
