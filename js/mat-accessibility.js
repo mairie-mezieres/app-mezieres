@@ -225,6 +225,8 @@ const OB_FEATURES = [
   { ico:'⚙️', title:`Personnalisation`, desc:`Thème sombre, taille de texte, contraste élevé… Adaptez l\'appli à vos besoins.`, sel:'button[onclick="openAccessibilite()"]', selDesktop:'.d-nav-acc', scrollTop:true },
 ];
 let _obStep = 0;
+let _obDrawToken = 0;       // invalidé à chaque changement d'étape (stoppe les repositionnements obsolètes)
+let _obReposition = null;   // handler de repositionnement actif (pour cleanup)
 
 function initOnboarding() {
   if (localStorage.getItem(OB_KEY)) return;
@@ -313,6 +315,14 @@ function obFirstVisible(sel) {
 async function showObFeature(idx) {
   const f = OB_FEATURES[idx];
   if (!f) { obFinish(); return; }
+  // Changement d'étape : invalider tout repositionnement en cours et détacher
+  // ses écouteurs avant de reconstruire le spotlight pour la nouvelle cible.
+  _obDrawToken++;
+  if (_obReposition) {
+    window.removeEventListener('load', _obReposition);
+    document.removeEventListener('load', _obReposition, true);
+    _obReposition = null;
+  }
   document.getElementById('ob-step-0').style.display = 'none';
   document.getElementById('ob-progress-bar-wrap').style.display = '';
   const card = document.getElementById('ob-feature-card');
@@ -350,37 +360,77 @@ async function showObFeature(idx) {
     window.scrollTo({ top: targetY, behavior: 'instant' });
     // Double RAF : garantit que le navigateur a repeint avant de lire les coordonnées.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    const rect = el.getBoundingClientRect();
     document.body.style.overflow = 'hidden'; // verrouiller à la nouvelle position
+    obDrawSpotlight(el, f);
 
-    if (rect.width === 0 && rect.height === 0) {
-      svg.innerHTML = `<rect width="100%" height="100%" fill="rgba(0,0,0,0.65)"/>`;
-      finger.style.display = 'none';
-      return;
-    }
-    const pad = 10, r = 14;
-    const yOff = f.yOffset || 0;
-    const x = rect.left - pad, y = rect.top - pad + yOff;
-    const w = rect.width + pad*2, h = rect.height + pad*2;
-    // Utiliser les dimensions réelles de l'overlay (plus fiable que window.innerWidth/Height
-    // sur Android où la toolbar dynamique peut fausser window.innerHeight).
-    const W = darkOverlay.offsetWidth || window.innerWidth;
-    const H = darkOverlay.offsetHeight || window.innerHeight;
-    svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="var(--sage,#22c55e)" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
-    finger.style.display = '';
-    const fingerBelow = rect.bottom + 50 < H * 0.62;
-    finger.innerHTML = fingerBelow ? '👆' : '👇';
-    finger.style.left = (rect.left + rect.width / 2 - 16) + 'px';
-    finger.style.top = (fingerBelow ? rect.bottom + 6 : rect.top - 44) + 'px';
+    // Sur connexion lente, les images au-dessus (header, vignettes actus) se
+    // chargent APRÈS ce premier calcul et décalent le contenu vers le bas : le
+    // trou se retrouverait alors sur la mauvaise carte (ex. Entreprises au lieu
+    // de Sorties locales). On replace donc le spotlight tant que l'étape est
+    // affichée — à chaque image qui finit de charger (capture des events 'load',
+    // qui ne bouillonnent pas) et via quelques recalculs différés.
+    const token = _obDrawToken;
+    const reposition = function() {
+      if (token !== _obDrawToken) return; // étape changée → on arrête
+      const r = el.getBoundingClientRect();
+      // Recentre si l'élément a dérivé du centre suite au reflow, puis redessine.
+      if (Math.abs((r.top + r.height / 2) - window.innerHeight / 2) > 40) {
+        document.body.style.overflow = '';
+        window.scrollTo({ top: Math.max(0, window.scrollY + r.top - window.innerHeight / 2 + r.height / 2), behavior: 'instant' });
+        document.body.style.overflow = 'hidden';
+      }
+      obDrawSpotlight(el, f);
+    };
+    _obReposition = reposition;
+    window.addEventListener('load', reposition);
+    document.addEventListener('load', reposition, true);
+    [250, 600, 1200, 2000].forEach(function(ms){ setTimeout(reposition, ms); });
   } else {
     svg.innerHTML = `<rect width="100%" height="100%" fill="rgba(0,0,0,0.65)"/>`;
     finger.style.display = 'none';
   }
 }
 
+// Trace le « trou » lumineux + le doigt sur l'élément ciblé, à sa position
+// actuelle. Extrait de showObFeature pour être rejoué après chaque reflow
+// (images tardives sur connexion lente) sans relancer l'animation de la carte.
+function obDrawSpotlight(el, f) {
+  const svg = document.getElementById('ob-svg');
+  const finger = document.getElementById('ob-finger');
+  const darkOverlay = document.getElementById('ob-overlay-dark');
+  if (!svg || !finger || !darkOverlay) return;
+  const rect = el.getBoundingClientRect();
+  if (rect.width === 0 && rect.height === 0) {
+    svg.innerHTML = `<rect width="100%" height="100%" fill="rgba(0,0,0,0.65)"/>`;
+    finger.style.display = 'none';
+    return;
+  }
+  const pad = 10, r = 14;
+  const yOff = f.yOffset || 0;
+  const x = rect.left - pad, y = rect.top - pad + yOff;
+  const w = rect.width + pad*2, h = rect.height + pad*2;
+  // Utiliser les dimensions réelles de l'overlay (plus fiable que window.innerWidth/Height
+  // sur Android où la toolbar dynamique peut fausser window.innerHeight).
+  const W = darkOverlay.offsetWidth || window.innerWidth;
+  const H = darkOverlay.offsetHeight || window.innerHeight;
+  svg.innerHTML = `<defs><mask id="ob-mask"><rect width="${W}" height="${H}" fill="white"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="black"/></mask></defs><rect width="${W}" height="${H}" fill="rgba(0,0,0,0.78)" mask="url(#ob-mask)"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="none" stroke="var(--sage,#22c55e)" stroke-width="2.5" stroke-dasharray="8 4" style="animation:obDash 1.5s linear infinite;"/>`;
+  finger.style.display = '';
+  const fingerBelow = rect.bottom + 50 < H * 0.62;
+  finger.innerHTML = fingerBelow ? '👆' : '👇';
+  finger.style.left = (rect.left + rect.width / 2 - 16) + 'px';
+  finger.style.top = (fingerBelow ? rect.bottom + 6 : rect.top - 44) + 'px';
+}
+
 function obSkip() { obFinish(); }
 function obFinish() {
   localStorage.setItem(OB_KEY, '1');
+  // Stopper tout repositionnement en cours et détacher ses écouteurs.
+  _obDrawToken++;
+  if (_obReposition) {
+    window.removeEventListener('load', _obReposition);
+    document.removeEventListener('load', _obReposition, true);
+    _obReposition = null;
+  }
   const ob = document.getElementById('mat-onboarding');
   if (ob) {
     ob.style.pointerEvents = 'none';
