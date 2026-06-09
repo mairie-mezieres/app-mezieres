@@ -43,14 +43,14 @@ document.documentElement.style.background = bg;
 })();
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.3.7">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.2.7">
-<script defer src="js/mat-utils.js?v=4.3.0"></script>
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.2.8">
+<script defer src="js/mat-utils.js?v=4.3.1"></script>
 <script defer src="js/mat-core.js?v=4.2.17"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
-<script defer src="js/mat-widgets.js?v=4.4.2"></script>
+<script defer src="js/mat-widgets.js?v=4.4.3"></script>
 <script defer src="js/mat-agenda.js?v=4.3.2"></script>
 <script defer src="js/mat-forms.js?v=4.4.1"></script>
-<script defer src="js/mat-actus.js?v=4.4.3"></script>
+<script defer src="js/mat-actus.js?v=4.4.4"></script>
 <script defer src="js/mat-trombi.js?v=4.2.6"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
@@ -149,7 +149,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.28 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.30 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -426,7 +426,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.28</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.30</button>
 </div>
 </div>
 </div>
@@ -1457,7 +1457,7 @@ et accompagnée des documents suivants :
 </div>
 </div>
 </div>
-<script defer src="js/mat-desktop.js?v=4.1.2"></script>
+<script defer src="js/mat-desktop.js?v=4.1.3"></script>
 <div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1469,6 +1469,19 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 juin 2026 — v4.30</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Actualit&eacute;s plus l&eacute;g&egrave;res&nbsp;: les photos se chargent beaucoup plus vite et consomment bien moins de donn&eacute;es (images optimis&eacute;es automatiquement)</li>
+<li>Lisibilit&eacute;&nbsp;: la date des actualit&eacute;s est affich&eacute;e dans un gris plus contrast&eacute;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 juin 2026 — v4.29</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>D&eacute;chets&nbsp;: lien d&rsquo;inscription &agrave; la d&eacute;chetterie (d&eacute;claration de plaque) ajout&eacute; dans les horaires</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 juin 2026 — v4.28</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Pr&eacute;sentation guid&eacute;e&nbsp;: le surlignage vise d&eacute;sormais la bonne carte, m&ecirc;me sur connexion lente (le contenu qui se chargeait en retard pouvait d&eacute;caler le rep&egrave;re)</li>

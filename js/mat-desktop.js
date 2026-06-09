@@ -86,7 +86,7 @@ function loadActus(){
       }
       var html='';
       items.slice(0,5).forEach(function(a){
-        var img=a.photo?'<img src="'+escHtml(a.photo)+'" alt="" onerror="this.style.display=\'none\'">':'';
+        var img=a.photo?'<img src="'+escHtml(matCloudImg(a.photo,120))+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
         var rawDate=a.date||a.createdAt||'';
         var dateStr=rawDate?fmtShort(rawDate):'';
         var actuId=encodeURIComponent(a.id||a._id||'');
@@ -219,7 +219,7 @@ function renderFeatured(e){
   }
   el.innerHTML=
     '<div class="d-featured" onclick="openAgenda&&openAgenda()" title="Voir l\'agenda complet">'+
-      (photo?'<img class="d-featured-img" src="'+escHtml(photo)+'" alt="" onerror="this.style.display=\'none\'">':'')+
+      (photo?'<img class="d-featured-img" src="'+escHtml(matCloudImg(photo,900))+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+
       '<div class="d-featured-body">'+
         '<div class="d-featured-badge">Prochain évènement</div>'+
         '<h2 class="d-featured-title">'+escHtml(e.summary||'')+'</h2>'+

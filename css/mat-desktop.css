@@ -95,7 +95,7 @@
   .d-actu-body{flex:1;min-width:0}
   .d-actu-cat{font-size:.58rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--sage-ink);margin-bottom:2px}
   .d-actu-title{font-size:.78rem;font-weight:800;color:var(--forest);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .d-actu-date{font-size:.65rem;color:#aaa;margin-top:3px}
+  .d-actu-date{font-size:.65rem;color:#767676;margin-top:3px}
   .d-actu-item:hover .d-actu-title{color:var(--leaf)}
 
   /* SIGNAL GRID */
@@ -124,7 +124,7 @@
   .d-agenda-mon{font-size:.6rem;text-transform:uppercase;font-weight:800;color:var(--sage-ink)}
   .d-agenda-body{flex:1}
   .d-agenda-title{font-size:.8rem;font-weight:800;color:var(--forest)}
-  .d-agenda-time{font-size:.68rem;color:#aaa;margin-top:2px}
+  .d-agenda-time{font-size:.68rem;color:#767676;margin-top:2px}
   .d-agenda-dot{width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:6px}
 
   /* MEL PANEL */
