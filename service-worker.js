@@ -8,7 +8,9 @@
 // J5.d : retrait de la ligne url.includes('panneaupocket') morte.
 // J6   : bump suite à C10 — validation URL avant innerHTML href côté
 //         frontend (safeHref dans mat-utils.js).
-const CACHE = 'mat-v4.30.0';
+// J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
+//         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
+const CACHE = 'mat-v4.31.0';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -49,6 +51,7 @@ const PRECACHE_URLS = [
   './data/mel-tree.json?v=4.2.3',
   './img/mat-header.webp',
   './img/MAT et MEL.webp',
+  './notif.html',
   './icon-192.png',
   './icon-badge.png'
 ];
@@ -263,46 +266,35 @@ self.addEventListener('notificationclick', e => {
 
   const data = e.notification.data || {};
   const openType = data.open || 'notifs';
+  const actuId = data.actuId != null ? String(data.actuId) : null;
 
-  // Construire l'URL cible selon le type
-  let fallbackHash;
-  if (openType === 'meteo') fallbackHash = './#meteo';
-  else if (openType === 'idees') fallbackHash = './#idees';
-  else if (openType === 'signalements') fallbackHash = './#signalements';
-  else if (openType === 'contact') fallbackHash = './#contact';
-  else if (openType === 'actu' && data.actuId != null) fallbackHash = `./#actu=${encodeURIComponent(String(data.actuId))}`;
-  else fallbackHash = './#notifs';
-
-  const targetUrl = new URL(
-    normalizeInAppPath(data.url || fallbackHash, fallbackHash),
-    self.registration.scope
-  ).href;
+  // URL de landing : query string > fragment pour openWindow() — les fragments
+  // sont parfois ignorés ou provoquent l'ouverture d'un onglet vide sur Firefox Android.
+  const params = new URLSearchParams({ open: openType });
+  if (actuId) params.set('actuId', actuId);
+  const landingUrl = new URL('./notif.html?' + params.toString(), self.registration.scope).href;
 
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async cls => {
       const existing = cls.find(c => c.url.startsWith(self.registration.scope));
 
       if (existing) {
+        // L'app est déjà ouverte : focus + postMessage pour ouvrir le bon overlay
+        // sans recharger la page (navigate() vers notif.html provoquerait un rechargement).
         try { await existing.focus(); } catch (_) {}
-        // navigate() est plus fiable que postMessage depuis un écran verrouillé
-        // (l'app suspendue peut ne pas répondre au postMessage immédiatement).
-        try {
-          await existing.navigate(targetUrl);
-          return;
-        } catch (_) {}
-        // Fallback postMessage si navigate() n'est pas supporté
         try {
           if (openType === 'meteo') existing.postMessage({ action: 'openMeteo' });
           else if (openType === 'idees') existing.postMessage({ action: 'openIdees' });
           else if (openType === 'signalements') existing.postMessage({ action: 'openSignalements' });
           else if (openType === 'contact') existing.postMessage({ action: 'openContact' });
-          else if (openType === 'actu' && data.actuId != null) existing.postMessage({ action: 'openActu', actuId: String(data.actuId) });
+          else if (openType === 'actu' && actuId != null) existing.postMessage({ action: 'openActu', actuId });
           else existing.postMessage({ action: 'openNotifs' });
         } catch (_) {}
         return;
       }
 
-      return clients.openWindow(targetUrl);
+      // L'app n'est pas ouverte : ouvrir notif.html qui redirige vers index.html#hash.
+      return clients.openWindow(landingUrl);
     })
   );
 });
