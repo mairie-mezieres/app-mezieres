@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#1a3d2b",
   "theme_color": "#1a3d2b",
-  "orientation": "portrait",
+  "orientation": "any",
   "lang": "fr",
   "categories": ["government","lifestyle"],
   "prefer_related_applications": false,
