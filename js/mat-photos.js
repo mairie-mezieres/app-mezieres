@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.2.1
+   MAT — Galerie photos communautaires v1.2.2
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -65,6 +65,26 @@ function _getSorted() {
   return _photoSort === 'date'
     ? [..._allPhotos].sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
     : _allPhotos;
+}
+
+// ── Diaporama direct depuis la tuile (page principale) ───────────
+// Contourne le verrou WebAPK Android : fullscreen + orientation.lock
+// depuis un geste utilisateur — pas besoin de tourner l'écran.
+function launchDiapo() {
+  if (!_allPhotos.length) {
+    fetch(_PHOTOS_API + '/photos')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        _allPhotos = d.photos || [];
+        _galeriePhotos = _allPhotos;
+        if (!_galeriePhotos.length) { alertMAT('Aucune photo disponible pour le moment.', 'Vos photos', '📸'); return; }
+        _startGalerieAt(0);
+      })
+      .catch(function() { alertMAT('Impossible de charger les photos.', 'Vos photos', '⚠️'); });
+    return;
+  }
+  _galeriePhotos = _getSorted();
+  _startGalerieAt(0);
 }
 
 // ── Overlay "Vos photos" ─────────────────────────────────────────
