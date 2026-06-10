@@ -50,7 +50,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-widgets.js?v=4.4.3"></script>
 <script defer src="js/mat-agenda.js?v=4.3.2"></script>
 <script defer src="js/mat-forms.js?v=4.5.0"></script>
-<script defer src="js/mat-photos.js?v=1.1.0"></script>
+<script defer src="js/mat-photos.js?v=1.2.0"></script>
 <script defer src="js/mat-actus.js?v=4.4.4"></script>
 <script defer src="js/mat-trombi.js?v=4.2.6"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
@@ -150,7 +150,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.33.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.34 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -281,7 +281,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
 </button>
 <button class="card" onclick="openPhotos()">
-<div class="ico" style="background:#fdf4ff">📸</div>
+<div class="ico" style="background:#fdf4ff;position:relative">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
 <div class="ct"><div class="ct-label">Vos photos</div><div class="ct-sub">Galerie communale</div></div>
 </button>
 <button class="card simple-card" onclick="openContact()">
@@ -424,7 +424,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.33.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.34</button>
 </div>
 </div>
 </div>
@@ -1483,10 +1483,11 @@ et accompagnée des documents suivants :
 <button id="photo-upload-btn" onclick="submitPhoto()" style="width:100%;margin-top:8px;padding:10px;background:var(--forest);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">📤 Envoyer</button>
 <p style="font-size:.7rem;color:var(--muted);margin:6px 0 0;text-align:center">Visible après validation par la mairie.</p>
 </div>
-<div style="display:flex;gap:6px;margin-bottom:12px">
+<div style="display:flex;gap:6px;margin-bottom:8px">
 <button id="photo-sort-votes" onclick="setPhotoSort('votes')" style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--forest);color:#fff;font-family:inherit;font-size:.78rem;font-weight:900;cursor:pointer">❤️ Les plus aimées</button>
 <button id="photo-sort-date"  onclick="setPhotoSort('date')"  style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--mist);color:var(--text);font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer">🕐 Les plus récentes</button>
 </div>
+<p style="font-size:.67rem;color:var(--muted);text-align:center;margin:0 0 10px;line-height:1.5">👆 Appuyez sur une photo pour l'agrandir · ↔️ Tournez l'écran pour le diaporama</p>
 <div id="photos-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
 </div>
 </div>
@@ -1512,6 +1513,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.34</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Galerie photos&nbsp;: appuyez sur une photo pour la voir en plein &eacute;cran avec le diaporama</li>
+<li>Galerie photos&nbsp;: un badge 🔴 appara&icirc;t sur la tuile quand de nouvelles photos ont &eacute;t&eacute; approuv&eacute;es</li>
+<li>Correction&nbsp;: la rotation de l&rsquo;&eacute;cran &eacute;tait bloqu&eacute;e dans l&rsquo;app install&eacute;e &mdash; le mode diaporama paysage fonctionne &agrave; nouveau</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.33.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Galerie photos&nbsp;: trier par &laquo;&nbsp;les plus aim&eacute;es&nbsp;&raquo; ou &laquo;&nbsp;les plus r&eacute;centes&nbsp;&raquo; en un clic</li>

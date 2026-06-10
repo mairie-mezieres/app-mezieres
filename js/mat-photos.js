@@ -1,12 +1,13 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.1.0
-   Overlay "Vos photos" + mode galerie plein écran en paysage.
+   MAT — Galerie photos communautaires v1.2.0
+   Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
-const _PHOTOS_API    = 'https://chatbot-mairie-mezieres.onrender.com';
+const _PHOTOS_API      = 'https://chatbot-mairie-mezieres.onrender.com';
 const _PHOTO_VOTES_KEY = 'mat_photo_votes_v1';
 const _MY_PHOTOS_KEY   = 'mat_my_photos_v1';
+const _PHOTOS_SEEN_KEY = 'mat_photos_seen_v1';
 
 function _getPhotoVotes() {
   try { return JSON.parse(localStorage.getItem(_PHOTO_VOTES_KEY) || '{}'); } catch(_) { return {}; }
@@ -19,7 +20,24 @@ function _addMyPhoto(id) {
   if (!ids.includes(id)) { ids.unshift(id); localStorage.setItem(_MY_PHOTOS_KEY, JSON.stringify(ids.slice(0, 50))); }
 }
 function _removeMyPhoto(id) {
-  localStorage.setItem(_MY_PHOTOS_KEY, JSON.stringify(_getMyPhotos().filter(i => i !== id)));
+  localStorage.setItem(_MY_PHOTOS_KEY, JSON.stringify(_getMyPhotos().filter(function(i) { return i !== id; })));
+}
+
+// ── Badge "nouvelles photos" ─────────────────────────────────────
+function _checkPhotosBadge() {
+  var seen = parseInt(localStorage.getItem(_PHOTOS_SEEN_KEY) || '0', 10);
+  var badge = document.getElementById('photos-badge');
+  if (!badge) return;
+  if (_allPhotos.length > seen) {
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+function _clearPhotosBadge() {
+  localStorage.setItem(_PHOTOS_SEEN_KEY, String(_allPhotos.length));
+  var badge = document.getElementById('photos-badge');
+  if (badge) badge.style.display = 'none';
 }
 
 // ── État ─────────────────────────────────────────────────────────
@@ -36,15 +54,22 @@ function setPhotoSort(sort) {
     var btn = document.getElementById('photo-sort-' + s);
     if (!btn) return;
     var st = (s === sort) ? active : inactive;
-    btn.style.background  = st.background;
-    btn.style.color       = st.color;
-    btn.style.fontWeight  = st.fontWeight;
+    btn.style.background = st.background;
+    btn.style.color      = st.color;
+    btn.style.fontWeight = st.fontWeight;
   });
   _renderPhotos();
 }
 
+function _getSorted() {
+  return _photoSort === 'date'
+    ? [..._allPhotos].sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
+    : _allPhotos;
+}
+
 // ── Overlay "Vos photos" ─────────────────────────────────────────
 function openPhotos() {
+  _clearPhotosBadge();
   openOv('photos');
   loadPhotos();
 }
@@ -59,6 +84,7 @@ async function loadPhotos() {
     const data = await r.json();
     _allPhotos = data.photos || [];
     _galeriePhotos = _allPhotos;
+    _checkPhotosBadge();
     _renderPhotos();
   } catch(_) {
     list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#dc2626">Impossible de charger les photos.</div>';
@@ -69,9 +95,7 @@ function _renderPhotos() {
   const list = document.getElementById('photos-list');
   if (!list) return;
 
-  const sorted = _photoSort === 'date'
-    ? [..._allPhotos].sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
-    : _allPhotos; // déjà triées par votes depuis l'API
+  const sorted = _getSorted();
 
   if (!sorted.length) {
     list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">Aucune photo pour l\'instant.<br>Soyez le premier à partager !</div>';
@@ -88,7 +112,9 @@ function _renderPhotos() {
     const safeId = JSON.stringify(p.id).replace(/"/g, '&quot;');
     return '<div style="border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.08)">'
       + '<div style="position:relative">'
-      + '<img src="' + esc(imgUrl) + '" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block" alt="' + esc(p.desc || '') + '">'
+      + '<img src="' + esc(imgUrl) + '" loading="lazy"'
+      + ' onclick="openGalerie(' + safeId + ')" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:pointer"'
+      + ' alt="' + esc(p.desc || 'Photo') + '">'
       + (isMine
           ? '<button onclick="deleteMyPhoto(' + safeId + ')" title="Supprimer ma photo"'
             + ' style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border:none;'
@@ -108,6 +134,7 @@ function _renderPhotos() {
   }).join('');
 }
 
+// ── Votes ────────────────────────────────────────────────────────
 async function votePhoto(id) {
   const votes = _getPhotoVotes();
   const alreadyVoted = !!votes[id];
@@ -121,12 +148,12 @@ async function votePhoto(id) {
     localStorage.setItem(_PHOTO_VOTES_KEY, JSON.stringify(votes));
     try { await matFetch(url, { method: 'POST', headers: { 'x-device-id': getMatDeviceId() } }, 8000); } catch(_) {}
   }
-  // Mise à jour optimiste du compteur
   const idx = _allPhotos.findIndex(function(p) { return p.id === id; });
   if (idx >= 0) _allPhotos[idx].votes = Math.max(0, (_allPhotos[idx].votes || 0) + (alreadyVoted ? -1 : 1));
   _renderPhotos();
 }
 
+// ── Suppression de sa propre photo ───────────────────────────────
 async function deleteMyPhoto(id) {
   if (!confirm('Supprimer votre photo ? Cette action est irréversible.')) return;
   try {
@@ -178,7 +205,6 @@ async function submitPhoto() {
     });
     const d = await r.json();
     if (d.id) _addMyPhoto(d.id);
-    // Reset
     if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer'; }
     const input = document.getElementById('photo-upload-input');
     if (input) input.value = '';
@@ -196,29 +222,42 @@ async function submitPhoto() {
   }
 }
 
-// ── Mode galerie paysage ─────────────────────────────────────────
+// ── Lightbox / Galerie plein écran ───────────────────────────────
+// Ouvre le diaporama en commençant par la photo dont l'id est fourni.
+// Appelée au tap sur une photo dans la grille ET à la rotation paysage.
+function openGalerie(photoId) {
+  if (!_allPhotos.length) return;
+  var sorted = _getSorted();
+  _galeriePhotos = sorted;
+  var idx = sorted.findIndex(function(p) { return p.id === photoId; });
+  _startGalerieAt(idx >= 0 ? idx : 0);
+}
+
+function _startGalerieAt(startIdx) {
+  var ov = document.getElementById('ov-galerie-paysage');
+  if (!ov) return;
+  clearTimeout(_galerieTimer);
+  _galerieOpen = true;
+  _galerieIdx = startIdx;
+  ov.style.display = 'block';
+  _galerieStep(true);
+  ov.addEventListener('click', _galerieClickHandler);
+}
+
 function _showGaleriePaysage() {
-  if (!_galeriePhotos.length) {
+  if (!_allPhotos.length) {
     fetch(_PHOTOS_API + '/photos')
       .then(function(r) { return r.json(); })
       .then(function(d) {
-        _galeriePhotos = d.photos || [];
-        if (_galeriePhotos.length) _startGalerie();
+        _allPhotos = d.photos || [];
+        _galeriePhotos = _allPhotos;
+        if (_galeriePhotos.length) _startGalerieAt(0);
       })
       .catch(function() {});
     return;
   }
-  _startGalerie();
-}
-
-function _startGalerie() {
-  var ov = document.getElementById('ov-galerie-paysage');
-  if (!ov) return;
-  _galerieOpen = true;
-  _galerieIdx = 0;
-  ov.style.display = 'block';
-  _galerieStep(true);
-  ov.addEventListener('click', _galerieClickHandler);
+  _galeriePhotos = _allPhotos;
+  _startGalerieAt(0);
 }
 
 function _galerieClickHandler(e) {
@@ -278,6 +317,7 @@ function _galerieStep(immediate) {
   }
 }
 
+// ── Listener orientation (diaporama automatique en paysage) ──────
 var _landscapeMQ = window.matchMedia('(orientation: landscape)');
 function _onOrientationChange(e) {
   if (e.matches) { _showGaleriePaysage(); }
