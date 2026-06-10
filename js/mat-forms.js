@@ -138,6 +138,7 @@ function _saveMySig(id, cat, type){
 
 async function submitSignal(){
   const desc=document.getElementById('signal-desc').value.trim();
+  if(!desc){await alertMAT('Veuillez décrire le problème à signaler.','Signalement','⚠️');return;}
   const photoEl=document.getElementById('signal-photo-preview');
   const btn=document.querySelector('#signal-form .submit-btn');
   btn.textContent='Envoi en cours…'; btn.disabled=true;
@@ -300,6 +301,7 @@ function setIdeasSort(mode){
 async function submitIdee(){
   const txt=document.getElementById('idea-input').value.trim();
   if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
+  if(txt.length<10){await alertMAT('Merci de détailler un peu votre idée (10 caractères minimum).','Vos idées','💡');return;}
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
   const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
   rememberSeenIdeas([idea]);
@@ -377,6 +379,9 @@ async function submitContactForm(){
   const reply=document.getElementById('contact-reply').value.trim();
   const msg=document.getElementById('contact-msg').value.trim();
   if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
+  if(reply && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(reply) && !/^\d{10}$/.test(reply.replace(/[\s.\-]/g,''))){
+    await alertMAT('Votre adresse e-mail ou numéro de téléphone semble invalide — vérifiez-le ou laissez le champ vide.','Contacter la mairie','💬');return;
+  }
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi…'; btn.disabled=true;
   const contactId=Date.now();
@@ -429,6 +434,7 @@ function removeBugPhoto(){
 
 async function submitBug(){
   const desc=document.getElementById('bug-desc').value.trim();
+  if(!desc){await alertMAT('Veuillez décrire le problème rencontré.','Rapport de bug','⚠️');return;}
   const btn=document.querySelector('#bug-form .submit-btn');
   const photoEl=document.getElementById('bug-photo-preview');
   btn.textContent='Envoi…'; btn.disabled=true;
@@ -699,4 +705,42 @@ async function loadSuivi(type){
   }catch(e){
     body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
   }
+}
+
+// ── Web Share Target API ────────────────────────────────────────
+// Appelé au démarrage si le SW a redirigé un partage OS vers l'app.
+// Ouvre le formulaire de signalement et pré-remplit le texte et la photo partagés.
+async function _handleShareTarget(){
+  const p=new URLSearchParams(location.search);
+  if(!p.has('share-open')) return;
+  if(history.replaceState) history.replaceState({},'',(location.pathname||'/')+location.hash);
+  await new Promise(r=>setTimeout(r,600));
+  if(typeof openSignal==='function') openSignal();
+  const shareText=p.get('share-text');
+  if(shareText){const d=document.getElementById('signal-desc');if(d) d.value=shareText;}
+  if(p.has('share-media')){
+    try{
+      const cache=await caches.open('mat-share-v1');
+      const resp=await cache.match('./share-image');
+      if(resp){
+        const blob=await resp.blob();
+        const reader=new FileReader();
+        reader.onload=ev=>{
+          const prev=document.getElementById('signal-photo-preview');
+          if(prev){prev.src=ev.target.result;prev.style.display='block';}
+          const actions=document.getElementById('signal-photo-actions');
+          if(actions) actions.style.display='none';
+          const removeBtn=document.getElementById('signal-photo-remove');
+          if(removeBtn) removeBtn.style.display='block';
+        };
+        reader.readAsDataURL(blob);
+        cache.delete('./share-image').catch(()=>{});
+      }
+    }catch(_){}
+  }
+}
+if(document.readyState==='complete'){
+  setTimeout(_handleShareTarget,600);
+}else{
+  window.addEventListener('load',()=>setTimeout(_handleShareTarget,600));
 }
