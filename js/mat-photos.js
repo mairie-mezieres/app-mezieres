@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.2.0
+   MAT — Galerie photos communautaires v1.2.1
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -240,8 +240,27 @@ function _startGalerieAt(startIdx) {
   _galerieOpen = true;
   _galerieIdx = startIdx;
   ov.style.display = 'block';
+  _enterFullscreenLandscape(ov);
   _galerieStep(true);
   ov.addEventListener('click', _galerieClickHandler);
+}
+
+// Force le paysage : le WebAPK Android verrouille l'orientation portrait
+// (intégrée à l'installation, unlock() ne fait que restaurer ce défaut).
+// Seul plein écran + lock('landscape') contourne ce verrou à l'exécution.
+function _enterFullscreenLandscape(ov) {
+  try {
+    var p = ov.requestFullscreen ? ov.requestFullscreen() : Promise.reject();
+    Promise.resolve(p).then(function() {
+      if (screen.orientation && screen.orientation.lock)
+        return screen.orientation.lock('landscape');
+    }).catch(function() {});
+  } catch(_) {}
+}
+
+function _exitFullscreenLandscape() {
+  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(_) {}
+  try { if (document.fullscreenElement) document.exitFullscreen().catch(function() {}); } catch(_) {}
 }
 
 function _showGaleriePaysage() {
@@ -273,7 +292,14 @@ function _closeGaleriePaysage() {
     ov.style.display = 'none';
     ov.removeEventListener('click', _galerieClickHandler);
   }
+  _exitFullscreenLandscape();
 }
+
+// Sortie du plein écran par geste système (retour Android, Échap) →
+// fermer aussi la galerie pour ne pas la laisser figée derrière.
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement && _galerieOpen) _closeGaleriePaysage();
+});
 
 function _galerieStep(immediate) {
   if (!_galerieOpen || !_galeriePhotos.length) return;
@@ -320,7 +346,9 @@ function _galerieStep(immediate) {
 // ── Listener orientation (diaporama automatique en paysage) ──────
 var _landscapeMQ = window.matchMedia('(orientation: landscape)');
 function _onOrientationChange(e) {
-  if (e.matches) { _showGaleriePaysage(); }
+  // _galerieOpen : le lock('landscape') programmatique déclenche aussi ce
+  // listener — ne pas redémarrer le diaporama à la photo 0 dans ce cas.
+  if (e.matches) { if (!_galerieOpen) _showGaleriePaysage(); }
   else           { _closeGaleriePaysage(); }
 }
 if (_landscapeMQ.addEventListener) {
