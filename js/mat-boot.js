@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Initialisation v3.7.2 (Phase 3)
+   MAT — Initialisation v3.7.3 (Phase 3)
    Séquence d'amorçage appelée au chargement de la page.
    DOIT Être CHARGÉ EN DERNIER — tous les autres modules doivent
    déjà avoir défini leurs fonctions globales.
@@ -7,6 +7,10 @@
    ════════════════════════════════════════════════════════════ */
 
 (function matInit(){
+  // 0) Déverrouillage orientation — corrige le verrou WebAPK Android hérité
+  //    du manifest "orientation: portrait" sur les installations existantes.
+  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e) {}
+
   // 1) Accessibilité & préférences utilisateur
   try { loadAccessibilite(); } catch(e){ console.warn('[init] loadAccessibilite', e); }
   try { refreshAllContextHelp(); } catch(e){}
