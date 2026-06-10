@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.2.2
+   MAT — Galerie photos communautaires v1.3.0
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -44,6 +44,7 @@ function _clearPhotosBadge() {
 var _allPhotos  = [];
 var _photoSort  = 'votes'; // 'votes' | 'date'
 var _galeriePhotos = [], _galerieIdx = 0, _galerieTimer = null, _galerieOpen = false;
+var _gyroMode = false, _gyroDebounce = null;
 
 // ── Tri ──────────────────────────────────────────────────────────
 function setPhotoSort(sort) {
@@ -253,16 +254,81 @@ function openGalerie(photoId) {
   _startGalerieAt(idx >= 0 ? idx : 0);
 }
 
-function _startGalerieAt(startIdx) {
+function _startGalerieAt(startIdx, gyro, gyroRot) {
   var ov = document.getElementById('ov-galerie-paysage');
   if (!ov) return;
   clearTimeout(_galerieTimer);
   _galerieOpen = true;
   _galerieIdx = startIdx;
   ov.style.display = 'block';
-  _enterFullscreenLandscape(ov);
+  if (gyro) {
+    _enterGyroMode(ov, gyroRot || 90);
+  } else {
+    _enterFullscreenLandscape(ov);
+  }
   _galerieStep(true);
   ov.addEventListener('click', _galerieClickHandler);
+}
+
+// ── Mode gyroscope (CSS rotation via DeviceOrientationEvent) ────
+// DeviceOrientationEvent se déclenche indépendamment du verrou OS.
+// Quand |gamma| > 65° pendant 500ms : on pivote le contenu en CSS.
+// Pas besoin de requestFullscreen ni de geste utilisateur.
+function _enterGyroMode(ov, rotation) {
+  _gyroMode = true;
+  ov.style.top = '50%';
+  ov.style.right = 'auto';
+  ov.style.bottom = 'auto';
+  ov.style.left = '50%';
+  ov.style.width = '100vh';
+  ov.style.height = '100vw';
+  ov.style.transform = 'translate(-50%, -50%) rotate(' + rotation + 'deg)';
+}
+
+function _exitGyroMode(ov) {
+  _gyroMode = false;
+  if (!ov) return;
+  ov.style.top = '0';
+  ov.style.right = '0';
+  ov.style.bottom = '0';
+  ov.style.left = '0';
+  ov.style.width = '';
+  ov.style.height = '';
+  ov.style.transform = '';
+}
+
+function _showGalerieGyro(rotation) {
+  if (!_allPhotos.length) {
+    fetch(_PHOTOS_API + '/photos')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        _allPhotos = d.photos || [];
+        _galeriePhotos = _allPhotos;
+        if (_galeriePhotos.length) _startGalerieAt(0, true, rotation);
+      })
+      .catch(function() {});
+    return;
+  }
+  _galeriePhotos = _getSorted();
+  _startGalerieAt(0, true, rotation);
+}
+
+function _onDeviceOrientation(e) {
+  if (_galerieOpen) return;
+  var gamma = e.gamma || 0;
+  var absGamma = Math.abs(gamma);
+  if (absGamma > 65) {
+    if (!_gyroDebounce) {
+      var rotation = gamma < 0 ? 90 : -90; // landscape-droite ou gauche
+      _gyroDebounce = setTimeout(function() {
+        _gyroDebounce = null;
+        if (!_galerieOpen) _showGalerieGyro(rotation);
+      }, 500);
+    }
+  } else {
+    if (_gyroDebounce) { clearTimeout(_gyroDebounce); _gyroDebounce = null; }
+    if (_gyroMode) _closeGaleriePaysage();
+  }
 }
 
 // Force le paysage : le WebAPK Android verrouille l'orientation portrait
@@ -311,8 +377,10 @@ function _closeGaleriePaysage() {
   if (ov) {
     ov.style.display = 'none';
     ov.removeEventListener('click', _galerieClickHandler);
+    if (_gyroMode) _exitGyroMode(ov);
   }
-  _exitFullscreenLandscape();
+  if (!_gyroMode) _exitFullscreenLandscape();
+  _gyroMode = false;
 }
 
 // Sortie du plein écran par geste système (retour Android, Échap) →
@@ -363,16 +431,22 @@ function _galerieStep(immediate) {
   }
 }
 
-// ── Listener orientation (diaporama automatique en paysage) ──────
+// ── Listener orientation (pour les appareils où la rotation est libre) ──
 var _landscapeMQ = window.matchMedia('(orientation: landscape)');
 function _onOrientationChange(e) {
-  // _galerieOpen : le lock('landscape') programmatique déclenche aussi ce
-  // listener — ne pas redémarrer le diaporama à la photo 0 dans ce cas.
-  if (e.matches) { if (!_galerieOpen) _showGaleriePaysage(); }
+  // Ignoré si le diaporama est déjà ouvert (évite redémarrage après lock)
+  // ou si on est en mode gyro (l'écran reste portrait, pas de changement)
+  if (_galerieOpen || _gyroMode) return;
+  if (e.matches) { _showGaleriePaysage(); }
   else           { _closeGaleriePaysage(); }
 }
 if (_landscapeMQ.addEventListener) {
   _landscapeMQ.addEventListener('change', _onOrientationChange);
 } else {
   _landscapeMQ.addListener(_onOrientationChange);
+}
+
+// ── Activation gyroscope ─────────────────────────────────────────
+if (window.DeviceOrientationEvent) {
+  window.addEventListener('deviceorientation', _onDeviceOrientation, { passive: true });
 }
