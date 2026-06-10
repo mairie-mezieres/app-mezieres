@@ -50,7 +50,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-widgets.js?v=4.4.3"></script>
 <script defer src="js/mat-agenda.js?v=4.3.2"></script>
 <script defer src="js/mat-forms.js?v=4.5.0"></script>
-<script defer src="js/mat-photos.js?v=1.0.0"></script>
+<script defer src="js/mat-photos.js?v=1.1.0"></script>
 <script defer src="js/mat-actus.js?v=4.4.4"></script>
 <script defer src="js/mat-trombi.js?v=4.2.6"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
@@ -150,7 +150,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.33 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.33.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -424,7 +424,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.33</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.33.1</button>
 </div>
 </div>
 </div>
@@ -1483,6 +1483,10 @@ et accompagnée des documents suivants :
 <button id="photo-upload-btn" onclick="submitPhoto()" style="width:100%;margin-top:8px;padding:10px;background:var(--forest);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">📤 Envoyer</button>
 <p style="font-size:.7rem;color:var(--muted);margin:6px 0 0;text-align:center">Visible après validation par la mairie.</p>
 </div>
+<div style="display:flex;gap:6px;margin-bottom:12px">
+<button id="photo-sort-votes" onclick="setPhotoSort('votes')" style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--forest);color:#fff;font-family:inherit;font-size:.78rem;font-weight:900;cursor:pointer">❤️ Les plus aimées</button>
+<button id="photo-sort-date"  onclick="setPhotoSort('date')"  style="flex:1;padding:7px;border:none;border-radius:8px;background:var(--mist);color:var(--text);font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer">🕐 Les plus récentes</button>
+</div>
 <div id="photos-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
 </div>
 </div>
@@ -1508,6 +1512,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.33.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Galerie photos&nbsp;: trier par &laquo;&nbsp;les plus aim&eacute;es&nbsp;&raquo; ou &laquo;&nbsp;les plus r&eacute;centes&nbsp;&raquo; en un clic</li>
+<li>Vos photos&nbsp;: un bouton 🗑️ apparaît sur les photos que vous avez soumises pour pouvoir les supprimer</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.33</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Nouvelle galerie &laquo;&nbsp;Vos photos&nbsp;&raquo; dans &laquo;&nbsp;Participez&nbsp;&raquo;&nbsp;: partagez vos photos de la commune, votez pour vos pr&eacute;f&eacute;r&eacute;es</li>
