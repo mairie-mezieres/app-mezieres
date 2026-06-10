@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.3.0
+   MAT — Galerie photos communautaires v1.3.1
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -261,6 +261,10 @@ function _startGalerieAt(startIdx, gyro, gyroRot) {
   _galerieOpen = true;
   _galerieIdx = startIdx;
   ov.style.display = 'block';
+  var hint = document.getElementById('galerie-hint');
+  if (hint) hint.textContent = gyro
+    ? 'Redressez le téléphone ou appuyez pour revenir'
+    : 'Appuyez pour revenir';
   if (gyro) {
     _enterGyroMode(ov, gyroRot || 90);
   } else {
@@ -314,9 +318,14 @@ function _showGalerieGyro(rotation) {
 }
 
 function _onDeviceOrientation(e) {
-  if (_galerieOpen) return;
   var gamma = e.gamma || 0;
   var absGamma = Math.abs(gamma);
+  if (_galerieOpen) {
+    // Retour à la verticale → fermeture (mode gyro uniquement).
+    // Hystérésis 65°/35° : évite l'oscillation ouverture/fermeture au seuil.
+    if (_gyroMode && absGamma < 35) _closeGaleriePaysage();
+    return;
+  }
   if (absGamma > 65) {
     if (!_gyroDebounce) {
       var rotation = gamma < 0 ? 90 : -90; // landscape-droite ou gauche
@@ -327,7 +336,6 @@ function _onDeviceOrientation(e) {
     }
   } else {
     if (_gyroDebounce) { clearTimeout(_gyroDebounce); _gyroDebounce = null; }
-    if (_gyroMode) _closeGaleriePaysage();
   }
 }
 
@@ -389,6 +397,13 @@ document.addEventListener('fullscreenchange', function() {
   if (!document.fullscreenElement && _galerieOpen) _closeGaleriePaysage();
 });
 
+// Compteur de cœurs + état voté du bouton ❤️ du diaporama.
+// photo référence l'objet de _allPhotos : votes y est tenu à jour par votePhoto.
+function _refreshGalerieVoteBtn(btn, photo) {
+  btn.textContent = '❤️ ' + (photo.votes || 0);
+  btn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
+}
+
 function _galerieStep(immediate) {
   if (!_galerieOpen || !_galeriePhotos.length) return;
   var photo = _galeriePhotos[_galerieIdx % _galeriePhotos.length];
@@ -407,10 +422,13 @@ function _galerieStep(immediate) {
 
     var voteBtn = document.getElementById('galerie-vote');
     if (voteBtn) {
-      voteBtn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
-      voteBtn.onclick = (function(pid) {
-        return function(e) { e.stopPropagation(); votePhoto(pid); };
-      }(photo.id));
+      _refreshGalerieVoteBtn(voteBtn, photo);
+      voteBtn.onclick = (function(p) {
+        return function(e) {
+          e.stopPropagation();
+          votePhoto(p.id).then(function() { _refreshGalerieVoteBtn(voteBtn, p); });
+        };
+      }(photo));
     }
 
     if (_galeriePhotos.length > 1) {
