@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.3.1
+   MAT — Galerie photos communautaires v1.3.2
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -44,7 +44,8 @@ function _clearPhotosBadge() {
 var _allPhotos  = [];
 var _photoSort  = 'votes'; // 'votes' | 'date'
 var _galeriePhotos = [], _galerieIdx = 0, _galerieTimer = null, _galerieOpen = false;
-var _gyroMode = false, _gyroDebounce = null;
+var _gyroMode = false, _gyroDebounce = null, _gyroRotDir = 90;
+var _touchStartX = 0, _touchStartY = 0;
 
 // ── Tri ──────────────────────────────────────────────────────────
 function setPhotoSort(sort) {
@@ -263,8 +264,10 @@ function _startGalerieAt(startIdx, gyro, gyroRot) {
   ov.style.display = 'block';
   var hint = document.getElementById('galerie-hint');
   if (hint) hint.textContent = gyro
-    ? 'Redressez le téléphone ou appuyez pour revenir'
-    : 'Appuyez pour revenir';
+    ? '← → Glisser · Redresser ou appuyer pour fermer'
+    : '← → Glisser pour naviguer · Appuyer pour fermer';
+  ov.addEventListener('touchstart', _galerieTouchStart, { passive: true });
+  ov.addEventListener('touchend', _galerieTouchEnd);
   if (gyro) {
     _enterGyroMode(ov, gyroRot || 90);
   } else {
@@ -280,6 +283,7 @@ function _startGalerieAt(startIdx, gyro, gyroRot) {
 // Pas besoin de requestFullscreen ni de geste utilisateur.
 function _enterGyroMode(ov, rotation) {
   _gyroMode = true;
+  _gyroRotDir = rotation;
   ov.style.top = '50%';
   ov.style.right = 'auto';
   ov.style.bottom = 'auto';
@@ -385,6 +389,8 @@ function _closeGaleriePaysage() {
   if (ov) {
     ov.style.display = 'none';
     ov.removeEventListener('click', _galerieClickHandler);
+    ov.removeEventListener('touchstart', _galerieTouchStart);
+    ov.removeEventListener('touchend', _galerieTouchEnd);
     if (_gyroMode) _exitGyroMode(ov);
   }
   if (!_gyroMode) _exitFullscreenLandscape();
@@ -396,6 +402,49 @@ function _closeGaleriePaysage() {
 document.addEventListener('fullscreenchange', function() {
   if (!document.fullscreenElement && _galerieOpen) _closeGaleriePaysage();
 });
+
+// ── Swipe pour naviguer ──────────────────────────────────────────
+function _galerieTouchStart(e) {
+  _touchStartX = e.changedTouches[0].clientX;
+  _touchStartY = e.changedTouches[0].clientY;
+}
+
+function _galerieTouchEnd(e) {
+  if (e.target && e.target.id === 'galerie-vote') return;
+  var dx = e.changedTouches[0].clientX - _touchStartX;
+  var dy = e.changedTouches[0].clientY - _touchStartY;
+  var adx = Math.abs(dx), ady = Math.abs(dy);
+
+  if (adx < 20 && ady < 20) {
+    _closeGaleriePaysage(); return; // tap → fermer
+  }
+
+  // En mode gyro, le contenu est pivoté : l'axe visuel horizontal = axe Y écran
+  // (inversé selon le sens de rotation). Hors gyro : axe X classique.
+  var navDelta;
+  if (_gyroMode) {
+    if (ady > adx) navDelta = _gyroRotDir === 90 ? -dy : dy;
+  } else {
+    if (adx > ady) navDelta = -dx;
+  }
+
+  if (navDelta !== undefined && Math.abs(navDelta) > 50) {
+    e.preventDefault(); // évite le click suivant
+    _galerieNavigate(navDelta > 0 ? 1 : -1);
+  }
+}
+
+function _galerieNavigate(dir) {
+  if (!_galeriePhotos.length) return;
+  clearTimeout(_galerieTimer);
+  var len = _galeriePhotos.length;
+  if (dir < 0) {
+    // Précédente : _galerieIdx pointe sur la suivante, donc -2 pour revenir en arrière
+    _galerieIdx = ((_galerieIdx - 2) % len + len) % len;
+  }
+  // dir > 0 : suivante, _galerieIdx pointe déjà dessus — rien à faire
+  _galerieStep(false);
+}
 
 // Compteur de cœurs + état voté du bouton ❤️ du diaporama.
 // photo référence l'objet de _allPhotos : votes y est tenu à jour par votePhoto.
