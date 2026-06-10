@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.31.0';
+const CACHE = 'mat-v4.33.1';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -34,7 +34,8 @@ const PRECACHE_URLS = [
   './js/mat-accessibility.js?v=4.3.8',
   './js/mat-widgets.js?v=4.4.3',
   './js/mat-agenda.js?v=4.3.2',
-  './js/mat-forms.js?v=4.4.1',
+  './js/mat-forms.js?v=4.5.0',
+  './js/mat-photos.js?v=1.1.0',
   './js/mat-actus.js?v=4.4.4',
   './js/mat-trombi.js?v=4.2.6',
   './js/mat-mel.js?v=4.3.4',
@@ -107,6 +108,30 @@ self.addEventListener('fetch', e => {
     url.includes('res.cloudinary.com') ||
     url.includes('data.education.gouv.fr')
   ) return;
+
+  // Web Share Target API — partage OS (photo depuis galerie → signalement MAT)
+  if (e.request.method === 'POST' && new URL(e.request.url).pathname.endsWith('/share-target')) {
+    e.respondWith((async () => {
+      try {
+        const fd = await e.request.formData();
+        const text = (fd.get('text') || fd.get('title') || '').trim();
+        const media = fd.get('media');
+        const params = new URLSearchParams({ 'share-open': '1' });
+        if (text) params.set('share-text', text);
+        if (media && media.size > 0) {
+          const shareCache = await caches.open('mat-share-v1');
+          await shareCache.put('./share-image', new Response(await media.arrayBuffer(), {
+            headers: { 'Content-Type': media.type || 'image/jpeg' }
+          }));
+          params.set('share-media', '1');
+        }
+        return Response.redirect('./?' + params.toString(), 303);
+      } catch (_) {
+        return Response.redirect('./', 303);
+      }
+    })());
+    return;
+  }
 
   // Hors-GET : laisser passer sans interception (POST same-origin éventuels)
   if (e.request.method !== 'GET') return;

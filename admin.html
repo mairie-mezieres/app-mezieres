@@ -188,6 +188,14 @@ tr:hover td{background:#f9fafb;}
 .mel-admin-json{background:var(--warm);border:1px solid var(--border);border-radius:12px;padding:12px;white-space:pre-wrap;font-size:0.7rem;color:var(--text);max-height:260px;overflow:auto;}
 @media(max-width:640px){.mel-admin-toolbar{align-items:flex-start;}.mel-admin-actions{width:100%;}.mel-admin-btn{flex:1;justify-content:center;text-align:center;padding:10px 12px;}}
 
+/* Galerie photos admin */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:20px;}
+.photo-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.photo-card.pending{border-color:#fbbf24;box-shadow:0 2px 12px rgba(251,191,36,0.18);}
+.photo-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--mist);display:block;}
+.photo-meta{padding:10px 12px;}
+.photo-actions{display:flex;gap:6px;padding:0 12px 12px;flex-wrap:wrap;}
+
 </style>
 <!-- Sentry — remplacez la chaîne vide par votre DSN admin pour activer le suivi d'erreurs -->
 <script>
@@ -242,6 +250,7 @@ tr:hover td{background:#f9fafb;}
     <button class="nav-tab" onclick="showTab('banner',this)">📢 Info/Alerte</button>
     <button class="nav-tab" onclick="showTab('signals',this)">🚨 Signalements</button>
     <button class="nav-tab" onclick="showTab('ideas',this)">💡 Idées</button>
+    <button class="nav-tab" onclick="showTab('photos',this)">📸 Photos</button>
     <button class="nav-tab" onclick="showTab('sondages',this)">🗳️ Sondages</button>
     <button class="nav-tab" onclick="showTab('docs',this)">📁 Documents</button>
     <button class="nav-tab" onclick="showTab('entreprises',this)">🛠️ Entreprises</button>
@@ -265,6 +274,7 @@ tr:hover td{background:#f9fafb;}
     <div class="tab-panel" id="tab-services"><div id="services-content"></div></div>
     <div class="tab-panel" id="tab-app"><div id="app-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-ideas"><div id="ideas-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
+    <div class="tab-panel" id="tab-photos"><div id="photos-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-actus"><div id="actus-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-signals"><div id="signals-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
     <div class="tab-panel" id="tab-mel"><div id="mel-content"><div class="loading"><div class="loading-spinner"></div><br>Chargement…</div></div></div>
@@ -543,7 +553,7 @@ async function apiPost(path, body) {
   return r.json();
 }
     
-function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderActus(); renderSignals(); renderBanner(); renderMigration(); renderPurge(); if(_melTreeEditor) renderMelAdmin(); }
+function renderAll() { renderOverview(); renderIa(); renderRedis(); renderServices(); renderApp(); renderIdeas(); renderPhotos(); renderActus(); renderSignals(); renderBanner(); renderMigration(); renderPurge(); if(_melTreeEditor) renderMelAdmin(); }
 
 // ── Helpers généraux ──────────────────
 function fmt(n) { return (n||0).toLocaleString('fr-FR'); }
@@ -1692,6 +1702,84 @@ function renderSignals() {
 async function deleteSignal(id) { if(!confirm('Supprimer ce signalement ?'))return; await apiDelete(`/admin/signals/${id}`); _data.signals=_data.signals.filter(s=>s.id!==id); renderSignals(); }
 
 // ══════════════════════════════════════════════════════════════
+// GALERIE PHOTOS — modération
+// ══════════════════════════════════════════════════════════════
+function renderPhotos() {
+  const photos = _data.photos || [];
+  const pending  = photos.filter(p => p.status === 'pending');
+  const approved = photos.filter(p => p.status === 'approved');
+
+  const pendingHtml = pending.length ? `
+    <div class="section-title" style="color:var(--orange)">⏳ En attente de modération (${pending.length})</div>
+    <div class="photo-grid">${pending.map(p => _photoCard(p)).join('')}</div>
+  ` : '';
+
+  const approvedHtml = `
+    <div class="section-title">✅ Photos approuvées (${approved.length})</div>
+    ${approved.length ? `<div class="photo-grid">${approved.map(p => _photoCard(p)).join('')}</div>`
+      : '<p style="color:var(--muted);font-size:0.82rem;padding-bottom:16px">Aucune photo approuvée</p>'}
+  `;
+
+  document.getElementById('photos-content').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+      <div class="section-title" style="margin:0">📸 Galerie photos (${photos.length} au total)</div>
+      <button onclick="reloadPhotos()" style="background:var(--warm);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:0.76rem;font-weight:800;cursor:pointer">🔄 Actualiser</button>
+    </div>
+    ${pendingHtml}${approvedHtml}
+  `;
+}
+
+function _photoCard(p) {
+  const isPending = p.status === 'pending';
+  const imgUrl = p.url ? p.url.replace('/upload/', '/upload/f_auto,q_auto,w_300,c_limit/') : '';
+  return `<div class="photo-card${isPending ? ' pending' : ''}">
+    ${imgUrl
+      ? `<img src="${safe(imgUrl)}" alt="" class="photo-thumb" loading="lazy">`
+      : `<div class="photo-thumb" style="display:flex;align-items:center;justify-content:center;font-size:2rem">📷</div>`}
+    <div class="photo-meta">
+      ${p.desc ? `<div style="font-size:0.78rem;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.4">${safe(p.desc)}</div>` : ''}
+      ${p.lieu ? `<div style="font-size:0.7rem;color:var(--muted)">📍 ${safe(p.lieu)}</div>` : ''}
+      <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
+        <span class="badge ${isPending ? 'badge-orange' : 'badge-green'}">${isPending ? '⏳ En attente' : '✅ Approuvée'}</span>
+        <span style="font-size:0.7rem;color:var(--muted)">❤️ ${p.votes||0}</span>
+        <span style="font-size:0.7rem;color:var(--muted)">${(p.date||'').slice(0,10)}</span>
+      </div>
+    </div>
+    <div class="photo-actions">
+      ${isPending ? `<button onclick="approvePhoto(${p.id})" style="background:var(--leaf);color:white;border:none;border-radius:8px;padding:6px 12px;font-size:0.76rem;font-weight:800;cursor:pointer;flex:1">✅ Approuver</button>` : ''}
+      <button onclick="deletePhoto(${p.id})" class="del-btn" style="flex:${isPending ? '0' : '1'}">🗑️ Supprimer</button>
+    </div>
+  </div>`;
+}
+
+async function approvePhoto(id) {
+  try {
+    const r = await apiPost(`/admin/photos/${id}/approve`, {});
+    if (!r.success) throw new Error(r.error || 'Erreur');
+    const idx = (_data.photos||[]).findIndex(p => p.id === id);
+    if (idx >= 0) _data.photos[idx].status = 'approved';
+    renderPhotos();
+  } catch(e) { alert('Erreur : ' + e.message); }
+}
+
+async function deletePhoto(id) {
+  if (!confirm('Supprimer cette photo ? Elle sera également supprimée de Cloudinary.')) return;
+  try {
+    await apiDelete(`/admin/photos/${id}`);
+    _data.photos = (_data.photos||[]).filter(p => p.id !== id);
+    renderPhotos();
+  } catch(e) { alert('Erreur : ' + e.message); }
+}
+
+async function reloadPhotos() {
+  try {
+    const r = await apiGet('/admin/photos');
+    _data.photos = r.photos || [];
+    renderPhotos();
+  } catch(e) { alert('Erreur : ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════════
 // CHARTS
 // ══════════════════════════════════════════════════════════════
 function renderLineChart(id, labels, datasets, opts) {
@@ -2488,8 +2576,8 @@ async function init() {
     const r=await fetch(`${API}/admin/dashboard`,{headers:{'x-admin-token':TOKEN},signal:AbortSignal.timeout(8000)});
     if(r.status===401){logout();return;} if(!r.ok)throw new Error(`dashboard ${r.status}`);
     const d=await r.json();
-    const[ideas,actus,signals]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals')]);
-    _data={dash:d,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[]};
+    const[ideas,actus,signals,photos]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals'),apiGet('/admin/photos').catch(()=>({photos:[]}))]);
+    _data={dash:d,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[],photos:photos.photos||[]};
     document.getElementById('login-screen').style.display='none';
     document.getElementById('admin-screen').style.display='block';
     document.getElementById('last-refresh').textContent=new Date().toLocaleTimeString('fr-FR');
@@ -2508,9 +2596,9 @@ async function loadAll() {
     const dashRes=await fetch(`${API}/admin/dashboard`,{headers:{'x-admin-token':TOKEN},signal:controller.signal});
     if(dashRes.status===401){clearTimeout(timer);logout();return;} if(!dashRes.ok){clearTimeout(timer);throw new Error(`dashboard ${dashRes.status}`);}
     const dash=await dashRes.json();
-    const[ideas,actus,signals]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals')]);
+    const[ideas,actus,signals,photos]=await Promise.all([apiGet('/admin/ideas'),apiGet('/admin/actus'),apiGet('/admin/signals'),apiGet('/admin/photos').catch(()=>({photos:[]}))]);
     clearTimeout(timer);
-    _data={dash,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[]};
+    _data={dash,ideas:ideas.ideas||[],actus:actus.actus||[],signals:signals.signals||[],photos:photos.photos||[]};
     document.getElementById('last-refresh').textContent=new Date().toLocaleTimeString('fr-FR');
     renderAll();
   }catch(e){console.warn('loadAll échoué:',e.message);document.getElementById('last-refresh').textContent='⚠️ Erreur — '+new Date().toLocaleTimeString('fr-FR');}
