@@ -49,7 +49,8 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.3"></script>
 <script defer src="js/mat-agenda.js?v=4.3.2"></script>
-<script defer src="js/mat-forms.js?v=4.4.1"></script>
+<script defer src="js/mat-forms.js?v=4.5.0"></script>
+<script defer src="js/mat-photos.js?v=1.0.0"></script>
 <script defer src="js/mat-actus.js?v=4.4.4"></script>
 <script defer src="js/mat-trombi.js?v=4.2.6"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
@@ -149,7 +150,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.32 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.33 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -279,6 +280,14 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
 <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
 </button>
+<button class="card" onclick="openPhotos()">
+<div class="ico" style="background:#fdf4ff">📸</div>
+<div class="ct"><div class="ct-label">Vos photos</div><div class="ct-sub">Galerie communale</div></div>
+</button>
+<button class="card simple-card" onclick="openContact()">
+<div class="ico ico-hab">💬</div>
+<div class="ct"><div class="ct-label">Contacter vos élus</div></div>
+</button>
 </div>
 <div class="sec">Signalements et Contacts</div>
 <div class="grid2">
@@ -292,17 +301,6 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct-label" id="iob-label">Signaler un bug</div>
 <div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
 </div>
-</button>
-</div>
-<hr style="margin:6px 0;border:none;border-top:1px solid var(--border)">
-<div class="grid2">
-<button class="card simple-card" onclick="openContact()">
-<div class="ico ico-hab">💬</div>
-<div class="ct"><div class="ct-label">Contacter vos élus</div></div>
-</button>
-<button class="card" onclick="openRgpd()">
-<div class="ico ico-rgpd">🔒</div>
-<div class="ct"><div class="ct-label">Vie privée</div><div class="ct-sub">Données &amp; RGPD</div></div>
 </button>
 </div>
 <div class="sec">Réseaux mairie et citoyens</div>
@@ -426,7 +424,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.32</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.33</button>
 </div>
 </div>
 </div>
@@ -638,7 +636,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div class="footer">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left">
 <span>MAT · Application officielle · Mézières-lez-Cléry</span>
-<a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;flex-shrink:0;letter-spacing:0">🔗 Partager</a>
+<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+<a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;letter-spacing:0">🔗 Partager</a>
+<button onclick="openRgpd()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🔒 RGPD</button>
+</div>
 </div>
 <div id="footer-perf" class="footer-perf"></div>
 </div>
@@ -1458,6 +1459,44 @@ et accompagnée des documents suivants :
 </div>
 </div>
 <script defer src="js/mat-desktop.js?v=4.1.3"></script>
+<div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
+<template data-lazy-ov>
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:#fdf4ff">📸</div>
+<div class="panel-title">Vos photos</div>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('photos')">✕</button>
+</div>
+<div class="panel-body">
+<div style="margin-bottom:16px;border:1px solid var(--border);border-radius:12px;padding:12px">
+<div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:10px">📤 Partager une photo de la commune</div>
+<div id="photo-upload-area" style="position:relative;border:2px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;min-height:120px;display:flex;align-items:center;justify-content:center;background:var(--mist)" onclick="document.getElementById('photo-upload-input').click()">
+<div id="photo-upload-placeholder" style="text-align:center;padding:20px;color:var(--muted)">
+<div style="font-size:2rem;margin-bottom:6px">📸</div>
+<div style="font-size:.78rem">Appuyez pour choisir une photo</div>
+</div>
+<img id="photo-upload-preview" style="display:none;width:100%;max-height:220px;object-fit:contain;border-radius:8px" alt="">
+</div>
+<input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="_previewPhotoUpload()">
+<input type="text" id="photo-upload-desc" placeholder="Description (facultatif)" style="width:100%;margin-top:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.82rem;font-family:inherit;background:var(--card);color:var(--text);box-sizing:border-box">
+<input type="text" id="photo-upload-lieu" placeholder="Lieu dans la commune (facultatif)" style="width:100%;margin-top:6px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.82rem;font-family:inherit;background:var(--card);color:var(--text);box-sizing:border-box">
+<button id="photo-upload-btn" onclick="submitPhoto()" style="width:100%;margin-top:8px;padding:10px;background:var(--forest);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer">📤 Envoyer</button>
+<p style="font-size:.7rem;color:var(--muted);margin:6px 0 0;text-align:center">Visible après validation par la mairie.</p>
+</div>
+<div id="photos-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+</div>
+</div>
+</template>
+</div>
+<div id="ov-galerie-paysage" style="display:none;position:fixed;inset:0;z-index:10000;background:#000;touch-action:manipulation">
+<div id="galerie-img" style="position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity .8s ease;opacity:0"></div>
+<div id="galerie-info" style="position:absolute;bottom:24px;left:20px;right:80px;pointer-events:none">
+<div id="galerie-lieu" style="font-size:.85rem;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.9)"></div>
+<div id="galerie-auteur" style="font-size:.72rem;color:rgba(255,255,255,.7);text-shadow:0 1px 4px rgba(0,0,0,.8);margin-top:2px"></div>
+</div>
+<button id="galerie-vote" style="position:absolute;bottom:20px;right:20px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:1.3rem;padding:10px 16px;border-radius:50px;cursor:pointer;backdrop-filter:blur(4px)">❤️</button>
+<div style="position:absolute;top:16px;right:16px;color:rgba(255,255,255,.45);font-size:.65rem;letter-spacing:.04em;pointer-events:none">Appuyez pour revenir</div>
+</div>
 <div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1469,6 +1508,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.33</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Nouvelle galerie &laquo;&nbsp;Vos photos&nbsp;&raquo; dans &laquo;&nbsp;Participez&nbsp;&raquo;&nbsp;: partagez vos photos de la commune, votez pour vos pr&eacute;f&eacute;r&eacute;es</li>
+<li>Mode paysage&nbsp;: basculez votre t&eacute;l&eacute;phone &agrave; l&rsquo;horizontale pour voir les photos en plein &eacute;cran &mdash; appuyez pour revenir &agrave; l&rsquo;app</li>
+<li>Interface&nbsp;: &laquo;&nbsp;Contacter vos &eacute;lus&nbsp;&raquo; d&eacute;sormais dans &laquo;&nbsp;Participez&nbsp;&raquo;, RGPD en lien discret dans le bas de page</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juin 2026 — v4.32</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Signalement depuis la galerie&nbsp;: choisissez MAT dans le menu &laquo;&nbsp;Partager&nbsp;&raquo; de votre t&eacute;l&eacute;phone pour envoyer une photo directement dans un signalement, sans ouvrir l&rsquo;app d&rsquo;abord</li>
