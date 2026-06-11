@@ -25,6 +25,9 @@ jobs:
         with:
           # Jeton d'abonnement Claude Pro/Max — généré en local avec `claude setup-token`
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Token explicite : évite l'échange OIDC avec la GitHub App Claude
+          # (qui exigerait la permission id-token: write et l'installation de l'app)
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
             --allowedTools "WebSearch,WebFetch,Write,Bash(date:*),Bash(gh label create:*),Bash(gh issue create:*)"
           prompt: |
