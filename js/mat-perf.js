@@ -32,7 +32,7 @@ async function loadPerfBadge() {
       `<span class="fp-sep">·</span>` +
       `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Accessibilité&nbsp;${d.accessibility}</span>` +
       `<span class="fp-sep">·</span>` +
-      `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Bonnes&nbsp;pratiques&nbsp;${d.bestPractices}</span>` +
+      `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Pratiques&nbsp;${d.bestPractices}</span>` +
       (dateStr ? `<span class="fp-sep">·</span><span class="fp-date">${dateStr}</span>` : '');
 
     els.forEach(el => { el.innerHTML = html; });
