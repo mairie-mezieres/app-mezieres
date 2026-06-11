@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.3.2
+   MAT — Galerie photos communautaires v1.3.3
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -453,6 +453,34 @@ function _refreshGalerieVoteBtn(btn, photo) {
   btn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
 }
 
+// Photo portrait sur écran paysage : background-size:cover ne montrerait
+// qu'une bande recadrée. On pivote la photo de 90° (div dimensionnée comme
+// le viewport tourné) + contain pour l'afficher en entier, plein écran.
+function _setGalerieImg(imgEl, url, isPortrait) {
+  var ov = document.getElementById('ov-galerie-paysage');
+  if (isPortrait && ov) {
+    imgEl.style.top = '50%';
+    imgEl.style.left = '50%';
+    imgEl.style.right = 'auto';
+    imgEl.style.bottom = 'auto';
+    imgEl.style.width = ov.clientHeight + 'px';
+    imgEl.style.height = ov.clientWidth + 'px';
+    imgEl.style.transform = 'translate(-50%,-50%) rotate(90deg)';
+    imgEl.style.backgroundSize = 'contain';
+  } else {
+    imgEl.style.top = '0';
+    imgEl.style.left = '0';
+    imgEl.style.right = '0';
+    imgEl.style.bottom = '0';
+    imgEl.style.width = '';
+    imgEl.style.height = '';
+    imgEl.style.transform = '';
+    imgEl.style.backgroundSize = 'cover';
+  }
+  imgEl.style.backgroundImage = 'url(\'' + url.replace(/'/g, "\\'") + '\')';
+  imgEl.style.opacity = '1';
+}
+
 function _galerieStep(immediate) {
   if (!_galerieOpen || !_galeriePhotos.length) return;
   var photo = _galeriePhotos[_galerieIdx % _galeriePhotos.length];
@@ -461,8 +489,10 @@ function _galerieStep(immediate) {
 
   function show() {
     var url = (typeof matCloudImg === 'function') ? matCloudImg(photo.url, 1400) : photo.url;
-    imgEl.style.backgroundImage = 'url(\'' + url.replace(/'/g, "\\'") + '\')';
-    imgEl.style.opacity = '1';
+    var probe = new Image();
+    probe.onload  = function() { _setGalerieImg(imgEl, url, probe.naturalHeight > probe.naturalWidth); };
+    probe.onerror = function() { _setGalerieImg(imgEl, url, false); };
+    probe.src = url;
 
     var lieu   = document.getElementById('galerie-lieu');
     var auteur = document.getElementById('galerie-auteur');
