@@ -453,30 +453,34 @@ function _refreshGalerieVoteBtn(btn, photo) {
   btn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
 }
 
-// Photo portrait sur écran paysage : background-size:cover ne montrerait
-// qu'une bande recadrée. On pivote la photo de 90° (div dimensionnée comme
-// le viewport tourné) + contain pour l'afficher en entier, plein écran.
+// Photo portrait sur écran paysage : rotate(-90deg) pour que le bas de la
+// photo reste vers le bas du téléphone. En mode gyro l'overlay est déjà
+// rotaté → contain sans rotation supplémentaire pour éviter le double pivot.
 function _setGalerieImg(imgEl, url, isPortrait) {
   var ov = document.getElementById('ov-galerie-paysage');
-  if (isPortrait && ov) {
+  // Reset
+  imgEl.style.top = '0';
+  imgEl.style.left = '0';
+  imgEl.style.right = '0';
+  imgEl.style.bottom = '0';
+  imgEl.style.width = '';
+  imgEl.style.height = '';
+  imgEl.style.transform = '';
+  imgEl.style.backgroundSize = 'cover';
+
+  if (isPortrait && !_gyroMode && ov) {
     imgEl.style.top = '50%';
     imgEl.style.left = '50%';
     imgEl.style.right = 'auto';
     imgEl.style.bottom = 'auto';
     imgEl.style.width = ov.clientHeight + 'px';
     imgEl.style.height = ov.clientWidth + 'px';
-    imgEl.style.transform = 'translate(-50%,-50%) rotate(90deg)';
+    imgEl.style.transform = 'translate(-50%,-50%) rotate(-90deg)';
     imgEl.style.backgroundSize = 'contain';
-  } else {
-    imgEl.style.top = '0';
-    imgEl.style.left = '0';
-    imgEl.style.right = '0';
-    imgEl.style.bottom = '0';
-    imgEl.style.width = '';
-    imgEl.style.height = '';
-    imgEl.style.transform = '';
-    imgEl.style.backgroundSize = 'cover';
+  } else if (isPortrait) {
+    imgEl.style.backgroundSize = 'contain';
   }
+
   imgEl.style.backgroundImage = 'url(\'' + url.replace(/'/g, "\\'") + '\')';
   imgEl.style.opacity = '1';
 }

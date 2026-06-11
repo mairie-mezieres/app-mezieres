@@ -26,14 +26,12 @@ async function loadPerfBadge() {
 
     const html =
       (showEco
-        ? `<span class="fp-eco" style="color:${col}" title="Éco-index : sobriété numérique (poids, DOM, requêtes) — ${d.ecoindex}/100, note ${d.grade}">🌿&nbsp;Éco&nbsp;${d.grade}&nbsp;${d.ecoindex}</span><span class="fp-sep">·</span>`
+        ? `<span class="fp-eco" style="color:${col}" title="Éco-index : sobriété numérique (poids, DOM, requêtes) — ${d.ecoindex}/100, note ${d.grade}">🌿&nbsp;Éco&nbsp;${d.grade}&nbsp;${d.ecoindex}</span>`
         : '') +
-      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Performance&nbsp;${d.performance}</span>` +
-      `<span class="fp-sep">·</span>` +
-      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Accessibilité&nbsp;${d.accessibility}</span>` +
-      `<span class="fp-sep">·</span>` +
+      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Perf&nbsp;${d.performance}</span>` +
+      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Access&nbsp;${d.accessibility}</span>` +
       `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Pratiques&nbsp;${d.bestPractices}</span>` +
-      (dateStr ? `<span class="fp-sep">·</span><span class="fp-date">${dateStr}</span>` : '');
+      (dateStr ? `<span class="fp-date">${dateStr}</span>` : '');
 
     els.forEach(el => { el.innerHTML = html; });
   } catch (_) {}
