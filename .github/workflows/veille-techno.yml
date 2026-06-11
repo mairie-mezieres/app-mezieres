@@ -1,0 +1,63 @@
+name: Veille technologique MAT
+
+on:
+  schedule:
+    # Tous les lundis à 06h00 UTC (08h00 Paris été / 07h00 hiver)
+    - cron: '0 6 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  veille:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Veille avec Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Jeton d'abonnement Claude Pro/Max — généré en local avec `claude setup-token`
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --allowedTools "WebSearch,WebFetch,Write,Bash(date:*),Bash(gh label create:*),Bash(gh issue create:*)"
+          prompt: |
+            Tu es un agent de veille technologique pour MAT (Mézières Avec Toi), une PWA municipale française.
+
+            Stack technique de la PWA :
+            - Frontend : PWA vanilla JS hébergée sur GitHub Pages, Service Worker, notifications push web
+            - Backend : Node.js / Express hébergé sur Render.com
+            - Base de données : Upstash Redis (REST API)
+            - IA : Mistral AI (chatbot principal), Claude Haiku (fallback)
+            - Cartographie : Leaflet.js + GeoJSON (randonnée, PLU)
+            - Intégrations : Trello, Facebook Graph API, Google Calendar, Open-Meteo, Météo-France, IGN Apicarto, api-adresse.data.gouv.fr, Cloudinary
+            - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
+            Contexte : portail citoyen d'une commune rurale française de moins de 1 000 habitants, audience majoritairement séniors, exigences fortes d'accessibilité et de souveraineté numérique.
+
+            Effectue des recherches web récentes (moins de 30 jours si possible) et rédige un rapport de veille en français, en Markdown, structuré ainsi :
+
+            ## 1. Mises à jour du stack
+            Nouvelles versions, breaking changes, failles de sécurité ou dépréciations concernant : Leaflet.js, Node.js/Express, Upstash Redis, Render, GitHub Pages/Actions, API Mistral, API Anthropic, Service Workers / PWA (Chrome, Safari iOS), Playwright, Sentry.
+
+            ## 2. Innovations civic-tech et communes
+            Nouvelles fonctionnalités vues dans d'autres applications de communes françaises ou portails citoyens (France ou Europe) qui pourraient inspirer une commune rurale : participation citoyenne, accessibilité séniors, IA souveraine, signalements, etc.
+
+            ## 3. Accessibilité et séniors
+            Évolutions des bonnes pratiques, RGAA, outils ou patterns UX pertinents pour un public âgé.
+
+            ## 4. Recommandations actionnables
+            3 à 5 actions concrètes, priorisées (haute / moyenne / basse), avec effort estimé.
+
+            Règles : cite tes sources (liens), reste factuel, ne mentionne que des informations vérifiées par recherche web. Si une section n'a rien de nouveau cette semaine, indique-le brièvement.
+
+            Une fois le rapport rédigé, publie-le en issue GitHub :
+            1. Écris le rapport dans un fichier `rapport-veille.md`, en terminant par la ligne :
+               `---` puis `*Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web).*`
+            2. Assure-toi que le label existe : `gh label create veille --color "0E8A16" --description "Rapport de veille technologique" --force`
+            3. Crée l'issue : `gh issue create --title "Veille technologique MAT - <date du jour au format JJ mois AAAA, obtenue avec la commande date>" --label veille --body-file rapport-veille.md`
