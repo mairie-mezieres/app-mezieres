@@ -26,7 +26,6 @@ jobs:
           # Facebook/Instagram bloquent les robots → exclus pour éviter les faux positifs.
           args: >-
             --no-progress
-            --exclude-mail
             --max-retries 2
             --exclude 'facebook\.com'
             --exclude 'instagram\.com'
