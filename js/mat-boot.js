@@ -49,6 +49,12 @@
     .then(function(d){ window._matFeatures = d; })
     .catch(function(){}); // dégradé : window._matFeatures reste undefined → réactions activées
 
+  // 7c) Photo MAT & MEL personnalisée (saison/occasion) — définie depuis l'admin
+  fetch('https://chatbot-mairie-mezieres.onrender.com/config/mascotte',{signal:matAbortTimeout(5000)})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (d && d.active && d.url && typeof applyMascotte === 'function') applyMascotte(d.url); })
+    .catch(function(){}); // dégradé : image MAT & MEL par défaut conservée
+
   // 8) Protection email mairie (déobfuscation)
   try { initMailProtection(); } catch(e){}
 
