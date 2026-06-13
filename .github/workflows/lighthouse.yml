@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Lighthouse CI
         id: lhci
@@ -36,7 +36,7 @@ jobs:
           temporaryPublicStorage: true
 
       - name: Installer Node.js pour eco-index
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -46,7 +46,7 @@ jobs:
           GITHUB_WORKSPACE: ${{ github.workspace }}
 
       - name: Publier le rapport Eco-index
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rapport-ecoindex
           path: rapport-ecoindex.md
