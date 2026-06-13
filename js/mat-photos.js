@@ -453,12 +453,11 @@ function _refreshGalerieVoteBtn(btn, photo) {
   btn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
 }
 
-// Photo portrait sur écran paysage : rotate(-90deg) pour que le bas de la
-// photo reste vers le bas du téléphone. En mode gyro l'overlay est déjà
-// rotaté → contain sans rotation supplémentaire pour éviter le double pivot.
-function _setGalerieImg(imgEl, url, isPortrait) {
-  var ov = document.getElementById('ov-galerie-paysage');
-  // Reset
+// Affiche la photo en plein écran (background-size: cover), sans rotation
+// automatique : chaque photo conserve son orientation d'origine. La détection
+// portrait/paysage (probe) a été retirée car elle pivotait à tort certaines
+// photos paysage (orientation EXIF mal interprétée).
+function _setGalerieImg(imgEl, url) {
   imgEl.style.top = '0';
   imgEl.style.left = '0';
   imgEl.style.right = '0';
@@ -467,20 +466,6 @@ function _setGalerieImg(imgEl, url, isPortrait) {
   imgEl.style.height = '';
   imgEl.style.transform = '';
   imgEl.style.backgroundSize = 'cover';
-
-  if (isPortrait && !_gyroMode && ov) {
-    imgEl.style.top = '50%';
-    imgEl.style.left = '50%';
-    imgEl.style.right = 'auto';
-    imgEl.style.bottom = 'auto';
-    imgEl.style.width = ov.clientHeight + 'px';
-    imgEl.style.height = ov.clientWidth + 'px';
-    imgEl.style.transform = 'translate(-50%,-50%) rotate(-90deg)';
-    imgEl.style.backgroundSize = 'contain';
-  } else if (isPortrait) {
-    imgEl.style.backgroundSize = 'contain';
-  }
-
   imgEl.style.backgroundImage = 'url(\'' + url.replace(/'/g, "\\'") + '\')';
   imgEl.style.opacity = '1';
 }
@@ -493,10 +478,7 @@ function _galerieStep(immediate) {
 
   function show() {
     var url = (typeof matCloudImg === 'function') ? matCloudImg(photo.url, 1400) : photo.url;
-    var probe = new Image();
-    probe.onload  = function() { _setGalerieImg(imgEl, url, probe.naturalHeight > probe.naturalWidth); };
-    probe.onerror = function() { _setGalerieImg(imgEl, url, false); };
-    probe.src = url;
+    _setGalerieImg(imgEl, url);
 
     var lieu   = document.getElementById('galerie-lieu');
     var auteur = document.getElementById('galerie-auteur');
