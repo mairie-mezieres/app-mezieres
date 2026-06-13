@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
   veille:
@@ -20,8 +19,6 @@ jobs:
 
       - name: Veille avec Claude Code
         uses: anthropics/claude-code-action@v1
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Jeton d'abonnement Claude Pro/Max — généré en local avec `claude setup-token`
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -29,7 +26,7 @@ jobs:
           # (qui exigerait la permission id-token: write et l'installation de l'app)
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
-            --allowedTools "WebSearch,WebFetch,Write,Bash(date:*),Bash(gh label create:*),Bash(gh issue create:*)"
+            --allowedTools "WebSearch,WebFetch,Write"
           prompt: |
             Tu es un agent de veille technologique pour MAT (Mézières Avec Toi), une PWA municipale française.
 
@@ -43,7 +40,7 @@ jobs:
             - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
             Contexte : portail citoyen d'une commune rurale française de moins de 1 000 habitants, audience majoritairement séniors, exigences fortes d'accessibilité et de souveraineté numérique.
 
-            Effectue des recherches web récentes (moins de 30 jours si possible) et rédige un rapport de veille en français, en Markdown, structuré ainsi :
+            Effectue des recherches web récentes (moins de 30 jours si possible) et rédige un rapport de veille en français, structuré ainsi :
 
             ## 1. Mises à jour du stack
             Nouvelles versions, breaking changes, failles de sécurité ou dépréciations concernant : Leaflet.js, Node.js/Express, Upstash Redis, Render, GitHub Pages/Actions, API Mistral, API Anthropic, Service Workers / PWA (Chrome, Safari iOS), Playwright, Sentry.
@@ -57,10 +54,22 @@ jobs:
             ## 4. Recommandations actionnables
             3 à 5 actions concrètes, priorisées (haute / moyenne / basse), avec effort estimé.
 
-            Règles : cite tes sources (liens), reste factuel, ne mentionne que des informations vérifiées par recherche web. Si une section n'a rien de nouveau cette semaine, indique-le brièvement.
+            Règles de contenu : cite tes sources (liens cliquables), reste factuel, ne mentionne que des informations vérifiées par recherche web. Si une section n'a rien de nouveau cette semaine, indique-le brièvement.
 
-            Une fois le rapport rédigé, publie-le en issue GitHub :
-            1. Écris le rapport dans un fichier `rapport-veille.md`, en terminant par la ligne :
-               `---` puis `*Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web).*`
-            2. Assure-toi que le label existe : `gh label create veille --color "0E8A16" --description "Rapport de veille technologique" --force`
-            3. Crée l'issue : `gh issue create --title "Veille technologique MAT - <date du jour au format JJ mois AAAA, obtenue avec la commande date>" --label veille --body-file rapport-veille.md`
+            IMPORTANT — mise en forme du livrable :
+            Écris le rapport directement dans un fichier `rapport-veille.html` (et nulle part ailleurs) sous forme d'un document HTML complet et autonome, optimisé pour la lecture dans un client email (Gmail, Outlook, Mail iOS). Contraintes :
+            - Document HTML complet : `<!DOCTYPE html>`, `<html lang="fr">`, `<head>` avec `<meta charset="utf-8">`, et tout le contenu dans `<body>`.
+            - Tous les styles en CSS INLINE (attribut `style="..."` sur chaque balise) — pas de balise `<style>` ni de CSS externe, car de nombreux clients email les ignorent.
+            - Contenu centré dans un conteneur de largeur maximale 640px.
+            - Lisibilité séniors : police sans-serif, taille de base 16px minimum, titres bien contrastés, interligne aéré (line-height 1.6), liens soulignés et de couleur foncée distincte.
+            - Un en-tête avec le titre « Veille technologique MAT » et la date du jour en français.
+            - Les 4 sections avec des titres clairs (`<h2>`), listes à puces lisibles, et une pastille de priorité (haute/moyenne/basse) bien visible dans la section recommandations.
+            - Terminer par un pied de page discret : « Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web). »
+            N'utilise que l'outil Write pour créer ce fichier. Ne crée aucune issue, ne fais aucun commit.
+
+      - name: Envoyer le rapport par email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.VEILLE_EMAIL_FROM }}
+        run: node scripts/send-veille-email.js
