@@ -1,0 +1,44 @@
+name: Détection de liens morts
+
+on:
+  schedule:
+    # Tous les lundis à 07h00 UTC
+    - cron: '0 7 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  liens-morts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Vérifier les liens
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # On vérifie les pages HTML de l'application (pas les libs vendor ni les tests).
+          # Facebook/Instagram bloquent les robots → exclus pour éviter les faux positifs.
+          args: >-
+            --no-progress
+            --exclude-mail
+            --max-retries 2
+            --exclude 'facebook\.com'
+            --exclude 'instagram\.com'
+            index.html admin.html architecture.html notif.html offline.html partager.html
+          format: markdown
+          output: ./lychee/rapport.md
+          fail: false
+
+      - name: Créer une issue si des liens sont cassés
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 🔗 Liens morts détectés sur le site
+          content-filepath: ./lychee/rapport.md
+          labels: liens-morts
