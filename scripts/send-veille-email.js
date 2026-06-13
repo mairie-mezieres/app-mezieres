@@ -3,9 +3,10 @@
  * Lit le fichier rapport-veille.html généré par Claude Code et l'envoie.
  *
  * Variables d'environnement requises :
- *   RESEND_API_KEY    - clé API Resend (secret)
+ *   RESEND_API_KEY    - clé API Resend (secret, partagée avec le chatbot)
  *   EMAIL_TO          - adresse destinataire (secret VEILLE_EMAIL_TO)
- *   EMAIL_FROM        - adresse expéditrice (optionnel, défaut onboarding@resend.dev)
+ *   RESEND_FROM       - adresse expéditrice (optionnel, même convention que le
+ *                       chatbot ; défaut « MAT Veille <onboarding@resend.dev> »)
  *
  * Node 20+ requis (fetch global). Aucune dépendance externe.
  */
@@ -14,7 +15,7 @@ const fs = require('fs');
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_TO = process.env.EMAIL_TO;
-const EMAIL_FROM = (process.env.EMAIL_FROM || 'onboarding@resend.dev').trim();
+const EMAIL_FROM = (process.env.RESEND_FROM || 'MAT Veille <onboarding@resend.dev>').trim();
 
 if (!RESEND_API_KEY || !EMAIL_TO) {
   console.error('Variables manquantes : RESEND_API_KEY et/ou VEILLE_EMAIL_TO (EMAIL_TO).');

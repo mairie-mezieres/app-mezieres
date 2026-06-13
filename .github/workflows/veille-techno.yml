@@ -17,6 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Date du jour
+        id: now
+        run: |
+          echo "iso=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          echo "year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
+
       - name: Veille avec Claude Code
         uses: anthropics/claude-code-action@v1
         with:
@@ -40,7 +46,15 @@ jobs:
             - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
             Contexte : portail citoyen d'une commune rurale française de moins de 1 000 habitants, audience majoritairement séniors, exigences fortes d'accessibilité et de souveraineté numérique.
 
-            Effectue des recherches web récentes (moins de 30 jours si possible) et rédige un rapport de veille en français, structuré ainsi :
+            ⚠️ FRAÎCHEUR DE L'INFORMATION (impératif) :
+            - Nous sommes aujourd'hui le ${{ steps.now.outputs.iso }}. Tu ne dois rapporter QUE des informations publiées au cours des 30 derniers jours précédant cette date.
+            - N'inclus AUCUNE information antérieure à l'année ${{ steps.now.outputs.year }}. Pas de rétrospective, pas de « rappels » d'anciennes versions, rien qui date de plus d'un mois.
+            - Pour CHAQUE information rapportée, indique sa date de publication (ex. « (publié le 5 juin ${{ steps.now.outputs.year }}) »). Si tu ne peux pas dater une information ou qu'elle a plus de 30 jours, ne l'inclus pas.
+            - Dans tes recherches web, privilégie explicitement les actualités du mois en cours et formule tes requêtes avec l'année ${{ steps.now.outputs.year }}.
+            - Si une section n'a vraiment rien de récent cette semaine, écris-le clairement (« Rien de notable cette semaine ») plutôt que de la remplir avec du contenu ancien.
+            - CHAQUE affirmation doit être accompagnée d'un lien cliquable (balise <a href="URL">) vers la source d'origine, pour que le lecteur puisse y accéder directement.
+
+            Effectue des recherches web récentes (moins de 30 jours) et rédige un rapport de veille en français, structuré ainsi :
 
             ## 1. Mises à jour du stack
             Nouvelles versions, breaking changes, failles de sécurité ou dépréciations concernant : Leaflet.js, Node.js/Express, Upstash Redis, Render, GitHub Pages/Actions, API Mistral, API Anthropic, Service Workers / PWA (Chrome, Safari iOS), Playwright, Sentry.
@@ -64,12 +78,13 @@ jobs:
             - Lisibilité séniors : police sans-serif, taille de base 16px minimum, titres bien contrastés, interligne aéré (line-height 1.6), liens soulignés et de couleur foncée distincte.
             - Un en-tête avec le titre « Veille technologique MAT » et la date du jour en français.
             - Les 4 sections avec des titres clairs (`<h2>`), listes à puces lisibles, et une pastille de priorité (haute/moyenne/basse) bien visible dans la section recommandations.
+            - Chaque lien doit être une vraie balise `<a href="URL">texte</a>` cliquable, en couleur foncée et soulignée, ouvrant la source d'origine.
             - Terminer par un pied de page discret : « Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web). »
             N'utilise que l'outil Write pour créer ce fichier. Ne crée aucune issue, ne fais aucun commit.
 
       - name: Envoyer le rapport par email
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
           EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
-          EMAIL_FROM: ${{ secrets.VEILLE_EMAIL_FROM }}
         run: node scripts/send-veille-email.js
