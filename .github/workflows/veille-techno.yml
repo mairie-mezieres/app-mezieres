@@ -88,6 +88,12 @@ jobs:
       - name: Envoyer le rapport par email
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          RESEND_FROM: ${{ secrets.RESEND_FROM }}
+          # Expéditeur volontairement figé sur le sender de test Resend
+          # (onboarding@resend.dev, défaut du script). Tant que le domaine
+          # mezieres-lez-clery.fr n'est pas vérifié sur Resend, c'est le seul
+          # « from » utilisable ; il n'autorise l'envoi que vers l'adresse du
+          # compte Resend (cf. secret VEILLE_EMAIL_TO). Ne pas réintroduire de
+          # secret RESEND_FROM avec une adresse Gmail : Resend la rejette
+          # (domaine non vérifié → 403).
           EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
         run: node scripts/send-veille-email.js
