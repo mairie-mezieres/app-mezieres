@@ -1,0 +1,37 @@
+name: Sauvegarde Upstash (réplication)
+
+on:
+  schedule:
+    # Tous les lundis à 05h00 UTC
+    - cron: '0 5 * * 1'
+  workflow_dispatch: {}
+
+# Le workflow ne fait qu'appeler une URL externe : aucune permission GitHub requise.
+permissions: {}
+
+jobs:
+  sauvegarde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Déclencher la réplication Upstash
+        env:
+          # Seul secret nécessaire : la clé de déclenchement (PAS les identifiants Upstash,
+          # qui restent côté Render). Même valeur que CRON_SECRET sur Render.
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Secret CRON_SECRET manquant dans le dépôt."
+            exit 1
+          fi
+          # --max-time large : l'offre gratuite Render peut mettre ~1 min à se réveiller.
+          code=$(curl -sS --max-time 300 -o response.json -w '%{http_code}' \
+            "https://chatbot-mairie-mezieres.onrender.com/cron/backup?key=$CRON_SECRET")
+          echo "HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::Échec de la réplication (HTTP $code)"
+            cat response.json || true
+            exit 1
+          fi
+          # La réponse ne contient que des compteurs (rien de sensible).
+          echo "Réplication OK : $(cat response.json)"

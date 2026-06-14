@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Vérifier les liens
         id: lychee
@@ -26,7 +26,6 @@ jobs:
           # Facebook/Instagram bloquent les robots → exclus pour éviter les faux positifs.
           args: >-
             --no-progress
-            --exclude-mail
             --max-retries 2
             --exclude 'facebook\.com'
             --exclude 'instagram\.com'
@@ -37,7 +36,7 @@ jobs:
 
       - name: Créer une issue si des liens sont cassés
         if: steps.lychee.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: 🔗 Liens morts détectés sur le site
           content-filepath: ./lychee/rapport.md

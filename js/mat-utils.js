@@ -61,6 +61,21 @@ function matCloudImg(url, width) {
   return url.replace('/image/upload/', '/image/upload/' + t + '/');
 }
 
+// ── Photo MAT & MEL personnalisée (saison/occasion) ──────────────
+// Remplace l'illustration MAT & MEL (splash, tuile d'accueil, majordome,
+// indicateur MEL) par une variante définie depuis l'admin. Repli automatique
+// sur l'image par défaut si l'URL personnalisée échoue à charger.
+function applyMascotte(url) {
+  if (!url) return;
+  var imgs = document.querySelectorAll('.splash-logo, .mat-img, .d-mel-img, .majordome-img');
+  for (var i = 0; i < imgs.length; i++) {
+    (function(img) {
+      img.onerror = function() { img.onerror = null; img.src = 'img/MAT et MEL.webp'; };
+      img.src = url;
+    })(imgs[i]);
+  }
+}
+
 // ── Validation URL pour href ─────────────────────────────────
 // esc() échappe HTML mais PAS javascript:/data: URLs. safeHref valide
 // que le protocole est http(s) avant d'autoriser l'injection dans un
