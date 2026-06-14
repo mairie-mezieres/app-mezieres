@@ -44,10 +44,6 @@ function _clearPhotosBadge() {
 var _allPhotos  = [];
 var _photoSort  = 'votes'; // 'votes' | 'date'
 var _galeriePhotos = [], _galerieIdx = 0, _galerieTimer = null, _galerieOpen = false;
-var _gyroMode = false, _gyroDebounce = null, _gyroRotDir = 90;
-// Verrou anti-réouverture : passe à true quand on ferme manuellement (tap) le
-// diaporama, pour ne pas le rouvrir tant qu'on n'est pas repassé en portrait.
-var _galerieDismissed = false;
 var _touchStartX = 0, _touchStartY = 0;
 
 // ── Tri ──────────────────────────────────────────────────────────
@@ -73,8 +69,8 @@ function _getSorted() {
 }
 
 // ── Diaporama direct depuis la tuile (page principale) ───────────
-// Contourne le verrou WebAPK Android : fullscreen + orientation.lock
-// depuis un geste utilisateur — pas besoin de tourner l'écran.
+// Lancement manuel : ouvre le diaporama plein écran (s'adapte à l'orientation
+// de l'écran). Aucun capteur d'inclinaison n'est utilisé.
 function launchDiapo() {
   if (!_allPhotos.length) {
     fetch(_PHOTOS_API + '/photos')
@@ -248,8 +244,8 @@ async function submitPhoto() {
 }
 
 // ── Lightbox / Galerie plein écran ───────────────────────────────
-// Ouvre le diaporama en commençant par la photo dont l'id est fourni.
-// Appelée au tap sur une photo dans la grille ET à la rotation paysage.
+// Ouvre le diaporama en commençant par la photo dont l'id est fourni
+// (au tap sur une photo de la grille). Lancement manuel uniquement.
 function openGalerie(photoId) {
   if (!_allPhotos.length) return;
   var sorted = _getSorted();
@@ -258,7 +254,7 @@ function openGalerie(photoId) {
   _startGalerieAt(idx >= 0 ? idx : 0);
 }
 
-function _startGalerieAt(startIdx, gyro, gyroRot) {
+function _startGalerieAt(startIdx) {
   var ov = document.getElementById('ov-galerie-paysage');
   if (!ov) return;
   clearTimeout(_galerieTimer);
@@ -266,129 +262,28 @@ function _startGalerieAt(startIdx, gyro, gyroRot) {
   _galerieIdx = startIdx;
   ov.style.display = 'block';
   var hint = document.getElementById('galerie-hint');
-  if (hint) hint.textContent = gyro
-    ? '← → Glisser · Redresser ou appuyer pour fermer'
-    : '← → Glisser pour naviguer · Appuyer pour fermer';
+  if (hint) hint.textContent = '← → Glisser pour naviguer · Appuyer pour fermer';
   ov.addEventListener('touchstart', _galerieTouchStart, { passive: true });
   ov.addEventListener('touchend', _galerieTouchEnd);
-  if (gyro) {
-    _enterGyroMode(ov, gyroRot || 90);
-  } else {
-    _enterFullscreenLandscape(ov);
-  }
+  _enterFullscreen(ov);
   _galerieStep(true);
   ov.addEventListener('click', _galerieClickHandler);
 }
 
-// ── Mode gyroscope (CSS rotation via DeviceOrientationEvent) ────
-// DeviceOrientationEvent se déclenche indépendamment du verrou OS.
-// Quand |gamma| > 65° pendant 500ms : on pivote le contenu en CSS.
-// Pas besoin de requestFullscreen ni de geste utilisateur.
-function _enterGyroMode(ov, rotation) {
-  _gyroMode = true;
-  _gyroRotDir = rotation;
-  ov.style.top = '50%';
-  ov.style.right = 'auto';
-  ov.style.bottom = 'auto';
-  ov.style.left = '50%';
-  ov.style.width = '100vh';
-  ov.style.height = '100vw';
-  ov.style.transform = 'translate(-50%, -50%) rotate(' + rotation + 'deg)';
+// Affichage immersif : plein écran si le navigateur l'autorise (geste
+// utilisateur). Aucun verrouillage d'orientation — le diaporama s'adapte à
+// l'orientation de l'écran (portrait ou paysage), chaque photo étant affichée
+// en entier (voir _setGalerieImg → background-size: contain).
+function _enterFullscreen(ov) {
+  try { if (ov.requestFullscreen) ov.requestFullscreen().catch(function() {}); } catch(_) {}
 }
 
-function _exitGyroMode(ov) {
-  _gyroMode = false;
-  if (!ov) return;
-  ov.style.top = '0';
-  ov.style.right = '0';
-  ov.style.bottom = '0';
-  ov.style.left = '0';
-  ov.style.width = '';
-  ov.style.height = '';
-  ov.style.transform = '';
-}
-
-function _showGalerieGyro(rotation) {
-  if (!_allPhotos.length) {
-    fetch(_PHOTOS_API + '/photos')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        _allPhotos = d.photos || [];
-        _galeriePhotos = _allPhotos;
-        if (_galeriePhotos.length) _startGalerieAt(0, true, rotation);
-      })
-      .catch(function() {});
-    return;
-  }
-  _galeriePhotos = _getSorted();
-  _startGalerieAt(0, true, rotation);
-}
-
-function _onDeviceOrientation(e) {
-  var gamma = e.gamma || 0;
-  var absGamma = Math.abs(gamma);
-  if (_galerieOpen) {
-    // Retour à la verticale → fermeture (mode gyro uniquement).
-    // Hystérésis 65°/35° : évite l'oscillation ouverture/fermeture au seuil.
-    if (_gyroMode && absGamma < 35) _closeGaleriePaysage();
-    return;
-  }
-  if (absGamma > 65) {
-    if (!_gyroDebounce) {
-      var rotation = gamma < 0 ? 90 : -90; // landscape-droite ou gauche
-      _gyroDebounce = setTimeout(function() {
-        _gyroDebounce = null;
-        // Le mode gyro (rotation CSS) ne sert QUE si l'écran reste bloqué en
-        // portrait. Si l'écran tourne réellement en paysage, c'est la bascule
-        // d'orientation (plein écran, identique au bouton) qui prend le relais —
-        // sinon on cumulerait deux rotations. On respecte aussi le verrou de
-        // fermeture manuelle.
-        if (!_galerieOpen && !_galerieDismissed && !_landscapeMQ.matches) _showGalerieGyro(rotation);
-      }, 500);
-    }
-  } else {
-    if (_gyroDebounce) { clearTimeout(_gyroDebounce); _gyroDebounce = null; }
-    if (absGamma < 35) _galerieDismissed = false; // revenu vertical → on réarme
-  }
-}
-
-// Force le paysage : le WebAPK Android verrouille l'orientation portrait
-// (intégrée à l'installation, unlock() ne fait que restaurer ce défaut).
-// Seul plein écran + lock('landscape') contourne ce verrou à l'exécution.
-function _enterFullscreenLandscape(ov) {
-  try {
-    var p = ov.requestFullscreen ? ov.requestFullscreen() : Promise.reject();
-    Promise.resolve(p).then(function() {
-      if (screen.orientation && screen.orientation.lock)
-        return screen.orientation.lock('landscape');
-    }).catch(function() {});
-  } catch(_) {}
-}
-
-function _exitFullscreenLandscape() {
-  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(_) {}
+function _exitFullscreen() {
   try { if (document.fullscreenElement) document.exitFullscreen().catch(function() {}); } catch(_) {}
-}
-
-function _showGaleriePaysage() {
-  if (!_allPhotos.length) {
-    fetch(_PHOTOS_API + '/photos')
-      .then(function(r) { return r.json(); })
-      .then(function(d) {
-        _allPhotos = d.photos || [];
-        _galeriePhotos = _allPhotos;
-        if (_galeriePhotos.length) _startGalerieAt(0);
-      })
-      .catch(function() {});
-    return;
-  }
-  _galeriePhotos = _allPhotos;
-  _startGalerieAt(0);
 }
 
 function _galerieClickHandler(e) {
   if (e.target && e.target.id === 'galerie-vote') return;
-  _galerieDismissed = true; // fermeture manuelle : pas de réouverture tant qu'on reste en paysage
   _closeGaleriePaysage();
 }
 
@@ -401,10 +296,8 @@ function _closeGaleriePaysage() {
     ov.removeEventListener('click', _galerieClickHandler);
     ov.removeEventListener('touchstart', _galerieTouchStart);
     ov.removeEventListener('touchend', _galerieTouchEnd);
-    if (_gyroMode) _exitGyroMode(ov);
   }
-  if (!_gyroMode) _exitFullscreenLandscape();
-  _gyroMode = false;
+  _exitFullscreen();
 }
 
 // Sortie du plein écran par geste système (retour Android, Échap) →
@@ -426,22 +319,13 @@ function _galerieTouchEnd(e) {
   var adx = Math.abs(dx), ady = Math.abs(dy);
 
   if (adx < 20 && ady < 20) {
-    _galerieDismissed = true; // tap → fermer, sans réouverture tant qu'on reste en paysage
-    _closeGaleriePaysage(); return;
+    _closeGaleriePaysage(); return; // tap → fermer
   }
 
-  // En mode gyro, le contenu est pivoté : l'axe visuel horizontal = axe Y écran
-  // (inversé selon le sens de rotation). Hors gyro : axe X classique.
-  var navDelta;
-  if (_gyroMode) {
-    if (ady > adx) navDelta = _gyroRotDir === 90 ? -dy : dy;
-  } else {
-    if (adx > ady) navDelta = -dx;
-  }
-
-  if (navDelta !== undefined && Math.abs(navDelta) > 50) {
+  // Glissement horizontal pour naviguer : swipe gauche → photo suivante.
+  if (adx > ady && adx > 50) {
     e.preventDefault(); // évite le click suivant
-    _galerieNavigate(navDelta > 0 ? 1 : -1);
+    _galerieNavigate(dx < 0 ? 1 : -1);
   }
 }
 
@@ -464,10 +348,9 @@ function _refreshGalerieVoteBtn(btn, photo) {
   btn.style.background = _getPhotoVotes()[photo.id] ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.15)';
 }
 
-// Affiche la photo en plein écran (background-size: cover), sans rotation
-// automatique : chaque photo conserve son orientation d'origine. La détection
-// portrait/paysage (probe) a été retirée car elle pivotait à tort certaines
-// photos paysage (orientation EXIF mal interprétée).
+// Affiche la photo ENTIÈRE (background-size: contain), sans rotation ni
+// recadrage : la photo s'adapte à l'orientation de l'écran (portrait ou
+// paysage), centrée, avec d'éventuelles bandes noires sur les côtés.
 function _setGalerieImg(imgEl, url) {
   imgEl.style.top = '0';
   imgEl.style.left = '0';
@@ -476,7 +359,7 @@ function _setGalerieImg(imgEl, url) {
   imgEl.style.width = '';
   imgEl.style.height = '';
   imgEl.style.transform = '';
-  imgEl.style.backgroundSize = 'cover';
+  imgEl.style.backgroundSize = 'contain';
   imgEl.style.backgroundImage = 'url(\'' + url.replace(/'/g, "\\'") + '\')';
   imgEl.style.opacity = '1';
 }
@@ -525,28 +408,5 @@ function _galerieStep(immediate) {
   }
 }
 
-// ── Listener orientation (pour les appareils où la rotation est libre) ──
-var _landscapeMQ = window.matchMedia('(orientation: landscape)');
-function _onOrientationChange(e) {
-  if (e.matches) {
-    // Passage en paysage → diaporama plein écran (identique au bouton de la tuile).
-    // Pas de réouverture si déjà ouvert, en mode gyro, ou si on vient de fermer
-    // manuellement (tant qu'on n'est pas repassé en portrait).
-    if (_galerieOpen || _gyroMode || _galerieDismissed) return;
-    _showGaleriePaysage();
-  } else {
-    // Retour en portrait → on réarme le verrou et on ferme si encore ouvert.
-    _galerieDismissed = false;
-    if (_galerieOpen && !_gyroMode) _closeGaleriePaysage();
-  }
-}
-if (_landscapeMQ.addEventListener) {
-  _landscapeMQ.addEventListener('change', _onOrientationChange);
-} else {
-  _landscapeMQ.addListener(_onOrientationChange);
-}
-
-// ── Activation gyroscope ─────────────────────────────────────────
-if (window.DeviceOrientationEvent) {
-  window.addEventListener('deviceorientation', _onDeviceOrientation, { passive: true });
-}
+// Le diaporama se lance UNIQUEMENT manuellement (bouton de la tuile ou tap sur
+// une photo). Plus aucun déclenchement par capteur d'orientation/accéléromètre.
