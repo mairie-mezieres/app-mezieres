@@ -18,6 +18,7 @@
   // 2) État initial des cartes (badge notif, push)
   try { updateNotifCardStatus(null); } catch(e){}
   try { refreshActusBadge(); } catch(e){}
+  try { if (typeof refreshPhotosBadge === 'function') refreshPhotosBadge(); } catch(e){}
 
   // 3) Widgets header (asynchrones)
   try { loadMeteo(); }         catch(e){ console.warn('[init] loadMeteo', e); }
@@ -85,6 +86,7 @@
     window._matTimers.busRemi       = setInterval(function(){ try { loadBusRemi(); }       catch(e){} },  60000);
     window._matTimers.meteo         = setInterval(function(){ try { loadMeteo(); }         catch(e){} }, 600000);
     window._matTimers.actusBadge    = setInterval(function(){ try { refreshActusBadge(); } catch(e){} }, 300000);
+    window._matTimers.photosBadge   = setInterval(function(){ try { if (typeof refreshPhotosBadge === 'function') refreshPhotosBadge(); } catch(e){} }, 300000);
   }
   function _matStopTimers(){
     Object.keys(window._matTimers).forEach(function(k){

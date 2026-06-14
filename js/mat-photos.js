@@ -39,6 +39,18 @@ function _clearPhotosBadge() {
   var badge = document.getElementById('photos-badge');
   if (badge) badge.style.display = 'none';
 }
+// Vérifie au démarrage (et périodiquement) s'il y a de nouvelles photos depuis
+// la dernière visite, pour allumer la pastille sur la tuile sans ouvrir la
+// galerie. Met aussi _allPhotos en cache → diaporama plus rapide à lancer.
+async function refreshPhotosBadge() {
+  try {
+    var r = await fetch(_PHOTOS_API + '/photos');
+    if (!r.ok) return;
+    var data = await r.json();
+    _allPhotos = data.photos || [];
+    _checkPhotosBadge();
+  } catch (_) {}
+}
 
 // ── État ─────────────────────────────────────────────────────────
 var _allPhotos  = [];
