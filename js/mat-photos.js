@@ -45,6 +45,9 @@ var _allPhotos  = [];
 var _photoSort  = 'votes'; // 'votes' | 'date'
 var _galeriePhotos = [], _galerieIdx = 0, _galerieTimer = null, _galerieOpen = false;
 var _gyroMode = false, _gyroDebounce = null, _gyroRotDir = 90;
+// Verrou anti-réouverture : passe à true quand on ferme manuellement (tap) le
+// diaporama, pour ne pas le rouvrir tant qu'on n'est pas repassé en portrait.
+var _galerieDismissed = false;
 var _touchStartX = 0, _touchStartY = 0;
 
 // ── Tri ──────────────────────────────────────────────────────────
@@ -335,11 +338,17 @@ function _onDeviceOrientation(e) {
       var rotation = gamma < 0 ? 90 : -90; // landscape-droite ou gauche
       _gyroDebounce = setTimeout(function() {
         _gyroDebounce = null;
-        if (!_galerieOpen) _showGalerieGyro(rotation);
+        // Le mode gyro (rotation CSS) ne sert QUE si l'écran reste bloqué en
+        // portrait. Si l'écran tourne réellement en paysage, c'est la bascule
+        // d'orientation (plein écran, identique au bouton) qui prend le relais —
+        // sinon on cumulerait deux rotations. On respecte aussi le verrou de
+        // fermeture manuelle.
+        if (!_galerieOpen && !_galerieDismissed && !_landscapeMQ.matches) _showGalerieGyro(rotation);
       }, 500);
     }
   } else {
     if (_gyroDebounce) { clearTimeout(_gyroDebounce); _gyroDebounce = null; }
+    if (absGamma < 35) _galerieDismissed = false; // revenu vertical → on réarme
   }
 }
 
@@ -379,6 +388,7 @@ function _showGaleriePaysage() {
 
 function _galerieClickHandler(e) {
   if (e.target && e.target.id === 'galerie-vote') return;
+  _galerieDismissed = true; // fermeture manuelle : pas de réouverture tant qu'on reste en paysage
   _closeGaleriePaysage();
 }
 
@@ -416,7 +426,8 @@ function _galerieTouchEnd(e) {
   var adx = Math.abs(dx), ady = Math.abs(dy);
 
   if (adx < 20 && ady < 20) {
-    _closeGaleriePaysage(); return; // tap → fermer
+    _galerieDismissed = true; // tap → fermer, sans réouverture tant qu'on reste en paysage
+    _closeGaleriePaysage(); return;
   }
 
   // En mode gyro, le contenu est pivoté : l'axe visuel horizontal = axe Y écran
@@ -517,11 +528,17 @@ function _galerieStep(immediate) {
 // ── Listener orientation (pour les appareils où la rotation est libre) ──
 var _landscapeMQ = window.matchMedia('(orientation: landscape)');
 function _onOrientationChange(e) {
-  // Ignoré si le diaporama est déjà ouvert (évite redémarrage après lock)
-  // ou si on est en mode gyro (l'écran reste portrait, pas de changement)
-  if (_galerieOpen || _gyroMode) return;
-  if (e.matches) { _showGaleriePaysage(); }
-  else           { _closeGaleriePaysage(); }
+  if (e.matches) {
+    // Passage en paysage → diaporama plein écran (identique au bouton de la tuile).
+    // Pas de réouverture si déjà ouvert, en mode gyro, ou si on vient de fermer
+    // manuellement (tant qu'on n'est pas repassé en portrait).
+    if (_galerieOpen || _gyroMode || _galerieDismissed) return;
+    _showGaleriePaysage();
+  } else {
+    // Retour en portrait → on réarme le verrou et on ferme si encore ouvert.
+    _galerieDismissed = false;
+    if (_galerieOpen && !_gyroMode) _closeGaleriePaysage();
+  }
 }
 if (_landscapeMQ.addEventListener) {
   _landscapeMQ.addEventListener('change', _onOrientationChange);
