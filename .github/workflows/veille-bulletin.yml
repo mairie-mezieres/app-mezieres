@@ -1,0 +1,150 @@
+name: Veille bulletin municipal MAT
+
+on:
+  schedule:
+    # Tous les lundis à 06h10 UTC ; un garde-fou ne laisse passer que le
+    # 1er lundi du mois (jour du mois ≤ 7) → une exécution mensuelle.
+    - cron: '10 6 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  veille-bulletin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Premier lundi du mois ?
+        id: gate
+        run: |
+          dom=$(( 10#$(date -u +%d) ))
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$dom" -le 7 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Jour du mois $dom : pas le 1er lundi, exécution ignorée."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Date du jour
+        id: now
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          echo "iso=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          echo "year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
+          echo "mois=$(LC_TIME=fr_FR.UTF-8 date -u +'%B %Y')" >> "$GITHUB_OUTPUT"
+
+      - name: Veille éditoriale avec Claude Code
+        if: steps.gate.outputs.run == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Jeton d'abonnement Claude Pro/Max — généré en local avec `claude setup-token`
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Token explicite : évite l'échange OIDC avec la GitHub App Claude
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "WebSearch,WebFetch,Write"
+          prompt: |
+            Tu es un agent de veille ÉDITORIALE pour le bulletin municipal de Mézières-lez-Cléry.
+            Ton rôle : proposer chaque mois des idées d'articles et de rubriques ORIGINAUX et
+            ADAPTÉS à notre village, que l'équipe municipale pourra reprendre dans son bulletin.
+
+            ⚠️ Tu ne rédiges PAS le bulletin : tu proposes des IDÉES, des angles et des pistes,
+            avec à chaque fois pourquoi c'est pertinent pour Mézières et comment le décliner localement.
+
+            CONTEXTE DU VILLAGE (à respecter impérativement) :
+            - Mézières-lez-Cléry, commune rurale du Loiret (45), région Centre-Val de Loire,
+              ~1 000 habitants, membre de la Communauté de Communes des Terres du Val de Loire (CCTVL).
+            - Population à forte composante senior ; ton chaleureux, clair, accessible, sans jargon.
+            - Identité locale : val de Loire, viticulture et agriculture, patrimoine, nature et bords
+              de l'Ardoux, vie associative active.
+            - Associations locales : Comité des fêtes, GERM de Mézières, Les Trialistes de l'Ardoux
+              (trial moto), Association des parents d'élèves, Pamela & Co.
+            - Acteurs / entreprises locales : Chai Amandine et Quentin (vigneron), Les Fruits de la
+              Masure, Horticulteur Gatelier, et autres artisans/commerçants du village.
+            - Vie quotidienne : École La Forêt, périscolaire/cantine, collecte des déchets et tri,
+              bus Rémi (ligne 8), démarches en mairie, météo et vigilances.
+            - L'application citoyenne MAT (Mézières Avec Toi) couvre déjà actualités, agenda, météo,
+              signalements, déchets : le bulletin doit COMPLÉTER et non répéter ces flux.
+
+            ⚠️ ANCRAGE LOCAL ET FRAÎCHEUR :
+            - Nous sommes le ${{ steps.now.outputs.iso }} (mois courant : ${{ steps.now.outputs.mois }}).
+              Privilégie des idées de SAISON, calées sur le mois et la période de l'année
+              (fêtes, rentrée scolaire, vendanges, saison des associations, jardinage, sécurité
+              saisonnière, etc.).
+            - Pour les inspirations tirées d'AUTRES communes ou d'actualités, appuie-toi sur des
+              recherches web récentes (privilégie ${{ steps.now.outputs.year }}) et fournis pour
+              chacune un lien cliquable (balise <a href="URL">) vers la source.
+            - Reste réaliste pour une petite commune rurale : pas de moyens d'une grande ville,
+              des idées simples à mettre en œuvre par une équipe municipale réduite.
+
+            Effectue des recherches web pertinentes, puis rédige en français un rapport structuré
+            ainsi (chaque idée = un titre d'article proposé + un court pitch + « pourquoi c'est
+            adapté à Mézières » + une piste de mise en œuvre + sources si applicable) :
+
+            ## 1. Idées d'articles de saison (${{ steps.now.outputs.mois }})
+            4 à 6 idées d'articles originales liées à la période de l'année et à la vie du village
+            (événements, traditions locales, nature, calendrier scolaire/associatif…).
+
+            ## 2. Rubriques pratiques et citoyennes
+            Sujets utiles aux habitants à mettre en avant ce mois-ci : démarches administratives,
+            environnement et tri, sécurité et prévention (saisonnière), transports/mobilité,
+            inclusion numérique des seniors. Donne l'angle local concret.
+
+            ## 3. Valoriser la vie locale
+            Idées de portraits et de mises en lumière : une association, un commerçant/artisan/
+            vigneron, un bénévole, un métier, un lieu ou un coin de patrimoine du village. Propose
+            des angles concrets (questions, format) sans inventer de faits sur des personnes réelles.
+
+            ## 4. Inspirations d'autres bulletins municipaux
+            2 à 4 idées originales repérées dans des bulletins ou sites de communes rurales
+            françaises (rubriques, formats, initiatives) transposables à Mézières. Cite tes sources
+            (liens cliquables) et explique comment les adapter à notre échelle.
+
+            ## 5. Mini-rubriques récurrentes à lancer
+            2 à 3 idées de rubriques légères et reconductibles d'un numéro à l'autre (le saviez-vous,
+            recette/produit local de saison, mot d'un élu, photo d'hier/aujourd'hui, quiz local…).
+
+            Règles de contenu : reste factuel et n'invente pas d'informations sur des personnes,
+            commerces ou événements réels ; quand tu t'appuies sur une source web, cite-la par un
+            lien cliquable. Les idées doivent être originales, concrètes et réalistes pour une
+            commune de moins de 1 000 habitants.
+
+            IMPORTANT — mise en forme du livrable :
+            Écris le rapport directement dans un fichier `rapport-bulletin.html` (et nulle part
+            ailleurs) sous forme d'un document HTML complet et autonome, optimisé pour la lecture
+            dans un client email (Gmail, Outlook, Mail iOS). Contraintes :
+            - Document HTML complet : `<!DOCTYPE html>`, `<html lang="fr">`, `<head>` avec
+              `<meta charset="utf-8">`, et tout le contenu dans `<body>`.
+            - Tous les styles en CSS INLINE (attribut `style="..."` sur chaque balise) — pas de
+              balise `<style>` ni de CSS externe, car de nombreux clients email les ignorent.
+            - Contenu centré dans un conteneur de largeur maximale 640px.
+            - Lisibilité seniors : police sans-serif, taille de base 16px minimum, titres bien
+              contrastés, interligne aéré (line-height 1.6), liens soulignés et de couleur foncée distincte.
+            - Un en-tête avec le titre « Veille bulletin municipal — Mézières-lez-Cléry » et la
+              date du jour en français.
+            - Les 5 sections avec des titres clairs (`<h2>`) ; pour chaque idée, un titre proposé en
+              gras et un court paragraphe (pitch + adaptation locale + mise en œuvre).
+            - Chaque lien doit être une vraie balise `<a href="URL">texte</a>` cliquable, en couleur
+              foncée et soulignée, ouvrant la source d'origine.
+            - Terminer par un pied de page discret : « Idées générées automatiquement par l'agent de
+              veille éditoriale (GitHub Actions + Claude Code avec recherche web). À relire et adapter
+              avant publication. »
+            N'utilise que l'outil Write pour créer ce fichier. Ne crée aucune issue, ne fais aucun commit.
+
+      - name: Envoyer les idées par email
+        if: steps.gate.outputs.run == 'true'
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # Expéditeur volontairement figé sur le sender de test Resend
+          # (onboarding@resend.dev, défaut du script). Tant que le domaine
+          # mezieres-lez-clery.fr n'est pas vérifié sur Resend, c'est le seul
+          # « from » utilisable ; il n'autorise l'envoi que vers l'adresse du
+          # compte Resend (cf. secret VEILLE_EMAIL_TO).
+          EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
+          REPORT_PATH: rapport-bulletin.html
+          EMAIL_SUBJECT: Veille bulletin municipal MAT - ${{ steps.now.outputs.iso }}
+        run: node scripts/send-veille-email.js

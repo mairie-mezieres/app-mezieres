@@ -1,12 +1,19 @@
 /**
- * Envoi du rapport de veille par email via l'API Resend.
- * Lit le fichier rapport-veille.html généré par Claude Code et l'envoie.
+ * Envoi d'un rapport de veille par email via l'API Resend.
+ * Lit le rapport HTML généré par Claude Code et l'envoie.
+ *
+ * Script générique partagé par les workflows de veille (techno, bulletin…).
  *
  * Variables d'environnement requises :
  *   RESEND_API_KEY    - clé API Resend (secret, partagée avec le chatbot)
  *   EMAIL_TO          - adresse destinataire (secret VEILLE_EMAIL_TO)
- *   RESEND_FROM       - adresse expéditrice (optionnel, même convention que le
- *                       chatbot ; défaut « MAT Veille <onboarding@resend.dev> »)
+ *
+ * Variables d'environnement optionnelles :
+ *   RESEND_FROM       - adresse expéditrice (même convention que le chatbot ;
+ *                       défaut « MAT Veille <onboarding@resend.dev> »)
+ *   REPORT_PATH       - chemin du rapport HTML à envoyer
+ *                       (défaut « rapport-veille.html »)
+ *   EMAIL_SUBJECT     - objet de l'email (défaut « Veille technologique MAT - <date> »)
  *
  * Node 20+ requis (fetch global). Aucune dépendance externe.
  */
@@ -22,7 +29,7 @@ if (!RESEND_API_KEY || !EMAIL_TO) {
   process.exit(1);
 }
 
-const HTML_PATH = 'rapport-veille.html';
+const HTML_PATH = (process.env.REPORT_PATH || 'rapport-veille.html').trim();
 
 if (!fs.existsSync(HTML_PATH)) {
   console.error(`Fichier introuvable : ${HTML_PATH}. Claude Code n'a pas généré le rapport.`);
@@ -42,6 +49,8 @@ const today = new Date().toLocaleDateString('fr-FR', {
   timeZone: 'Europe/Paris'
 });
 
+const SUBJECT = (process.env.EMAIL_SUBJECT || `Veille technologique MAT - ${today}`).trim();
+
 (async () => {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -52,7 +61,7 @@ const today = new Date().toLocaleDateString('fr-FR', {
     body: JSON.stringify({
       from: EMAIL_FROM,
       to: EMAIL_TO.split(',').map((addr) => addr.trim()).filter(Boolean),
-      subject: `Veille technologique MAT - ${today}`,
+      subject: SUBJECT,
       html
     })
   });
