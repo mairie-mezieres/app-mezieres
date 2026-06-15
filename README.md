@@ -27,13 +27,13 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
   (France) ; données applicatives hébergées en **Union européenne**.
 - 🌱 **Sobriété** : images optimisées (**−86 %** JPG, **−95 %** PNG→WebP), polices
   sous-ensemblées, chargement paresseux ; empreinte suivie en continu via
-  [EcoIndex](.github/workflows/ecoindex.yml) et [Lighthouse](.github/workflows/lighthouse.yml).
+  [EcoIndex](.github/workflows/lighthouse.yml) et [Lighthouse](.github/workflows/lighthouse.yml).
 - ♿ **Accessibilité** : démarche RGAA documentée, contrastes **WCAG 2.1 AA
   vérifiés automatiquement** (axe-core, dans la CI E2E).
 - 🛡️ **Sécurité** : politique de divulgation responsable ([SECURITY.md](SECURITY.md)),
   en-têtes HTTP durcis, secrets hors dépôt.
 - 📖 **100 % open source (MIT)** — réplicable par toute commune
-  (voir [REPLICATION.md](REPLICATION.md)).
+  (voir [REPLICATION.md](docs/REPLICATION.md)).
 
 ---
 
@@ -43,7 +43,7 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
 |----------|----------|---------|
 | [Guide utilisateur](docs/guide-utilisateur.md) | Habitants | Installation PWA, toutes les fonctionnalités, RGPD |
 | [Guide technique](docs/guide-technique.md) | Développeurs | Architecture, variables d'env, MEL, CI/CD, déploiement |
-| [Kit de réplication](REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
+| [Kit de réplication](docs/REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
 | [Politique de sécurité](SECURITY.md) | Tous | Divulgation responsable, périmètre |
 
 ---
