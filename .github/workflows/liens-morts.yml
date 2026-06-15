@@ -23,12 +23,15 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           # On vérifie les pages HTML de l'application (pas les libs vendor ni les tests).
-          # Facebook/Instagram bloquent les robots → exclus pour éviter les faux positifs.
+          # Certains sites bloquent les robots (Facebook/Instagram, LinkedIn → 999,
+          # claude.ai → 403) : on les exclut pour éviter les faux positifs.
           args: >-
             --no-progress
             --max-retries 2
             --exclude 'facebook\.com'
             --exclude 'instagram\.com'
+            --exclude 'linkedin\.com'
+            --exclude 'claude\.ai'
             index.html admin.html architecture.html notif.html offline.html partager.html
           format: markdown
           output: ./lychee/rapport.md
