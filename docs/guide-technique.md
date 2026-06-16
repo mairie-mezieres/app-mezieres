@@ -24,6 +24,10 @@
 
 ## 1. Architecture générale
 
+> 🏗️ Pour les **schémas détaillés** (vues de contexte, conteneurs, déploiement, diagrammes de
+> séquence des flux métier et modèle de données), voir la
+> [documentation d'architecture applicative](architecture.md).
+
 MAT est une application en deux parties indépendantes :
 
 ```

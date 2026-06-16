@@ -43,6 +43,7 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
 |----------|----------|---------|
 | [Guide utilisateur](docs/guide-utilisateur.md) | Habitants | Installation PWA, toutes les fonctionnalités, RGPD |
 | [Guide technique](docs/guide-technique.md) | Développeurs | Architecture, variables d'env, MEL, CI/CD, déploiement |
+| [Architecture applicative](docs/architecture.md) | Développeurs · MOA | Schémas (contexte, conteneurs, déploiement, flux métier, données) |
 | [Spécifications fonctionnelles (MOA)](docs/specifications/README.md) | Maîtrise d'ouvrage | Exigences & règles de gestion par processus (référentiel SFG + SFD) |
 | [Kit de réplication](docs/REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
 | [Politique de sécurité](SECURITY.md) | Tous | Divulgation responsable, périmètre |

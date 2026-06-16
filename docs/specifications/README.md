@@ -22,6 +22,9 @@ MAT. Il décrit, processus par processus, **ce que fait le produit**, sous forme
 | [Spécifications Fonctionnelles Générales (SFG)](SFG-specifications-generales.md) | Vision, acteurs, cartographie des processus, exigences transverses (offline, RGPD, accessibilité, sécurité…), modèle de données. |
 | **Spécifications Fonctionnelles Détaillées (SFD)** | Un document par processus métier (voir ci-dessous). |
 
+> 🏗️ **Vue d'architecture.** Pour la traduction technique de ces processus (schémas de contexte,
+> conteneurs, déploiement et flux métier), voir la [documentation d'architecture applicative](../architecture.md).
+
 ### Index des SFD
 
 | Réf. | Processus | Acteurs principaux |
