@@ -258,14 +258,14 @@ Carte Leaflet centrée sur la commune :
       id: 'chatbot',
       label: 'Chatbot IA "assistant"',
       pill: 'opt', cost: 0, costMin: 0, costMax: 1, backend: true, def: false,
-      desc: 'LLM Mistral ou Claude Haiku, réponses 24/7. API quasi gratuite (les règles directes filtrent l’essentiel) ; le coût réel est le backend.',
+      desc: 'LLM Mistral ou Claude, réponses 24/7. API quasi gratuite (les règles directes filtrent l’essentiel) ; le coût réel est le backend.',
       instructions: `### Chatbot IA "assistant" — uniquement profil intermédiaire
 **Architecture recommandée :**
 - Backend Node.js Express déployé sur Render (~10 €/mois plan Starter ; le free tier s’endort).
 - LLM principal au choix :
   - **Mistral Small** via api.mistral.ai (souverain européen, ~0,10 € / million de tokens entrée). À privilégier en mode 100 % français.
-  - **Claude Haiku** via api.anthropic.com (rapide, économique, prompt caching natif réduisant les coûts de 90 %).
-- Fallback optionnel : si Mistral est principal, ajouter Claude Haiku en secours, et inversement.
+  - **Claude (Anthropic)** via api.anthropic.com (rapide, économique, prompt caching natif réduisant les coûts de 90 %).
+- Fallback optionnel : si Mistral est principal, ajouter Claude en secours, et inversement.
 - Pas d’embeddings ni de base vectorielle au démarrage : injecter directement les pages du site dans le prompt système (RAG syntaxique simple).
 - **Rate limiting** : 5 questions/jour/appareil (empreinte hash) pour maîtriser les coûts.
 - **Détection d’injection prompt** basique : regex sur patterns connus (ignore previous, bypass, override).
@@ -457,7 +457,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
   const DAU_RATE_MIN        = 0.15;         // visiteurs actifs/jour : 15 % de la pop (bas)
   const DAU_RATE_MAX        = 0.20;         // 20 % (haut)
   const LLM_Q_PER_HAB_MONTH = 40 / MAT_REF_POP; // ~0,044 question LLM/hab/MOIS (40/mois pour 900 hab.)
-  const COST_PER_LLM_Q_MIN  = 0.0004;       // €/question (cache chaud + Mistral Small/Haiku)
+  const COST_PER_LLM_Q_MIN  = 0.0004;       // €/question (cache chaud + Mistral Small)
   const COST_PER_LLM_Q_MAX  = 0.0010;       // €/question (prompt long, cache froid)
   const REDIS_CMD_PER_DAU   = 30;           // commandes Redis/visiteur actif/jour
   const REDIS_FREE_CMD_DAY  = 10000;        // palier gratuit Upstash Redis (10 000 cmd/jour)
@@ -971,7 +971,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '- **Hébergement front** : ' + state.host + ' (free tier suffit pour une commune)',
       '- **Back-end** (si requis) : Render.com Starter (~7 €/mois)',
       '- **Stockage / cache** : Upstash Redis région EU',
-      '- **IA du chatbot** : Mistral Small (api.mistral.ai) en principal, Claude Haiku en fallback',
+      '- **IA du chatbot** : Mistral Small (api.mistral.ai) en principal, Claude en fallback',
       '- **CDN images** : Cloudinary free tier (25 Go)',
       '- **Météo** : Open-Meteo + vigilance Météo-France',
       '- **Géocodage** : api-adresse.data.gouv.fr',

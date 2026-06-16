@@ -228,8 +228,8 @@ Carte Leaflet centrée sur la commune, tuiles **Géoportail IGN** (gratuit), cou
 ### 18. Chatbot IA « assistant »
 Architecture recommandée (à ne proposer **que pour le profil intermédiaire**) :
 - Backend Node.js Express déployé sur **Render** (~10 €/mois plan starter).
-- LLM principal au choix : **Claude Haiku** via `api.anthropic.com` (rapide, économique, prompt caching natif) ou **Mistral Small** via `api.mistral.ai` (souverain européen, ~0,10 € / million de tokens entrée).
-- Optionnel fallback : Claude Haiku 4.5 d'Anthropic.
+- LLM principal au choix : **Claude (Anthropic)** via `api.anthropic.com` (rapide, économique, prompt caching natif) ou **Mistral Small** via `api.mistral.ai` (souverain européen, ~0,10 € / million de tokens entrée).
+- Optionnel fallback : Claude (Anthropic).
 - Pas d'embeddings ni de base vectorielle au démarrage : injecter les pages du site dans le prompt système (RAG syntaxique).
 - Rate limiting : 5 questions / jour / appareil pour maîtriser les coûts.
 - Détection d'injection prompt basique (regex sur patterns connus).
