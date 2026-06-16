@@ -1845,9 +1845,11 @@ function drawWordCloud(canvasId,parJour) {
 let _bannerData = {active:false,icon:'ℹ️',title:'',text:''};
 let _mascotteData = {active:false,url:''};
 let _mascotteB64 = null;
+let _horairesData = [];
 async function renderBanner() {
   try{const r=await fetch(`${API}/info-banner`);if(r.ok)_bannerData=await r.json();}catch(e){}
   try{const r=await fetch(`${API}/config/mascotte`);if(r.ok)_mascotteData=await r.json();}catch(e){}
+  try{const r=await fetch(`${API}/horaires/exceptions`);if(r.ok){const d=await r.json();_horairesData=Array.isArray(d.exceptions)?d.exceptions:[];}}catch(e){}
   document.getElementById('banner-content').innerHTML=`
     <div class="section-title">📢 Encart d'information / alerte</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
@@ -1883,7 +1885,70 @@ async function renderBanner() {
         <button onclick="saveMascotte()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:11px 20px;font-size:0.84rem;font-weight:800;cursor:pointer;align-self:flex-start;">💾 Enregistrer</button>
         <div id="masc-save-msg" style="display:none;font-weight:800;font-size:0.8rem;"></div>
       </div>
+    </div>
+    <div class="section-title">🕐 Horaires exceptionnels</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">Déclarez une <strong>fermeture exceptionnelle</strong> (congés, pont…) ou des <strong>horaires de remplacement</strong> (canicule…) pour la mairie ou la déchetterie. L'app les affiche automatiquement pendant la période, sans modification du code. Les exceptions terminées sont supprimées automatiquement.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        ${_horairesData.length?_horairesData.map(_horaireRowHtml).join(''):'<div style="color:var(--muted);font-size:0.82rem;">Aucune exception active.</div>'}
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:800;font-size:0.82rem;">➕ Ajouter une exception</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select id="he-service" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;"><option value="dechetterie">♻️ Déchetterie</option><option value="mairie">🏛️ Mairie</option></select>
+          <label style="font-size:0.8rem;">Du <input type="date" id="he-start" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;font-size:0.82rem;"></label>
+          <label style="font-size:0.8rem;">Au <input type="date" id="he-end" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;font-size:0.82rem;"></label>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:0.82rem;">
+          <label style="cursor:pointer;"><input type="radio" name="he-type" value="closed" checked onchange="_heToggle()"> Fermeture</label>
+          <label style="cursor:pointer;"><input type="radio" name="he-type" value="hours" onchange="_heToggle()"> Horaires de remplacement</label>
+        </div>
+        <div id="he-hours" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;font-size:0.82rem;">
+          Ouvert de <input type="time" id="he-o1" style="border:1.5px solid var(--border);border-radius:8px;padding:5px 7px;"> à <input type="time" id="he-c1" style="border:1.5px solid var(--border);border-radius:8px;padding:5px 7px;">
+          <span style="color:var(--muted);">puis (optionnel)</span> <input type="time" id="he-o2" style="border:1.5px solid var(--border);border-radius:8px;padding:5px 7px;"> à <input type="time" id="he-c2" style="border:1.5px solid var(--border);border-radius:8px;padding:5px 7px;">
+        </div>
+        <input id="he-message" maxlength="200" placeholder="Message affiché (ex : Forte chaleur — déchetterie ouverte 7h-13h)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;">
+        <button onclick="addHoraireException()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:10px 18px;font-size:0.82rem;font-weight:800;cursor:pointer;align-self:flex-start;">➕ Ajouter</button>
+        <div id="he-msg" style="display:none;font-weight:800;font-size:0.8rem;"></div>
+      </div>
     </div>`;
+}
+function _frDate(iso){ if(!iso) return ''; const p=String(iso).split('-'); return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):iso; }
+function _horaireRowHtml(e){
+  const ico=e.service==='mairie'?'🏛️':'♻️';
+  const period=e.start===e.end?_frDate(e.start):(_frDate(e.start)+' → '+_frDate(e.end));
+  const what=e.type==='closed'?'<span style="color:#b91c1c;font-weight:800;">Fermé</span>':('Horaires : '+(e.ranges||[]).map(r=>r[0]+'-'+r[1]).join(' / '));
+  return `<div style="display:flex;align-items:center;gap:10px;background:var(--mist);border-radius:10px;padding:10px 12px;font-size:0.82rem;"><span style="font-size:1.1rem;">${ico}</span><div style="flex:1;min-width:0;"><div style="font-weight:800;">${safe(e.service==='mairie'?'Mairie':'Déchetterie')} · ${period}</div><div style="color:var(--text);">${what}${e.message?(' · '+safe(e.message)):''}</div></div><button onclick="deleteHoraireException(${e.id})" style="background:none;border:none;cursor:pointer;font-size:1rem;" title="Supprimer">🗑️</button></div>`;
+}
+function _heToggle(){ const t=(document.querySelector('input[name="he-type"]:checked')||{}).value; const h=document.getElementById('he-hours'); if(h) h.style.display=(t==='hours')?'flex':'none'; }
+function _heErr(m){ const el=document.getElementById('he-msg'); if(el){el.style.color='#b91c1c';el.textContent='⚠️ '+m;el.style.display='block';} }
+function addHoraireException(){
+  const service=document.getElementById('he-service').value;
+  const start=document.getElementById('he-start').value;
+  const end=document.getElementById('he-end').value||start;
+  const type=(document.querySelector('input[name="he-type"]:checked')||{}).value||'closed';
+  const message=document.getElementById('he-message').value.trim();
+  if(!start) return _heErr('Choisissez une date de début.');
+  if(end<start) return _heErr('La date de fin est antérieure à la date de début.');
+  let ranges=[];
+  if(type==='hours'){
+    const o1=document.getElementById('he-o1').value,c1=document.getElementById('he-c1').value;
+    const o2=document.getElementById('he-o2').value,c2=document.getElementById('he-c2').value;
+    if(o1&&c1&&o1<c1) ranges.push([o1,c1]);
+    if(o2&&c2&&o2<c2) ranges.push([o2,c2]);
+    if(!ranges.length) return _heErr('Indiquez au moins une plage horaire valide (début avant fin).');
+  }
+  _horairesData.push({id:Date.now(),service,start,end,type,ranges,message});
+  saveHoraires();
+}
+function deleteHoraireException(id){ _horairesData=_horairesData.filter(e=>e.id!==id); saveHoraires(); }
+async function saveHoraires(){
+  try{
+    const r=await fetch(`${API}/admin/horaires/exceptions`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({exceptions:_horairesData})});
+    const d=await r.json();
+    if(d.ok){ _horairesData=d.exceptions||[]; renderBanner(); }
+    else alert('Erreur : '+(d.error||'inconnue'));
+  }catch(e){ alert('Erreur lors de la sauvegarde : '+e.message); }
 }
 async function saveBanner() {
   const icon=document.getElementById('b-icon').value.trim()||'ℹ️';

@@ -536,6 +536,53 @@ function isFerieDate(d){
 }
 
 // ── Mairie ────────────────────────────────────────────────
+// ── Horaires exceptionnels (mairie & déchetterie) ───────────────
+// Exceptions administrables (fermeture / horaires de remplacement) servies par
+// le backend. Pré-chargées depuis localStorage pour un rendu immédiat hors-ligne.
+var _matHoraires = { exceptions: [] };
+try { var _hc=localStorage.getItem('mat_horaires_exc'); if(_hc) _matHoraires.exceptions=JSON.parse(_hc)||[]; } catch(e){}
+
+function loadHoraireExceptions(){
+  fetch('https://chatbot-mairie-mezieres.onrender.com/horaires/exceptions',{signal:matAbortTimeout(6000)})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(d){
+      if(d && Array.isArray(d.exceptions)){
+        _matHoraires.exceptions=d.exceptions;
+        try{ localStorage.setItem('mat_horaires_exc',JSON.stringify(d.exceptions)); }catch(e){}
+        try{ loadMairieStatus(); }catch(e){}
+        try{ loadDechets(); }catch(e){}
+      }
+    })
+    .catch(function(){});
+}
+
+// Exception active aujourd'hui (Europe/Paris) pour un service, sinon null.
+function _matHoraireActive(service){
+  var ex=_matHoraires.exceptions; if(!ex||!ex.length) return null;
+  var today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris'}).format(new Date());
+  for(var i=0;i<ex.length;i++){
+    var e=ex[i]; if(!e||e.service!==service) continue;
+    var s=e.start, en=e.end||e.start;
+    if(today>=s && today<=en) return e;
+  }
+  return null;
+}
+
+function _hm2min(s){ var p=String(s).split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
+function _fmtHM(s){ var p=String(s).split(':'); var h=parseInt(p[0],10)||0,m=parseInt(p[1],10)||0; return m?(h+'h'+String(m).padStart(2,'0')):(h+'h'); }
+
+// Statut ouvert/fermé pour un jeu de plages horaires « HH:MM » et l'heure courante (minutes).
+function _matRangeStatus(ranges, mins){
+  var nextOpen=null;
+  for(var i=0;i<ranges.length;i++){
+    var o=_hm2min(ranges[i][0]), c=_hm2min(ranges[i][1]);
+    if(mins>=o && mins<c) return {open:true, sub:"ferme à "+_fmtHM(ranges[i][1])};
+    if(mins<o && nextOpen===null) nextOpen=ranges[i][0];
+  }
+  if(nextOpen!==null) return {open:false, sub:"ouvre à "+_fmtHM(nextOpen)};
+  return {open:false, sub:"fermé pour aujourd'hui"};
+}
+
 function loadMairieStatus(){
   var nowParis=new Date(new Date().toLocaleString('en-US',{timeZone:'Europe/Paris'}));
   var day=nowParis.getDay(), mins=nowParis.getHours()*60+nowParis.getMinutes();
@@ -549,6 +596,14 @@ function loadMairieStatus(){
     var d=new Date(from); d.setDate(d.getDate()+1);
     for(var i=0;i<14;i++){var dow=d.getDay();if(map[dow]&&!isFerieDate(d))return map[dow][0]+' '+map[dow][1];d.setDate(d.getDate()+1);}
     return 'prochainement';
+  }
+  var _mExc=_matHoraireActive('mairie');
+  if(_mExc){
+    if(_mExc.type==='closed') return setStatus('Fermée', _mExc.message||'Fermeture exceptionnelle', 'Exceptionnel');
+    if(_mExc.type==='hours' && _mExc.ranges && _mExc.ranges.length && !isFerieDate(nowParis) && (day===1||day===3||day===5)){
+      var _ms=_matRangeStatus(_mExc.ranges, mins);
+      return setStatus(_ms.open?'Ouverte':'Fermée', (_ms.open?'Accueil ':'Mairie ')+_ms.sub+' · horaires exceptionnels', 'Exceptionnel');
+    }
   }
   if(isFerieDate(nowParis)) return setStatus('Fermée','Prochaine ouverture '+nextOpen(nowParis),'Mairie');
   if(day===1){
@@ -586,6 +641,7 @@ function getWeekNumber(d){
 function loadDechets(){
   const now=new Date(), tz={timeZone:'Europe/Paris'};
   const hP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,hour:'numeric',hour12:false}).format(now));
+  const minP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,minute:'numeric'}).format(now))||0;
   const jour=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,day:'numeric'}).format(now));
   const moisP=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,month:'numeric'}).format(now));
   const annee=parseInt(new Intl.DateTimeFormat('fr-FR',{...tz,year:'numeric'}).format(now));
@@ -645,7 +701,12 @@ function loadDechets(){
   const isH=moisP>=10||moisP<=3, matO=isH?10:9, apF=isH?17:18;
   const isJourOuv=dowP>=1&&dowP<=6&&!ferie;
   let dTxt='',dOuv=false;
-  if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée (ouvre lundi à '+matO+'h)';}
+  const _dExc=_matHoraireActive('dechetterie');
+  if(_dExc && _dExc.type==='closed'){dTxt=_dExc.message||'Déchetterie fermée (exceptionnel)';dOuv=false;}
+  else if(_dExc && _dExc.type==='hours' && _dExc.ranges && _dExc.ranges.length && isJourOuv){
+    const _ds=_matRangeStatus(_dExc.ranges,hP*60+minP);
+    dOuv=_ds.open;dTxt='Déchetterie '+(_ds.open?'ouverte':'fermée')+' — '+_ds.sub+' (except.)';}
+  else if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée (ouvre lundi à '+matO+'h)';}
   else if(hP<matO){dTxt='Déchetterie fermée — ouvre à '+matO+'h';}
   else if(hP<12){dOuv=true;dTxt='Déchetterie ouverte — ferme à 12h';}
   else if(hP<14){dTxt='Déchetterie fermée — ouvre à 14h';}
@@ -658,7 +719,14 @@ function loadDechets(){
 
 function loadDechetsDetail(){
   var el=document.getElementById('dechets-content');
-  el.innerHTML='<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
+  var _de=_matHoraireActive('dechetterie');
+  var _esc=function(s){return (''+s).replace(/[&<>]/g,function(c){return c==='&'?'&amp;':c==='<'?'&lt;':'&gt;';});};
+  var _deNote=_de?('<div style="background:#fff7e6;border:1px solid #f5d77b;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:0.8rem;color:#5a3d00;line-height:1.5"><strong>♻️ Horaires exceptionnels</strong><br>'
+    +(_de.type==='closed'
+      ? _esc(_de.message||'Déchetterie fermée sur cette période.')
+      : 'Horaires de remplacement : '+_de.ranges.map(function(r){return r[0]+'–'+r[1];}).join(' / ')+(_de.message?(' — '+_esc(_de.message)):''))
+    +'</div>'):'';
+  el.innerHTML=_deNote+'<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🗑️ Collecte des ordures</div>'
     +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Bac noir (ordures ménagères) : chaque <strong>lundi matin</strong>. Sortez-le le dimanche soir.<br>'
     +'Bac jaune (recyclables) : un <strong>lundi sur deux</strong> (semaines paires). Sortez-le le lundi soir précédent.</div>'
