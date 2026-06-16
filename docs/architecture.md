@@ -182,7 +182,7 @@ sequenceDiagram
                 B->>R: Mémorise (TTL 24h)
                 B-->>F: Réponse (mistral)
             else Mistral indisponible
-                B->>C: Appel Claude Haiku
+                B->>C: Appel Claude
                 alt Claude OK
                     C-->>B: Réponse IA
                     B->>R: Mémorise (TTL 24h)

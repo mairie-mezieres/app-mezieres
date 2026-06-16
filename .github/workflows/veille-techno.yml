@@ -40,7 +40,7 @@ jobs:
             - Frontend : PWA vanilla JS hébergée sur GitHub Pages, Service Worker, notifications push web
             - Backend : Node.js / Express hébergé sur Render.com
             - Base de données : Upstash Redis (REST API)
-            - IA : Mistral AI (chatbot principal), Claude Haiku (fallback)
+            - IA : Mistral AI (chatbot principal), Claude (fallback)
             - Cartographie : Leaflet.js + GeoJSON (randonnée, PLU)
             - Intégrations : Trello, Facebook Graph API, Google Calendar, Open-Meteo, Météo-France, IGN Apicarto, api-adresse.data.gouv.fr, Cloudinary
             - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
