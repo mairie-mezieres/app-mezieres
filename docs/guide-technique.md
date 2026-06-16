@@ -27,6 +27,9 @@
 > 🏗️ Pour les **schémas détaillés** (vues de contexte, conteneurs, déploiement, diagrammes de
 > séquence des flux métier et modèle de données), voir la
 > [documentation d'architecture applicative](architecture.md).
+>
+> ⚙️ Pour le **contrat technique de l'API** (chaque endpoint : validations, codes HTTP, messages
+> d'erreur exacts, limites), voir le [référentiel de spécifications techniques (STD)](specifications-techniques/README.md).
 
 MAT est une application en deux parties indépendantes :
 

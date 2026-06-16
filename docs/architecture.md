@@ -5,7 +5,8 @@
 > conteneurs et de déploiement, flux métier clés, fonctionnement hors-ligne et modèle de données.
 >
 > Documents liés : [README](../README.md) · [Guide technique](guide-technique.md) ·
-> [Référentiel de spécifications (MOA)](specifications/README.md) ·
+> [Spécifications fonctionnelles (MOA)](specifications/README.md) ·
+> [Spécifications techniques (STD)](specifications-techniques/README.md) ·
 > [Cartographie visuelle des services](../architecture.html) (page interactive).
 >
 > 🔄 **Document vivant** — à mettre à jour à chaque évolution structurante de l'architecture.

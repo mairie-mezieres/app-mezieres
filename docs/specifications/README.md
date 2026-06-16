@@ -24,6 +24,10 @@ MAT. Il décrit, processus par processus, **ce que fait le produit**, sous forme
 
 > 🏗️ **Vue d'architecture.** Pour la traduction technique de ces processus (schémas de contexte,
 > conteneurs, déploiement et flux métier), voir la [documentation d'architecture applicative](../architecture.md).
+>
+> ⚙️ **Contrat technique.** Pour le détail des endpoints (validations, codes HTTP, messages d'erreur,
+> limites), voir le [référentiel de spécifications techniques (STD)](../specifications-techniques/README.md).
+> Chaque STD renvoie au SFD correspondant.
 
 ### Index des SFD
 
