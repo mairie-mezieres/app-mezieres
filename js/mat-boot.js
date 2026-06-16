@@ -21,6 +21,7 @@
   try { if (typeof refreshPhotosBadge === 'function') refreshPhotosBadge(); } catch(e){}
 
   // 3) Widgets header (asynchrones)
+  try { loadHoraireExceptions(); } catch(e){}
   try { loadMeteo(); }         catch(e){ console.warn('[init] loadMeteo', e); }
   try { loadEvents(); }        catch(e){ console.warn('[init] loadEvents', e); }
   try { loadDechets(); }       catch(e){ console.warn('[init] loadDechets', e); }
