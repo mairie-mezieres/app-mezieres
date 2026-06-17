@@ -1332,17 +1332,33 @@ function renderActus() {
       <div class="pub-row">
         <label class="pub-label">Canaux de publication</label>
         <div class="pub-options-grid">
-          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-fb" checked><span>📘 Publier sur Facebook</span></label>
-          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-push" checked><span>🔔 Notifier maintenant</span></label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-fb" checked><span>📘 Facebook</span></label>
+          <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-push" checked><span>🔔 Notification push</span></label>
           <label class="pub-checkbox-row"><input type="checkbox" id="pub-opt-calendar" checked><span>📅 Google Agenda</span></label>
         </div>
-        <div style="margin-top:10px;display:flex;flex-direction:column;gap:7px">
+        <div class="pub-hint">Ces canaux sont diffusés selon le <strong>mode</strong> choisi ci-dessous.</div>
+      </div>
+      <div class="pub-row">
+        <label class="pub-label">Mode de diffusion</label>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+          <label class="pub-checkbox-row" style="cursor:pointer"><input type="radio" name="pub-mode" value="now" checked onchange="pubModeToggle()"><span>📤 Publier maintenant</span></label>
+          <label class="pub-checkbox-row" style="cursor:pointer"><input type="radio" name="pub-mode" value="schedule" onchange="pubModeToggle()"><span>🕒 Programmer pour plus tard</span></label>
+        </div>
+        <div id="pub-schedule-row" style="display:none;margin-top:8px">
+          <input type="datetime-local" id="pub-schedule-at" class="pub-input">
+          <div class="pub-hint">La publication (Facebook + push + agenda, selon les canaux cochés) sera diffusée <strong>automatiquement</strong> à cette date.</div>
+        </div>
+      </div>
+      <div class="pub-row">
+        <label class="pub-label">🔔 Rappels push supplémentaires <span style="font-weight:600;color:var(--muted)">(facultatif)</span></label>
+        <div class="pub-hint" style="margin-bottom:6px">Notifications de rappel envoyées <strong>en plus</strong> de la publication, aux dates choisies. N'affectent ni Facebook ni l'agenda.</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕐 Push programmé 1</label>
+            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕐 Rappel 1</label>
             <input type="datetime-local" id="pub-push-sched-1" class="pub-input" style="flex:1;min-width:180px">
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕑 Push programmé 2</label>
+            <label style="font-size:0.76rem;font-weight:800;color:var(--muted);min-width:180px">🕑 Rappel 2</label>
             <input type="datetime-local" id="pub-push-sched-2" class="pub-input" style="flex:1;min-width:180px">
           </div>
         </div>
@@ -1356,6 +1372,8 @@ function renderActus() {
       <button type="button" class="pub-publish-btn" id="pub-submit" onclick="pubSubmit()">📢 Publier</button>
       <div class="pub-status" id="pub-status" style="display:none"></div>
     </div>
+    <div class="section-title">🕒 Publications programmées</div>
+    <div id="sched-actus-list" style="margin-bottom:16px"><div style="color:var(--muted);font-size:0.82rem">Chargement…</div></div>
     <div class="table-wrap">
       <div class="table-header"><span class="table-title">🔔 Actualités publiées (${actus.length})</span></div>
       <table>
@@ -1405,6 +1423,46 @@ function renderActus() {
     </div>
   `;
   pubUpdate();
+  renderScheduledActus();
+}
+
+function pubModeToggle(){
+  const m=(document.querySelector('input[name="pub-mode"]:checked')||{}).value;
+  const row=document.getElementById('pub-schedule-row');
+  if(row) row.style.display=(m==='schedule')?'block':'none';
+  const btn=document.getElementById('pub-submit');
+  if(btn) btn.textContent=(m==='schedule')?'🕒 Programmer la publication':'📢 Publier';
+}
+
+async function renderScheduledActus(){
+  const box=document.getElementById('sched-actus-list');
+  if(!box) return;
+  try{
+    const r=await fetch(`${API}/admin/actus/scheduled`,{headers:{'x-admin-token':TOKEN}});
+    const d=await r.json();
+    const list=d.scheduled||[];
+    if(!list.length){ box.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Aucune publication programmée.</div>'; return; }
+    box.innerHTML=list.map(s=>{
+      const when=new Date(s.scheduledAt).toLocaleString('fr-FR',{dateStyle:'medium',timeStyle:'short'});
+      const chans=[s.publishFacebook?'📘':'',s.sendPush?'🔔':'',(s.createCalendar&&s.eventDate)?'📅':''].filter(Boolean).join(' ')||'—';
+      const failed=s.status==='failed';
+      return `<div style="display:flex;align-items:center;gap:10px;background:${failed?'#fef2f2':'var(--mist)'};border:1px solid ${failed?'#fecaca':'transparent'};border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:0.82rem">
+        <span style="font-size:1.1rem">${failed?'⚠️':'🕒'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800">${safe(s.title||'—')}</div>
+          <div style="color:var(--muted)">${failed?('Échec : '+safe(s.failedReason||'inconnu')):('Diffusion le '+when)} · ${chans}${s.photoUrl?' · 🖼️':''}</div>
+        </div>
+        <button onclick="cancelScheduledActu(${s.id})" class="del-btn" title="Annuler">🗑️</button>
+      </div>`;
+    }).join('');
+  }catch(e){ box.innerHTML='<div style="color:var(--muted);font-size:0.82rem">Liste indisponible.</div>'; }
+}
+
+function cancelScheduledActu(id){
+  if(!confirm('Annuler cette publication programmée ?')) return;
+  fetch(`${API}/admin/actus/scheduled/${id}`,{method:'DELETE',headers:{'x-admin-token':TOKEN}})
+    .then(r=>r.json()).then(()=>renderScheduledActus())
+    .catch(e=>alert('Erreur : '+e.message));
 }
 
 let _pubImageBase64 = null;
@@ -1482,18 +1540,27 @@ async function pubSubmit() {
   const pushSched1     =(document.getElementById('pub-push-sched-1')?.value||'').trim();
   const pushSched2     =(document.getElementById('pub-push-sched-2')?.value||'').trim();
   const createCalendar =(document.getElementById('pub-opt-calendar')?.checked||false)&&!!eventDate;
+  const pubMode        =(document.querySelector('input[name="pub-mode"]:checked')||{}).value||'now';
+  const scheduleAt     =(document.getElementById('pub-schedule-at')?.value||'').trim();
 
   if(!title){alert("Le titre est obligatoire");return;}
   if(!description){alert("La description est obligatoire");return;}
+  if(pubMode==='schedule'){
+    if(!scheduleAt){alert("Choisissez la date et l'heure de programmation.");return;}
+    if(new Date(scheduleAt).getTime()<=Date.now()){alert("La date de programmation doit être dans le futur.");return;}
+  }
 
   const status=document.getElementById('pub-status');
   const btn=document.getElementById('pub-submit');
   btn.disabled=true; btn.textContent='⏳ Publication en cours…'; status.style.display='none';
 
   try {
-    const r=await fetch(`${API}/admin/actus/add`,{
+    const endpoint = pubMode==='schedule' ? '/admin/actus/schedule' : '/admin/actus/add';
+    const payload = {title, description, imageBase64:_pubImageBase64, eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar};
+    if(pubMode==='schedule') payload.scheduledAt = new Date(scheduleAt).toISOString();
+    const r=await fetch(`${API}${endpoint}`,{
       method:'POST', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
-      body:JSON.stringify({title, description, imageBase64:_pubImageBase64, eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar})
+      body:JSON.stringify(payload)
     });
     const d=await r.json();
 
@@ -1501,6 +1568,22 @@ async function pubSubmit() {
       status.className='pub-status error';
       status.innerHTML='❌ Erreur : '+(d.error||'Publication échouée');
       status.style.display='block';
+      return;
+    }
+
+    if(pubMode==='schedule'){
+      status.className='pub-status success';
+      status.innerHTML='🕒 Publication programmée pour le '+new Date(scheduleAt).toLocaleString('fr-FR')+'.';
+      status.style.display='block';
+      document.getElementById('pub-title').value='';
+      document.getElementById('pub-desc').value='';
+      document.getElementById('pub-event-date').value='';
+      document.getElementById('pub-event-location').value='';
+      pubRemoveImage();
+      const _sa=document.getElementById('pub-schedule-at'); if(_sa) _sa.value='';
+      document.getElementById('pub-calendar-warn').style.display='none';
+      pubUpdate();
+      renderScheduledActus();
       return;
     }
 
@@ -1588,7 +1671,11 @@ async function pubSubmit() {
     status.className='pub-status error';
     status.textContent='❌ Erreur réseau : '+e.message;
     status.style.display='block';
-  } finally { btn.disabled=false; btn.textContent='📢 Publier'; }
+  } finally {
+    btn.disabled=false;
+    const _m=(document.querySelector('input[name="pub-mode"]:checked')||{}).value;
+    btn.textContent=(_m==='schedule')?'🕒 Programmer la publication':'📢 Publier';
+  }
 }
 
 async function deleteActu(id) { if(!confirm('Supprimer cette actualité ?'))return; await apiDelete(`/admin/actus/${id}`); _data.actus=_data.actus.filter(a=>a.id!==id); renderActus(); }
