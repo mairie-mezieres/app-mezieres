@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.37.1';
+const CACHE = 'mat-v4.38.0';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -34,7 +34,7 @@ const PRECACHE_URLS = [
   './js/mat-accessibility.js?v=4.3.8',
   './js/mat-widgets.js?v=4.4.3',
   './js/mat-agenda.js?v=4.3.2',
-  './js/mat-forms.js?v=4.5.0',
+  './js/mat-forms.js?v=4.6.0',
   './js/mat-photos.js?v=1.3.2',
   './js/mat-actus.js?v=4.4.4',
   './js/mat-trombi.js?v=4.2.6',

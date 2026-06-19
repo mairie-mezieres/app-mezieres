@@ -303,12 +303,23 @@ async function submitIdee(){
   if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
   if(txt.length<10){await alertMAT('Merci de détailler un peu votre idée (10 caractères minimum).','Vos idées','💡');return;}
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
-  const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
-  rememberSeenIdeas([idea]);
   const notifyToken=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():null;
   const pushSub=notifyToken?await _getPushSubForNotify():null;
   const ideaBody=Object.assign({},idea,notifyToken?{notifyToken,sub:pushSub||undefined}:{});
-  try{await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ideaBody)});}catch(e){}
+  // Envoi serveur d'abord : la mairie peut avoir déclaré ce sujet comme « déjà
+  // proposé » (filtre anti-doublon). L'idée est alors refusée avec un message,
+  // sans être enregistrée. En cas d'échec réseau (hors-ligne), on bascule sur
+  // l'enregistrement local (offline-first) — le filtre ne s'applique qu'en ligne.
+  try{
+    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ideaBody)});
+    let data={}; try{ data=await r.json(); }catch(_){}
+    if(data&&data.blocked){
+      await alertMAT(data.message||'Une idée sur ce sujet a déjà été proposée. Pensez à voter pour celle qui existe déjà !','Sujet déjà proposé','💡');
+      return; // on garde le texte saisi pour que l'habitant puisse l'adapter
+    }
+  }catch(e){ /* hors-ligne : enregistrement local ci-dessous */ }
+  const ideas=getIdeas(); ideas.unshift(idea); localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas));
+  rememberSeenIdeas([idea]);
   if(notifyToken){try{localStorage.setItem('mat:notify:idea:'+idea.id,notifyToken);}catch(_){}}
   try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
