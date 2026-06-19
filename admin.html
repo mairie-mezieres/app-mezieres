@@ -1933,10 +1933,12 @@ let _bannerData = {active:false,icon:'ℹ️',title:'',text:''};
 let _mascotteData = {active:false,url:''};
 let _mascotteB64 = null;
 let _horairesData = [];
+let _ideaFiltersData = [];
 async function renderBanner() {
   try{const r=await fetch(`${API}/info-banner`);if(r.ok)_bannerData=await r.json();}catch(e){}
   try{const r=await fetch(`${API}/config/mascotte`);if(r.ok)_mascotteData=await r.json();}catch(e){}
   try{const r=await fetch(`${API}/horaires/exceptions`);if(r.ok){const d=await r.json();_horairesData=Array.isArray(d.exceptions)?d.exceptions:[];}}catch(e){}
+  try{const r=await fetch(`${API}/admin/idees/filtres`,{headers:{'x-admin-token':TOKEN}});if(r.ok){const d=await r.json();_ideaFiltersData=Array.isArray(d.filtres)?d.filtres:[];}}catch(e){}
   document.getElementById('banner-content').innerHTML=`
     <div class="section-title">📢 Encart d'information / alerte</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
@@ -1998,7 +2000,45 @@ async function renderBanner() {
         <button onclick="addHoraireException()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:10px 18px;font-size:0.82rem;font-weight:800;cursor:pointer;align-self:flex-start;">➕ Ajouter</button>
         <div id="he-msg" style="display:none;font-weight:800;font-size:0.8rem;"></div>
       </div>
+    </div>
+    <div class="section-title">🚫 Filtres anti-doublon des idées</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">Déclarez un <strong>sujet déjà proposé</strong> pour éviter les idées en doublon. Quand un habitant soumet une idée contenant <strong>tous les mots-clés</strong> d'un filtre, elle est <strong>refusée</strong> et le message que vous définissez s'affiche (il est invité à voter pour l'idée existante). Créez un filtre par sujet&nbsp;; pour des synonymes, ajoutez plusieurs filtres.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        ${_ideaFiltersData.length?_ideaFiltersData.map(_ideaFilterRowHtml).join(''):'<div style="color:var(--muted);font-size:0.82rem;">Aucun filtre actif.</div>'}
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:800;font-size:0.82rem;">➕ Ajouter un filtre</div>
+        <input id="if-label" maxlength="100" placeholder="Nom du sujet (ex : Climatisation de l'école)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;">
+        <input id="if-keywords" placeholder="Mots-clés séparés par des virgules (ex : climatisation, école)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;">
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:-4px;">L'idée est bloquée si elle contient <strong>tous</strong> ces mots (accents et majuscules ignorés). Ex&nbsp;: «&nbsp;climatisation, école&nbsp;» bloque «&nbsp;une clim à l'école&nbsp;» mais pas «&nbsp;climatisation de la salle des fêtes&nbsp;».</div>
+        <textarea id="if-message" rows="2" maxlength="300" placeholder="Message affiché à l'habitant (ex : Une idée de climatisation de l'école existe déjà. Le budget ne permet pas de la réallouer pour l'instant — vous pouvez voter pour l'idée existante.)" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;resize:vertical;"></textarea>
+        <button onclick="addIdeaFilter()" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:10px 18px;font-size:0.82rem;font-weight:800;cursor:pointer;align-self:flex-start;">➕ Ajouter</button>
+        <div id="if-msg" style="display:none;font-weight:800;font-size:0.8rem;"></div>
+      </div>
     </div>`;
+}
+function _ideaFilterRowHtml(f){
+  const kws=(f.keywords||[]).map(k=>safe(k)).join(' + ');
+  return `<div style="display:flex;align-items:flex-start;gap:10px;background:var(--mist);border-radius:10px;padding:10px 12px;font-size:0.82rem;"><span style="font-size:1.1rem;">🚫</span><div style="flex:1;min-width:0;"><div style="font-weight:800;">${safe(f.label||'(sans nom)')}</div><div style="color:var(--muted);font-size:0.74rem;margin:2px 0;">Mots-clés : ${kws}</div><div style="color:var(--text);font-style:italic;">${safe(f.message||'')}</div></div><button onclick="deleteIdeaFilter(${f.id})" style="background:none;border:none;cursor:pointer;font-size:1rem;" title="Supprimer">🗑️</button></div>`;
+}
+function _ifErr(m){ const el=document.getElementById('if-msg'); if(el){el.style.color='#b91c1c';el.textContent='⚠️ '+m;el.style.display='block';} }
+function addIdeaFilter(){
+  const label=document.getElementById('if-label').value.trim();
+  const keywords=document.getElementById('if-keywords').value.split(',').map(k=>k.trim()).filter(Boolean).slice(0,10);
+  const message=document.getElementById('if-message').value.trim();
+  if(!keywords.length) return _ifErr('Indiquez au moins un mot-clé.');
+  _ideaFiltersData.push({id:Date.now(),label,keywords,message});
+  saveIdeaFilters();
+}
+function deleteIdeaFilter(id){ _ideaFiltersData=_ideaFiltersData.filter(f=>f.id!==id); saveIdeaFilters(); }
+async function saveIdeaFilters(){
+  try{
+    const r=await fetch(`${API}/admin/idees/filtres`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({filtres:_ideaFiltersData})});
+    const d=await r.json();
+    if(d.ok){ _ideaFiltersData=d.filtres||[]; renderBanner(); }
+    else alert('Erreur : '+(d.error||'inconnue'));
+  }catch(e){ alert('Erreur lors de la sauvegarde : '+e.message); }
 }
 function _frDate(iso){ if(!iso) return ''; const p=String(iso).split('-'); return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):iso; }
 function _horaireRowHtml(e){
