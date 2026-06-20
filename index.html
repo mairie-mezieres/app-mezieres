@@ -150,7 +150,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.38 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.38.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -427,7 +427,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.38</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.38.1</button>
 </div>
 </div>
 </div>
@@ -1194,6 +1194,10 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">💊 Pharmacie de Cléry</div><div style="font-size:0.68rem;color:var(--muted)">Cléry-Saint-André</div></div>
 <a href="tel:0238457471" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 02 38 45 74 71</a>
 </div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">🩺 Cabinet infirmier Cléry</div><div style="font-size:0.68rem;color:var(--muted)">Cléry-Saint-André</div></div>
+<a href="tel:0238456912" style="background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border-radius:10px;padding:7px 12px;font-size:0.74rem;font-weight:900;text-decoration:none;flex-shrink:0">📞 02 38 45 69 12</a>
+</div>
 </div>
 </div>
 <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
@@ -1520,6 +1524,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 20 juin 2026 — v4.38.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Num&eacute;ros utiles&nbsp;: ajout du <strong>Cabinet infirmier Cl&eacute;ry</strong> dans la rubrique Sant&eacute; (02&nbsp;38&nbsp;45&nbsp;69&nbsp;12)</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 19 juin 2026 — v4.38</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Bo&icirc;te &agrave; id&eacute;es&nbsp;: si une id&eacute;e sur le m&ecirc;me sujet a d&eacute;j&agrave; &eacute;t&eacute; propos&eacute;e, un message vous l&rsquo;indique et vous invite &agrave; <strong>voter pour l&rsquo;id&eacute;e existante</strong> plut&ocirc;t que de cr&eacute;er un doublon</li>
