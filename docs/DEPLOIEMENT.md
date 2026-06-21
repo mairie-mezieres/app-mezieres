@@ -18,7 +18,7 @@ MAT, c'est **deux morceaux** hébergés gratuitement :
 
 | Morceau | Dépôt | Hébergeur | Rôle |
 |---|---|---|---|
-| **Front** (l'app que voient les habitants) | `app-mezieres` | **Cloudflare Pages** | Pages HTML/JS statiques (PWA) |
+| **Front** (l'app que voient les habitants) | `app-mezieres` | **GitHub Pages** | Pages HTML/JS statiques (PWA) |
 | **Back** (l'API) | `chatbot-mairie-mezieres` | **Render** | Node.js : chatbot, push, météo, photos… |
 
 Le front appelle le back via **une seule URL** (configurable, voir §6). Aucune
@@ -34,7 +34,7 @@ Commencez petit, ajoutez les intégrations au fur et à mesure.
 
 | Niveau | Ce que vous obtenez | Comptes à créer |
 |---|---|---|
-| 🟢 **Minimum** | Portail consultable (agenda, infos, météo de base), admin, notifications push | GitHub, Render, Cloudflare, **Upstash** |
+| 🟢 **Minimum** | Portail consultable (agenda, infos, météo de base), admin, notifications push | GitHub (+ Pages), Render, **Upstash** |
 | 🟡 **Recommandé** | + Assistant MEL (chatbot), vigilance Météo-France | + **Anthropic** (ou Mistral), + Météo-France |
 | 🔵 **Complet** | + Publication Facebook, photos, signalements Trello, agenda Google, e-mails | + Facebook, Cloudinary, Trello, Google, Resend |
 
@@ -47,20 +47,19 @@ petite commune.
 
 | # | Service | Niveau | À récupérer | Lien |
 |---|---|---|---|---|
-| 1 | **GitHub** | 🟢 requis | (héberge le code, déclenche les déploiements) | https://github.com |
-| 2 | **Cloudflare** | 🟢 requis | (héberge le front) | https://dash.cloudflare.com |
-| 3 | **Render** | 🟢 requis | (héberge le back) | https://dashboard.render.com |
-| 4 | **Upstash** | 🟢 requis | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | https://console.upstash.com |
+| 1 | **GitHub** | 🟢 requis | héberge le **code ET le front** (via **GitHub Pages**) | https://github.com |
+| 2 | **Render** | 🟢 requis | (héberge le back) | https://dashboard.render.com |
+| 3 | **Upstash** | 🟢 requis | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | https://console.upstash.com |
 | — | **Clés VAPID** | 🟢 requis | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (générées, pas de compte) | voir §5.C |
-| 5 | **Anthropic** | 🟡 reco | `ANTHROPIC_API_KEY` | https://console.anthropic.com |
-| 6 | **Mistral** *(alternative IA)* | 🟡 option | `MISTRAL_API_KEY` | https://console.mistral.ai |
-| 7 | **Météo-France** | 🟡 reco | `METEOFRANCE_VIGILANCE_URL` | https://portail-api.meteofrance.fr |
-| 8 | **Facebook / Meta** | 🔵 option | `PAGE_ACCESS_TOKEN`, `FACEBOOK_PAGE_ID`, `FACEBOOK_APP_SECRET` | https://developers.facebook.com |
-| 9 | **Cloudinary** | 🔵 option | `CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET` | https://cloudinary.com |
-| 10 | **Trello** | 🔵 option | `TRELLO_KEY`, `TRELLO_TOKEN`, IDs de listes | https://trello.com/app-key |
-| 11 | **Google Cloud** | 🔵 option | compte de service JSON, `GOOGLE_CALENDAR_ID` | https://console.cloud.google.com |
-| 12 | **Resend** | 🔵 option | `RESEND_API_KEY` | https://resend.com |
-| 13 | **Sentry** | 🔵 option | `SENTRY_DSN` | https://sentry.io |
+| 4 | **Anthropic** | 🟡 reco | `ANTHROPIC_API_KEY` | https://console.anthropic.com |
+| 5 | **Mistral** *(alternative IA)* | 🟡 option | `MISTRAL_API_KEY` | https://console.mistral.ai |
+| 6 | **Météo-France** | 🟡 reco | `METEOFRANCE_VIGILANCE_URL` | https://portail-api.meteofrance.fr |
+| 7 | **Facebook / Meta** | 🔵 option | `PAGE_ACCESS_TOKEN`, `FACEBOOK_PAGE_ID`, `FACEBOOK_APP_SECRET` | https://developers.facebook.com |
+| 8 | **Cloudinary** | 🔵 option | `CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET` | https://cloudinary.com |
+| 9 | **Trello** | 🔵 option | `TRELLO_KEY`, `TRELLO_TOKEN`, IDs de listes | https://trello.com/app-key |
+| 10 | **Google Cloud** | 🔵 option | compte de service JSON, `GOOGLE_CALENDAR_ID` | https://console.cloud.google.com |
+| 11 | **Resend** | 🔵 option | `RESEND_API_KEY` | https://resend.com |
+| 12 | **Sentry** | 🔵 option | `SENTRY_DSN` | https://sentry.io |
 
 > La liste **exhaustive et commentée** des variables est dans
 > [`chatbot-mairie-mezieres/.env.example`](https://github.com/mairie-mezieres/chatbot-mairie-mezieres/blob/main/.env.example).
@@ -112,13 +111,16 @@ Copiez la **Public Key** dans `VAPID_PUBLIC_KEY` et la **Private Key** dans
 2. Dans l'onglet **REST API**, copiez `UPSTASH_REDIS_REST_URL` et
    `UPSTASH_REDIS_REST_TOKEN` → collez-les côté Render.
 
-### E. Frontend sur Cloudflare Pages
-1. Sur **Cloudflare** → **Workers & Pages** → **Create** → **Pages** → connectez
-   votre dépôt **`app-mezieres`**.
-2. **Build settings** : commande de build = *(vide)*, dossier de sortie = `/`
-   (le site est statique, aucun build).
-3. Déployez. Cloudflare vous donne une URL (ex. `mon-commune.pages.dev`) ; vous
-   pourrez ensuite y brancher votre nom de domaine.
+### E. Frontend sur GitHub Pages
+1. Dans votre dépôt **`app-mezieres`** sur GitHub → **Settings** → **Pages**.
+2. **Build and deployment** → *Source* = **Deploy from a branch** ; branche =
+   **`main`**, dossier = **`/ (root)`**. Le site est statique : aucun build.
+3. GitHub publie le site (en quelques minutes) à
+   `https://VOTRE-COMPTE.github.io/app-mezieres/`.
+4. *(Optionnel)* **Nom de domaine perso** : saisissez-le dans le champ *Custom
+   domain* (ex. `mezieres-lez-clery.fr`). GitHub crée alors un fichier `CNAME`
+   dans le dépôt ; configurez ensuite les enregistrements DNS chez votre
+   registrar comme indiqué par GitHub.
 
 ### F. Brancher le front sur votre back ⚙️
 C'est **le seul réglage de code**. Dans le dépôt `app-mezieres`, modifiez l'URL
@@ -132,7 +134,8 @@ du backend (celle notée à l'étape B) à **3 endroits balisés** :
 > Avant la centralisation, cette URL était codée en dur ~60 fois. Désormais ce
 > sont **ces 3 endroits**, tous commentés `⚙️ RÉPLICATION`.
 
-Commitez : Cloudflare redéploie automatiquement. **C'est en ligne. 🎉**
+Commitez : GitHub Pages redéploie automatiquement à chaque push sur `main`.
+**C'est en ligne. 🎉**
 
 ---
 

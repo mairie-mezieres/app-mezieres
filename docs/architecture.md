@@ -117,7 +117,7 @@ flowchart TB
         browser["Navigateur + PWA installée"]
     end
 
-    subgraph cf["Cloudflare Pages"]
+    subgraph cf["GitHub Pages"]
         static["Frontend statique<br/>mezieres-lez-clery.fr<br/>déploiement auto sur push main"]
     end
 

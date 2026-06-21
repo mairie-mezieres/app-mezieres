@@ -37,7 +37,7 @@ MAT est une application en deux parties indépendantes :
 ┌─────────────────────────────────┐       ┌──────────────────────────────────┐
 │  Frontend (app-mezieres)        │       │  Backend (chatbot-mairie-mezieres)│
 │  HTML / CSS / JS vanilla        │ HTTP  │  Node.js / Express               │
-│  Hébergé sur Cloudflare Pages   │──────▶│  Hébergé sur Render              │
+│  Hébergé sur GitHub Pages       │──────▶│  Hébergé sur Render              │
 │  https://mezieres-lez-clery.fr  │       │  https://chatbot-*.onrender.com  │
 └─────────────────────────────────┘       └──────────────────────────────────┘
          ▲                                          │
@@ -473,19 +473,18 @@ Le serveur statique de test est `tests/e2e/static-server.js`. Toutes les requêt
 
 ## 11. Déploiement
 
-### Frontend — Cloudflare Pages
+### Frontend — GitHub Pages
 
-Déploiement automatique à chaque push sur `main` (connexion GitHub → Cloudflare Pages configurée).
+Déploiement automatique à chaque push sur `main` (*Settings → Pages* du dépôt).
 
 - Branche de production : `main`
 - Commande de build : aucune (fichiers statiques directs)
 - Répertoire de sortie : `/` (racine du dépôt)
+- Domaine personnalisé `mezieres-lez-clery.fr` via le fichier `CNAME`
 
-Pour un déploiement manuel :
-```bash
-# Via Cloudflare Pages CLI
-npx wrangler pages deploy . --project-name=mezieres-lez-clery
-```
+> ℹ️ Le fichier `_headers` (en-têtes CSP/HSTS) n'est honoré que par Cloudflare
+> Pages / Netlify ; **GitHub Pages l'ignore** — ces en-têtes ne sont donc pas
+> appliqués sur l'hébergement actuel.
 
 ### Backend — Render
 
