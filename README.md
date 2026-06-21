@@ -46,6 +46,7 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
 | [Architecture applicative](docs/architecture.md) | Développeurs · MOA | Schémas (contexte, conteneurs, déploiement, flux métier, données) |
 | [Spécifications fonctionnelles (MOA)](docs/specifications/README.md) | Maîtrise d'ouvrage | Exigences & règles de gestion par processus (référentiel SFG + SFD) |
 | [Spécifications techniques (STD)](docs/specifications-techniques/README.md) | Développeurs · intégrateurs | Contrat de chaque endpoint : validations, codes HTTP, messages d'erreur, limites |
+| [Guide de déploiement](docs/DEPLOIEMENT.md) | Autres communes | Mise en ligne « de zéro » : checklist des comptes, déploiement 1-clic, où coller chaque clé |
 | [Kit de réplication](docs/REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
 | [Politique de sécurité](SECURITY.md) | Tous | Divulgation responsable, périmètre |
 
