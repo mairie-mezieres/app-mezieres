@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
    MAT — Sondages citoyens v4.0.1
    ═══════════════════════════════════════════════════════════ */
-var _SONDAGES_API = 'https://chatbot-mairie-mezieres.onrender.com';
+var _SONDAGES_API = window.MAT_API;
 var _selectedStar = 0;
 var _currentSondages = [];
 

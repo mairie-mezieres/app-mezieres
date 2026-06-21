@@ -337,7 +337,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
         id = 'mat-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 10);
         try { localStorage.setItem(KEY, id); } catch(_e) {}
       }
-      fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
+      fetch(window.MAT_API+'/stats/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-device-id': id },
         body: JSON.stringify({ service, deviceId: id }),

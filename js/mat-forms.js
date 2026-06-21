@@ -61,7 +61,7 @@ async function _getPushSubForNotify(){
   }catch(e){return null;}
 }
 
-const _CHATBOT='https://chatbot-mairie-mezieres.onrender.com';
+const _CHATBOT=window.MAT_API;
 
 function _injectNotifBox(el,html){
   const old=document.getElementById('_notif-ask-box');
@@ -202,7 +202,7 @@ function resetSignal(){
 
 // ── Boîte à idées ───────────────────────────────────────────────────
 const IDEAS_KEY='mat_ideas_v3', VOTES_KEY='mat_votes_v3', IDEAS_SEEN_KEY='mat_ideas_seen_v1';
-const IDEAS_URL='https://chatbot-mairie-mezieres.onrender.com/idees';
+const IDEAS_URL=window.MAT_API+'/idees';
 const IDEAS_SORT_KEY='mat_ideas_sort_v1';
 const IDEA_TREND_MIN_VOTES=3;
 const IDEA_TREND_MAX_AGE_DAYS=10;
@@ -311,7 +311,7 @@ async function submitIdee(){
   // sans être enregistrée. En cas d'échec réseau (hors-ligne), on bascule sur
   // l'enregistrement local (offline-first) — le filtre ne s'applique qu'en ligne.
   try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ideaBody)});
+    const r=await fetch(window.MAT_API+'/idee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(ideaBody)});
     let data={}; try{ data=await r.json(); }catch(_){}
     if(data&&data.blocked){
       await alertMAT(data.message||'Une idée sur ce sujet a déjà été proposée. Pensez à voter pour celle qui existe déjà !','Sujet déjà proposé','💡');
@@ -331,7 +331,7 @@ async function voteIdee(id){
   if(window._matFeatures&&window._matFeatures.reactionsEnabled===false) return;
   const votes=getVotes();
   const alreadyVoted=!!votes[id];
-  const url='https://chatbot-mairie-mezieres.onrender.com/idee/'+id+'/vote';
+  const url=window.MAT_API+'/idee/'+id+'/vote';
   if(alreadyVoted){
     delete votes[id]; localStorage.setItem(VOTES_KEY,JSON.stringify(votes));
     try{ await matFetch(url,{method:'DELETE',headers:{'x-device-id':getMatDeviceId()}},8000); }catch(e){}
@@ -469,7 +469,7 @@ async function submitBug(){
       +'\n\nDescription :\n'+desc;
     const bugBody={cat:'[BUG] '+(bugService||'Non précisé'),desc:descFull,type:'bug',photoB64,
       ...(notifyToken?{notifyToken,sub:pushSub||undefined}:{})};
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/signal',{
+    await fetch(window.MAT_API+'/signal',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify(bugBody)
     });
@@ -567,7 +567,7 @@ async function loadSignalMap(){
   if(!el) return;
   let items=[];
   try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
+    const r=await fetch(window.MAT_API+'/api/signalements');
     if(r.ok){ const d=await r.json(); items=(d.signalements||[]).filter(s=>typeof s.lat==='number'&&typeof s.lon==='number'); }
   }catch(_){}
   try{ await _loadLeaflet(); }
@@ -697,7 +697,7 @@ async function loadSuivi(type){
   if(!body) return;
   body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>';
   try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/api/signalements');
+    const r=await fetch(window.MAT_API+'/api/signalements');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
     _suiviItems=(type==='bugs' ? (data.bugs||[]) : (data.signalements||[])).map(s=>({...s,status:(s.status in _suiviStCfg)?s.status:'pending'}));

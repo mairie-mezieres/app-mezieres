@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 
-var API='https://chatbot-mairie-mezieres.onrender.com';
+var API=window.MAT_API;
 var _cache=null;
 
 /* Données initiales — complétées/corrigées via l'onglet Admin */

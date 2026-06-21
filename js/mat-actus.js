@@ -88,7 +88,7 @@ async function fetchIdeasForBadge(){
     if(typeof fetchIdeasList==='function') return await fetchIdeasList();
   }catch(e){}
   try{
-    const r=await fetch('https://chatbot-mairie-mezieres.onrender.com/idees',{cache:'no-store',signal:matAbortTimeout(8000)});
+    const r=await fetch(window.MAT_API+'/idees',{cache:'no-store',signal:matAbortTimeout(8000)});
     const d=await r.json();
     return d.idees||[];
   }catch(e){
@@ -216,7 +216,7 @@ async function toggleLikeActu(id){
   const btn = document.getElementById('like-btn-'+id);
   if(btn){ btn.classList.toggle('liked',!liked); btn.setAttribute('aria-pressed',String(!liked)); }
   try{
-    const resp = await matFetch('https://chatbot-mairie-mezieres.onrender.com/actu/'+id+'/like',{
+    const resp = await matFetch(window.MAT_API+'/actu/'+id+'/like',{
       method:'POST', headers:{'x-device-id': getMatDeviceId()}
     }, 8000);
     if(!resp.ok){
@@ -361,12 +361,12 @@ async function checkPushStatus(){
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);_showPushDiag();
       // Re-sync silencieux : uniquement si l'utilisateur a explicitement activé les push
-      try { if(localStorage.getItem('mat_push_active') && localStorage.getItem(ACTUS_NOTIF_KEY)!=='0') fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){}); } catch(_) {}
+      try { if(localStorage.getItem('mat_push_active') && localStorage.getItem(ACTUS_NOTIF_KEY)!=='0') fetch(window.MAT_API+'/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){}); } catch(_) {}
       try {
         if(localStorage.getItem('mat_push_active') && localStorage.getItem(METEO_NOTIF_KEY)!=='0'){
           var lvl=parseInt(localStorage.getItem(METEO_NOTIF_LEVEL_KEY))||2;
           var subM=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:lvl});
-          fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subM),keepalive:true}).catch(function(){});
+          fetch(window.MAT_API+'/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subM),keepalive:true}).catch(function(){});
         }
       } catch(_) {}
     }
@@ -386,7 +386,7 @@ function _showPushDiag() {
     return reg.pushManager.getSubscription();
   }).then(function(sub){
     if(!sub || !t) return;
-    fetch('https://chatbot-mairie-mezieres.onrender.com/push/status',{
+    fetch(window.MAT_API+'/push/status',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true
     }).then(function(r){return r.json();}).then(function(d){
@@ -424,8 +424,8 @@ async function testPushNotification() {
     var reg=await navigator.serviceWorker.ready;
     var sub=await reg.pushManager.getSubscription();
     if(!sub){if(txt)txt.textContent='⚠️ Aucun abonnement local trouvé';if(btn){btn.textContent='Tester 🔔';btn.disabled=false;}return;}
-    try{await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true});}catch(_){}
-    var r=await fetch('https://chatbot-mairie-mezieres.onrender.com/push/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true});
+    try{await fetch(window.MAT_API+'/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true});}catch(_){}
+    var r=await fetch(window.MAT_API+'/push/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true});
     if(r.ok){
       if(txt)txt.textContent='✅ Notification envoyée — vérifiez votre appareil';
     } else {
@@ -445,8 +445,8 @@ async function testPushNotification() {
 async function togglePush(){
   const btn=document.getElementById('push-btn');
   if(pushRegistered){
-    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});
-      fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true}).catch(function(){});
+    try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch(window.MAT_API+'/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})});
+      fetch(window.MAT_API+'/push/unsubscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint}),keepalive:true}).catch(function(){});
       if(!localStorage.getItem('mat_dechets_notif_v1')) await sub.unsubscribe();}}catch(e){}
     if(btn){btn.textContent='Être alerté';btn.classList.remove('off');btn.classList.add('on');}
     updateNotifCardStatus(false);
@@ -462,9 +462,9 @@ async function togglePush(){
       const reg=await navigator.serviceWorker.ready;
       let sub=await reg.pushManager.getSubscription();
       if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUB)});
-      if(localStorage.getItem(ACTUS_NOTIF_KEY)!=='0') await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-      if(localStorage.getItem('mat_dechets_notif_v1')==='1'){fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});}
-      try{if(localStorage.getItem(METEO_NOTIF_KEY)!=='0'){var lvlA=parseInt(localStorage.getItem(METEO_NOTIF_LEVEL_KEY))||2;var subMA=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:lvlA});fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subMA),keepalive:true}).catch(function(){});}}catch(_){}
+      if(localStorage.getItem(ACTUS_NOTIF_KEY)!=='0') await fetch(window.MAT_API+'/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+      if(localStorage.getItem('mat_dechets_notif_v1')==='1'){fetch(window.MAT_API+'/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});}
+      try{if(localStorage.getItem(METEO_NOTIF_KEY)!=='0'){var lvlA=parseInt(localStorage.getItem(METEO_NOTIF_LEVEL_KEY))||2;var subMA=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:lvlA});fetch(window.MAT_API+'/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subMA),keepalive:true}).catch(function(){});}}catch(_){}
       _registerPendingNotifyTokens(sub).catch(function(){});
       if(btn){btn.textContent='Ne pas être alerté';btn.classList.remove('on');btn.classList.add('off');}
       updateNotifCardStatus(true);
@@ -484,7 +484,7 @@ async function _registerPendingNotifyTokens(sub){
       var token=localStorage.getItem(keys[i]);
       if(!token) continue;
       try{
-        fetch('https://chatbot-mairie-mezieres.onrender.com/notify/register-token',{
+        fetch(window.MAT_API+'/notify/register-token',{
           method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({token:token,sub:sub}),keepalive:true
         }).catch(function(){});
@@ -499,7 +499,7 @@ const MAT_BANNER_DISMISS_KEY = 'mat_banner_dismissed_v3_';
 async function loadMatInfoBanner() {
   // 1. Vigilance météo prioritaire
   try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/meteo/commune',{signal:matAbortTimeout(6000)});
+    const r = await fetch(window.MAT_API+'/meteo/commune',{signal:matAbortTimeout(6000)});
     if (r.ok) {
       const d = await r.json();
       const v = d.vigilance;
@@ -514,7 +514,7 @@ async function loadMatInfoBanner() {
   } catch(e) { if(typeof matLogError==='function') matLogError('banner','meteo: '+e.message); }
   // 2. Sinon, encart admin
   try {
-    const r = await fetch('https://chatbot-mairie-mezieres.onrender.com/info-banner',{signal:matAbortTimeout(6000)});
+    const r = await fetch(window.MAT_API+'/info-banner',{signal:matAbortTimeout(6000)});
     if (!r.ok) return;
     const d = await r.json();
     if (!d.active || !d.text) return;
@@ -637,7 +637,7 @@ async function toggleMeteoNotif(enabled) {
     if(sub){
       var lvl=parseInt(localStorage.getItem(METEO_NOTIF_LEVEL_KEY))||2;
       var subD=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:lvl});
-      fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subD),keepalive:true}).catch(function(){});
+      fetch(window.MAT_API+'/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subD),keepalive:true}).catch(function(){});
       updateNotifCardStatus(true); _showPushDiag();
     } else {
       try{localStorage.setItem(METEO_NOTIF_KEY,'0');}catch(_){} // rollback si permission refusée
@@ -646,7 +646,7 @@ async function toggleMeteoNotif(enabled) {
     try{
       var reg=await navigator.serviceWorker.ready;
       var sub2=await reg.pushManager.getSubscription();
-      if(sub2) fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
+      if(sub2) fetch(window.MAT_API+'/push/unsubscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
     }catch(e){}
     await _unsubscribeIfAllOff();
   }
@@ -658,7 +658,7 @@ async function toggleActusNotifFromAcc(enabled) {
   if(enabled){
     var sub=await _ensurePushSub();
     if(sub){
-      fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});
+      fetch(window.MAT_API+'/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});
       updateNotifCardStatus(true); _showPushDiag();
     } else {
       try{localStorage.setItem(ACTUS_NOTIF_KEY,'0');}catch(_){}
@@ -667,7 +667,7 @@ async function toggleActusNotifFromAcc(enabled) {
     try{
       var reg=await navigator.serviceWorker.ready;
       var sub2=await reg.pushManager.getSubscription();
-      if(sub2) fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
+      if(sub2) fetch(window.MAT_API+'/push/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
     }catch(e){}
     await _unsubscribeIfAllOff();
     updateNotifCardStatus(pushRegistered); // rafraîchit la carte même si d'autres types restent actifs
@@ -680,7 +680,7 @@ async function toggleDechetsNotifFromAcc(enabled) {
     var sub=await _ensurePushSub();
     if(sub){
       try{localStorage.setItem('mat_dechets_notif_v1','1');}catch(_){}
-      fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});
+      fetch(window.MAT_API+'/push/subscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub),keepalive:true}).catch(function(){});
       updateNotifCardStatus(true); _showPushDiag();
     }
   } else {
@@ -688,7 +688,7 @@ async function toggleDechetsNotifFromAcc(enabled) {
     try{
       var reg=await navigator.serviceWorker.ready;
       var sub2=await reg.pushManager.getSubscription();
-      if(sub2) fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
+      if(sub2) fetch(window.MAT_API+'/push/unsubscribe/dechets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub2.endpoint}),keepalive:true}).catch(function(){});
     }catch(e){}
     await _unsubscribeIfAllOff();
   }
@@ -702,7 +702,7 @@ function setMeteoNotifLevel(level) {
       navigator.serviceWorker.ready.then(function(reg){return reg.pushManager.getSubscription();}).then(function(sub){
         if(!sub) return;
         var subD=Object.assign(JSON.parse(JSON.stringify(sub)),{minLevel:level});
-        fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subD),keepalive:true}).catch(function(){});
+        fetch(window.MAT_API+'/push/subscribe/meteo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(subD),keepalive:true}).catch(function(){});
       }).catch(function(){});
     }
   }catch(_){}

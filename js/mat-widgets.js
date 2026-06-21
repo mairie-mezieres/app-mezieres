@@ -543,7 +543,7 @@ var _matHoraires = { exceptions: [] };
 try { var _hc=localStorage.getItem('mat_horaires_exc'); if(_hc) _matHoraires.exceptions=JSON.parse(_hc)||[]; } catch(e){}
 
 function loadHoraireExceptions(){
-  fetch('https://chatbot-mairie-mezieres.onrender.com/horaires/exceptions',{signal:matAbortTimeout(6000)})
+  fetch(window.MAT_API+'/horaires/exceptions',{signal:matAbortTimeout(6000)})
     .then(function(r){ return r.ok?r.json():null; })
     .then(function(d){
       if(d && Array.isArray(d.exceptions)){
@@ -893,7 +893,7 @@ async function loadCarburant() {
   if (!el) return;
   try {
     if (!_carburantCache) {
-      var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' });
+      var r = await fetch(window.MAT_API+'/carburant', { cache: 'no-store' });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       var fetched = await r.json();
       if (!fetched || fetched.error) throw new Error('payload carburant invalide');
@@ -922,7 +922,7 @@ function loadCarburantPanel() {
   var el = document.getElementById('carburant-panel-body');
   if (!el) return;
   if (!_carburantCache) {
-    fetch('https://chatbot-mairie-mezieres.onrender.com/carburant', { cache: 'no-store' })
+    fetch(window.MAT_API+'/carburant', { cache: 'no-store' })
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function(d){ if (!d || d.error) throw new Error('payload'); _carburantCache = d; renderCarburantPanel(el, d); })
       .catch(function(){ el.innerHTML = '<p style="color:var(--muted);text-align:center">Données temporairement indisponibles.</p>'; });
@@ -961,7 +961,7 @@ var _envLocalCache = null;
 async function loadEnvLocal() {
   try {
     if (_envLocalCache && Date.now() - (_envLocalCache._ts || 0) < 15 * 60000) return;
-    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/env-local', { cache: 'no-store' });
+    var r = await fetch(window.MAT_API+'/env-local', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
     d._ts = Date.now();
@@ -1030,7 +1030,7 @@ async function loadEventsLocaux() {
   } catch(_) {}
 
   try {
-    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/events-locaux', { cache: 'no-store' });
+    var r = await fetch(window.MAT_API+'/events-locaux', { cache: 'no-store' });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     var d = await r.json();
     if (d.nokey) {

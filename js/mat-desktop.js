@@ -5,7 +5,7 @@
 var _initialized = false;
 var _mq = window.matchMedia('(min-width:1024px)');
 
-var API='https://chatbot-mairie-mezieres.onrender.com';
+var API=window.MAT_API;
 var _retryScheduled=false;
 
 /* ── helpers ─────────────────────────────────────────────────── */

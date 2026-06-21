@@ -153,7 +153,7 @@ async function toggleDechetsNotif() {
       var reg = await navigator.serviceWorker.ready;
       var sub = await reg.pushManager.getSubscription();
       if (sub) {
-        fetch('https://chatbot-mairie-mezieres.onrender.com/push/unsubscribe/dechets', {
+        fetch(window.MAT_API+'/push/unsubscribe/dechets', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: sub.endpoint }), keepalive: true
         }).catch(function() {});
@@ -177,11 +177,11 @@ async function toggleDechetsNotif() {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
     });
     // Toujours synchroniser l'abonnement aux actualités (idempotent côté serveur)
-    fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+    fetch(window.MAT_API+'/push/subscribe', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSub), keepalive: true
     }).catch(function() {});
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe/dechets', {
+    await fetch(window.MAT_API+'/push/subscribe/dechets', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSub)
     });

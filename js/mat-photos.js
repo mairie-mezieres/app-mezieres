@@ -4,7 +4,7 @@
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
-const _PHOTOS_API      = 'https://chatbot-mairie-mezieres.onrender.com';
+const _PHOTOS_API      = window.MAT_API;
 const _PHOTO_VOTES_KEY = 'mat_photo_votes_v1';
 const _MY_PHOTOS_KEY   = 'mat_my_photos_v1';
 const _PHOTOS_SEEN_KEY = 'mat_photos_seen_v1';
