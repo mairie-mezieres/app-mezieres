@@ -1163,11 +1163,19 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '- **"Comment j’obtiens un nom de domaine ?»** → OVH, Gandi, Namecheap selon la souveraineté.',
       '- **"Pourquoi créer une adresse mail spéciale ?»** → explique que si le maire ou l’agent utilise son adresse personnelle, la commune perd l’accès à ses outils en cas de départ. L’adresse générique garantit la continuité.',
       '- **"Je n’arrive pas à créer mon compte GitHub / Render»** → guide pas à pas : aller sur le site, cliquer sur «Sign up», renseigner l’adresse générique, valider l’e-mail de confirmation, puis revenir.',
-      '- **"J’ai oublié de noter mon mot de passe»** → recommande un gestionnaire de mots de passe simple (Bitwarden gratuit) ou un document partagé sécurisé en interne (pas un post-it).',
-      '',
-      '---',
-      '',
-      '**TU PEUX COMMENCER. CONSTRUIS LE SITE.**'
+      ‘- **"J’ai oublié de noter mon mot de passe»** → recommande un gestionnaire de mots de passe simple (Bitwarden gratuit) ou un document partagé sécurisé en interne (pas un post-it).’,
+      ‘- **"Comment payer les abonnements numériques sans carte personnelle ?»** → Plusieurs voies autonomes existent sans passer par un prestataire privé :’,
+      ‘  - **Régie d’avances** (à privilégier pour les petites communes) : par délibération + arrêté, la commune crée une régie d’avances ; le régisseur (souvent le secrétaire de mairie) dispose d’une carte bancaire de régie pour régler directement les abonnements en ligne. C’est le mécanisme prévu par la comptabilité publique pour les petites dépenses récurrentes ; de nombreuses collectivités l’utilisent pour leurs abonnements numériques. À confirmer avec le receveur municipal.’,
+      ‘  - **Carte d’achat public** : carte adossée à un marché bancaire, adaptée aux achats récurrents des communes de taille moyenne ou grande.’,
+      ‘  - **UGAP** : centrale d’achat publique qui propose cloud et numérique "sur étagère" ; la commune achète en cadre conforme, sans intermédiaire privé, et reste propriétaire de tout.’,
+      ‘  - **Mutualisation intercommunale** : la communauté de communes, un syndicat mixte ou une agence publique du numérique (Mégalis Bretagne, Gironde Numérique, etc.) peuvent héberger et financer pour leurs membres — solution publique, pas un prestataire privé.’,
+      ‘  - **Hébergeurs FR facturables par virement** : Clever Cloud, Scaleway ou OVHcloud pour l’hébergement ; Mistral (FR) pour l’IA ; Brevo (FR) pour les e-mails ; tous habitués au secteur public et facturables par mandat de paiement, sans carte bancaire.’,
+      ‘  - **Résumé pratique** : petite commune → restez en gratuit (Cloudflare Pages / GitHub Pages, rien à payer) ; commune qui doit payer mais veut rester autonome → régie d’avances avec carte de régie (le plus simple) ou carte d’achat / UGAP ; grande commune / plusieurs communes → mutualisation publique (intercommunalité, agence numérique), idéalement sur hébergeurs FR.’,
+      ‘- **"Peut-on rester 100 % autonome et souverain sans prestataire ?»** → Oui. La régie d’avances couvre les paiements directs. Pour l’hébergement, OVH / Scaleway / Clever Cloud sont facturables par virement et habitués des marchés publics. Pour l’IA, Mistral (FR) remplace Anthropic. Pour le CDN images, Bunny.net (EU). Pour les e-mails, Brevo (FR). Techniquement, changer d’hébergeur revient principalement à redéployer le backend et à mettre à jour la variable d’URL dans le frontend — pas de réécriture de l’application.’,
+      ‘’,
+      ‘---’,
+      ‘’,
+      ‘**TU PEUX COMMENCER. CONSTRUIS LE SITE.**’
     ].join('\n');
   }
 
