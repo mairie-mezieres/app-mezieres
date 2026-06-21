@@ -117,9 +117,14 @@ dans `js/mat-utils.js` (variable `CHATBOT_URL`).
 
 ## Déploiement
 
-Le site est conçu pour **[Cloudflare Pages](https://pages.cloudflare.com)** (free tier).  
-Branchez simplement ce dépôt — aucun build step requis, le fichier `_headers`
-configure automatiquement les en-têtes de sécurité (CSP, HSTS, etc.).
+Le front est déployé sur **[GitHub Pages](https://pages.github.com)** (gratuit) :
+*Settings → Pages → branche `main`, dossier `/`*. Aucun build step ; déploiement
+automatique à chaque push sur `main`. Le domaine `mezieres-lez-clery.fr` est
+branché via le fichier `CNAME`. Guide complet : [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md).
+
+> ℹ️ Le fichier `_headers` (en-têtes de sécurité CSP/HSTS) n'est lu que par
+> Cloudflare Pages / Netlify — **GitHub Pages l'ignore**. Sur l'hébergement
+> actuel, ces en-têtes ne sont donc pas appliqués par ce fichier.
 
 ---
 
