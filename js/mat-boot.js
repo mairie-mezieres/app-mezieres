@@ -46,13 +46,13 @@
   try { loadMatInfoBanner(); } catch(e){}
 
   // 7b) Config fonctionnalités (réactions, RSVP…)
-  fetch('https://chatbot-mairie-mezieres.onrender.com/config/features',{signal:matAbortTimeout(5000)})
+  fetch(window.MAT_API+'/config/features',{signal:matAbortTimeout(5000)})
     .then(function(r){ return r.json(); })
     .then(function(d){ window._matFeatures = d; })
     .catch(function(){}); // dégradé : window._matFeatures reste undefined → réactions activées
 
   // 7c) Photo MAT & MEL personnalisée (saison/occasion) — définie depuis l'admin
-  fetch('https://chatbot-mairie-mezieres.onrender.com/config/mascotte',{signal:matAbortTimeout(5000)})
+  fetch(window.MAT_API+'/config/mascotte',{signal:matAbortTimeout(5000)})
     .then(function(r){ return r.json(); })
     .then(function(d){ if (d && d.active && d.url && typeof applyMascotte === 'function') applyMascotte(d.url); })
     .catch(function(){}); // dégradé : image MAT & MEL par défaut conservée
@@ -104,13 +104,13 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=4.2.4';
+  s.src = 'js/mat-pwa-notif.js?v=4.2.5';
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-dechets-notif.js?v=4.2.5';
+  s.src = 'js/mat-dechets-notif.js?v=4.2.6';
   document.head.appendChild(s);
 })();
 
@@ -122,7 +122,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-sondages.js?v=4.3.0';
+  s.src = 'js/mat-sondages.js?v=4.3.1';
   s.onload = function() {
     setTimeout(function() {
       try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}
@@ -139,7 +139,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-entreprises.js?v=1.2.0';
+  s.src = 'js/mat-entreprises.js?v=1.2.1';
   document.head.appendChild(s);
 })();
 

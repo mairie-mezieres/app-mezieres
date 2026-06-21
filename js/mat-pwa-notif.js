@@ -29,7 +29,7 @@ async function checkAndRenewPushSubscription() {
       // (évite d'inscrire les abonnements "réponse uniquement" créés via les formulaires)
       if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
       // Re-synchroniser avec le serveur au cas où il a perdu la souscription (redémarrage Render/Redis)
-      fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+      fetch(window.MAT_API+'/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sub),
@@ -45,7 +45,7 @@ async function checkAndRenewPushSubscription() {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
     });
-    fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+    fetch(window.MAT_API+'/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSub),
@@ -65,7 +65,7 @@ async function retryPendingPushSync() {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
     if (!sub) { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); return; }
-    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+    var r = await fetch(window.MAT_API+'/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sub),
@@ -113,7 +113,7 @@ async function showPostInstallNotifPrompt() {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
     });
     // Enregistrement serveur en arrière-plan ; si échec, flag pour retry au prochain lancement
-    fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+    fetch(window.MAT_API+'/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSub),

@@ -10,7 +10,12 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.38.1';
+const CACHE = 'mat-v4.39.0';
+
+// ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
+// (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
+// gardez cette valeur synchronisée avec window.MAT_API dans js/mat-config.js.
+const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 
 // Sous-ensemble de PRECACHE_URLS pour lequel un échec lors de install
 // doit faire échouer l'install entière. Tout le reste est best-effort.
@@ -18,8 +23,9 @@ const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
   './css/mat.css?v=4.3.7',
-  './js/mat-utils.js?v=4.3.1',
-  './js/mat-core.js?v=4.2.17'
+  './js/mat-config.js?v=1',
+  './js/mat-utils.js?v=4.3.2',
+  './js/mat-core.js?v=4.2.18'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -29,25 +35,26 @@ const PRECACHE_URLS = [
   './css/mat.css?v=4.3.7',
   './css/mat-desktop.css?v=4.2.8',
   './css/fonts.css?v=1',
-  './js/mat-utils.js?v=4.3.1',
-  './js/mat-core.js?v=4.2.17',
+  './js/mat-config.js?v=1',
+  './js/mat-utils.js?v=4.3.2',
+  './js/mat-core.js?v=4.2.18',
   './js/mat-accessibility.js?v=4.3.8',
-  './js/mat-widgets.js?v=4.4.3',
-  './js/mat-agenda.js?v=4.3.2',
-  './js/mat-forms.js?v=4.6.0',
-  './js/mat-photos.js?v=1.3.2',
-  './js/mat-actus.js?v=4.4.4',
-  './js/mat-trombi.js?v=4.2.6',
+  './js/mat-widgets.js?v=4.4.4',
+  './js/mat-agenda.js?v=4.3.3',
+  './js/mat-forms.js?v=4.6.1',
+  './js/mat-photos.js?v=1.3.3',
+  './js/mat-actus.js?v=4.4.5',
+  './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.3.4',
-  './js/mat-boot.js?v=4.3.2',
-  './js/mat-pwa-notif.js?v=4.2.4',
-  './js/mat-dechets-notif.js?v=4.2.5',
+  './js/mat-boot.js?v=4.3.3',
+  './js/mat-pwa-notif.js?v=4.2.5',
+  './js/mat-dechets-notif.js?v=4.2.6',
   './js/mat-jours-feries.js?v=4.2.3',
-  './js/mat-sondages.js?v=4.3.0',
+  './js/mat-sondages.js?v=4.3.1',
   './js/mat-associations.js?v=4.2.3',
-  './js/mat-desktop.js?v=4.1.3',
+  './js/mat-desktop.js?v=4.1.4',
   './js/mat-eau8.js?v=4.2.8',
-  './js/mat-entreprises.js?v=1.2.0',
+  './js/mat-entreprises.js?v=1.2.1',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=4.2.3',
   './img/mat-header.webp',
@@ -93,7 +100,7 @@ self.addEventListener('fetch', e => {
 
   // Ne JAMAIS cacher les API backend et services externes
   if (
-    url.includes('onrender.com') ||
+    url.startsWith(MAT_API) ||
     url.includes('googleapis.com') ||
     url.includes('clearbit.com') ||
     url.includes('google.com') ||
@@ -376,7 +383,7 @@ self.addEventListener('pushsubscriptionchange', e => {
     if (!sub) return; // impossible de se ré-abonner sans clé VAPID
 
     try {
-      await fetch('https://chatbot-mairie-mezieres.onrender.com/push/subscribe', {
+      await fetch(MAT_API + '/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sub),

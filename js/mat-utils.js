@@ -5,11 +5,11 @@
    ════════════════════════════════════════════════════════════ */
 
 // ── Constantes globales ──────────────────────────────────────
-const MEL_PROXY   = 'https://chatbot-mairie-mezieres.onrender.com/mel';
-const SIGNAL_URL  = 'https://chatbot-mairie-mezieres.onrender.com/signal';
-const ACTU_URL    = 'https://chatbot-mairie-mezieres.onrender.com/actus';
-const ICAL_URL    = 'https://chatbot-mairie-mezieres.onrender.com/calendar-proxy';
-const METEO_URL   = 'https://chatbot-mairie-mezieres.onrender.com/meteo/commune';
+const MEL_PROXY   = window.MAT_API+'/mel';
+const SIGNAL_URL  = window.MAT_API+'/signal';
+const ACTU_URL    = window.MAT_API+'/actus';
+const ICAL_URL    = window.MAT_API+'/calendar-proxy';
+const METEO_URL   = window.MAT_API+'/meteo/commune';
 const VAPID_PUB   = 'BNB6bL64B5oCbb9XYqQx37hGt9ZIdcXFuJvepRTRfpIiu146XfaoTtVVFgjbteSGq0Z7Kreo7oOYcGO3Kk4YAtA';
 
 // Met la clé VAPID publique dans le Cache API au plus tôt, indépendamment du
@@ -24,7 +24,7 @@ if (typeof window !== 'undefined' && 'caches' in window) {
 const INSTALL_KEY = 'mat_installed_v3';
 const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
 const MAT_VERSION = 'v3.7.5';
-const MEL_BACKEND = 'https://chatbot-mairie-mezieres.onrender.com';
+const MEL_BACKEND = window.MAT_API;
 
 // ── AbortSignal.timeout polyfill (Safari < 16 / old WebView) ─
 function matAbortTimeout(ms) {
@@ -233,7 +233,7 @@ async function trackStat(service, extra = {}){
       ...extra
     };
 
-    await fetch('https://chatbot-mairie-mezieres.onrender.com/stats/track', {
+    await fetch(window.MAT_API+'/stats/track', {
       method:'POST',
       headers:{
         'Content-Type':'application/json',

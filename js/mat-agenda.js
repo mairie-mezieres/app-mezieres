@@ -164,7 +164,7 @@ function _applyRsvpState(uid, count, rsvp){
 
 async function _loadRsvpCount(uid){
   try{
-    var resp=await matFetch('https://chatbot-mairie-mezieres.onrender.com/event/'+encodeURIComponent(uid)+'/rsvp',{
+    var resp=await matFetch(window.MAT_API+'/event/'+encodeURIComponent(uid)+'/rsvp',{
       headers:{'x-device-id':getMatDeviceId()}
     },8000);
     if(!resp.ok) return;
@@ -181,7 +181,7 @@ async function toggleRsvpEvent(uid){
   var btn=document.getElementById('rsvp-btn-'+uid);
   if(btn){ btn.classList.toggle('rsvp-on',!rsvp); btn.setAttribute('aria-pressed',String(!rsvp)); btn.setAttribute('aria-label',!rsvp?'Retirer mon inscription':'J’y serai'); btn.textContent=!rsvp?'✅ J’y serai':'📅 J’y serai'; }
   try{
-    var resp=await matFetch('https://chatbot-mairie-mezieres.onrender.com/event/'+encodeURIComponent(uid)+'/rsvp',{
+    var resp=await matFetch(window.MAT_API+'/event/'+encodeURIComponent(uid)+'/rsvp',{
       method:'POST', headers:{'x-device-id':getMatDeviceId()}
     },8000);
     if(!resp.ok){

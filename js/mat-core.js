@@ -230,7 +230,7 @@ async function loadFeaturedDoc() {
   var el = document.getElementById('docs-featured-container');
   if (!el) return;
   try {
-    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/docs/featured', {cache:'no-store'});
+    var r = await fetch(window.MAT_API+'/docs/featured', {cache:'no-store'});
     var d = await r.json();
     if (!d.doc) { el.style.display = 'none'; return; }
     var doc = d.doc;
@@ -275,7 +275,7 @@ async function loadTempDocs() {
   if (!el) return;
   el.innerHTML = '<div class="actu-empty">Chargement…</div>';
   try {
-    var r = await fetch('https://chatbot-mairie-mezieres.onrender.com/docs/temp', {cache:'no-store'});
+    var r = await fetch(window.MAT_API+'/docs/temp', {cache:'no-store'});
     var d = await r.json();
     var docs = d.docs || [];
     if (!docs.length) {
@@ -552,7 +552,7 @@ document.addEventListener('keydown', function(e) {
   function _checkRedisMode() {
     if (_checked || !navigator.onLine) return;
     _checked = true;
-    fetch('https://chatbot-mairie-mezieres.onrender.com/health', { cache: 'no-store' })
+    fetch(window.MAT_API+'/health', { cache: 'no-store' })
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if (!data || data.mode !== 'degraded') return;

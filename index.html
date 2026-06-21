@@ -14,7 +14,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <!-- Préconnexion au backend : l'app tire ~10 requêtes vers cette origine au lancement.
-     Anticiper DNS+TCP+TLS fait apparaître météo/déchets/actus plus vite. -->
+     Anticiper DNS+TCP+TLS fait apparaître météo/déchets/actus plus vite.
+     ⚙️ RÉPLICATION : adaptez ces 2 URLs à votre backend (cf. js/mat-config.js). -->
 <link rel="preconnect" href="https://chatbot-mairie-mezieres.onrender.com" crossorigin>
 <link rel="dns-prefetch" href="https://chatbot-mairie-mezieres.onrender.com">
 <script>
@@ -44,18 +45,20 @@ document.documentElement.style.background = bg;
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.3.7">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.8">
-<script defer src="js/mat-utils.js?v=4.3.1"></script>
-<script defer src="js/mat-core.js?v=4.2.17"></script>
+<!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
+<script src="js/mat-config.js?v=1"></script>
+<script defer src="js/mat-utils.js?v=4.3.2"></script>
+<script defer src="js/mat-core.js?v=4.2.18"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
-<script defer src="js/mat-widgets.js?v=4.4.3"></script>
-<script defer src="js/mat-agenda.js?v=4.3.2"></script>
-<script defer src="js/mat-forms.js?v=4.6.0"></script>
-<script defer src="js/mat-photos.js?v=1.3.2"></script>
-<script defer src="js/mat-actus.js?v=4.4.4"></script>
-<script defer src="js/mat-trombi.js?v=4.2.6"></script>
+<script defer src="js/mat-widgets.js?v=4.4.4"></script>
+<script defer src="js/mat-agenda.js?v=4.3.3"></script>
+<script defer src="js/mat-forms.js?v=4.6.1"></script>
+<script defer src="js/mat-photos.js?v=1.3.3"></script>
+<script defer src="js/mat-actus.js?v=4.4.5"></script>
+<script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
-<script defer src="js/mat-boot.js?v=4.3.2"></script>
+<script defer src="js/mat-boot.js?v=4.3.3"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -99,7 +102,7 @@ document.documentElement.style.background = bg;
 <script>
 (function(){
 if (location.hostname !== 'mairie-mezieres.github.io') return;
-fetch('https://chatbot-mairie-mezieres.onrender.com/migration-status')
+fetch(window.MAT_API+'/migration-status')
 .then(function(r){ return r.ok ? r.json() : null; })
 .then(function(d){
 if (!d || !d.active) return;
@@ -1345,7 +1348,7 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 (function(){
 var CACHE_KEY = 'mat_install_count';
 var CACHE_TTL = 86400000;
-var API_URL = 'https://chatbot-mairie-mezieres.onrender.com/api/install-count';
+var API_URL = window.MAT_API+'/api/install-count';
 function showCount(n){
 if(!n || n < 2) return;
 var badge = document.getElementById('install-count-badge');
@@ -1469,7 +1472,7 @@ et accompagnée des documents suivants :
 </div>
 </div>
 </div>
-<script defer src="js/mat-desktop.js?v=4.1.3"></script>
+<script defer src="js/mat-desktop.js?v=4.1.4"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
 <template data-lazy-ov>
 <div class="panel">

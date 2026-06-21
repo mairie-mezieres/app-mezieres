@@ -12,6 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="MAT Admin">
 <link rel="apple-touch-icon" href="icon-admin.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha512-WWG/QztPBvezaRo3WuRRhsIuvpBPq0jqrQhuD6neZjle2/Fwj/spneB5NxBptNJDdYU/+u2bztZlDpz0JCHyBQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<!-- ⚙️ Config backend (window.MAT_API) — voir js/mat-config.js -->
+<script src="js/mat-config.js?v=1"></script>
 <style>
 :root{
   --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
@@ -447,7 +449,7 @@ tr:hover td{background:#f9fafb;}
 </div>
 
 <script>
-const API = 'https://chatbot-mairie-mezieres.onrender.com';
+const API = window.MAT_API;
 let TOKEN = localStorage.getItem('mat_admin_token') || '';
 let _data = null;
 let _charts = {};
