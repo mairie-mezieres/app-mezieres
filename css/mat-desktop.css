@@ -11,7 +11,7 @@
 
   /* NAV */
   .d-nav{display:flex;position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.08);padding:0 32px}
-  .d-nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1400px;margin:0 auto;height:70px;gap:12px}
+  .d-nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1400px;margin:0 auto;min-height:70px;padding:6px 0;gap:12px}
   .d-nav-logo{display:flex;align-items:center;gap:10px}
   .d-nav-img{width:34px;height:34px;border-radius:8px}
   .d-nav-title{font-size:.95rem;font-weight:900;color:var(--forest)}

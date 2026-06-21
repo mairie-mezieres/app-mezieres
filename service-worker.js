@@ -33,7 +33,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './css/mat.css?v=4.3.7',
-  './css/mat-desktop.css?v=4.2.8',
+  './css/mat-desktop.css?v=4.2.9',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.2',
