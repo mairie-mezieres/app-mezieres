@@ -274,7 +274,7 @@ Carte Leaflet centrée sur la commune :
 - **Anonymisation** : ne jamais associer une question à un compte utilisateur.
 - Code de référence open-source : https://github.com/mairie-mezieres/chatbot-mairie-mezieres
 
-**Pour le profil débutant :** propose plutôt un lien direct vers Claude (claude.ai) avec un prompt système pré-rempli en clipboard — zéro infrastructure à gérer.`
+**Pour le profil débutant :** propose plutôt un lien direct vers Claude (claude.ai), ChatGPT (chatgpt.com) ou Mistral (chat.mistral.ai) avec un prompt système pré-rempli en clipboard — zéro infrastructure à gérer.`
     },
     {
       id: 'admin',
@@ -738,7 +738,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     const notice = document.getElementById('copy-notice');
     notice.innerHTML =
       '<strong>Prompt généré</strong> (' + charCount.toLocaleString('fr-FR') + ' caractères). '
-      + 'Copiez-le, puis ouvrez Claude pour le coller.'
+      + 'Collez-le dans l’IA de votre choix (Claude, ChatGPT, Mistral…).'
       + '<br><span style="font-size:.74rem;color:var(--muted);display:block;margin-top:6px">'
       + '🔏 <em>Bon réflexe :</em> l’assistant vous posera ensuite les questions de contenu (élus, horaires…) une par une. '
       + 'Ne saisissez de données nominatives (noms, photos d’élus, contacts de tiers) qu’avec leur accord préalable.'
@@ -1157,7 +1157,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '',
       '- **"Ça coûte combien réellement ?»** → détaille les coûts fixes (hébergement, domaine) et variables (chatbot selon usage).',
       '- **"Comment je mets à jour le contenu ?»** → explique le workflow JSON pour chaque type de contenu.',
-      '- **"Et si Claude est saturé / mon site est en panne ?»** → PWA = fonctionnement hors ligne ; service worker.',
+      '- **"Et si l’IA est saturée ou mon site en panne ?»** → PWA = fonctionnement hors ligne ; service worker en cache (site accessible hors connexion).',
       '- **"Mes données restent en France ?»** → réponds précisément selon la stack choisie.',
       '- **"Comment créer les icônes PWA ?»** → propose des générateurs gratuits (favicon.io, pwabuilder.com).',
       '- **"Comment j’obtiens un nom de domaine ?»** → OVH, Gandi, Namecheap selon la souveraineté.',
@@ -1186,7 +1186,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       await navigator.clipboard.writeText(text);
       const notice = document.getElementById('copy-notice');
       notice.classList.add('success');
-      notice.textContent = '✅ Prompt copié ! Ouvrez Claude et collez-le dans une nouvelle conversation.';
+      notice.textContent = '✅ Prompt copié ! Collez-le dans Claude, ChatGPT ou Mistral dans une nouvelle conversation.';
     } catch (e) {
       // Fallback : sélection manuelle
       const ta = document.getElementById('prompt-output');
