@@ -254,6 +254,54 @@ button.btn:active{transform:translateY(1px)}
       <a class="btn btn-primary" id="llm-open-btn" href="https://claude.ai" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Ouvrir Claude &#8599;</a>
     </div>
 
+    <details style="margin-top:14px;border:1px solid var(--sage);border-radius:12px;background:var(--mist);overflow:hidden">
+      <summary style="cursor:pointer;font-size:.82rem;font-weight:800;color:var(--forest);padding:12px 14px;list-style:none;display:flex;align-items:center;gap:8px">
+        <span style="font-size:1rem">&#9881;&#65039;</span> Comment utiliser ce prompt &mdash; m&eacute;thode, forfait, mode
+      </summary>
+      <div style="padding:0 14px 14px;font-size:.8rem;color:var(--text);line-height:1.65;display:flex;flex-direction:column;gap:14px">
+
+        <div>
+          <div style="font-weight:900;color:var(--forest);margin-bottom:5px">&#128241; M&eacute;thode recommand&eacute;e &mdash; Claude Code + git</div>
+          <p style="margin:0">Plut&ocirc;t que de coller le prompt dans Claude.ai et copier-coller chaque bloc de code &agrave; la main, utilisez <strong>Claude Code</strong> branch&eacute; sur un d&eacute;p&ocirc;t git&nbsp;: il &eacute;crit directement les fichiers, commite, et si la session est interrompue il <em>relit le d&eacute;p&ocirc;t</em> au red&eacute;marrage &mdash; z&eacute;ro perte de contexte. Fonctionne sur mobile d&egrave;s que git est configur&eacute;.</p>
+          <ol style="margin:8px 0 0 18px;padding:0;display:flex;flex-direction:column;gap:4px">
+            <li>Cr&eacute;ez un d&eacute;p&ocirc;t git vide sur GitHub.</li>
+            <li>Ouvrez <strong>Claude Code</strong> (navigateur ou application) et connectez-le au d&eacute;p&ocirc;t.</li>
+            <li>Collez le prompt g&eacute;n&eacute;r&eacute; ci-dessus comme premi&egrave;re instruction.</li>
+            <li>Claude Code construit, commite et d&eacute;ploie fichier par fichier.</li>
+            <li>Si la session coupe&nbsp;: rouvrez, Claude relit le d&eacute;p&ocirc;t et repart l&agrave; o&ugrave; il s&rsquo;est arr&ecirc;t&eacute;.</li>
+          </ol>
+        </div>
+
+        <div>
+          <div style="font-weight:900;color:var(--forest);margin-bottom:5px">&#128179; Quel forfait choisir&nbsp;?</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:#fff7e6;border:1px solid #f5d77b;border-radius:8px;padding:10px 12px">
+              <div style="font-weight:800;color:#5a3d00">Claude Pro &mdash; 20&nbsp;&euro;/mois</div>
+              <div style="color:#7a5500;margin-top:3px">Suffisant pour construire votre site&nbsp;: le build complet passe, il faut juste <strong>accepter les pauses</strong> quand la limite glissante est atteinte (quelques minutes d&rsquo;attente avant de reprendre). Id&eacute;al si vous n&rsquo;&ecirc;tes pas press&eacute;.</div>
+            </div>
+            <div style="background:var(--mist);border:1px solid var(--sage);border-radius:8px;padding:10px 12px">
+              <div style="font-weight:800;color:var(--forest)">Claude Max &mdash; 100&nbsp;&euro;/mois</div>
+              <div style="color:var(--muted);margin-top:3px">Limite multipli&eacute;e par 5&nbsp;: quasi aucune interruption pendant le build. Recommand&eacute; si vous construisez un site volumineux (&gt;&nbsp;10 fonctionnalit&eacute;s) ou si vous voulez tout g&eacute;n&eacute;rer d&rsquo;une traite. <strong>Un mois suffit</strong>&nbsp;: repassez en Pro ensuite pour les mises &agrave; jour.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-weight:900;color:var(--forest);margin-bottom:5px">&#9654;&#65039; Mode Auto ou mode Plan&nbsp;?</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:8px 12px;background:var(--warm);border-radius:8px;border:1px solid var(--border)">
+              <strong>Mode Plan</strong> &mdash; Claude vous montre d&rsquo;abord la liste de ce qu&rsquo;il va cr&eacute;er (fichiers, structure, d&eacute;pendances) et attend votre validation avant d&rsquo;agir. <em>Recommand&eacute; pour commencer</em>&nbsp;: vous voyez ce qui arrive et pouvez corriger le tir.
+            </div>
+            <div style="padding:8px 12px;background:var(--warm);border-radius:8px;border:1px solid var(--border)">
+              <strong>Mode Auto</strong> &mdash; Claude ex&eacute;cute sans demander &agrave; chaque &eacute;tape. Plus rapide, mais vous validez apr&egrave;s coup. &Agrave; utiliser une fois que vous avez confiance dans le r&eacute;sultat ou pour les it&eacute;rations rapides.
+            </div>
+          </div>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:.76rem">Dans Claude Code&nbsp;: appuyez sur <kbd style="background:var(--border);padding:1px 5px;border-radius:4px;font-family:monospace">Shift+Tab</kbd> pour basculer entre les deux modes.</p>
+        </div>
+
+      </div>
+    </details>
+
     <div class="notice success" style="margin-top:14px">
       Le prompt vous semble trop long ou trop complexe&nbsp;? Vous pouvez aussi t&eacute;l&eacute;charger le fichier
       <a href="docs/REPLICATION.md" download>REPLICATION.md</a> et l&rsquo;envoyer en pi&egrave;ce jointe &agrave; Claude.
