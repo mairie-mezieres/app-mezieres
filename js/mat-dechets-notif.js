@@ -6,6 +6,27 @@
 
 var DECHETS_NOTIF_KEY = 'mat_dechets_notif_v1';
 
+// Re-sync silencieux au boot : si l'utilisateur a activé les rappels déchets,
+// re-enregistre son endpoint actuel dans mat:subs:dechets sans aucune action
+// de sa part. Corrige la perte silencieuse lors d'une rotation d'endpoint.
+// Indépendant de mat_push_active (actus) — les deux abonnements sont distincts.
+(async function _dechetsBootSync() {
+  if (localStorage.getItem(DECHETS_NOTIF_KEY) !== '1') return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (!sub) return;
+    fetch(window.MAT_API + '/push/subscribe/dechets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub),
+      keepalive: true
+    }).catch(function() {});
+  } catch(e) {}
+})();
+
 var _TRI_DATA = [
   {
     id: 'jaune', color: '#eab308', bg: '#fefce8', border: 'rgba(234,179,8,0.35)',
