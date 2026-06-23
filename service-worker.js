@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.39.3';
+const CACHE = 'mat-v4.39.4';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -65,9 +65,10 @@ const PRECACHE_URLS = [
 ];
 
 self.addEventListener('install', e => {
-  // J4.b — skipWaiting() retiré : la nouvelle version reste en 'waiting'
-  // tant que la PWA n'a pas envoyé postMessage('SKIP_WAITING') après
-  // confirmation utilisateur. Cf. listener 'message' plus bas.
+  // J4.c — skipWaiting() rétabli : activation immédiate sans action utilisateur.
+  // Nécessaire pour que les correctifs push (dechets boot sync) soient déployés
+  // sans intervention manuelle (réabonnement automatique endpoint rotation).
+  self.skipWaiting();
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
     const results = await Promise.allSettled(PRECACHE_URLS.map(url => c.add(url)));
