@@ -180,6 +180,34 @@ async function checkDechetsNotifStatus() {
   btn.textContent = enabled ? '🔕 Désactiver les rappels' : '🔔 Activer les rappels collecte';
   btn.style.background = enabled ? '#ef4444' : 'var(--forest)';
   if (info) info.textContent = '';
+
+  // Re-sync en background à chaque ouverture du panneau : garantit que l'endpoint
+  // est enregistré côté serveur même après rotation ou perte de subscription.
+  if (enabled && 'Notification' in window && Notification.permission === 'granted') {
+    (async function _dechetsOpenSync() {
+      try {
+        var reg = await navigator.serviceWorker.ready;
+        var sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+          try {
+            sub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
+            });
+          } catch(_) { return; }
+        }
+        if (!sub) return;
+        fetch(window.MAT_API + '/push/subscribe/dechets', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub), keepalive: true
+        }).catch(function() {});
+        fetch(window.MAT_API + '/push/subscribe', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub), keepalive: true
+        }).catch(function() {});
+      } catch(_) {}
+    })();
+  }
 }
 
 async function toggleDechetsNotif() {
