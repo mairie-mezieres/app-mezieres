@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.39.2';
+const CACHE = 'mat-v4.39.3';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -389,6 +389,35 @@ self.addEventListener('pushsubscriptionchange', e => {
         body: JSON.stringify(sub),
         keepalive: true
       });
+    } catch (_) {}
+
+    // Re-sync canaux spécifiques depuis les préférences stockées par le client.
+    // Nécessaire car la rotation d'endpoint vide silencieusement les listes
+    // mat:subs:dechets / mat:subs:meteo si seul /push/subscribe est rappelé.
+    try {
+      const prefsCache = await caches.open('mat-config-v1');
+      const prefsResp  = await prefsCache.match('mat-push-prefs');
+      if (prefsResp) {
+        const prefs = await prefsResp.json();
+        const subJson = JSON.parse(JSON.stringify(sub));
+        if (prefs.dechets) {
+          fetch(MAT_API + '/push/subscribe/dechets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(subJson),
+            keepalive: true
+          }).catch(() => {});
+        }
+        if (prefs.meteo) {
+          const subM = Object.assign({}, subJson, { minLevel: prefs.meteoLevel || 2 });
+          fetch(MAT_API + '/push/subscribe/meteo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(subM),
+            keepalive: true
+          }).catch(() => {});
+        }
+      }
     } catch (_) {}
   })());
 });

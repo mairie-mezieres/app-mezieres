@@ -12,12 +12,51 @@ if ('caches' in window && typeof VAPID_PUB !== 'undefined') {
   }).catch(function() {});
 }
 
+// Stocke les préférences de canal (déchets / météo) dans le Cache API pour
+// que le SW puisse les relire lors d'un pushsubscriptionchange sans onglet ouvert.
+function _updatePushPrefsCache() {
+  if (!('caches' in window)) return;
+  var prefs = {
+    dechets:    localStorage.getItem('mat_dechets_notif_v1') === '1',
+    meteo:      localStorage.getItem('mat_meteo_notif_v1') !== '0',
+    meteoLevel: parseInt(localStorage.getItem('mat_meteo_notif_level')) || 2,
+  };
+  caches.open('mat-config-v1').then(function(cache) {
+    cache.put('mat-push-prefs', new Response(JSON.stringify(prefs), { headers: { 'Content-Type': 'application/json' } }));
+  }).catch(function() {});
+}
+_updatePushPrefsCache();
+
+// Re-synchronise les canaux push spécifiques (déchets + météo) selon les
+// préférences enregistrées en localStorage. Fire-and-forget, erreurs ignorées.
+function _syncSubChannels(sub) {
+  if (localStorage.getItem('mat_dechets_notif_v1') === '1') {
+    fetch(window.MAT_API+'/push/subscribe/dechets', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub), keepalive: true
+    }).catch(function() {});
+  }
+  try {
+    if (localStorage.getItem('mat_meteo_notif_v1') !== '0') {
+      var lvl = parseInt(localStorage.getItem('mat_meteo_notif_level')) || 2;
+      var subM = Object.assign(JSON.parse(JSON.stringify(sub)), { minLevel: lvl });
+      fetch(window.MAT_API+'/push/subscribe/meteo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subM), keepalive: true
+      }).catch(function() {});
+    }
+  } catch(_) {}
+}
+
 var PUSH_PENDING_SYNC_KEY = 'mat_push_pending_sync';
 var PUSH_ACTIVE_KEY = 'mat_push_active';
 var _lastPushSync = 0;
 var PUSH_SYNC_COOLDOWN = 5 * 60 * 1000; // 5 minutes entre deux syncs visibilité
 
-// Renouvelle silencieusement l'abonnement push si le navigateur l'a invalidé
+// Renouvelle silencieusement l'abonnement push si le navigateur l'a invalidé,
+// et re-synchronise TOUS les canaux actifs (actus + déchets + météo) pour
+// éviter que la liste mat:subs:dechets / mat:subs:meteo ne se vide en silence
+// lors d'une rotation d'endpoint côté navigateur.
 async function checkAndRenewPushSubscription() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -28,6 +67,7 @@ async function checkAndRenewPushSubscription() {
       // Ne ré-inscrire aux alertes générales que si l'utilisateur a explicitement opté
       // (évite d'inscrire les abonnements "réponse uniquement" créés via les formulaires)
       if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
+      _updatePushPrefsCache();
       // Re-synchroniser avec le serveur au cas où il a perdu la souscription (redémarrage Render/Redis)
       fetch(window.MAT_API+'/push/subscribe', {
         method: 'POST',
@@ -38,6 +78,9 @@ async function checkAndRenewPushSubscription() {
         if (r.ok) { localStorage.removeItem(PUSH_PENDING_SYNC_KEY); _lastPushSync = Date.now(); }
         else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
       }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
+      // Re-sync canaux spécifiques : si l'endpoint a tourné, ces listes ont
+      // gardé l'ancien endpoint mort — on remet le nouveau sans attendre.
+      _syncSubChannels(sub);
       return;
     }
     if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
@@ -45,6 +88,7 @@ async function checkAndRenewPushSubscription() {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
     });
+    _updatePushPrefsCache();
     fetch(window.MAT_API+'/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,6 +98,7 @@ async function checkAndRenewPushSubscription() {
       if (r.ok) _lastPushSync = Date.now();
       else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
+    _syncSubChannels(newSub);
   } catch(e) {}
 }
 
