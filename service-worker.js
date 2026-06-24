@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.39.8';
+const CACHE = 'mat-v4.39.9';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -25,7 +25,7 @@ const CRITICAL_PRECACHE = [
   './css/mat.css?v=4.3.7',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.2',
-  './js/mat-core.js?v=4.2.18'
+  './js/mat-core.js?v=4.2.19'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -37,7 +37,7 @@ const PRECACHE_URLS = [
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.2',
-  './js/mat-core.js?v=4.2.18',
+  './js/mat-core.js?v=4.2.19',
   './js/mat-accessibility.js?v=4.3.8',
   './js/mat-widgets.js?v=4.4.4',
   './js/mat-agenda.js?v=4.3.3',
@@ -319,6 +319,7 @@ self.addEventListener('notificationclick', e => {
           if (openType === 'meteo') existing.postMessage({ action: 'openMeteo' });
           else if (openType === 'idees') existing.postMessage({ action: 'openIdees' });
           else if (openType === 'signalements') existing.postMessage({ action: 'openSignalements' });
+          else if (openType === 'bugs') existing.postMessage({ action: 'openBugs' });
           else if (openType === 'contact') existing.postMessage({ action: 'openContact' });
           else if (openType === 'actu' && actuId != null) existing.postMessage({ action: 'openActu', actuId });
           else existing.postMessage({ action: 'openNotifs' });
