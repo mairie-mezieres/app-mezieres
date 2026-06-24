@@ -405,7 +405,32 @@ La clé publique est présente en **deux endroits** :
 
 ### Abonnements expirés
 
-Quand un endpoint répond 410 ou 404, le backend le supprime automatiquement de Redis lors du prochain envoi.
+Quand un endpoint répond 410 ou 404 (endpoint révoqué par FCM/APNs après mise à jour du navigateur), le backend met le champ `sub` à `null` dans l'entrée Redis — il **ne supprime pas** le token. Le frontend re-synchronise l'abonnement à la prochaine ouverture de l'app via `_registerPendingNotifyTokens()` (dans `mat-actus.js`, appelée par `mat-pwa-notif.js`). Voir ADR-0003 du repo `chatbot-mairie-mezieres` pour le raisonnement complet.
+
+### Notifications citoyens — signalements, demandes et bugs
+
+En plus des notifications broadcast (actus, météo, déchets), MAT envoie des notifications **individuelles** aux citoyens lorsque leur signalement, demande ou bug évolue.
+
+**Flux :**
+1. À la soumission, le backend génère un `notifyToken` (UUID) et écrit `MAT-REF: {uuid}` dans la description de la carte Trello.
+2. Le frontend stocke l'UUID en `localStorage` et enregistre l'abonnement push via `POST /notify/register-token`.
+3. Quand la carte est déplacée dans Trello (changement de statut) ou commentée, le webhook Trello notifie le backend qui envoie le push au citoyen.
+
+**Routage selon le type de carte :**
+
+| Type | Déclencheur | Notification | Ouvre dans l'app |
+|------|-------------|-------------|-----------------|
+| `[Signalement]` | Déplacement de liste | « 🔵 En cours / ✅ Résolu » | Onglet Signalements |
+| `[Signalement]` | Commentaire | « 💬 Réponse de la mairie » | Onglet Signalements |
+| `[BUG]` | Déplacement de liste | « 🔵 En cours / ✅ Résolu » | Onglet Bugs |
+| `[BUG]` | Commentaire | « 💬 Réponse de la mairie » | Onglet Bugs |
+| `[Demande]` | Déplacement de liste | « 🔵 En cours / ✅ Traitée » | Onglet Contact |
+| `[Demande]` | Commentaire | « 💬 Nouveau message » | Onglet Contact |
+
+> Le push ne fonctionne que si la carte contient `MAT-REF: {uuid}` dans sa description (ajouté automatiquement à la création). Les cartes créées manuellement dans Trello ne notifient personne.
+
+**Fichiers concernés (backend) :** `lib/push-notify.js`, `routes/trello-webhook.js`, `routes/signalements.js`.
+**Fichier concerné (frontend) :** `js/mat-pwa-notif.js` (renouvellement abonnement), `js/mat-actus.js` (`_registerPendingNotifyTokens`).
 
 ---
 
