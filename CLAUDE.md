@@ -1,5 +1,32 @@
 # Instructions pour Claude Code — MAT Mézières Avec Toi
 
+## 📚 Documentation — aiguillage OBLIGATOIRE (à lire avant d'agir)
+
+Ce fichier est le **seul** document automatiquement chargé à chaque session. Toute la
+connaissance détaillée vit dans les fichiers ci-dessous. **Avant de coder, de répondre
+à une question d'architecture, ou de créer une fonctionnalité, ouvre le(s) document(s)
+correspondant(s)** — ne raisonne pas de mémoire et ne réinvente pas l'existant.
+
+Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI + doc) avant de la construire.**
+
+| Si la tâche touche à… | LIRE d'abord |
+|---|---|
+| Vue d'ensemble, conteneurs, déploiement, flux métier, modèle de données | `docs/architecture.md` (modèle C4) |
+| Code, structure des fichiers, env, intégrations, **notifications push** (§8), **PWA/Service Worker** (§7), **webhook Facebook** (§9), CI/CD, ajout de feature (§12) | `docs/guide-technique.md` |
+| Comportement attendu côté habitant (actus, agenda, MEL, signalements, idées, notifs, hors-ligne, RGPD) | `docs/guide-utilisateur.md` |
+| Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
+| Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
+| Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
+| Historique des versions techniques | `CHANGELOG.md` |
+| Présentation générale du frontend | `README.md` |
+| **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
+
+> ⚠️ Les notifications signalements/demandes/bugs reposent sur le **backend** (webhook
+> Trello + tokens). Pour toute question sur ces notifs, lire **aussi** le `CLAUDE.md` et
+> `GUIDE-ADMIN.md` du repo `chatbot-mairie-mezieres`.
+
+Quand tu crées une doc durable, ajoute-la à ce tableau pour rester aiguillable.
+
 ## Changelog (`index.html` → overlay `ov-changelog`)
 
 À chaque changement **significatif pour les habitants** (nouvelle fonctionnalité, amélioration visible, correction notable) :
