@@ -48,7 +48,7 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.2"></script>
-<script defer src="js/mat-core.js?v=4.2.18"></script>
+<script defer src="js/mat-core.js?v=4.2.19"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.4"></script>
 <script defer src="js/mat-agenda.js?v=4.3.3"></script>
@@ -58,7 +58,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
-<script defer src="js/mat-boot.js?v=4.3.3"></script>
+<script defer src="js/mat-boot.js?v=4.3.4"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -153,7 +153,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.38.7 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.38.8 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -430,7 +430,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.38.7</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.38.8</button>
 </div>
 </div>
 </div>
@@ -1527,6 +1527,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 24 juin 2026 — v4.38.8</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Signalements, demandes et bugs&nbsp;: vous recevez d&eacute;sormais une notification push d&egrave;s que la mairie change le <strong>statut</strong> de votre demande ou y r&eacute;pond par un <strong>commentaire</strong> &mdash; pour les trois types de demandes</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 23 juin 2026 — v4.38.7</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Rappels collecte d&eacute;chets&nbsp;: la re-synchronisation de votre abonnement est d&eacute;sormais garantie &agrave; l&rsquo;ouverture de la section D&eacute;chets, en plus du d&eacute;marrage de l&rsquo;app</li>

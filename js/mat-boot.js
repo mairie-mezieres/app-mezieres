@@ -104,7 +104,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=4.2.6';
+  s.src = 'js/mat-pwa-notif.js?v=4.2.7';
   document.head.appendChild(s);
 })();
 
