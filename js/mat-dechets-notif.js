@@ -6,6 +6,45 @@
 
 var DECHETS_NOTIF_KEY = 'mat_dechets_notif_v1';
 
+// Re-sync silencieux au boot : si l'utilisateur a activé les rappels déchets,
+// re-enregistre son endpoint actuel dans mat:subs:dechets sans aucune action
+// de sa part. Corrige la perte silencieuse lors d'une rotation d'endpoint.
+// Si l'abonnement push est complètement perdu côté navigateur (sub === null),
+// le recrée silencieusement — possible sans geste utilisateur dès lors que la
+// permission Notification est déjà accordée.
+// Indépendant de mat_push_active (actus) — les deux abonnements sont distincts.
+(async function _dechetsBootSync() {
+  if (localStorage.getItem(DECHETS_NOTIF_KEY) !== '1') return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      try {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
+        });
+      } catch(_) { return; }
+    }
+    if (!sub) return;
+    fetch(window.MAT_API + '/push/subscribe/dechets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub),
+      keepalive: true
+    }).catch(function() {});
+    // Synchroniser aussi l'abonnement actus (idempotent côté serveur)
+    fetch(window.MAT_API + '/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub),
+      keepalive: true
+    }).catch(function() {});
+  } catch(e) {}
+})();
+
 var _TRI_DATA = [
   {
     id: 'jaune', color: '#eab308', bg: '#fefce8', border: 'rgba(234,179,8,0.35)',
@@ -141,6 +180,34 @@ async function checkDechetsNotifStatus() {
   btn.textContent = enabled ? '🔕 Désactiver les rappels' : '🔔 Activer les rappels collecte';
   btn.style.background = enabled ? '#ef4444' : 'var(--forest)';
   if (info) info.textContent = '';
+
+  // Re-sync en background à chaque ouverture du panneau : garantit que l'endpoint
+  // est enregistré côté serveur même après rotation ou perte de subscription.
+  if (enabled && 'Notification' in window && Notification.permission === 'granted') {
+    (async function _dechetsOpenSync() {
+      try {
+        var reg = await navigator.serviceWorker.ready;
+        var sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+          try {
+            sub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUB)
+            });
+          } catch(_) { return; }
+        }
+        if (!sub) return;
+        fetch(window.MAT_API + '/push/subscribe/dechets', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub), keepalive: true
+        }).catch(function() {});
+        fetch(window.MAT_API + '/push/subscribe', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub), keepalive: true
+        }).catch(function() {});
+      } catch(_) {}
+    })();
+  }
 }
 
 async function toggleDechetsNotif() {
