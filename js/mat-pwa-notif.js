@@ -81,6 +81,10 @@ async function checkAndRenewPushSubscription() {
       // Re-sync canaux spécifiques : si l'endpoint a tourné, ces listes ont
       // gardé l'ancien endpoint mort — on remet le nouveau sans attendre.
       _syncSubChannels(sub);
+      // Re-sync tokens de signalements/idées stockés en localStorage
+      if (typeof _registerPendingNotifyTokens === 'function') {
+        _registerPendingNotifyTokens(sub).catch(function() {});
+      }
       return;
     }
     if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
@@ -99,6 +103,9 @@ async function checkAndRenewPushSubscription() {
       else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
     _syncSubChannels(newSub);
+    if (typeof _registerPendingNotifyTokens === 'function') {
+      _registerPendingNotifyTokens(newSub).catch(function() {});
+    }
   } catch(e) {}
 }
 
