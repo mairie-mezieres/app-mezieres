@@ -19,6 +19,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
 | Historique des versions techniques | `CHANGELOG.md` |
 | Présentation générale du frontend | `README.md` |
+| **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |
 | **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
 
 > ⚠️ Les notifications signalements/demandes/bugs reposent sur le **backend** (webhook
