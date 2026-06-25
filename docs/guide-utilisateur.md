@@ -228,6 +228,26 @@ MAT respecte votre vie privée :
 
 Pour toute question sur vos données : mairie@mezieres-lez-clery.fr ou 02 38 45 61 76.
 
+---
+
+## 14. Partager MAT avec d'autres communes
+
+En bas de chaque page de l'application se trouve un lien discret **"Partager MAT"**. Cet outil
+ne s'adresse pas aux habitants, mais aux **responsables numériques d'autres communes** qui
+souhaiteraient créer un site municipal similaire pour leur propre collectivité.
+
+**Comment ça fonctionne :**
+
+1. Un questionnaire en 3 étapes vous demande le profil de votre commune (nom, taille, budget,
+   hébergeur envisagé) et les fonctionnalités souhaitées parmi celles proposées par MAT.
+2. L'outil génère un **prompt personnalisé** (15 000–25 000 caractères) prêt à être collé dans
+   une IA (Claude, ChatGPT ou Mistral) pour qu'elle produise l'application adaptée à votre commune.
+3. Un **estimateur de coûts mensuels** vous indique les dépenses prévisibles en fonction du nombre
+   d'habitants.
+
+**Vie privée :** L'outil enregistre une visite anonyme à des fins statistiques (identifiant
+aléatoire, sans adresse IP ni données personnelles).
+
 La politique complète est disponible en appuyant sur **🔒 RGPD** en bas de l'application.
 
 ---

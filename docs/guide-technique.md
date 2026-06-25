@@ -513,6 +513,28 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
 - [ ] **Docs** : mettre à jour `docs/guide-utilisateur.md` (section correspondante)
 - [ ] **Docs** : mettre à jour ce guide si l'architecture change
 
+### Mettre à jour le générateur "Partager" (`js/mat-partager.js`)
+
+La page `partager.html` utilise exclusivement `js/mat-partager.js`. Quand vous ajoutez une
+fonctionnalité à MAT ou que vous modifiez les coûts d'hébergement :
+
+1. **Catalogue des fonctionnalités** — tableau `FEATURES` en début de fichier. Chaque entrée :
+   - `id` : identifiant unique (ex. `"sondages"`)
+   - `label` / `desc` : libellé et description courte
+   - `pill` : badge affiché (`"ess"` | `"reco"` | `"opt"`)
+   - `cost` : objet `{ cloudflare, render, hybrid }` avec `min`/`max` en euros/mois
+   - `instructions` : texte long injecté dans le prompt généré — à rédiger avec soin
+
+2. **Coûts d'hébergement** — constantes `HOSTING_COSTS` (render, cloudflare, upstash, domain,
+   cloudinary). À mettre à jour si les tarifs changent.
+
+3. **Test après modification** : parcourir les 3 étapes complètes, tester avec chaque niveau
+   technique (débutant/intermédiaire/expert), chaque hébergeur (Render, Cloudflare, Hybride)
+   et vérifier que le prompt généré est cohérent.
+
+4. **Bumper** le numéro de version dans `PRECACHE_URLS` du service worker :
+   `'./js/mat-partager.js?v=X.Y.Z'`.
+
 ### Règles de contraste AXE (pièges fréquents)
 
 - `color:var(--muted)` (`#5a7065`) sur `background:var(--mist)` (`#d8f3dc`) → ratio ~4.1:1 — **échoue** pour le texte normal. Utiliser `var(--leaf)` ou `var(--forest)` à la place.
