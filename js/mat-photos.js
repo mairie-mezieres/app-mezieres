@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Galerie photos communautaires v1.3.3
+   MAT — Galerie photos communautaires v1.3.4
    Overlay "Vos photos" + lightbox + mode galerie plein écran en paysage.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -57,6 +57,8 @@ var _allPhotos  = [];
 var _photoSort  = 'votes'; // 'votes' | 'date'
 var _galeriePhotos = [], _galerieIdx = 0, _galerieTimer = null, _galerieOpen = false;
 var _touchStartX = 0, _touchStartY = 0;
+var _photosSeenAtOpen = 0;  // nb de photos vues au moment d'ouvrir l'overlay
+var _newPhotoIds = [];      // ids des photos nouvelles depuis la dernière visite
 
 // ── Tri ──────────────────────────────────────────────────────────
 function setPhotoSort(sort) {
@@ -102,7 +104,11 @@ function launchDiapo() {
 
 // ── Overlay "Vos photos" ─────────────────────────────────────────
 function openPhotos() {
-  _clearPhotosBadge();
+  // Mémorise le nombre de photos déjà vues AVANT de réinitialiser le badge :
+  // sert à mettre en évidence les nouvelles photos dans l'overlay.
+  _photosSeenAtOpen = parseInt(localStorage.getItem(_PHOTOS_SEEN_KEY) || '0', 10);
+  var badge = document.getElementById('photos-badge');
+  if (badge) badge.style.display = 'none';
   openOv('photos');
   loadPhotos();
 }
@@ -117,8 +123,16 @@ async function loadPhotos() {
     const data = await r.json();
     _allPhotos = data.photos || [];
     _galeriePhotos = _allPhotos;
-    _checkPhotosBadge();
+    // Identifie les nouvelles photos : les (total − déjà vues) plus récentes
+    // par date. On marque ainsi par id, indépendamment du tri choisi.
+    var nbNew = Math.max(0, _allPhotos.length - _photosSeenAtOpen);
+    _newPhotoIds = nbNew
+      ? [..._allPhotos].sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
+          .slice(0, nbNew).map(function(p) { return p.id; })
+      : [];
     _renderPhotos();
+    // Toutes les photos sont désormais considérées comme vues.
+    localStorage.setItem(_PHOTOS_SEEN_KEY, String(_allPhotos.length));
   } catch(_) {
     list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#dc2626">Impossible de charger les photos.</div>';
   }
@@ -141,13 +155,22 @@ function _renderPhotos() {
   list.innerHTML = sorted.map(function(p) {
     const voted  = !!votes[p.id];
     const isMine = myIds.includes(p.id);
+    const isNew  = _newPhotoIds.indexOf(p.id) !== -1;
     const imgUrl = (typeof matCloudImg === 'function') ? matCloudImg(p.url, 400) : p.url;
     const safeId = JSON.stringify(p.id).replace(/"/g, '&quot;');
-    return '<div style="border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.08)">'
+    return '<div style="border-radius:12px;overflow:hidden;background:var(--card);'
+      + (isNew
+          ? 'box-shadow:0 0 0 2px var(--leaf),0 2px 12px rgba(0,0,0,.18)'
+          : 'box-shadow:0 1px 4px rgba(0,0,0,.08)') + '">'
       + '<div style="position:relative">'
       + '<img src="' + esc(imgUrl) + '" loading="lazy"'
       + ' onclick="openGalerie(' + safeId + ')" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:pointer"'
       + ' alt="' + esc(p.desc || 'Photo') + '">'
+      + (isNew
+          ? '<span style="position:absolute;top:6px;left:6px;background:var(--leaf);color:#fff;'
+            + 'font-size:.6rem;font-weight:900;letter-spacing:.04em;padding:3px 8px;border-radius:50px;'
+            + 'box-shadow:0 1px 3px rgba(0,0,0,.35);z-index:2">✨ NOUVEAU</span>'
+          : '')
       + (isMine
           ? '<button onclick="deleteMyPhoto(' + safeId + ')" title="Supprimer ma photo"'
             + ' style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);border:none;'

@@ -19,6 +19,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
 | Historique des versions techniques | `CHANGELOG.md` |
 | Présentation générale du frontend | `README.md` |
+| **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |
 | **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
 
 > ⚠️ Les notifications signalements/demandes/bugs reposent sur le **backend** (webhook
@@ -26,6 +27,19 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 > `GUIDE-ADMIN.md` du repo `chatbot-mairie-mezieres`.
 
 Quand tu crées une doc durable, ajoute-la à ce tableau pour rester aiguillable.
+
+## Règle de mise à jour de la documentation
+
+**À chaque correction ou évolution du code**, avant de fermer la PR :
+1. Identifier quelle(s) doc(s) décrivent la zone touchée (voir tableau ci-dessus).
+2. Mettre à jour ces docs dans la **même PR** que le code.
+3. Si une décision structurante est prise ou un bug non-évident corrigé → créer un ADR dans `docs/adr/`.
+
+Cas typiques :
+- Nouveau comportement d'une notification push → `docs/guide-technique.md` §8
+- Nouvelle route admin ou nouveau check diagnostic → `GUIDE-ADMIN.md` du backend
+- Changement de comportement visible habitant → `docs/guide-utilisateur.md`
+- Décision « pourquoi on ne fait pas X » → ADR
 
 ## Changelog (`index.html` → overlay `ov-changelog`)
 

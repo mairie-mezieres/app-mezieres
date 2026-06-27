@@ -24,7 +24,8 @@ jobs:
         with:
           # On vérifie les pages HTML de l'application (pas les libs vendor ni les tests).
           # Certains sites bloquent les robots (Facebook/Instagram, LinkedIn → 999,
-          # claude.ai → 403) : on les exclut pour éviter les faux positifs.
+          # claude.ai / chatgpt.com / chat.mistral.ai → 403) : on les exclut pour
+          # éviter les faux positifs.
           args: >-
             --no-progress
             --max-retries 2
@@ -32,6 +33,8 @@ jobs:
             --exclude 'instagram\.com'
             --exclude 'linkedin\.com'
             --exclude 'claude\.ai'
+            --exclude 'chatgpt\.com'
+            --exclude 'chat\.mistral\.ai'
             index.html admin.html architecture.html notif.html offline.html partager.html
           format: markdown
           output: ./lychee/rapport.md
