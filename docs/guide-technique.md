@@ -300,6 +300,18 @@ URL configurée via `METEOFRANCE_VIGILANCE_URL`.
 
 API météo gratuite et sans clé (données ECMWF). Coordonnées GPS dans `OPEN_METEO_LAT` / `OPEN_METEO_LON`.
 
+### VigiEau (restrictions sécheresse)
+
+`js/mat-eau8.js` interroge `api.vigieau.gouv.fr` pour afficher le niveau de restriction
+sécheresse et les **consignes par niveau** dans la section 💧 Eau de l'overlay météo.
+
+> ⚠️ **Séparation stricte d'avec la vigilance Météo-France.** La sécheresse n'occupe **jamais**
+> le bandeau de vigilance météo (`js/mat-widgets.js`). Côté backend, un flux dédié
+> (`lib/vigieau.js` + `routes/eau.js`, polling `DROUGHT_CHECK_INTERVAL_MS`) publie, à partir du
+> niveau **Alerte**, une **actualité distincte** (`source: vigieau`) + push + Facebook
+> (`AUTO_POST_DROUGHT_ALERTS`). Voir le `GUIDE-ADMIN.md` §5ter du repo backend. Décisions :
+> ADR-0004 (séparation) et ADR-0005 (seuil Alerte).
+
 ---
 
 ## 6. MEL — l'assistante virtuelle

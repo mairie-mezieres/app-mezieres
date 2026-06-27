@@ -19,6 +19,8 @@
 11. [Utiliser l'application sans connexion](#11-utiliser-lapplication-sans-connexion)
 12. [Contacter la mairie](#12-contacter-la-mairie)
 13. [Vos données personnelles (RGPD)](#13-vos-données-personnelles-rgpd)
+14. [Partager MAT avec d'autres communes](#14-partager-mat-avec-dautres-communes)
+15. [Météo et restrictions d'eau (sécheresse)](#15-météo-et-restrictions-deau-sécheresse)
 
 ---
 
@@ -252,5 +254,36 @@ La politique complète est disponible en appuyant sur **🔒 RGPD** en bas de l'
 
 ---
 
-*Dernière mise à jour : mai 2026*
+## 15. Météo et restrictions d'eau (sécheresse)
+
+Dans l'application, appuyez sur la **météo** (en-tête de l'écran d'accueil) pour ouvrir le
+détail. Tout en bas, la section **💧 Eau** récapitule la pluie, l'humidité, le niveau de la
+Loire, le niveau de la nappe et l'état des **restrictions sécheresse** de la commune.
+
+### Comprendre les niveaux de restriction (source officielle VigiEau)
+
+| Niveau | Ce que ça veut dire |
+|--------|---------------------|
+| 🟡 **Vigilance** | Aucune interdiction — économies d'eau simplement recommandées |
+| 🟠 **Alerte** | Premières restrictions (arrosage, lavage de voiture, remplissage de piscine limités) |
+| 🔴 **Alerte renforcée** | Restrictions durcies |
+| 🟣 **Crise** | Usages essentiels uniquement (santé, sécurité, eau potable) |
+
+Sous l'indicateur, une ligne rappelle les **consignes** du niveau en cours, avec un lien
+**« consignes officielles ↗ »** vers VigiEau pour le détail adapté à votre adresse.
+
+> Le niveau **Vigilance** est le plus bas : il est normal de le voir affiché sans qu'aucune
+> interdiction ne s'applique.
+
+### Notifications
+
+- Les **alertes météo** (orages, canicule…) s'affichent dans le **bandeau de vigilance** en
+  haut de l'application.
+- Les **restrictions d'eau** sont **séparées** : à partir du niveau **Alerte**, une
+  **actualité** est publiée et une **notification** est envoyée (si vous êtes abonné), avec
+  les consignes. Une actualité annonce aussi la **fin des restrictions** le moment venu.
+
+---
+
+*Dernière mise à jour : juin 2026*
 *Application MAT — Commune de Mézières-lez-Cléry — Licence MIT*
