@@ -19,6 +19,8 @@
 11. [Utiliser l'application sans connexion](#11-utiliser-lapplication-sans-connexion)
 12. [Contacter la mairie](#12-contacter-la-mairie)
 13. [Vos données personnelles (RGPD)](#13-vos-données-personnelles-rgpd)
+14. [Partager MAT avec d'autres communes](#14-partager-mat-avec-dautres-communes)
+15. [Météo et restrictions d'eau (sécheresse)](#15-météo-et-restrictions-deau-sécheresse)
 
 ---
 
@@ -228,9 +230,60 @@ MAT respecte votre vie privée :
 
 Pour toute question sur vos données : mairie@mezieres-lez-clery.fr ou 02 38 45 61 76.
 
+---
+
+## 14. Partager MAT avec d'autres communes
+
+En bas de chaque page de l'application se trouve un lien discret **"Partager MAT"**. Cet outil
+ne s'adresse pas aux habitants, mais aux **responsables numériques d'autres communes** qui
+souhaiteraient créer un site municipal similaire pour leur propre collectivité.
+
+**Comment ça fonctionne :**
+
+1. Un questionnaire en 3 étapes vous demande le profil de votre commune (nom, taille, budget,
+   hébergeur envisagé) et les fonctionnalités souhaitées parmi celles proposées par MAT.
+2. L'outil génère un **prompt personnalisé** (15 000–25 000 caractères) prêt à être collé dans
+   une IA (Claude, ChatGPT ou Mistral) pour qu'elle produise l'application adaptée à votre commune.
+3. Un **estimateur de coûts mensuels** vous indique les dépenses prévisibles en fonction du nombre
+   d'habitants.
+
+**Vie privée :** L'outil enregistre une visite anonyme à des fins statistiques (identifiant
+aléatoire, sans adresse IP ni données personnelles).
+
 La politique complète est disponible en appuyant sur **🔒 RGPD** en bas de l'application.
 
 ---
 
-*Dernière mise à jour : mai 2026*
+## 15. Météo et restrictions d'eau (sécheresse)
+
+Dans l'application, appuyez sur la **météo** (en-tête de l'écran d'accueil) pour ouvrir le
+détail. Tout en bas, la section **💧 Eau** récapitule la pluie, l'humidité, le niveau de la
+Loire, le niveau de la nappe et l'état des **restrictions sécheresse** de la commune.
+
+### Comprendre les niveaux de restriction (source officielle VigiEau)
+
+| Niveau | Ce que ça veut dire |
+|--------|---------------------|
+| 🟡 **Vigilance** | Aucune interdiction — économies d'eau simplement recommandées |
+| 🟠 **Alerte** | Premières restrictions (arrosage, lavage de voiture, remplissage de piscine limités) |
+| 🔴 **Alerte renforcée** | Restrictions durcies |
+| 🟣 **Crise** | Usages essentiels uniquement (santé, sécurité, eau potable) |
+
+Sous l'indicateur, une ligne rappelle les **consignes** du niveau en cours, avec un lien
+**« consignes officielles ↗ »** vers VigiEau pour le détail adapté à votre adresse.
+
+> Le niveau **Vigilance** est le plus bas : il est normal de le voir affiché sans qu'aucune
+> interdiction ne s'applique.
+
+### Notifications
+
+- Les **alertes météo** (orages, canicule…) s'affichent dans le **bandeau de vigilance** en
+  haut de l'application.
+- Les **restrictions d'eau** sont **séparées** : à partir du niveau **Alerte**, une
+  **actualité** est publiée et une **notification** est envoyée (si vous êtes abonné), avec
+  les consignes. Une actualité annonce aussi la **fin des restrictions** le moment venu.
+
+---
+
+*Dernière mise à jour : juin 2026*
 *Application MAT — Commune de Mézières-lez-Cléry — Licence MIT*

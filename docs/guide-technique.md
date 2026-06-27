@@ -300,6 +300,23 @@ URL configurée via `METEOFRANCE_VIGILANCE_URL`.
 
 API météo gratuite et sans clé (données ECMWF). Coordonnées GPS dans `OPEN_METEO_LAT` / `OPEN_METEO_LON`.
 
+### VigiEau (restrictions sécheresse)
+
+`js/mat-eau8.js` interroge `api.vigieau.gouv.fr` pour afficher le niveau de restriction
+sécheresse et les **consignes par niveau** dans la section 💧 Eau de l'overlay météo.
+
+> ⚠️ **Séparation stricte d'avec la vigilance Météo-France.** La sécheresse n'occupe **jamais**
+> le bandeau de vigilance météo (`js/mat-widgets.js`). Côté backend, un flux dédié
+> (`lib/vigieau.js` + `routes/eau.js`, polling `DROUGHT_CHECK_INTERVAL_MS`) publie, à partir du
+> niveau **Alerte**, une **actualité distincte** (`source: vigieau`) + push + Facebook
+> (`AUTO_POST_DROUGHT_ALERTS`). Voir le `GUIDE-ADMIN.md` §5ter du repo backend. Décisions :
+> ADR-0004 (séparation) et ADR-0005 (seuil Alerte).
+
+**Visuels d'alerte sécheresse** : les cartes 1200×630 (`img/secheresse/secheresse-*.png`)
+sont générées par `scripts/generate-secheresse-cards.js` (Chromium/Playwright, même
+approche que les visuels de vigilance météo `img/vigilance/`). Pour les régénérer après
+un changement de design : `node scripts/generate-secheresse-cards.js`.
+
 ---
 
 ## 6. MEL — l'assistante virtuelle
@@ -537,6 +554,28 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
 - [ ] **AXE** : vérifier que les nouveaux éléments visibles respectent les contrastes WCAG AA (ratio ≥ 4.5:1 pour le texte normal, ≥ 3:1 pour le grand texte)
 - [ ] **Docs** : mettre à jour `docs/guide-utilisateur.md` (section correspondante)
 - [ ] **Docs** : mettre à jour ce guide si l'architecture change
+
+### Mettre à jour le générateur "Partager" (`js/mat-partager.js`)
+
+La page `partager.html` utilise exclusivement `js/mat-partager.js`. Quand vous ajoutez une
+fonctionnalité à MAT ou que vous modifiez les coûts d'hébergement :
+
+1. **Catalogue des fonctionnalités** — tableau `FEATURES` en début de fichier. Chaque entrée :
+   - `id` : identifiant unique (ex. `"sondages"`)
+   - `label` / `desc` : libellé et description courte
+   - `pill` : badge affiché (`"ess"` | `"reco"` | `"opt"`)
+   - `cost` : objet `{ cloudflare, render, hybrid }` avec `min`/`max` en euros/mois
+   - `instructions` : texte long injecté dans le prompt généré — à rédiger avec soin
+
+2. **Coûts d'hébergement** — constantes `HOSTING_COSTS` (render, cloudflare, upstash, domain,
+   cloudinary). À mettre à jour si les tarifs changent.
+
+3. **Test après modification** : parcourir les 3 étapes complètes, tester avec chaque niveau
+   technique (débutant/intermédiaire/expert), chaque hébergeur (Render, Cloudflare, Hybride)
+   et vérifier que le prompt généré est cohérent.
+
+4. **Bumper** le numéro de version dans `PRECACHE_URLS` du service worker :
+   `'./js/mat-partager.js?v=X.Y.Z'`.
 
 ### Règles de contraste AXE (pièges fréquents)
 

@@ -1,4 +1,4 @@
-/* MAT — Eau v3.9.1 — Niveau nappe + restrictions VigiEau (endpoint /api/zones) */
+/* MAT — Eau v3.10.0 — Niveau nappe + restrictions VigiEau + consignes par niveau (endpoint /api/zones) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
 
@@ -61,6 +61,10 @@ async function _loadEauSection() {
   // sait pas (chargement, API injoignable), on reste neutre \u2014 jamais de faux vert.
   var restric    = '\u26AA\u00a0V\u00E9rification\u2026';
   var restCol    = '#94a3b8';
+  // Consignes / recommandations affich\u00E9es sous la ligne Restrictions (selon le
+  // niveau VigiEau). Vide tant qu'aucune zone active n'est confirm\u00E9e.
+  var restricNote = '';
+  var _vigieauLink = 'https://vigieau.gouv.fr';
 
   function render() {
     var meteo   = window._meteoData || {};
@@ -118,6 +122,9 @@ async function _loadEauSection() {
       + row('\uD83C\uDFDE\uFE0F Loire \u00b7 Meung-sur-Loire', '<span style="font-weight:700">' + loireStr + '</span>', true)
       + row('\uD83C\uDF0A Nappe \u00b7 ' + _EAU_LABEL, '<span style="text-align:right">' + nappeHtml + '</span>', true)
       + row('\uD83D\uDEB0 Restrictions', '<span style="font-weight:700;color:' + restCol + '">' + restric + '</span>', true)
+      + (restricNote
+          ? '<div style="padding:2px 14px 10px;font-size:0.7rem;color:var(--muted);line-height:1.5">' + restricNote + '</div>'
+          : '')
       + '</div>';
   }
   render();
@@ -188,11 +195,27 @@ async function _loadEauSection() {
           else if (raw.indexOf('alerte') >= 0)    sev = Math.max(sev, 2);
           else if (raw.indexOf('vigilance') >= 0) sev = Math.max(sev, 1);
         });
-        if      (sev === 4) { restric = '\uD83D\uDFE3 Crise';                 restCol = '#7c3aed'; }
-        else if (sev === 3) { restric = '\uD83D\uDD34 Alerte renforc\u00e9e'; restCol = '#dc2626'; }
-        else if (sev === 2) { restric = '\uD83D\uDFE0 Alerte';                restCol = '#ea580c'; }
-        else if (sev === 1) { restric = '\uD83D\uDFE1 Vigilance';             restCol = '#d97706'; }
-        else                { restric = '\uD83D\uDFE0 Restriction en vigueur'; restCol = '#ea580c'; }
+        var _lien = ' <a href="' + _vigieauLink + '" target="_blank" rel="noopener" style="color:var(--leaf);font-weight:600">consignes officielles \u2197</a>';
+        if      (sev === 4) {
+          restric = '\uD83D\uDFE3 Crise';                 restCol = '#7c3aed';
+          restricNote = 'Usages essentiels uniquement (sant\u00e9, s\u00e9curit\u00e9, eau potable).' + _lien;
+        }
+        else if (sev === 3) {
+          restric = '\uD83D\uDD34 Alerte renforc\u00e9e'; restCol = '#dc2626';
+          restricNote = 'Restrictions durcies : arrosage, lavage, remplissage interdits sur de larges plages.' + _lien;
+        }
+        else if (sev === 2) {
+          restric = '\uD83D\uDFE0 Alerte';                restCol = '#ea580c';
+          restricNote = 'Premi\u00E8res restrictions : arrosage des pelouses, lavage des voitures, remplissage des piscines limit\u00e9s.' + _lien;
+        }
+        else if (sev === 1) {
+          restric = '\uD83D\uDFE1 Vigilance';             restCol = '#d97706';
+          restricNote = 'Pas d\u2019interdiction \u2014 \u00e9conomies d\u2019eau recommand\u00e9es.' + _lien;
+        }
+        else                {
+          restric = '\uD83D\uDFE0 Restriction en vigueur'; restCol = '#ea580c';
+          restricNote = 'Restrictions d\u2019usage de l\u2019eau en vigueur.' + _lien;
+        }
       }
       render();
       }
