@@ -312,6 +312,11 @@ sécheresse et les **consignes par niveau** dans la section 💧 Eau de l'overla
 > (`AUTO_POST_DROUGHT_ALERTS`). Voir le `GUIDE-ADMIN.md` §5ter du repo backend. Décisions :
 > ADR-0004 (séparation) et ADR-0005 (seuil Alerte).
 
+**Visuels d'alerte sécheresse** : les cartes 1200×630 (`img/secheresse/secheresse-*.png`)
+sont générées par `scripts/generate-secheresse-cards.js` (Chromium/Playwright, même
+approche que les visuels de vigilance météo `img/vigilance/`). Pour les régénérer après
+un changement de design : `node scripts/generate-secheresse-cards.js`.
+
 ---
 
 ## 6. MEL — l'assistante virtuelle
