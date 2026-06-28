@@ -176,7 +176,7 @@ Le panneau **Accessibilité & Personnalisation** (icône ♿) propose plusieurs 
 | **Taille du texte** | A / A+ / A++ — agrandit le texte dans toute l'application |
 | **Contraste élevé** | Augmente le contraste des couleurs pour améliorer la lisibilité |
 | **Mode daltonien** | Adapte les couleurs pour les personnes daltoniennes |
-| **Lecture vocale** | Lit le contenu des pages à voix haute (synthèse vocale). Un bouton **« 🔊 Écouter »** est aussi proposé sur le détail des actualités — il fonctionne même si la lecture automatique est désactivée |
+| **Lecture vocale** | Lit le contenu des pages à voix haute (synthèse vocale). Une fois activée, l'ouverture d'une **actualité la lit automatiquement** ; une **barre en bas de l'écran** (⏸ Pause / ⏹ Arrêter) reste accessible pendant la lecture. Un bouton **« 🔊 Écouter »** est aussi présent sur le détail (il fonctionne même sans la lecture automatique) |
 | **Thème** | Vert (défaut), Bleu, Sombre |
 | **Notifications push** | Gérer vos abonnements aux notifications |
 
