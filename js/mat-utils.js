@@ -354,18 +354,27 @@ function ttsSpeak(text, label, force) {
     if (txt) txt.textContent = label || 'Lecture en cours…';
     _ttsPaused = false;
     updateTtsPauseBtn();
+    _ttsEmit('start');
   };
   _ttsUtterance.onend = () => {
     const bar = document.getElementById('tts-bar');
     if (bar) bar.classList.remove('visible');
     _ttsPaused = false;
+    _ttsEmit('end');
   };
   _ttsUtterance.onerror = () => {
     const bar = document.getElementById('tts-bar');
     if (bar) bar.classList.remove('visible');
+    _ttsEmit('end');
   };
 
   speechSynthesis.speak(_ttsUtterance);
+}
+
+// Signale l'état de la lecture vocale (start/end) à l'UI via un événement DOM,
+// pour que les boutons « Écouter » puissent se synchroniser (toggle lecture/arrêt).
+function _ttsEmit(state) {
+  try { document.dispatchEvent(new CustomEvent('mat-tts', { detail: { state } })); } catch (_) {}
 }
 
 function ttsPause() {
@@ -386,6 +395,7 @@ function ttsStop() {
   _ttsPaused = false;
   const bar = document.getElementById('tts-bar');
   if (bar) bar.classList.remove('visible');
+  _ttsEmit('end');
 }
 
 function updateTtsPauseBtn() {

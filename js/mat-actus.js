@@ -264,14 +264,30 @@ function renderActuDetail(actu){
   // automatique est désactivée (ttsRead force la lecture).
   _actuDetailTtsText = (getActuDisplayTitle(actu) + '. ' + (desc || '')).replace(/\s+/g, ' ').trim();
   const ttsBtn = (_actuDetailTtsText && ('speechSynthesis' in window))
-    ? `<button class="actu-btn actu-btn-detail" onclick="ttsReadActuDetail()" aria-label="Écouter l’actualité">🔊 Écouter</button>`
+    ? `<button id="actu-tts-btn" class="actu-btn actu-btn-detail" onclick="ttsReadActuDetail()">🔊 Écouter</button>`
     : '';
   el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
 }
 
 // Texte courant du détail d'actu pour la lecture vocale (rempli par renderActuDetail).
 let _actuDetailTtsText = '';
-function ttsReadActuDetail(){ if(_actuDetailTtsText && typeof ttsRead === 'function') ttsRead(_actuDetailTtsText, 'Actualité'); }
+function _setActuTtsBtn(playing){
+  const b = document.getElementById('actu-tts-btn');
+  if (b) b.textContent = playing ? '⏹ Arrêter' : '🔊 Écouter';
+}
+// Toggle : si une lecture est en cours, un nouveau clic l'arrête ; sinon on lit.
+function ttsReadActuDetail(){
+  if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking){
+    if (typeof ttsStop === 'function') ttsStop();   // émet « end » → libellé réinitialisé
+    return;
+  }
+  if (_actuDetailTtsText && typeof ttsRead === 'function'){
+    ttsRead(_actuDetailTtsText, 'Actualité');
+    _setActuTtsBtn(true);
+  }
+}
+// Fin de lecture (naturelle ou arrêt) → le bouton repasse à « 🔊 Écouter ».
+document.addEventListener('mat-tts', (e) => { if (e.detail && e.detail.state === 'end') _setActuTtsBtn(false); });
 
 async function openActuDetail(id, opts){
   opts=opts||{};
