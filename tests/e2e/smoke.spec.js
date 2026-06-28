@@ -73,6 +73,38 @@ test('overlay lazy (Majordome) : absent du DOM au chargement, hydraté à l’ou
   await expect(page.getByText('Bonjour, je suis MAT !')).toBeVisible();
 });
 
+test('clavier : la touche Échap ferme l’overlay ouvert', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.openAccessibilite === 'function');
+  await expect(async () => {
+    await page.evaluate(() => window.openAccessibilite());
+    await expect(page.locator('#ov-accessibilite')).toHaveClass(/open/, { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ov-accessibilite')).not.toHaveClass(/open/);
+});
+
+test('overlay Accessibilité : aucune violation axe sérieuse ou critique', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.openAccessibilite === 'function');
+  await expect(async () => {
+    await page.evaluate(() => window.openAccessibilite());
+    await expect(page.locator('#ov-accessibilite')).toHaveClass(/open/, { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
+  const results = await new AxeBuilder({ page })
+    .include('#ov-accessibilite')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  const blocking = results.violations.filter(
+    (v) => v.impact === 'serious' || v.impact === 'critical'
+  );
+  if (blocking.length) {
+    console.log('Violations overlay accessibilité:', JSON.stringify(
+      blocking.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })), null, 2));
+  }
+  expect(blocking, 'axe overlay accessibilité').toEqual([]);
+});
+
 test('accueil : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle').catch(() => {});

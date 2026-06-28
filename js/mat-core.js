@@ -144,10 +144,17 @@ function hideBanner(e){
 
 // ── Overlays + gestion bouton retour ─────────────────────────
 const _ovStack = [];
+// Élément déclencheur à re-focuser à la fermeture (accessibilité clavier) — pile
+// parallèle à _ovStack.
+const _ovReturnFocus = [];
 
 const _OV_BASE_Z = 200;
 function openOv(id){
   const el = document.getElementById('ov-'+id);
+  if(!el) return;
+  // Mémorise le focus courant (le bouton qui a ouvert l'overlay) pour le restaurer
+  // à la fermeture — l'utilisateur clavier ne « perd » pas sa position.
+  _ovReturnFocus.push(document.activeElement);
   // Lazy-hydratation : certains overlays au contenu purement statique sont
   // différés via <template data-lazy-ov> dans index.html pour alléger le DOM
   // initial (eco-index). On injecte leur contenu réel à la 1re ouverture.
@@ -158,16 +165,45 @@ function openOv(id){
   el.style.zIndex = String(_OV_BASE_Z + _ovStack.length + 1);
   document.body.style.overflow='hidden';
   _ovStack.push(id);
+  // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
+  if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
+  try { el.focus({ preventScroll:true }); } catch(_){}
 }
 function closeOv(id){
   const el = document.getElementById('ov-'+id);
+  if(!el) return;
   el.classList.remove('open');
   el.style.zIndex = '';
   const idx = _ovStack.lastIndexOf(id);
   if(idx !== -1) _ovStack.splice(idx,1);
   if(_ovStack.length === 0) document.body.style.overflow='';
+  // Restaure le focus sur l'élément déclencheur.
+  const prev = _ovReturnFocus.pop();
+  if(prev && typeof prev.focus === 'function'){ try { prev.focus({ preventScroll:true }); } catch(_){} }
 }
 function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
+
+// ── Accessibilité clavier des overlays ───────────────────────
+// Échap ferme le dernier overlay ouvert ; Tab est piégé à l'intérieur (focus-trap)
+// pour ne pas s'échapper vers la page de fond masquée. Géré globalement → vaut pour
+// les ~28 overlays sans modifier chacun.
+function _ovFocusables(el){
+  const sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  return Array.prototype.filter.call(el.querySelectorAll(sel), n => n.offsetParent !== null);
+}
+document.addEventListener('keydown', function(e){
+  if(_ovStack.length === 0) return;
+  const el = document.getElementById('ov-'+_ovStack[_ovStack.length-1]);
+  if(!el) return;
+  if(e.key === 'Escape'){ e.preventDefault(); closeOv(_ovStack[_ovStack.length-1]); return; }
+  if(e.key === 'Tab'){
+    const f = _ovFocusables(el);
+    if(!f.length){ e.preventDefault(); try{ el.focus(); }catch(_){} return; }
+    const first = f[0], last = f[f.length-1];
+    if(e.shiftKey && (document.activeElement === first || document.activeElement === el)){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+});
 
 // Bouton retour navigateur : ferme le dernier overlay ouvert,
 // ou maintient la PWA ouverte en mode standalone (évite l'écran gris Android).

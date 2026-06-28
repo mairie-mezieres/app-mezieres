@@ -330,8 +330,11 @@ let _ttsEnabled = false;
 let _ttsUtterance = null;
 let _ttsPaused = false;
 
-function ttsSpeak(text, label) {
-  if (!_ttsEnabled || !('speechSynthesis' in window)) return;
+function ttsSpeak(text, label, force) {
+  // `force` : lecture déclenchée explicitement par l'utilisateur (bouton « 🔊 Écouter »)
+  // → on lit même si la lecture vocale automatique est désactivée. Sans `force`,
+  // on ne lit que si le TTS global est activé (lecture auto des réponses MEL).
+  if ((!force && !_ttsEnabled) || !('speechSynthesis' in window)) return;
   ttsStop();
   const clean = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   _ttsUtterance = new SpeechSynthesisUtterance(clean);
@@ -395,7 +398,7 @@ async function ttsRead(text, label) {
     await alertMAT('La lecture vocale n\'est pas disponible sur ce navigateur.','Lecture vocale','🔊');
     return;
   }
-  ttsSpeak(text, label);
+  ttsSpeak(text, label, true);
 }
 
 // ── Compression image via canvas (utilisé par signalement) ──
