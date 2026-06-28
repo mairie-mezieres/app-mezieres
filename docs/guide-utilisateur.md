@@ -176,11 +176,18 @@ Le panneau **Accessibilité & Personnalisation** (icône ♿) propose plusieurs 
 | **Taille du texte** | A / A+ / A++ — agrandit le texte dans toute l'application |
 | **Contraste élevé** | Augmente le contraste des couleurs pour améliorer la lisibilité |
 | **Mode daltonien** | Adapte les couleurs pour les personnes daltoniennes |
-| **Lecture vocale** | Lit le contenu des pages à voix haute (synthèse vocale) |
+| **Lecture vocale** | Lit le contenu des pages à voix haute (synthèse vocale). Un bouton **« 🔊 Écouter »** est aussi proposé sur le détail des actualités — il fonctionne même si la lecture automatique est désactivée |
 | **Thème** | Vert (défaut), Bleu, Sombre |
 | **Notifications push** | Gérer vos abonnements aux notifications |
 
 Ces réglages sont sauvegardés sur votre appareil et persistent entre les visites.
+
+### Navigation au clavier
+
+Les fenêtres (actualités, agenda, accessibilité…) sont utilisables **entièrement au clavier** :
+la touche **Échap** ferme la fenêtre ouverte, la tabulation (**Tab**) reste à l'intérieur de la
+fenêtre tant qu'elle est ouverte, et le focus revient automatiquement à l'endroit d'où vous
+l'aviez ouverte. Utile aussi avec un lecteur d'écran.
 
 ---
 

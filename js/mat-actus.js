@@ -259,8 +259,19 @@ function renderActuDetail(actu){
   const likeCount = actu.likes || 0;
   const likedLS = _isActuLikedLocally(id);
   const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${likeBtn}</div></div>`;
+  // Lecture vocale du détail (titre + texte). Texte stocké hors HTML pour éviter
+  // toute interpolation fragile dans onclick ; le bouton lit même si la lecture
+  // automatique est désactivée (ttsRead force la lecture).
+  _actuDetailTtsText = (getActuDisplayTitle(actu) + '. ' + (desc || '')).replace(/\s+/g, ' ').trim();
+  const ttsBtn = (_actuDetailTtsText && ('speechSynthesis' in window))
+    ? `<button class="actu-btn actu-btn-detail" onclick="ttsReadActuDetail()" aria-label="Écouter l’actualité">🔊 Écouter</button>`
+    : '';
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
 }
+
+// Texte courant du détail d'actu pour la lecture vocale (rempli par renderActuDetail).
+let _actuDetailTtsText = '';
+function ttsReadActuDetail(){ if(_actuDetailTtsText && typeof ttsRead === 'function') ttsRead(_actuDetailTtsText, 'Actualité'); }
 
 async function openActuDetail(id, opts){
   opts=opts||{};
