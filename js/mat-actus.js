@@ -266,7 +266,20 @@ function renderActuDetail(actu){
   const ttsBtn = (_actuDetailTtsText && ('speechSynthesis' in window))
     ? `<button id="actu-tts-btn" class="actu-btn actu-btn-detail" onclick="ttsReadActuDetail()">🔊 Écouter</button>`
     : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title" tabindex="-1">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
+
+  // Lecteurs d'écran : porter le focus sur le titre pour que l'article soit
+  // annoncé/lu directement (les personnes aveugles utilisent leur propre synthèse).
+  const titleEl = el.querySelector('.actu-detail-title');
+  if (titleEl) { try { titleEl.focus({ preventScroll:true }); } catch(_){} }
+
+  // Si la lecture vocale de l'app est activée (drapeau partagé avec MEL), on lit
+  // l'actu automatiquement — l'utilisateur malvoyant n'a pas à chercher le bouton ;
+  // la barre flottante en bas (⏸/⏹) permet d'arrêter de n'importe où.
+  if (typeof _ttsEnabled !== 'undefined' && _ttsEnabled && _actuDetailTtsText && typeof ttsSpeak === 'function') {
+    ttsSpeak(_actuDetailTtsText, 'Actualité');
+    _setActuTtsBtn(true);
+  }
 }
 
 // Texte courant du détail d'actu pour la lecture vocale (rempli par renderActuDetail).

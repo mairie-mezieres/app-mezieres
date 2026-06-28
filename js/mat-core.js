@@ -165,6 +165,9 @@ function openOv(id){
   el.style.zIndex = String(_OV_BASE_Z + _ovStack.length + 1);
   document.body.style.overflow='hidden';
   _ovStack.push(id);
+  // Sémantique pour les lecteurs d'écran : fenêtre modale annoncée comme telle.
+  el.setAttribute('role','dialog');
+  el.setAttribute('aria-modal','true');
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
   try { el.focus({ preventScroll:true }); } catch(_){}
