@@ -47,14 +47,14 @@ document.documentElement.style.background = bg;
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.9">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
-<script defer src="js/mat-utils.js?v=4.3.3"></script>
+<script defer src="js/mat-utils.js?v=4.3.4"></script>
 <script defer src="js/mat-core.js?v=4.2.20"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.4"></script>
 <script defer src="js/mat-agenda.js?v=4.3.3"></script>
 <script defer src="js/mat-forms.js?v=4.6.1"></script>
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
-<script defer src="js/mat-actus.js?v=4.4.6"></script>
+<script defer src="js/mat-actus.js?v=4.4.7"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
@@ -153,7 +153,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.40.0 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.40.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -430,7 +430,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.40.0</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.40.1</button>
 </div>
 </div>
 </div>
@@ -1527,6 +1527,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 juin 2026 — v4.40.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Lecture vocale d&rsquo;une actualit&eacute;&nbsp;: le bouton <strong>&laquo;&nbsp;🔊 &Eacute;couter&nbsp;&raquo;</strong> permet maintenant d&rsquo;<strong>arr&ecirc;ter</strong> la lecture en recliquant dessus (il affiche &laquo;&nbsp;⏹ Arr&ecirc;ter&nbsp;&raquo; pendant la lecture)</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 juin 2026 — v4.40.0</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Accessibilit&eacute;&nbsp;: on peut d&eacute;sormais <strong>fermer les fen&ecirc;tres au clavier</strong> (touche &Eacute;chap), le focus reste &agrave; l&rsquo;int&eacute;rieur et revient au bon endroit &agrave; la fermeture</li>
