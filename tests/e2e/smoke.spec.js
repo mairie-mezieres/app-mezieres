@@ -105,6 +105,37 @@ test('overlay Accessibilité : aucune violation axe sérieuse ou critique', asyn
   expect(blocking, 'axe overlay accessibilité').toEqual([]);
 });
 
+// Couverture axe étendue (EAA / RGAA) : on ouvre chaque overlay qui se rend sans
+// backend et on vérifie l'absence de violation sérieuse/critique sur son contenu.
+const A11Y_OVERLAYS = [
+  { fn: 'openContact', sel: '#ov-contact', label: 'Contact' },
+  { fn: 'openNums',    sel: '#ov-nums',    label: 'Numéros utiles' },
+  { fn: 'openSignal',  sel: '#ov-signal',  label: 'Signalement' },
+];
+
+for (const ov of A11Y_OVERLAYS) {
+  test(`overlay ${ov.label} : aucune violation axe sérieuse ou critique`, async ({ page }) => {
+    await page.goto('/');
+    await page.waitForFunction((fn) => typeof window[fn] === 'function', ov.fn);
+    await expect(async () => {
+      await page.evaluate((fn) => window[fn](), ov.fn);
+      await expect(page.locator(ov.sel)).toHaveClass(/open/, { timeout: 1000 });
+    }).toPass({ timeout: 8000 });
+    const results = await new AxeBuilder({ page })
+      .include(ov.sel)
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
+    const blocking = results.violations.filter(
+      (v) => v.impact === 'serious' || v.impact === 'critical'
+    );
+    if (blocking.length) {
+      console.log(`Violations overlay ${ov.label}:`, JSON.stringify(
+        blocking.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })), null, 2));
+    }
+    expect(blocking, `axe overlay ${ov.label}`).toEqual([]);
+  });
+}
+
 test('accueil : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle').catch(() => {});
