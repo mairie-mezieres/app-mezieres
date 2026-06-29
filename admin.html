@@ -2690,6 +2690,7 @@ async function loadPushAdmin(){
 
     const TYPE_META = {
       meteo: { ico: '🌩️', label: 'Vigilance météo',  color: '#dc2626' },
+      'meteo-test': { ico: '🧪', label: 'Test météo', color: '#0891b2' },
       actu:  { ico: '📰', label: 'Actu mairie',      color: '#7c3aed' },
       fb:    { ico: '📘', label: 'Mirror Facebook',   color: '#1d4ed8' },
     };
@@ -2729,6 +2730,11 @@ async function loadPushAdmin(){
 
     el.innerHTML = `
       <div class="section-title">🔔 Notifications push</div>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px">
+        <button id="btn-meteo-test" onclick="testMeteoPush()" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:0.78rem;font-weight:900;cursor:pointer">🧪 Tester l'alerte météo</button>
+        <span id="meteo-test-status" style="font-size:0.76rem;font-weight:800;color:var(--muted)"></span>
+      </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px">
         <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px">
@@ -2771,6 +2777,25 @@ async function loadPushAdmin(){
   } catch(e) {
     el.innerHTML = `<div style="text-align:center;padding:24px;color:#dc2626">Erreur : ${e.message}</div>`;
   }
+}
+
+// Envoie une notification de TEST aux abonnés météo (vérifier la réception).
+async function testMeteoPush(){
+  if(!confirm('Envoyer une notification de TEST à tous les abonnés aux alertes météo ?')) return;
+  const btn=document.getElementById('btn-meteo-test');
+  const st=document.getElementById('meteo-test-status');
+  if(btn) btn.disabled=true;
+  if(st){ st.style.color='var(--muted)'; st.textContent='Envoi…'; }
+  try{
+    const r=await fetch(`${API}/admin/meteo/test-push`,{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN}});
+    const d=await r.json();
+    if(st){
+      if(d.sent>0){ st.style.color='#16a34a'; st.textContent=`✅ ${d.sent}/${d.total} notification(s) envoyée(s)`; }
+      else if(d.total===0){ st.style.color='#ea580c'; st.textContent='⚠️ Aucun abonné météo enregistré'; }
+      else { st.style.color='#ea580c'; st.textContent='⚠️ Aucun envoi (abonnements expirés ?)'; }
+    }
+  }catch(e){ if(st){ st.style.color='#dc2626'; st.textContent='Erreur : '+e.message; } }
+  finally{ if(btn) btn.disabled=false; }
 }
 
 // ── Logs PWA ──────────────────────────────────────────────────
