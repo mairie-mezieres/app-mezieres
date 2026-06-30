@@ -1,4 +1,4 @@
-/* MAT — Associations v4.0.5 */
+/* MAT — Associations v4.0.6 */
 (function(){
 var _D=[
   {
@@ -11,7 +11,7 @@ var _D=[
     n:'GERM de Mézières',
     l:'img/germ.jpeg',
     e:'martine.baudoin.goyer@orange.fr',
-    desc:"Groupe d'Études et de Réflexion Municipales. Participe à la réflexion et au débat sur la vie locale, les projets d'avenir et l'environnement de la commune."
+    desc:"Groupe d'Études et de Réflexion Municipales. Association de randonnée et de préservation des chemins : sorties pédestres conviviales et entretien des sentiers de Mézières-lez-Cléry."
   },
   {
     n:"Les Trialistes de l'Ardoux",

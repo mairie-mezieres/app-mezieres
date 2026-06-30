@@ -133,7 +133,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-associations.js?v=4.2.3';
+  s.src = 'js/mat-associations.js?v=4.2.4';
   document.head.appendChild(s);
 })();
 
