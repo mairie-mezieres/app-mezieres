@@ -46,6 +46,13 @@ function getLocation(){
   if(!navigator.geolocation){document.getElementById('loc-status').textContent='GPS non disponible';return;}
   document.getElementById('loc-btn').textContent='📍 Localisation en cours…';
   navigator.geolocation.getCurrentPosition(pos=>{
+    // Certains téléphones renvoient (0,0) — « Null Island », golfe de Guinée —
+    // au lieu d'une erreur quand la position est indisponible : à traiter comme un échec.
+    if(Math.abs(pos.coords.latitude)<0.001&&Math.abs(pos.coords.longitude)<0.001){
+      document.getElementById('loc-btn').textContent='❌ Position indisponible';
+      document.getElementById('loc-status').textContent='Le GPS n\'a pas trouvé votre position — réessayez (idéalement en extérieur)';
+      return;
+    }
     sigLat=pos.coords.latitude.toFixed(5); sigLon=pos.coords.longitude.toFixed(5);
     document.getElementById('loc-btn').textContent='✅ Position obtenue ('+sigLat+', '+sigLon+')';
     document.getElementById('loc-btn').classList.add('on');
