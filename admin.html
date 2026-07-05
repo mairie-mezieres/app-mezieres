@@ -1227,11 +1227,28 @@ function _ideaStatusBadge(status) {
   const [label, color] = map[status] || ['—','var(--muted)'];
   return `<span style="background:${color};color:white;border-radius:6px;padding:2px 8px;font-size:0.72rem;font-weight:800">${label}</span>`;
 }
+// Filtre d'affichage par statut de résolution (≠ filtres anti-doublon plus bas).
+// 'all' = tout · 'none' = sans statut · sinon la valeur du statut.
+let _ideaViewFilter = 'all';
+function setIdeaViewFilter(f){ _ideaViewFilter = f; renderIdeas(); }
 function renderIdeas() {
-  const ideas = [..._data.ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
+  const all = [..._data.ideas].sort((a,b)=>(b.votes||0)-(a.votes||0));
+  const count = s => s==='all' ? all.length : s==='none' ? all.filter(i=>!i.status).length : all.filter(i=>i.status===s).length;
+  const ideas = _ideaViewFilter==='all' ? all : all.filter(i => _ideaViewFilter==='none' ? !i.status : i.status===_ideaViewFilter);
+  const chip = (val, label) => `<button onclick="setIdeaViewFilter('${val}')" style="border-radius:20px;padding:5px 12px;font-size:0.74rem;font-weight:800;cursor:pointer;font-family:inherit;${_ideaViewFilter===val
+    ? 'background:var(--forest);color:white;border:1.5px solid var(--forest)'
+    : 'background:var(--warm,#fff);color:var(--text);border:1.5px solid var(--border)'}">${label} (${count(val)})</button>`;
   document.getElementById('ideas-content').innerHTML = `
     <div class="table-wrap">
-      <div class="table-header"><span class="table-title">💡 Idées (${ideas.length})</span></div>
+      <div class="table-header" style="flex-wrap:wrap;gap:8px"><span class="table-title">💡 Idées (${ideas.length}/${all.length})</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${chip('none','⏳ Sans statut')}
+          ${chip('studying','🔍 En cours d\'étude')}
+          ${chip('accepted','✅ Retenues')}
+          ${chip('rejected','❌ Non retenues')}
+          ${chip('all','Toutes')}
+        </div>
+      </div>
       <table>
         <tr><th>Idée</th><th style="white-space:nowrap">Actions</th><th>Catégorie</th><th>Votes</th><th>Date</th><th>Statut</th></tr>
         ${ideas.length ? ideas.map(i=>`
@@ -1265,7 +1282,7 @@ function renderIdeas() {
               </div>
             </td>
           </tr>
-        `).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucune idée</td></tr>'}
+        `).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">${_ideaViewFilter==='all' ? 'Aucune idée' : 'Aucune idée pour ce filtre'}</td></tr>`}
       </table>
     </div>`;
 }
