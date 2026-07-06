@@ -1737,8 +1737,14 @@ async function saveActuEdit(id) {
     if (!r.ok || !d.ok) throw new Error(d.error || 'Erreur');
     const idx = _data.actus.findIndex(a => a.id === id);
     if (idx >= 0) _data.actus[idx] = d.actu;
-    if (statusEl) { statusEl.textContent = '✅ Enregistré'; statusEl.style.color = 'var(--leaf)'; }
-    setTimeout(() => { toggleActuEdit(id); renderActus(); }, 900);
+    let fbMsg = '', fbFail = false;
+    if (fbEl?.checked) {
+      if (d.facebook?.ok) fbMsg = ' · 📘 <a href="https://www.facebook.com/'+encodeURIComponent(d.facebook.post_id||'')+'" target="_blank" rel="noopener">voir le post ↗</a>';
+      else { fbMsg = ' · ⚠️ Facebook : '+safe(d.facebook?.error||'échec'); fbFail = true; }
+    }
+    if (statusEl) { statusEl.innerHTML = '✅ Enregistré'+fbMsg; statusEl.style.color = fbFail ? 'var(--red,#dc2626)' : 'var(--leaf)'; }
+    // Laisser le temps de lire (et cliquer) le résultat Facebook avant de refermer
+    setTimeout(() => { toggleActuEdit(id); renderActus(); }, fbEl?.checked ? 5000 : 900);
   } catch(e) {
     if (statusEl) { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = 'var(--red,#dc2626)'; }
   }
