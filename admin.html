@@ -1407,7 +1407,11 @@ function renderActus() {
           <td style="max-width:220px;font-size:0.72rem;color:var(--muted)">${a.description?(safe(a.description.substring(0,100))+(a.description.length>100?'…':'')):' —'}</td>
           <td style="font-size:0.72rem">${safe(a.date||'')}${a.eventDate?'<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>':''}</td>
           <td>${a.photo?'<span class="badge badge-green">✓</span>':'<span class="badge">—</span>'}</td>
-          <td>${a.source==='admin'?'<span class="badge badge-blue">Admin</span>':a.source==='facebook'?'<span class="badge badge-orange">FB</span>':'<span class="badge">—</span>'}</td>
+          <td>${a.source==='admin'
+            ?'<span class="badge badge-blue">Admin</span>'+(a.fb&&a.fb.postId
+              ?' <a href="https://www.facebook.com/'+encodeURIComponent(a.fb.postId)+'" target="_blank" rel="noopener" class="badge badge-green" style="text-decoration:none" title="'+(a.fb.fallback?'Publiée sur Facebook en texte seul (photo refusée)':'Publiée sur Facebook')+' — voir le post">📘</a>'
+              :'')
+            :a.source==='facebook'?'<span class="badge badge-orange">FB</span>':'<span class="badge">—</span>'}</td>
         </tr>
         <tr id="actu-edit-${a.id}" style="display:none;background:#f0f7ff">
           <td colspan="6" style="padding:14px 16px">
@@ -1614,7 +1618,8 @@ async function pubSubmit() {
       if(d.facebook?.ok){
         const mode=d.facebook.mode==='photo'?'avec photo':'texte seul';
         const fb=d.facebook.fallbackUsed?' <em>(photo non envoyée, fallback texte)</em>':'';
-        lines.push(`📘 Facebook — ${mode}${fb}`);
+        const lien=d.facebook.post_id?` — <a href="https://www.facebook.com/${encodeURIComponent(d.facebook.post_id)}" target="_blank" rel="noopener">voir le post ↗</a>`:'';
+        lines.push(`📘 Facebook — ${mode}${fb}${lien}`);
       } else if(d.facebook){
         lines.push(`⚠️ Facebook : ${d.facebook.error||'échec'}`);
       }
