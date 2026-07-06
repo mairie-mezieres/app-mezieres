@@ -412,6 +412,23 @@ Navigateur                Backend (Render)
     │   (titre, body, icône)   │
 ```
 
+### Routage du clic sur une notification
+
+Le payload push porte `data.open` (type d'écran cible). Le clic est routé en **trois
+endroits à garder synchronisés** — ajouter un type = modifier les trois :
+
+1. `service-worker.js` (`notificationclick`) — app déjà ouverte : `postMessage({action})`
+2. `notif.html` — app fermée : landing `?open=…` → redirection `index.html#hash`
+3. `js/mat-core.js` — récepteur `postMessage` + routeur `handleMatHashRoute()`
+
+| `data.open` | Écran ouvert |
+|---|---|
+| `actu` (+ `actuId`) | Détail de l'actualité |
+| `meteo` | Overlay météo |
+| `dechets` | Calendrier des déchets |
+| `idees` / `signalements` / `bugs` / `contact` | Écran correspondant |
+| *(défaut)* | Notifications/actus |
+
 ### VAPID
 
 La paire de clés VAPID identifie le serveur émetteur. Générée une fois avec `npx web-push generate-vapid-keys` et jamais changée (sinon tous les abonnements deviennent invalides).
