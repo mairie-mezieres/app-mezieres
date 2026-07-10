@@ -61,7 +61,11 @@ jobs:
           git add data/ecoindex.json
           git diff --cached --quiet && echo "Aucun changement" && exit 0
           git commit -m "chore(ci): mise à jour eco-index $(date +%Y-%m-%d) [skip ci]"
-          git pull --rebase origin main
+          # ecoindex.json est un fichier GÉNÉRÉ : si main a bougé pendant l'audit,
+          # la version fraîchement calculée doit gagner. Pendant un rebase,
+          # -X theirs = le commit qu'on applique (le nôtre). Sans ça, le push
+          # conflicte dès qu'un merge et un audit se croisent (vu le 10/07/2026).
+          git pull --rebase -X theirs origin main
           git push
 
       - name: Mettre à jour l'issue de suivi #190
