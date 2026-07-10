@@ -135,13 +135,15 @@ function openEventDetail(uid){
     if(match&&match.photo) photo=match.photo;
   }
   var photoHTML=photo?'<img class="event-detail-img" src="'+esc(photo)+'" alt="" onerror="this.style.display=\'none\'">':'';
+  // openOv d'abord : l'overlay est lazy (template data-lazy-ov), le body
+  // n'existe dans le DOM qu'après hydratation.
+  openOv('event');
   var body=document.getElementById('event-detail-body');
   var uidSafe=_agJsArg(evt.uid);
   var reactionsEnabled=!(window._matFeatures&&window._matFeatures.reactionsEnabled===false);
   var rsvpOn=_isEventRsvpLocally(uid);
   var rsvpBtn=reactionsEnabled?'<button id="rsvp-btn-'+esc(uid)+'" class="event-btn-rsvp'+(rsvpOn?' rsvp-on':'')+'" onclick="toggleRsvpEvent('+uidSafe+')" aria-label="'+(rsvpOn?'Retirer mon inscription':'J’y serai')+'" aria-pressed="'+rsvpOn+'">'+(rsvpOn?'✅ J’y serai':'📅 J’y serai')+'</button>':'';
   body.innerHTML='<div class="event-detail-card">'+photoHTML+'<div class="event-detail-title">'+esc(evt.summary)+'</div><div class="event-detail-meta">'+formatEventMeta(evt)+'</div><div class="event-detail-desc">'+(evt.description?esc(evt.description):'Aucune description.')+'</div><div class="event-detail-actions"><button class="event-btn primary" onclick="downloadEventIcs('+uidSafe+')">Ajouter à mon agenda</button>'+rsvpBtn+'</div></div>';
-  openOv('event');
   // Charge le compteur RSVP réel (1 requête ponctuelle à l'ouverture du détail)
   if(reactionsEnabled) _loadRsvpCount(uid);
 }

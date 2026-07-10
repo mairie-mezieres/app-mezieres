@@ -304,11 +304,13 @@ document.addEventListener('mat-tts', (e) => { if (e.detail && e.detail.state ===
 
 async function openActuDetail(id, opts){
   opts=opts||{};
-  const body=document.getElementById('actu-detail-body');
-  if(body) body.innerHTML='<div class="actu-empty">Chargement…</div>';
   const notifs=document.getElementById('ov-notifs');
   if(notifs && notifs.classList.contains('open')) closeOv('notifs');
+  // openOv d'abord : l'overlay est lazy (template data-lazy-ov), le body
+  // n'existe dans le DOM qu'après hydratation.
   openOv('actu');
+  const body=document.getElementById('actu-detail-body');
+  if(body) body.innerHTML='<div class="actu-empty">Chargement…</div>';
   if(!opts.fromHash) setActuHash(id);
   try{
     const actus=await fetchActus(false);

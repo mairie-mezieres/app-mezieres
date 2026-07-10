@@ -562,6 +562,13 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
 ### Checklist type
 
 - [ ] **Frontend** : ajouter la section HTML dans `index.html` (overlay ou section principale)
+  - ⚠️ **Nouvel overlay = lazy par défaut** : envelopper le contenu (le `.panel`) dans un
+    `<template data-lazy-ov>` enfant direct du `<div class="ov">` — il est hydraté à la
+    première ouverture par `openOv()` (allège le DOM initial, éco-index).
+    Corollaire : la fonction d'ouverture doit appeler `openOv('x')` **avant** tout
+    `getElementById` sur le contenu de l'overlay (sinon `null` au premier affichage).
+    Seule exception : un overlay dont le contenu est écrit par un chargement au boot
+    (ex. `ov-sondages`, rempli par `loadSondages()` qui alimente aussi le badge) reste inline.
 - [ ] **JS** : créer ou modifier le fichier `js/mat-<feature>.js`
 - [ ] **CSS** : ajouter les styles dans `css/mat.css` (mobile) et/ou `css/mat-desktop.css` (desktop ≥ 900 px)
 - [ ] **Backend** (si API nécessaire) : créer `routes/<feature>.js` et l'enregistrer dans `index.js`

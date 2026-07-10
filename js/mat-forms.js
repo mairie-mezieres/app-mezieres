@@ -683,6 +683,9 @@ ${descHtml}${photosHtml}${commentsHtml}
 }
 
 function openSuivi(type){
+  // openOv d'abord : l'overlay est lazy (template data-lazy-ov), le titre
+  // et l'icône n'existent dans le DOM qu'après hydratation.
+  openOv('suivi');
   const titleEl=document.querySelector('#ov-suivi .panel-title');
   const icoEl=document.querySelector('#ov-suivi .panel-ico');
   if(type==='bugs'){
@@ -692,7 +695,6 @@ function openSuivi(type){
     if(titleEl) titleEl.textContent='Suivi des signalements';
     if(icoEl) icoEl.textContent='📋';
   }
-  openOv('suivi');
   loadSuivi(type);
 }
 
