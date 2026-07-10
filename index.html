@@ -51,10 +51,10 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-core.js?v=4.2.22"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.4"></script>
-<script defer src="js/mat-agenda.js?v=4.3.3"></script>
-<script defer src="js/mat-forms.js?v=4.6.2"></script>
+<script defer src="js/mat-agenda.js?v=4.3.4"></script>
+<script defer src="js/mat-forms.js?v=4.6.3"></script>
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
-<script defer src="js/mat-actus.js?v=4.4.8"></script>
+<script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
@@ -153,7 +153,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.40.5 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.40.6 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -430,7 +430,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.40.5</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.40.6</button>
 </div>
 </div>
 </div>
@@ -676,6 +676,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </template>
 </div>
 <div class="ov" id="ov-mel" onclick="ovClick('mel',event)">
+<template data-lazy-ov>
 <div class="mel-panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:var(--gold);font-size:22px">👩</div>
@@ -706,6 +707,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </div>
 <div id="mel-privacy-hint" style="display:none;font-size:0.65rem;color:var(--muted);text-align:center;padding:3px 10px 4px;line-height:1.4">🔒 Questions anonymisées — <button onclick="openRgpd()" style="background:none;border:none;padding:0;font-size:0.65rem;color:var(--muted);text-decoration:underline;cursor:pointer">vie privée</button></div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-signal" onclick="ovClick('signal',event)">
 <template data-lazy-ov>
@@ -766,6 +768,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </template>
 </div>
 <div class="ov" id="ov-suivi" onclick="ovClick('suivi',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#eff6ff">📋</div>
@@ -776,8 +779,10 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div style="text-align:center;padding:24px;color:var(--muted)">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-idees" onclick="ovClick('idees',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fffbe8">💡</div>
@@ -809,6 +814,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div id="ideas-list" class="ideas-list"></div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-notifs" onclick="ovClick('notifs',event)">
 <template data-lazy-ov>
@@ -861,6 +867,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </template>
 </div>
 <div class="ov" id="ov-actu" onclick="ovClick('actu',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fff7ed">📰</div>
@@ -871,6 +878,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <div class="actu-empty">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-contact" onclick="ovClick('contact',event)">
 <template data-lazy-ov>
@@ -955,6 +963,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 </template>
 </div>
 <div class="ov" id="ov-agenda" onclick="ovClick('agenda',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fef3e0">📅</div>
@@ -970,8 +979,10 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div id="agenda-content"><div class="agenda-empty">Chargement de l'agenda…</div></div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-event" onclick="ovClick('event',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#fff7ed">🎉</div>
@@ -982,6 +993,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <div class="agenda-empty">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-bug" onclick="ovClick('bug',event)">
 <template data-lazy-ov>
@@ -1130,6 +1142,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </template>
 </div>
 <div class="ov" id="ov-conseil" onclick="ovClick('conseil',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🏛️</div>
@@ -1141,6 +1154,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div class="trombi-grid" id="trombi-grid"></div>
 </div>
 </div>
+</template>
 </div>
 <div id="trombi-modal" style="display:none;position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px" onclick="closeTrombi(event)">
 <div id="trombi-card" style="background:var(--warm);border-radius:24px;overflow:hidden;width:min(100%,340px);max-height:min(92vh,760px);display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.4);position:relative;transform:scale(0.8);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease">
@@ -1251,6 +1265,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </template>
 </div>
 <div class="ov" id="ov-remi" onclick="ovClick('remi',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fc">🚌</div>
@@ -1263,8 +1278,10 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-dechets" onclick="ovClick('dechets',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#eaf8e8">🗑️</div>
@@ -1275,8 +1292,10 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div id="dechets-content"></div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-meteo" onclick="ovClick('meteo',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f4f8">🌤️</div>
@@ -1287,8 +1306,10 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-docs" onclick="ovClick('docs',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.15)">📁</div>
@@ -1343,6 +1364,7 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 </div>
 </div>
 </div>
+</template>
 </div>
 <script>
 (function(){
@@ -1390,6 +1412,7 @@ showCount(n);
 </div>
 </div>
 <div class="ov" id="ov-assoc" onclick="ovClick('assoc',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f5e9">🤝</div>
@@ -1400,6 +1423,7 @@ showCount(n);
 <div class="actu-empty">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-subvention" onclick="ovClick('subvention',event)">
 <template data-lazy-ov>
@@ -1435,6 +1459,7 @@ et accompagnée des documents suivants :
 </template>
 </div>
 <div class="ov" id="ov-entreprises" onclick="ovClick('entreprises',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:#e8f0fe">🛠️</div>
@@ -1445,8 +1470,10 @@ et accompagnée des documents suivants :
 <div class="actu-empty">Chargement…</div>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-carburant" onclick="ovClick('carburant',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr" style="background:linear-gradient(135deg,#92400e,#d97706)">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">⛽</div>
@@ -1458,8 +1485,10 @@ et accompagnée des documents suivants :
 <p style="font-size:0.68rem;color:var(--muted);margin-top:12px;text-align:center">Source : données officielles gouvernementales<br>Mise à jour selon déclaration des stations</p>
 </div>
 </div>
+</template>
 </div>
 <div class="ov" id="ov-events-locaux" onclick="ovClick('events-locaux',event)">
+<template data-lazy-ov>
 <div class="panel">
 <div class="panel-hdr" style="background:linear-gradient(135deg,#4c1d95,#7c3aed)">
 <div class="panel-ico" style="background:rgba(255,255,255,0.2)">🎭</div>
@@ -1471,6 +1500,7 @@ et accompagnée des documents suivants :
 <div id="events-locaux-body"><div class="actu-empty">Chargement…</div></div>
 </div>
 </div>
+</template>
 </div>
 <script defer src="js/mat-desktop.js?v=4.1.4"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
@@ -1527,6 +1557,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juillet 2026 — v4.40.6</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Chargement all&eacute;g&eacute;&nbsp;: les fen&ecirc;tres de l&rsquo;app (m&eacute;t&eacute;o, agenda, d&eacute;chets, MEL&hellip;) ne sont construites qu&rsquo;&agrave; leur premi&egrave;re ouverture &mdash; d&eacute;marrage plus l&eacute;ger et sobri&eacute;t&eacute; num&eacute;rique am&eacute;lior&eacute;e</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 6 juillet 2026 — v4.40.5</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Le clic sur la notification de <strong>rappel de collecte</strong> ouvre d&eacute;sormais directement le <strong>calendrier des d&eacute;chets</strong> (au lieu des actualit&eacute;s)</li>
