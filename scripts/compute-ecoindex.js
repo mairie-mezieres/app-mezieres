@@ -70,6 +70,7 @@ function extractMetrics(report) {
     dom: dom !== null ? Math.round(dom) : null,
     requests,
     weightKb: weightBytes !== null ? Math.round(weightBytes / 1024) : null,
+    fetchTime: report.fetchTime || null,
     performance: lh('performance'),
     accessibility: lh('accessibility'),
     seo: lh('seo'),
@@ -105,7 +106,17 @@ function run() {
 
   const date = new Date().toISOString().slice(0, 10);
 
-  // Moyenne des runs (LHCI lance 3 runs par défaut)
+  // Le 1er passage chronologique est ÉCARTÉ des moyennes : il mesure le réveil
+  // du backend Render (cold start du plan gratuit), pas l'app — vu le 10/07/2026 :
+  // perf 25 au 1er run contre 71/72 aux suivants. On ne l'écarte que s'il reste
+  // au moins 2 passages pour moyenner.
+  let ignored = null;
+  if (results.length >= 2) {
+    results.sort((a, b) => new Date(a.fetchTime || 0) - new Date(b.fetchTime || 0));
+    ignored = results.shift();
+  }
+
+  // Moyenne des runs restants (LHCI lance 3 runs par défaut)
   const avg = (key) => results.length
     ? Math.round(results.reduce((s, r) => s + (r[key] ?? 0), 0) / results.length)
     : null;
@@ -135,6 +146,9 @@ function run() {
   if (!results.length) {
     md += '> ⚠️ Aucun rapport Lighthouse trouvé. Vérifier que le step LHCI a bien produit des fichiers `.report.json`.\n';
   } else {
+    if (ignored) {
+      md += `> ℹ️ Le 1er passage (cold start du backend Render — perf ${ignored.performance}/100, éco ${ignored.ecoindex}/100) est écarté des moyennes.\n\n`;
+    }
     md += '### Scores Lighthouse\n\n';
     md += `| Métrique | Score |\n|---|---|\n`;
     md += `| 🚀 Performance | ${avg('performance')}/100 |\n`;
@@ -167,6 +181,9 @@ function run() {
 
   fs.writeFileSync('rapport-ecoindex.md', md, 'utf8');
   console.log('[eco-index] rapport-ecoindex.md écrit');
+  if (ignored) {
+    console.log(`[eco-index] 1er passage écarté (cold start) → éco:${ignored.ecoindex}/100 perf:${ignored.performance}`);
+  }
   for (const r of results) {
     console.log(`[eco-index] ${r.url.replace('?_lh=1', '')} → éco:${r.ecoindex}/100 ${r.grade} perf:${r.performance} a11y:${r.accessibility} seo:${r.seo}`);
   }
