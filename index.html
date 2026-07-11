@@ -43,7 +43,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.3.7">
+<link rel="stylesheet" href="css/mat.css?v=4.3.8">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.9">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
@@ -153,7 +153,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.40.6 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.41 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -241,6 +241,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDocs()">📄 Documents officiels</button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
+<button onclick="openPlui()" style="position:relative">🗺️ PLUi-H-D<span id="plui-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
 <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener noreferrer">🥾 Randonnées</a>
 <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener noreferrer">🌐 CCTVL</a>
 </nav>
@@ -248,6 +249,12 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 </div>
 <div class="content">
+<button type="button" class="plui-banner" onclick="openPlui()" aria-label="Grand dossier PLUi-H-D — Dessinons le territoire de 2040. Suivez l’étude et donnez votre avis.">
+<span class="plui-badge" id="plui-badge" aria-hidden="true">Nouveau</span>
+<span class="plui-tag">Grand dossier</span>
+<span class="plui-title">🗺️ PLUi-H-D — Dessinons le territoire de 2040</span>
+<span class="plui-sub">Suivez l’étude et donnez votre avis</span>
+</button>
 <div class="sec">Démarches et Services</div>
 <div class="grid2">
 <button class="card simple-card mel-entry" onclick="openMel()">
@@ -430,7 +437,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.40.6</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.41</button>
 </div>
 </div>
 </div>
@@ -1366,6 +1373,63 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 </div>
 </template>
 </div>
+<div class="ov" id="ov-plui" onclick="ovClick('plui',event)">
+<template data-lazy-ov>
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:rgba(255,255,255,0.15)">🗺️</div>
+<div class="panel-title">PLUi-H-D — territoire 2040</div>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('plui')">✕</button>
+</div>
+<div class="panel-body">
+
+<!-- BLOC 1 — C’est quoi ? -->
+<section style="margin-bottom:22px">
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 10px">🧭 C’est quoi&nbsp;?</h3>
+<p style="font-size:0.95rem;line-height:1.65;color:var(--text);margin:0">Le PLUi-H-D est le grand document qui décidera, d’ici 2040, où l’on pourra construire, comment se loger et comment se déplacer sur notre territoire. Il est préparé par la Communauté de Communes des Terres du Val de Loire pour ses 25 communes. Il remplacera notre plan d’urbanisme actuel. Son approbation est prévue fin 2028.</p>
+</section>
+
+<!-- BLOC 2 — Où en est-on ? -->
+<section style="margin-bottom:22px">
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 14px">📍 Où en est-on&nbsp;?</h3>
+<div id="plui-timeline"></div>
+</section>
+
+<!-- BLOC 3 — Donnez votre avis -->
+<section style="margin-bottom:22px">
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">🗣️ Donnez votre avis</h3>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--mist);border-radius:14px;color:var(--text)">
+<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">📖</div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Cahier de concertation</div><div style="font-size:0.8rem;color:var(--sage-ink);margin-top:3px;line-height:1.4">Disponible en mairie de Mézières-lez-Cléry aux horaires d’ouverture.</div></div>
+</div>
+<a href="mailto:pluihd@ccterresduvaldeloire.fr" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;text-decoration:none;color:var(--text);-webkit-tap-highlight-color:transparent">
+<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">✉️</div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Par mail</div><div style="font-size:0.8rem;color:var(--muted);margin-top:3px;line-height:1.4;word-break:break-word">pluihd@ccterresduvaldeloire.fr</div></div>
+<div style="font-size:1.2rem;flex-shrink:0;opacity:0.8" aria-hidden="true">→</div>
+</a>
+<div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;color:var(--text)">
+<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">📮</div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Par courrier</div><div style="font-size:0.8rem;color:var(--muted);margin-top:3px;line-height:1.45">CCTVL – Concertation PLUi-H-D<br>44 rue de Châteaudun<br>45130 Meung-sur-Loire</div></div>
+</div>
+<a href="https://www.ccterresduvaldeloire.fr/plui-h-d/" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;text-decoration:none;color:var(--text);-webkit-tap-highlight-color:transparent">
+<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">🌐</div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Formulaire en ligne</div><div style="font-size:0.8rem;color:var(--muted);margin-top:3px;line-height:1.4">Sur le site de la CCTVL</div></div>
+<div style="font-size:1.2rem;flex-shrink:0;opacity:0.8" aria-hidden="true">↗</div>
+</a>
+</div>
+</section>
+
+<!-- BLOC 4 — Documents -->
+<section>
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">📑 Documents officiels du PLUi-H-D</h3>
+<div id="plui-docs"></div>
+</section>
+
+</div>
+</div>
+</template>
+</div>
 <script>
 (function(){
 var CACHE_KEY = 'mat_install_count';
@@ -1557,6 +1621,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juillet 2026 — v4.41</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Nouveau <strong>Grand dossier PLUi-H-D</strong>&nbsp;: suivez l&rsquo;&eacute;tude qui dessinera notre territoire d&rsquo;ici 2040 (frise d&rsquo;avancement, moyens pour donner votre avis, documents officiels &agrave; venir) &mdash; accessible depuis l&rsquo;accueil</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 juillet 2026 — v4.40.6</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Chargement all&eacute;g&eacute;&nbsp;: les fen&ecirc;tres de l&rsquo;app (m&eacute;t&eacute;o, agenda, d&eacute;chets, MEL&hellip;) ne sont construites qu&rsquo;&agrave; leur premi&egrave;re ouverture &mdash; d&eacute;marrage plus l&eacute;ger et sobri&eacute;t&eacute; num&eacute;rique am&eacute;lior&eacute;e</li>

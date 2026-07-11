@@ -21,6 +21,7 @@
 13. [Vos données personnelles (RGPD)](#13-vos-données-personnelles-rgpd)
 14. [Partager MAT avec d'autres communes](#14-partager-mat-avec-dautres-communes)
 15. [Météo et restrictions d'eau (sécheresse)](#15-météo-et-restrictions-deau-sécheresse)
+16. [Grand dossier PLUi-H-D](#16-grand-dossier-plui-h-d)
 
 ---
 
@@ -65,6 +66,7 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 | Zone | Contenu |
 |------|---------|
 | **En-tête** | Statut de la mairie (ouverte / fermée), météo locale, prochain ramassage des poubelles, prochain événement, passage du bus Rémi (ligne 8), prix des carburants |
+| **Grand dossier PLUi-H-D** | Bandeau mis en avant menant à la page de suivi du Plan Local d'Urbanisme intercommunal (voir §16) |
 | **Démarches et services** | Accès à MEL (assistante virtuelle) et aux documents officiels de la commune |
 | **Actualité et calendrier** | Dernières nouvelles et agenda |
 | **Participez** | Boîte à idées et sondages citoyens |
@@ -292,5 +294,27 @@ Sous l'indicateur, une ligne rappelle les **consignes** du niveau en cours, avec
 
 ---
 
-*Dernière mise à jour : juin 2026*
+## 16. Grand dossier PLUi-H-D
+
+Depuis l'écran d'accueil, un **bandeau « Grand dossier »** ouvre une page dédiée au
+**PLUi-H-D** (Plan Local d'Urbanisme intercommunal — Habitat et Déplacements), le grand
+document qui décidera d'ici 2040 où l'on pourra construire, comment se loger et se déplacer
+sur le territoire des 25 communes de la CCTVL.
+
+La page comporte quatre parties :
+
+1. **C'est quoi ?** — une explication simple du dossier et de son calendrier (approbation
+   prévue fin 2028).
+2. **Où en est-on ?** — une frise chronologique montrant les étapes passées, l'**étape en
+   cours** (mise en avant) et les étapes à venir.
+3. **Donnez votre avis** — quatre moyens de participer à la concertation : cahier en mairie,
+   mail, courrier, formulaire en ligne de la CCTVL.
+4. **Documents officiels** — la liste des documents du PLUi-H-D. Tant qu'aucun document n'est
+   publié, un message l'indique. **Dès qu'un nouveau document est disponible, une pastille
+   « Nouveau »** apparaît sur le bandeau d'accueil (et sur l'entrée du menu en version
+   ordinateur) ; elle disparaît une fois la page consultée.
+
+---
+
+*Dernière mise à jour : juillet 2026*
 *Application MAT — Commune de Mézières-lez-Cléry — Licence MIT*
