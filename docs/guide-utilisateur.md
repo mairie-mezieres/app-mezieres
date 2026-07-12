@@ -292,6 +292,17 @@ Sous l'indicateur, une ligne rappelle les **consignes** du niveau en cours, avec
   **actualité** est publiée et une **notification** est envoyée (si vous êtes abonné), avec
   les consignes. Une actualité annonce aussi la **fin des restrictions** le moment venu.
 
+### Qualité de l'air et conseils du jour
+
+Dans la fenêtre météo, la section **🌿 Air** indique l'indice de qualité de l'air (IQA), et,
+quand l'air est dégradé, le **polluant dominant** du moment (ozone, particules fines…).
+
+Un bloc **💡 Conseils du jour** apparaît **uniquement lorsqu'un paramètre le justifie** — pic
+de pollution, forte chaleur, grand froid, pollens élevés ou UV très fort. Il propose alors des
+gestes simples pour se protéger (s'hydrater, aérer au bon moment, limiter l'effort dehors…).
+Ce sont des recommandations générales de santé publique ; en cas de doute, demandez conseil à
+votre médecin. Quand les conditions sont bonnes, ce bloc **ne s'affiche pas**.
+
 ---
 
 ## 16. Grand dossier PLUi-H-D

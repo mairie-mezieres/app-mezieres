@@ -495,6 +495,9 @@ async function loadMeteoDetail() {
     aqiBarHtml = _envBar('🏭', 'Qualité de l\'air', 'IQA ' + aqiN, esc(env.aqi.label || '–'),
       Math.min(100, Math.max(0, +aqiV)),
       ['Bon', 'Moyen', 'Dégradé', 'Mauvais', 'Très mauv.'], false);
+    if (env.aqi.dominant && env.aqi.dominant.label) {
+      aqiBarHtml += '<div style="padding:0 14px 10px;margin-top:-3px;font-size:.68rem;color:var(--muted)">↳ Polluant dominant : <span style="font-weight:700;color:var(--text)">' + esc(env.aqi.dominant.label) + '</span></div>';
+    }
   }
   var pollenBarHtml = '';
   if (env.pollen && env.pollen.niveau != null) {
@@ -521,6 +524,34 @@ async function loadMeteoDetail() {
     + _airRow('💨 Rafales max · 24h', rafaleMax24 + ' km/h' + (ventDirCur ? ' ' + ventDirCur : '') + meteoTrendBadge(tRaf), true)
     + _airRow('📊 Pression', (presCur != null ? Math.round(presCur) : '–') + ' hPa' + meteoTrendBadge(tPres), true)
     + '</div>';
+
+  // ── Conseils du jour (par seuil) — n’apparaît QUE si un paramètre le justifie.
+  //    Déterministe (pas d’IA), gestes de bon sens de santé publique, source citée.
+  //    Chaque règle est auto-limitante par sa saison (froid l’hiver, UV l’été…).
+  var _cons = [];
+  var _txT = (days.temperature_2m_max || [])[0];
+  var _tnT = (days.temperature_2m_min || [])[0];
+  var _uvT = (days.uv_index_max || [])[0];
+  var _aqV = (env && env.aqi) ? env.aqi.valeur : null;
+  var _plV = (env && env.pollen) ? env.pollen.niveau : null;
+  var _dom = (env && env.aqi && env.aqi.dominant) ? env.aqi.dominant.label : null;
+  if (_txT != null && _txT >= 36) _cons.push(['🥵', 'Chaleur extrême : buvez souvent, restez au frais aux heures chaudes, ne laissez jamais un enfant ou un animal seul dans une voiture, et prenez des nouvelles des personnes isolées.']);
+  else if (_txT != null && _txT >= 32) _cons.push(['☀️', 'Forte chaleur : buvez régulièrement, fermez volets et fenêtres le jour, gardez une pièce fraîche, pensez aux personnes âgées ou isolées.']);
+  if (_tnT != null && _tnT <= -4) _cons.push(['🥶', 'Grand froid : couvrez-vous bien, surveillez le chauffage (risque de monoxyde de carbone), prenez des nouvelles des voisins isolés.']);
+  if (_aqV != null && _aqV >= 80) _cons.push(['🏭', 'Air très pollué' + (_dom ? ' (' + _dom + ')' : '') + ' : limitez les efforts physiques intenses en extérieur, même en bonne santé.']);
+  else if (_aqV != null && _aqV >= 60) _cons.push(['🏭', 'Air pollué' + (_dom ? ' (' + _dom + ')' : '') + ' : personnes sensibles (asthme, enfants, seniors), évitez les efforts intenses dehors.']);
+  if (_plV != null && _plV >= 50) _cons.push(['🌸', 'Pollens élevés : aérez tôt le matin, fenêtres fermées en journée ; pour les allergiques, évitez de tondre et rincez-vous les cheveux le soir.']);
+  if (_uvT != null && +_uvT >= 8) _cons.push(['🧴', 'UV très fort : chapeau, lunettes et crème solaire ; évitez le soleil entre 12 h et 16 h.']);
+  if (_cons.length) {
+    html += '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
+      + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">💡 Conseils du jour</div>'
+      + _cons.map(function(c, i){
+          return '<div style="display:flex;gap:10px;padding:10px 14px;font-size:0.8rem;line-height:1.5;color:var(--text)' + (i ? ';border-top:1px solid var(--border)' : '') + '">'
+            + '<span style="flex-shrink:0" aria-hidden="true">' + c[0] + '</span><span>' + esc(c[1]) + '</span></div>';
+        }).join('')
+      + '<div style="padding:8px 14px 10px;font-size:.62rem;color:var(--muted);border-top:1px solid var(--border)">Recommandations générales — source&nbsp;: Santé publique France / ATMO. En cas de doute, demandez conseil à votre médecin.</div>'
+      + '</div>';
+  }
 
   html += '</div>';
   el.innerHTML = html;
