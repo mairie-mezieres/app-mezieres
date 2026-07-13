@@ -13,8 +13,27 @@
 - Ransomware MedusaLocker sur mairie de Thiverval-Grignon (constaté 1er juillet 2026) — https://ransomware.live/id/TWFpcmllIFRoaXZlcnZhbCBHcmlnbm9uQG1lZHVzYWxvY2tlcg==
 - Bulletin CERT-FR CERTFR-2026-ACT-029 (6 juillet 2026) — https://www.cert.ssi.gouv.fr/actualite/
 - Avis CERT-FR noyaux Linux multi-éditeurs, CPython, Suricata (10 juillet 2026) — https://www.cert.ssi.gouv.fr/avis/
+- Anthropic retrait définitif Claude Sonnet 4 / Opus 4 sur l'API (15 juin 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Render.com connection pooling PgBouncer intégré pour Postgres (1er juillet 2026) — https://render.com/changelog
+- GitHub Actions : Copilot CLI utilisable sans PAT longue durée (2 juillet 2026) — https://github.blog/changelog/2026-07-02-copilot-cli-no-longer-needs-a-personal-access-token-in-github-actions/
+- Mistral AI : nouveaux contrôles admin sur les Connectors (24 juin 2026) — https://mistral.ai/news/more-control-over-connectors/
+- iOS/iPadOS 26.5.2 correctif sécurité WebKit ~29 failles (29 juin 2026) — https://support.apple.com/en-us/127594
+- Chrome 150 : migration d'origine PWA transparente (1er juillet 2026) — https://developer.chrome.com/release-notes/150
+- Sentry JavaScript 10.63.0, support React Router v8 (1er juillet 2026) — https://github.com/getsentry/sentry-javascript/releases
+- Plan « Notre IA » et création de la DIAN à Bercy (16 juin 2026) — https://www.economie.gouv.fr/actualites/video-le-plan-notre-ia-pour-les-services-publics-devoile
+- Baromètre 2026 Data Publica collectivités/données/IA, enquête jusqu'au 17 juillet 2026 — https://www.lagazettedescommunes.com/numerique/donnees-intelligence-artificielle-ou-en-sont-les-collectivites-participez-au-barometre-de-lobservatoire-data-publica.ZVOZBCA44NBD3FBGPWU2CM4D3U.html
+- Mise en demeure Arcom impots.gouv.fr pour non-conformité RGAA (24 juin / publié 6 juillet 2026) — https://www.arcom.fr/se-documenter/espace-juridique/decisions/decision-du-24-juin-2026-mettant-en-demeure-le-ministere-de-laction-et-des-comptes-publics
+- Report de la Conférence nationale du handicap au 4 septembre 2026 (annoncé 23 juin 2026) — https://handicap.gouv.fr/canicule-conference-nationale-du-handicap-reportee
+- Outil gratuit « Simplificateur FALC » (3 juillet 2026) — https://lesbases.anct.gouv.fr/ressources/simplificateur-falc-transformer-un-texte-en-facile-a-lire-et-a-comprendre
+- Ransomware Qilin sur commune d'Eyguières (19 juin 2026) — https://www.ransomware.live/id/Q29tbXVuZSBkJ0V5Z3VpcmVzQHFpbGlu
+- Ransomware Payload sur commune de Castries (9 juillet 2026) — https://www.ransomware.live/id/VGhlIGNvbW11bmUgb2YgQ2FzdHJpZXNAcGF5bG9hZA
 - [reco] Mettre à jour Node.js vers versions patchées (22.23.0/24.17.0/26.3.1)
 - [reco] Vérifier compatibilité npm v12 (scripts d'installation bloqués)
 - [reco] Passer actions/checkout à v7
 - [reco] Configurer expiration des clés API Mistral/Anthropic
 - [reco] Sensibiliser les agents municipaux au risque ransomware (cas Thiverval-Grignon)
+- [reco] Vérifier absence de modèles Claude retirés (Sonnet 4/Opus 4) dans le code du fallback IA
+- [reco] Renforcer vigilance ransomware suite vague Eyguières/Castries
+- [reco] Tester la PWA MAT sur iOS 26.5.2
+- [reco] Répondre au Baromètre Data Publica 2026 avant le 17 juillet
+- [reco] Tester le Simplificateur FALC sur les contenus séniors
