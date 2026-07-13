@@ -601,6 +601,15 @@ fonctionnalité à MAT ou que vous modifiez les coûts d'hébergement :
 4. **Bumper** le numéro de version dans `PRECACHE_URLS` du service worker :
    `'./js/mat-partager.js?v=X.Y.Z'`.
 
+5. **Suivi des réutilisations du kit** : à la génération du prompt, la page envoie
+   le profil déclaré (nom de commune, population, budget, niveau informatique,
+   hébergeur, mode souverain) au backend via `POST /stats/partager`
+   (`_sendPartagerProfile()`), en plus des compteurs anonymes `partager_visite` /
+   `partager_prompt`. Envoi best-effort, uniquement si le nom de commune est
+   renseigné ; une mention de transparence est affichée à l'étape 3. Ces profils
+   apparaissent dans le mail quotidien « MAT stats » (voir `GUIDE-ADMIN.md` §6bis
+   du backend).
+
 ### Règles de contraste AXE (pièges fréquents)
 
 - `color:var(--muted)` (`#5a7065`) sur `background:var(--mist)` (`#d8f3dc`) → ratio ~4.1:1 — **échoue** pour le texte normal. Utiliser `var(--leaf)` ou `var(--forest)` à la place.
