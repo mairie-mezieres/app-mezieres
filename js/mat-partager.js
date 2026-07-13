@@ -1,5 +1,8 @@
 // ════════════════════════════════════════════════════════════
 // MAT — Générateur de prompt (partager.html)
+// Version 3.2 — Envoi du profil de commune (nom, population, budget, niveau)
+//               au backend à la génération du prompt, pour le suivi des
+//               réutilisations du kit dans le mail quotidien MAT stats.
 // Version 3.1 — Option « collez vos documents » (PLU, élus…) dans le prompt généré
 // ════════════════════════════════════════════════════════════
 //
@@ -341,6 +344,31 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-device-id': id },
         body: JSON.stringify({ service, deviceId: id }),
+        keepalive: true
+      }).catch(() => {});
+    } catch(_e) {}
+  }
+
+  // ─── Profil de commune → backend (mail quotidien MAT stats) ──
+  // À la génération du prompt, on transmet le profil déclaré (commune,
+  // population, budget, niveau) pour savoir qui réutilise le kit.
+  // Données de collectivité, pas de données personnelles. Best-effort :
+  // un échec réseau n'empêche jamais la génération du prompt.
+  function _sendPartagerProfile() {
+    try {
+      const commune = document.getElementById('f-commune').value.trim();
+      if (!commune) return; // rien d'exploitable sans le nom de la commune
+      fetch(window.MAT_API + '/stats/partager', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          commune: commune,
+          population: state.population,
+          budget: state.budget,
+          niveau: state.niveau,
+          sovereign: state.sovereign,
+          host: state.host
+        }),
         keepalive: true
       }).catch(() => {});
     } catch(_e) {}
@@ -720,6 +748,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     renderSummary(prompt);
     setOpenButton();
     _trackPartager('partager_prompt');
+    _sendPartagerProfile();
     goTo(3);
   };
 
@@ -742,6 +771,9 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       + '<br><span style="font-size:.74rem;color:var(--muted);display:block;margin-top:6px">'
       + '🔏 <em>Bon réflexe :</em> l’assistant vous posera ensuite les questions de contenu (élus, horaires…) une par une. '
       + 'Ne saisissez de données nominatives (noms, photos d’élus, contacts de tiers) qu’avec leur accord préalable.'
+      + '</span>'
+      + '<span style="font-size:.72rem;color:var(--muted);display:block;margin-top:6px">'
+      + '📊 Pour suivre les réutilisations du kit, le profil saisi (commune, population, budget, niveau) est transmis à l’équipe MAT. Aucune donnée personnelle.'
       + '</span>';
   }
 
