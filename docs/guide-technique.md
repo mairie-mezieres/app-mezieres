@@ -100,11 +100,15 @@ app-mezieres/
 ├── tests/
 │   └── e2e/                Tests Playwright (smoke UI + AXE accessibilité)
 │
+├── veille/                 Mémoire des veilles automatiques (voir §10)
 └── .github/workflows/
     ├── ci.yml              Vérification syntaxe JS
     ├── e2e.yml             Tests Playwright
     ├── lighthouse.yml      Audit performance/accessibilité
-    └── ecoindex.yml        Mesure empreinte carbone (hebdomadaire)
+    ├── liens-morts.yml     Détection de liens morts (hebdomadaire)
+    ├── sauvegarde-upstash.yml  Sauvegarde Redis Upstash (hebdomadaire)
+    ├── veille-techno.yml   Veille technologique par IA (hebdomadaire)
+    └── veille-bulletin.yml Veille éditoriale bulletin municipal (mensuelle)
 ```
 
 ### Backend — `chatbot-mairie-mezieres`
@@ -507,16 +511,36 @@ handleFacebookPublication()
 
 ## 10. CI/CD (GitHub Actions)
 
-Quatre workflows dans `.github/workflows/` :
+Les workflows dans `.github/workflows/` :
 
 | Workflow | Déclencheur | Description |
 |----------|-------------|-------------|
 | `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) |
 | `e2e.yml` | push/PR sur `main`, `claude/**` | Tests Playwright : 4 tests × 2 navigateurs (Desktop Chrome, Pixel 7) |
-| `lighthouse.yml` | push sur `main` | Audit Lighthouse (performance, accessibilité, SEO) |
-| `ecoindex.yml` | hebdomadaire (cron) | Mesure EcoIndex (empreinte carbone de la page) |
+| `lighthouse.yml` | push sur `main` + hebdo (cron) | Audit Lighthouse (performance, accessibilité, SEO) |
+| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app |
+| `sauvegarde-upstash.yml` | hebdomadaire (cron, lundi) | Sauvegarde de la base Redis Upstash |
+| `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
+| `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
+
+### Mémoire de la veille technologique (anti-redondance)
+
+`veille-techno.yml` maintient une **mémoire compacte** dans `veille/historique-techno.md`
+pour ne pas re-signaler d'une semaine sur l'autre une information déjà rapportée :
+
+1. Avant ses recherches, l'agent **lit** l'historique (12 dernières semaines maximum,
+   une ligne « Titre — URL » par info rapportée, `[reco]` pour les recommandations).
+2. Il exclut du rapport tout ce qui y figure déjà, sauf évolution notable (alors
+   signalée explicitement comme mise à jour).
+3. Après rédaction, il **met à jour** l'historique (nouvelle section datée en tête,
+   troncature à 12 semaines) ; le workflow le **committe sur `main` uniquement après
+   l'envoi réussi de l'email** (`[skip ci]`) — un envoi raté n'avance pas la mémoire,
+   les infos seront re-proposées la semaine suivante.
+
+Pour re-signaler volontairement une info, supprimer sa ligne de l'historique.
+Voir aussi `veille/README.md`.
 
 ### Tests Playwright
 
