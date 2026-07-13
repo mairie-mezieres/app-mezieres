@@ -6,8 +6,10 @@ on:
     - cron: '0 6 * * 1'
   workflow_dispatch: {}
 
+# contents: write — nécessaire pour committer la mémoire de veille
+# (veille/historique-techno.md) après chaque envoi réussi.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   veille:
@@ -32,9 +34,20 @@ jobs:
           # (qui exigerait la permission id-token: write et l'installation de l'app)
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
-            --allowedTools "WebSearch,WebFetch,Write"
+            --allowedTools "WebSearch,WebFetch,Read,Write"
           prompt: |
             Tu es un agent de veille technologique pour MAT (Mézières Avec Toi), une PWA municipale française.
+
+            🧠 MÉMOIRE DES VEILLES PRÉCÉDENTES (anti-redondance) :
+            - Commence par lire le fichier `veille/historique-techno.md` s'il existe : il
+              récapitule les informations déjà rapportées lors des veilles précédentes
+              (une ligne par info : titre + URL source).
+            - NE RAPPORTE PAS une information déjà présente dans cet historique (même URL,
+              ou même fait reformulé), SAUF s'il y a une évolution notable depuis (nouvelle
+              version, correctif publié, aggravation d'une faille…) — dans ce cas, signale-la
+              explicitement comme « mise à jour d'une info déjà signalée » avec ce qui a changé.
+            - Les recommandations actionnables déjà proposées à l'identique les semaines
+              précédentes ne doivent pas être répétées, sauf si elles deviennent urgentes.
 
             Stack technique de la PWA :
             - Frontend : PWA vanilla JS hébergée sur GitHub Pages, Service Worker, notifications push web
@@ -83,7 +96,21 @@ jobs:
             - Les 5 sections avec des titres clairs (`<h2>`), listes à puces lisibles, et une pastille de priorité (haute/moyenne/basse) bien visible dans la section recommandations.
             - Chaque lien doit être une vraie balise `<a href="URL">texte</a>` cliquable, en couleur foncée et soulignée, ouvrant la source d'origine.
             - Terminer par un pied de page discret : « Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web). »
-            N'utilise que l'outil Write pour créer ce fichier. Ne crée aucune issue, ne fais aucun commit.
+
+            APRÈS avoir écrit `rapport-veille.html`, mets à jour la mémoire de veille
+            `veille/historique-techno.md` (crée le fichier s'il n'existe pas) :
+            - Ajoute EN TÊTE du fichier une section `## ${{ steps.now.outputs.iso }}` listant,
+              une ligne par information rapportée cette semaine : `- Titre court — URL`.
+              Inclus aussi une ligne par recommandation actionnable émise : `- [reco] Titre court`.
+            - Si une section « Rien de notable » : écris simplement `- (rien de notable)`.
+            - Conserve les sections des semaines précédentes mais LIMITE le fichier aux
+              12 sections (semaines) les plus récentes — supprime les plus anciennes.
+            - Ce fichier est une mémoire compacte, pas un rapport : pas de HTML, pas de
+              commentaire, juste les lignes datées ci-dessus.
+
+            N'utilise Write que pour ces deux fichiers (`rapport-veille.html` et
+            `veille/historique-techno.md`). Ne crée aucune issue, ne fais aucun commit
+            (le workflow committe l'historique lui-même après l'envoi de l'email).
 
       - name: Envoyer le rapport par email
         env:
@@ -97,3 +124,25 @@ jobs:
           # (domaine non vérifié → 403).
           EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
         run: node scripts/send-veille-email.js
+
+      # Committer la mémoire de veille APRÈS l'envoi réussi : si l'email échoue,
+      # l'historique n'est pas mis à jour et les infos seront re-signalées la
+      # semaine suivante (pas de « trou » dans la veille). Le rapport HTML
+      # lui-même n'est pas committé (éphémère, envoyé par email).
+      - name: Committer la mémoire de veille
+        run: |
+          if [ ! -f veille/historique-techno.md ]; then
+            echo "Pas de fichier d'historique généré — rien à committer."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add veille/historique-techno.md
+          if git diff --cached --quiet; then
+            echo "Historique inchangé — rien à committer."
+            exit 0
+          fi
+          git commit -m "chore(veille): mémoire veille techno ${{ steps.now.outputs.iso }} [skip ci]"
+          # La branche a pu avancer pendant le run (~30 min) : rebase avant push.
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
