@@ -1,0 +1,20 @@
+## 2026-07-13
+- Node.js security release 18 juin 2026 (12 CVE, 2 haute sévérité) — https://nodejs.org/en/blog/vulnerability/june-2026-security-releases
+- npm v12 bloque les scripts d'installation par défaut (8 juillet 2026) — https://thehackernews.com/2026/07/npm-12-disables-install-scripts-by.html
+- GitHub Actions actions/checkout v7 protection anti pwn-request (18 juin 2026, backport 16 juillet) — https://thehackernews.com/2026/06/github-updates-actionscheckout-to-block.html
+- Playwright 1.61 / 1.61.1 (15 et 23 juin 2026) — https://github.com/microsoft/playwright/releases
+- Sentry détection spans faible valeur (8 juillet 2026) — https://sentry.io/changelog/
+- Mistral OCR 4 lancé fin juin 2026 — https://www.techtimes.com/articles/318978/20260624/mistral-ocr-4-ships-structure-aware-document-ai-runs-your-own-infrastructure.htm
+- Anthropic Claude Sonnet 5 lancé (30 juin 2026), hausse limites débit (26 juin), expiration clés API (8 juillet) — https://platform.claude.com/docs/en/release-notes/overview
+- Render Node.js 24.14.1 par défaut, CLI amélioré (juillet 2026) — https://render.com/changelog
+- Webinaire Décider Ensemble prospective citoyenne Brette-les-Pins / Montpellier (1er juillet 2026) — https://www.deciderensemble.com/les-prix
+- Lancement INEDI, groupe solutions numériques secteur public (1er juillet 2026) — https://www.inedi.fr/articles/une-application-locale-pour-ma-commune-pour-quoi-faire
+- Rapport Cour des comptes : non-conformité généralisée accessibilité numérique publique (18 juin 2026) — https://next.ink/243475/accessibilite-du-numerique-public-une-non-conformite-generalisee/
+- Ransomware MedusaLocker sur mairie de Thiverval-Grignon (constaté 1er juillet 2026) — https://ransomware.live/id/TWFpcmllIFRoaXZlcnZhbCBHcmlnbm9uQG1lZHVzYWxvY2tlcg==
+- Bulletin CERT-FR CERTFR-2026-ACT-029 (6 juillet 2026) — https://www.cert.ssi.gouv.fr/actualite/
+- Avis CERT-FR noyaux Linux multi-éditeurs, CPython, Suricata (10 juillet 2026) — https://www.cert.ssi.gouv.fr/avis/
+- [reco] Mettre à jour Node.js vers versions patchées (22.23.0/24.17.0/26.3.1)
+- [reco] Vérifier compatibilité npm v12 (scripts d'installation bloqués)
+- [reco] Passer actions/checkout à v7
+- [reco] Configurer expiration des clés API Mistral/Anthropic
+- [reco] Sensibiliser les agents municipaux au risque ransomware (cas Thiverval-Grignon)
