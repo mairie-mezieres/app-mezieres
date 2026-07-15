@@ -309,6 +309,15 @@ API météo gratuite et sans clé (données ECMWF). Coordonnées GPS dans `OPEN_
 `js/mat-eau8.js` interroge `api.vigieau.gouv.fr` pour afficher le niveau de restriction
 sécheresse et les **consignes par niveau** dans la section 💧 Eau de l'overlay météo.
 
+L'API est interrogée **deux fois en parallèle** — par **coordonnées du bourg**
+(`lon`/`lat`, le chemin utilisé par vigieau.gouv.fr quand un habitant saisit son
+adresse) et par **code commune** — et le niveau **le plus grave** est retenu :
+les deux chemins de résolution de l'API peuvent diverger (zone AEP « eau potable »
+absente de l'index par commune, constaté le 15/07/2026 — l'app affichait
+« vigilance » quand le site officiel affichait « alerte renforcée »). Même logique
+côté backend (`lib/vigieau.js`) : toute évolution doit être répercutée des deux
+côtés. Décision : ADR-0009 du repo backend.
+
 > ⚠️ **Séparation stricte d'avec la vigilance Météo-France.** La sécheresse n'occupe **jamais**
 > le bandeau de vigilance météo (`js/mat-widgets.js`). Côté backend, un flux dédié
 > (`lib/vigieau.js` + `routes/eau.js`, polling `DROUGHT_CHECK_INTERVAL_MS`) publie, à partir du

@@ -281,6 +281,11 @@ Loire, le niveau de la nappe et l'état des **restrictions sécheresse** de la c
 Sous l'indicateur, une ligne rappelle les **consignes** du niveau en cours, avec un lien
 **« consignes officielles ↗ »** vers VigiEau pour le détail adapté à votre adresse.
 
+Le niveau affiché est celui du **bourg** (le plus grave parmi les zones qui le couvrent,
+y compris l'**eau du robinet**), comme si vous consultiez vigieau.gouv.fr pour le centre
+de la commune. Si votre habitation est desservie par un autre réseau d'eau, le lien
+« consignes officielles » vous donne le détail exact pour votre adresse.
+
 > Le niveau **Vigilance** est le plus bas : il est normal de le voir affiché sans qu'aucune
 > interdiction ne s'applique.
 
