@@ -1,6 +1,11 @@
-/* MAT — Eau v3.10.0 — Niveau nappe + restrictions VigiEau + consignes par niveau (endpoint /api/zones) */
+/* MAT — Eau v3.11.0 — Niveau nappe + restrictions VigiEau (double requête coordonnées + commune, niveau le plus grave) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
+var _EAU_INSEE = '45203';
+// Coordonnées du bourg (même point que la météo) pour la requête VigiEau par
+// géométrie — le chemin utilisé par vigieau.gouv.fr quand on saisit une adresse.
+var _EAU_LAT   = 47.822;
+var _EAU_LON   = 1.808;
 
 function _eauFetch(url) {
   return new Promise(function(resolve) {
@@ -143,44 +148,55 @@ async function _loadEauSection() {
     render();
   }
 
-  // Restrictions s\u00e9cheresse \u2014 API officielle VigiEau (zones de restriction de la
-  // commune 45203). _eauFetch renvoie null si l'appel \u00e9choue (404, r\u00e9seau, non-OK).
-  // Endpoint migr\u00e9 : l'ancien /communes/{insee}/restrictions renvoie d\u00e9sormais 404.
+  // Restrictions sécheresse — API officielle VigiEau, interrogée DEUX fois en
+  // parallèle car ses deux chemins de résolution peuvent diverger (ADR-0009 du
+  // backend : zone AEP « eau potable » absente de l'index par commune alors que
+  // le site officiel l'affichait par adresse) :
+  //   1. par coordonnées du bourg — le chemin de vigieau.gouv.fr pour une adresse ;
+  //   2. par code commune — index commune→zones (l'ancienne requête, conservée).
+  // On retient le niveau LE PLUS GRAVE : jamais sous-estimer les restrictions.
+  // Même logique que lib/vigieau.js côté backend — toute évolution doit être
+  // répercutée des deux côtés.
+  // Résultat d'une requête : {kind:'ok', zones} | {kind:'multi'} (409) | {kind:'ko', why}.
+  async function _vigieauQuery(url) {
+    var r = await _eauFetch(url);
+    if (!r) return { kind: 'ko', why: 'VigiEau injoignable (/api/zones)' };
+    // 409 : plusieurs zones d'alerte de même type au point/commune interrogé →
+    // restrictions actives mais niveau indéterminable par cette requête.
+    if (r.status === 409) return { kind: 'multi' };
+    if (!r.ok) return { kind: 'ko', why: 'VigiEau HTTP ' + r.status };
+    var txt = await r.text();
+    var d2;
+    // 200 OK mais corps non-JSON (page d'erreur HTML d'un proxy/CDN) → 'ko'.
+    try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { return { kind: 'ko', why: 'VigiEau: réponse 200 non-JSON' }; }
+    return { kind: 'ok', zones: Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.zones) ? d2.zones : []) };
+  }
   try {
-    var r2 = await _eauFetch('https://api.vigieau.gouv.fr/api/zones?commune=45203&profil=particulier');
-    if (!r2) {
-      // Injoignable : surtout PAS de faux \u00AB Aucune restriction \u00BB. \u00C9tat neutre + log.
-      restric = '\u26AA\u00A0Info indisponible';
-      restCol = '#94a3b8';
-      if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau injoignable (/api/zones)');
-      render();
-    } else if (r2.status === 409) {
-      // La commune comporte plusieurs zones d'alerte de m\u00EAme type \u2192 restrictions
-      // actives mais niveau ind\u00E9terminable via API. On affiche une alerte orange.
-      restric = '\u26A0\uFE0F\u00A0Restrictions \u2014 voir vigieau.gouv.fr';
-      restCol = '#ea580c';
-      render();
-    } else if (!r2.ok) {
-      restric = '\u26AA\u00A0Info indisponible';
-      restCol = '#94a3b8';
-      if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau HTTP ' + r2.status);
-      render();
-    } else {
-      var txt = await r2.text();
-      var d2, _parseOk = true;
-      try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { d2 = null; _parseOk = false; }
-      if (!_parseOk) {
-        // 200 OK mais corps non-JSON (page d'erreur HTML d'un proxy/CDN) :
-        // surtout PAS de faux « Aucune restriction ». État neutre + log.
+    var _vzBase = 'https://api.vigieau.gouv.fr/api/zones';
+    var _vzResults = await Promise.all([
+      _vigieauQuery(_vzBase + '?lon=' + _EAU_LON + '&lat=' + _EAU_LAT + '&commune=' + _EAU_INSEE + '&profil=particulier'),
+      _vigieauQuery(_vzBase + '?commune=' + _EAU_INSEE + '&profil=particulier')
+    ]);
+    var zones = [], _vzOk = 0, _vzMulti = false, _vzWhy = null;
+    _vzResults.forEach(function(res) {
+      if (res.kind === 'ok') { _vzOk++; zones = zones.concat(res.zones); }
+      else if (res.kind === 'multi') _vzMulti = true;
+      else _vzWhy = _vzWhy || res.why;
+    });
+      if (zones.length === 0 && _vzMulti) {
+        // Restrictions actives quelque part mais niveau indéterminable via API
+        // (409 sans zone remontée par l'autre requête). Alerte orange.
+        restric = '⚠️ Restrictions — voir vigieau.gouv.fr';
+        restCol = '#ea580c';
+      } else if (zones.length === 0 && _vzOk < _vzResults.length) {
+        // Aucune zone confirmée et au moins une requête en échec : surtout PAS
+        // de faux « Aucune restriction ». État neutre + log.
         restric = '⚪ Info indisponible';
         restCol = '#94a3b8';
-        if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau: réponse 200 non-JSON');
-        render();
-      } else {
-      var zones = Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.zones) ? d2.zones : []);
-      if (zones.length === 0) {
-        // L'API confirme explicitement l'absence de zone de restriction active.
-        restric = '\uD83D\uDFE2\u00A0Aucune restriction';
+        if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', _vzWhy || 'VigiEau indisponible');
+      } else if (zones.length === 0) {
+        // Les DEUX requêtes confirment explicitement l'absence de zone active.
+        restric = '🟢 Aucune restriction';
         restCol = '#16a34a';
       } else {
         // Au moins une zone active \u2192 jamais \u00AB aucune \u00BB. On lit le niveau de gravit\u00e9
@@ -218,8 +234,6 @@ async function _loadEauSection() {
         }
       }
       render();
-      }
-    }
   } catch (_) {
     // Erreur inattendue : neutre, jamais de faux \u00AB Aucune restriction \u00BB.
     restric = '\u26AA\u00A0Info indisponible';
