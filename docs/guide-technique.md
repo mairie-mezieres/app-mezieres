@@ -551,6 +551,21 @@ pour ne pas re-signaler d'une semaine sur l'autre une information déjà rapport
 Pour re-signaler volontairement une info, supprimer sa ligne de l'historique.
 Voir aussi `veille/README.md`.
 
+### Robustesse des veilles IA (retry + diagnostic)
+
+L'étape Claude Code des deux veilles peut se terminer « avec succès » **sans avoir
+écrit le rapport HTML** (abandon prématuré de l'agent, recherches en échec…). Les
+workflows traitent donc le livrable comme vérifiable (ADR-0004) :
+
+- le prompt est construit une fois dans une variable d'env (`VEILLE_PROMPT` /
+  `BULLETIN_PROMPT`) partagée par les deux invocations ;
+- 1re tentative en `continue-on-error`, puis vérification `[ -s rapport-*.html ]` ;
+  si le fichier manque, **2e tentative** avec le même prompt, puis vérification
+  finale bloquante ;
+- la sortie de l'agent (`claude-execution-output.json`, masquée dans les logs par
+  l'action) est archivée en **artefact 30 jours** (`claude-execution-output`,
+  les deux tentatives) pour diagnostiquer tout run sans livrable.
+
 ### Tests Playwright
 
 Les tests sont dans `tests/e2e/smoke.spec.js` :
