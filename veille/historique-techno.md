@@ -1,3 +1,20 @@
+## 2026-07-20
+- actions/checkout v7 blocage pwn-request désormais actif au 20 juillet 2026 (échéance repoussée du 16 au 20 juillet) — https://github.blog/changelog/2026-06-18-safer-pull_request_target-defaults-for-github-actions-checkout/
+- Render.com : outil MCP trigger_deploy (17 juillet 2026) — https://render.com/changelog
+- Render.com : OIDC AWS en disponibilité générale pour workspaces Pro+ (15 juillet 2026) — https://render.com/changelog
+- Anthropic : Admin API bêta gestion des membres Claude Enterprise (14 juillet 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Anthropic : mode fast Claude Opus 4.7 déprécié, suppression le 24 juillet 2026 (annoncé 25 juin 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Mistral AI : nouveau modèle open-weight en accès anticipé (~6 juillet 2026) — https://www.techtimes.com/articles/319798/20260706/mistral-ai-targets-frontier-gap-open-weight-model-entering-july-early-access.htm
+- Chrome 150 (stable 30 juin 2026) : 382 correctifs de sécurité dont 15 critiques — https://www.malwarebytes.com/blog/bugs/2026/07/chrome-needs-another-whopper-update-to-fix-382-security-fixes
+- Article Colysée Média : préparer son site communal au RGAA (10 juillet 2026) — https://www.colysee.net/2026/07/10/votre-site-internet-communal-est-il-pret-pour-les-nouvelles-exigences-daccessibilite/
+- Alerte CERT-FR CERTFR-2026-ALE-006 : failles critiques SonicWall SMA1000 activement exploitées (15 juillet 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-006/
+- Bulletin CERT-FR CERTFR-2026-ACT-030 (13 juillet 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-030
+- [reco] Vérifier compatibilité workflows GitHub Actions avec blocage pwn-request désormais actif
+- [reco] Vérifier/patcher tout boîtier SonicWall SMA1000 utilisé par un prestataire de la mairie
+- [reco] Migrer du mode fast Opus 4.7 vers Opus 4.8 avant le 24 juillet 2026
+- [reco] Lire l'article Colysée Média sur la préparation RGAA du site communal
+- [reco] Suivre l'annonce du nouveau modèle open-weight Mistral pour option IA souveraine future
+
 ## 2026-07-13
 - Node.js security release 18 juin 2026 (12 CVE, 2 haute sévérité) — https://nodejs.org/en/blog/vulnerability/june-2026-security-releases
 - npm v12 bloque les scripts d'installation par défaut (8 juillet 2026) — https://thehackernews.com/2026/07/npm-12-disables-install-scripts-by.html
