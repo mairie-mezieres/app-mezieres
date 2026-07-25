@@ -229,7 +229,11 @@ function matCelebrate(){
   var W = window.innerWidth, H = window.innerHeight;
   canvas.width = W * dpr; canvas.height = H * dpr;
   document.body.appendChild(canvas);
+  // getContext peut renvoyer null (mémoire, trop de contextes) : sans ce
+  // garde, le canvas restait orphelin dans le DOM et _matCelebrating bloqué
+  // à true — plus aucun confetti jusqu'au rechargement de l'app.
   var ctx = canvas.getContext('2d');
+  if(!ctx){ canvas.remove(); _matCelebrating = false; return; }
   ctx.scale(dpr, dpr);
 
   var COLORS = ['#2e7d4f','#5cb85c','#a7f3d0','#f5c542','#fff7e6','#7cc4f5'];

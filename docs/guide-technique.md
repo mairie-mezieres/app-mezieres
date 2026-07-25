@@ -411,6 +411,18 @@ const CACHE = 'mat-v4.15.0';  // ← incrémenter à chaque déploiement
 `manifest.webmanifest` définit le nom, les icônes, la couleur de thème et l'orientation.  
 Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
 
+### Statistiques d'usage — le tracking ne doit jamais bloquer l'UI
+
+`trackStat()` (défini dans `js/mat-utils.js`) est appelé à l'ouverture de chaque
+écran via les wrappers de `js/mat-core.js`. Ces appels passent **obligatoirement**
+par le helper `_track()` (garde `typeof trackStat === 'function'` + `try/catch`) :
+si `mat-utils.js` n'a pas pu être chargé ou exécuté (réseau instable, cache
+partiel), un appel direct lèverait une `ReferenceError` **avant** d'ouvrir
+l'overlay — le bouton ne réagirait alors plus du tout (issue #324). Même garde
+dans `js/mat-forms.js`, où un `trackStat` absent faisait afficher « Erreur
+d'envoi » sur une demande pourtant transmise. Règle : **une statistique ne doit
+jamais faire échouer une action habitant.**
+
 ### Effets visuels — ambiance météo, View Transitions, confettis
 
 Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**
@@ -442,7 +454,10 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   ⚠️ **Seul le changement visuel est dans la transition** — l'hydratation lazy des
   `<template data-lazy-ov>`, la pile `_ovStack` et les attributs ARIA restent
   synchrones, car les appelants font `getElementById` dès le retour d'`openOv()`.
-  Voir ADR-0005.
+  Les trois promesses de la transition (`ready`, `updateCallbackDone`,
+  `finished`) reçoivent un `catch` neutre : leur rejet (`AbortError`) est normal
+  quand une transition en remplace une autre, et sans ce garde il remontait dans
+  Sentry sur WebKit/Safari. Voir ADR-0005.
 - **Confettis** (`matCelebrate()` dans `js/mat-ambiance.js`) : canvas éphémère
   (~1,8 s, ~90 particules) appelé — toujours via
   `try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}` — à la
