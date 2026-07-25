@@ -77,9 +77,16 @@ Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondan
 **Le bandeau d'accueil est vivant** : il reflète la météo réelle de la commune —
 fine pluie animée quand il pleut, flocons quand il neige, éclairs en cas d'orage,
 brume par temps de brouillard — et sa couleur change selon le moment de la journée
-(teintes dorées à l'aube et au crépuscule, vert profond la nuit). Ces animations
-sont purement décoratives : si votre téléphone est réglé sur « Réduire les
-animations », seule la teinte de couleur est conservée (voir §10).
+(teintes dorées à l'aube et au crépuscule, vert profond la nuit).
+
+Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
+lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au
+printemps, œufs pastel le week-end de Pâques, confettis bleu-blanc-rouge les 13
+et 14 juillet, feuilles mortes en automne et chauves-souris à Halloween. La vraie
+météo garde toujours la priorité sur les décorations.
+
+Ces animations sont purement décoratives : si votre téléphone est réglé sur
+« Réduire les animations », seule la teinte de couleur est conservée (voir §10).
 
 ---
 

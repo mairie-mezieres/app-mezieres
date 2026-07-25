@@ -427,6 +427,16 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   pour ne jamais écraser les thèmes d'accessibilité. Si « Réduire les animations »
   est actif : teinte statique seule, aucune particule. Le header étant masqué en
   desktop (≥ 1024 px), l'effet est mobile/PWA uniquement.
+- **Calendrier festif** (`_ambFestive()` dans `js/mat-ambiance.js`, v4.45) :
+  quand la météo est calme (aucune famille météo active), le header se décore
+  selon la période — guirlande + flocons (1–30 déc), étincelles (31 déc–2 janv),
+  pétales (20 mars–30 avril), œufs pastel (samedi → lundi de Pâques, calculé via
+  `_getFeriesForYear` de `mat-jours-feries.js` avec garde `typeof` : chargé en
+  async par mat-boot, il peut arriver après la 1re évaluation), confettis
+  tricolores (13–14 juil), chauves-souris + feuilles (29–31 oct), feuilles
+  mortes (oct–20 nov). **La météo réelle garde toujours la priorité** sur les
+  particules festives ; mêmes règles d'accessibilité (aria-hidden,
+  `prefers-reduced-motion`).
 - **View Transitions** (`_ovVisual()` dans `js/mat-core.js`) : l'ouverture/fermeture
   des overlays passe par `document.startViewTransition` quand l'API existe.
   ⚠️ **Seul le changement visuel est dans la transition** — l'hydratation lazy des
