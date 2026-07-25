@@ -25,7 +25,105 @@ jobs:
           echo "iso=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
           echo "year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
 
+      # Le prompt est construit une seule fois dans l'env VEILLE_PROMPT pour que
+      # la 2e tentative (voir plus bas, ADR-0004) utilise exactement le même,
+      # sans le dupliquer dans ce fichier.
+      - name: Construire le prompt de veille
+        run: |
+          {
+          echo 'VEILLE_PROMPT<<VEILLE_PROMPT_EOF'
+          cat <<'PROMPT_TXT'
+          Tu es un agent de veille technologique pour MAT (Mézières Avec Toi), une PWA municipale française.
+
+          ⚠️ LIVRABLE OBLIGATOIRE : quoi qu'il arrive (recherches infructueuses, sources
+          inaccessibles, peu d'actualités), tu DOIS créer le fichier `rapport-veille.html`
+          avant de terminer — au pire avec des sections « Rien de notable cette semaine ».
+          Une exécution qui se termine sans avoir écrit ce fichier est un échec du workflow.
+
+          🧠 MÉMOIRE DES VEILLES PRÉCÉDENTES (anti-redondance) :
+          - Commence par lire le fichier `veille/historique-techno.md` s'il existe : il
+            récapitule les informations déjà rapportées lors des veilles précédentes
+            (une ligne par info : titre + URL source).
+          - NE RAPPORTE PAS une information déjà présente dans cet historique (même URL,
+            ou même fait reformulé), SAUF s'il y a une évolution notable depuis (nouvelle
+            version, correctif publié, aggravation d'une faille…) — dans ce cas, signale-la
+            explicitement comme « mise à jour d'une info déjà signalée » avec ce qui a changé.
+          - Les recommandations actionnables déjà proposées à l'identique les semaines
+            précédentes ne doivent pas être répétées, sauf si elles deviennent urgentes.
+
+          Stack technique de la PWA :
+          - Frontend : PWA vanilla JS hébergée sur GitHub Pages, Service Worker, notifications push web
+          - Backend : Node.js / Express hébergé sur Render.com
+          - Base de données : Upstash Redis (REST API)
+          - IA : Mistral AI (chatbot principal), Claude (fallback)
+          - Cartographie : Leaflet.js + GeoJSON (randonnée, PLU)
+          - Intégrations : Trello, Facebook Graph API, Google Calendar, Open-Meteo, Météo-France, IGN Apicarto, api-adresse.data.gouv.fr, Cloudinary
+          - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
+          Contexte : portail citoyen d'une commune rurale française de moins de 1 000 habitants, audience majoritairement séniors, exigences fortes d'accessibilité et de souveraineté numérique.
+
+          ⚠️ FRAÎCHEUR DE L'INFORMATION (impératif) :
+          - Nous sommes aujourd'hui le ${{ steps.now.outputs.iso }}. Tu ne dois rapporter QUE des informations publiées au cours des 30 derniers jours précédant cette date.
+          - N'inclus AUCUNE information antérieure à l'année ${{ steps.now.outputs.year }}. Pas de rétrospective, pas de « rappels » d'anciennes versions, rien qui date de plus d'un mois.
+          - Pour CHAQUE information rapportée, indique sa date de publication (ex. « (publié le 5 juin ${{ steps.now.outputs.year }}) »). Si tu ne peux pas dater une information ou qu'elle a plus de 30 jours, ne l'inclus pas.
+          - Dans tes recherches web, privilégie explicitement les actualités du mois en cours et formule tes requêtes avec l'année ${{ steps.now.outputs.year }}.
+          - Si une section n'a vraiment rien de récent cette semaine, écris-le clairement (« Rien de notable cette semaine ») plutôt que de la remplir avec du contenu ancien.
+          - CHAQUE affirmation doit être accompagnée d'un lien cliquable (balise <a href="URL">) vers la source d'origine, pour que le lecteur puisse y accéder directement.
+
+          Effectue des recherches web récentes (moins de 30 jours) et rédige un rapport de veille en français, structuré ainsi :
+
+          ## 1. Mises à jour du stack
+          Nouvelles versions, breaking changes, failles de sécurité ou dépréciations concernant : Leaflet.js, Node.js/Express, Upstash Redis, Render, GitHub Pages/Actions, API Mistral, API Anthropic, Service Workers / PWA (Chrome, Safari iOS), Playwright, Sentry.
+
+          ## 2. Innovations civic-tech et communes
+          Nouvelles fonctionnalités vues dans d'autres applications de communes françaises ou portails citoyens (France ou Europe) qui pourraient inspirer une commune rurale : participation citoyenne, accessibilité séniors, IA souveraine, signalements, etc.
+
+          ## 3. Accessibilité et séniors
+          Évolutions des bonnes pratiques, RGAA, outils ou patterns UX pertinents pour un public âgé.
+
+          ## 4. Cybersécurité des collectivités
+          Alertes de sécurité récentes de l'ANSSI et du CERT-FR (cert.ssi.gouv.fr), incidents ou cyberattaques ayant visé des communes ou collectivités françaises, et bonnes pratiques applicables à une petite mairie (sauvegardes, hameçonnage, mises à jour, comptes). Reste sur l'actualité du mois ; mentionne les liens vers les bulletins officiels.
+
+          ## 5. Recommandations actionnables
+          3 à 5 actions concrètes, priorisées (haute / moyenne / basse), avec effort estimé.
+
+          Règles de contenu : cite tes sources (liens cliquables), reste factuel, ne mentionne que des informations vérifiées par recherche web. Si une section n'a rien de nouveau cette semaine, indique-le brièvement.
+
+          IMPORTANT — mise en forme du livrable :
+          Écris le rapport directement dans un fichier `rapport-veille.html` (et nulle part ailleurs) sous forme d'un document HTML complet et autonome, optimisé pour la lecture dans un client email (Gmail, Outlook, Mail iOS). Contraintes :
+          - Document HTML complet : `<!DOCTYPE html>`, `<html lang="fr">`, `<head>` avec `<meta charset="utf-8">`, et tout le contenu dans `<body>`.
+          - Tous les styles en CSS INLINE (attribut `style="..."` sur chaque balise) — pas de balise `<style>` ni de CSS externe, car de nombreux clients email les ignorent.
+          - Contenu centré dans un conteneur de largeur maximale 640px.
+          - Lisibilité séniors : police sans-serif, taille de base 16px minimum, titres bien contrastés, interligne aéré (line-height 1.6), liens soulignés et de couleur foncée distincte.
+          - Un en-tête avec le titre « Veille technologique MAT » et la date du jour en français.
+          - Les 5 sections avec des titres clairs (`<h2>`), listes à puces lisibles, et une pastille de priorité (haute/moyenne/basse) bien visible dans la section recommandations.
+          - Chaque lien doit être une vraie balise `<a href="URL">texte</a>` cliquable, en couleur foncée et soulignée, ouvrant la source d'origine.
+          - Terminer par un pied de page discret : « Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web). »
+
+          APRÈS avoir écrit `rapport-veille.html`, mets à jour la mémoire de veille
+          `veille/historique-techno.md` (crée le fichier s'il n'existe pas) :
+          - Ajoute EN TÊTE du fichier une section `## ${{ steps.now.outputs.iso }}` listant,
+            une ligne par information rapportée cette semaine : `- Titre court — URL`.
+            Inclus aussi une ligne par recommandation actionnable émise : `- [reco] Titre court`.
+          - Si une section `## ${{ steps.now.outputs.iso }}` existe déjà (tentative précédente
+            du même jour), REMPLACE-la au lieu d'en ajouter une deuxième.
+          - Si une section « Rien de notable » : écris simplement `- (rien de notable)`.
+          - Conserve les sections des semaines précédentes mais LIMITE le fichier aux
+            12 sections (semaines) les plus récentes — supprime les plus anciennes.
+          - Ce fichier est une mémoire compacte, pas un rapport : pas de HTML, pas de
+            commentaire, juste les lignes datées ci-dessus.
+
+          N'utilise Write que pour ces deux fichiers (`rapport-veille.html` et
+          `veille/historique-techno.md`). Ne crée aucune issue, ne fais aucun commit
+          (le workflow committe l'historique lui-même après l'envoi de l'email).
+          PROMPT_TXT
+          echo 'VEILLE_PROMPT_EOF'
+          } >> "$GITHUB_ENV"
+
+      # continue-on-error : un échec de la 1re tentative (erreur réseau, run IA
+      # terminé sans livrable…) ne condamne pas le job — la vérification
+      # ci-dessous déclenche une 2e tentative. Voir ADR-0004.
       - name: Veille avec Claude Code
+        continue-on-error: true
         uses: anthropics/claude-code-action@v1
         with:
           # Jeton d'abonnement Claude Pro/Max — généré en local avec `claude setup-token`
@@ -35,82 +133,52 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
             --allowedTools "WebSearch,WebFetch,Read,Write"
-          prompt: |
-            Tu es un agent de veille technologique pour MAT (Mézières Avec Toi), une PWA municipale française.
+          prompt: ${{ env.VEILLE_PROMPT }}
 
-            🧠 MÉMOIRE DES VEILLES PRÉCÉDENTES (anti-redondance) :
-            - Commence par lire le fichier `veille/historique-techno.md` s'il existe : il
-              récapitule les informations déjà rapportées lors des veilles précédentes
-              (une ligne par info : titre + URL source).
-            - NE RAPPORTE PAS une information déjà présente dans cet historique (même URL,
-              ou même fait reformulé), SAUF s'il y a une évolution notable depuis (nouvelle
-              version, correctif publié, aggravation d'une faille…) — dans ce cas, signale-la
-              explicitement comme « mise à jour d'une info déjà signalée » avec ce qui a changé.
-            - Les recommandations actionnables déjà proposées à l'identique les semaines
-              précédentes ne doivent pas être répétées, sauf si elles deviennent urgentes.
+      - name: Vérifier le rapport (1re tentative)
+        id: check1
+        run: |
+          if [ -s rapport-veille.html ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "rapport-veille.html généré à la 1re tentative."
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Veille techno::rapport-veille.html absent ou vide après la 1re tentative — nouvelle tentative."
+            # Préserver la trace de la 1re exécution avant que la 2e ne l'écrase
+            cp "$RUNNER_TEMP/claude-execution-output.json" \
+               "$RUNNER_TEMP/claude-execution-output-tentative1.json" 2>/dev/null || true
+          fi
 
-            Stack technique de la PWA :
-            - Frontend : PWA vanilla JS hébergée sur GitHub Pages, Service Worker, notifications push web
-            - Backend : Node.js / Express hébergé sur Render.com
-            - Base de données : Upstash Redis (REST API)
-            - IA : Mistral AI (chatbot principal), Claude (fallback)
-            - Cartographie : Leaflet.js + GeoJSON (randonnée, PLU)
-            - Intégrations : Trello, Facebook Graph API, Google Calendar, Open-Meteo, Météo-France, IGN Apicarto, api-adresse.data.gouv.fr, Cloudinary
-            - CI/CD : GitHub Actions, tests Playwright, monitoring Sentry, EcoIndex, Lighthouse
-            Contexte : portail citoyen d'une commune rurale française de moins de 1 000 habitants, audience majoritairement séniors, exigences fortes d'accessibilité et de souveraineté numérique.
+      - name: Veille avec Claude Code (2e tentative)
+        if: steps.check1.outputs.ok != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "WebSearch,WebFetch,Read,Write"
+          prompt: ${{ env.VEILLE_PROMPT }}
 
-            ⚠️ FRAÎCHEUR DE L'INFORMATION (impératif) :
-            - Nous sommes aujourd'hui le ${{ steps.now.outputs.iso }}. Tu ne dois rapporter QUE des informations publiées au cours des 30 derniers jours précédant cette date.
-            - N'inclus AUCUNE information antérieure à l'année ${{ steps.now.outputs.year }}. Pas de rétrospective, pas de « rappels » d'anciennes versions, rien qui date de plus d'un mois.
-            - Pour CHAQUE information rapportée, indique sa date de publication (ex. « (publié le 5 juin ${{ steps.now.outputs.year }}) »). Si tu ne peux pas dater une information ou qu'elle a plus de 30 jours, ne l'inclus pas.
-            - Dans tes recherches web, privilégie explicitement les actualités du mois en cours et formule tes requêtes avec l'année ${{ steps.now.outputs.year }}.
-            - Si une section n'a vraiment rien de récent cette semaine, écris-le clairement (« Rien de notable cette semaine ») plutôt que de la remplir avec du contenu ancien.
-            - CHAQUE affirmation doit être accompagnée d'un lien cliquable (balise <a href="URL">) vers la source d'origine, pour que le lecteur puisse y accéder directement.
+      # La sortie détaillée de Claude est masquée dans les logs (comportement de
+      # l'action) : cet artefact est le seul moyen de diagnostiquer a posteriori
+      # une exécution qui se termine « avec succès » sans avoir produit le rapport.
+      - name: Archiver la sortie Claude (diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-output
+          path: |
+            ${{ runner.temp }}/claude-execution-output.json
+            ${{ runner.temp }}/claude-execution-output-tentative1.json
+          if-no-files-found: ignore
+          retention-days: 30
 
-            Effectue des recherches web récentes (moins de 30 jours) et rédige un rapport de veille en français, structuré ainsi :
-
-            ## 1. Mises à jour du stack
-            Nouvelles versions, breaking changes, failles de sécurité ou dépréciations concernant : Leaflet.js, Node.js/Express, Upstash Redis, Render, GitHub Pages/Actions, API Mistral, API Anthropic, Service Workers / PWA (Chrome, Safari iOS), Playwright, Sentry.
-
-            ## 2. Innovations civic-tech et communes
-            Nouvelles fonctionnalités vues dans d'autres applications de communes françaises ou portails citoyens (France ou Europe) qui pourraient inspirer une commune rurale : participation citoyenne, accessibilité séniors, IA souveraine, signalements, etc.
-
-            ## 3. Accessibilité et séniors
-            Évolutions des bonnes pratiques, RGAA, outils ou patterns UX pertinents pour un public âgé.
-
-            ## 4. Cybersécurité des collectivités
-            Alertes de sécurité récentes de l'ANSSI et du CERT-FR (cert.ssi.gouv.fr), incidents ou cyberattaques ayant visé des communes ou collectivités françaises, et bonnes pratiques applicables à une petite mairie (sauvegardes, hameçonnage, mises à jour, comptes). Reste sur l'actualité du mois ; mentionne les liens vers les bulletins officiels.
-
-            ## 5. Recommandations actionnables
-            3 à 5 actions concrètes, priorisées (haute / moyenne / basse), avec effort estimé.
-
-            Règles de contenu : cite tes sources (liens cliquables), reste factuel, ne mentionne que des informations vérifiées par recherche web. Si une section n'a rien de nouveau cette semaine, indique-le brièvement.
-
-            IMPORTANT — mise en forme du livrable :
-            Écris le rapport directement dans un fichier `rapport-veille.html` (et nulle part ailleurs) sous forme d'un document HTML complet et autonome, optimisé pour la lecture dans un client email (Gmail, Outlook, Mail iOS). Contraintes :
-            - Document HTML complet : `<!DOCTYPE html>`, `<html lang="fr">`, `<head>` avec `<meta charset="utf-8">`, et tout le contenu dans `<body>`.
-            - Tous les styles en CSS INLINE (attribut `style="..."` sur chaque balise) — pas de balise `<style>` ni de CSS externe, car de nombreux clients email les ignorent.
-            - Contenu centré dans un conteneur de largeur maximale 640px.
-            - Lisibilité séniors : police sans-serif, taille de base 16px minimum, titres bien contrastés, interligne aéré (line-height 1.6), liens soulignés et de couleur foncée distincte.
-            - Un en-tête avec le titre « Veille technologique MAT » et la date du jour en français.
-            - Les 5 sections avec des titres clairs (`<h2>`), listes à puces lisibles, et une pastille de priorité (haute/moyenne/basse) bien visible dans la section recommandations.
-            - Chaque lien doit être une vraie balise `<a href="URL">texte</a>` cliquable, en couleur foncée et soulignée, ouvrant la source d'origine.
-            - Terminer par un pied de page discret : « Rapport généré automatiquement par l'agent de veille (GitHub Actions + Claude Code avec recherche web). »
-
-            APRÈS avoir écrit `rapport-veille.html`, mets à jour la mémoire de veille
-            `veille/historique-techno.md` (crée le fichier s'il n'existe pas) :
-            - Ajoute EN TÊTE du fichier une section `## ${{ steps.now.outputs.iso }}` listant,
-              une ligne par information rapportée cette semaine : `- Titre court — URL`.
-              Inclus aussi une ligne par recommandation actionnable émise : `- [reco] Titre court`.
-            - Si une section « Rien de notable » : écris simplement `- (rien de notable)`.
-            - Conserve les sections des semaines précédentes mais LIMITE le fichier aux
-              12 sections (semaines) les plus récentes — supprime les plus anciennes.
-            - Ce fichier est une mémoire compacte, pas un rapport : pas de HTML, pas de
-              commentaire, juste les lignes datées ci-dessus.
-
-            N'utilise Write que pour ces deux fichiers (`rapport-veille.html` et
-            `veille/historique-techno.md`). Ne crée aucune issue, ne fais aucun commit
-            (le workflow committe l'historique lui-même après l'envoi de l'email).
+      - name: Vérifier le rapport (final)
+        run: |
+          if [ ! -s rapport-veille.html ]; then
+            echo "::error title=Veille techno::rapport-veille.html toujours absent après 2 tentatives. Consulter l'artefact claude-execution-output pour comprendre pourquoi l'agent n'a pas écrit le fichier."
+            exit 1
+          fi
 
       - name: Envoyer le rapport par email
         env:

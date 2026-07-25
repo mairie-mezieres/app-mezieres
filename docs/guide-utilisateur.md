@@ -74,6 +74,20 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 
 Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondant.
 
+**Le bandeau d'accueil est vivant** : il reflète la météo réelle de la commune —
+fine pluie animée quand il pleut, flocons quand il neige, éclairs en cas d'orage,
+brume par temps de brouillard — et sa couleur change selon le moment de la journée
+(teintes dorées à l'aube et au crépuscule, vert profond la nuit).
+
+Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
+lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au
+printemps, œufs pastel le week-end de Pâques, confettis bleu-blanc-rouge les 13
+et 14 juillet, feuilles mortes en automne et chauves-souris à Halloween. La vraie
+météo garde toujours la priorité sur les décorations.
+
+Ces animations sont purement décoratives : si votre téléphone est réglé sur
+« Réduire les animations », seule la teinte de couleur est conservée (voir §10).
+
 ---
 
 ## 4. Les actualités
@@ -135,7 +149,8 @@ Vous constatez un problème sur la voie publique (nid-de-poule, éclairage défa
 4. Décrivez brièvement le problème et, si vous le souhaitez, ajoutez une photo.
 5. Appuyez sur **Envoyer**.
 
-Le signalement est transmis directement à la mairie. Les signalements sont anonymes.
+Le signalement est transmis directement à la mairie — un petit jet de confettis 🎉
+confirme l'envoi. Les signalements sont anonymes.
 
 ---
 
@@ -183,6 +198,11 @@ Le panneau **Accessibilité & Personnalisation** (icône ♿) propose plusieurs 
 | **Notifications push** | Gérer vos abonnements aux notifications |
 
 Ces réglages sont sauvegardés sur votre appareil et persistent entre les visites.
+
+Par ailleurs, toutes les animations décoratives de l'application (bandeau météo
+vivant, confettis, transitions entre fenêtres) respectent le réglage système
+**« Réduire les animations »** de votre téléphone : si vous l'avez activé, elles
+sont automatiquement désactivées.
 
 ### Navigation au clavier
 

@@ -79,6 +79,7 @@ app-mezieres/
 │   ├── mat-agenda.js       Agenda (Google Calendar via backend)
 │   ├── mat-mel.js          Chatbot MEL (appels backend)
 │   ├── mat-widgets.js      Widgets header (météo mini, bus mini…)
+│   ├── mat-ambiance.js     Header météo vivant + confettis de célébration
 │   ├── mat-forms.js        Signalements, boîte à idées, sondages, bugs
 │   ├── mat-trombi.js       Trombinoscope des élus
 │   ├── mat-associations.js Liste des associations
@@ -410,6 +411,59 @@ const CACHE = 'mat-v4.15.0';  // ← incrémenter à chaque déploiement
 `manifest.webmanifest` définit le nom, les icônes, la couleur de thème et l'orientation.  
 Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
 
+### Statistiques d'usage — le tracking ne doit jamais bloquer l'UI
+
+`trackStat()` (défini dans `js/mat-utils.js`) est appelé à l'ouverture de chaque
+écran via les wrappers de `js/mat-core.js`. Ces appels passent **obligatoirement**
+par le helper `_track()` (garde `typeof trackStat === 'function'` + `try/catch`) :
+si `mat-utils.js` n'a pas pu être chargé ou exécuté (réseau instable, cache
+partiel), un appel direct lèverait une `ReferenceError` **avant** d'ouvrir
+l'overlay — le bouton ne réagirait alors plus du tout (issue #324). Même garde
+dans `js/mat-forms.js`, où un `trackStat` absent faisait afficher « Erreur
+d'envoi » sur une demande pourtant transmise. Règle : **une statistique ne doit
+jamais faire échouer une action habitant.**
+
+### Effets visuels — ambiance météo, View Transitions, confettis
+
+Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**
+(aucune dépendance, dégradation silencieuse) :
+
+- **Header météo vivant** (`js/mat-ambiance.js` + styles `amb-*` dans `css/mat.css`) :
+  `matHeaderAmbiance()` lit `window._meteoData` (alimenté par `loadMeteo`) et pose
+  sur `.header` une classe de famille météo (`amb-rain`, `amb-snow`, `amb-storm`,
+  `amb-fog`) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
+  bornes = lever/coucher Open-Meteo ± 40 min). Les particules (pluie/neige/brume,
+  éclairs) sont des `<span>` animés en CSS dans une couche `.header-amb` ; la phase
+  est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé sont
+  scopées `html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre)`
+  pour ne jamais écraser les thèmes d'accessibilité. Si « Réduire les animations »
+  est actif : teinte statique seule, aucune particule. Le header étant masqué en
+  desktop (≥ 1024 px), l'effet est mobile/PWA uniquement.
+- **Calendrier festif** (`_ambFestive()` dans `js/mat-ambiance.js`, v4.45) :
+  quand la météo est calme (aucune famille météo active), le header se décore
+  selon la période — guirlande + flocons (1–30 déc), étincelles (31 déc–2 janv),
+  pétales (20 mars–30 avril), œufs pastel (samedi → lundi de Pâques, calculé via
+  `_getFeriesForYear` de `mat-jours-feries.js` avec garde `typeof` : chargé en
+  async par mat-boot, il peut arriver après la 1re évaluation), confettis
+  tricolores (13–14 juil), chauves-souris + feuilles (29–31 oct), feuilles
+  mortes (oct–20 nov). **La météo réelle garde toujours la priorité** sur les
+  particules festives ; mêmes règles d'accessibilité (aria-hidden,
+  `prefers-reduced-motion`).
+- **View Transitions** (`_ovVisual()` dans `js/mat-core.js`) : l'ouverture/fermeture
+  des overlays passe par `document.startViewTransition` quand l'API existe.
+  ⚠️ **Seul le changement visuel est dans la transition** — l'hydratation lazy des
+  `<template data-lazy-ov>`, la pile `_ovStack` et les attributs ARIA restent
+  synchrones, car les appelants font `getElementById` dès le retour d'`openOv()`.
+  Les trois promesses de la transition (`ready`, `updateCallbackDone`,
+  `finished`) reçoivent un `catch` neutre : leur rejet (`AbortError`) est normal
+  quand une transition en remplace une autre, et sans ce garde il remontait dans
+  Sentry sur WebKit/Safari. Voir ADR-0005.
+- **Confettis** (`matCelebrate()` dans `js/mat-ambiance.js`) : canvas éphémère
+  (~1,8 s, ~90 particules) appelé — toujours via
+  `try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}` — à la
+  soumission réussie d'une idée, d'un signalement, d'une demande de contact ou
+  d'un bug (`js/mat-forms.js`). Jamais si « Réduire les animations » est actif.
+
 ---
 
 ## 8. Notifications push
@@ -550,6 +604,21 @@ pour ne pas re-signaler d'une semaine sur l'autre une information déjà rapport
 
 Pour re-signaler volontairement une info, supprimer sa ligne de l'historique.
 Voir aussi `veille/README.md`.
+
+### Robustesse des veilles IA (retry + diagnostic)
+
+L'étape Claude Code des deux veilles peut se terminer « avec succès » **sans avoir
+écrit le rapport HTML** (abandon prématuré de l'agent, recherches en échec…). Les
+workflows traitent donc le livrable comme vérifiable (ADR-0004) :
+
+- le prompt est construit une fois dans une variable d'env (`VEILLE_PROMPT` /
+  `BULLETIN_PROMPT`) partagée par les deux invocations ;
+- 1re tentative en `continue-on-error`, puis vérification `[ -s rapport-*.html ]` ;
+  si le fichier manque, **2e tentative** avec le même prompt, puis vérification
+  finale bloquante ;
+- la sortie de l'agent (`claude-execution-output.json`, masquée dans les logs par
+  l'action) est archivée en **artefact 30 jours** (`claude-execution-output`,
+  les deux tentatives) pour diagnostiquer tout run sans livrable.
 
 ### Tests Playwright
 
