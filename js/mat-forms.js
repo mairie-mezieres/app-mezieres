@@ -174,6 +174,7 @@ async function submitSignal(){
     _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'signal-success');
   }catch(e){
     clearTimeout(timer);
@@ -182,6 +183,7 @@ async function submitSignal(){
       _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
+      try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
       _askPushForNotify(notifyToken,'signal-success');
     } else {
       alertMAT('Erreur d\'envoi. Vérifiez votre connexion.','Signalement','⚠️');
@@ -330,6 +332,7 @@ async function submitIdee(){
   if(notifyToken){try{localStorage.setItem('mat:notify:idea:'+idea.id,notifyToken);}catch(_){}}
   try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
   _askPushForNotify(notifyToken,'idea-form');
   loadIdees();
 }
@@ -418,6 +421,7 @@ async function submitContactForm(){
     trackStat('contact');
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'contact-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
@@ -485,6 +489,7 @@ async function submitBug(){
     trackStat('bug');
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'bug-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
