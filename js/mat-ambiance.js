@@ -1,6 +1,6 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.0.0
-   Header météo vivant + confettis de célébration
+   MAT — Ambiance v1.1.0
+   Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 
@@ -39,6 +39,32 @@ function _ambDayPhase(daily){
   return '';
 }
 
+// Calendrier festif : périodes de l'année où le header se décore quand la
+// météo est calme — la météo réelle (pluie/neige/orage/brouillard) garde
+// TOUJOURS la priorité sur les particules festives.
+// Pâques s'appuie sur _getFeriesForYear (mat-jours-feries.js, chargé au boot
+// par mat-boot.js) ; si le script n'est pas encore là, la période est
+// simplement ignorée jusqu'à la prochaine ré-évaluation (10 min).
+function _ambFestive(now){
+  var m = now.getMonth() + 1, d = now.getDate();
+  try{
+    if(typeof _getFeriesForYear === 'function'){
+      var lundi = _getFeriesForYear(now.getFullYear()).find(function(f){ return f.n === 'Lundi de Pâques'; });
+      if(lundi){
+        var diff = (new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(lundi.d.getFullYear(), lundi.d.getMonth(), lundi.d.getDate())) / 86400000;
+        if(diff >= -2 && diff <= 0) return 'paques'; // samedi → lundi de Pâques
+      }
+    }
+  }catch(_){}
+  if(m === 12 && d <= 30) return 'noel';
+  if((m === 12 && d === 31) || (m === 1 && d <= 2)) return 'nouvelan';
+  if((m === 3 && d >= 20) || m === 4) return 'printemps';   // pétales
+  if(m === 7 && (d === 13 || d === 14)) return 'juillet14';
+  if(m === 10 && d >= 29) return 'halloween';               // avant l'automne
+  if(m === 10 || (m === 11 && d <= 20)) return 'automne';   // feuilles mortes
+  return '';
+}
+
 var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-dawn','amb-dusk','amb-night'];
 
 function matHeaderAmbiance(){
@@ -50,7 +76,7 @@ function matHeaderAmbiance(){
   _AMB_CLASSES.forEach(function(c){ header.classList.remove(c); });
   if(fam) header.classList.add('amb-' + fam);
   if(phase) header.classList.add('amb-' + phase);
-  _ambRenderParticles(header, fam);
+  _ambRenderParticles(header, fam || _ambFestive(new Date()));
 }
 
 function _ambRenderParticles(header, fam){
@@ -82,21 +108,98 @@ function _ambRenderParticles(header, fam){
       layer.appendChild(s);
     }
   } else if(kind === 'snow'){
-    for(i = 0; i < 14; i++){
-      s = document.createElement('span');
-      s.className = 'amb-flake';
-      s.textContent = '❄';
-      s.style.left = (Math.random() * 100).toFixed(1) + '%';
-      s.style.fontSize = (0.4 + Math.random() * 0.5).toFixed(2) + 'rem';
-      s.style.animationDelay = (Math.random() * 8).toFixed(2) + 's';
-      s.style.animationDuration = (6 + Math.random() * 6).toFixed(2) + 's';
-      layer.appendChild(s);
-    }
+    _ambFall(layer, '❄', 14, 6, 12, 0.4, 0.9);
   } else if(kind === 'fog'){
     s = document.createElement('span'); s.className = 'amb-mist'; layer.appendChild(s);
     s = document.createElement('span'); s.className = 'amb-mist amb-mist2'; layer.appendChild(s);
+  } else if(kind === 'noel'){
+    _ambGuirlande(layer);
+    _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
+  } else if(kind === 'nouvelan'){
+    _ambFall(layer, '✨', 12, 7, 12, 0.4, 0.7);
+  } else if(kind === 'printemps'){
+    _ambFall(layer, '🌸', 10, 8, 14, 0.5, 0.8);
+  } else if(kind === 'paques'){
+    _ambEggs(layer);
+  } else if(kind === 'juillet14'){
+    _ambTricolore(layer);
+  } else if(kind === 'automne'){
+    _ambFall(layer, '🍂', 10, 8, 14, 0.5, 0.9);
+  } else if(kind === 'halloween'){
+    _ambBats(layer);
+    _ambFall(layer, '🍂', 6, 9, 14, 0.5, 0.8);
   }
   header.appendChild(layer);
+}
+
+// Chute avec balancement (réutilise les keyframes ambSnow) : flocons,
+// pétales, feuilles, étincelles…
+function _ambFall(layer, char, count, minDur, maxDur, minSize, maxSize){
+  for(var i = 0; i < count; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-flake';
+    s.textContent = char;
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    s.style.fontSize = (minSize + Math.random() * (maxSize - minSize)).toFixed(2) + 'rem';
+    s.style.animationDelay = '-' + (Math.random() * maxDur).toFixed(2) + 's';
+    s.style.animationDuration = (minDur + Math.random() * (maxDur - minDur)).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Guirlande lumineuse le long du bord supérieur (Noël)
+var _AMB_GUIRLANDE_COLORS = ['#f87171','#fbbf24','#34d399','#60a5fa','#f472b6'];
+function _ambGuirlande(layer){
+  for(var i = 0; i < 14; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-guirlande';
+    s.style.left = (2 + i * 7).toFixed(1) + '%';
+    s.style.background = _AMB_GUIRLANDE_COLORS[i % _AMB_GUIRLANDE_COLORS.length];
+    s.style.animationDelay = (Math.random() * 2).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Confettis bleu-blanc-rouge (14 Juillet)
+var _AMB_TRICOLORE = ['#0055A4','#ffffff','#EF4135'];
+function _ambTricolore(layer){
+  for(var i = 0; i < 18; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-conf';
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    s.style.background = _AMB_TRICOLORE[i % 3];
+    s.style.animationDelay = '-' + (Math.random() * 6).toFixed(2) + 's';
+    s.style.animationDuration = (5 + Math.random() * 4).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Petits œufs pastel (week-end de Pâques)
+var _AMB_EGG_COLORS = ['#fbcfe8','#bfdbfe','#fde68a','#bbf7d0','#ddd6fe'];
+function _ambEggs(layer){
+  for(var i = 0; i < 10; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-egg';
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    s.style.background = _AMB_EGG_COLORS[i % _AMB_EGG_COLORS.length];
+    s.style.animationDelay = '-' + (Math.random() * 8).toFixed(2) + 's';
+    s.style.animationDuration = (7 + Math.random() * 5).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Chauves-souris qui traversent le header (Halloween)
+function _ambBats(layer){
+  for(var i = 0; i < 4; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-bat';
+    s.textContent = '🦇';
+    s.style.top = (8 + Math.random() * 45).toFixed(1) + '%';
+    s.style.fontSize = (0.6 + Math.random() * 0.5).toFixed(2) + 'rem';
+    s.style.animationDelay = '-' + (Math.random() * 9).toFixed(2) + 's';
+    s.style.animationDuration = (8 + Math.random() * 6).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
 }
 
 (function(){
