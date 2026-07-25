@@ -79,6 +79,7 @@ app-mezieres/
 │   ├── mat-agenda.js       Agenda (Google Calendar via backend)
 │   ├── mat-mel.js          Chatbot MEL (appels backend)
 │   ├── mat-widgets.js      Widgets header (météo mini, bus mini…)
+│   ├── mat-ambiance.js     Header météo vivant + confettis de célébration
 │   ├── mat-forms.js        Signalements, boîte à idées, sondages, bugs
 │   ├── mat-trombi.js       Trombinoscope des élus
 │   ├── mat-associations.js Liste des associations
@@ -409,6 +410,34 @@ const CACHE = 'mat-v4.15.0';  // ← incrémenter à chaque déploiement
 
 `manifest.webmanifest` définit le nom, les icônes, la couleur de thème et l'orientation.  
 Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
+
+### Effets visuels — ambiance météo, View Transitions, confettis
+
+Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**
+(aucune dépendance, dégradation silencieuse) :
+
+- **Header météo vivant** (`js/mat-ambiance.js` + styles `amb-*` dans `css/mat.css`) :
+  `matHeaderAmbiance()` lit `window._meteoData` (alimenté par `loadMeteo`) et pose
+  sur `.header` une classe de famille météo (`amb-rain`, `amb-snow`, `amb-storm`,
+  `amb-fog`) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
+  bornes = lever/coucher Open-Meteo ± 40 min). Les particules (pluie/neige/brume,
+  éclairs) sont des `<span>` animés en CSS dans une couche `.header-amb` ; la phase
+  est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé sont
+  scopées `html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre)`
+  pour ne jamais écraser les thèmes d'accessibilité. Si « Réduire les animations »
+  est actif : teinte statique seule, aucune particule. Le header étant masqué en
+  desktop (≥ 1024 px), l'effet est mobile/PWA uniquement.
+- **View Transitions** (`_ovVisual()` dans `js/mat-core.js`) : l'ouverture/fermeture
+  des overlays passe par `document.startViewTransition` quand l'API existe.
+  ⚠️ **Seul le changement visuel est dans la transition** — l'hydratation lazy des
+  `<template data-lazy-ov>`, la pile `_ovStack` et les attributs ARIA restent
+  synchrones, car les appelants font `getElementById` dès le retour d'`openOv()`.
+  Voir ADR-0005.
+- **Confettis** (`matCelebrate()` dans `js/mat-ambiance.js`) : canvas éphémère
+  (~1,8 s, ~90 particules) appelé — toujours via
+  `try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}` — à la
+  soumission réussie d'une idée, d'un signalement, d'une demande de contact ou
+  d'un bug (`js/mat-forms.js`). Jamais si « Réduire les animations » est actif.
 
 ---
 
