@@ -39,7 +39,7 @@ window.addEventListener('appinstalled', () => {
   const banner = document.getElementById('install-banner');
   if(banner) banner.classList.add('hidden');
   if (!localStorage.getItem('mat_install_tracked')) {
-    trackStat('installation', { device: detectDevice() });
+    _track('installation', { device: detectDevice() });
     localStorage.setItem('mat_install_tracked', '1');
   }
   updateInstallBtn();
@@ -149,6 +149,33 @@ const _ovStack = [];
 const _ovReturnFocus = [];
 
 const _OV_BASE_Z = 200;
+// Fondu fluide entre les vues via la View Transitions API quand elle existe
+// (amélioration progressive — sinon, mutation immédiate comme avant).
+// ⚠️ Contrainte : seul le changement VISUEL passe ici. Tout ce dont les
+// appelants dépendent de façon synchrone (hydratation lazy, _ovStack,
+// attributs ARIA) doit rester hors de la transition, car le callback de
+// startViewTransition est asynchrone. Voir ADR côté docs/adr/.
+function _ovVisual(mutate){
+  try{
+    if(document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const vt = document.startViewTransition(mutate);
+      // Une transition remplacée par une suivante voit sa promesse `ready`
+      // rejetée (AbortError « Old view transition aborted by new view
+      // transition ») — cas NORMAL et fréquent chez nous : openActuDetail
+      // enchaîne closeOv('notifs') puis openOv('actu'). Chromium marque ces
+      // promesses comme gérées, WebKit/Safari non : sans ce catch, chaque
+      // enchaînement remonte une erreur non gérée dans Sentry (issue #325).
+      // On neutralise les 3 promesses, sans changer le rendu.
+      if(vt){
+        if(vt.ready && vt.ready.catch) vt.ready.catch(function(){});
+        if(vt.updateCallbackDone && vt.updateCallbackDone.catch) vt.updateCallbackDone.catch(function(){});
+        if(vt.finished && vt.finished.catch) vt.finished.catch(function(){});
+      }
+      return;
+    }
+  }catch(_){}
+  mutate();
+}
 function openOv(id){
   const el = document.getElementById('ov-'+id);
   if(!el) return;
@@ -158,31 +185,39 @@ function openOv(id){
   // Lazy-hydratation : certains overlays au contenu purement statique sont
   // différés via <template data-lazy-ov> dans index.html pour alléger le DOM
   // initial (eco-index). On injecte leur contenu réel à la 1re ouverture.
-  // openOv reste le seul point d'entrée, le comportement est inchangé.
+  // openOv reste le seul point d'entrée. L'hydratation reste SYNCHRONE :
+  // les appelants font getElementById sur le contenu dès le retour d'openOv.
   const tpl = el.querySelector(':scope > template[data-lazy-ov]');
   if(tpl){ el.appendChild(tpl.content.cloneNode(true)); tpl.remove(); }
-  el.classList.add('open');
-  el.style.zIndex = String(_OV_BASE_Z + _ovStack.length + 1);
-  document.body.style.overflow='hidden';
+  const z = String(_OV_BASE_Z + _ovStack.length + 1);
   _ovStack.push(id);
   // Sémantique pour les lecteurs d'écran : fenêtre modale annoncée comme telle.
   el.setAttribute('role','dialog');
   el.setAttribute('aria-modal','true');
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
-  try { el.focus({ preventScroll:true }); } catch(_){}
+  _ovVisual(function(){
+    el.classList.add('open');
+    el.style.zIndex = z;
+    document.body.style.overflow='hidden';
+    try { el.focus({ preventScroll:true }); } catch(_){}
+  });
 }
 function closeOv(id){
   const el = document.getElementById('ov-'+id);
   if(!el) return;
-  el.classList.remove('open');
-  el.style.zIndex = '';
   const idx = _ovStack.lastIndexOf(id);
   if(idx !== -1) _ovStack.splice(idx,1);
-  if(_ovStack.length === 0) document.body.style.overflow='';
-  // Restaure le focus sur l'élément déclencheur.
   const prev = _ovReturnFocus.pop();
-  if(prev && typeof prev.focus === 'function'){ try { prev.focus({ preventScroll:true }); } catch(_){} }
+  _ovVisual(function(){
+    el.classList.remove('open');
+    el.style.zIndex = '';
+    // _ovStack est lu au moment où la transition s'applique : si un autre
+    // overlay a été ouvert entre-temps, le scroll du fond reste verrouillé.
+    if(_ovStack.length === 0) document.body.style.overflow='';
+    // Restaure le focus sur l'élément déclencheur.
+    if(prev && typeof prev.focus === 'function'){ try { prev.focus({ preventScroll:true }); } catch(_){} }
+  });
 }
 function ovClick(id,e){ if(e.target===document.getElementById('ov-'+id)) closeOv(id); }
 
@@ -295,7 +330,7 @@ function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }
 
 function openAgendaFromTopEvent(){
-  trackStat('agenda');
+  _track('agenda');
   openOv('agenda');
   ensureAgendaEvents().then(function(evts){
     if(!evts||!evts.length)return;
@@ -337,6 +372,14 @@ async function loadTempDocs() {
 }
 
 // Mapping tracking sur ouvertures
+// ⚠️ Le tracking ne doit JAMAIS empêcher l'ouverture d'un écran : si
+// mat-utils.js n'a pas pu être chargé/exécuté (réseau, cache partiel),
+// `trackStat` est absent et l'appel direct lève une ReferenceError AVANT
+// _origOpenX() — le bouton ne réagit alors plus du tout (issue #324).
+// Même idiome défensif que mat-plui.js.
+function _track(service, extra){
+  try{ if(typeof trackStat === 'function') trackStat(service, extra); }catch(_){}
+}
 (function(){
   const _origOpenMel          = openMel,
         _origOpenSignal       = openSignal,
@@ -353,20 +396,20 @@ async function loadTempDocs() {
         _origOpenNums         = openNums,
         _origOpenConseil      = openConseil;
 
-  window.openMel          = () => { trackStat('mel');           _origOpenMel(); };
-  window.openSignal       = () => { trackStat('signalement');   _origOpenSignal(); };
-  window.openIdees        = () => { trackStat('idees');         _origOpenIdees(); };
-  window.openNotifs       = () => { trackStat('actualites');    _origOpenNotifs(); };
-  window.openMeteo        = () => { trackStat('meteo');         _origOpenMeteo(); };
-  window.openContact      = () => { trackStat('contact');       _origOpenContact(); };
-  window.openCarburant    = () => { trackStat('carburant');     _origOpenCarburant(); };
-  window.openEventsLocaux = () => { trackStat('events_locaux'); _origOpenEventsLocaux(); };
-  window.openAgenda       = () => { trackStat('agenda');        _origOpenAgenda(); };
-  window.openDechets      = () => { trackStat('dechets');       _origOpenDechets(); };
-  window.openSondages     = () => { trackStat('sondages');      _origOpenSondages(); };
-  window.openDocs         = () => { trackStat('docs');          _origOpenDocs(); };
-  window.openNums         = () => { trackStat('nums');          _origOpenNums(); };
-  window.openConseil      = () => { trackStat('conseil');       _origOpenConseil(); };
+  window.openMel          = () => { _track('mel');           _origOpenMel(); };
+  window.openSignal       = () => { _track('signalement');   _origOpenSignal(); };
+  window.openIdees        = () => { _track('idees');         _origOpenIdees(); };
+  window.openNotifs       = () => { _track('actualites');    _origOpenNotifs(); };
+  window.openMeteo        = () => { _track('meteo');         _origOpenMeteo(); };
+  window.openContact      = () => { _track('contact');       _origOpenContact(); };
+  window.openCarburant    = () => { _track('carburant');     _origOpenCarburant(); };
+  window.openEventsLocaux = () => { _track('events_locaux'); _origOpenEventsLocaux(); };
+  window.openAgenda       = () => { _track('agenda');        _origOpenAgenda(); };
+  window.openDechets      = () => { _track('dechets');       _origOpenDechets(); };
+  window.openSondages     = () => { _track('sondages');      _origOpenSondages(); };
+  window.openDocs         = () => { _track('docs');          _origOpenDocs(); };
+  window.openNums         = () => { _track('nums');          _origOpenNums(); };
+  window.openConseil      = () => { _track('conseil');       _origOpenConseil(); };
 })();
 
 // ── Bouton install / bug ──────────────────────────────────────
@@ -761,7 +804,7 @@ document.addEventListener('visibilitychange', function(){
   if(document.visibilityState==='visible'){
     checkPushStatus();
     refreshActusBadge();
-    trackStat('app_resume');
+    _track('app_resume');
   }
 });
 

@@ -339,6 +339,8 @@ async function loadMeteo() {
 
     badge.style.display = 'inline-flex';
     window._meteoData = d;
+    // Header vivant : reflète la météo dans le bandeau (js/mat-ambiance.js)
+    try{ if(typeof matHeaderAmbiance === 'function') matHeaderAmbiance(); }catch(_){}
   } catch (e) {
     if(typeof matLogError==='function' && navigator.onLine) matLogError('meteo','loadMeteo: '+e.message);
     var offline = !navigator.onLine;

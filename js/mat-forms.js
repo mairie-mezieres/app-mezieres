@@ -174,6 +174,7 @@ async function submitSignal(){
     _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
     document.getElementById('signal-form').style.display='none';
     document.getElementById('signal-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'signal-success');
   }catch(e){
     clearTimeout(timer);
@@ -182,6 +183,7 @@ async function submitSignal(){
       _saveMySig(signalId, sigCat||'Non précisé', 'signalement');
       document.getElementById('signal-form').style.display='none';
       document.getElementById('signal-success').style.display='block';
+      try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
       _askPushForNotify(notifyToken,'signal-success');
     } else {
       alertMAT('Erreur d\'envoi. Vérifiez votre connexion.','Signalement','⚠️');
@@ -330,6 +332,7 @@ async function submitIdee(){
   if(notifyToken){try{localStorage.setItem('mat:notify:idea:'+idea.id,notifyToken);}catch(_){}}
   try{ if(typeof refreshActusBadge==='function') refreshActusBadge(); }catch(e){}
   document.getElementById('idea-input').value=''; ideaCat=''; document.querySelectorAll('.idea-cat').forEach(b=>b.classList.remove('on'));
+  try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
   _askPushForNotify(notifyToken,'idea-form');
   loadIdees();
 }
@@ -415,9 +418,13 @@ async function submitContactForm(){
       })
     });
     if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+contactId,notifyToken);}catch(_){}}
-    trackStat('contact');
+    // Défensif : sans ce garde, un trackStat absent (mat-utils.js non chargé)
+    // lèverait ici et ferait afficher « Erreur d'envoi » alors que la demande
+    // est bien partie — cf. issue #324.
+    try{ if(typeof trackStat==='function') trackStat('contact'); }catch(_){}
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'contact-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
@@ -482,9 +489,10 @@ async function submitBug(){
     });
     if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+signalId,notifyToken);}catch(_){}}
     _saveMySig(signalId, bugService||'Non précisé', 'bug');
-    trackStat('bug');
+    try{ if(typeof trackStat==='function') trackStat('bug'); }catch(_){}
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
+    try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
     _askPushForNotify(notifyToken,'bug-success');
   }catch(e){
     alertMAT('Erreur d\'envoi. Réessayez plus tard.','MAT','⚠️');
