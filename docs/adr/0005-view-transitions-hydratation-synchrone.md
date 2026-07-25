@@ -53,3 +53,24 @@ Nous découpons `openOv()`/`closeOv()` en deux temps :
   (lecture du DOM, état) doit rester **hors** de `_ovVisual`.
 - Ne pas mettre dans `_ovVisual` du code qui mesure la mise en page
   (`offsetHeight`, `scrollTop`…) d'un élément encore en `display:none`.
+
+## Mise à jour — 25 juillet 2026 : neutraliser les promesses de la transition
+
+`startViewTransition()` renvoie un objet `ViewTransition` porteur de trois
+promesses (`ready`, `updateCallbackDone`, `finished`). Quand une transition est
+remplacée par une suivante, sa promesse `ready` est **rejetée** avec
+`AbortError: Old view transition aborted by new view transition` — situation
+parfaitement normale ici, `openActuDetail()` enchaînant `closeOv('notifs')`
+puis `openOv('actu')`.
+
+**Différence entre moteurs, source du piège** : Chromium marque ces promesses
+comme « déjà gérées », donc aucune trace ; **WebKit/Safari non** — chaque
+enchaînement produisait une *unhandled rejection* remontée dans Sentry
+(issue #325). Un test manuel sur Chromium ne reproduit donc **pas** le
+problème : c'est le rapport Sentry (parc réel, majoritairement iOS/Safari) qui
+l'a révélé.
+
+**Décision** : `_ovVisual` attache un `catch` neutre aux trois promesses. Aucun
+effet sur le rendu ; on documente ainsi que ces rejets sont attendus et non des
+anomalies. Toute future utilisation de `startViewTransition` dans le projet doit
+faire de même.

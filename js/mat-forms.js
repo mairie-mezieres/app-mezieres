@@ -418,7 +418,10 @@ async function submitContactForm(){
       })
     });
     if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+contactId,notifyToken);}catch(_){}}
-    trackStat('contact');
+    // Défensif : sans ce garde, un trackStat absent (mat-utils.js non chargé)
+    // lèverait ici et ferait afficher « Erreur d'envoi » alors que la demande
+    // est bien partie — cf. issue #324.
+    try{ if(typeof trackStat==='function') trackStat('contact'); }catch(_){}
     document.getElementById('contact-form').style.display='none';
     document.getElementById('contact-success').style.display='block';
     try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
@@ -486,7 +489,7 @@ async function submitBug(){
     });
     if(notifyToken){try{localStorage.setItem('mat:notify:signal:'+signalId,notifyToken);}catch(_){}}
     _saveMySig(signalId, bugService||'Non précisé', 'bug');
-    trackStat('bug');
+    try{ if(typeof trackStat==='function') trackStat('bug'); }catch(_){}
     document.getElementById('bug-form').style.display='none';
     document.getElementById('bug-success').style.display='block';
     try{ if(typeof matCelebrate==='function') matCelebrate(); }catch(_){}
