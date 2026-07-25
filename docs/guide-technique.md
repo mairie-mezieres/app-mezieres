@@ -211,6 +211,17 @@ npx playwright test --ui     # mode interactif
 
 Les tests démarrent automatiquement le serveur statique via `static-server.js`.
 
+⚠️ **Le service worker est bloqué pendant les tests** (`serviceWorkers: 'block'` dans
+`playwright.config.js`) — ne pas retirer. Sinon le SW s'installe, prend le contrôle via
+`skipWaiting()`, et `mat-core.js` recharge la page sur `controllerchange` : le frame
+principal navigue en plein test et coupe l'opération en cours (attente de locator, ou
+`analyze()` d'axe qui reste pendant jusqu'au timeout). Cette course faisait échouer
+~2 exécutions sur 3, au hasard des projets et des tests. Voir ADR-0006.
+
+Les tests couvrent le shell et l'accessibilité, pas le service worker : tester le
+comportement hors-ligne demanderait une suite dédiée, avec attente explicite de
+l'activation du SW.
+
 ---
 
 ## 4. Variables d'environnement (backend)
