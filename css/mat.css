@@ -1179,6 +1179,8 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 .amb-mist{position:absolute;top:18%;left:-60%;width:140%;height:45%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.15),rgba(255,255,255,0) 70%);animation:ambMist 26s ease-in-out infinite alternate;}
 .amb-mist2{top:46%;animation-duration:34s;animation-delay:-12s;}
 @keyframes ambMist{from{transform:translateX(0)}to{transform:translateX(45%)}}
+.amb-cloud{position:absolute;left:-280px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.24),rgba(255,255,255,0) 68%);animation:ambCloud 70s linear infinite;}
+@keyframes ambCloud{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 560px))}}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si
    « Réduire les animations ») — la météo réelle garde la priorité. */
@@ -1193,6 +1195,7 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 /* Teintes du dégradé selon la météo et le moment de la journée.
    Scopées pour ne JAMAIS écraser les thèmes d'accessibilité
    (contraste élevé, daltonisme, thème bleu, thème sombre). */
+html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-overcast{background:linear-gradient(160deg,#28453a 0%,#4c6252 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-fog{background:linear-gradient(160deg,#33493c 0%,#5c6f60 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-storm{background:linear-gradient(160deg,#22343a 0%,#3a5548 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-dawn{background:linear-gradient(160deg,#2c4a3a 0%,#3f6249 55%,#b8804f 100%);}

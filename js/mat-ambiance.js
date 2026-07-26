@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.1.0
+   MAT — Ambiance v1.2.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -24,6 +24,8 @@ function _ambWeatherFamily(code){
   if((c >= 71 && c <= 77) || c === 85 || c === 86) return 'snow';
   if((c >= 51 && c <= 67) || (c >= 80 && c <= 82)) return 'rain';
   if(c === 45 || c === 48) return 'fog';
+  if(c === 3) return 'overcast';  // couvert : nuages + teinte grisée
+  if(c === 2) return 'cloudy';    // partiellement nuageux : quelques nuages
   return '';
 }
 
@@ -65,7 +67,7 @@ function _ambFestive(now){
   return '';
 }
 
-var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-dawn','amb-dusk','amb-night'];
+var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night'];
 
 function matHeaderAmbiance(){
   var header = document.querySelector('.header');
@@ -112,6 +114,10 @@ function _ambRenderParticles(header, fam){
   } else if(kind === 'fog'){
     s = document.createElement('span'); s.className = 'amb-mist'; layer.appendChild(s);
     s = document.createElement('span'); s.className = 'amb-mist amb-mist2'; layer.appendChild(s);
+  } else if(kind === 'cloudy'){
+    _ambClouds(layer, 2);
+  } else if(kind === 'overcast'){
+    _ambClouds(layer, 4);
   } else if(kind === 'noel'){
     _ambGuirlande(layer);
     _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
@@ -143,6 +149,21 @@ function _ambFall(layer, char, count, minDur, maxDur, minSize, maxSize){
     s.style.fontSize = (minSize + Math.random() * (maxSize - minSize)).toFixed(2) + 'rem';
     s.style.animationDelay = '-' + (Math.random() * maxDur).toFixed(2) + 's';
     s.style.animationDuration = (minDur + Math.random() * (maxDur - minDur)).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Nuages doux qui dérivent lentement (partiellement nuageux / couvert)
+function _ambClouds(layer, count){
+  for(var i = 0; i < count; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-cloud';
+    var dur = 50 + Math.random() * 40;
+    s.style.top = (4 + Math.random() * 50).toFixed(1) + '%';
+    s.style.width = (140 + Math.random() * 130).toFixed(0) + 'px';
+    s.style.height = (36 + Math.random() * 30).toFixed(0) + 'px';
+    s.style.animationDuration = dur.toFixed(1) + 's';
+    s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
     layer.appendChild(s);
   }
 }

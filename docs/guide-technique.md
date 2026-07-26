@@ -211,6 +211,17 @@ npx playwright test --ui     # mode interactif
 
 Les tests démarrent automatiquement le serveur statique via `static-server.js`.
 
+⚠️ **Le service worker est bloqué pendant les tests** (`serviceWorkers: 'block'` dans
+`playwright.config.js`) — ne pas retirer. Sinon le SW s'installe, prend le contrôle via
+`skipWaiting()`, et `mat-core.js` recharge la page sur `controllerchange` : le frame
+principal navigue en plein test et coupe l'opération en cours (attente de locator, ou
+`analyze()` d'axe qui reste pendant jusqu'au timeout). Cette course faisait échouer
+~2 exécutions sur 3, au hasard des projets et des tests. Voir ADR-0006.
+
+Les tests couvrent le shell et l'accessibilité, pas le service worker : tester le
+comportement hors-ligne demanderait une suite dédiée, avec attente explicite de
+l'activation du SW.
+
 ---
 
 ## 4. Variables d'environnement (backend)
@@ -431,7 +442,8 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
 - **Header météo vivant** (`js/mat-ambiance.js` + styles `amb-*` dans `css/mat.css`) :
   `matHeaderAmbiance()` lit `window._meteoData` (alimenté par `loadMeteo`) et pose
   sur `.header` une classe de famille météo (`amb-rain`, `amb-snow`, `amb-storm`,
-  `amb-fog`) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
+  `amb-fog`, `amb-cloudy` code WMO 2, `amb-overcast` code 3 — nuages dérivants,
+  teinte grisée pour le couvert) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
   bornes = lever/coucher Open-Meteo ± 40 min). Les particules (pluie/neige/brume,
   éclairs) sont des `<span>` animés en CSS dans une couche `.header-amb` ; la phase
   est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé sont

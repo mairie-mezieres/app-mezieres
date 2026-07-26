@@ -76,8 +76,11 @@ Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondan
 
 **Le bandeau d'accueil est vivant** : il reflète la météo réelle de la commune —
 fine pluie animée quand il pleut, flocons quand il neige, éclairs en cas d'orage,
-brume par temps de brouillard — et sa couleur change selon le moment de la journée
-(teintes dorées à l'aube et au crépuscule, vert profond la nuit).
+brume par temps de brouillard, nuages qui dérivent doucement par temps nuageux ou
+couvert (avec une teinte légèrement grisée quand le ciel est couvert) — et sa
+couleur change selon le moment de la journée (teintes dorées à l'aube et au
+crépuscule, vert profond la nuit). Par ciel dégagé en journée, le bandeau reste
+volontairement sobre : rien ne bouge.
 
 Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
 lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au
