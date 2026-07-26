@@ -446,11 +446,16 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   teinte grisée pour le couvert) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
   bornes = lever/coucher Open-Meteo ± 40 min). Les particules (pluie/neige/brume,
   éclairs) sont des `<span>` animés en CSS dans une couche `.header-amb` ; la phase
-  est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé sont
-  scopées `html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre)`
-  pour ne jamais écraser les thèmes d'accessibilité. Si « Réduire les animations »
-  est actif : teinte statique seule, aucune particule. Le header étant masqué en
-  desktop (≥ 1024 px), l'effet est mobile/PWA uniquement.
+  est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé ne
+  s'appliquent **jamais** sur les thèmes d'accessibilité (`high-contrast`,
+  `colorblind-mode`) ni sur le thème Sombre (déjà nocturne) ; le thème **Bleu** a
+  ses propres déclinaisons dans sa gamme (`html.theme-bleu … .header.amb-*`).
+  Les particules (nuages, pluie…) s'affichent sur tous les thèmes. Règle de
+  calibrage : l'effet doit être perceptible en **quelques secondes** (temps réel
+  passé sur l'accueil) — c'est pourquoi les nuages traversent en ~25-45 s.
+  Si « Réduire les animations » est actif : teinte statique seule, aucune
+  particule. Le header étant masqué en desktop (≥ 1024 px), l'effet est
+  mobile/PWA uniquement.
 - **Calendrier festif** (`_ambFestive()` dans `js/mat-ambiance.js`, v4.45) :
   quand la météo est calme (aucune famille météo active), le header se décore
   selon la période — guirlande + flocons (1–30 déc), étincelles (31 déc–2 janv),
