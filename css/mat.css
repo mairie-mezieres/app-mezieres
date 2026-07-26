@@ -1179,7 +1179,11 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 .amb-mist{position:absolute;top:18%;left:-60%;width:140%;height:45%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.15),rgba(255,255,255,0) 70%);animation:ambMist 26s ease-in-out infinite alternate;}
 .amb-mist2{top:46%;animation-duration:34s;animation-delay:-12s;}
 @keyframes ambMist{from{transform:translateX(0)}to{transform:translateX(45%)}}
-.amb-cloud{position:absolute;left:-280px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.24),rgba(255,255,255,0) 68%);animation:ambCloud 70s linear infinite;}
+/* Nuage en deux lobes, assez dense pour être perçu en quelques secondes
+   (les habitants restent peu sur l'accueil — l'effet doit se voir d'un
+   coup d'œil, pas après une minute de contemplation). */
+.amb-cloud{position:absolute;left:-280px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.38),rgba(255,255,255,0) 60%);animation:ambCloud 34s linear infinite;}
+.amb-cloud::before{content:'';position:absolute;left:22%;top:-45%;width:56%;height:95%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.30),rgba(255,255,255,0) 60%);}
 @keyframes ambCloud{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 560px))}}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si
@@ -1193,14 +1197,23 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 @keyframes ambBat{0%{transform:translateX(0) translateY(0)}25%{transform:translateX(30vw) translateY(-12px)}50%{transform:translateX(60vw) translateY(8px)}75%{transform:translateX(90vw) translateY(-10px)}100%{transform:translateX(120vw) translateY(0)}}
 
 /* Teintes du dégradé selon la météo et le moment de la journée.
-   Scopées pour ne JAMAIS écraser les thèmes d'accessibilité
-   (contraste élevé, daltonisme, thème bleu, thème sombre). */
+   Jamais appliquées sur les thèmes d'accessibilité (contraste élevé,
+   daltonisme) ni sur le thème Sombre (déjà nocturne). Le thème Bleu a
+   ses propres déclinaisons dans sa gamme, plus bas. */
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-overcast{background:linear-gradient(160deg,#28453a 0%,#4c6252 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-fog{background:linear-gradient(160deg,#33493c 0%,#5c6f60 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-storm{background:linear-gradient(160deg,#22343a 0%,#3a5548 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-dawn{background:linear-gradient(160deg,#2c4a3a 0%,#3f6249 55%,#b8804f 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-dusk{background:linear-gradient(160deg,#20402e 0%,#49593a 50%,#c9843d 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-night{background:linear-gradient(160deg,#0f271b 0%,#1d3a29 100%);}
+
+/* Déclinaisons pour le thème Bleu — mêmes moments, gamme bleue */
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-overcast{background:linear-gradient(160deg,#243b52 0%,#4a6b8f 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-fog{background:linear-gradient(160deg,#2c4257 0%,#5c7186 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-storm{background:linear-gradient(160deg,#1d2f3d 0%,#33506b 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-dawn{background:linear-gradient(160deg,#1a3a5c 0%,#446286 55%,#b8804f 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-dusk{background:linear-gradient(160deg,#1a3a5c 0%,#3d5a80 50%,#c9843d 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-night{background:linear-gradient(160deg,#0c1c2e 0%,#16324e 100%);}
 
 /* View Transitions (mat-core.js _ovVisual) — fondu doux et bref à
    l'ouverture/fermeture des overlays sur les navigateurs compatibles. */

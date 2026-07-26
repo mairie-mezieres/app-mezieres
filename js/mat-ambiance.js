@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.2.0
+   MAT — Ambiance v1.2.1
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -115,9 +115,9 @@ function _ambRenderParticles(header, fam){
     s = document.createElement('span'); s.className = 'amb-mist'; layer.appendChild(s);
     s = document.createElement('span'); s.className = 'amb-mist amb-mist2'; layer.appendChild(s);
   } else if(kind === 'cloudy'){
-    _ambClouds(layer, 2);
+    _ambClouds(layer, 3);
   } else if(kind === 'overcast'){
-    _ambClouds(layer, 4);
+    _ambClouds(layer, 5);
   } else if(kind === 'noel'){
     _ambGuirlande(layer);
     _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
@@ -153,12 +153,14 @@ function _ambFall(layer, char, count, minDur, maxDur, minSize, maxSize){
   }
 }
 
-// Nuages doux qui dérivent lentement (partiellement nuageux / couvert)
+// Nuages qui dérivent (partiellement nuageux / couvert). Traversée en
+// ~25-45 s : le mouvement doit être perceptible pendant les quelques
+// secondes qu'un habitant passe sur l'accueil.
 function _ambClouds(layer, count){
   for(var i = 0; i < count; i++){
     var s = document.createElement('span');
     s.className = 'amb-cloud';
-    var dur = 50 + Math.random() * 40;
+    var dur = 25 + Math.random() * 20;
     s.style.top = (4 + Math.random() * 50).toFixed(1) + '%';
     s.style.width = (140 + Math.random() * 130).toFixed(0) + 'px';
     s.style.height = (36 + Math.random() * 30).toFixed(0) + 'px';
