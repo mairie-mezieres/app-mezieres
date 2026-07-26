@@ -442,7 +442,8 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
 - **Header météo vivant** (`js/mat-ambiance.js` + styles `amb-*` dans `css/mat.css`) :
   `matHeaderAmbiance()` lit `window._meteoData` (alimenté par `loadMeteo`) et pose
   sur `.header` une classe de famille météo (`amb-rain`, `amb-snow`, `amb-storm`,
-  `amb-fog`) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
+  `amb-fog`, `amb-cloudy` code WMO 2, `amb-overcast` code 3 — nuages dérivants,
+  teinte grisée pour le couvert) et une classe de phase du jour (`amb-dawn`, `amb-dusk`, `amb-night`,
   bornes = lever/coucher Open-Meteo ± 40 min). Les particules (pluie/neige/brume,
   éclairs) sont des `<span>` animés en CSS dans une couche `.header-amb` ; la phase
   est ré-évaluée toutes les 10 min sans appel réseau. Les teintes de dégradé sont
