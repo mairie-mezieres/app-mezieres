@@ -17,6 +17,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
+| **« Est-ce qu'une alerte CERT-FR nous concerne ? »**, inventaire des domaines/hébergeurs/technologies, prestataires | `docs/surface-exposition.md` |
 | Historique des versions techniques | `CHANGELOG.md` |
 | Présentation générale du frontend | `README.md` |
 | **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |

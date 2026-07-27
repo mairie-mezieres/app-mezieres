@@ -30,6 +30,10 @@ Trello, Mistral, etc. — voir la rubrique « Vie privée & RGPD » de
 l'application) ; merci de signaler les failles les concernant directement à
 leurs éditeurs.
 
+L'inventaire complet des domaines, hébergeurs et technologies — et la marche à
+suivre pour déterminer si une alerte CERT-FR nous concerne — est tenu à jour
+dans [`docs/surface-exposition.md`](docs/surface-exposition.md).
+
 ## Bonnes pratiques déjà en place
 
 - Aucun secret committé dans le dépôt (clés et tokens en variables
@@ -38,6 +42,13 @@ leurs éditeurs.
 - En-têtes de sécurité HTTP côté API (`X-Content-Type-Options`,
   `X-Frame-Options`, `Referrer-Policy`), limitation de débit
   (rate-limiting) sur les routes sensibles.
+- **Aucun CMS** : le site est composé de fichiers statiques, sans code exécuté
+  côté serveur, sans base de données ni page d'administration exposée. Les
+  vagues d'exploitation qui visent les CMS grand public (WordPress, SharePoint…)
+  ne trouvent aucune prise — voir
+  [`docs/surface-exposition.md`](docs/surface-exposition.md).
+- Bibliothèques tierces (Leaflet, Sentry) **embarquées dans le dépôt** plutôt
+  que chargées depuis un CDN : le code servi est celui qui a été relu.
 - Intégration continue : vérification de syntaxe à chaque modification.
 - Suivi des erreurs en production (Sentry) pour détecter rapidement les
   comportements anormaux.
