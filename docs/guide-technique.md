@@ -637,6 +637,34 @@ workflows traitent donc le livrable comme vérifiable (ADR-0004) :
   l'action) est archivée en **artefact 30 jours** (`claude-execution-output`,
   les deux tentatives) pour diagnostiquer tout run sans livrable.
 
+### Canal actionnable : issue « Actions PWA » (ADR-0005)
+
+En plus du rapport HTML (fait pour être lu par un humain), la veille technologique
+produit un **canal actionnable** qui alimente le backlog technique de la PWA :
+
+1. L'agent écrit un 3e fichier `veille/actions-pwa.json` — un tableau d'actions
+   **concrètes et sourcées**, limitées à trois catégories : `dependance`,
+   `securite`, `accessibilite`. Rien d'éligible → `[]`.
+2. L'étape « Créer l'issue "Actions PWA" » exécute `scripts/create-veille-issue.js`,
+   qui transforme ce JSON en une **issue-checklist** GitHub (`🔭 Actions PWA —
+   veille du JJ/MM`), groupée par catégorie et priorité, une case sourcée par action.
+3. Le script est **best-effort** (il sort toujours en `0`, l'étape est en
+   `continue-on-error`) : un JSON absent/vide/invalide ou une erreur d'API ne bloque
+   jamais l'email ni le commit de l'historique. Il est **idempotent** : un re-run du
+   même jour met à jour l'issue existante au lieu d'en créer une seconde.
+4. **Anti-injection** : le rapport dérive de sources web (non fiables). Le script
+   rejette toute action sans URL `http(s)` valide, le périmètre est restreint aux 3
+   catégories, et le prompt interdit à l'agent d'obéir à des instructions trouvées
+   dans une page. La revue humaine de l'issue (puis, à terme, des PR) reste le filet.
+
+> Le fichier `actions-pwa.json` est **éphémère** (comme `rapport-veille.html`) : il
+> n'est pas committé ; l'issue est l'artefact durable. Permission requise :
+> `issues: write`.
+>
+> Étape suivante prévue (non encore livrée) : un agent ouvrant automatiquement une
+> **PR en draft** par action éligible. La `veille-bulletin.yml` (éditoriale) n'a pas
+> ce canal : ses idées d'articles ne sont pas des actions techniques.
+
 ### Tests Playwright
 
 Les tests sont dans `tests/e2e/smoke.spec.js` :
