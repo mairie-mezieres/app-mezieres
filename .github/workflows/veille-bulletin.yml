@@ -186,7 +186,7 @@ jobs:
       # une exécution qui se termine « avec succès » sans avoir produit le rapport.
       - name: Archiver la sortie Claude (diagnostic)
         if: always() && steps.gate.outputs.run == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: claude-execution-output
           path: |
