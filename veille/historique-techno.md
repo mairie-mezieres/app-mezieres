@@ -1,3 +1,22 @@
+## 2026-07-27
+- Node.js security release 27 juillet 2026, sévérité HIGH (22.x/24.x/26.x) — https://nodejs.org/en/blog/vulnerability/july-2026-security-releases
+- Chrome correctif d'urgence 150.0.7871.181/182, 12 failles haute sévérité (22 juillet 2026) — https://www.malwarebytes.com/blog/bugs/2026/07/chrome-needs-another-whopper-update-to-fix-382-security-fixes
+- iOS 26.6 sorti (27 juillet 2026) — https://www.iphon.fr/post/quand-sort-ios-26-6-quelles-nouveautes
+- Anthropic Claude Opus 5 lancé, betas mid-conversation tool changes et fallback default (24 juillet 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Render.com : OIDC Anthropic/OpenAI (24 juillet), MCP OAuth (22 juillet), Bun 1.3.14 par défaut (16 juillet 2026) — https://render.com/changelog
+- Sentry : Seer GA + support GitLab (21 juillet 2026), Sentry JS 10.66.0 streaming gen_ai spans (16 juillet 2026) — https://sentry.io/changelog/seer-supports-gitlab/
+- Campagne d'attaque cPanel/WHM via dépôts GitHub compromis (12-13 juillet 2026) — https://thehackernews.com/2026/07/attackers-weaponize-github-actions.html
+- Relance de l'application citoyenne Agora, dispositif « Questions au Gouvernement » (publié 2 juillet 2026) — https://acteurspublics.fr/articles/pour-relancer-la-participation-citoyenne-le-gouvernement-ressort-agora-des-cartons/
+- Ransomware sur la mairie de Drancy, attaque constatée le 3 juillet 2026 — https://www.lejournaltoulousain.fr/ile-de-france/seine-saint-denis/cyberattaque-drancy-services-municipaux-perturbes-fuites-donnees-probables-392892/
+- Alerte CERT-FR CERTFR-2026-ALE-008 : failles critiques SharePoint activement exploitées (22 juillet 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-008/
+- Alerte CERT-FR CERTFR-2026-ALE-007 : failles critiques WordPress, exploitation massive anticipée (20 juillet 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-007/
+- Bulletin CERT-FR CERTFR-2026-ACT-031 (20 juillet 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-031/
+- [reco] Vérifier immédiatement l'absence de SharePoint et WordPress vulnérables (CERT-FR ALE-007/008)
+- [reco] Mettre à jour Node.js vers les versions patchées de la publication du 27 juillet 2026
+- [reco] Tester la PWA MAT sur iOS 26.6 et avec le dernier Chrome 150 corrigé
+- [reco] S'inspirer du dispositif « Questions au Gouvernement » d'Agora pour le module Idées de MAT
+- [reco] Vérifier la procédure de sauvegarde/restauration du backend et Redis à la lumière du cas Drancy
+
 ## 2026-07-20
 - actions/checkout v7 blocage pwn-request désormais actif au 20 juillet 2026 (échéance repoussée du 16 au 20 juillet) — https://github.blog/changelog/2026-06-18-safer-pull_request_target-defaults-for-github-actions-checkout/
 - Render.com : outil MCP trigger_deploy (17 juillet 2026) — https://render.com/changelog
