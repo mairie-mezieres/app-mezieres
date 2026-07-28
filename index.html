@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.46.2 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.46.3 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -438,7 +438,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.46.2</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.46.3</button>
 </div>
 </div>
 </div>
@@ -1434,14 +1434,15 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <script>
 (function(){
 /* Badge « X Macérien(ne)s ont installé MAT ».
-   Stale-while-revalidate : on affiche immédiatement la valeur en cache (pas
-   d'attente réseau au démarrage), puis on rafraîchit en arrière-plan si le
-   cache a plus d'une heure. Sans cette revalidation, un cache de 24 h côté
-   navigateur + un cache côté serveur pouvaient figer le badge plusieurs jours
-   pendant que le total réel montait (cf. ADR-0010 du backend). */
+   Stale-while-revalidate : la valeur en cache s'affiche immédiatement (pas
+   d'attente réseau, badge visible hors-ligne), et on revalide à CHAQUE
+   ouverture. Pas de plancher de rafraîchissement : la route ne coûte aucune
+   commande Redis (total servi depuis le cache mémoire du serveur) et l'app
+   émet déjà un stats/track à chaque lancement — throttler ce GET ne ferait
+   qu'afficher plus longtemps une valeur périmée, ce qu'on cherche justement à
+   éviter (cf. ADR-0010 du backend). */
 var CACHE_KEY = 'mat_install_count';
 var CACHE_TTL = 86400000;   // au-delà : on n'affiche plus la valeur en cache
-var REFRESH_MS = 3600000;   // au-delà : on revalide en arrière-plan
 var API_URL = window.MAT_API+'/api/install-count';
 function showCount(n){
 if(!n || n < 2) return;
@@ -1452,15 +1453,10 @@ val.textContent = n;
 badge.style.display = 'block';
 }
 }
-var cachedAge = null;
 try {
 var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-if(cached && cached.ts){
-cachedAge = Date.now() - cached.ts;
-if(cachedAge < CACHE_TTL) showCount(cached.count);
-}
+if(cached && cached.ts && (Date.now() - cached.ts) < CACHE_TTL) showCount(cached.count);
 } catch(e){}
-if(cachedAge !== null && cachedAge < REFRESH_MS) return;
 fetch(API_URL)
 .then(function(r){ return r.json(); })
 .then(function(d){
@@ -1631,9 +1627,9 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
-<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 juillet 2026 — v4.46.2</div>
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 juillet 2026 — v4.46.3</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
-<li>Compteur d&rsquo;installations&nbsp;: le badge &laquo;&nbsp;<strong>X Mac&eacute;rien(ne)s ont install&eacute; MAT</strong>&nbsp;&raquo; &eacute;tait fig&eacute; sur une ancienne valeur &mdash; il affiche de nouveau le total r&eacute;el et se met &agrave; jour tout seul</li>
+<li>Compteur d&rsquo;installations&nbsp;: le badge &laquo;&nbsp;<strong>X Mac&eacute;rien(ne)s ont install&eacute; MAT</strong>&nbsp;&raquo; &eacute;tait fig&eacute; sur une ancienne valeur &mdash; il affiche de nouveau le total r&eacute;el, v&eacute;rifi&eacute; &agrave; chaque ouverture de l&rsquo;app</li>
 <li>Un m&ecirc;me appareil n&rsquo;est plus compt&eacute; deux fois (installation puis 1er lancement), et les iPhone install&eacute;s apr&egrave;s avoir masqu&eacute; la banni&egrave;re sont enfin compt&eacute;s</li>
 </ul>
 </div>
