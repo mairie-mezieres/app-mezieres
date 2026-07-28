@@ -2315,6 +2315,7 @@ async function listTrelloWebhooks(){
 // ── PURGE ─────────────────────────────
 function renderPurge() {
   const today=new Date().toISOString().slice(0,10); if(!_purgeDateValue)_purgeDateValue=today;
+  const _installTotal = Number(_data.dash?.app?.totalInstalls || 0);
   document.getElementById('purge-content').innerHTML=`
     <div class="section-title">🗑️ Purge des données par date</div>
     <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
@@ -2327,6 +2328,21 @@ function renderPurge() {
         </div>
         <div id="purge-msg" style="display:none;font-size:0.8rem;font-weight:800;"></div>
       </div>
+    </div>
+
+    <div class="section-title">🏘️ Compteur d'installations</div>
+    <div style="background:white;border-radius:14px;padding:20px;border:1px solid var(--border);margin-bottom:16px;">
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:14px;line-height:1.5;">
+        Total affiché par le badge de l'app, le mail quotidien et le tableau de bord — une seule et même valeur.<br>
+        À corriger uniquement pour retirer d'anciens doublons (import, migration). Action tracée dans les <strong>🪲 Logs</strong>.
+      </p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <label style="font-size:0.8rem;font-weight:800;">Nouveau total</label>
+        <input type="number" id="install-total" min="0" step="1" value="${_installTotal}" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.84rem;width:120px;outline:none;">
+        <span style="font-size:0.78rem;color:var(--muted);">actuel : <strong style="color:var(--text)">${_installTotal}</strong></span>
+        <button onclick="setInstallTotal()" style="background:var(--forest);color:white;border:none;border-radius:8px;padding:7px 14px;font-size:0.76rem;font-weight:800;cursor:pointer;">Corriger</button>
+      </div>
+      <div id="install-msg" style="display:none;font-size:0.8rem;font-weight:800;margin-top:10px;"></div>
     </div>
 
     <div class="section-title">📝 Questions MEL — chat libre</div>
@@ -2355,6 +2371,26 @@ async function doPurge(type){
     const d=await r.json(); const msg=document.getElementById('purge-msg');
     if(d.ok){if(msg){msg.textContent='✅ Purge effectuée : '+d.deleted+' entrée(s) supprimée(s).';msg.style.color='var(--leaf)';msg.style.display='block';}setTimeout(async()=>{await loadAll();renderPurge();},800);}
     else{if(msg){msg.textContent='❌ Erreur : '+(d.error||'inconnue');msg.style.color='var(--red)';msg.style.display='block';}}
+  }catch(e){alert('Erreur réseau : '+e.message);}
+}
+// Corrige `services.installation` côté serveur. Une écriture directe dans Redis
+// serait écrasée par le cache mémoire du backend au flush suivant : la
+// correction DOIT passer par cette route.
+async function setInstallTotal(){
+  const el=document.getElementById('install-total');
+  const total=parseInt(el?.value,10);
+  if(!Number.isFinite(total)||total<0){alert('Total invalide');return;}
+  if(!confirm('Fixer le total d\'installations à '+total+' ?\n\nLe badge de l\'app suivra dans l\'heure (cache navigateur).'))return;
+  const msg=document.getElementById('install-msg');
+  try{
+    const r=await fetch(API+'/admin/stats/installations',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':TOKEN},body:JSON.stringify({total})});
+    const d=await r.json();
+    if(d.ok){
+      if(msg){msg.textContent='✅ Total corrigé : '+d.previous+' → '+d.total+'.';msg.style.color='var(--leaf)';msg.style.display='block';}
+      setTimeout(async()=>{await loadAll();renderPurge();},800);
+    } else {
+      if(msg){msg.textContent='❌ Erreur : '+(d.error||'inconnue');msg.style.color='var(--red)';msg.style.display='block';}
+    }
   }catch(e){alert('Erreur réseau : '+e.message);}
 }
 async function loadMelQuestions(){
