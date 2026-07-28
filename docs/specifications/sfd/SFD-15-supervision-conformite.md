@@ -74,6 +74,11 @@ Et seuls des compteurs sont journalisés (jamais le contenu des données).
   (`detailedStatsEnabled`, `melUsageStatsEnabled`, `appOpenStatsEnabled`).
 - **RG-15.5** — La donnée `allDevices` (liste brute d'identifiants) **n'est jamais exposée** dans les
   statistiques publiques (minimisation, RG-T-7).
+- **RG-15.8** — Le **compteur d'installations** a une source unique, `services.installation` :
+  badge public de l'app, mail quotidien et tableau de bord affichent la même valeur, sans cache
+  serveur intermédiaire susceptible de la figer. Une installation est comptée **une fois par
+  appareil** (drapeau local `mat_install_tracked`), quel que soit le chemin de détection
+  (événement `appinstalled` ou premier lancement en mode « app »).
 
 ### Diagnostic des services
 - **RG-15.6** — Le diagnostic teste chaque dépendance et retourne un **statut** (ok / avertissement /

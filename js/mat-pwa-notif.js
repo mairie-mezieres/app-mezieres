@@ -217,11 +217,14 @@ function _showNotifSheet() {
 
 function checkFirstStandaloneRun() {
   if (!isStandaloneMode()) return;
-  if (!localStorage.getItem(INSTALL_KEY)) {
+  if (localStorage.getItem(INSTALL_KEY) !== '1') {
     localStorage.setItem(INSTALL_KEY, '1');
-    try { trackStat('installation', { device: detectDevice(), method: 'standalone' }); } catch(e) {}
     try { updateInstallBtn(); } catch(e) {}
   }
+  // Comptage dédoublonné (drapeau mat_install_tracked, cf. mat-utils.js) :
+  // ne recompte pas un appareil déjà vu par l'événement `appinstalled`, et
+  // compte enfin ceux qui avaient masqué la bannière avant d'installer.
+  try { if (typeof trackInstallOnce === 'function') trackInstallOnce({ method: 'standalone' }); } catch(e) {}
   showPostInstallNotifPrompt();
 }
 
