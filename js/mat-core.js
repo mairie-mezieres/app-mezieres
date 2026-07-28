@@ -38,10 +38,10 @@ window.addEventListener('appinstalled', () => {
   localStorage.setItem(INSTALL_KEY, '1');
   const banner = document.getElementById('install-banner');
   if(banner) banner.classList.add('hidden');
-  if (!localStorage.getItem('mat_install_tracked')) {
-    _track('installation', { device: detectDevice() });
-    localStorage.setItem('mat_install_tracked', '1');
-  }
+  // Dédoublonnage partagé avec le 1er lancement standalone (mat-pwa-notif.js) :
+  // un appareil n'est compté qu'une fois. Idiome défensif habituel — le tracking
+  // ne doit jamais casser la suite si mat-utils.js n'a pas pu être chargé.
+  try { if(typeof trackInstallOnce === 'function') trackInstallOnce({ method: 'appinstalled' }); } catch(_){}
   updateInstallBtn();
 });
 

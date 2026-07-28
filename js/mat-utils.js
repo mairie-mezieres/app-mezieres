@@ -22,6 +22,13 @@ if (typeof window !== 'undefined' && 'caches' in window) {
 }
 
 const INSTALL_KEY = 'mat_installed_v3';
+// Drapeau DÉDIÉ au comptage de l'installation, distinct de INSTALL_KEY (qui
+// pilote la bannière et vaut aussi 'dismissed', et que « vider le cache »
+// supprime). Deux chemins détectent une installation — l'événement
+// `appinstalled` (Chrome/Android) et le 1er lancement en mode « app »
+// (iOS/desktop, où `appinstalled` ne se déclenche pas) : sans drapeau commun,
+// le même appareil pouvait être compté deux fois. Voir trackInstallOnce().
+const INSTALL_TRACKED_KEY = 'mat_install_tracked';
 const NOTIF_PROMPTED_KEY = 'mat_notif_prompted_v1';
 const MAT_VERSION = 'v3.7.5';
 const MEL_BACKEND = window.MAT_API;
@@ -246,6 +253,30 @@ async function trackStat(service, extra = {}){
     try{ updateNotifCardStatus(false); }catch(_e){}
   }
 }
+
+// ── Comptage de l'installation : une fois par appareil ───────
+// Renvoie true si l'installation vient d'être comptée, false si l'appareil
+// l'était déjà. Le drapeau est posé AVANT l'envoi : en cas d'échec réseau on
+// préfère un compte manqué à un doublon.
+function trackInstallOnce(extra){
+  try {
+    if (localStorage.getItem(INSTALL_TRACKED_KEY)) return false;
+    localStorage.setItem(INSTALL_TRACKED_KEY, '1');
+  } catch(e) { return false; }
+  try { trackStat('installation', Object.assign({ device: detectDevice() }, extra || {})); } catch(e) {}
+  return true;
+}
+
+// Rattrapage des appareils installés AVANT l'introduction du drapeau : ils ont
+// déjà été comptés à l'époque via INSTALL_KEY, on les marque sans recompter.
+// (INSTALL_KEY === 'dismissed' n'est pas concerné : bannière masquée ≠ installé.)
+(function(){
+  try {
+    if (localStorage.getItem(INSTALL_KEY) === '1' && !localStorage.getItem(INSTALL_TRACKED_KEY)) {
+      localStorage.setItem(INSTALL_TRACKED_KEY, '1');
+    }
+  } catch(e) {}
+})();
 
 function trackAppOpenOncePerDay(){
   const now = new Date();
