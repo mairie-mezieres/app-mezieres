@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Widgets header v3.7.0
+   MAT — Widgets header v3.8.0
    Météo, déchets, bus Rémi, mairie, prochain événement
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -74,6 +74,63 @@ function meteoFindFirstFutureIndex(times, nowDate) {
     if (!isNaN(ms) && ms >= nowMs - 30 * 60000) return i;
   }
   return meteoFindClosestHourlyIndex(times, nowDate);
+}
+
+// ── Indice du jour dans les tableaux `daily` ────────────────
+// ⚠️ PIÈGE : le backend interroge Open-Meteo avec `past_days=1`
+// (chatbot-mairie-mezieres/lib/meteo.js), donc `daily[0]` est **HIER** et
+// `daily[1]` aujourd'hui. Lire l'indice 0 en croyant lire aujourd'hui a
+// produit un bug d'un jour (voir ADR-0007).
+// On ne code pas ce décalage en dur : on cherche la date du jour — calculée
+// à Paris, pas dans le fuseau du téléphone — dans `daily.time`. Le code reste
+// juste si le backend change un jour ses paramètres.
+function meteoParisDateKey(dateObj) {
+  try {
+    // en-CA formate en YYYY-MM-DD, directement comparable à daily.time
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(dateObj || new Date());
+  } catch (e) {
+    var d = dateObj || new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+}
+
+// Renvoie l'indice d'aujourd'hui dans daily.time, ou -1 si introuvable
+// (données périmées, réponse partielle…). Les appelants doivent traiter -1
+// comme « je ne sais pas » plutôt que de retomber sur 0.
+function meteoTodayIndex(daily, nowDate) {
+  var times = (daily && daily.time) || [];
+  if (!times.length) return -1;
+  var today = meteoParisDateKey(nowDate);
+  for (var i = 0; i < times.length; i++) {
+    if (String(times[i] || '').slice(0, 10) === today) return i;
+  }
+  return -1;
+}
+
+// Minutes écoulées depuis minuit, heure de Paris — pour comparer une heure
+// locale d'Open-Meteo (« 2026-07-29T06:32 ») sans dépendre du fuseau du
+// téléphone (un habitant en vacances à l'étranger verrait sinon la mauvaise
+// phase du jour).
+function meteoParisNowMinutes(dateObj) {
+  try {
+    var parts = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(dateObj || new Date());
+    var get = function (type) { var p = parts.find(function (x) { return x.type === type; }); return p ? Number(p.value) : 0; };
+    return get('hour') * 60 + get('minute');
+  } catch (e) {
+    var d = dateObj || new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  }
+}
+
+// « 2026-07-29T06:32 » → 392 (minutes depuis minuit), ou null
+function meteoIsoToMinutes(iso) {
+  var m = String(iso || '').match(/T(\d{2}):(\d{2})/);
+  if (!m) return null;
+  return Number(m[1]) * 60 + Number(m[2]);
 }
 
 function meteoDir(deg) {
@@ -171,31 +228,21 @@ function meteoGetMoonPhase(nowDate) {
 }
 
 function meteoBuildSunBlock(days, nowDate) {
-  var sunriseIso = (days.sunrise || [])[0];
-  var sunsetIso  = (days.sunset || [])[0];
+  // daily[0] = hier (past_days=1) : on résout l'indice du jour courant.
+  var dayIdx = meteoTodayIndex(days, nowDate);
+  if (dayIdx < 0) return '';
+  var sunriseIso = (days.sunrise || [])[dayIdx];
+  var sunsetIso  = (days.sunset || [])[dayIdx];
   if (!sunriseIso || !sunsetIso) return '';
 
-  function isoToMinutes(iso) {
-    var m = String(iso || '').match(/T(\d{2}):(\d{2})/);
-    if (!m) return null;
-    return Number(m[1]) * 60 + Number(m[2]);
-  }
+  var isoToMinutes = meteoIsoToMinutes;
   function minutesToLabel(mins) {
     if (mins == null || isNaN(mins)) return '—';
     var h = String(Math.floor(mins / 60)).padStart(2, '0');
     var m = String(mins % 60).padStart(2, '0');
     return h + 'h' + m;
   }
-  function parisNowMinutes(dateObj) {
-    var parts = new Intl.DateTimeFormat('fr-FR', {
-      timeZone: 'Europe/Paris',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).formatToParts(dateObj || new Date());
-    var get = function(type){ var p = parts.find(function(x){ return x.type === type; }); return p ? Number(p.value) : 0; };
-    return get('hour') * 60 + get('minute');
-  }
+  var parisNowMinutes = meteoParisNowMinutes;
 
   var sunriseMins = isoToMinutes(sunriseIso);
   var sunsetMins = isoToMinutes(sunsetIso);
@@ -386,8 +433,10 @@ async function loadMeteoDetail() {
   var hrlyWGst = hourly.wind_gusts_10m || [];
   var hrlyPrec = hourly.precipitation || [];
 
-  var pluie24h = days.precipitation_sum && days.precipitation_sum[0] != null ? parseFloat(days.precipitation_sum[0]).toFixed(1) : '–';
-  var rafaleMax24 = days.wind_gusts_10m_max && days.wind_gusts_10m_max[0] != null ? Math.round(days.wind_gusts_10m_max[0]) : '–';
+  // Indice du jour courant : daily[0] = hier (past_days=1) — cf. ADR-0007.
+  var dayIdx = meteoTodayIndex(days, now);
+  var rafaleMax24 = dayIdx >= 0 && days.wind_gusts_10m_max && days.wind_gusts_10m_max[dayIdx] != null
+    ? Math.round(days.wind_gusts_10m_max[dayIdx]) : '–';
   var ventDirCur = meteoDir(cur.wind_direction_10m);
   var tempCur = cur.temperature_2m != null ? Math.round(cur.temperature_2m) : '–';
   var ressenti = cur.apparent_temperature != null ? Math.round(cur.apparent_temperature) : '–';
@@ -422,10 +471,13 @@ async function loadMeteoDetail() {
   html += '<div class="meteo-days-block">'
     + '<div class="meteo-card-kicker">📅 Prochains jours</div>'
     + '<div class="meteo-days-scroll"><div class="meteo-days-track">';
-  var nD = Math.min((days.time || []).length, 11);
-  for (var i = 1; i < nD; i++) {
+  // Démarre au jour courant (et non à l'indice 1 en dur) : même source de
+  // vérité que le reste, robuste si le backend change `past_days`.
+  var dStart = dayIdx >= 0 ? dayIdx : 1;
+  var nD = Math.min((days.time || []).length, dStart + 10);
+  for (var i = dStart; i < nD; i++) {
     var dt = days.time[i] ? new Date(days.time[i]) : new Date();
-    var jr = i === 1 ? 'Auj.' : i === 2 ? 'Dem.' : JOURS[dt.getDay()] + ' ' + dt.getDate();
+    var jr = i === dStart ? 'Auj.' : i === dStart + 1 ? 'Dem.' : JOURS[dt.getDay()] + ' ' + dt.getDate();
     var co = (days.weather_code || [])[i] || 0;
     var tx = Math.round((days.temperature_2m_max || [])[i] || 0);
     var tn = Math.round((days.temperature_2m_min || [])[i] || 0);

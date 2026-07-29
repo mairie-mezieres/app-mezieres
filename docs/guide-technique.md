@@ -434,6 +434,23 @@ dans `js/mat-forms.js`, où un `trackStat` absent faisait afficher « Erreur
 d'envoi » sur une demande pourtant transmise. Règle : **une statistique ne doit
 jamais faire échouer une action habitant.**
 
+### ⚠️ Données météo — `daily[0]` est HIER
+
+Le backend interroge Open-Meteo avec **`past_days=1`** : les tableaux `daily`
+commencent la veille (`daily[0]` = hier, `daily[1]` = aujourd'hui). **Ne jamais
+indexer `daily` en dur** — utiliser `meteoTodayIndex(daily, nowDate)`
+(`js/mat-widgets.js`), qui cherche la date du jour dans `daily.time` et renvoie `-1`
+si elle est absente (à traiter comme « je ne sais pas », pas comme `0`).
+
+Les heures d'Open-Meteo sont **locales sans fuseau** (`2026-07-29T06:32`) :
+`Date.parse` les interprète dans le fuseau de l'appareil. Comparer via
+`meteoParisNowMinutes()` / `meteoIsoToMinutes()`, qui ancrent tout sur Europe/Paris.
+
+Lire l'indice 0 en croyant lire aujourd'hui a produit un bug d'un jour resté invisible
+plusieurs versions (phase « nuit » 24 h/24, soleil et crépuscule jamais déclenchés).
+Voir **ADR-0007** — et les tests de régression `tests/e2e/ambiance.spec.js`, dont le
+jeu de données reproduit volontairement la vraie forme de la réponse.
+
 ### Effets visuels — ambiance météo, View Transitions, confettis
 
 Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**
