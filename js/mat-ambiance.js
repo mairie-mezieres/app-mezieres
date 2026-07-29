@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.2.1
+   MAT — Ambiance v1.3.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -67,18 +67,34 @@ function _ambFestive(now){
   return '';
 }
 
-var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night'];
+// Ciel dégagé (codes WMO 0-1) : halo de soleil en plein jour, étoiles
+// scintillantes la nuit. À l'aube et au crépuscule, la teinte dorée de la
+// phase suffit — pas de particule supplémentaire.
+function _ambClearSky(code, phase){
+  var c = Number(code);
+  if(c !== 0 && c !== 1) return '';
+  if(phase === 'night') return 'stars';
+  if(phase === '') return 'sun';
+  return '';
+}
+
+var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night','amb-sunny'];
 
 function matHeaderAmbiance(){
   var header = document.querySelector('.header');
   if(!header) return;
   var forecast = (window._meteoData || {}).forecast || {};
-  var fam = _ambWeatherFamily((forecast.current || {}).weather_code);
+  var code = (forecast.current || {}).weather_code;
+  var fam = _ambWeatherFamily(code);
   var phase = _ambDayPhase(forecast.daily || {});
+  var clear = _ambClearSky(code, phase);
   _AMB_CLASSES.forEach(function(c){ header.classList.remove(c); });
   if(fam) header.classList.add('amb-' + fam);
   if(phase) header.classList.add('amb-' + phase);
-  _ambRenderParticles(header, fam || _ambFestive(new Date()));
+  if(clear === 'sun') header.classList.add('amb-sunny');
+  // Priorité des particules : météo active > décor festif > ciel dégagé —
+  // le soleil ne doit pas masquer la guirlande de Noël un beau jour d'hiver.
+  _ambRenderParticles(header, fam || _ambFestive(new Date()) || clear);
 }
 
 function _ambRenderParticles(header, fam){
@@ -118,6 +134,10 @@ function _ambRenderParticles(header, fam){
     _ambClouds(layer, 3);
   } else if(kind === 'overcast'){
     _ambClouds(layer, 5);
+  } else if(kind === 'sun'){
+    s = document.createElement('span'); s.className = 'amb-sun'; layer.appendChild(s);
+  } else if(kind === 'stars'){
+    _ambStars(layer);
   } else if(kind === 'noel'){
     _ambGuirlande(layer);
     _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
@@ -166,6 +186,21 @@ function _ambClouds(layer, count){
     s.style.height = (36 + Math.random() * 30).toFixed(0) + 'px';
     s.style.animationDuration = dur.toFixed(1) + 's';
     s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Étoiles scintillantes par nuit dégagée (réutilise les keyframes ambTwinkle)
+function _ambStars(layer){
+  for(var i = 0; i < 13; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-star';
+    s.textContent = '✦';
+    s.style.left = (2 + Math.random() * 96).toFixed(1) + '%';
+    s.style.top = (3 + Math.random() * 55).toFixed(1) + '%';
+    s.style.fontSize = (0.3 + Math.random() * 0.4).toFixed(2) + 'rem';
+    s.style.animationDelay = '-' + (Math.random() * 3).toFixed(2) + 's';
+    s.style.animationDuration = (1.6 + Math.random() * 2.4).toFixed(2) + 's';
     layer.appendChild(s);
   }
 }

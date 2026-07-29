@@ -456,6 +456,13 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   Si « Réduire les animations » est actif : teinte statique seule, aucune
   particule. Le header étant masqué en desktop (≥ 1024 px), l'effet est
   mobile/PWA uniquement.
+- **Ciel dégagé** (`_ambClearSky()`, v4.47) : codes WMO 0-1 → halo de soleil
+  (`.amb-sun`, contre-jour derrière MAT & MEL, rayons `repeating-conic-gradient`
+  en rotation lente) + teinte `amb-sunny` en plein jour ; étoiles scintillantes
+  (`.amb-star`, réutilise `ambTwinkle`) en phase `night`. Rien à l'aube/crépuscule
+  (la teinte de phase suffit). **Ordre de priorité des particules : météo active
+  (pluie/neige/orage/brouillard/nuages) > décor festif > ciel dégagé** — le soleil
+  ne masque jamais la guirlande de Noël.
 - **Calendrier festif** (`_ambFestive()` dans `js/mat-ambiance.js`, v4.45) :
   quand la météo est calme (aucune famille météo active), le header se décore
   selon la période — guirlande + flocons (1–30 déc), étincelles (31 déc–2 janv),
