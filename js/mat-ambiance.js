@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.3.1
+   MAT — Ambiance v1.4.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -152,7 +152,7 @@ function _ambRenderParticles(header, fam){
   } else if(kind === 'overcast'){
     _ambClouds(layer, 5);
   } else if(kind === 'sun'){
-    s = document.createElement('span'); s.className = 'amb-sun'; layer.appendChild(s);
+    layer.appendChild(_ambFlare());
   } else if(kind === 'stars'){
     _ambStars(layer);
   } else if(kind === 'noel'){
@@ -205,6 +205,45 @@ function _ambClouds(layer, count){
     s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
     layer.appendChild(s);
   }
+}
+
+// Reflet d'objectif par ciel dégagé : une étoile lumineuse aux branches
+// inégales, suivie de cercles irisés (« fantômes ») alignés sur l'axe du
+// reflet. La source est volontairement placée en HAUT À GAUCHE : au centre
+// droit elle voilait l'illustration MAT & MEL.
+function _ambFlare(){
+  var wrap = document.createElement('span');
+  wrap.className = 'amb-sun';
+
+  var core = document.createElement('span');
+  core.className = 'amb-sun-core';
+  // [angle°, longueur px, opacité] — longueurs inégales : un reflet réel n'a
+  // pas de branches régulières (c'est ce qui faisait « roue » auparavant).
+  [[0, 400, 0.70], [62, 230, 0.40], [118, 170, 0.28], [28, 130, 0.20]].forEach(function(r){
+    var ray = document.createElement('span');
+    ray.className = 'amb-flare-ray';
+    ray.style.width = r[1] + 'px';
+    ray.style.opacity = r[2];
+    ray.style.transform = 'translate(-50%,-50%) rotate(' + r[0] + 'deg)';
+    core.appendChild(ray);
+  });
+  wrap.appendChild(core);
+
+  // Fantômes le long de l'axe, vers le bas-droite : [gauche%, haut%, ø px, opacité]
+  [[30, 31, 28, 0.18], [41, 45, 16, 0.14], [52, 58, 36, 0.11], [63, 72, 20, 0.16], [74, 85, 26, 0.10]]
+    .forEach(function(g, i){
+      var ghost = document.createElement('span');
+      ghost.className = 'amb-flare-ghost';
+      ghost.style.left = g[0] + '%';
+      ghost.style.top = g[1] + '%';
+      ghost.style.width = g[2] + 'px';
+      ghost.style.height = g[2] + 'px';
+      ghost.style.opacity = g[3];
+      ghost.style.animationDelay = '-' + (i * 1.9).toFixed(1) + 's';
+      wrap.appendChild(ghost);
+    });
+
+  return wrap;
 }
 
 // Étoiles scintillantes par nuit dégagée (réutilise les keyframes ambTwinkle)

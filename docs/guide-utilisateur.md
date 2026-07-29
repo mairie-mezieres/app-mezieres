@@ -79,9 +79,9 @@ fine pluie animée quand il pleut, flocons quand il neige, éclairs en cas d'ora
 brume par temps de brouillard, nuages qui dérivent doucement par temps nuageux ou
 couvert (avec une teinte légèrement grisée quand le ciel est couvert) — et sa
 couleur change selon le moment de la journée (teintes dorées à l'aube et au
-crépuscule, vert profond la nuit). Par beau temps, un halo de soleil rayonne
-doucement derrière MAT & MEL en journée, et par nuit dégagée, des étoiles
-scintillent sur le bandeau.
+crépuscule, vert profond la nuit). Par beau temps, un reflet de soleil traverse
+le bandeau en journée — un éclat lumineux et sa traînée de halos dorés — et par
+nuit dégagée, des étoiles scintillent.
 
 Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
 lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au

@@ -473,13 +473,22 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   Si « Réduire les animations » est actif : teinte statique seule, aucune
   particule. Le header étant masqué en desktop (≥ 1024 px), l'effet est
   mobile/PWA uniquement.
-- **Ciel dégagé** (`_ambClearSky()`, v4.47) : codes WMO 0-1 → halo de soleil
-  (`.amb-sun`, contre-jour derrière MAT & MEL, rayons `repeating-conic-gradient`
-  en rotation lente) + teinte `amb-sunny` en plein jour ; étoiles scintillantes
+- **Ciel dégagé** (`_ambClearSky()`, v4.47 ; rendu revu en v4.48) : codes WMO 0-1
+  → **reflet d'objectif** construit par `_ambFlare()` — cœur lumineux compact
+  (`.amb-sun-core`), branches d'étoile de longueurs **inégales**
+  (`.amb-flare-ray`, angle et longueur posés en JS) et chaîne de cercles irisés
+  (`.amb-flare-ghost`) alignés sur l'axe du reflet — + teinte `amb-sunny` en
+  plein jour ; étoiles scintillantes
   (`.amb-star`, réutilise `ambTwinkle`) en phase `night`. Rien à l'aube/crépuscule
   (la teinte de phase suffit). **Ordre de priorité des particules : météo active
   (pluie/neige/orage/brouillard/nuages) > décor festif > ciel dégagé** — le soleil
   ne masque jamais la guirlande de Noël.
+  ⚠️ Deux contraintes issues du terrain, à ne pas défaire : la source est en
+  **haut à gauche** (à droite, elle voilait l'illustration MAT & MEL) et le cœur
+  est **petit et intense** plutôt que large et diffus — une tache large lave le
+  texte de la date, alors que de fines branches le traversent sans nuire à la
+  lisibilité. Pas de rotation, mais une dérive et une palpitation **franchement
+  perceptibles** : une animation trop timide revient à ne rien animer.
 - **Calendrier festif** (`_ambFestive()` dans `js/mat-ambiance.js`, v4.45) :
   quand la météo est calme (aucune famille météo active), le header se décore
   selon la période — guirlande + flocons (1–30 déc), étincelles (31 déc–2 janv),
