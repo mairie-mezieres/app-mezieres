@@ -1186,6 +1186,14 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 .amb-cloud::before{content:'';position:absolute;left:22%;top:-45%;width:56%;height:95%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,0.30),rgba(255,255,255,0) 60%);}
 @keyframes ambCloud{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 560px))}}
 
+/* Ciel dégagé — halo de soleil en contre-jour derrière MAT & MEL (jour)
+   et étoiles scintillantes (nuit). */
+.amb-sun{position:absolute;top:-50px;right:-35px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle at center,rgba(255,221,130,0.5),rgba(255,210,110,0.18) 45%,rgba(255,200,90,0) 70%);animation:ambSunPulse 5s ease-in-out infinite alternate;}
+.amb-sun::before{content:'';position:absolute;inset:-45px;border-radius:50%;background:repeating-conic-gradient(rgba(255,232,150,0.13) 0deg 9deg,rgba(255,232,150,0) 9deg 36deg);animation:ambSunRays 46s linear infinite;}
+@keyframes ambSunPulse{from{opacity:.72}to{opacity:1}}
+@keyframes ambSunRays{to{transform:rotate(360deg)}}
+.amb-star{position:absolute;color:rgba(255,255,255,0.92);text-shadow:0 0 5px rgba(255,255,255,0.55);animation:ambTwinkle 2.4s ease-in-out infinite;}
+
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si
    « Réduire les animations ») — la météo réelle garde la priorité. */
 .amb-guirlande{position:absolute;top:4px;width:7px;height:7px;border-radius:50%;box-shadow:0 0 6px 1px currentColor;animation:ambTwinkle 1.8s ease-in-out infinite;}
@@ -1206,6 +1214,7 @@ html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombr
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-dawn{background:linear-gradient(160deg,#2c4a3a 0%,#3f6249 55%,#b8804f 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-dusk{background:linear-gradient(160deg,#20402e 0%,#49593a 50%,#c9843d 100%);}
 html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-night{background:linear-gradient(160deg,#0f271b 0%,#1d3a29 100%);}
+html:not(.high-contrast):not(.colorblind-mode):not(.theme-bleu):not(.theme-sombre) .header.amb-sunny{background:linear-gradient(160deg,#1f4a2f 0%,#38754a 65%,#4f9758 100%);}
 
 /* Déclinaisons pour le thème Bleu — mêmes moments, gamme bleue */
 html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-overcast{background:linear-gradient(160deg,#243b52 0%,#4a6b8f 100%);}
@@ -1214,6 +1223,7 @@ html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-storm{back
 html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-dawn{background:linear-gradient(160deg,#1a3a5c 0%,#446286 55%,#b8804f 100%);}
 html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-dusk{background:linear-gradient(160deg,#1a3a5c 0%,#3d5a80 50%,#c9843d 100%);}
 html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-night{background:linear-gradient(160deg,#0c1c2e 0%,#16324e 100%);}
+html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-sunny{background:linear-gradient(160deg,#1c4470 0%,#2c67ac 65%,#3f85c8 100%);}
 
 /* View Transitions (mat-core.js _ovVisual) — fondu doux et bref à
    l'ouverture/fermeture des overlays sur les navigateurs compatibles. */
