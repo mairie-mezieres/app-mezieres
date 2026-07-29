@@ -1188,10 +1188,25 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 
 /* Ciel dégagé — halo de soleil en contre-jour derrière MAT & MEL (jour)
    et étoiles scintillantes (nuit). */
-.amb-sun{position:absolute;top:-50px;right:-35px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle at center,rgba(255,221,130,0.5),rgba(255,210,110,0.18) 45%,rgba(255,200,90,0) 70%);animation:ambSunPulse 5s ease-in-out infinite alternate;}
-.amb-sun::before{content:'';position:absolute;inset:-45px;border-radius:50%;background:repeating-conic-gradient(rgba(255,232,150,0.13) 0deg 9deg,rgba(255,232,150,0) 9deg 36deg);animation:ambSunRays 46s linear infinite;}
-@keyframes ambSunPulse{from{opacity:.72}to{opacity:1}}
-@keyframes ambSunRays{to{transform:rotate(360deg)}}
+/* Halo de soleil : cœur lumineux net, dégradé doré très progressif, et deux
+   fins rais FIXES façon reflet d'objectif. Pas de rotation — une roue de
+   rayons tournante attire l'œil et fatigue ; on veut une présence discrète.
+   Respiration très lente (18 s) : perceptible sans jamais happer le regard. */
+.amb-sun{position:absolute;top:-56px;right:-42px;width:250px;height:250px;border-radius:50%;
+  background:radial-gradient(circle at center,
+    rgba(255,255,255,0.60) 0%,
+    rgba(255,248,206,0.44) 8%,
+    rgba(255,232,158,0.24) 22%,
+    rgba(255,214,116,0.10) 42%,
+    rgba(255,204,96,0) 68%);
+  animation:ambSunBreathe 18s ease-in-out infinite alternate;}
+.amb-sun::before{content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(26deg,rgba(255,255,255,0) 46.5%,rgba(255,247,214,0.20) 50%,rgba(255,255,255,0) 53.5%),
+    linear-gradient(114deg,rgba(255,255,255,0) 47.5%,rgba(255,247,214,0.12) 50%,rgba(255,255,255,0) 52.5%);
+  animation:ambSunGlint 22s ease-in-out infinite alternate;}
+@keyframes ambSunBreathe{from{opacity:.82;transform:scale(.98)}to{opacity:1;transform:scale(1.02)}}
+@keyframes ambSunGlint{from{opacity:.5}to{opacity:1}}
 .amb-star{position:absolute;color:rgba(255,255,255,0.92);text-shadow:0 0 5px rgba(255,255,255,0.55);animation:ambTwinkle 2.4s ease-in-out infinite;}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si
