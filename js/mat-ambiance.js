@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.3.0
+   MAT — Ambiance v1.3.1
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -29,16 +29,31 @@ function _ambWeatherFamily(code){
   return '';
 }
 
-// Moment de la journée : ±40 min autour du lever/coucher = aube/crépuscule
+// Moment de la journée : ±40 min autour du lever/coucher = aube/crépuscule.
+// Renvoie 'dawn' | 'dusk' | 'night' | 'day', ou '' si indéterminé.
+//
+// ⚠️ DEUX PIÈGES, tous deux à l'origine du bug corrigé en v4.47.1 (ADR-0007) :
+//  1. `daily[0]` est **HIER** (le backend demande `past_days=1`) — lire l'indice 0
+//     comparait l'heure courante au coucher de la veille, donc `now > coucher`
+//     était vrai en permanence : phase « nuit » 24 h/24, aube/crépuscule et
+//     soleil jamais déclenchés.
+//  2. Open-Meteo renvoie des heures locales sans fuseau (« 2026-07-29T06:32 ») ;
+//     `Date.parse` les interprète dans le fuseau du téléphone. On compare donc
+//     des minutes-depuis-minuit calculées à Paris, des deux côtés.
+// '' (indéterminé) est volontairement distinct de 'day' : sans donnée fiable,
+// on n'affiche ni soleil ni étoiles plutôt que de risquer le mauvais effet.
 function _ambDayPhase(daily){
-  var sr = Date.parse((daily.sunrise || [])[0] || '');
-  var ss = Date.parse((daily.sunset || [])[0] || '');
-  if(isNaN(sr) || isNaN(ss)) return '';
-  var now = Date.now(), M = 40 * 60000;
+  if(typeof meteoTodayIndex !== 'function' || typeof meteoParisNowMinutes !== 'function') return '';
+  var idx = meteoTodayIndex(daily);
+  if(idx < 0) return '';
+  var sr = meteoIsoToMinutes((daily.sunrise || [])[idx]);
+  var ss = meteoIsoToMinutes((daily.sunset || [])[idx]);
+  if(sr == null || ss == null || ss <= sr) return '';
+  var now = meteoParisNowMinutes(), M = 40;
   if(Math.abs(now - sr) <= M) return 'dawn';
   if(Math.abs(now - ss) <= M) return 'dusk';
   if(now < sr || now > ss) return 'night';
-  return '';
+  return 'day';
 }
 
 // Calendrier festif : périodes de l'année où le header se décore quand la
@@ -74,8 +89,8 @@ function _ambClearSky(code, phase){
   var c = Number(code);
   if(c !== 0 && c !== 1) return '';
   if(phase === 'night') return 'stars';
-  if(phase === '') return 'sun';
-  return '';
+  if(phase === 'day') return 'sun';
+  return ''; // aube, crépuscule, ou phase indéterminée
 }
 
 var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night','amb-sunny'];
@@ -90,7 +105,9 @@ function matHeaderAmbiance(){
   var clear = _ambClearSky(code, phase);
   _AMB_CLASSES.forEach(function(c){ header.classList.remove(c); });
   if(fam) header.classList.add('amb-' + fam);
-  if(phase) header.classList.add('amb-' + phase);
+  // 'day' n'a pas de teinte propre (c'est le dégradé par défaut) et '' signifie
+  // « indéterminé » : seules aube/crépuscule/nuit posent une classe.
+  if(phase === 'dawn' || phase === 'dusk' || phase === 'night') header.classList.add('amb-' + phase);
   if(clear === 'sun') header.classList.add('amb-sunny');
   // Priorité des particules : météo active > décor festif > ciel dégagé —
   // le soleil ne doit pas masquer la guirlande de Noël un beau jour d'hiver.
