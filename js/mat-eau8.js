@@ -1,4 +1,4 @@
-/* MAT — Eau v3.11.0 — Niveau nappe + restrictions VigiEau (double requête coordonnées + commune, niveau le plus grave) */
+/* MAT — Eau v3.12.0 — Niveau nappe + restrictions VigiEau (double requête coordonnées + commune, niveau le plus grave) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
 var _EAU_INSEE = '45203';
@@ -7,13 +7,23 @@ var _EAU_INSEE = '45203';
 var _EAU_LAT   = 47.822;
 var _EAU_LON   = 1.808;
 
+// Requête tolérante aux pannes : renvoie {status, ok, text} ou null (échec/délai).
+//
+// ⚠️ Le délai de garde couvre AUSSI la lecture du corps de la réponse. Avant, on
+// annulait le minuteur dès l'arrivée des en-têtes : sur un réseau mobile lent, un
+// corps qui n'arrivait jamais laissait le `await` en suspens indéfiniment — la
+// section Eau restait bloquée sur « ⚪ Vérification… » (bug du 30/07/2026).
 function _eauFetch(url) {
   return new Promise(function(resolve) {
     var c = new AbortController();
-    var t = setTimeout(function() { c.abort(); }, 9000);
+    var done = false;
+    var t = setTimeout(function() { c.abort(); if (!done) { done = true; resolve(null); } }, 9000);
+    function finish(v) { if (done) return; done = true; clearTimeout(t); resolve(v); }
     fetch(url, { signal: c.signal })
-      .then(function(r) { clearTimeout(t); resolve(r); })
-      .catch(function() { clearTimeout(t); resolve(null); });
+      .then(function(r) {
+        return r.text().then(function(txt) { finish({ status: r.status, ok: r.ok, text: txt }); });
+      })
+      .catch(function() { finish(null); });
   });
 }
 
@@ -22,8 +32,8 @@ async function _fetchNappe() {
   var url = 'https://hubeau.eaufrance.fr/api/v1/niveaux_nappes/chroniques?code_bss=' + enc + '&sort=desc&format=json&size=365';
   try {
     var r = await _eauFetch(url);
-    if (!r) return null;
-    var d = await r.json();
+    if (!r || !r.ok || !r.text) return null;
+    var d = JSON.parse(r.text);
     var obs = (d.data || []).filter(function(o) { return o.niveau_nappe_eau != null; });
     if (obs.length === 0) return null;
 
@@ -134,8 +144,14 @@ async function _loadEauSection() {
   }
   render();
 
-  var nappe = await _fetchNappe();
-  if (nappe) {
+  // La nappe et les restrictions sont chargées EN PARALLÈLE : deux API
+  // indépendantes (hubeau / VigiEau), et la ligne « Restrictions » ne doit
+  // jamais attendre la nappe. Auparavant les deux étaient enchaînées : une
+  // réponse hubeau lente (365 mesures sur un réseau mobile) laissait la ligne
+  // bloquée sur « Vérification… » — bug constaté le 30/07/2026.
+  async function _loadNappe() {
+    var nappe = await _fetchNappe();
+    if (!nappe) return;
     var arrow = nappe.tendance === 'up'
       ? '\u00a0<span style="color:#16a34a">\u2191</span>'
       : nappe.tendance === 'down'
@@ -165,32 +181,97 @@ async function _loadEauSection() {
     // restrictions actives mais niveau indéterminable par cette requête.
     if (r.status === 409) return { kind: 'multi' };
     if (!r.ok) return { kind: 'ko', why: 'VigiEau HTTP ' + r.status };
-    var txt = await r.text();
+    var txt = r.text;
     var d2;
     // 200 OK mais corps non-JSON (page d'erreur HTML d'un proxy/CDN) → 'ko'.
     try { d2 = txt ? JSON.parse(txt) : []; } catch (e) { return { kind: 'ko', why: 'VigiEau: réponse 200 non-JSON' }; }
     return { kind: 'ok', zones: Array.isArray(d2) ? d2 : (d2 && Array.isArray(d2.zones) ? d2.zones : []) };
   }
-  try {
-    var _vzBase = 'https://api.vigieau.gouv.fr/api/zones';
-    var _vzResults = await Promise.all([
-      _vigieauQuery(_vzBase + '?lon=' + _EAU_LON + '&lat=' + _EAU_LAT + '&commune=' + _EAU_INSEE + '&profil=particulier'),
-      _vigieauQuery(_vzBase + '?commune=' + _EAU_INSEE + '&profil=particulier')
-    ]);
-    var zones = [], _vzOk = 0, _vzMulti = false, _vzWhy = null;
-    _vzResults.forEach(function(res) {
-      if (res.kind === 'ok') { _vzOk++; zones = zones.concat(res.zones); }
-      else if (res.kind === 'multi') _vzMulti = true;
-      else _vzWhy = _vzWhy || res.why;
-    });
+  // Rendu de la ligne « Restrictions » pour un niveau VigiEau.
+  //   sev 1..4  → vigilance / alerte / alerte renforcée / crise
+  //   sev 0     → « aucune restriction » (vert) UNIQUEMENT si l'absence de zone
+  //               est confirmée (zeroMeansNone) ; sinon zone active de niveau
+  //               illisible → on reste prudent.
+  function _applySeverity(sev, zeroMeansNone) {
+    var _lien = ' <a href="' + _vigieauLink + '" target="_blank" rel="noopener" style="color:var(--leaf);font-weight:600">consignes officielles ↗</a>';
+    if      (sev === 4) {
+      restric = '🟣 Crise';                  restCol = '#7c3aed';
+      restricNote = 'Usages essentiels uniquement (santé, sécurité, eau potable).' + _lien;
+    }
+    else if (sev === 3) {
+      restric = '🔴 Alerte renforcée';       restCol = '#dc2626';
+      restricNote = 'Restrictions durcies : arrosage, lavage, remplissage interdits sur de larges plages.' + _lien;
+    }
+    else if (sev === 2) {
+      restric = '🟠 Alerte';                 restCol = '#ea580c';
+      restricNote = 'Premières restrictions : arrosage des pelouses, lavage des voitures, remplissage des piscines limités.' + _lien;
+    }
+    else if (sev === 1) {
+      restric = '🟡 Vigilance';              restCol = '#d97706';
+      restricNote = 'Pas d’interdiction — économies d’eau recommandées.' + _lien;
+    }
+    else if (sev === 0 && zeroMeansNone) {
+      restric = '🟢 Aucune restriction';     restCol = '#16a34a';
+      restricNote = '';
+    }
+    else {
+      restric = '🟠 Restriction en vigueur'; restCol = '#ea580c';
+      restricNote = 'Restrictions d’usage de l’eau en vigueur.' + _lien;
+    }
+  }
+
+  // Repli quand api.vigieau.gouv.fr est injoignable depuis le téléphone : le
+  // backend expose son propre relevé (GET /eau/restrictions), obtenu depuis
+  // Render avec la même double requête. Renvoie le niveau (0..4) ou null.
+  // Un niveau 0 n'est retenu que si le relevé serveur est COMPLET (les deux
+  // requêtes abouties) — sinon on préfère « Info indisponible » à un faux vert.
+  async function _fetchRestrictionsFromBackend() {
+    if (!window.MAT_API) return null;
+    var r = await _eauFetch(window.MAT_API + '/eau/restrictions');
+    if (!r || !r.ok || !r.text) return null;
+    try {
+      var d = JSON.parse(r.text);
+      if (typeof d.level !== 'number') return null;
+      if (d.level === 0 && d.complete !== true) return null;
+      return d.level;
+    } catch (e) { return null; }
+  }
+
+  async function _loadRestrictions() {
+    try {
+      var _vzBase = 'https://api.vigieau.gouv.fr/api/zones';
+      var _vzResults = await Promise.all([
+        _vigieauQuery(_vzBase + '?lon=' + _EAU_LON + '&lat=' + _EAU_LAT + '&commune=' + _EAU_INSEE + '&profil=particulier'),
+        _vigieauQuery(_vzBase + '?commune=' + _EAU_INSEE + '&profil=particulier')
+      ]);
+      var zones = [], _vzOk = 0, _vzMulti = false, _vzWhy = null;
+      _vzResults.forEach(function(res) {
+        if (res.kind === 'ok') { _vzOk++; zones = zones.concat(res.zones); }
+        else if (res.kind === 'multi') _vzMulti = true;
+        else _vzWhy = _vzWhy || res.why;
+      });
       if (zones.length === 0 && _vzMulti) {
         // Restrictions actives quelque part mais niveau indéterminable via API
         // (409 sans zone remontée par l'autre requête). Alerte orange.
         restric = '⚠️ Restrictions — voir vigieau.gouv.fr';
         restCol = '#ea580c';
+      } else if (zones.length === 0 && _vzOk === 0) {
+        // Les DEUX requêtes ont échoué depuis le téléphone (réseau mobile,
+        // filtrage…) : dernier recours, on demande son niveau au backend, qui
+        // interroge VigiEau depuis Render avec la même logique (ADR-0009).
+        var _srv = await _fetchRestrictionsFromBackend();
+        if (_srv != null) {
+          _applySeverity(_srv, true);
+        } else {
+          // Toujours rien : état neutre, surtout PAS de faux « Aucune restriction ».
+          restric = '⚪ Info indisponible';
+          restCol = '#94a3b8';
+          if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', _vzWhy || 'VigiEau indisponible');
+        }
       } else if (zones.length === 0 && _vzOk < _vzResults.length) {
-        // Aucune zone confirmée et au moins une requête en échec : surtout PAS
-        // de faux « Aucune restriction ». État neutre + log.
+        // Une seule requête a abouti et elle ne voit aucune zone : elle peut
+        // sous-estimer (l'index commune→zones « oublie » parfois une zone AEP).
+        // On n'affiche donc pas de vert — état neutre + log.
         restric = '⚪ Info indisponible';
         restCol = '#94a3b8';
         if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', _vzWhy || 'VigiEau indisponible');
@@ -211,36 +292,19 @@ async function _loadEauSection() {
           else if (raw.indexOf('alerte') >= 0)    sev = Math.max(sev, 2);
           else if (raw.indexOf('vigilance') >= 0) sev = Math.max(sev, 1);
         });
-        var _lien = ' <a href="' + _vigieauLink + '" target="_blank" rel="noopener" style="color:var(--leaf);font-weight:600">consignes officielles \u2197</a>';
-        if      (sev === 4) {
-          restric = '\uD83D\uDFE3 Crise';                 restCol = '#7c3aed';
-          restricNote = 'Usages essentiels uniquement (sant\u00e9, s\u00e9curit\u00e9, eau potable).' + _lien;
-        }
-        else if (sev === 3) {
-          restric = '\uD83D\uDD34 Alerte renforc\u00e9e'; restCol = '#dc2626';
-          restricNote = 'Restrictions durcies : arrosage, lavage, remplissage interdits sur de larges plages.' + _lien;
-        }
-        else if (sev === 2) {
-          restric = '\uD83D\uDFE0 Alerte';                restCol = '#ea580c';
-          restricNote = 'Premi\u00E8res restrictions : arrosage des pelouses, lavage des voitures, remplissage des piscines limit\u00e9s.' + _lien;
-        }
-        else if (sev === 1) {
-          restric = '\uD83D\uDFE1 Vigilance';             restCol = '#d97706';
-          restricNote = 'Pas d\u2019interdiction \u2014 \u00e9conomies d\u2019eau recommand\u00e9es.' + _lien;
-        }
-        else                {
-          restric = '\uD83D\uDFE0 Restriction en vigueur'; restCol = '#ea580c';
-          restricNote = 'Restrictions d\u2019usage de l\u2019eau en vigueur.' + _lien;
-        }
+        _applySeverity(sev);
       }
       render();
-  } catch (_) {
-    // Erreur inattendue : neutre, jamais de faux \u00AB Aucune restriction \u00BB.
-    restric = '\u26AA\u00A0Info indisponible';
-    restCol = '#94a3b8';
-    if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau: ' + ((_ && _.message) || 'err'));
-    render();
+    } catch (_) {
+      // Erreur inattendue : neutre, jamais de faux \u00AB Aucune restriction \u00BB.
+      restric = '\u26AA\u00A0Info indisponible';
+      restCol = '#94a3b8';
+      if (navigator.onLine && typeof matLogError === 'function') matLogError('eau', 'VigiEau: ' + ((_ && _.message) || 'err'));
+      render();
+    }
   }
+
+  await Promise.all([_loadNappe(), _loadRestrictions()]);
 }
 
 (function() {

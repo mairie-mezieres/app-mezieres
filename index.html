@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.48 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.49 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -438,7 +438,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.48</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.49</button>
 </div>
 </div>
 </div>
@@ -1627,6 +1627,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 30 juillet 2026 — v4.49</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Restrictions d&rsquo;eau</strong>&nbsp;: la ligne de la section &laquo;&nbsp;Eau&nbsp;&raquo; ne reste plus bloqu&eacute;e sur &laquo;&nbsp;V&eacute;rification&hellip;&nbsp;&raquo;. Elle affiche toujours un r&eacute;sultat&nbsp;: le niveau en cours, &laquo;&nbsp;Aucune restriction&nbsp;&raquo;, ou &laquo;&nbsp;Info indisponible&nbsp;&raquo; si le service officiel VigiEau ne r&eacute;pond pas</li>
+<li>Niveau de la nappe et restrictions se chargent d&eacute;sormais <strong>en parall&egrave;le</strong>&nbsp;: l&rsquo;un ne fait plus attendre l&rsquo;autre</li>
+<li><strong>Notifications s&eacute;cheresse</strong>&nbsp;: vous n&rsquo;&ecirc;tes pr&eacute;venu que lorsque le niveau <strong>change vraiment</strong>. Plus de notification en double quand la commune reste au m&ecirc;me niveau</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 juillet 2026 — v4.48</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Par beau temps, le bandeau affiche d&eacute;sormais un <strong>reflet de soleil</strong>&nbsp;: un &eacute;clat lumineux et sa tra&icirc;n&eacute;e de halos dor&eacute;s, qui d&eacute;rivent doucement &mdash; et qui ne voilent plus MAT &amp; MEL</li>
