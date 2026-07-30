@@ -330,6 +330,16 @@ absente de l'index par commune, constaté le 15/07/2026 — l'app affichait
 côté backend (`lib/vigieau.js`) : toute évolution doit être répercutée des deux
 côtés. Décision : ADR-0009 du repo backend.
 
+**Robustesse du chargement (ADR-0008).** La nappe (hubeau) et les restrictions
+(VigiEau) sont chargées **en parallèle** — aucune ligne n'attend l'autre — et le
+délai de garde de `_eauFetch` (9 s) couvre **aussi la lecture du corps** de la
+réponse. Avant, les deux étaient enchaînées et le minuteur était désarmé dès les
+en-têtes : sur réseau mobile lent, un corps qui n'arrivait jamais laissait la
+section bloquée sur « ⚪ Vérification… » indéfiniment (constaté le 30/07/2026).
+Si les deux appels directs à VigiEau échouent, on interroge en **repli** le
+backend (`GET /eau/restrictions`) ; un niveau `0` venu du serveur n'est retenu
+que s'il est marqué `complete: true` — jamais de faux « Aucune restriction ».
+
 > ⚠️ **Séparation stricte d'avec la vigilance Météo-France.** La sécheresse n'occupe **jamais**
 > le bandeau de vigilance météo (`js/mat-widgets.js`). Côté backend, un flux dédié
 > (`lib/vigieau.js` + `routes/eau.js`, polling `DROUGHT_CHECK_INTERVAL_MS`) publie, à partir du

@@ -320,6 +320,14 @@ de la commune. Si votre habitation est desservie par un autre réseau d'eau, le 
 - Les **restrictions d'eau** sont **séparées** : à partir du niveau **Alerte**, une
   **actualité** est publiée et une **notification** est envoyée (si vous êtes abonné), avec
   les consignes. Une actualité annonce aussi la **fin des restrictions** le moment venu.
+- Vous recevez une notification **uniquement quand le niveau change**. Tant que la commune
+  reste au même niveau, aucune notification n'est renvoyée. Et pour éviter toute fausse
+  bonne nouvelle, une **baisse** de niveau n'est annoncée qu'une fois **confirmée** — elle
+  peut donc arriver quelques heures après le changement affiché sur vigieau.gouv.fr.
+
+> Si la ligne « Restrictions » indique **« Info indisponible »**, c'est que le service
+> officiel VigiEau n'a pas pu être joint : l'application préfère ne rien affirmer plutôt que
+> d'annoncer à tort qu'il n'y a aucune restriction. Réessayez un peu plus tard.
 
 ### Qualité de l'air et conseils du jour
 
