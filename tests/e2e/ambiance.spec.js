@@ -189,3 +189,78 @@ test('nuit de décembre sous la pluie → gouttes seules', async ({ page }) => {
   const k = await ambianceLe(page, '2026-12-15', '2026-12-14', '18:00', '+01:00', '08:35', '16:55', 61);
   expect(k).toBe('rain');
 });
+
+// ── Aperçu des ambiances (outil mairie) ──────────────────────────────────────
+// Contrat vérifié ici : invisible pour les habitants (rien dans le DOM tant
+// qu'on ne l'ouvre pas), et strictement en mémoire (aucune trace persistée).
+test.describe('aperçu des ambiances', () => {
+  async function ouvrirPersonnalisation(page) {
+    await page.route('**/*', (route) => {
+      const url = route.request().url();
+      if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
+      return route.continue();
+    });
+    await page.addInitScript(() => {
+      try { localStorage.setItem('mat_onboarded_v3', '1'); } catch (_) {}
+    });
+    await page.goto('/');
+    await page.waitForFunction(() => typeof window.openAccessibilite === 'function');
+    await expect(async () => {
+      await page.evaluate(() => window.openAccessibilite());
+      await expect(page.locator('#ov-accessibilite')).toHaveClass(/open/, { timeout: 1000 });
+    }).toPass({ timeout: 8000 });
+    // L'écran de démarrage recouvre encore la page juste après le boot : un
+    // appui y atterrirait au lieu du titre. On attend que le titre soit
+    // réellement l'élément touché au point visé.
+    await page.waitForFunction(() => {
+      const t = document.querySelector('#ov-accessibilite .panel-title');
+      if (!t) return false;
+      const r = t.getBoundingClientRect();
+      const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!(el && el.closest('.panel-title'));
+    }, null, { timeout: 10000 });
+  }
+
+  test('absent du DOM tant qu’il n’est pas ouvert', async ({ page }) => {
+    await ouvrirPersonnalisation(page);
+    expect(await page.locator('#amb-apercu').count()).toBe(0);
+    expect(await page.locator('#amb-apercu-bandeau').count()).toBe(0);
+  });
+
+  test('appui long sur le titre → panneau, simulation et bandeau APERÇU', async ({ page }) => {
+    await ouvrirPersonnalisation(page);
+    const titre = page.locator('#ov-accessibilite .panel-title');
+    const box = await titre.boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.waitForTimeout(1100);      // seuil = 900 ms
+    await page.mouse.up();
+
+    await expect(page.locator('#amb-apercu')).toBeVisible();
+    await expect(page.locator('#amb-apercu-bandeau')).toBeVisible();
+
+    // Neige + nuit, quelle que soit la météo réelle
+    await page.selectOption('#amb-ap-meteo', '73');
+    await page.selectOption('#amb-ap-moment', 'night');
+    expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toBe('snow');
+
+    // Ciel dégagé + nuit + Noël → superposition
+    await page.selectOption('#amb-ap-meteo', '0');
+    await page.selectOption('#amb-ap-saison', '2026-12-15');
+    expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toBe('stars+noel');
+
+    // Retour au réel : bandeau retiré, aucune trace persistée
+    await page.click('#amb-ap-stop');
+    await expect(page.locator('#amb-apercu-bandeau')).toHaveCount(0);
+    const persiste = await page.evaluate(() =>
+      Object.keys(localStorage).some((k) => /apercu|ambiance|sim/i.test(k)));
+    expect(persiste).toBe(false);
+  });
+
+  test('un appui bref n’ouvre rien', async ({ page }) => {
+    await ouvrirPersonnalisation(page);
+    await page.locator('#ov-accessibilite .panel-title').click();
+    await page.waitForTimeout(400);
+    expect(await page.locator('#amb-apercu').count()).toBe(0);
+  });
+});
