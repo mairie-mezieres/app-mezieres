@@ -437,7 +437,8 @@ Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
 Pour visualiser une ambiance sans attendre la météo ou la saison correspondante :
 
 1. Ouvrir **♿ Personnalisation** depuis l'accueil.
-2. **Appui long (900 ms) sur le titre** « ♿ Accessibilité & Personnalisation ».
+2. **Cinq appuis rapides sur le titre** « ♿ Accessibilité & Personnalisation »
+   (moins de 800 ms entre deux appuis).
 3. Un panneau propose trois listes : **Météo** (dégagé, nuageux, couvert,
    brouillard, pluie, averses, orage, neige), **Moment** (plein jour, aube,
    crépuscule, nuit) et **Saison / fête** (Noël, Nouvel An, printemps,
@@ -446,6 +447,10 @@ Pour visualiser une ambiance sans attendre la météo ou la saison correspondant
 
 Garanties de non-perturbation, à préserver si l'outil évolue :
 
+- ⚠️ Un **appui long** avait été essayé d'abord : inutilisable au doigt, car le
+  moindre micro-déplacement l'annulait. Le test Playwright maintenait une souris
+  parfaitement immobile — il validait donc un geste que la main humaine ne
+  reproduit pas. Ne pas y revenir sans simuler un vrai doigt (léger glissement).
 - **Aucun élément visible** : pas de bouton, pas de paramètre d'URL. Le panneau
   n'est **construit qu'à l'ouverture** — il n'existe donc pas dans le DOM des
   habitants, ni pour les audits d'accessibilité.

@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.6.0
+   MAT — Ambiance v1.6.1
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -530,18 +530,26 @@ function _ambApercuBandeau(actif){
   }
 }
 
-// Déclencheur caché : appui long sur le titre de l'écran Personnalisation.
-// Délégué sur document car l'overlay est hydraté à la première ouverture.
+// Déclencheur caché : CINQ APPUIS RAPIDES sur le titre de l'écran
+// Personnalisation (800 ms max entre deux appuis).
+//
+// ⚠️ Un appui long avait été tenté d'abord : inutilisable au doigt, car le
+// moindre micro-déplacement l'annulait. Le test Playwright, lui, maintenait
+// une souris parfaitement immobile — il validait donc un geste que la main
+// humaine ne reproduit pas. Ne pas revenir à l'appui long sans reproduire le
+// geste réel (drag de quelques pixels pendant le maintien).
+//
+// Délégué sur document car l'overlay est hydraté à sa première ouverture.
 (function(){
-  var timer = null;
-  var annule = function(){ if(timer){ clearTimeout(timer); timer = null; } };
-  document.addEventListener('pointerdown', function(e){
-    var t = e.target.closest && e.target.closest('#ov-accessibilite .panel-title');
-    if(!t) return;
-    annule();
-    timer = setTimeout(function(){ timer = null; try{ matAmbianceApercu(); }catch(_){} }, 900);
+  var compte = 0, dernier = 0;
+  document.addEventListener('click', function(e){
+    var t = e.target && e.target.closest && e.target.closest('#ov-accessibilite .panel-title');
+    if(!t){ compte = 0; return; }
+    var now = Date.now();
+    compte = (now - dernier <= 800) ? compte + 1 : 1;
+    dernier = now;
+    // Évite le surlignage du titre pendant la série d'appuis
+    if(compte >= 2){ try{ window.getSelection().removeAllRanges(); }catch(_){} }
+    if(compte >= 5){ compte = 0; try{ matAmbianceApercu(); }catch(_){} }
   }, true);
-  ['pointerup','pointercancel','pointermove','scroll'].forEach(function(ev){
-    document.addEventListener(ev, annule, true);
-  });
 })();
