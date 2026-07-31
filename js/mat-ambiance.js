@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.5.0
+   MAT — Ambiance v1.6.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -116,13 +116,19 @@ function _ambCompose(fam, fest, clear, phase){
 
 var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night','amb-sunny'];
 
+// Aperçu (mairie) : quand il est actif, il se substitue à la météo et au
+// moment réels. Volontairement EN MÉMOIRE SEULEMENT — jamais de localStorage
+// ni de paramètre d'URL : un rechargement rend toujours l'ambiance réelle, et
+// aucun habitant ne peut tomber dessus par accident. Voir matAmbianceApercu().
+var _ambSim = null; // { code, phase, date } ou null
+
 function matHeaderAmbiance(){
   var header = document.querySelector('.header');
   if(!header) return;
   var forecast = (window._meteoData || {}).forecast || {};
-  var code = (forecast.current || {}).weather_code;
+  var code = _ambSim ? _ambSim.code : (forecast.current || {}).weather_code;
   var fam = _ambWeatherFamily(code);
-  var phase = _ambDayPhase(forecast.daily || {});
+  var phase = _ambSim ? _ambSim.phase : _ambDayPhase(forecast.daily || {});
   var clear = _ambClearSky(code, phase);
   _AMB_CLASSES.forEach(function(c){ header.classList.remove(c); });
   if(fam) header.classList.add('amb-' + fam);
@@ -130,7 +136,7 @@ function matHeaderAmbiance(){
   // « indéterminé » : seules aube/crépuscule/nuit posent une classe.
   if(phase === 'dawn' || phase === 'dusk' || phase === 'night') header.classList.add('amb-' + phase);
   if(clear === 'sun') header.classList.add('amb-sunny');
-  _ambRenderParticles(header, _ambCompose(fam, _ambFestive(new Date()), clear, phase));
+  _ambRenderParticles(header, _ambCompose(fam, _ambFestive(_ambSim ? _ambSim.date : new Date()), clear, phase));
 }
 
 // `kinds` : liste d'effets superposés (ex. ['stars','noel']). `dataset.kind`
@@ -426,3 +432,116 @@ function matCelebrate(){
   }
   requestAnimationFrame(frame);
 }
+
+/* ── Aperçu des ambiances (usage mairie) ─────────────────────
+   Permet de visualiser toutes les combinaisons météo × moment × saison sans
+   attendre la vraie météo, et SANS jamais perturber les habitants :
+     • déclencheur caché — appui long (900 ms) sur le titre de l'écran
+       ♿ Personnalisation. Aucun bouton visible, rien dans l'URL ;
+     • l'état vit en mémoire seulement : tout rechargement revient au réel ;
+     • un bandeau « APERÇU » reste affiché tant que la simulation est active,
+       pour ne jamais confondre avec la réalité ;
+     • le panneau n'est construit qu'à l'ouverture — il n'existe donc pas dans
+       le DOM des habitants (ni pour les audits d'accessibilité).
+   ──────────────────────────────────────────────────────────── */
+
+var _AMB_APERCU_METEO = [
+  ['Ciel dégagé', 0], ['Partiellement nuageux', 2], ['Couvert', 3],
+  ['Brouillard', 45], ['Pluie', 61], ['Averses', 80], ['Orage', 95], ['Neige', 73]
+];
+var _AMB_APERCU_MOMENT = [
+  ['Plein jour', 'day'], ['Aube', 'dawn'], ['Crépuscule', 'dusk'], ['Nuit', 'night']
+];
+// Dates choisies pour tomber dans chaque période de _ambFestive()
+var _AMB_APERCU_SAISON = [
+  ['Aucune (période réelle)', ''], ['Noël', '2026-12-15'], ['Nouvel An', '2026-12-31'],
+  ['Printemps', '2026-04-10'], ['14 Juillet', '2026-07-14'],
+  ['Halloween', '2026-10-30'], ['Automne', '2026-11-10']
+];
+
+function _ambSelect(id, label, options){
+  var opts = options.map(function(o){
+    return '<option value="' + o[1] + '">' + o[0] + '</option>';
+  }).join('');
+  return '<label style="display:block;margin-bottom:10px;font-size:.75rem;font-weight:800;color:#1a3d2b">'
+    + label
+    + '<select id="' + id + '" style="display:block;width:100%;margin-top:4px;padding:9px 10px;border:1.5px solid #cfe0d4;'
+    + 'border-radius:10px;font-family:inherit;font-size:.85rem;background:#fff;color:#1a3d2b">'
+    + opts + '</select></label>';
+}
+
+function matAmbianceApercu(){
+  if(document.getElementById('amb-apercu')) return;
+  var box = document.createElement('div');
+  box.id = 'amb-apercu';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-label', 'Aperçu des ambiances');
+  box.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:99998;'
+    + 'width:min(340px,92vw);background:#fff;border-radius:16px;padding:16px;'
+    + 'box-shadow:0 12px 40px rgba(0,0,0,.35);font-family:Nunito,sans-serif';
+  box.innerHTML =
+      '<div style="font-size:.9rem;font-weight:900;color:#1a3d2b;margin-bottom:12px">🎨 Aperçu des ambiances</div>'
+    + _ambSelect('amb-ap-meteo',  'Météo',  _AMB_APERCU_METEO)
+    + _ambSelect('amb-ap-moment', 'Moment', _AMB_APERCU_MOMENT)
+    + _ambSelect('amb-ap-saison', 'Saison / fête', _AMB_APERCU_SAISON)
+    + '<div style="display:flex;gap:8px;margin-top:6px">'
+    + '<button type="button" id="amb-ap-stop" style="flex:1;padding:11px;border:1.5px solid #cfe0d4;background:#fff;'
+    + 'color:#1a3d2b;border-radius:10px;font-family:inherit;font-weight:800;font-size:.82rem;cursor:pointer">Revenir au réel</button>'
+    + '<button type="button" id="amb-ap-close" style="flex:1;padding:11px;border:none;background:linear-gradient(135deg,#1a3d2b,#2d6a4f);'
+    + 'color:#fff;border-radius:10px;font-family:inherit;font-weight:800;font-size:.82rem;cursor:pointer">Fermer</button>'
+    + '</div>';
+  document.body.appendChild(box);
+
+  var appliquer = function(){
+    var saison = document.getElementById('amb-ap-saison').value;
+    _ambSim = {
+      code: Number(document.getElementById('amb-ap-meteo').value),
+      phase: document.getElementById('amb-ap-moment').value,
+      date: saison ? new Date(saison + 'T12:00:00') : new Date()
+    };
+    _ambApercuBandeau(true);
+    matHeaderAmbiance();
+  };
+  ['amb-ap-meteo','amb-ap-moment','amb-ap-saison'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', appliquer);
+  });
+  document.getElementById('amb-ap-stop').addEventListener('click', matAmbianceApercuStop);
+  document.getElementById('amb-ap-close').addEventListener('click', function(){ box.remove(); });
+  appliquer();
+}
+
+function matAmbianceApercuStop(){
+  _ambSim = null;
+  _ambApercuBandeau(false);
+  matHeaderAmbiance();
+}
+
+function _ambApercuBandeau(actif){
+  var b = document.getElementById('amb-apercu-bandeau');
+  if(!actif){ if(b) b.remove(); return; }
+  if(!b){
+    b = document.createElement('div');
+    b.id = 'amb-apercu-bandeau';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:7px 14px;background:#b45309;'
+      + 'color:#fff;font-family:Nunito,sans-serif;font-size:.72rem;font-weight:800;text-align:center;'
+      + 'box-shadow:0 2px 10px rgba(0,0,0,.25)';
+    b.textContent = '🎨 APERÇU — ambiance simulée, non réelle';
+    document.body.prepend(b);
+  }
+}
+
+// Déclencheur caché : appui long sur le titre de l'écran Personnalisation.
+// Délégué sur document car l'overlay est hydraté à la première ouverture.
+(function(){
+  var timer = null;
+  var annule = function(){ if(timer){ clearTimeout(timer); timer = null; } };
+  document.addEventListener('pointerdown', function(e){
+    var t = e.target.closest && e.target.closest('#ov-accessibilite .panel-title');
+    if(!t) return;
+    annule();
+    timer = setTimeout(function(){ timer = null; try{ matAmbianceApercu(); }catch(_){} }, 900);
+  }, true);
+  ['pointerup','pointercancel','pointermove','scroll'].forEach(function(ev){
+    document.addEventListener(ev, annule, true);
+  });
+})();

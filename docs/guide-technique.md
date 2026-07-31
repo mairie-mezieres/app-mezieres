@@ -432,6 +432,31 @@ const CACHE = 'mat-v4.15.0';  // ← incrémenter à chaque déploiement
 `manifest.webmanifest` définit le nom, les icônes, la couleur de thème et l'orientation.  
 Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
 
+### 🎨 Aperçu des ambiances (outil mairie, v4.51)
+
+Pour visualiser une ambiance sans attendre la météo ou la saison correspondante :
+
+1. Ouvrir **♿ Personnalisation** depuis l'accueil.
+2. **Appui long (900 ms) sur le titre** « ♿ Accessibilité & Personnalisation ».
+3. Un panneau propose trois listes : **Météo** (dégagé, nuageux, couvert,
+   brouillard, pluie, averses, orage, neige), **Moment** (plein jour, aube,
+   crépuscule, nuit) et **Saison / fête** (Noël, Nouvel An, printemps,
+   14 Juillet, Halloween, automne). Le bandeau se met à jour à chaque choix.
+4. « Revenir au réel » rend la main à la météo réelle.
+
+Garanties de non-perturbation, à préserver si l'outil évolue :
+
+- **Aucun élément visible** : pas de bouton, pas de paramètre d'URL. Le panneau
+  n'est **construit qu'à l'ouverture** — il n'existe donc pas dans le DOM des
+  habitants, ni pour les audits d'accessibilité.
+- **État en mémoire seulement** (`_ambSim`) : aucun `localStorage`. Tout
+  rechargement revient à l'ambiance réelle, même si l'aperçu a été laissé actif.
+- Un bandeau orange **« APERÇU — ambiance simulée, non réelle »** reste affiché
+  tant que la simulation tourne.
+
+Couvert par `tests/e2e/ambiance.spec.js` : absence du DOM avant ouverture, appui
+bref sans effet, simulation effective, et absence de trace persistée après arrêt.
+
 ### Statistiques d'usage — le tracking ne doit jamais bloquer l'UI
 
 `trackStat()` (défini dans `js/mat-utils.js`) est appelé à l'ouverture de chaque
