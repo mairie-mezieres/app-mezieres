@@ -227,14 +227,10 @@ test.describe('aperçu des ambiances', () => {
     expect(await page.locator('#amb-apercu-bandeau').count()).toBe(0);
   });
 
-  test('appui long sur le titre → panneau, simulation et bandeau APERÇU', async ({ page }) => {
+  test('cinq appuis rapides sur le titre → panneau, simulation et bandeau APERÇU', async ({ page }) => {
     await ouvrirPersonnalisation(page);
     const titre = page.locator('#ov-accessibilite .panel-title');
-    const box = await titre.boundingBox();
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.waitForTimeout(1100);      // seuil = 900 ms
-    await page.mouse.up();
+    for (let i = 0; i < 5; i++) await titre.click({ delay: 20 });
 
     await expect(page.locator('#amb-apercu')).toBeVisible();
     await expect(page.locator('#amb-apercu-bandeau')).toBeVisible();
@@ -257,10 +253,19 @@ test.describe('aperçu des ambiances', () => {
     expect(persiste).toBe(false);
   });
 
-  test('un appui bref n’ouvre rien', async ({ page }) => {
+  test('quatre appuis ne suffisent pas', async ({ page }) => {
     await ouvrirPersonnalisation(page);
-    await page.locator('#ov-accessibilite .panel-title').click();
-    await page.waitForTimeout(400);
+    const titre = page.locator('#ov-accessibilite .panel-title');
+    for (let i = 0; i < 4; i++) await titre.click({ delay: 20 });
+    await page.waitForTimeout(300);
     expect(await page.locator('#amb-apercu').count()).toBe(0);
   });
+
+  test('des appuis trop espacés ne déclenchent rien', async ({ page }) => {
+    await ouvrirPersonnalisation(page);
+    const titre = page.locator('#ov-accessibilite .panel-title');
+    for (let i = 0; i < 5; i++) { await titre.click(); await page.waitForTimeout(900); }
+    expect(await page.locator('#amb-apercu').count()).toBe(0);
+  });
+
 });
