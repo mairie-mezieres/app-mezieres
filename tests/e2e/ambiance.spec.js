@@ -84,11 +84,18 @@ test('ciel dégagé la nuit → étoiles', async ({ page }) => {
   expect(r.sunny).toBe(false);
 });
 
-test('crépuscule → teinte dorée, sans soleil ni étoiles', async ({ page }) => {
+// Le bandeau restait vide ~80 min autour du coucher — l'heure la plus consultée.
+test('crépuscule → teinte dorée ET premières étoiles', async ({ page }) => {
   // 21h20, soit 16 min avant le coucher du jour (21h36) → fenêtre ±40 min
   const r = await ambianceAt(page, '21:20', 0);
   expect(r.dusk).toBe(true);
-  expect(r.particules).toBe('');
+  expect(r.particules).toBe('stars-dim');
+  expect(r.sunny).toBe(false);
+});
+
+test('aube → dernières étoiles, jamais le soleil', async ({ page }) => {
+  const r = await ambianceAt(page, '06:10', 0); // lever 06h32 → fenêtre aube
+  expect(r.particules).toBe('stars-dim');
   expect(r.sunny).toBe(false);
 });
 
@@ -96,6 +103,18 @@ test('météo active prioritaire sur le ciel dégagé (non-régression nuages)',
   const r = await ambianceAt(page, '15:00', 3);
   expect(r.particules).toBe('overcast');
   expect(r.sunny).toBe(false);
+});
+
+// Pas d'étoiles sous les nuages : la météo réelle l'emporte toujours, même la nuit.
+test('pluie la nuit → gouttes seules, aucune étoile', async ({ page }) => {
+  const r = await ambianceAt(page, '23:30', 61);
+  expect(r.particules).toBe('rain');
+  expect(r.night).toBe(true);
+});
+
+test('orage la nuit → éclairs seuls', async ({ page }) => {
+  const r = await ambianceAt(page, '23:30', 95);
+  expect(r.particules).toBe('storm');
 });
 
 // Les heures d'Open-Meteo sont des heures locales SANS fuseau : les comparer
@@ -115,4 +134,58 @@ test.describe('appareil dans un autre fuseau horaire', () => {
     const nuit = await ambianceAt(page, '23:30', 0);
     expect(nuit.particules).toBe('stars');
   });
+});
+
+// ── Hiver : le soleil se couche tôt, et le calendrier festif occupe décembre ──
+// Deux règles vérifiées ici : les décors de SOIRÉE (guirlande, étincelles,
+// chauves-souris, 14 Juillet) se superposent aux étoiles ; les décors DIURNES
+// (feuilles, pétales, œufs) leur cèdent la place — des feuilles qui tombent à
+// 19 h dans le noir n'évoquent rien.
+async function ambianceLe(page, dateISO, veilleISO, parisTime, offset, lever, coucher, weatherCode) {
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
+    return route.continue();
+  });
+  await page.addInitScript(() => {
+    try { localStorage.setItem('mat_onboarded_v3', '1'); } catch (_) {}
+  });
+  await page.clock.setFixedTime(new Date(`${dateISO}T${parisTime}:00${offset}`));
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.matHeaderAmbiance === 'function'
+    && typeof window._getFeriesForYear === 'function');
+  await page.evaluate((d) => { window._meteoData = d; matHeaderAmbiance(); }, {
+    forecast: {
+      current: { weather_code: weatherCode },
+      daily: {
+        time:    [veilleISO, dateISO],
+        sunrise: [`${veilleISO}T${lever}`, `${dateISO}T${lever}`],
+        sunset:  [`${veilleISO}T${coucher}`, `${dateISO}T${coucher}`],
+      },
+    },
+  });
+  return page.evaluate(() => {
+    const layer = document.querySelector('.header-amb');
+    return layer ? layer.dataset.kind : '';
+  });
+}
+
+test('nuit de décembre, ciel dégagé → étoiles ET guirlande de Noël', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-12-15', '2026-12-14', '22:00', '+01:00', '08:35', '16:55', 0);
+  expect(k).toBe('stars+noel');
+});
+
+test('nuit de novembre → étoiles à la place des feuilles mortes', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-11-20', '2026-11-19', '19:00', '+01:00', '08:00', '17:10', 0);
+  expect(k).toBe('stars');
+});
+
+test('jour de novembre → feuilles mortes, pas d’étoiles', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-11-20', '2026-11-19', '14:00', '+01:00', '08:00', '17:10', 0);
+  expect(k).toBe('automne');
+});
+
+test('nuit de décembre sous la pluie → gouttes seules', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-12-15', '2026-12-14', '18:00', '+01:00', '08:35', '16:55', 61);
+  expect(k).toBe('rain');
 });

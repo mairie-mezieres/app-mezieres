@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.4.0
+   MAT — Ambiance v1.5.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -82,15 +82,36 @@ function _ambFestive(now){
   return '';
 }
 
-// Ciel dégagé (codes WMO 0-1) : halo de soleil en plein jour, étoiles
-// scintillantes la nuit. À l'aube et au crépuscule, la teinte dorée de la
-// phase suffit — pas de particule supplémentaire.
+// Ciel dégagé (codes WMO 0-1) : reflet de soleil en plein jour, étoiles
+// scintillantes dès la tombée du jour.
 function _ambClearSky(code, phase){
   var c = Number(code);
   if(c !== 0 && c !== 1) return '';
   if(phase === 'night') return 'stars';
+  // Aube et crépuscule : les premières (ou dernières) étoiles, en retrait.
+  // Sans cela, le bandeau restait vide ~80 min autour du coucher — soit l'heure
+  // où l'app est le plus consultée, et le plus beau moment du ciel.
+  if(phase === 'dusk' || phase === 'dawn') return 'stars-dim';
   if(phase === 'day') return 'sun';
-  return ''; // aube, crépuscule, ou phase indéterminée
+  return ''; // phase indéterminée : ni soleil ni étoiles
+}
+
+// Décors festifs compatibles avec la nuit — fêtes du soir ou effets lumineux :
+// ils se SUPERPOSENT aux étoiles. Les autres (nature diurne : pétales, feuilles,
+// œufs) leur cèdent la place, car des feuilles qui tombent à 19 h en décembre,
+// dans le noir, n'évoquent rien.
+var _AMB_FEST_NOCTURNES = ['noel', 'nouvelan', 'juillet14', 'halloween'];
+
+// Compose la liste des effets à peindre, par ordre de superposition.
+function _ambCompose(fam, fest, clear, phase){
+  if(fam) return [fam];                      // météo active : elle seule (pas d'étoiles sous les nuages)
+  var sombre = (phase === 'night' || phase === 'dusk' || phase === 'dawn');
+  if(fest){
+    if(!sombre) return [fest];               // en journée, le décor festif prime sur le soleil
+    if(_AMB_FEST_NOCTURNES.indexOf(fest) >= 0) return [clear, fest].filter(Boolean);
+    return [clear || fest];                  // décor diurne la nuit → étoiles à la place
+  }
+  return [clear].filter(Boolean);
 }
 
 var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night','amb-sunny'];
@@ -109,23 +130,30 @@ function matHeaderAmbiance(){
   // « indéterminé » : seules aube/crépuscule/nuit posent une classe.
   if(phase === 'dawn' || phase === 'dusk' || phase === 'night') header.classList.add('amb-' + phase);
   if(clear === 'sun') header.classList.add('amb-sunny');
-  // Priorité des particules : météo active > décor festif > ciel dégagé —
-  // le soleil ne doit pas masquer la guirlande de Noël un beau jour d'hiver.
-  _ambRenderParticles(header, fam || _ambFestive(new Date()) || clear);
+  _ambRenderParticles(header, _ambCompose(fam, _ambFestive(new Date()), clear, phase));
 }
 
-function _ambRenderParticles(header, fam){
-  // Teinte seule si l'utilisateur préfère réduire les animations
-  var kind = _ambReducedMotion() ? '' : fam;
+// `kinds` : liste d'effets superposés (ex. ['stars','noel']). `dataset.kind`
+// porte leur clé jointe — c'est aussi l'identité utilisée pour ne pas
+// reconstruire la couche à chaque ré-évaluation.
+function _ambRenderParticles(header, kinds){
+  if(typeof kinds === 'string') kinds = [kinds];
+  kinds = (_ambReducedMotion() ? [] : (kinds || [])).filter(Boolean);
+  var key = kinds.join('+');
   var layer = header.querySelector(':scope > .header-amb');
-  if(layer && layer.dataset.kind === kind) return; // déjà en place, ne pas reconstruire
+  if(layer && layer.dataset.kind === key) return; // déjà en place, ne pas reconstruire
   if(layer) layer.remove();
-  if(!kind) return;
+  if(!key) return;
 
   layer = document.createElement('div');
   layer.className = 'header-amb';
-  layer.dataset.kind = kind;
+  layer.dataset.kind = key;
   layer.setAttribute('aria-hidden', 'true');
+  kinds.forEach(function(k){ _ambPaint(layer, k); });
+  header.appendChild(layer);
+}
+
+function _ambPaint(layer, kind){
   var i, s;
   if(kind === 'rain' || kind === 'storm'){
     var n = kind === 'storm' ? 26 : 20;
@@ -154,7 +182,9 @@ function _ambRenderParticles(header, fam){
   } else if(kind === 'sun'){
     layer.appendChild(_ambFlare());
   } else if(kind === 'stars'){
-    _ambStars(layer);
+    _ambStars(layer, 13, 1);
+  } else if(kind === 'stars-dim'){
+    _ambStars(layer, 6, 0.5);
   } else if(kind === 'noel'){
     _ambGuirlande(layer);
     _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
@@ -172,7 +202,6 @@ function _ambRenderParticles(header, fam){
     _ambBats(layer);
     _ambFall(layer, '🍂', 6, 9, 14, 0.5, 0.8);
   }
-  header.appendChild(layer);
 }
 
 // Chute avec balancement (réutilise les keyframes ambSnow) : flocons,
@@ -246,15 +275,19 @@ function _ambFlare(){
   return wrap;
 }
 
-// Étoiles scintillantes par nuit dégagée (réutilise les keyframes ambTwinkle)
-function _ambStars(layer){
-  for(var i = 0; i < 13; i++){
+// Étoiles scintillantes par ciel dégagé (réutilise les keyframes ambTwinkle).
+// `eclat` < 1 pour les premières étoiles du crépuscule / les dernières de l'aube.
+function _ambStars(layer, nombre, eclat){
+  nombre = nombre || 13;
+  eclat = eclat == null ? 1 : eclat;
+  for(var i = 0; i < nombre; i++){
     var s = document.createElement('span');
     s.className = 'amb-star';
     s.textContent = '✦';
     s.style.left = (2 + Math.random() * 96).toFixed(1) + '%';
     s.style.top = (3 + Math.random() * 55).toFixed(1) + '%';
-    s.style.fontSize = (0.3 + Math.random() * 0.4).toFixed(2) + 'rem';
+    s.style.fontSize = ((0.3 + Math.random() * 0.4) * (eclat < 1 ? 0.85 : 1)).toFixed(2) + 'rem';
+    s.style.opacity = eclat;
     s.style.animationDelay = '-' + (Math.random() * 3).toFixed(2) + 's';
     s.style.animationDuration = (1.6 + Math.random() * 2.4).toFixed(2) + 's';
     layer.appendChild(s);

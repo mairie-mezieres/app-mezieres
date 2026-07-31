@@ -490,9 +490,21 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   (`.amb-flare-ghost`) alignés sur l'axe du reflet — + teinte `amb-sunny` en
   plein jour ; étoiles scintillantes
   (`.amb-star`, réutilise `ambTwinkle`) en phase `night`. Rien à l'aube/crépuscule
-  (la teinte de phase suffit). **Ordre de priorité des particules : météo active
-  (pluie/neige/orage/brouillard/nuages) > décor festif > ciel dégagé** — le soleil
-  ne masque jamais la guirlande de Noël.
+  (la teinte de phase suffit).
+- **Composition des effets** (`_ambCompose()`, v4.50) — la couche peut désormais
+  superposer plusieurs effets, sa clé est leur jointure (`dataset.kind` =
+  `"stars+noel"`). Règles :
+  1. **Météo active** (pluie/neige/orage/brouillard/nuages) → **elle seule**.
+     Pas d'étoiles sous les nuages : c'est ce qui rend le rendu crédible.
+  2. **Journée + décor festif** → le décor prime sur le reflet de soleil (une
+     guirlande de Noël ne disparaît pas parce qu'il fait beau).
+  3. **Nuit/aube/crépuscule + décor festif** → les décors **du soir** de
+     `_AMB_FEST_NOCTURNES` (Noël, Nouvel An, 14 Juillet, Halloween) se
+     **superposent** aux étoiles ; les décors **diurnes** (pétales, feuilles,
+     œufs) leur **cèdent la place** — des feuilles qui tombent à 19 h dans le
+     noir de novembre n'évoquent rien.
+  Conséquence voulue en hiver : le soleil se couchant vers 16 h 55, les étoiles
+  occupent une grande partie de la soirée — c'est la réalité du ciel.
   ⚠️ Deux contraintes issues du terrain, à ne pas défaire : la source est en
   **haut à gauche** (à droite, elle voilait l'illustration MAT & MEL) et le cœur
   est **petit et intense** plutôt que large et diffus — une tache large lave le

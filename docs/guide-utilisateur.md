@@ -80,14 +80,19 @@ brume par temps de brouillard, nuages qui dérivent doucement par temps nuageux 
 couvert (avec une teinte légèrement grisée quand le ciel est couvert) — et sa
 couleur change selon le moment de la journée (teintes dorées à l'aube et au
 crépuscule, vert profond la nuit). Par beau temps, un reflet de soleil traverse
-le bandeau en journée — un éclat lumineux et sa traînée de halos dorés — et par
-nuit dégagée, des étoiles scintillent.
+le bandeau en journée — un éclat lumineux et sa traînée de halos dorés — puis les
+premières étoiles apparaissent **dès le coucher du soleil** et scintillent toute
+la nuit, avant de s'effacer à l'aube. S'il pleut ou si le ciel est couvert, ce
+sont les gouttes ou les nuages qui s'affichent : pas d'étoiles derrière les
+nuages.
 
 Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
 lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au
 printemps, œufs pastel le week-end de Pâques, confettis bleu-blanc-rouge les 13
 et 14 juillet, feuilles mortes en automne et chauves-souris à Halloween. La vraie
-météo garde toujours la priorité sur les décorations.
+météo garde toujours la priorité sur les décorations. La nuit, les décors du soir
+(guirlande, étincelles, chauves-souris) se mêlent aux étoiles, tandis que les
+feuilles et les pétales leur laissent la place.
 
 Ces animations sont purement décoratives : si votre téléphone est réglé sur
 « Réduire les animations », seule la teinte de couleur est conservée (voir §10).
