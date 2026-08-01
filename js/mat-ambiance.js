@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.6.1
+   MAT — Ambiance v1.7.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -56,12 +56,23 @@ function _ambDayPhase(daily){
   return 'day';
 }
 
-// Calendrier festif : périodes de l'année où le header se décore quand la
-// météo est calme — la météo réelle (pluie/neige/orage/brouillard) garde
-// TOUJOURS la priorité sur les particules festives.
+// Calendrier festif — deux natures de périodes, toutes courtes :
+//   • les FÊTES, sur leur durée propre ;
+//   • les SAISONS, sur 3 jours seulement : il s'agit d'ANNONCER un début, pas
+//     d'habiller des semaines entières.
+// La météo réelle (pluie/neige/orage/brouillard/nuages) garde TOUJOURS la
+// priorité sur ces décors.
+//
+// Ordre = priorité (premier trouvé l'emporte). Deux chevauchements voulus :
+//   • Pâques est testé avant tout, sa fenêtre étant mobile ;
+//   • l'hiver (21-23 déc) l'emporte sur Noël (15-30 déc) : sans cela l'annonce
+//     de saison, entièrement contenue dans Noël, ne s'afficherait jamais.
 // Pâques s'appuie sur _getFeriesForYear (mat-jours-feries.js, chargé au boot
 // par mat-boot.js) ; si le script n'est pas encore là, la période est
 // simplement ignorée jusqu'à la prochaine ré-évaluation (10 min).
+//
+// Les dates d'équinoxe et de solstice varient d'un jour selon les années ; on
+// retient les dates usuelles, la fenêtre de 3 jours absorbant l'écart.
 function _ambFestive(now){
   var m = now.getMonth() + 1, d = now.getDate();
   try{
@@ -73,12 +84,16 @@ function _ambFestive(now){
       }
     }
   }catch(_){}
-  if(m === 12 && d <= 30) return 'noel';
+  // Saisons — 3 jours d'annonce
+  if(m === 3  && d >= 20 && d <= 22) return 'printemps'; // équinoxe de printemps
+  if(m === 6  && d >= 21 && d <= 23) return 'ete';       // solstice d'été
+  if(m === 9  && d >= 23 && d <= 25) return 'automne';   // équinoxe d'automne
+  if(m === 12 && d >= 21 && d <= 23) return 'hiver';     // solstice d'hiver
+  // Fêtes
+  if(m === 12 && d >= 15 && d <= 30) return 'noel';
   if((m === 12 && d === 31) || (m === 1 && d <= 2)) return 'nouvelan';
-  if((m === 3 && d >= 20) || m === 4) return 'printemps';   // pétales
   if(m === 7 && (d === 13 || d === 14)) return 'juillet14';
-  if(m === 10 && d >= 29) return 'halloween';               // avant l'automne
-  if(m === 10 || (m === 11 && d <= 20)) return 'automne';   // feuilles mortes
+  if(m === 10 && d >= 29) return 'halloween';
   return '';
 }
 
@@ -100,7 +115,7 @@ function _ambClearSky(code, phase){
 // ils se SUPERPOSENT aux étoiles. Les autres (nature diurne : pétales, feuilles,
 // œufs) leur cèdent la place, car des feuilles qui tombent à 19 h en décembre,
 // dans le noir, n'évoquent rien.
-var _AMB_FEST_NOCTURNES = ['noel', 'nouvelan', 'juillet14', 'halloween'];
+var _AMB_FEST_NOCTURNES = ['noel', 'nouvelan', 'juillet14', 'halloween', 'hiver'];
 
 // Compose la liste des effets à peindre, par ordre de superposition.
 function _ambCompose(fam, fest, clear, phase){
@@ -192,8 +207,14 @@ function _ambPaint(layer, kind){
   } else if(kind === 'stars-dim'){
     _ambStars(layer, 6, 0.5);
   } else if(kind === 'noel'){
+    // Pas de flocons : ils se lisaient comme « il neige » alors qu'il s'agit
+    // d'un décor. Guirlande + étoiles dorées, sans ambiguïté météo.
     _ambGuirlande(layer);
-    _ambFall(layer, '❄', 8, 9, 15, 0.4, 0.7);
+    _ambStars(layer, 9, 0.85, '#ffe9a8');
+  } else if(kind === 'hiver'){
+    _ambGivre(layer);
+  } else if(kind === 'ete'){
+    _ambMotes(layer);
   } else if(kind === 'nouvelan'){
     _ambFall(layer, '✨', 12, 7, 12, 0.4, 0.7);
   } else if(kind === 'printemps'){
@@ -201,12 +222,13 @@ function _ambPaint(layer, kind){
   } else if(kind === 'paques'){
     _ambEggs(layer);
   } else if(kind === 'juillet14'){
-    _ambTricolore(layer);
+    _ambFanions(layer);
+    _ambFeuArtifice(layer);
   } else if(kind === 'automne'){
-    _ambFall(layer, '🍂', 10, 8, 14, 0.5, 0.9);
+    _ambFeuilles(layer, 10);
   } else if(kind === 'halloween'){
     _ambBats(layer);
-    _ambFall(layer, '🍂', 6, 9, 14, 0.5, 0.8);
+    _ambFeuilles(layer, 6);
   }
 }
 
@@ -283,7 +305,7 @@ function _ambFlare(){
 
 // Étoiles scintillantes par ciel dégagé (réutilise les keyframes ambTwinkle).
 // `eclat` < 1 pour les premières étoiles du crépuscule / les dernières de l'aube.
-function _ambStars(layer, nombre, eclat){
+function _ambStars(layer, nombre, eclat, couleur){
   nombre = nombre || 13;
   eclat = eclat == null ? 1 : eclat;
   for(var i = 0; i < nombre; i++){
@@ -294,8 +316,85 @@ function _ambStars(layer, nombre, eclat){
     s.style.top = (3 + Math.random() * 55).toFixed(1) + '%';
     s.style.fontSize = ((0.3 + Math.random() * 0.4) * (eclat < 1 ? 0.85 : 1)).toFixed(2) + 'rem';
     s.style.opacity = eclat;
+    if(couleur) s.style.color = couleur;
     s.style.animationDelay = '-' + (Math.random() * 3).toFixed(2) + 's';
     s.style.animationDuration = (1.6 + Math.random() * 2.4).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Feuilles d'automne : chute lente avec forte oscillation latérale et rotation
+// propre — une feuille ne tombe pas droit comme un flocon (keyframes ambLeaf).
+function _ambFeuilles(layer, nombre){
+  var CHARS = ['🍂', '🍁'];
+  for(var i = 0; i < nombre; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-leaf';
+    s.textContent = CHARS[i % CHARS.length];
+    var dur = 11 + Math.random() * 8;
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    s.style.fontSize = (0.55 + Math.random() * 0.45).toFixed(2) + 'rem';
+    s.style.animationDuration = dur.toFixed(1) + 's';
+    s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// 14 Juillet : guirlande de fanions bleu-blanc-rouge en haut du bandeau
+var _AMB_FANION_COLORS = ['#0055A4', '#f2f2f2', '#EF4135'];
+function _ambFanions(layer){
+  for(var i = 0; i < 13; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-fanion';
+    s.style.left = (1 + i * 7.7).toFixed(1) + '%';
+    s.style.borderTopColor = _AMB_FANION_COLORS[i % 3];
+    s.style.animationDelay = '-' + (i * 0.28).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Feu d'artifice discret : quelques éclosions colorées espacées, sur le même
+// principe que l'éclair d'orage — de la lumière, pas des particules lourdes.
+function _ambFeuArtifice(layer){
+  var COULEURS = ['rgba(255,235,140,.55)', 'rgba(150,200,255,.5)', 'rgba(255,160,180,.5)'];
+  for(var i = 0; i < 3; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-firework';
+    s.style.left = (18 + Math.random() * 64).toFixed(1) + '%';
+    s.style.top = (10 + Math.random() * 30).toFixed(1) + '%';
+    s.style.background = 'radial-gradient(circle at center,' + COULEURS[i % 3] + ',rgba(255,255,255,0) 68%)';
+    s.style.animationDelay = '-' + (i * 2.6).toFixed(1) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Hiver : cristaux de givre aux angles du bandeau. Fixes — donc jamais confondus
+// avec de la neige qui tombe.
+function _ambGivre(layer){
+  for(var i = 0; i < 8; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-givre';
+    s.textContent = '❅';
+    s.style.left = (i < 4 ? Math.random() * 26 : 74 + Math.random() * 24).toFixed(1) + '%';
+    s.style.top = (Math.random() * 62).toFixed(1) + '%';
+    s.style.fontSize = (0.5 + Math.random() * 0.6).toFixed(2) + 'rem';
+    s.style.animationDelay = '-' + (Math.random() * 5).toFixed(2) + 's';
+    layer.appendChild(s);
+  }
+}
+
+// Été : fines particules dorées qui montent lentement, comme de la poussière
+// de lumière dans l'air chaud.
+function _ambMotes(layer){
+  for(var i = 0; i < 14; i++){
+    var s = document.createElement('span');
+    s.className = 'amb-mote';
+    var dur = 9 + Math.random() * 7;
+    s.style.left = (Math.random() * 100).toFixed(1) + '%';
+    var t = (2 + Math.random() * 3).toFixed(1);
+    s.style.width = t + 'px'; s.style.height = t + 'px';
+    s.style.animationDuration = dur.toFixed(1) + 's';
+    s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
     layer.appendChild(s);
   }
 }
@@ -454,9 +553,16 @@ var _AMB_APERCU_MOMENT = [
 ];
 // Dates choisies pour tomber dans chaque période de _ambFestive()
 var _AMB_APERCU_SAISON = [
-  ['Aucune (période réelle)', ''], ['Noël', '2026-12-15'], ['Nouvel An', '2026-12-31'],
-  ['Printemps', '2026-04-10'], ['14 Juillet', '2026-07-14'],
-  ['Halloween', '2026-10-30'], ['Automne', '2026-11-10']
+  ['Aucune (période réelle)', ''],
+  ['Printemps (20-22 mars)', '2026-03-21'],
+  ['Pâques (samedi → lundi)', '2026-04-05'],
+  ['Été (21-23 juin)', '2026-06-22'],
+  ['14 Juillet', '2026-07-14'],
+  ['Automne (23-25 sept.)', '2026-09-24'],
+  ['Halloween (29-31 oct.)', '2026-10-30'],
+  ['Noël (15-30 déc.)', '2026-12-17'],
+  ['Hiver (21-23 déc.)', '2026-12-22'],
+  ['Nouvel An', '2026-12-31']
 ];
 
 function _ambSelect(id, label, options){

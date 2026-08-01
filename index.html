@@ -43,7 +43,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.8.0">
+<link rel="stylesheet" href="css/mat.css?v=4.9.0">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.2.9">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
@@ -51,7 +51,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-core.js?v=4.3.2"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.7"></script>
-<script defer src="js/mat-ambiance.js?v=1.6.1"></script>
+<script defer src="js/mat-ambiance.js?v=1.7.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.4"></script>
 <script defer src="js/mat-forms.js?v=4.6.5"></script>
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.51.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.52 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -438,7 +438,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.51.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.52</button>
 </div>
 </div>
 </div>
@@ -1627,6 +1627,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 31 juillet 2026 — v4.52</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Les <strong>saisons s&rsquo;annoncent d&eacute;sormais sur 3&nbsp;jours</strong> &agrave; leur d&eacute;but&nbsp;: printemps (20&nbsp;mars), &eacute;t&eacute; (21&nbsp;juin), automne (23&nbsp;septembre) et hiver (21&nbsp;d&eacute;cembre) &mdash; au lieu d&rsquo;habiller des semaines enti&egrave;res</li>
+<li>No&euml;l (15-30&nbsp;d&eacute;c.)&nbsp;: <strong>guirlande et &eacute;toiles dor&eacute;es</strong>, sans les flocons qui laissaient croire qu&rsquo;il neigeait</li>
+<li>14&nbsp;Juillet&nbsp;: <strong>fanions bleu-blanc-rouge</strong> et discrets feux d&rsquo;artifice ; automne&nbsp;: les feuilles <strong>oscillent</strong> en tombant, comme de vraies feuilles</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 31 juillet 2026 — v4.50</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Les <strong>&eacute;toiles apparaissent d&egrave;s le coucher du soleil</strong> (et s&rsquo;effacent &agrave; l&rsquo;aube) au lieu d&rsquo;attendre 40&nbsp;minutes&nbsp;: le bandeau ne reste plus vide au plus beau moment du ciel</li>

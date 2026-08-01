@@ -1218,6 +1218,46 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 @keyframes ambFlareDrift{from{transform:translate(-8px,-4px)}to{transform:translate(10px,6px)}}
 @keyframes ambFlarePulse{from{opacity:.72;transform:scale(.93)}to{opacity:1;transform:scale(1.08)}}
 @keyframes ambGhostShimmer{from{transform:scale(.88)}to{transform:scale(1.12)}}
+/* Feuilles d'automne : une feuille ne tombe pas droit — forte oscillation
+   latérale et rotation propre, contrairement aux flocons (ambSnow). */
+.amb-leaf{position:absolute;top:-28px;animation:ambLeaf 14s linear infinite;}
+@keyframes ambLeaf{
+  0%{transform:translate(0,0) rotate(0deg)}
+  15%{transform:translate(26px,80px) rotate(48deg)}
+  30%{transform:translate(-18px,165px) rotate(-32deg)}
+  45%{transform:translate(30px,250px) rotate(70deg)}
+  60%{transform:translate(-22px,335px) rotate(-46deg)}
+  75%{transform:translate(24px,420px) rotate(96deg)}
+  90%{transform:translate(-14px,505px) rotate(-24deg)}
+  100%{transform:translate(8px,580px) rotate(60deg)}
+}
+
+/* 14 Juillet : guirlande de fanions + éclosions de feu d'artifice */
+.amb-fanion{position:absolute;top:0;width:0;height:0;border-left:9px solid transparent;
+  border-right:9px solid transparent;border-top:16px solid currentColor;opacity:.9;
+  transform-origin:50% 0;animation:ambFanion 3.4s ease-in-out infinite;}
+@keyframes ambFanion{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.amb-firework{position:absolute;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;
+  opacity:0;animation:ambFirework 7.8s ease-out infinite;}
+@keyframes ambFirework{0%,88%,100%{opacity:0;transform:scale(.35)}
+  92%{opacity:1;transform:scale(1)}96%{opacity:.35;transform:scale(1.25)}}
+
+/* Hiver : cristaux de givre FIXES (jamais confondus avec de la neige) */
+.amb-givre{position:absolute;color:rgba(214,240,255,.85);
+  text-shadow:0 0 7px rgba(180,225,255,.6);animation:ambTwinkle 4.5s ease-in-out infinite;}
+
+/* Été : poussière de lumière qui monte doucement dans l'air chaud */
+.amb-mote{position:absolute;bottom:-10px;border-radius:50%;
+  background:radial-gradient(circle at center,rgba(255,244,190,.9),rgba(255,226,140,0) 70%);
+  animation:ambMote 12s linear infinite;}
+@keyframes ambMote{
+  0%{transform:translate(0,0);opacity:0}
+  12%{opacity:.9}
+  50%{transform:translate(14px,-260px);opacity:.75}
+  88%{opacity:.5}
+  100%{transform:translate(-8px,-520px);opacity:0}
+}
+
 .amb-star{position:absolute;color:rgba(255,255,255,0.92);text-shadow:0 0 5px rgba(255,255,255,0.55);animation:ambTwinkle 2.4s ease-in-out infinite;}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si

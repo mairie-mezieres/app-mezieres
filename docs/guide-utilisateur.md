@@ -86,13 +86,18 @@ la nuit, avant de s'effacer à l'aube. S'il pleut ou si le ciel est couvert, ce
 sont les gouttes ou les nuages qui s'affichent : pas d'étoiles derrière les
 nuages.
 
-Il suit aussi **les saisons et les fêtes** quand la météo est calme : guirlande
-lumineuse et flocons en décembre, étincelles au Nouvel An, pétales de fleurs au
-printemps, œufs pastel le week-end de Pâques, confettis bleu-blanc-rouge les 13
-et 14 juillet, feuilles mortes en automne et chauves-souris à Halloween. La vraie
-météo garde toujours la priorité sur les décorations. La nuit, les décors du soir
-(guirlande, étincelles, chauves-souris) se mêlent aux étoiles, tandis que les
-feuilles et les pétales leur laissent la place.
+Il suit aussi **les saisons et les fêtes** quand la météo est calme. Les débuts
+de saison sont annoncés pendant **3 jours** : pétales au printemps (20 mars),
+poussière de lumière à l'été (21 juin), feuilles qui virevoltent à l'automne
+(23 septembre) et cristaux de givre à l'hiver (21 décembre). Les fêtes ont leur
+propre durée : guirlande et étoiles dorées à Noël (15-30 décembre), étincelles au
+Nouvel An, œufs pastel le week-end de Pâques, fanions tricolores et feux
+d'artifice les 13 et 14 juillet, chauves-souris à Halloween (29-31 octobre).
+
+La vraie météo garde toujours la priorité sur les décorations. La nuit, les
+décors du soir (guirlande, étincelles, fanions, chauves-souris, givre) se mêlent
+aux étoiles, tandis que les pétales, les feuilles et les œufs leur laissent la
+place.
 
 Ces animations sont purement décoratives : si votre téléphone est réglé sur
 « Réduire les animations », seule la teinte de couleur est conservée (voir §10).

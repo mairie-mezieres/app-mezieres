@@ -171,22 +171,41 @@ async function ambianceLe(page, dateISO, veilleISO, parisTime, offset, lever, co
 }
 
 test('nuit de décembre, ciel dégagé → étoiles ET guirlande de Noël', async ({ page }) => {
-  const k = await ambianceLe(page, '2026-12-15', '2026-12-14', '22:00', '+01:00', '08:35', '16:55', 0);
+  const k = await ambianceLe(page, '2026-12-17', '2026-12-16', '22:00', '+01:00', '08:37', '16:55', 0);
   expect(k).toBe('stars+noel');
 });
 
-test('nuit de novembre → étoiles à la place des feuilles mortes', async ({ page }) => {
-  const k = await ambianceLe(page, '2026-11-20', '2026-11-19', '19:00', '+01:00', '08:00', '17:10', 0);
+// Les saisons ne durent que 3 jours : l'équinoxe d'automne, pas tout novembre.
+test('nuit d’équinoxe d’automne → étoiles à la place des feuilles', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-09-24', '2026-09-23', '22:00', '+02:00', '07:35', '19:50', 0);
   expect(k).toBe('stars');
 });
 
-test('jour de novembre → feuilles mortes, pas d’étoiles', async ({ page }) => {
-  const k = await ambianceLe(page, '2026-11-20', '2026-11-19', '14:00', '+01:00', '08:00', '17:10', 0);
+test('jour d’équinoxe d’automne → feuilles, pas d’étoiles', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-09-24', '2026-09-23', '14:00', '+02:00', '07:35', '19:50', 0);
   expect(k).toBe('automne');
 });
 
+// Hors des fenêtres de 3 jours, plus aucun décor : le 10 novembre est nu.
+test('hors fenêtre de saison → aucun décor, seulement le ciel', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-11-10', '2026-11-09', '14:00', '+01:00', '07:45', '17:20', 0);
+  expect(k).toBe('sun');
+});
+
+// L'annonce du solstice (21-23 déc) est incluse dans Noël (15-30 déc) : sans
+// priorité explicite, elle ne s'afficherait jamais.
+test('solstice d’hiver → givre, prioritaire sur Noël', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-12-22', '2026-12-21', '14:00', '+01:00', '08:40', '16:55', 0);
+  expect(k).toBe('hiver');
+});
+
+test('solstice d’été → poussière de lumière', async ({ page }) => {
+  const k = await ambianceLe(page, '2026-06-22', '2026-06-21', '14:00', '+02:00', '05:50', '21:55', 0);
+  expect(k).toBe('ete');
+});
+
 test('nuit de décembre sous la pluie → gouttes seules', async ({ page }) => {
-  const k = await ambianceLe(page, '2026-12-15', '2026-12-14', '18:00', '+01:00', '08:35', '16:55', 61);
+  const k = await ambianceLe(page, '2026-12-17', '2026-12-16', '18:00', '+01:00', '08:37', '16:55', 61);
   expect(k).toBe('rain');
 });
 
@@ -242,7 +261,15 @@ test.describe('aperçu des ambiances', () => {
 
     // Ciel dégagé + nuit + Noël → superposition
     await page.selectOption('#amb-ap-meteo', '0');
-    await page.selectOption('#amb-ap-saison', '2026-12-15');
+    // On retrouve l'option par son LIBELLÉ, pas par sa date : ce couplage à la
+    // valeur avait cassé le test au premier resserrage de la fenêtre de Noël.
+    const valeurNoel = await page.evaluate(() => {
+      const o = Array.from(document.getElementById('amb-ap-saison').options)
+        .find((x) => x.textContent.trim().startsWith('Noël'));
+      return o ? o.value : '';
+    });
+    expect(valeurNoel, 'option Noël absente de la liste d’aperçu').not.toBe('');
+    await page.selectOption('#amb-ap-saison', valeurNoel);
     expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toBe('stars+noel');
 
     // Retour au réel : bandeau retiré, aucune trace persistée
