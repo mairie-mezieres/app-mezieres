@@ -37,3 +37,9 @@ tests/e2e/node_modules/
 tests/e2e/test-results/
 tests/e2e/playwright-report/
 tests/e2e/playwright/.cache/
+
+# Veille automatique — livrables éphémères (générés en CI, jamais committés ;
+# voir docs/guide-technique.md §10). Seul veille/historique-techno.md est suivi.
+rapport-veille.html
+rapport-bulletin.html
+veille/actions-pwa.json

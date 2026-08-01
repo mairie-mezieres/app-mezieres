@@ -8,6 +8,13 @@ Ce dossier contient la **mémoire compacte des veilles automatiques** (workflow
   une ligne par information rapportée (`- Titre court — URL`) ou recommandation
   émise (`- [reco] Titre court`). Limité aux 12 dernières semaines.
 
+- `actions-pwa.json` — **éphémère, non committé** (généré à chaque run, comme le
+  rapport HTML). Tableau d'actions concrètes et sourcées à mener sur la PWA
+  (catégories `dependance` / `securite` / `accessibilite`).
+  `scripts/create-veille-issue.js` le transforme en une **issue-checklist**
+  « 🔭 Actions PWA — veille du JJ/MM ». Voir ADR-0005 et
+  `docs/guide-technique.md` §10.
+
 L'agent lit ce fichier **avant** ses recherches pour ne pas re-signaler une
 information déjà rapportée (anti-redondance), puis le met à jour ; le workflow
 le committe **après l'envoi réussi de l'email** (si l'envoi échoue, la mémoire
