@@ -261,7 +261,15 @@ test.describe('aperçu des ambiances', () => {
 
     // Ciel dégagé + nuit + Noël → superposition
     await page.selectOption('#amb-ap-meteo', '0');
-    await page.selectOption('#amb-ap-saison', '2026-12-15');
+    // On retrouve l'option par son LIBELLÉ, pas par sa date : ce couplage à la
+    // valeur avait cassé le test au premier resserrage de la fenêtre de Noël.
+    const valeurNoel = await page.evaluate(() => {
+      const o = Array.from(document.getElementById('amb-ap-saison').options)
+        .find((x) => x.textContent.trim().startsWith('Noël'));
+      return o ? o.value : '';
+    });
+    expect(valeurNoel, 'option Noël absente de la liste d’aperçu').not.toBe('');
+    await page.selectOption('#amb-ap-saison', valeurNoel);
     expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toBe('stars+noel');
 
     // Retour au réel : bandeau retiré, aucune trace persistée
