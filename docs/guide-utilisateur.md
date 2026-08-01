@@ -88,7 +88,7 @@ nuages.
 
 Il suit aussi **les saisons et les fêtes** quand la météo est calme. Les débuts
 de saison sont annoncés pendant **3 jours** : pétales au printemps (20 mars),
-poussière de lumière à l'été (21 juin), feuilles qui virevoltent à l'automne
+papillons à l'été (21 juin), feuilles qui virevoltent à l'automne
 (23 septembre) et cristaux de givre à l'hiver (21 décembre). Les fêtes ont leur
 propre durée : guirlande et étoiles dorées à Noël (15-30 décembre), étincelles au
 Nouvel An, œufs pastel le week-end de Pâques, fanions tricolores et feux

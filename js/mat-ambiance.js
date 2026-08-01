@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.7.0
+   MAT — Ambiance v1.8.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -214,7 +214,7 @@ function _ambPaint(layer, kind){
   } else if(kind === 'hiver'){
     _ambGivre(layer);
   } else if(kind === 'ete'){
-    _ambMotes(layer);
+    _ambPapillons(layer);
   } else if(kind === 'nouvelan'){
     _ambFall(layer, '✨', 12, 7, 12, 0.4, 0.7);
   } else if(kind === 'printemps'){
@@ -343,12 +343,12 @@ function _ambFeuilles(layer, nombre){
 // 14 Juillet : guirlande de fanions bleu-blanc-rouge en haut du bandeau
 var _AMB_FANION_COLORS = ['#0055A4', '#f2f2f2', '#EF4135'];
 function _ambFanions(layer){
-  for(var i = 0; i < 13; i++){
+  for(var i = 0; i < 17; i++){
     var s = document.createElement('span');
     s.className = 'amb-fanion';
-    s.style.left = (1 + i * 7.7).toFixed(1) + '%';
+    s.style.left = (0.5 + i * 5.9).toFixed(1) + '%';
     s.style.borderTopColor = _AMB_FANION_COLORS[i % 3];
-    s.style.animationDelay = '-' + (i * 0.28).toFixed(2) + 's';
+    s.style.animationDelay = '-' + (i * 0.16).toFixed(2) + 's';
     layer.appendChild(s);
   }
 }
@@ -357,13 +357,13 @@ function _ambFanions(layer){
 // principe que l'éclair d'orage — de la lumière, pas des particules lourdes.
 function _ambFeuArtifice(layer){
   var COULEURS = ['rgba(255,235,140,.55)', 'rgba(150,200,255,.5)', 'rgba(255,160,180,.5)'];
-  for(var i = 0; i < 3; i++){
+  for(var i = 0; i < 5; i++){
     var s = document.createElement('span');
     s.className = 'amb-firework';
     s.style.left = (18 + Math.random() * 64).toFixed(1) + '%';
     s.style.top = (10 + Math.random() * 30).toFixed(1) + '%';
     s.style.background = 'radial-gradient(circle at center,' + COULEURS[i % 3] + ',rgba(255,255,255,0) 68%)';
-    s.style.animationDelay = '-' + (i * 2.6).toFixed(1) + 's';
+    s.style.animationDelay = '-' + (i * 0.9).toFixed(1) + 's';
     layer.appendChild(s);
   }
 }
@@ -383,32 +383,50 @@ function _ambGivre(layer){
   }
 }
 
-// Été : fines particules dorées qui montent lentement, comme de la poussière
-// de lumière dans l'air chaud.
-function _ambMotes(layer){
-  for(var i = 0; i < 14; i++){
+// Été : papillons qui traversent le bandeau en voletant. Remplace une
+// « poussière de lumière » que personne ne reliait à l'été — elle se lisait
+// comme des bulles. Même principe que les chauves-souris d'Halloween, qui
+// fonctionnent : une silhouette reconnaissable et une trajectoire irrégulière.
+function _ambPapillons(layer){
+  var CHARS = ['🦋', '🦋', '🌼'];
+  for(var i = 0; i < 3; i++){
     var s = document.createElement('span');
-    s.className = 'amb-mote';
-    var dur = 9 + Math.random() * 7;
-    s.style.left = (Math.random() * 100).toFixed(1) + '%';
-    var t = (2 + Math.random() * 3).toFixed(1);
-    s.style.width = t + 'px'; s.style.height = t + 'px';
+    s.className = 'amb-papillon';
+    s.textContent = CHARS[i];
+    s.style.top = (12 + Math.random() * 40).toFixed(1) + '%';
+    s.style.fontSize = (0.75 + Math.random() * 0.4).toFixed(2) + 'rem';
+    var dur = 11 + Math.random() * 6;
     s.style.animationDuration = dur.toFixed(1) + 's';
-    s.style.animationDelay = '-' + (Math.random() * dur).toFixed(1) + 's';
+    s.style.animationDelay = '-' + (i * 3.6).toFixed(1) + 's';
     layer.appendChild(s);
   }
 }
 
-// Guirlande lumineuse le long du bord supérieur (Noël)
+// Noël : guirlande FESTONNÉE — trois cordons qui pendent, avec des ampoules
+// suspendues le long de la courbe. La version précédente (une rangée de points
+// alignés en haut) ne se lisait pas comme une guirlande.
 var _AMB_GUIRLANDE_COLORS = ['#f87171','#fbbf24','#34d399','#60a5fa','#f472b6'];
 function _ambGuirlande(layer){
-  for(var i = 0; i < 14; i++){
-    var s = document.createElement('span');
-    s.className = 'amb-guirlande';
-    s.style.left = (2 + i * 7).toFixed(1) + '%';
-    s.style.background = _AMB_GUIRLANDE_COLORS[i % _AMB_GUIRLANDE_COLORS.length];
-    s.style.animationDelay = (Math.random() * 2).toFixed(2) + 's';
-    layer.appendChild(s);
+  var ARCS = 3, PAR_ARC = 5, n = 0;
+  for(var a = 0; a < ARCS; a++){
+    var cordon = document.createElement('span');
+    cordon.className = 'amb-cordon';
+    cordon.style.left = (a * (100 / ARCS)).toFixed(2) + '%';
+    cordon.style.width = (100 / ARCS).toFixed(2) + '%';
+    layer.appendChild(cordon);
+    for(var i = 0; i <= PAR_ARC; i++){
+      var t = i / PAR_ARC;                       // 0 → 1 le long de l'arc
+      var creux = Math.sin(t * Math.PI) * 21;    // profondeur du feston
+      var b = document.createElement('span');
+      b.className = 'amb-ampoule';
+      b.style.left = ((a + t) * (100 / ARCS)).toFixed(2) + '%';
+      b.style.top = (5 + creux).toFixed(1) + 'px';
+      b.style.background = _AMB_GUIRLANDE_COLORS[n % _AMB_GUIRLANDE_COLORS.length];
+      b.style.color = _AMB_GUIRLANDE_COLORS[n % _AMB_GUIRLANDE_COLORS.length];
+      b.style.animationDelay = '-' + (n * 0.32).toFixed(2) + 's';
+      layer.appendChild(b);
+      n++;
+    }
   }
 }
 
