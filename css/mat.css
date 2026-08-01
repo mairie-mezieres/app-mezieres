@@ -1246,23 +1246,34 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
 .amb-givre{position:absolute;color:rgba(214,240,255,.85);
   text-shadow:0 0 7px rgba(180,225,255,.6);animation:ambTwinkle 4.5s ease-in-out infinite;}
 
-/* Été : poussière de lumière qui monte doucement dans l'air chaud */
-.amb-mote{position:absolute;bottom:-10px;border-radius:50%;
-  background:radial-gradient(circle at center,rgba(255,244,190,.9),rgba(255,226,140,0) 70%);
-  animation:ambMote 12s linear infinite;}
-@keyframes ambMote{
-  0%{transform:translate(0,0);opacity:0}
-  12%{opacity:.9}
-  50%{transform:translate(14px,-260px);opacity:.75}
-  88%{opacity:.5}
-  100%{transform:translate(-8px,-520px);opacity:0}
+/* Été — papillons : trajectoire irrégulière, montées et descentes, comme un vol
+   réel. Remplace une « poussière de lumière » qui se lisait comme des bulles. */
+.amb-papillon{position:absolute;left:-9%;animation:ambPapillon 13s linear infinite;}
+@keyframes ambPapillon{
+  0%{transform:translate(0,0) rotate(-8deg)}
+  15%{transform:translate(18vw,-26px) rotate(10deg)}
+  30%{transform:translate(36vw,14px) rotate(-12deg)}
+  45%{transform:translate(54vw,-20px) rotate(8deg)}
+  60%{transform:translate(72vw,18px) rotate(-10deg)}
+  80%{transform:translate(95vw,-14px) rotate(9deg)}
+  100%{transform:translate(122vw,6px) rotate(-6deg)}
+}
+
 }
 
 .amb-star{position:absolute;color:rgba(255,255,255,0.92);text-shadow:0 0 5px rgba(255,255,255,0.55);animation:ambTwinkle 2.4s ease-in-out infinite;}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si
    « Réduire les animations ») — la météo réelle garde la priorité. */
-.amb-guirlande{position:absolute;top:4px;width:7px;height:7px;border-radius:50%;box-shadow:0 0 6px 1px currentColor;animation:ambTwinkle 1.8s ease-in-out infinite;}
+/* Noël — guirlande festonnée : cordon qui pend + ampoules le long de la courbe.
+   Une simple rangée de points alignés ne se lisait pas comme une guirlande. */
+.amb-cordon{position:absolute;top:0;height:30px;border-bottom:2px solid rgba(255,255,255,.42);
+  border-radius:0 0 46% 46%;pointer-events:none;}
+.amb-ampoule{position:absolute;width:9px;height:12px;margin-left:-4.5px;border-radius:50% 50% 55% 55%;
+  box-shadow:0 0 9px 2px currentColor;animation:ambTwinkle 1.8s ease-in-out infinite;}
+.amb-ampoule::before{content:'';position:absolute;left:50%;top:-4px;width:1.5px;height:4px;
+  margin-left:-.75px;background:rgba(255,255,255,.5);}
+
 @keyframes ambTwinkle{0%,100%{opacity:1}50%{opacity:.25}}
 .amb-conf{position:absolute;top:-14px;width:6px;height:9px;border-radius:2px;opacity:.85;animation:ambConfFall 7s linear infinite;}
 @keyframes ambConfFall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(560px) rotate(300deg)}}
