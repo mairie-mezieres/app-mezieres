@@ -1105,7 +1105,7 @@ function pluSwitchTab(btn, tabId){
 // .replace(), le second re-matchait le HTML fabriqué par le premier (le
 // le `href` en `https:` déjà inséré) et produisait des liens imbriqués.
 // L'ordre de l'alternance compte : le courriel doit passer AVANT le domaine
-// nu, sinon « mairie@exemple.fr » deviendrait un lien vers le domaine.
+// nu, sinon « mairie@example.com » deviendrait un lien vers le domaine.
 const _MEL_LIEN = new RegExp(
   '(https?:\\/\\/[^\\s<>]+)'                                        // 1. URL complète
   + '|([a-z0-9._%+-]+@(?:[a-z0-9-]+\\.)+[a-z]{2,})'                 // 2. courriel
@@ -1118,8 +1118,8 @@ function _melLinkify(texte){
   return String(texte==null?'':texte).replace(_MEL_LIEN, function(m, url, mail){
     // La ponctuation qui suit l'adresse n'en fait pas partie. Le motif d'URL
     // est volontairement large (`[^\s<>]+`) pour accepter les chemins et les
-    // paramètres ; sans ce rognage, « (voir https://exemple.fr) » produisait
-    // un href « https://exemple.fr) » — lien cassé, constaté en production.
+    // paramètres ; sans ce rognage, « (voir https://example.com) » produisait
+    // un href « https://example.com) » — lien cassé, constaté en production.
     let suffixe='';
     const p=/[.,;:!?)\]»…]+$/.exec(m);
     if(p){ suffixe=p[0]; m=m.slice(0,-suffixe.length); }

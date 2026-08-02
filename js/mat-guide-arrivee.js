@@ -17,7 +17,7 @@
 //
 // Trois formes de lien :
 //   { label, open:'openDechets' }  → ouvre un autre écran de l’app
-//   { label, url:'https://exemple.fr' } → lien externe (nouvel onglet)
+//   { label, url:'https://example.com' } → lien externe (nouvel onglet)
 //   { label, tel:'0238456176' }    → appel téléphonique
 //   { label, mail:'…@…' }          → courriel
 //
