@@ -48,9 +48,9 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.5"></script>
-<script defer src="js/mat-core.js?v=4.3.2"></script>
+<script defer src="js/mat-core.js?v=4.3.3"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
-<script defer src="js/mat-widgets.js?v=4.4.7"></script>
+<script defer src="js/mat-widgets.js?v=4.4.8"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.4"></script>
 <script defer src="js/mat-forms.js?v=4.6.5"></script>
@@ -59,7 +59,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.4"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
-<script defer src="js/mat-boot.js?v=4.3.6"></script>
+<script defer src="js/mat-boot.js?v=4.3.7"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.52.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.53 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -237,6 +237,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <span class="d-nav-title">Mézières-lez-Cléry</span>
 </div>
 <nav class="d-nav-links">
+<button onclick="openGuideArrivee()">📦 Nouveaux habitants</button>
 <button onclick="openAssociations()">🤝 Associations</button>
 <button onclick="openEntreprises()">🛠️ Entreprises</button>
 <button onclick="openDocs()">📄 Documents officiels</button>
@@ -257,6 +258,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <span class="plui-sub">Suivez l’étude et donnez votre avis</span>
 </button>
 <div class="sec">Démarches et Services</div>
+<button class="card simple-card" onclick="openGuideArrivee()" style="margin-bottom:9px">
+<div class="ico" style="background:#e8f5e9">📦</div>
+<div class="ct"><div class="ct-label">Je viens d’emménager</div><div class="ct-sub">Guide d’arrivée des nouveaux habitants</div></div>
+</button>
 <div class="grid2">
 <button class="card simple-card mel-entry" onclick="openMel()">
 <div class="ico ico-mel mel-wiggle">👩‍💼</div>
@@ -438,7 +443,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.52.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.53</button>
 </div>
 </div>
 </div>
@@ -1616,6 +1621,20 @@ et accompagnée des documents suivants :
 <button id="galerie-vote" style="position:absolute;bottom:20px;right:20px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:1.3rem;padding:10px 16px;border-radius:50px;cursor:pointer;backdrop-filter:blur(4px)">❤️</button>
 <div id="galerie-hint" style="position:absolute;top:16px;right:16px;color:rgba(255,255,255,.65);font-size:.7rem;letter-spacing:.04em;pointer-events:none;text-shadow:0 1px 4px rgba(0,0,0,.8)">Appuyez pour revenir</div>
 </div>
+<div class="ov" id="ov-guide" onclick="ovClick('guide',event)">
+<template data-lazy-ov>
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:#e8f5e9">📦</div>
+<div class="panel-title">Je viens d&rsquo;emm&eacute;nager</div>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('guide')">✕</button>
+</div>
+<div class="panel-body">
+<div id="guide-etapes"><div class="actu-empty">Chargement…</div></div>
+</div>
+</div>
+</template>
+</div>
 <div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1627,6 +1646,16 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 2 ao&ucirc;t 2026 — v4.53</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Nouveau&nbsp;: <strong>&laquo;&nbsp;Je viens d&rsquo;emm&eacute;nager&nbsp;&raquo;</strong>, le guide d&rsquo;arriv&eacute;e des nouveaux habitants &mdash; 23&nbsp;d&eacute;marches class&eacute;es par &eacute;ch&eacute;ance, &agrave; <strong>cocher au fur et &agrave; mesure</strong>, avec les num&eacute;ros et les liens utiles. Id&eacute;e propos&eacute;e par un habitant&nbsp;!</li>
+<li>Le guide reste consultable <strong>sans connexion</strong>, et vos cases coch&eacute;es restent sur votre t&eacute;l&eacute;phone</li>
+<li>MEL sait d&eacute;sormais r&eacute;pondre &agrave; &laquo;&nbsp;je viens d&rsquo;emm&eacute;nager, que dois-je faire&nbsp;?&nbsp;&raquo;, ainsi qu&rsquo;au <strong>changement d&rsquo;adresse</strong>, &agrave; l&rsquo;ouverture des <strong>compteurs</strong> et &agrave; l&rsquo;<strong>inscription scolaire</strong></li>
+<li>Correction&nbsp;: elle r&eacute;pond aussi &agrave; &laquo;&nbsp;carte d&rsquo;identit&eacute;&nbsp;&raquo;, &laquo;&nbsp;maison de sant&eacute;&nbsp;&raquo; et &laquo;&nbsp;centre de loisirs&nbsp;&raquo; &eacute;crits en toutes lettres</li>
+<li>Correction&nbsp;: le <strong>bac jaune</strong> est bien annonc&eacute; le <strong>mardi</strong> des semaines paires, et non le lundi</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 1er août 2026 — v4.52.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>No&euml;l&nbsp;: une <strong>vraie guirlande festonn&eacute;e</strong> (cordons qui pendent et ampoules color&eacute;es) rempla&ccedil;ant les points align&eacute;s qu&rsquo;on ne reconnaissait pas</li>

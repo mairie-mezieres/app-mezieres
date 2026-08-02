@@ -108,9 +108,10 @@ test('overlay Accessibilité : aucune violation axe sérieuse ou critique', asyn
 // Couverture axe étendue (EAA / RGAA) : on ouvre chaque overlay qui se rend sans
 // backend et on vérifie l'absence de violation sérieuse/critique sur son contenu.
 const A11Y_OVERLAYS = [
-  { fn: 'openContact', sel: '#ov-contact', label: 'Contact' },
-  { fn: 'openNums',    sel: '#ov-nums',    label: 'Numéros utiles' },
-  { fn: 'openSignal',  sel: '#ov-signal',  label: 'Signalement' },
+  { fn: 'openContact',       sel: '#ov-contact', label: 'Contact' },
+  { fn: 'openNums',          sel: '#ov-nums',    label: 'Numéros utiles' },
+  { fn: 'openSignal',        sel: '#ov-signal',  label: 'Signalement' },
+  { fn: 'openGuideArrivee',  sel: '#ov-guide',   label: 'Guide d’arrivée' },
 ];
 
 for (const ov of A11Y_OVERLAYS) {
@@ -135,6 +136,66 @@ for (const ov of A11Y_OVERLAYS) {
     expect(blocking, `axe overlay ${ov.label}`).toEqual([]);
   });
 }
+
+// Guide d'arrivée des nouveaux habitants : contenu 100 % embarqué, donc
+// entièrement testable sans backend (les hôtes externes sont coupés ci-dessus).
+async function ouvrirGuide(page) {
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.openGuideArrivee === 'function');
+  await expect(async () => {
+    await page.evaluate(() => window.openGuideArrivee());
+    await expect(page.locator('#ov-guide')).toHaveClass(/open/, { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
+}
+
+test('guide d’arrivée : hydraté dès la première ouverture, 4 étapes rendues', async ({ page }) => {
+  // L'overlay est lazy : son contenu vit dans un <template> tant qu'on ne l'a
+  // pas ouvert. C'est le piège n°1 d'un nouvel overlay (getElementById avant
+  // openOv → null), donc on vérifie qu'il est peuplé au PREMIER affichage.
+  await page.goto('/');
+  expect(await page.locator('#ov-guide section').count()).toBe(0);
+  await ouvrirGuide(page);
+  await expect(page.getByRole('heading', { name: /Dès votre arrivée/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Dans le premier mois/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Bien vivre à Mézières/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Rester informé/ })).toBeVisible();
+  await expect(page.locator('#ov-guide [role="checkbox"]')).toHaveCount(23);
+});
+
+test('guide d’arrivée : cocher une démarche est mémorisé après rechargement', async ({ page }) => {
+  await ouvrirGuide(page);
+  const cases = page.locator('#ov-guide [role="checkbox"]');
+  await expect(cases.first()).toHaveAttribute('aria-checked', 'false');
+  await cases.first().click();
+  await expect(page.locator('#ov-guide [role="checkbox"]').first())
+    .toHaveAttribute('aria-checked', 'true');
+  await expect(page.locator('#ov-guide')).toContainText('1 / 23 démarche faite');
+  // Rechargement complet : l'état vient de localStorage, pas du DOM.
+  await ouvrirGuide(page);
+  await expect(page.locator('#ov-guide [role="checkbox"]').first())
+    .toHaveAttribute('aria-checked', 'true');
+  await expect(page.locator('#ov-guide')).toContainText('1 / 23 démarche faite');
+  // « Tout décocher » remet le compteur à zéro.
+  await page.getByRole('button', { name: 'Tout décocher' }).click();
+  await expect(page.locator('#ov-guide')).toContainText('0 / 23 démarche faite');
+});
+
+test('guide d’arrivée : un lien interne empile l’overlay cible sans fermer le guide', async ({ page }) => {
+  await ouvrirGuide(page);
+  await page.getByRole('button', { name: /Calendrier des collectes/ }).click();
+  await expect(page.locator('#ov-dechets')).toHaveClass(/open/);
+  // Le guide reste ouvert dessous : Échap ne doit refermer que le dernier.
+  await expect(page.locator('#ov-guide')).toHaveClass(/open/);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ov-dechets')).not.toHaveClass(/open/);
+  await expect(page.locator('#ov-guide')).toHaveClass(/open/);
+});
+
+test('guide d’arrivée : l’adresse #guide ouvre la page directement', async ({ page }) => {
+  await page.goto('/#guide');
+  await expect(page.locator('#ov-guide')).toHaveClass(/open/, { timeout: 8000 });
+  await expect(page.getByRole('heading', { name: /Dès votre arrivée/ })).toBeVisible();
+});
 
 test('accueil : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');

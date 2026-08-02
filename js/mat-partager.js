@@ -64,6 +64,33 @@ Grille de cartes : photo, nom, fonction, mandats, courte bio au clic.
 - Ne jamais afficher de coordonnées personnelles (téléphone perso, email perso) sans accord explicite : renvoyer vers la mairie.`
     },
     {
+      id: 'guide-arrivee',
+      label: 'Guide d’arrivée des nouveaux habitants',
+      pill: 'reco', cost: 0, backend: false, def: true,
+      desc: 'Check-list cochable des démarches à faire en emménageant.',
+      jsonTemplate: 'guide-arrivee.json',
+      instructions: `### Guide d’arrivée des nouveaux habitants
+Page « Je viens d’emménager » : une check-list des démarches à faire en arrivant dans la commune,
+groupée par échéance et cochable par l’habitant.
+- Structure : quatre étapes (dès l’arrivée / dans le premier mois / bien vivre ici / rester informé),
+  chacune contenant des items { id, ico, titre, texte, liens }.
+- Trois formes de lien par item : lien externe (téléservice, opérateur), téléphone/mail, et surtout
+  **lien interne** vers un autre écran de l’app (calendrier des collectes, annuaire des associations…).
+- ⚠️ Règle de conception la plus importante : **ne recopiez pas** une information qui vit déjà dans
+  un autre écran (jours de collecte, associations, élus, horaires de bus) — pointez vers cet écran.
+  Toute copie finit par diverger de l’original. N’écrivez en dur que ce qui n’existe nulle part
+  ailleurs : changement d’adresse, ouverture des compteurs, inscription scolaire, médecin traitant.
+- Cochage persistant en \`localStorage\` (clé { etape:item }), avec barre de progression et bouton
+  « Tout décocher ». Rien n’est envoyé au serveur : aucune donnée personnelle, rien à déclarer.
+- Contenu **embarqué en statique** et précaché par le service worker : le guide doit fonctionner
+  hors connexion, car c’est précisément la situation d’une personne qui vient d’emménager et dont
+  la ligne internet n’est pas encore ouverte.
+- Prévoir une adresse directe (\`…/#guide\`) : la mairie peut imprimer un QR code dans le courrier
+  d’accueil remis aux nouveaux arrivants.
+- Si vous avez un assistant conversationnel, ajoutez-lui en parallèle une réponse à
+  « je viens d’emménager, que dois-je faire ? » : les deux canaux servent des usages différents.`
+    },
+    {
       id: 'horaires',
       label: 'Horaires & jours fériés',
       pill: 'ess', cost: 0, backend: false, def: true,

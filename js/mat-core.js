@@ -652,6 +652,17 @@ document.addEventListener('keydown', function(e) {
 
 
 // ── Service Worker + hash routing ─────────────────────────────
+// Les modules chargés dynamiquement par mat-boot.js (guide d'arrivée…) ne sont
+// pas forcément définis quand la route est évaluée : le délai fixe de 180 ms
+// suffit aux scripts `defer` d'index.html, pas à un <script> ajouté à la volée.
+// On réessaie brièvement, et on n'ouvre qu'une fois.
+function _openWhenReady(fn, tries){
+  tries = (tries == null) ? 25 : tries;
+  if(typeof window[fn] === 'function'){ window[fn](); return; }
+  if(tries <= 0) return;
+  setTimeout(function(){ _openWhenReady(fn, tries - 1); }, 120);
+}
+
 function handleMatHashRoute(){
   try{
     var h=(location.hash||'').trim();
@@ -664,6 +675,8 @@ function handleMatHashRoute(){
     if(h==='#meteo'){ setTimeout(function(){ if(typeof openMeteo==='function') openMeteo(); }, 180); return; }
     if(h==='#dechets'){ setTimeout(function(){ if(typeof openDechets==='function') openDechets(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
+    // #guide : adresse imprimable (QR code du courrier d'accueil de la mairie).
+    if(h==='#guide'||h==='#nouveaux-habitants'){ _openWhenReady('openGuideArrivee'); return; }
     if(h.indexOf('#actu=')===0){
       var raw=h.substring(6);
       var id=decodeURIComponent(raw||'').trim();
