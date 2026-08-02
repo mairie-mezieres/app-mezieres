@@ -562,14 +562,21 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('scroll', fixIOSViewportAfterKeyboard);
 }
 
-// ── Touche Échap pour fermer overlays & modales ───────────────
+// ── Touche Échap pour fermer les modales ─────────────────────
+// ⚠️ Ne PAS refermer d'overlay ici : c'est déjà le rôle du gestionnaire
+// clavier des overlays (focus-trap, plus haut dans ce fichier). Les deux
+// écoutent `keydown` sur `document` et se déclenchent tous les deux sur une
+// seule frappe ; comme closeOv() dépile `_ovStack` de façon synchrone, le
+// second fermait l'overlay du DESSOUS. Invisible tant qu'un seul overlay
+// était ouvert (fermer « deux fois » une pile de un ne se voit pas), le
+// bug apparaissait dès qu'un overlay en ouvrait un autre par-dessus —
+// associations → subvention, actualités → détail, guide → déchets.
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     const matModal = document.getElementById('mat-modal');
     if (matModal && matModal.classList.contains('open')) { closeMatModal(false); return; }
     const trombi = document.getElementById('trombi-modal');
     if (trombi && trombi.style.display === 'flex') { closeTrombi(e); return; }
-    if (_ovStack.length > 0) { closeOv(_ovStack[_ovStack.length - 1]); return; }
   }
 });
 
@@ -652,6 +659,17 @@ document.addEventListener('keydown', function(e) {
 
 
 // ── Service Worker + hash routing ─────────────────────────────
+// Les modules chargés dynamiquement par mat-boot.js (guide d'arrivée…) ne sont
+// pas forcément définis quand la route est évaluée : le délai fixe de 180 ms
+// suffit aux scripts `defer` d'index.html, pas à un <script> ajouté à la volée.
+// On réessaie brièvement, et on n'ouvre qu'une fois.
+function _openWhenReady(fn, tries){
+  tries = (tries == null) ? 25 : tries;
+  if(typeof window[fn] === 'function'){ window[fn](); return; }
+  if(tries <= 0) return;
+  setTimeout(function(){ _openWhenReady(fn, tries - 1); }, 120);
+}
+
 function handleMatHashRoute(){
   try{
     var h=(location.hash||'').trim();
@@ -664,6 +682,8 @@ function handleMatHashRoute(){
     if(h==='#meteo'){ setTimeout(function(){ if(typeof openMeteo==='function') openMeteo(); }, 180); return; }
     if(h==='#dechets'){ setTimeout(function(){ if(typeof openDechets==='function') openDechets(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }
+    // #guide : adresse imprimable (QR code du courrier d'accueil de la mairie).
+    if(h==='#guide'||h==='#nouveaux-habitants'){ _openWhenReady('openGuideArrivee'); return; }
     if(h.indexOf('#actu=')===0){
       var raw=h.substring(6);
       var id=decodeURIComponent(raw||'').trim();

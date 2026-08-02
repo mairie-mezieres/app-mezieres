@@ -155,3 +155,9 @@
   s.onload = function(){ try { if (typeof refreshPluiBadge === 'function') refreshPluiBadge(); } catch(e){} };
   document.head.appendChild(s);
 })();
+
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-guide-arrivee.js?v=1.0.0';
+  document.head.appendChild(s);
+})();

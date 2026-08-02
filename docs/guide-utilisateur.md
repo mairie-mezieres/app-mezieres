@@ -22,6 +22,7 @@
 14. [Partager MAT avec d'autres communes](#14-partager-mat-avec-dautres-communes)
 15. [Météo et restrictions d'eau (sécheresse)](#15-météo-et-restrictions-deau-sécheresse)
 16. [Grand dossier PLUi-H-D](#16-grand-dossier-plui-h-d)
+17. [Je viens d'emménager — le guide d'arrivée](#17-je-viens-demménager--le-guide-darrivée)
 
 ---
 
@@ -374,5 +375,51 @@ La page comporte quatre parties :
 
 ---
 
-*Dernière mise à jour : juillet 2026*
+## 17. Je viens d'emménager — le guide d'arrivée
+
+*(Ajouté en août 2026 — idée proposée par un habitant via la boîte à idées.)*
+
+Quand on s'installe dans la commune, on ne sait pas toujours par quoi commencer.
+L'information existait dans l'application, mais éparpillée entre MEL, la page des déchets,
+celle des élus, celle des associations… Le guide d'arrivée la rassemble en **une seule
+liste à cocher**.
+
+**Où le trouver :**
+- sur téléphone, la tuile **« Je viens d'emménager »** en tête de la section
+  *Démarches et Services* de l'écran d'accueil ;
+- sur ordinateur, l'entrée **« 📦 Nouveaux habitants »** du menu ;
+- directement à l'adresse **`…/#guide`** — pratique pour un QR code imprimé dans le
+  courrier d'accueil de la mairie.
+
+**Ce qu'il contient — 23 démarches réparties en quatre temps :**
+
+| Étape | Ce qu'on y trouve |
+|---|---|
+| **📦 Dès votre arrivée** | Se présenter en mairie, changement d'adresse, carte grise, ouverture des compteurs d'eau/électricité/gaz, demande des bacs gris et jaune, inscription à la déchetterie, éligibilité à la fibre |
+| **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine/crèche, médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
+| **🌳 Bien vivre à Mézières** | Associations, entreprises et artisans, bus Rémi ligne 8, conseil municipal, règles avant travaux, aides à la rénovation (OPAH) |
+| **🔔 Rester informé** | Notifications, agenda, signalements, boîte à idées |
+
+Chaque démarche donne le numéro de téléphone, l'adresse mail ou le lien officiel utile, et
+renvoie directement vers l'écran de l'application qui traite le sujet (le calendrier des
+collectes, l'annuaire des associations, MEL…).
+
+**La liste se coche.** Appuyez sur la case à gauche d'une démarche pour la marquer comme
+faite : elle se barre et la barre de progression avance (« 7 / 23 démarches faites »). Le
+bouton **« Tout décocher »** remet le compteur à zéro.
+
+> 🔒 **Vos cases cochées ne quittent jamais votre téléphone.** Elles sont enregistrées
+> localement, ne sont envoyées à personne et ne sont pas visibles par la mairie. Elles
+> disparaissent si vous effacez les données du site ou changez d'appareil.
+
+**Le guide fonctionne sans connexion** : son contenu est embarqué dans l'application, donc
+consultable même en zone blanche ou pendant un déménagement, quand la ligne internet n'est
+pas encore ouverte.
+
+Vous pouvez aussi poser la question directement à MEL — « je viens d'emménager, que
+dois-je faire ? » — elle répond avec la même liste.
+
+---
+
+*Dernière mise à jour : août 2026*
 *Application MAT — Commune de Mézières-lez-Cléry — Licence MIT*
