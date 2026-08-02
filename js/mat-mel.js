@@ -548,7 +548,7 @@ const _MEL_TREE_FALLBACK = {
       },
       {id:"pacs",ico:"💑",label:"PACS — Pacte Civil de Solidarité",
         directAnswer:{text:"Le PACS se déclare à la mairie. Il faut remplir la déclaration conjointe (cerfa 15725*03) avec attestations sur l'honneur de non-parenté, non-alliance et résidence commune, joindre une convention-type (cerfa 15726*02) ou une convention personnalisée, et les justificatifs d'identité.",
-          links:[{label:"📄 Déclaration PACS (cerfa 15725*03)",url:"https://www.service-public.fr/particuliers/vosdroits/R42142"},{label:"📄 Convention-type PACS (cerfa 15726*02)",url:"https://www.service-public.fr/particuliers/vosdroits/R43750"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
+          links:[{label:"📄 Déclaration PACS (cerfa 15725*03)",url:"https://www.formulaires.service-public.gouv.fr/gf/cerfa_15725.do"},{label:"📄 Convention-type PACS (cerfa 15726*02)",url:"https://www.formulaires.service-public.gouv.fr/gf/cerfa_15726.do"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"vote",ico:"🗳️",label:"Inscription sur les listes électorales",
         directAnswer:{text:"Pour voter, vous devez être inscrit sur les listes électorales. Inscription en mairie ou en ligne sur service-public.gouv.fr. Documents à prévoir : pièce d'identité et justificatif de domicile.",
@@ -560,7 +560,7 @@ const _MEL_TREE_FALLBACK = {
       },
       {id:"location",ico:"🪑",label:"Location de matériel communal",
         directAnswer:{text:"La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
-          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"},{label:"🌐 Page location matériel",url:"https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"}]}
+          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
       },
     ]
   },
@@ -1097,13 +1097,13 @@ function pluSwitchTab(btn, tabId){
 //
 // Les réponses sont rédigées en texte libre côté backend (DIRECT_RULES), donc
 // une adresse peut y apparaître sous plusieurs formes. Avant, seules
-// `https://…` et `www.…` devenaient des liens : un domaine écrit nu
+// les adresses en `https:` et `www.` devenaient des liens : un domaine nu
 // (« valdeloire-fibre.fr ») s'affichait mais ne s'ouvrait pas — 14 règles sur
 // 27 étaient dans ce cas. Les courriels non plus n'étaient pas cliquables.
 //
 // ⚠️ UN SEUL passage, avec une alternance unique : en chaînant plusieurs
 // .replace(), le second re-matchait le HTML fabriqué par le premier (le
-// `href="https://…"` déjà inséré) et produisait des liens imbriqués.
+// le `href` en `https:` déjà inséré) et produisait des liens imbriqués.
 // L'ordre de l'alternance compte : le courriel doit passer AVANT le domaine
 // nu, sinon « mairie@exemple.fr » deviendrait un lien vers le domaine.
 const _MEL_LIEN = new RegExp(
