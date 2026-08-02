@@ -14,7 +14,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   `js/mat-saviez-vous.js`).
 - **Aucune IA à l'exécution** : le contenu vient du corpus versionné ou d'arithmétique
   pure ; chaque entrée porte sa source, affichée à l'écran. Voir
-  [ADR-0010](docs/adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md) et
+  [ADR-0012](docs/adr/0012-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md) et
   [SFD-16](docs/specifications/sfd/SFD-16-le-saviez-vous.md).
 - **Backend** : `GET` et `POST /saviezvous/:id` pour la répartition des réponses
   (déduplication par appareil, même motif que les RSVP).

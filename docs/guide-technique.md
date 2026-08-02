@@ -449,7 +449,7 @@ l'invalidation de cache.
 
 `js/mat-saviez-vous.js` affiche un fait par jour sur la commune. **Le contenu ne provient
 jamais d'un modèle de langage au moment de l'affichage** — c'est une règle, pas une
-préférence, formalisée par l'[ADR-0010](adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md).
+préférence, formalisée par l'[ADR-0012](adr/0012-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md).
 
 Deux sources, et deux seulement :
 
@@ -465,10 +465,19 @@ Deux points de vigilance pour qui reprendra ce code :
 - **Le corpus ne contient que des questions**, jamais des affirmations. C'est ce qui
   interdit structurellement d'afficher une contre-vérité : seule la révélation, après la
   réponse de l'habitant, porte du contenu factuel.
-- **`SV_GRAINE` ne doit jamais changer.** L'ordre du corpus est mélangé une fois avec
-  cette graine fixe ; la modifier ferait rejouer des faits déjà vus et en sauterait
-  d'autres. La rotation est `quantième du jour % taille du corpus`, ancrée sur Paris —
-  tout le village voit le même fait le même jour.
+- **L'ordre du corpus est éditorial, pas aléatoire.** `_ordonner()` fait tourner les
+  catégories à tour de rôle (`SV_ORDRE_CATEGORIES`), du plus surprenant au plus aride :
+  deux questions d'urbanisme ne peuvent pas se suivre tant qu'il reste de la matière
+  ailleurs. Le mélange par graine ne joue qu'**à l'intérieur** d'une catégorie.
+  Motif : avec 18 entrées d'urbanisme sur 75, un mélange aveugle ouvrait la rubrique sur
+  des règles de construction — utile, mais mauvaise entrée en matière.
+- **La rotation compte les jours depuis `SV_ORIGINE`**, pas depuis le 1er janvier. Avec
+  un quantième d'année, le premier jour affiché aurait été la 213e entrée du cycle, soit
+  sa fin — là où les catégories les plus fournies se retrouvent seules, réduisant à néant
+  l'ordre éditorial. Effet de bord bienvenu : plus de saut au changement d'année.
+- **`SV_GRAINE` et `SV_ORIGINE` ne doivent plus changer** : les modifier ferait rejouer
+  des faits déjà vus et en sauterait d'autres. Tout le village voit le même fait le même
+  jour, c'est un engagement implicite.
 
 ### Régions `aria-live` — la règle du silence
 
