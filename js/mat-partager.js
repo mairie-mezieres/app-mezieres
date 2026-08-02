@@ -188,6 +188,52 @@ Indicateur visuel : pastille colorée + icône du bac concerné.`
 - Versioning du cache (\`mat-v1.0.0\`) à incrémenter à chaque déploiement.`
     },
     {
+      id: 'saviez_vous',
+      label: 'Le saviez-vous ? (fait du jour)',
+      pill: 'opt', cost: 0, backend: false, def: false,
+      desc: 'Un fait sourcé par jour, avec une question à laquelle répondre.',
+      jsonTemplate: 'saviez-vous.json',
+      instructions: `### « Le saviez-vous ? » — le fait du jour
+Une ligne repliée sur l’écran d’accueil qui, une fois dépliée, pose une question sur la
+commune, propose deux réponses (Oui / Non), puis révèle la bonne réponse **avec sa source**.
+Objectif : donner une raison d’ouvrir l’application tous les jours, et de quoi en parler.
+
+**RÈGLE ABSOLUE — aucune IA n’écrit le fait affiché.** C’est le point le plus important
+de cette fonctionnalité, et le plus facile à saboter par confort :
+- Le contenu vient d’un fichier \`saviez-vous.json\` versionné dans le dépôt et **relu par
+  la mairie**, jamais d’un appel à un modèle de langage au moment de l’affichage.
+- **Chaque entrée porte une source et une URL, affichées à l’écran** sous la réponse.
+  Une entrée sans source ne doit pas pouvoir entrer dans le corpus : le vérifier par un
+  test automatisé, sinon la règle ne tient pas.
+- Un LLM peut aider à **rédiger** le corpus en amont ; un humain valide chaque entrée
+  contre sa source avant publication. Dans un cas la machine publie, dans l’autre un
+  humain signe.
+
+**Le format interdit structurellement la contre-vérité.** Le corpus ne contient que des
+**questions**, jamais des affirmations : seule la révélation, après la réponse de
+l’habitant, porte du contenu factuel. Un vrai/faux classique afficherait la phrase fausse
+à l’écran, où elle serait lue — et parfois mémorisée — par qui ne fait pas défiler jusqu’à
+la réponse.
+
+**Structure d’une entrée** : \`{ id, question, reponse (booléen), explication, source, url, categorie }\`.
+
+**Rotation déterministe** : \`quantième du jour % taille du corpus\`, sur un ordre mélangé
+une fois avec une graine **fixe**. Tout le village voit le même fait le même jour — c’est
+ce qui en fait un sujet de conversation. Ne jamais changer la graine ensuite : cela
+rejouerait des faits déjà vus et en sauterait d’autres.
+
+**Sources de contenu qui ne coûtent rien** : les données ouvertes de l’INSEE
+(recensements depuis 1793), l’IGN (cartes anciennes, vues aériennes), la base Mérimée
+pour le patrimoine, et surtout ce que la mairie est seule à savoir. Ajoutez-y des entrées
+**calculées** (distances à vol d’oiseau depuis les coordonnées de la commune, jours
+fériés) : elles sont vérifiables par construction et ne demandent aucune relecture.
+
+**Ergonomie** : repliée, la rubrique ne doit occuper qu’une ligne (~34 px). Ne la placez
+jamais au-dessus d’un bouton d’urgence. Mémorisez la réponse du jour en local pour ne pas
+faire rejouer, et n’affichez un pourcentage de répartition qu’au-delà de quelques
+réponses — en deçà, une proportion est trompeuse.`
+    },
+    {
       id: 'access',
       label: 'Mode accessibilité',
       pill: 'reco', cost: 0, backend: false, def: true,

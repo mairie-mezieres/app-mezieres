@@ -5,6 +5,31 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.54] — 2 août 2026
+
+### Ajouté
+- **« Le saviez-vous ? »** : un fait sourcé sur la commune chaque jour, posé sous forme de
+  question, sur l'écran d'accueil. Repliée, la rubrique tient sur une ligne (~34 px).
+  46 entrées sourcées + 7 générateurs calculés (`data/saviez-vous.json`,
+  `js/mat-saviez-vous.js`).
+- **Aucune IA à l'exécution** : le contenu vient du corpus versionné ou d'arithmétique
+  pure ; chaque entrée porte sa source, affichée à l'écran. Voir
+  [ADR-0010](docs/adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md) et
+  [SFD-16](docs/specifications/sfd/SFD-16-le-saviez-vous.md).
+- **Backend** : `GET` et `POST /saviezvous/:id` pour la répartition des réponses
+  (déduplication par appareil, même motif que les RSVP).
+- **Tests** : 7 scénarios Playwright × 2 profils, dont un **test d'intégrité du corpus**
+  qui rejette toute entrée sans source — la règle anti-fake-news est vérifiée
+  mécaniquement, pas laissée à la vigilance du relecteur.
+- **Accessibilité** : première région `aria-live` du dépôt, sur la révélation de la
+  réponse.
+
+### Modifié
+- Le lien de pied de page **« 🔗 Partager » devient « 🏛️ Créer la vôtre »** : il mène au
+  kit de réplication destiné à une autre commune, pas à un partage entre voisins.
+
+---
+
 ## [4.15] — 31 mai 2026
 
 ### Ajouté

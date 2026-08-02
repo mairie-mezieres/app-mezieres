@@ -1,0 +1,421 @@
+{
+  "version": "1.0.0",
+  "maj": "2026-08-02",
+  "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0010.",
+  "entrees": [
+    {
+      "id": "cctvl-communes",
+      "question": "La Communauté de communes des Terres du Val de Loire compte-t-elle plus de 20 communes ?",
+      "reponse": true,
+      "explication": "Elle en regroupe 27, dont Mézières-lez-Cléry. Son siège est à Beaugency, 2 rue des Germines.",
+      "source": "Mairie de Mézières-lez-Cléry — base de connaissances de l’assistante MEL",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "plu-approbation",
+      "question": "Le PLU communal de Mézières date-t-il d’avant 2015 ?",
+      "reponse": true,
+      "explication": "Il a été approuvé le 30 janvier 2013. Il reste en vigueur en attendant le PLUi-H-D porté par la CCTVL.",
+      "source": "Mairie de Mézières-lez-Cléry — base de connaissances de l’assistante MEL",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "cloture-dp",
+      "question": "Peut-on poser une clôture sur rue sans aucune formalité à Mézières ?",
+      "reponse": false,
+      "explication": "Non. Une déclaration préalable est obligatoire depuis la délibération du 1er mars 2012, quelle que soit la hauteur. Formulaire Cerfa 16702*02.",
+      "source": "Délibération du conseil municipal du 1er mars 2012",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "abri-5m2",
+      "question": "Un abri de jardin de moins de 5 m² nécessite-t-il une déclaration ?",
+      "reponse": false,
+      "explication": "Non, il est libre — sauf en secteur protégé. Entre 5 et 20 m², une déclaration préalable suffit ; au-delà de 20 m², c’est un permis de construire.",
+      "source": "Mairie de Mézières-lez-Cléry — règles d’urbanisme communiquées par le service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "piscine-10m2",
+      "question": "Une piscine de moins de 10 m² non couverte demande-t-elle une autorisation ?",
+      "reponse": false,
+      "explication": "Non, elle est libre — sauf en secteur protégé. Jusqu’à 100 m², une déclaration préalable suffit ; au-delà, permis de construire.",
+      "source": "Mairie de Mézières-lez-Cléry — règles d’urbanisme communiquées par le service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "piscine-temporaire",
+      "question": "Une piscine démontable installée moins de trois mois demande-t-elle une autorisation ?",
+      "reponse": false,
+      "explication": "Non, quelle que soit sa surface, dès lors qu’elle reste en place moins de trois mois.",
+      "source": "Mairie de Mézières-lez-Cléry — règles d’urbanisme communiquées par le service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "delai-dp",
+      "question": "Une déclaration préalable est-elle instruite en un mois ?",
+      "reponse": true,
+      "explication": "Oui : un mois pour une déclaration préalable, deux mois pour un permis de construire. Dans les deux cas, l’autorisation est valable trois ans.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "architecte-150",
+      "question": "Faut-il un architecte pour agrandir sa maison au-delà de 150 m² ?",
+      "reponse": true,
+      "explication": "Oui. Si la surface de plancher totale dépasse 150 m² après travaux, le recours à un architecte est obligatoire et le projet relève du permis de construire.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "toiture-identique",
+      "question": "Refaire sa toiture à l’identique demande-t-il une déclaration ?",
+      "reponse": false,
+      "explication": "Non, le remplacement à l’identique est libre, sauf en secteur protégé. En revanche, changer de matériau ou de teinte demande une déclaration préalable.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "velux-dp",
+      "question": "Poser une fenêtre de toit demande-t-il une déclaration préalable ?",
+      "reponse": true,
+      "explication": "Oui, comme l’installation de panneaux photovoltaïques en toiture : une déclaration préalable est nécessaire.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "stationnement-2places",
+      "question": "Le PLU impose-t-il au moins deux places de stationnement par logement ?",
+      "reponse": true,
+      "explication": "Oui, deux places minimum par logement. Pour l’artisanat et les bureaux, la règle est d’une place par tranche de 25 m².",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "gnau-enligne",
+      "question": "Peut-on déposer un permis de construire en ligne sans se déplacer ?",
+      "reponse": true,
+      "explication": "Oui, via le Guichet Numérique des Autorisations d’Urbanisme (GNAU) de la CCTVL. Le dépôt en mairie reste possible.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "dechetterie-inscription",
+      "question": "L’accès à la déchetterie de Cléry-Saint-André est-il libre sans inscription ?",
+      "reponse": false,
+      "explication": "Non. L’inscription est obligatoire — l’accès se fait par lecture automatique de plaque. Une seule inscription vaut pour tous les sites de la CCTVL.",
+      "source": "Communauté de communes des Terres du Val de Loire — gestion des accès déchetteries",
+      "url": "https://portail-usagers.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "dechetterie-plaque",
+      "question": "Faut-il saisir sa plaque d’immatriculation avec des tirets lors de l’inscription en déchetterie ?",
+      "reponse": false,
+      "explication": "Non, sans tiret — par exemple AA123BB. Munissez-vous d’un justificatif de domicile et de la carte grise.",
+      "source": "Communauté de communes des Terres du Val de Loire — gestion des accès déchetteries",
+      "url": "https://portail-usagers.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "dechetterie-sites",
+      "question": "La CCTVL gère-t-elle plus de cinq déchetteries ?",
+      "reponse": true,
+      "explication": "Six sites : Beauce la Romaine, Cléry-Saint-André, Épieds-en-Beauce, Meung-sur-Loire, Saint-Ay et Villorceau. La plus proche de Mézières est celle de Cléry-Saint-André.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "dechetterie-horaires",
+      "question": "La déchetterie de Cléry-Saint-André ouvre-t-elle plus tôt en été qu’en hiver ?",
+      "reponse": true,
+      "explication": "Oui : 9 h en été (avril-septembre) contre 10 h en hiver (octobre-mars). Elle ferme à 18 h l’été et 17 h l’hiver, et reste fermée les jours fériés.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "bac-jaune-quinzaine",
+      "question": "Le bac jaune est-il ramassé toutes les semaines à Mézières ?",
+      "reponse": false,
+      "explication": "Non, une semaine sur deux — le mardi des semaines paires. Le bac noir, lui, passe chaque lundi. MAT décale automatiquement l’affichage les semaines de jour férié.",
+      "source": "Mairie de Mézières-lez-Cléry — calendrier de collecte",
+      "url": "",
+      "categorie": "dechets"
+    },
+    {
+      "id": "sante-clery",
+      "question": "La maison de santé la plus proche de Mézières compte-t-elle plus de cinq médecins ?",
+      "reponse": true,
+      "explication": "Celle de Cléry-Saint-André — Val d’Ardoux réunit 6 médecins, 5 kinésithérapeutes, 4 infirmiers, 2 dentistes, et plusieurs autres praticiens. Rendez-vous possibles sur Doctolib.",
+      "source": "Communauté de communes des Terres du Val de Loire — maisons de santé pluridisciplinaires",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "sante"
+    },
+    {
+      "id": "sante-nombre",
+      "question": "Le territoire de la CCTVL compte-t-il trois maisons de santé ?",
+      "reponse": true,
+      "explication": "Oui : Cléry-Saint-André, Meung-sur-Loire et Tavers. La CCTVL cherche activement à attirer de nouveaux médecins sur le territoire.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "sante"
+    },
+    {
+      "id": "ligne8-orleans",
+      "question": "La ligne 8 du réseau Rémi relie-t-elle Mézières à Orléans ?",
+      "reponse": true,
+      "explication": "Oui : elle part de Saint-Laurent-Nouan, passe par Cléry-Saint-André puis Mézières — arrêts Mairie et Le Bréau — et rejoint Orléans. C’est la ligne principale de la commune.",
+      "source": "Réseau Rémi — Région Centre-Val de Loire",
+      "url": "https://www.remi-centrevaldeloire.fr",
+      "categorie": "transports"
+    },
+    {
+      "id": "ligne8-arrets",
+      "question": "La ligne 8 dessert-elle deux arrêts à Mézières-lez-Cléry ?",
+      "reponse": true,
+      "explication": "Oui : l’arrêt Mairie et l’arrêt Le Bréau. Les horaires diffèrent entre période scolaire et vacances — MAT en tient compte automatiquement.",
+      "source": "Réseau Rémi — Région Centre-Val de Loire",
+      "url": "https://www.remi-centrevaldeloire.fr",
+      "categorie": "transports"
+    },
+    {
+      "id": "vae-cctvl",
+      "question": "Peut-on louer un vélo à assistance électrique auprès de la CCTVL ?",
+      "reponse": true,
+      "explication": "Oui, la location de vélos à assistance électrique fait partie des services de la Communauté de communes.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "transports"
+    },
+    {
+      "id": "opah-2023",
+      "question": "Existe-t-il une aide locale pour rénover son logement à Mézières ?",
+      "reponse": true,
+      "explication": "Oui : l’OPAH de la CCTVL, ouverte depuis décembre 2023. L’opérateur SOLIHA accompagne gratuitement et sans engagement les ménages modestes — 02 38 77 87 21.",
+      "source": "Communauté de communes des Terres du Val de Loire — Opération Programmée d’Amélioration de l’Habitat",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "habitat"
+    },
+    {
+      "id": "spanc-obligatoire",
+      "question": "Le contrôle des fosses septiques est-il facultatif ?",
+      "reponse": false,
+      "explication": "Non, il est obligatoire. Le SPANC de la CCTVL contrôle la conception, la réalisation et l’entretien des installations non raccordées au réseau public.",
+      "source": "Communauté de communes des Terres du Val de Loire — SPANC",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "habitat"
+    },
+    {
+      "id": "conseil-15",
+      "question": "Le conseil municipal de Mézières-lez-Cléry compte-t-il 15 élus ?",
+      "reponse": true,
+      "explication": "Oui : le maire, quatre adjoints et dix conseillers municipaux, dont plusieurs conseillers délégués. Vous les retrouvez tous dans la rubrique Conseil municipal.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-hameaux",
+      "question": "Les élus de Mézières viennent-ils tous du bourg ?",
+      "reponse": false,
+      "explication": "Non. Le conseil rassemble des habitants du Bourg, de Manthelon, de Rolland, du Bréau, du Buisson et de La Grange — la plupart des hameaux de la commune y sont représentés.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-commissions",
+      "question": "Le conseil municipal a-t-il plus de dix commissions de travail ?",
+      "reponse": true,
+      "explication": "Oui, une quinzaine : finances, achats, vie scolaire, environnement, actions sociales, voirie, cimetière, urbanisme, travaux, communication, fêtes et vie associative…",
+      "source": "Mairie de Mézières-lez-Cléry — commissions du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-jeune",
+      "question": "Le plus jeune membre du conseil municipal a-t-il moins de 30 ans ?",
+      "reponse": true,
+      "explication": "Oui — 24 ans. Les âges des élus vont de 24 à 65 ans, et leurs métiers vont de l’exploitation agricole à l’informatique en passant par les pompiers.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "mairie-mercredi",
+      "question": "La mairie de Mézières reçoit-elle sans rendez-vous le mercredi ?",
+      "reponse": false,
+      "explication": "Non, le mercredi se fait uniquement sur rendez-vous. Les ouvertures libres sont le lundi de 14 h à 17 h 30 et le vendredi de 8 h 30 à 11 h 30. Téléphone : 02 38 45 61 76.",
+      "source": "Mairie de Mézières-lez-Cléry",
+      "url": "",
+      "categorie": "pratique"
+    },
+    {
+      "id": "cctvl-siege",
+      "question": "Le siège de la Communauté de communes se trouve-t-il à Cléry-Saint-André ?",
+      "reponse": false,
+      "explication": "Non, à Beaugency — 2 rue des Germines. Téléphone : 02 38 44 59 35. C’est aussi le numéro à composer pour toute question sur les déchets.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "plui-2040",
+      "question": "Le PLUi-H-D en cours d’élaboration dessine-t-il le territoire jusqu’en 2040 ?",
+      "reponse": true,
+      "explication": "Oui. Ce grand dossier intercommunal fixe les règles d’urbanisme, d’habitat et de déplacements pour les quinze prochaines années. Vous pouvez suivre l’étude et donner votre avis depuis MAT.",
+      "source": "Communauté de communes des Terres du Val de Loire — PLUi-H-D",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "mat-horsligne",
+      "question": "MAT fonctionne-t-elle sans connexion internet ?",
+      "reponse": true,
+      "explication": "En partie, oui. Une copie de l’application est enregistrée sur votre téléphone : les informations déjà consultées restent lisibles, et les calculs locaux — collectes, horaires, jours fériés — continuent de fonctionner.",
+      "source": "Documentation de MAT — guide utilisateur, section « Utiliser l’application sans connexion »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-cdn",
+      "question": "MAT envoie-t-elle des données à Google ou à d’autres services publicitaires ?",
+      "reponse": false,
+      "explication": "Non. Les polices de caractères, les cartes et les bibliothèques sont hébergées par la commune elle-même : aucune requête vers un service tiers de suivi. C’est un choix de souveraineté numérique assumé.",
+      "source": "Documentation de MAT — déclaration RGPD et souveraineté numérique",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-libre",
+      "question": "Le code de l’application MAT est-il public ?",
+      "reponse": true,
+      "explication": "Oui, sous licence MIT. N’importe quelle commune peut le reprendre gratuitement — c’est l’objet du lien « Créer la vôtre » en bas de page.",
+      "source": "Dépôt public de MAT — fichier LICENSE",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mel-decision",
+      "question": "L’assistante MEL peut-elle accorder ou refuser une autorisation d’urbanisme ?",
+      "reponse": false,
+      "explication": "Non, jamais. MEL informe et oriente, mais ne prend aucune décision administrative et renvoie systématiquement vers la mairie. Ses réponses n’ont pas de valeur juridique.",
+      "source": "Note de conformité de l’assistante MEL — qualification au titre du règlement européen sur l’IA",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mel-anonyme",
+      "question": "Faut-il créer un compte pour utiliser MAT ?",
+      "reponse": false,
+      "explication": "Non. MAT ne demande ni nom, ni adresse, ni mot de passe. Vos votes et vos signalements sont rattachés à un identifiant technique d’appareil, jamais à votre identité.",
+      "source": "Documentation de MAT — déclaration RGPD",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "signalement-photo",
+      "question": "Peut-on joindre une photo à un signalement dans MAT ?",
+      "reponse": true,
+      "explication": "Oui, et même la position GPS si vous l’autorisez. Vous pouvez aussi partager une photo depuis votre galerie directement vers MAT, sans ouvrir l’application d’abord.",
+      "source": "Documentation de MAT — guide utilisateur, section « Signaler un problème »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "emmenager-guide",
+      "question": "MAT propose-t-elle un guide pour les nouveaux habitants ?",
+      "reponse": true,
+      "explication": "Oui : « Je viens d’emménager » réunit une vingtaine de démarches classées par échéance, à cocher au fur et à mesure, avec les numéros et les liens utiles. L’idée vient d’un habitant.",
+      "source": "Mairie de Mézières-lez-Cléry — guide d’arrivée des nouveaux habitants",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "urgence-112",
+      "question": "Le 112 fonctionne-t-il dans toute l’Europe ?",
+      "reponse": true,
+      "explication": "Oui, c’est le numéro d’urgence unique européen, joignable gratuitement depuis n’importe quel téléphone. En France, le 15 reste le SAMU, le 17 la police et le 18 les pompiers.",
+      "source": "Ministère de l’Intérieur — numéros d’urgence",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F34386",
+      "categorie": "pratique"
+    },
+    {
+      "id": "urgence-114",
+      "question": "Existe-t-il un numéro d’urgence pour les personnes sourdes ou malentendantes ?",
+      "reponse": true,
+      "explication": "Oui, le 114 : accessible par SMS, visiophonie ou tchat, gratuitement et 24 h/24, pour joindre les secours sans passer par la voix.",
+      "source": "Ministère de l’Intérieur — numéro d’urgence 114",
+      "url": "https://www.info.urgence114.fr",
+      "categorie": "pratique"
+    },
+    {
+      "id": "urgence-3114",
+      "question": "Le 3114 est-il le numéro national de prévention du suicide ?",
+      "reponse": true,
+      "explication": "Oui. Gratuit, confidentiel et joignable 24 h/24, il met en relation avec un professionnel de santé formé à l’écoute et à l’orientation.",
+      "source": "Ministère de la Santé — numéro national de prévention du suicide",
+      "url": "https://3114.fr",
+      "categorie": "pratique"
+    },
+    {
+      "id": "recensement-16",
+      "question": "Faut-il se faire recenser à 16 ans ?",
+      "reponse": true,
+      "explication": "Oui, dans les trois mois qui suivent le seizième anniversaire, en mairie. L’attestation est indispensable pour passer le baccalauréat, le permis de conduire ou un concours.",
+      "source": "Service-public.fr — recensement citoyen obligatoire",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F870",
+      "categorie": "demarches"
+    },
+    {
+      "id": "procuration-mairie",
+      "question": "Peut-on établir une procuration de vote entièrement en ligne ?",
+      "reponse": false,
+      "explication": "Non. La demande se prépare en ligne, mais l’identité doit être vérifiée physiquement en gendarmerie, commissariat, tribunal ou consulat.",
+      "source": "Service-public.fr — vote par procuration",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F1604",
+      "categorie": "demarches"
+    },
+    {
+      "id": "cni-gratuite",
+      "question": "Le renouvellement d’une carte nationale d’identité est-il payant ?",
+      "reponse": false,
+      "explication": "Non, il est gratuit — sauf en cas de perte ou de vol, où un timbre fiscal de 25 € est demandé. La demande se fait dans une mairie équipée d’un dispositif de recueil, sur rendez-vous.",
+      "source": "Service-public.fr — carte nationale d’identité",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F21089",
+      "categorie": "demarches"
+    },
+    {
+      "id": "eau-vigieau",
+      "question": "Les restrictions d’eau en période de sécheresse sont-elles décidées par la mairie ?",
+      "reponse": false,
+      "explication": "Non, par arrêté préfectoral. MAT relaie le niveau officiel publié par VigiEau et vous prévient quand il change réellement.",
+      "source": "VigiEau — service public d’information sur les restrictions d’eau",
+      "url": "https://vigieau.gouv.fr",
+      "categorie": "environnement"
+    },
+    {
+      "id": "vigilance-meteo",
+      "question": "Une vigilance météo orange signifie-t-elle qu’il faut rester confiné chez soi ?",
+      "reponse": false,
+      "explication": "Non. L’orange appelle à la vigilance et à limiter ses déplacements ; c’est le rouge qui appelle à une vigilance absolue. MAT affiche le niveau officiel de Météo-France pour le Loiret.",
+      "source": "Météo-France — dispositif de vigilance météorologique",
+      "url": "https://vigilance.meteofrance.fr",
+      "categorie": "environnement"
+    }
+  ]
+}

@@ -648,6 +648,52 @@ html.line-spacing .rgpd-text,
 html.line-spacing .contact-sub { line-height: 1.9 !important; }
 
 /* Boutons utilitaires dans le header */
+/* ── « Le saviez-vous ? » ─────────────────────────────────────
+   Repliée, la ligne ne coûte que ~34 px : c'est ce qui permet de la poser
+   sur l'accueil sans repousser le contenu. Elle vit DANS le bandeau vert,
+   après .header-tools — rien d'agréable-mais-facultatif ne doit passer
+   devant le bouton Urgences. */
+.sv-bloc{display:block;margin-top:8px;}
+.sv-bloc:empty{display:none;}
+.sv-ligne{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:9px 12px;border:none;border-radius:12px;cursor:pointer;
+  background:rgba(255,255,255,.13);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  font-family:'Nunito',sans-serif;color:var(--cream);text-align:left;
+  min-height:44px;-webkit-tap-highlight-color:transparent;
+}
+.sv-ligne:active{transform:scale(.99);}
+.sv-ligne-ico{font-size:1.05rem;flex-shrink:0;}
+.sv-ligne-txt{flex:1;min-width:0;font-size:.78rem;font-weight:900;letter-spacing:.01em;}
+.sv-ligne-fait{font-size:.7rem;color:#a7f3d0;flex-shrink:0;}
+.sv-ligne-chev{font-size:1.1rem;font-weight:900;opacity:.7;flex-shrink:0;line-height:1;}
+.sv-ligne[aria-expanded="true"] .sv-ligne-chev{transform:rotate(90deg);}
+.sv-corps{
+  margin-top:6px;padding:12px 14px;border-radius:12px;
+  background:rgba(255,255,255,.13);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.sv-question{font-size:.82rem;font-weight:800;color:var(--cream);line-height:1.5;}
+.sv-choix{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px;}
+.sv-btn{
+  border:none;border-radius:999px;padding:10px 12px;min-height:44px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;
+  background:rgba(255,255,255,.92);color:var(--forest);
+  -webkit-tap-highlight-color:transparent;
+}
+.sv-btn:active{transform:scale(.98);}
+.sv-reveal:empty{display:none;}
+.sv-verdict{margin-top:10px;font-size:.8rem;font-weight:900;line-height:1.45;}
+.sv-verdict.sv-ok{color:#a7f3d0;}
+.sv-verdict.sv-ko{color:#fde68a;}
+.sv-expli{margin-top:5px;font-size:.78rem;color:rgba(255,255,255,.94);line-height:1.55;}
+.sv-source{margin-top:8px;font-size:.66rem;color:rgba(255,255,255,.78);line-height:1.45;}
+.sv-source a{color:#a7f3d0;text-decoration:underline;}
+.sv-part{margin-top:6px;font-size:.68rem;font-weight:800;color:#a7f3d0;line-height:1.4;}
+.sv-part:empty{display:none;}
+.sv-vide{font-size:.76rem;color:rgba(255,255,255,.82);}
+/* Masquée en même temps que le reste du bandeau, par cohérence. */
+html.no-header .sv-bloc{display:none !important;}
+
 .header-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .header-tool-btn{border:none;border-radius:12px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;}
 .header-tool-btn.urgent{background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;box-shadow:0 4px 14px rgba(185,28,28,.25);}
