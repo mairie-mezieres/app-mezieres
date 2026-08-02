@@ -82,6 +82,24 @@
 
   /* CARD */
   .d-card{background:#fff;border-radius:18px;border:1px solid var(--border,#e8f0ea);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(26,61,43,.05)}
+
+  /* « Le saviez-vous ? » sur PC : fond clair, à l'inverse du bandeau vert
+     mobile. Les contrastes sont repris de la charte (--forest / --leaf sur
+     blanc) — var(--muted) sur var(--mist) échouerait AXE. */
+  .d-col-left .sv-bloc{display:block;margin-bottom:16px}
+  .d-col-left .sv-bloc:empty{display:none}
+  .d-col-left .sv-ligne{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05);color:var(--forest)}
+  .d-col-left .sv-ligne-fait{color:var(--leaf)}
+  .d-col-left .sv-corps{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05)}
+  .d-col-left .sv-question{color:var(--forest)}
+  .d-col-left .sv-btn{background:var(--mist);color:var(--forest);box-shadow:inset 0 0 0 1px rgba(45,106,79,.25)}
+  .d-col-left .sv-verdict.sv-ok{color:var(--leaf)}
+  .d-col-left .sv-verdict.sv-ko{color:#b45309}
+  .d-col-left .sv-expli{color:var(--text)}
+  .d-col-left .sv-source{color:var(--muted)}
+  .d-col-left .sv-source a{color:var(--leaf)}
+  .d-col-left .sv-part{color:var(--leaf)}
+  .d-col-left .sv-vide{color:var(--muted)}
   .d-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f0f4f0}
   .d-card-hdr span{font-size:.82rem;font-weight:900;color:var(--forest)}
   .d-card-hdr button{background:none;border:none;color:var(--sage-ink);font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:800;cursor:pointer}

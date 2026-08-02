@@ -1,0 +1,400 @@
+/* ════════════════════════════════════════════════════════════
+   MAT — « Le saviez-vous ? » v1.0.0
+   Un fait sur la commune par jour, avec sa source, et une
+   question à laquelle on répond.
+   Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
+   ════════════════════════════════════════════════════════════
+
+   ⛔ RÈGLE ABSOLUE — aucune IA n'écrit le fait affiché.
+
+   Le contenu vient de `data/saviez-vous.json`, versionné dans le dépôt et
+   relu par la mairie, ou des générateurs `SV_CALCULES` ci-dessous qui sont
+   de l'arithmétique pure. Un LLM peut aider à RÉDIGER le corpus en amont ;
+   il n'intervient JAMAIS à l'exécution. Même raison d'être que la constante
+   ASSOCIATIONS côté backend et que l'ADR-0003 (conseils santé déterministes
+   par seuil plutôt que générés) : sur des informations que l'habitant va
+   croire, on ne joue pas aux dés. Voir ADR-0010.
+
+   Corollaire de rédaction : on n'affiche JAMAIS une affirmation fausse.
+   L'entrée pose une QUESTION, et seule la révélation porte du contenu
+   factuel. Un vrai/faux classique afficherait la contre-vérité à l'écran ;
+   celui-ci ne le peut pas par construction.
+*/
+
+(function () {
+  'use strict';
+
+  var SV_URL       = './data/saviez-vous.json?v=1.0.0';
+  var SV_ETAT_KEY  = 'mat_sv_v1';       // { jour, id, reponse }
+  var SV_GRAINE    = 20260802;          // graine fixe : l'ordre ne doit jamais changer
+
+  // Coordonnées de la commune — mêmes valeurs que js/mat-eau8.js (_EAU_LAT/_EAU_LON).
+  var SV_LAT = 47.822;
+  var SV_LON = 1.808;
+
+  var _corpus = null;     // liste ordonnée, construite une fois
+  var _entree = null;     // entrée du jour
+  var _ouvert = false;
+
+  // ── Outils ────────────────────────────────────────────────
+
+  // Quantième du jour dans l'année, ancré sur Paris — surtout pas l'heure
+  // locale de l'appareil (c'est le piège corrigé par l'ADR-0007).
+  function _jourDeLAnnee() {
+    try {
+      var tz = { timeZone: 'Europe/Paris' };
+      var f = function (opt) {
+        return parseInt(new Intl.DateTimeFormat('fr-FR', Object.assign({}, tz, opt)).format(new Date()), 10);
+      };
+      var j = f({ day: 'numeric' }), m = f({ month: 'numeric' }), a = f({ year: 'numeric' });
+      var debut = Date.UTC(a, 0, 1);
+      return Math.floor((Date.UTC(a, m - 1, j) - debut) / 86400000);
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Clé de jour « AAAA-MM-JJ » à Paris, pour ne rejouer qu'une fois par jour.
+  function _cleDuJour() {
+    try {
+      var p = new Intl.DateTimeFormat('fr-CA', {
+        timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).format(new Date());
+      return p;
+    } catch (e) {
+      return String(_jourDeLAnnee());
+    }
+  }
+
+  // Générateur pseudo-aléatoire déterministe (LCG). Une graine fixe garantit
+  // que l'ordre du corpus est le MÊME pour tout le village et d'une version à
+  // l'autre — c'est ce qui fait du fait du jour un sujet de conversation.
+  function _melange(liste, graine) {
+    var a = liste.slice(), s = graine >>> 0;
+    for (var i = a.length - 1; i > 0; i--) {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      var j = s % (i + 1);
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function _nombre(n) {
+    // Espace insécable fine comme séparateur de milliers (typographie française).
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  // Distance orthodromique depuis la commune, en kilomètres (haversine).
+  function _distance(lat, lon) {
+    var R = 6371.0088, r = Math.PI / 180;
+    var dLat = (lat - SV_LAT) * r, dLon = (lon - SV_LON) * r;
+    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+          + Math.cos(SV_LAT * r) * Math.cos(lat * r) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+
+  // ── Entrées calculées ─────────────────────────────────────
+  // Arithmétique pure : le calcul EST la preuve, il n'y a rien à croire.
+  // Chacune doit rester vraie sans réseau et sans donnée externe, pour que
+  // tout le monde voie la même chose le même jour.
+
+  var SV_CALCULES = [
+    {
+      id: 'calc-orleans',
+      build: function () {
+        var d = _distance(47.8975, 1.9099);
+        return {
+          question: 'À vol d’oiseau, Mézières-lez-Cléry est-elle à moins de 15 km de la cathédrale d’Orléans ?',
+          reponse: true,
+          explication: 'Oui : ' + _nombre(d) + ' km à vol d’oiseau. Par la route, comptez une vingtaine de minutes.',
+          source: 'Calcul de distance orthodromique depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-paris',
+      build: function () {
+        var d = _distance(48.8530, 2.3499);
+        return {
+          question: 'Paris est-elle à plus de 150 km de Mézières à vol d’oiseau ?',
+          reponse: false,
+          explication: 'Non : ' + _nombre(d) + ' km seulement séparent Mézières de Notre-Dame de Paris.',
+          source: 'Calcul de distance orthodromique depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-equateur',
+      build: function () {
+        var d = SV_LAT * 111.319;
+        return {
+          question: 'Mézières est-elle plus proche de l’équateur que du pôle Nord ?',
+          reponse: false,
+          explication: 'Non : ' + _nombre(d) + ' km jusqu’à l’équateur, contre '
+            + _nombre(_distance(90, 0)) + ' km jusqu’au pôle Nord. Nous sommes dans la moitié nord de l’hémisphère.',
+          source: 'Calcul depuis la latitude de la commune (47,822 N), un degré de latitude valant 111,319 km',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-newyork',
+      build: function () {
+        var d = _distance(40.7128, -74.0060);
+        return {
+          question: 'New York est-elle à plus de 5 000 km de Mézières ?',
+          reponse: true,
+          explication: 'Oui : ' + _nombre(d) + ' km à vol d’oiseau. Un avion de ligne met environ huit heures.',
+          source: 'Calcul de distance orthodromique depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-montstmichel',
+      build: function () {
+        var d = _distance(48.6360, -1.5115);
+        return {
+          question: 'Le Mont-Saint-Michel est-il à moins de 300 km de Mézières ?',
+          reponse: true,
+          explication: 'Oui : ' + _nombre(d) + ' km à vol d’oiseau.',
+          source: 'Calcul de distance orthodromique depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-lune',
+      build: function () {
+        return {
+          question: 'La Lune est-elle à environ 300 000 km de Mézières ?',
+          reponse: false,
+          explication: 'Non — elle est bien plus loin : 384 400 km en moyenne. Son orbite étant elliptique, '
+            + 'la distance varie de 356 500 km au périgée à 406 700 km à l’apogée.',
+          source: 'IMCCE / Observatoire de Paris — éphémérides du système solaire',
+          url: 'https://www.imcce.fr/'
+        };
+      }
+    },
+    {
+      id: 'calc-ferie',
+      build: function () {
+        // S'appuie sur js/mat-jours-feries.js, chargé au boot par mat-boot.js.
+        if (typeof _getFeriesForYear !== 'function') return null;
+        try {
+          var tz = { timeZone: 'Europe/Paris' };
+          var an = parseInt(new Intl.DateTimeFormat('fr-FR', Object.assign({}, tz, { year: 'numeric' })).format(new Date()), 10);
+          var feries = _getFeriesForYear(an);
+          var n = feries && feries.length ? feries.length : 0;
+          if (!n) return null;
+          return {
+            question: 'La France compte-t-elle plus de 10 jours fériés dans l’année ?',
+            reponse: n > 10,
+            explication: 'En ' + an + ', le calendrier en compte ' + n + '. Ils apparaissent en couleur dans l’agenda de MAT.',
+            source: 'Code du travail, article L3133-1 — calcul des dates par MAT (Pâques comprise)',
+            url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033024562'
+          };
+        } catch (e) { return null; }
+      }
+    }
+  ];
+
+  // ── Construction du corpus ────────────────────────────────
+
+  function _construire(json) {
+    var fixes = (json && Array.isArray(json.entrees)) ? json.entrees : [];
+    var calc = SV_CALCULES.map(function (c) {
+      return { id: c.id, _build: c.build };
+    });
+    // Ordre stable, mélangé une fois : sans cela le corpus se déroulerait
+    // dans l'ordre du fichier, et toutes les entrées d'une même catégorie
+    // tomberaient la même semaine.
+    return _melange(fixes.concat(calc), SV_GRAINE);
+  }
+
+  // Résout l'entrée du jour. Si une entrée calculée ne peut pas se construire
+  // (donnée absente), on avance DÉTERMINISTIQUEMENT jusqu'à la suivante —
+  // jamais au hasard, sinon deux habitants verraient deux faits différents.
+  function _entreeDuJour(liste) {
+    if (!liste.length) return null;
+    var depart = _jourDeLAnnee() % liste.length;
+    for (var k = 0; k < liste.length; k++) {
+      var e = liste[(depart + k) % liste.length];
+      if (!e) continue;
+      if (typeof e._build === 'function') {
+        var r = null;
+        try { r = e._build(); } catch (_) { r = null; }
+        if (r) { r.id = e.id; return r; }
+        continue;
+      }
+      if (e.question && e.explication && e.source) return e;
+    }
+    return null;
+  }
+
+  // ── Mémoire locale ────────────────────────────────────────
+
+  function _etat() {
+    var s = matStore.get(SV_ETAT_KEY, null);
+    if (!s || s.jour !== _cleDuJour()) return null;
+    return s;
+  }
+
+  function _memoriser(reponse) {
+    matStore.set(SV_ETAT_KEY, {
+      jour: _cleDuJour(),
+      id: _entree ? _entree.id : '',
+      reponse: reponse
+    });
+  }
+
+  // ── Rendu ─────────────────────────────────────────────────
+
+  function _conteneurs() {
+    return Array.prototype.slice.call(document.querySelectorAll('.sv-bloc'));
+  }
+
+  function _ligneRepliee() {
+    var deja = _etat();
+    return '<button type="button" class="sv-ligne" aria-expanded="false" onclick="matSaviezVousBascule()">'
+      + '<span class="sv-ligne-ico" aria-hidden="true">🤔</span>'
+      + '<span class="sv-ligne-txt">Le saviez-vous ?</span>'
+      + (deja ? '<span class="sv-ligne-fait" aria-hidden="true">✓</span>' : '')
+      + '<span class="sv-ligne-chev" aria-hidden="true">›</span>'
+      + '</button>';
+  }
+
+  function _corpsHtml() {
+    if (!_entree) {
+      return '<div class="sv-corps"><div class="sv-vide">Le fait du jour n’est pas disponible.</div></div>';
+    }
+    var deja = _etat();
+    var h = '<div class="sv-corps" id="sv-corps">'
+      + '<div class="sv-question">' + esc(_entree.question) + '</div>';
+
+    if (!deja) {
+      h += '<div class="sv-choix">'
+        + '<button type="button" class="sv-btn" onclick="matSaviezVousRepondre(true)">Oui</button>'
+        + '<button type="button" class="sv-btn" onclick="matSaviezVousRepondre(false)">Non</button>'
+        + '</div>';
+    }
+    h += '<div class="sv-reveal" id="sv-reveal" role="status" aria-live="polite" aria-atomic="true">'
+      + (deja ? _revelationHtml(deja.reponse) : '')
+      + '</div></div>';
+    return h;
+  }
+
+  function _revelationHtml(reponseDonnee) {
+    if (!_entree) return '';
+    var bon = (reponseDonnee === _entree.reponse);
+    var verdict = _entree.reponse ? 'Oui.' : 'Non.';
+    var h = '<div class="sv-verdict ' + (bon ? 'sv-ok' : 'sv-ko') + '">'
+      + (bon ? '✅ Bien vu — ' : '💡 Eh non — ') + esc(verdict) + '</div>'
+      + '<div class="sv-expli">' + esc(_entree.explication) + '</div>';
+
+    var src = esc(_entree.source);
+    if (_entree.url && typeof safeHref === 'function' && safeHref(_entree.url)) {
+      h += '<div class="sv-source">Source : <a href="' + esc(_entree.url)
+         + '" target="_blank" rel="noopener noreferrer">' + src + ' ↗</a></div>';
+    } else {
+      h += '<div class="sv-source">Source : ' + src + '</div>';
+    }
+    h += '<div class="sv-part" id="sv-part"></div>';
+    return h;
+  }
+
+  function _peindre() {
+    var html = _ligneRepliee() + (_ouvert ? _corpsHtml() : '');
+    _conteneurs().forEach(function (el) {
+      el.innerHTML = html;
+      var b = el.querySelector('.sv-ligne');
+      if (b) b.setAttribute('aria-expanded', _ouvert ? 'true' : 'false');
+      if (_ouvert) {
+        var c = el.querySelector('.sv-corps');
+        if (c && b) { c.id = ''; b.removeAttribute('aria-controls'); }
+      }
+    });
+    // aria-controls n'est posé que sur le premier conteneur rendu, pour ne pas
+    // dupliquer un id dans le document (mobile et desktop coexistent au DOM).
+    var premier = document.querySelector('.sv-bloc .sv-corps');
+    if (premier) {
+      premier.id = 'sv-corps';
+      var btn = premier.parentNode.querySelector('.sv-ligne');
+      if (btn) btn.setAttribute('aria-controls', 'sv-corps');
+    }
+  }
+
+  // ── Compteur « X % ont répondu comme vous » ───────────────
+  // Best-effort : sans réseau, la ligne reste simplement absente. On ne dit
+  // jamais « 0 % » — une donnée manquante ne doit pas se lire comme une valeur.
+
+  function _majPart(d, maReponse) {
+    if (!d) return;
+    var oui = Number(d.oui) || 0, non = Number(d.non) || 0, tot = oui + non;
+    if (tot < 5) return;   // sous 5 réponses, un pourcentage ne veut rien dire
+    var comme = maReponse ? oui : non;
+    var pct = Math.round((comme / tot) * 100);
+    document.querySelectorAll('#sv-part, .sv-part').forEach(function (el) {
+      el.textContent = pct + ' % des Macérien(ne)s ont répondu comme vous.';
+    });
+  }
+
+  function _envoyer(reponse) {
+    if (!_entree || !window.MAT_API) return;
+    var id = encodeURIComponent(_entree.id || '');
+    if (!id) return;
+    matFetch(window.MAT_API + '/saviezvous/' + id, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-device-id': getMatDeviceId() },
+      body: JSON.stringify({ reponse: reponse ? 'oui' : 'non' })
+    }, 8000)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { _majPart(d, reponse); })
+      .catch(function () { /* hors ligne : le pourcentage reste absent */ });
+  }
+
+  // ── API publique ──────────────────────────────────────────
+
+  window.matSaviezVousBascule = function () {
+    _ouvert = !_ouvert;
+    _peindre();
+    if (_ouvert) {
+      try { trackStat('saviez_vous'); } catch (e) {}
+      // Si l'habitant a déjà répondu aujourd'hui, on récupère le compteur.
+      var deja = _etat();
+      if (deja && _entree && window.MAT_API) {
+        matFetch(window.MAT_API + '/saviezvous/' + encodeURIComponent(_entree.id), {
+          headers: { 'x-device-id': getMatDeviceId() }
+        }, 8000)
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { _majPart(d, deja.reponse); })
+          .catch(function () {});
+      }
+    }
+  };
+
+  window.matSaviezVousRepondre = function (reponse) {
+    if (!_entree || _etat()) return;
+    _memoriser(reponse);
+    _peindre();
+    var z = document.querySelector('.sv-reveal');
+    if (z) z.innerHTML = _revelationHtml(reponse);
+    _envoyer(reponse);
+    try { trackStat('saviez_vous_reponse'); } catch (e) {}
+  };
+
+  window.matSaviezVousInit = function () {
+    if (!_conteneurs().length) return;
+    if (_corpus) { _peindre(); return; }
+    matFetch(SV_URL, { cache: 'no-cache' }, 8000)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (json) {
+        _corpus = _construire(json);
+        _entree = _entreeDuJour(_corpus);
+        if (_entree) _peindre();
+      })
+      .catch(function () { /* corpus indisponible : la ligne ne s'affiche pas */ });
+  };
+})();
