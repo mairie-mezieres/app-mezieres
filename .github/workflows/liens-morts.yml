@@ -36,7 +36,17 @@ jobs:
           #  - sites qui bloquent les robots (Facebook/Instagram, LinkedIn → 999 ;
           #    claude.ai / chatgpt.com / chat.mistral.ai → 403) ;
           #  - points d'entrée d'API et consoles d'admin, qui ne sont pas des
-          #    liens suivis par un humain et répondent 401/404 sans paramètres.
+          #    liens suivis par un humain et répondent 401/404 sans paramètres ;
+          #  - laposte.fr et jimdosite.com, qui répondent 403 aux robots alors
+          #    que leurs pages s'ouvrent normalement dans un navigateur (vérifié
+          #    à la main) — à ne pas confondre avec un lien réellement cassé.
+          #
+          # ⛔ NE JAMAIS écrire de commentaire À L'INTÉRIEUR du bloc `args: >-`
+          # ci-dessous. Dans un scalaire replié YAML, « # » n'est PAS un
+          # commentaire : le texte part tel quel dans la ligne de commande de
+          # lychee. C'est arrivé le 2 août 2026 — trois lignes d'explication ont
+          # rendu le scan muet (1 s d'exécution, rapport vide) sans rien casser
+          # de visible. Les commentaires vont ici, au-dessus de la clé.
           args: >-
             --no-progress
             --max-retries 2
@@ -65,9 +75,6 @@ jobs:
             --exclude 'vigieau\.gouv\.fr'
             --exclude 'trello\.com'
             --exclude 'upstash\.io'
-            # Sites qui refusent les agents automatiques (403) alors que la page
-            # existe bien dans un navigateur — vérifié à la main. À ne pas
-            # confondre avec un lien réellement cassé.
             --exclude 'laposte\.fr'
             --exclude 'jimdosite\.com'
             index.html admin.html architecture.html notif.html offline.html partager.html
