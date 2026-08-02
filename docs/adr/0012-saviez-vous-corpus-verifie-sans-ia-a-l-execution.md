@@ -111,6 +111,34 @@ d'une année à l'autre ne provoque plus de saut.
   Ces deux constantes ont été ajustées le jour même de la mise en service,
   quand personne n'avait vu plus d'une question — ce qui ne se représentera pas.
 
+**Ce que la mise en service a appris, le jour même :**
+
+Deux erreurs factuelles sont passées en production et ont été relevées par la mairie
+quelques heures après le déploiement.
+
+- « Existe-t-il une crèche à Mézières ? → Oui » : **faux**. La crèche est dans une
+  commune voisine, dont Mézières est partenaire.
+- « Peut-on faire une procuration entièrement en ligne ? → Non » : **faux depuis
+  France Identité**, qui permet la vérification d'identité à distance.
+
+Leurs origines diffèrent, et c'est l'enseignement principal :
+
+1. **La crèche était fausse en amont**, dans la base de connaissances de MEL
+   (`lib/mel.js`). Le corpus a hérité de l'erreur, et MEL la racontait déjà aux
+   habitants. Traiter cette base comme une source vérifiée était une facilité :
+   elle est validée par la mairie sur le fond, mais elle vieillit et n'avait jamais
+   été relue ligne à ligne. **Une entrée qui en provient doit citer la mairie comme
+   source — ce qui vaut demande de relecture, pas certificat de conformité.**
+2. **La procuration était une erreur de transcription.** La réponse de MEL mentionne
+   bien France Identité ; elle a été perdue en réécrivant l'entrée sous forme de
+   question. Reformuler, c'est réintroduire du risque.
+
+**Et surtout : la relecture par la mairie était prévue *avant* le merge. Elle n'a pas
+eu lieu.** L'ADR posait la règle, le processus ne l'a pas appliquée — les entrées ont
+été livrées puis relues. La page de revue générée pour la mairie (liste complète,
+question, réponse, source, ordre de passage) doit être soumise **avant** la fusion,
+pas après. Une règle qu'aucune étape n'impose n'est qu'une intention.
+
 **Points de vigilance pour les futures évolutions :**
 
 - Ajouter une entrée sans source fera **échouer la CI**. C'est voulu.
