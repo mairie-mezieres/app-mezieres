@@ -48,6 +48,7 @@ MAT. Il décrit, processus par processus, **ce que fait le produit**, sous forme
 | [SFD-13](sfd/SFD-13-accessibilite-personnalisation.md) | Accessibilité & personnalisation | Citoyen |
 | [SFD-14](sfd/SFD-14-administration-backoffice.md) | Administration (back-office mairie) | Admin |
 | [SFD-15](sfd/SFD-15-supervision-conformite.md) | Supervision, exploitation & conformité | Admin · Système |
+| [SFD-16](sfd/SFD-16-le-saviez-vous.md) | « Le saviez-vous ? » — le fait du jour, sourcé | Citoyen · Admin |
 
 ## Conventions de rédaction
 

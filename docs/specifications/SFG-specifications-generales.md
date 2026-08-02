@@ -71,6 +71,7 @@ Le présent référentiel couvre **les deux composants** d'un point de vue fonct
 | SFD-13 | Accessibilité & personnalisation | Réglages | — | — |
 | SFD-14 | Administration (back-office) | — | Tous contenus | — |
 | SFD-15 | Supervision & conformité | — | Tableau de bord, diagnostic, purge | Crons, sauvegarde |
+| SFD-16 | « Le saviez-vous ? » | Lecture, réponse | Enrichit le corpus | Rotation quotidienne, répartition |
 
 ## 4. Exigences transverses (règles de gestion transverses)
 

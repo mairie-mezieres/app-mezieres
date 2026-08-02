@@ -86,6 +86,7 @@ app-mezieres/
 │   ├── mat-entreprises.js  Annuaire des entreprises
 │   ├── mat-plui.js         Grand dossier PLUi-H-D (contenu embarqué)
 │   ├── mat-guide-arrivee.js Guide d'arrivée des nouveaux habitants (embarqué)
+│   ├── mat-saviez-vous.js  « Le saviez-vous ? » — fait du jour (corpus + calculs)
 │   ├── mat-sondages.js     Sondages citoyens
 │   ├── mat-accessibility.js Accessibilité (taille texte, contraste, TTS)
 │   ├── mat-desktop.js      Rendu spécifique layout desktop
@@ -428,6 +429,59 @@ Le service worker (`service-worker.js`) utilise une stratégie **Network First**
 // service-worker.js
 const CACHE = 'mat-v4.15.0';  // ← incrémenter à chaque déploiement
 ```
+
+### Contenus embarqués et précachés
+
+Certaines fonctionnalités fonctionnent **entièrement hors ligne** parce que leur contenu
+est versionné dans le dépôt et listé dans `PRECACHE_URLS` :
+
+| Fichier | Alimente |
+|---|---|
+| `data/mel-tree.json` | L'arbre de décision de MEL |
+| `data/plu-data.json` | Le module PLU / urbanisme |
+| `data/saviez-vous.json` | Le fait du jour — voir ci-dessous |
+
+⚠️ **Tout nouveau fichier de contenu doit être ajouté à `PRECACHE_URLS` avec son
+paramètre `?v=`**, sinon il ne sera pas disponible hors ligne et échappera à
+l'invalidation de cache.
+
+### « Le saviez-vous ? » — aucune IA à l'exécution
+
+`js/mat-saviez-vous.js` affiche un fait par jour sur la commune. **Le contenu ne provient
+jamais d'un modèle de langage au moment de l'affichage** — c'est une règle, pas une
+préférence, formalisée par l'[ADR-0010](adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md).
+
+Deux sources, et deux seulement :
+
+1. **`data/saviez-vous.json`** — corpus versionné et relu. Chaque entrée porte une
+   `source` et une `url`, **affichées à l'écran**. Une entrée sans source fait échouer la
+   CI (`tests/e2e/saviez-vous.spec.js`, test « intégrité du corpus »).
+2. **`SV_CALCULES`** dans le module — des générateurs d'arithmétique pure (distances
+   orthodromiques depuis les coordonnées de la commune, jours fériés). Le calcul *est* la
+   preuve.
+
+Deux points de vigilance pour qui reprendra ce code :
+
+- **Le corpus ne contient que des questions**, jamais des affirmations. C'est ce qui
+  interdit structurellement d'afficher une contre-vérité : seule la révélation, après la
+  réponse de l'habitant, porte du contenu factuel.
+- **`SV_GRAINE` ne doit jamais changer.** L'ordre du corpus est mélangé une fois avec
+  cette graine fixe ; la modifier ferait rejouer des faits déjà vus et en sauterait
+  d'autres. La rotation est `quantième du jour % taille du corpus`, ancrée sur Paris —
+  tout le village voit le même fait le même jour.
+
+### Régions `aria-live` — la règle du silence
+
+`js/mat-saviez-vous.js` introduit la **première région `aria-live` du dépôt**
+(`role="status" aria-live="polite" aria-atomic="true"` sur la révélation). Deux principes
+à reprendre pour les suivantes :
+
+- **N'annoncer que ce qui vient de changer sous l'action de l'utilisateur.** Ici, la
+  région est vide tant que l'habitant n'a pas répondu ; elle ne se remplit qu'à ce
+  moment-là.
+- **Ne jamais y déverser des données qui arrivent en rafale.** Une région live alimentée
+  par des chargements asynchrones successifs bavarderait sans fin dans l'oreille d'un
+  utilisateur de lecteur d'écran. Si le cas se présente, il faut regrouper et temporiser.
 
 ### Manifest PWA
 
@@ -842,8 +896,12 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
 - [ ] **MEL** : si la fonctionnalité appelle souvent les mêmes questions, ajouter une `DIRECT_RULE` dans `lib/mel.js`
 - [ ] **Tests** : vérifier que les 4 tests Playwright passent (`npx playwright test`)
 - [ ] **AXE** : vérifier que les nouveaux éléments visibles respectent les contrastes WCAG AA (ratio ≥ 4.5:1 pour le texte normal, ≥ 3:1 pour le grand texte)
+- [ ] **Contenu embarqué** : si la fonctionnalité s'appuie sur un fichier de `data/`,
+  l'ajouter à `PRECACHE_URLS` **avec son `?v=`** — sinon elle ne fonctionnera pas hors ligne
 - [ ] **Docs** : mettre à jour `docs/guide-utilisateur.md` (section correspondante)
 - [ ] **Docs** : mettre à jour ce guide si l'architecture change
+- [ ] **Spécification** : créer ou mettre à jour le SFD concerné dans
+  `docs/specifications/sfd/`, et la cartographie §3 du SFG
 
 ### Mettre à jour le générateur "Partager" (`js/mat-partager.js`)
 

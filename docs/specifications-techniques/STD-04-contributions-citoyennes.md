@@ -74,3 +74,30 @@
 - **`POST /event/:uid/rsvp`** (toggle, device-id requis) → `{ count, rsvp }`. Clés
   `mat:rsvp:event:{uid}` (Set dédup) + `mat:rsvp:event:{uid}:count` (compteur clampé ≥ 0).
   503 `Réactions désactivées`, 400 `device-id requis`, 500 `Erreur serveur`.
+
+## « Le saviez-vous ? » — répartition des réponses (`routes/reactions.js`)
+
+Alimente la ligne « X % des Macérien(ne)s ont répondu comme vous »
+(cf. [SFD-16](../specifications/sfd/SFD-16-le-saviez-vous.md)).
+
+- **`GET /saviezvous/:id`** → `{ oui, non, moi }`. En erreur, renvoie
+  `{oui:0,non:0,moi:false}` : le frontend masque alors simplement le pourcentage.
+- **`POST /saviezvous/:id`** — corps `{ reponse: "oui"|"non" }`, device-id requis →
+  `{ oui, non }`. Clés `mat:sv:votants:{id}` (Set dédup) + `mat:sv:count:{id}` (JSON
+  `{oui, non}`).
+  400 `identifiant invalide`, 400 `réponse attendue : oui ou non`, 400 `device-id requis`,
+  503 `Réactions désactivées`, 500 `Erreur serveur`.
+
+**Deux particularités par rapport aux RSVP ci-dessus :**
+
+- **Pas de bascule** — une seule réponse par appareil et par fait, sans retour arrière. La
+  répartition doit refléter les premières intuitions, pas un vote corrigé après avoir lu
+  la réponse. Un second `POST` renvoie la répartition inchangée.
+- **Le contenu du fait n'est pas ici.** Le backend ne connaît que des identifiants et des
+  compteurs ; les questions, réponses et sources vivent dans `data/saviez-vous.json` du
+  dépôt frontend, versionnées et relues (voir
+  [ADR-0010](../adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md)).
+
+Le format d'identifiant (`^[a-z0-9-]{2,64}$`) est validé côté route : `safeId` de
+`lib/validate.js` ne vaut que pour des entiers. Le nombre de clés Redis est borné par la
+taille du corpus, il n'y a donc pas de croissance à purger.

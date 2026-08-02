@@ -23,6 +23,7 @@
 15. [Météo et restrictions d'eau (sécheresse)](#15-météo-et-restrictions-deau-sécheresse)
 16. [Grand dossier PLUi-H-D](#16-grand-dossier-plui-h-d)
 17. [Je viens d'emménager — le guide d'arrivée](#17-je-viens-demménager--le-guide-darrivée)
+18. [« Le saviez-vous ? » — le fait du jour](#18--le-saviez-vous---le-fait-du-jour)
 
 ---
 
@@ -67,6 +68,7 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 | Zone | Contenu |
 |------|---------|
 | **En-tête** | Statut de la mairie (ouverte / fermée), météo locale, prochain ramassage des poubelles, prochain événement, passage du bus Rémi (ligne 8), prix des carburants |
+| **« Le saviez-vous ? »** | Sous les boutons Urgences et Personnalisation : le fait du jour sur la commune, sourcé, avec une question à laquelle répondre (voir §18) |
 | **Grand dossier PLUi-H-D** | Bandeau mis en avant menant à la page de suivi du Plan Local d'Urbanisme intercommunal (voir §16) |
 | **Démarches et services** | Accès à MEL (assistante virtuelle) et aux documents officiels de la commune |
 | **Actualité et calendrier** | Dernières nouvelles et agenda |
@@ -234,6 +236,10 @@ MAT est une **application progressive (PWA)** : une fois que vous l'avez visité
 
 - Les informations consultées lors de votre dernière visite restent accessibles.
 - Certaines fonctionnalités nécessitent une connexion (MEL, signalements, actualités en temps réel).
+- **Le fait du jour (§18) fonctionne hors ligne** : la question, la réponse et sa source
+  sont embarquées dans l'application. Seule la part des habitants ayant répondu comme vous
+  demande une connexion.
+- Le guide d'arrivée (§17) est également consultable sans réseau.
 
 Dès que la connexion revient, l'application se met à jour automatiquement.
 
@@ -418,6 +424,47 @@ pas encore ouverte.
 
 Vous pouvez aussi poser la question directement à MEL — « je viens d'emménager, que
 dois-je faire ? » — elle répond avec la même liste.
+
+---
+
+## 18. « Le saviez-vous ? » — le fait du jour
+
+Sous les boutons **Urgences** et **Personnalisation**, une ligne discrète vous attend
+chaque jour : **🤔 Le saviez-vous ?**
+
+Appuyez dessus. Une question s'affiche — sur la commune, ses règles d'urbanisme, ses
+déchetteries, ses transports, son conseil municipal… Répondez par **Oui** ou par **Non**,
+et la réponse apparaît, expliquée.
+
+### Trois choses à savoir
+
+**C'est le même fait pour tout le village.** Votre voisin voit exactement la même question
+que vous le même jour. C'est fait exprès : de quoi en parler à la boulangerie.
+
+**Chaque réponse cite sa source.** Sous l'explication, vous trouvez systématiquement d'où
+vient l'information — la mairie, la Communauté de communes, un service de l'État — et,
+quand elle existe, l'adresse pour aller vérifier vous-même. Aucune information n'est
+publiée sans sa source.
+
+**Aucune intelligence artificielle n'écrit ces textes.** Ils sont rédigés à l'avance et
+relus par la mairie, ou calculés (les distances, par exemple, sont de simples calculs de
+géométrie). C'est un choix délibéré : sur une information que vous allez croire, il n'est
+pas question de prendre le moindre risque d'erreur.
+
+### Le reste
+
+- **Une réponse par jour.** Une fois que vous avez répondu, la bonne réponse reste
+  affichée jusqu'au lendemain — vous ne pouvez pas rejouer.
+- **La part des habitants qui ont répondu comme vous** s'affiche sous la réponse, dès lors
+  qu'au moins cinq personnes ont participé. Elle nécessite une connexion : sans réseau, la
+  question et sa réponse s'affichent quand même, seul ce pourcentage disparaît.
+- **Ça ne prend pas de place.** Repliée, la rubrique tient sur une seule ligne.
+- Si vous avez **masqué l'en-tête** dans Personnalisation (voir §10), la rubrique
+  disparaît avec lui.
+
+> 🔒 **Aucune donnée personnelle.** Votre réponse n'est rattachée à aucune identité :
+> comme pour les votes d'idées, seul un identifiant technique d'appareil sert à éviter
+> qu'une même personne réponde deux fois.
 
 ---
 
