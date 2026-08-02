@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — « Le saviez-vous ? » v1.1.0
+   MAT — « Le saviez-vous ? » v1.2.0
    Un fait sur la commune par jour, avec sa source, et une
    question à laquelle on répond.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
@@ -111,6 +111,7 @@
   var SV_CALCULES = [
     {
       id: 'calc-orleans',
+      categorie: 'decouverte',
       build: function () {
         var d = _distance(47.8975, 1.9099);
         return {
@@ -124,6 +125,7 @@
     },
     {
       id: 'calc-paris',
+      categorie: 'decouverte',
       build: function () {
         var d = _distance(48.8530, 2.3499);
         return {
@@ -137,6 +139,7 @@
     },
     {
       id: 'calc-equateur',
+      categorie: 'decouverte',
       build: function () {
         var d = SV_LAT * 111.319;
         return {
@@ -151,6 +154,7 @@
     },
     {
       id: 'calc-newyork',
+      categorie: 'decouverte',
       build: function () {
         var d = _distance(40.7128, -74.0060);
         return {
@@ -164,6 +168,7 @@
     },
     {
       id: 'calc-montstmichel',
+      categorie: 'decouverte',
       build: function () {
         var d = _distance(48.6360, -1.5115);
         return {
@@ -177,6 +182,7 @@
     },
     {
       id: 'calc-lune',
+      categorie: 'decouverte',
       build: function () {
         return {
           question: 'La Lune est-elle à environ 300 000 km de Mézières ?',
@@ -190,6 +196,7 @@
     },
     {
       id: 'calc-ferie',
+      categorie: 'pratique',
       build: function () {
         // S'appuie sur js/mat-jours-feries.js, chargé au boot par mat-boot.js.
         if (typeof _getFeriesForYear !== 'function') return null;
@@ -244,9 +251,12 @@
       .concat(Object.keys(paquets).sort().filter(function (c) {
         return SV_ORDRE_CATEGORIES.indexOf(c) === -1;
       }));
-    // Mélange DANS chaque catégorie : la variété d'un cycle à l'autre sans
-    // toucher à l'ordre des catégories, qui lui est voulu.
-    cles.forEach(function (c) { paquets[c] = _melange(paquets[c], SV_GRAINE); });
+    // À l'INTÉRIEUR d'une catégorie, on garde l'ordre de déclaration du corpus.
+    // Un mélange y avait été essayé puis retiré : il plaçait au premier jour une
+    // question sur les jours fériés en France, alors que la rubrique porte sur la
+    // commune. L'ouverture d'un rendez-vous quotidien ne se joue pas aux dés — et
+    // un ordre explicite est aussi ce qui permet à la mairie de relire le corpus
+    // en sachant ce qui passera quand.
 
     var reste = true;
     for (var tour = 0; reste; tour++) {
@@ -262,7 +272,7 @@
   function _construire(json) {
     var fixes = (json && Array.isArray(json.entrees)) ? json.entrees : [];
     var calc = SV_CALCULES.map(function (c) {
-      return { id: c.id, _build: c.build, categorie: 'decouverte' };
+      return { id: c.id, _build: c.build, categorie: c.categorie || 'decouverte' };
     });
     return _ordonner(fixes.concat(calc));
   }
@@ -289,9 +299,14 @@
 
   // ── Mémoire locale ────────────────────────────────────────
 
+  // La réponse mémorisée ne vaut que pour LE fait du jour. On vérifie aussi
+  // l'identifiant : si le corpus est réordonné entre deux ouvertures — ce qui
+  // arrive à chaque enrichissement — l'habitant verrait sinon la révélation
+  // d'une question à laquelle il n'a pas répondu.
   function _etat() {
     var s = matStore.get(SV_ETAT_KEY, null);
     if (!s || s.jour !== _cleDuJour()) return null;
+    if (_entree && s.id && s.id !== _entree.id) return null;
     return s;
   }
 

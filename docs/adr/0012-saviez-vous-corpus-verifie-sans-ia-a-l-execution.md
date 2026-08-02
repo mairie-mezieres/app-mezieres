@@ -69,8 +69,12 @@ allant du plus surprenant au plus aride : découvertes calculées, l'application
 elle-même, la vie communale, l'environnement, le pratique, les transports, la
 santé, les déchets, l'intercommunalité, l'habitat, les démarches, l'urbanisme.
 Deux entrées de même catégorie ne peuvent pas se suivre tant qu'il reste de la
-matière ailleurs. Le mélange par graine ne joue plus qu'**à l'intérieur** d'une
-catégorie.
+matière ailleurs. À l'intérieur d'une catégorie, l'ordre est celui de **déclaration du corpus**.
+Un mélange y avait été essayé puis retiré : il plaçait au premier jour une question
+sur les jours fériés en France, alors que la rubrique porte sur la commune.
+L'ouverture d'un rendez-vous quotidien ne se joue pas aux dés — et un ordre
+explicite est aussi ce qui permet à la mairie de relire le corpus en sachant ce qui
+passera quand.
 
 Le compte depuis une origine, et non depuis le 1er janvier, n'est pas un détail :
 avec un quantième d'année, le premier jour affiché aurait été la 213e entrée du
