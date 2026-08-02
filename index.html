@@ -57,7 +57,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.3.4"></script>
+<script defer src="js/mat-mel.js?v=4.3.5"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
 <script defer src="js/mat-boot.js?v=4.3.7"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.53 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.53.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -443,7 +443,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0">🔗 Partager</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.53</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.53.1</button>
 </div>
 </div>
 </div>
@@ -1646,6 +1646,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 2 ao&ucirc;t 2026 — v4.53.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Les <strong>adresses de sites et les courriels</strong> cit&eacute;s par MEL sont enfin <strong>cliquables</strong> &mdash; ils s&rsquo;affichaient sans qu&rsquo;on puisse les ouvrir</li>
+<li>Correction&nbsp;: pour la <strong>carte d&rsquo;identit&eacute; et le passeport</strong>, MEL renvoie d&eacute;sormais vers le service officiel qui <strong>g&eacute;olocalise la mairie habilit&eacute;e</strong> la plus proche, au lieu d&rsquo;un lien qui n&rsquo;aboutissait pas</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 2 ao&ucirc;t 2026 — v4.53</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Nouveau&nbsp;: <strong>&laquo;&nbsp;Je viens d&rsquo;emm&eacute;nager&nbsp;&raquo;</strong>, le guide d&rsquo;arriv&eacute;e des nouveaux habitants &mdash; 23&nbsp;d&eacute;marches class&eacute;es par &eacute;ch&eacute;ance, &agrave; <strong>cocher au fur et &agrave; mesure</strong>, avec les num&eacute;ros et les liens utiles. Id&eacute;e propos&eacute;e par un habitant&nbsp;!</li>
