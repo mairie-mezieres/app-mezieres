@@ -158,6 +158,6 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-guide-arrivee.js?v=1.0.0';
+  s.src = 'js/mat-guide-arrivee.js?v=1.0.1';
   document.head.appendChild(s);
 })();

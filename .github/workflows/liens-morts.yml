@@ -22,10 +22,21 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # On vérifie les pages HTML de l'application (pas les libs vendor ni les tests).
-          # Certains sites bloquent les robots (Facebook/Instagram, LinkedIn → 999,
-          # claude.ai / chatgpt.com / chat.mistral.ai → 403) : on les exclut pour
-          # éviter les faux positifs.
+          # Périmètre : les pages HTML ET les modules js/ (pas les libs vendor ni
+          # les tests).
+          #
+          # ⚠️ js/ a été ajouté après coup : le guide d'arrivée annonçait
+          # « laposte.fr/reexpedition-courrier » (404) et « valdeloire-fibre.fr »
+          # (domaine inexistant) sans que rien ne le détecte, parce que ce
+          # scan ne regardait que les .html. Or l'essentiel des liens montrés
+          # aux habitants vit désormais dans les modules JS (guide d'arrivée,
+          # associations, arbre de décision de MEL…).
+          #
+          # Deux familles d'exclusions :
+          #  - sites qui bloquent les robots (Facebook/Instagram, LinkedIn → 999 ;
+          #    claude.ai / chatgpt.com / chat.mistral.ai → 403) ;
+          #  - points d'entrée d'API et consoles d'admin, qui ne sont pas des
+          #    liens suivis par un humain et répondent 401/404 sans paramètres.
           args: >-
             --no-progress
             --max-retries 2
@@ -35,7 +46,22 @@ jobs:
             --exclude 'claude\.ai'
             --exclude 'chatgpt\.com'
             --exclude 'chat\.mistral\.ai'
+            --exclude 'console\.mistral\.ai'
+            --exclude 'dashboard\.render\.com'
+            --exclude 'onrender\.com'
+            --exclude 'vercel\.com'
+            --exclude 'public-api\.meteofrance\.fr'
+            --exclude 'api-adresse\.data\.gouv\.fr'
+            --exclude 'apicarto\.ign\.fr'
+            --exclude 'data\.geopf\.fr'
+            --exclude 'cadastre\.data\.gouv\.fr'
+            --exclude 'openagenda\.com'
+            --exclude 'res\.cloudinary\.com'
+            --exclude 'sentry\.io'
+            --exclude 'tile\.openstreetmap\.org'
+            --exclude 'localhost'
             index.html admin.html architecture.html notif.html offline.html partager.html
+            'js/*.js'
           format: markdown
           output: ./lychee/rapport.md
           fail: false
