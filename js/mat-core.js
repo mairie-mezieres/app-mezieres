@@ -562,14 +562,21 @@ if(window.visualViewport){
   window.visualViewport.addEventListener('scroll', fixIOSViewportAfterKeyboard);
 }
 
-// ── Touche Échap pour fermer overlays & modales ───────────────
+// ── Touche Échap pour fermer les modales ─────────────────────
+// ⚠️ Ne PAS refermer d'overlay ici : c'est déjà le rôle du gestionnaire
+// clavier des overlays (focus-trap, plus haut dans ce fichier). Les deux
+// écoutent `keydown` sur `document` et se déclenchent tous les deux sur une
+// seule frappe ; comme closeOv() dépile `_ovStack` de façon synchrone, le
+// second fermait l'overlay du DESSOUS. Invisible tant qu'un seul overlay
+// était ouvert (fermer « deux fois » une pile de un ne se voit pas), le
+// bug apparaissait dès qu'un overlay en ouvrait un autre par-dessus —
+// associations → subvention, actualités → détail, guide → déchets.
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     const matModal = document.getElementById('mat-modal');
     if (matModal && matModal.classList.contains('open')) { closeMatModal(false); return; }
     const trombi = document.getElementById('trombi-modal');
     if (trombi && trombi.style.display === 'flex') { closeTrombi(e); return; }
-    if (_ovStack.length > 0) { closeOv(_ovStack[_ovStack.length - 1]); return; }
   }
 });
 

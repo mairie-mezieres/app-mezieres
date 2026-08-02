@@ -180,6 +180,11 @@ test('guide d’arrivée : cocher une démarche est mémorisé après rechargeme
   await expect(page.locator('#ov-guide')).toContainText('0 / 23 démarche faite');
 });
 
+// Régression : deux gestionnaires `keydown` distincts fermaient chacun le
+// dernier overlay de la pile à chaque Échap. Comme closeOv() dépile _ovStack
+// de façon SYNCHRONE (seul le visuel passe par la view transition), une seule
+// frappe en fermait deux. Invisible tant qu'un seul overlay était ouvert —
+// il fallait une pile de deux pour le voir.
 test('guide d’arrivée : un lien interne empile l’overlay cible sans fermer le guide', async ({ page }) => {
   await ouvrirGuide(page);
   await page.getByRole('button', { name: /Calendrier des collectes/ }).click();
@@ -189,6 +194,9 @@ test('guide d’arrivée : un lien interne empile l’overlay cible sans fermer 
   await page.keyboard.press('Escape');
   await expect(page.locator('#ov-dechets')).not.toHaveClass(/open/);
   await expect(page.locator('#ov-guide')).toHaveClass(/open/);
+  // Second Échap : c'est au tour du guide, et de lui seul.
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#ov-guide')).not.toHaveClass(/open/);
 });
 
 test('guide d’arrivée : l’adresse #guide ouvre la page directement', async ({ page }) => {
