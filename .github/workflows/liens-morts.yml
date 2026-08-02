@@ -60,6 +60,16 @@ jobs:
             --exclude 'sentry\.io'
             --exclude 'tile\.openstreetmap\.org'
             --exclude 'localhost'
+            --exclude 'overpass-api\.de'
+            --exclude 'hubeau\.eaufrance\.fr'
+            --exclude 'vigieau\.gouv\.fr'
+            --exclude 'trello\.com'
+            --exclude 'upstash\.io'
+            # Sites qui refusent les agents automatiques (403) alors que la page
+            # existe bien dans un navigateur — vérifié à la main. À ne pas
+            # confondre avec un lien réellement cassé.
+            --exclude 'laposte\.fr'
+            --exclude 'jimdosite\.com'
             index.html admin.html architecture.html notif.html offline.html partager.html
             'js/*.js'
           format: markdown
