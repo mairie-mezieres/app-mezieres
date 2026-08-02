@@ -44,7 +44,7 @@ var GUIDE_ETAPES = [
         texte:'Un téléservice unique prévient en une seule fois l’assurance maladie, les caisses de retraite, les impôts, France Travail et la CAF. Pensez aussi à votre employeur, votre banque et vos assurances.',
         liens:[
           { label:'Je change de coordonnées', url:'https://www.service-public.gouv.fr/particuliers/vosdroits/R11193' },
-          { label:'Réexpédition du courrier', url:'https://www.laposte.fr/reexpedition-courrier' }
+          { label:'Réexpédition du courrier', url:'https://www.laposte.fr/changement-adresse-demenagement-reexpedition' }
         ]
       },
       {
@@ -75,8 +75,12 @@ var GUIDE_ETAPES = [
       },
       {
         id:'fibre', ico:'🌐', titre:'Vérifiez votre éligibilité à la fibre',
-        texte:'Le déploiement de la fibre optique sur la commune est porté par Val de Loire Fibre. Vérifiez votre adresse, puis souscrivez auprès du fournisseur de votre choix.',
-        liens:[ { label:'valdeloire-fibre.fr', url:'https://www.valdeloire-fibre.fr/' } ]
+        // ⚠️ L'opérateur du réseau départemental est Lysséo — c'est ce que dit
+        // l'arbre de décision de MEL, validé par la mairie (js/mat-mel.js, 3 entrées).
+        // Ne pas réintroduire « Val de Loire Fibre » : ce réseau dessert
+        // l'Indre-et-Loire et le Loir-et-Cher, pas le Loiret.
+        texte:'Le réseau fibre du département est géré par Lysséo. Vérifiez votre adresse, puis souscrivez auprès du fournisseur de votre choix. Pour une construction neuve, déclarez-la le plus tôt possible.',
+        liens:[ { label:'lysseo.fr', url:'https://lysseo.fr' } ]
       }
     ]
   },

@@ -72,6 +72,26 @@ recopiant.
   assumé : ce sont deux canaux différents pour deux usages différents. Les faits verrouillés
   par `test/guide-arrivee.test.js` côté backend servent de garde-fou.
 
+## Mise à jour — 2 août 2026 : le contenu embarqué vieillit en silence
+
+Deux liens du guide sont morts en production dès le premier jour :
+`laposte.fr/reexpedition-courrier` (404) et `valdeloire-fibre.fr` (domaine inexistant).
+
+Le workflow `liens-morts.yml` existait déjà mais ne scannait que les **fichiers HTML** —
+or tout le contenu du guide vit dans `js/mat-guide-arrivee.js`. Le scan couvre désormais
+`js/*.js`, et un workflow équivalent a été ajouté au dépôt backend pour les réponses de
+MEL.
+
+Ce point renforce le compromis accepté ci-dessus : du contenu embarqué **n'est pas
+auto-vérifiant**. Il lui faut un filet automatique, sinon une adresse périmée reste
+affichée aux habitants sans que personne ne s'en aperçoive.
+
+Corollaire découvert au passage : le guide annonçait « Val de Loire Fibre » alors que
+l'arbre de décision de MEL, validé par la mairie, désignait **Lysséo** depuis toujours.
+Le guide avait recopié une information erronée d'une autre source au lieu de pointer
+vers celle qui fait foi — exactement ce que la règle « lier plutôt que copier » vise à
+empêcher.
+
 **Points de vigilance pour les futures évolutions :**
 - Si la mairie demande à éditer le guide elle-même, la bonne migration n'est **pas** une
   route dédiée mais l'arbre MEL, déjà administrable — au prix du hors-ligne, qu'il faudra
