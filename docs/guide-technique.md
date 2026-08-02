@@ -481,6 +481,37 @@ Deux points de vigilance pour qui reprendra ce code :
   des faits déjà vus et en sauterait d'autres. Tout le village voit le même fait le même
   jour, c'est un engagement implicite.
 
+#### Relire le corpus avant de le fusionner
+
+`revue-saviez-vous.html` liste le corpus complet dans l'**ordre réel de passage**, avec la
+date à laquelle chaque question tombera, sa réponse, son explication et sa source. C'est
+l'outil de la relecture exigée par la RG-16.13 — qui a lieu **avant** le merge, pas après :
+la mise en service a montré qu'une règle qu'aucune étape n'impose n'est qu'une intention.
+
+La page **ne réordonne rien de son côté**. Elle appelle deux fonctions exposées par le
+module :
+
+| Fonction | Rôle |
+|---|---|
+| `window.matSaviezVousInventaire()` | Promesse → corpus ordonné, entrées calculées résolues, marquées `calculee` / `indisponible` |
+| `window.matSaviezVousDatePassage(rang, taille)` | `{ jour, date, dejaVue, aujourdhui }` pour un rang donné |
+
+C'est délibéré : une seconde implémentation de `_ordonner()` finirait par diverger, et la
+revue certifierait alors autre chose que ce que voient les habitants. Même raison d'être
+que la source unique pour les associations ou pour l'opérateur fibre. Si vous touchez à
+l'ordonnancement, la revue suit automatiquement — et les tests
+`revue : …` de `tests/e2e/saviez-vous.spec.js` le vérifient.
+
+⚠️ La page est **hors précache** : c'est un outil de la mairie, pas un écran habitant. Elle
+n'a donc pas à être disponible hors ligne, et n'alourdit pas l'app installée.
+
+**Ajouter des entrées.** Elles se placent **à la fin de leur catégorie** (l'ordre du tableau
+est l'ordre de passage) et chacune doit porter une source **réellement consultée**. Si la
+source ne peut pas être ouverte, l'entrée ne s'écrit pas : c'est la RG-16.12, et c'est ce
+qui a limité la deuxième passe du corpus à 77 nouvelles entrées au lieu des 175 visées —
+INSEE, IGN, POP/Mérimée, Hub'Eau et Wikipédia étant inaccessibles depuis l'environnement de
+développement.
+
 ### Régions `aria-live` — la règle du silence
 
 `js/mat-saviez-vous.js` introduit la **première région `aria-live` du dépôt**

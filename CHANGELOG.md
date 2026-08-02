@@ -5,6 +5,41 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.55] — 2 août 2026
+
+### Ajouté
+- **Corpus « Le saviez-vous ? » : 75 → 158 entrées** (145 sourcées + 13 calculées), soit
+  plus de cinq mois sans répétition. L'effort a porté sur les catégories les plus pauvres —
+  santé, transports, intercommunalité, habitat, environnement, vie communale — et non sur
+  l'urbanisme, déjà fourni. Les nouvelles entrées sont ajoutées **en fin de leur catégorie**,
+  l'ordre de déclaration valant ordre de passage (RG-16.5).
+- **Six entrées calculées** dans `SV_CALCULES` (`js/mat-saviez-vous.js`), toutes en
+  arithmétique pure dérivée des seules coordonnées de la commune : vitesse d'entraînement par
+  la rotation terrestre, tour du monde au parallèle de Mézières, longueur d'un degré de
+  longitude, distance au méridien de Greenwich, antipode, heure du midi solaire moyen.
+- **`revue-saviez-vous.html`** — page de relecture du corpus pour la mairie : question,
+  réponse, explication, source et **date de passage**, dans l'ordre réel de rotation, avec
+  filtres et mise en page d'impression. Elle interroge `window.matSaviezVousInventaire()`
+  plutôt que de réordonner le corpus de son côté : une seconde implémentation divergerait, et
+  la revue mentirait alors sur ce que voient les habitants. L'ADR-0012 exigeait cette relecture
+  **avant** la fusion ; jusqu'ici rien ne la rendait praticable.
+- **Trois tests Playwright** sur la page de revue (exhaustivité, filtre, axe-core).
+
+### Corrigé
+- Le corpus était jusqu'ici déséquilibré côté réponses ; il est ramené à 71 « oui » pour
+  74 « non », pour qu'aucune des deux ne devienne le réflexe gagnant.
+
+### Notes
+- Les sources externes visées (INSEE, IGN Géoplateforme, base POP/Mérimée, Hub'Eau,
+  VigiEau, Vigicrues, Wikipédia) **n'ont pas pu être ouvertes** depuis l'environnement de
+  développement : la politique d'egress refuse le CONNECT vers ces hôtes. Aucune entrée n'a
+  donc été rédigée à partir d'elles — la règle « pas de source ouvrable, pas d'entrée » l'a
+  emporté sur l'objectif de volume. Les entrées ajoutées proviennent exclusivement de sources
+  consultables depuis le dépôt : règlement du PLU, arbre de décision de MEL, trombinoscope,
+  guide d'arrivée, annuaires communaux et documentation de MAT.
+
+---
+
 ## [4.54] — 2 août 2026
 
 ### Ajouté

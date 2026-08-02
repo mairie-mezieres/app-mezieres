@@ -126,6 +126,59 @@ test('« Le saviez-vous ? » déplié : aucune violation axe sérieuse ou critiq
   expect(graves.map((v) => `${v.id} (${v.impact})`)).toEqual([]);
 });
 
+// ── Page de revue pour la mairie ──────────────────────────────
+// L'ADR-0012 demande que le corpus soit relu AVANT la fusion. La page n'a de
+// valeur que si elle montre l'ordre RÉEL de passage : elle interroge donc
+// js/mat-saviez-vous.js plutôt que de réordonner le corpus de son côté. Ces
+// tests verrouillent ce contrat — une revue qui diverge de l'app ne sert à rien.
+
+test('revue : toutes les entrées sont listées, corpus et calculées', async ({ page }) => {
+  await page.goto('/revue-saviez-vous.html');
+  const cartes = page.locator('.entree');
+  await expect(async () => {
+    expect(await cartes.count()).toBeGreaterThan(0);
+  }).toPass({ timeout: 15000 });
+
+  const brut = fs.readFileSync(
+    path.join(__dirname, '..', '..', 'data', 'saviez-vous.json'), 'utf8'
+  );
+  const attendu = JSON.parse(brut).entrees.length;
+
+  // Au moins le corpus fixe ; les entrées calculées s'y ajoutent.
+  expect(await cartes.count()).toBeGreaterThan(attendu);
+
+  // Chaque carte porte une réponse ET une source — c'est tout l'objet de la revue.
+  await expect(page.locator('.entree .e-rep')).toHaveCount(await cartes.count());
+  await expect(page.locator('.entree .e-src')).toHaveCount(await cartes.count());
+  await expect(page.locator('.entree').first()).toContainText('Source :');
+});
+
+test('revue : le filtre par réponse ne garde que les « Non »', async ({ page }) => {
+  await page.goto('/revue-saviez-vous.html');
+  const cartes = page.locator('.entree');
+  await expect(async () => {
+    expect(await cartes.count()).toBeGreaterThan(0);
+  }).toPass({ timeout: 15000 });
+
+  const total = await cartes.count();
+  await page.selectOption('#rep', 'non');
+  const filtre = await cartes.count();
+  expect(filtre).toBeGreaterThan(0);
+  expect(filtre).toBeLessThan(total);
+  await expect(page.locator('.e-rep.oui')).toHaveCount(0);
+});
+
+test('revue : aucune violation axe sérieuse ou critique', async ({ page }) => {
+  await page.goto('/revue-saviez-vous.html');
+  await expect(async () => {
+    expect(await page.locator('.entree').count()).toBeGreaterThan(0);
+  }).toPass({ timeout: 15000 });
+
+  const res = await new AxeBuilder({ page }).analyze();
+  const graves = res.violations.filter((v) => ['serious', 'critical'].includes(v.impact));
+  expect(graves.map((v) => `${v.id} (${v.impact})`)).toEqual([]);
+});
+
 // ── Garde-fou anti-fake-news ──────────────────────────────────
 // Ce test lit le corpus sur disque, sans navigateur. C'est LUI qui empêche une
 // entrée non sourcée d'entrer dans le dépôt : la règle « une affirmation sans

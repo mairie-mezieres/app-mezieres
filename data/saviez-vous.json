@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.3.0",
   "maj": "2026-08-02",
   "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
@@ -677,6 +677,636 @@
       "source": "Documentation technique de MAT — quotas de l’assistante MEL",
       "url": "",
       "categorie": "mat"
+    },
+    {
+      "id": "ecole-horaires-fin",
+      "question": "Les cours se terminent-ils à 17 h à l’école de la Forêt ?",
+      "reponse": false,
+      "explication": "Non, à 16 h 30 — et 11 h 45 le matin. L’école ouvre à 8 h 20 et à 13 h 30. Elle est située 36 rue du Bourg.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "cantine-cent-repas",
+      "question": "Le restaurant scolaire de Mézières prépare-t-il plus de 50 repas par jour ?",
+      "reponse": true,
+      "explication": "Environ cent, à partir de produits frais. Les tarifs sont calculés selon le quotient familial.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "inscriptions-30-juin",
+      "question": "Les inscriptions au restaurant scolaire se ferment-elles dès la fin juin ?",
+      "reponse": true,
+      "explication": "Oui : les fiches sont à déposer en mairie avant le 30 juin pour l’année suivante — bien avant la rentrée. Même échéance pour l’accueil périscolaire, auprès de la directrice.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "marmousets-familiale",
+      "question": "Les enfants de la crèche Les Marmousets passent-ils leurs journées dans un même bâtiment ?",
+      "reponse": false,
+      "explication": "Non : c’est une crèche « familiale ». Dix-sept assistantes maternelles salariées accueillent les enfants chez elles, avec des temps collectifs hebdomadaires à la crèche.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "marmousets-communes",
+      "question": "Faut-il habiter Cléry-Saint-André pour prétendre à la crèche Les Marmousets ?",
+      "reponse": false,
+      "explication": "Non : il faut résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry — l’un ou l’autre suffit. La pré-inscription se fait sur place ou par téléphone, au 02 38 45 76 56.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "centre-loisirs-age",
+      "question": "Le centre de loisirs accueille-t-il les enfants jusqu’à 13 ans ?",
+      "reponse": true,
+      "explication": "Oui, de 3 à 13 ans, pendant toutes les vacances scolaires. Il est basé à Cléry-Saint-André, et ponctuellement à Mézières.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-femmes-majorite",
+      "question": "Les femmes sont-elles minoritaires au conseil municipal de Mézières ?",
+      "reponse": false,
+      "explication": "Non : huit conseillères pour sept conseillers. Elles y sont donc majoritaires.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-pompiers",
+      "question": "Le conseil municipal compte-t-il deux sapeurs-pompiers professionnels ?",
+      "reponse": true,
+      "explication": "Oui, deux officiers sapeurs-pompiers professionnels — dont le maire. Un troisième élu est référent sécurité civile de la commune.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "conseil-cinq-mandats",
+      "question": "Un élu de Mézières siège-t-il depuis plus de quatre mandats ?",
+      "reponse": true,
+      "explication": "Oui, l’un d’eux en est à son cinquième mandat. À l’autre bout, quatre élus effectuent leur premier.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "salle-communale-location",
+      "question": "Peut-on louer la salle communale pour une fête de famille ?",
+      "reponse": false,
+      "explication": "Non, elle n’est plus proposée à la location. En revanche, la commune met à disposition des Macériens des barnums, des tables et des chaises.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "barnum-tarif",
+      "question": "La commune loue-t-elle un barnum de 6 × 12 m pour moins de 150 € le week-end ?",
+      "reponse": true,
+      "explication": "Oui : 130 € le week-end pour le 6 × 12 m, et 110 € pour le 6 × 8 m. Un chèque de caution est demandé, restitué si aucune dégradation n’est constatée.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "tables-chaises-tarif",
+      "question": "Une table et quatre chaises se louent-elles à la commune pour moins de 5 € le week-end ?",
+      "reponse": true,
+      "explication": "Oui : 2,50 € le week-end pour l’ensemble. De quoi équiper une communion sans se ruiner.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "cimetiere-concessions",
+      "question": "Une concession de cimetière de 50 ans coûte-t-elle exactement le double d’une concession de 30 ans ?",
+      "reponse": true,
+      "explication": "Oui : 300 € contre 150 €. Pour les concessions d’urnes, c’est 200 € contre 100 €.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Tarifs cimetière",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "germ-acronyme",
+      "question": "Le GERM de Mézières est-il une commission du conseil municipal ?",
+      "reponse": false,
+      "explication": "Non, c’est une association de randonnée — malgré son nom : Groupe d’Études et de Réflexion Municipales. Elle organise des sorties pédestres et entretient les sentiers de la commune.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des associations domiciliées sur la commune",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "trialistes-1994",
+      "question": "Les Trialistes de l’Ardoux existent-ils depuis plus de trente ans ?",
+      "reponse": true,
+      "explication": "Oui, depuis 1994. Ce club de trial à vélo affilié UFOLEP a formé des pilotes de niveau régional, national et international, et organise chaque année une compétition régionale à Mézières.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des associations domiciliées sur la commune",
+      "url": "https://trialistes-de-lardoux.jimdosite.com/",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "assos-nombre",
+      "question": "Mézières compte-t-elle plus de dix associations domiciliées sur la commune ?",
+      "reponse": false,
+      "explication": "Cinq y sont domiciliées : le Comité des fêtes, le GERM, les Trialistes de l’Ardoux, l’Association des parents d’élèves et Pamela & Co. D’autres, voisines, sont ouvertes aux Macériens.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des associations domiciliées sur la commune",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "pamela-animaux",
+      "question": "L’association Pamela & Co s’occupe-t-elle d’animaux ?",
+      "reponse": true,
+      "explication": "Oui : sauvegarde et soin d’animaux. Magnoline, Nanou et Ramsès sont parmi ses pensionnaires.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des associations domiciliées sur la commune",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "vin-mezieres",
+      "question": "Produit-on du vin à Mézières-lez-Cléry ?",
+      "reponse": true,
+      "explication": "Oui : un chai de la commune propose dégustation et vente de ses productions. Et parmi les élus du conseil municipal figure une vigneronne.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des entreprises de la commune et trombinoscope du conseil municipal",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "entreprises-hypnose",
+      "question": "Trouve-t-on un cabinet d’hypnothérapie parmi les professionnels installés à Mézières ?",
+      "reponse": true,
+      "explication": "Oui — et une élue du conseil municipal exerce elle aussi ce métier. L’annuaire de la commune compte aussi un photographe, un horticulteur, un coach et un producteur de fruits.",
+      "source": "Mairie de Mézières-lez-Cléry — annuaire des entreprises de la commune",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "clic-soixante-ans",
+      "question": "Faut-il avoir 75 ans pour s’adresser au CLIC Relais Entour’âge ?",
+      "reponse": false,
+      "explication": "Non : dès 60 ans, et dès 20 ans en situation de handicap. Aide à domicile, téléassistance, portage de repas, aides financières — 02 38 44 90 20.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Services divers",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "sante-psychologue",
+      "question": "La maison de santé du Val d’Ardoux compte-t-elle un psychologue ?",
+      "reponse": true,
+      "explication": "Oui, ainsi qu’un podologue, un orthophoniste et un ostéopathe — en plus des médecins, kinésithérapeutes, infirmiers et dentistes. Elle est au 1 allée Dr Roland Delastre, à Cléry-Saint-André.",
+      "source": "Mairie de Mézières-lez-Cléry — base de connaissances de l’assistante MEL",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "conseils-seuils",
+      "question": "MAT affiche-t-elle des conseils santé tous les jours ?",
+      "reponse": false,
+      "explication": "Non : uniquement quand un seuil est franchi — 32 °C le jour, −4 °C la nuit, indice de qualité de l’air à 60, pollens élevés ou UV à 8. Quand tout est clément, le bloc ne s’affiche pas du tout.",
+      "source": "Documentation de MAT — ADR-0003, conseils santé du jour déterministes par seuil",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "conseils-sans-ia",
+      "question": "Les conseils santé de MAT sont-ils rédigés par une intelligence artificielle ?",
+      "reponse": false,
+      "explication": "Non. Ce sont des règles par seuil écrites à l’avance, sans aucune génération de texte, et présentées comme des recommandations générales de Santé publique France et d’ATMO. En cas de doute, voyez votre médecin.",
+      "source": "Documentation de MAT — ADR-0003, conseils santé du jour déterministes par seuil",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "polluant-dominant",
+      "question": "L’application indique-t-elle quel polluant domine quand l’air est dégradé ?",
+      "reponse": true,
+      "explication": "Oui — ozone, particules fines… L’indice européen de qualité de l’air étant le plus élevé des sous-indices, nommer le polluant responsable ne coûte rien de plus.",
+      "source": "Documentation de MAT — guide utilisateur, section « Qualité de l’air et conseils du jour »",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "carnet-sante-ecole",
+      "question": "Le carnet de santé est-il demandé pour inscrire son enfant à l’école ?",
+      "reponse": true,
+      "explication": "Oui, à jour des vaccinations — avec le livret de famille et un justificatif de domicile de moins de trois mois.",
+      "source": "Mairie de Mézières-lez-Cléry — inscription scolaire",
+      "url": "",
+      "categorie": "sante"
+    },
+    {
+      "id": "tad-reservation",
+      "question": "Faut-il réserver dès la veille pour utiliser le transport à la demande Rémi ?",
+      "reponse": true,
+      "explication": "Oui, avant 17 h la veille — on ne le prend pas au vol comme un bus ordinaire. C’est le service qui dessert les communes rurales que la ligne régulière ne couvre pas.",
+      "source": "Réseau Rémi — Région Centre-Val de Loire, service de transport à la demande",
+      "url": "https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande",
+      "categorie": "transports"
+    },
+    {
+      "id": "tad-jours",
+      "question": "Le transport à la demande dessert-il le secteur de Beaugency le jeudi ?",
+      "reponse": true,
+      "explication": "Oui : le jeudi pour le secteur de Beaugency, le mardi pour celui de Meung-sur-Loire. Les deux jours figurent dans la rubrique Bus de l’application.",
+      "source": "Réseau Rémi — Région Centre-Val de Loire, service de transport à la demande",
+      "url": "https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande",
+      "categorie": "transports"
+    },
+    {
+      "id": "ligne8-vacances",
+      "question": "Les horaires de la ligne 8 sont-ils les mêmes pendant les vacances scolaires ?",
+      "reponse": false,
+      "explication": "Non, ils diffèrent. MAT affiche le planning sur sept jours et distingue automatiquement les journées scolaires des journées de vacances — inutile de chercher la bonne colonne.",
+      "source": "Réseau Rémi — Région Centre-Val de Loire",
+      "url": "https://www.remi-centrevaldeloire.fr/",
+      "categorie": "transports"
+    },
+    {
+      "id": "a71-recul",
+      "question": "Le PLU impose-t-il de construire à plus de 100 mètres de l’axe de l’autoroute A71 ?",
+      "reponse": true,
+      "explication": "Oui, en zone agricole — contre 8 mètres seulement pour les autres voies. C’est la marge de recul la plus élevée de tout le règlement communal.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone A",
+      "url": "",
+      "categorie": "transports"
+    },
+    {
+      "id": "cctvl-assainissement-2018",
+      "question": "La Communauté de communes gère-t-elle l’assainissement de Mézières depuis plus de cinq ans ?",
+      "reponse": true,
+      "explication": "Oui, depuis 2018 — l’assainissement collectif comme le contrôle des installations individuelles. Un seul numéro pour les deux : 02 38 44 59 35.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "inclusion-numerique",
+      "question": "Faut-il se déplacer au siège de la Communauté de communes pour se faire aider sur une démarche en ligne ?",
+      "reponse": false,
+      "explication": "Non : le service Inclusion Numérique de la CCTVL est mobile. Trois agents, pilotés par un médiateur numérique, viennent à la rencontre des habitants dans les communes.",
+      "source": "Communauté de communes des Terres du Val de Loire — service Inclusion Numérique",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "maire-vice-president",
+      "question": "Le maire de Mézières siège-t-il à la vice-présidence de la Communauté de communes ?",
+      "reponse": true,
+      "explication": "Oui, il en est le 3ᵉ vice-président. Une commune de moins de mille habitants pèse ainsi dans une intercommunalité qui en regroupe vingt-sept.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal, représentations extérieures",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "centre-loisirs-gestion",
+      "question": "Le centre de loisirs est-il géré directement par la mairie de Mézières ?",
+      "reponse": false,
+      "explication": "Non, par la Communauté de communes. Le dossier de première inscription se retire auprès d’elle ; les réinscriptions arrivent pré-remplies par courriel.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "plui-lancement-2021",
+      "question": "L’élaboration du PLUi-H-D a-t-elle commencé il y a moins de deux ans ?",
+      "reponse": false,
+      "explication": "Non : elle a été lancée fin 2021, puis relancée au printemps 2026 avec deux bureaux d’études. L’approbation est attendue pour la fin 2028 — sept ans de travail.",
+      "source": "Communauté de communes des Terres du Val de Loire — calendrier du PLUi-H-D suivi dans MAT",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "representations-exterieures",
+      "question": "La commune est-elle représentée dans plus de cinq organismes extérieurs ?",
+      "reponse": true,
+      "explication": "Oui : Communauté de communes, C3M, crèche des Marmousets, EPFLI 45, CNAS, GIP RECIA, Pays Beauce Val de Loire, APPROLYS, commission de suivi de site de la préfecture… Chacun a ses titulaires et ses suppléants.",
+      "source": "Mairie de Mézières-lez-Cléry — trombinoscope du conseil municipal, représentations extérieures",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "certificat-urbanisme",
+      "question": "Un certificat d’urbanisme autorise-t-il à commencer les travaux ?",
+      "reponse": false,
+      "explication": "Non — et c’est la confusion la plus fréquente. Il indique seulement les règles applicables à un terrain et si une opération y est réalisable. Instruction : 2 mois. Validité : 18 mois.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "declaration-ouverture-chantier",
+      "question": "Faut-il déclarer l’ouverture du chantier après une simple déclaration préalable ?",
+      "reponse": false,
+      "explication": "Non : cette formalité ne concerne que les permis de construire et les permis d’aménager. Elle se dépose dès le démarrage des travaux.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "daact-trois-mois",
+      "question": "Une fois les travaux déclarés achevés, la mairie a-t-elle un mois pour en contester la conformité ?",
+      "reponse": false,
+      "explication": "Non, trois mois en règle générale — et cinq dans certains cas particuliers. La déclaration d’achèvement et de conformité est obligatoire après une déclaration préalable comme après un permis.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "benne-voie-publique",
+      "question": "Peut-on poser librement une benne ou un échafaudage sur la voie publique devant chez soi ?",
+      "reponse": false,
+      "explication": "Non : une autorisation préalable est nécessaire, et si l’installation gêne la circulation ou le stationnement, un arrêté temporaire de circulation peut s’y ajouter.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "numero-de-rue",
+      "question": "Le numéro de rue d’une maison est-il attribué par le service des impôts ?",
+      "reponse": false,
+      "explication": "Non, par la mairie. C’est elle qui attribue les numéros et modifie l’adressage — préparez l’adresse concernée, la référence cadastrale et un bref descriptif.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Habitat & démarches",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "opah-maprimerenov",
+      "question": "L’OPAH de la Communauté de communes remplace-t-elle MaPrimeRénov’ ?",
+      "reponse": false,
+      "explication": "Non, elle s’y ajoute : SOLIHA aide justement à mobiliser MaPrimeRénov’ et les aides de l’ANAH, en plus des aides locales. L’accompagnement est gratuit et sans engagement.",
+      "source": "Communauté de communes des Terres du Val de Loire — OPAH, opérateur SOLIHA",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "habitat"
+    },
+    {
+      "id": "changement-destination-hameaux",
+      "question": "Une grange de hameau peut-elle devenir une habitation à Mézières ?",
+      "reponse": true,
+      "explication": "Oui, dans les secteurs de hameaux Ah et Nh, où le changement de destination est admis — vers l’habitat, et selon le secteur vers le commerce, l’artisanat, le tourisme ou les loisirs.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlements des secteurs Ah et Nh",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "ub-espaces-verts",
+      "question": "En zone résidentielle, le PLU impose-t-il de laisser au moins 30 % du terrain en espaces verts ?",
+      "reponse": true,
+      "explication": "Oui, en zone Ub : 30 % au minimum, libres de toute construction et de toute imperméabilisation. L’emprise au sol bâtie, elle, est plafonnée à 30 %.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone Ub",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "manthelon-arbre-250",
+      "question": "Au Clos de Manthelon, faut-il planter un arbre de haute tige tous les 250 m² ?",
+      "reponse": true,
+      "explication": "Oui, en plus des 30 % d’espaces verts. C’est l’un des rares endroits du règlement où le PLU prescrit une plantation, et non une interdiction.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "manthelon-haie-varietes",
+      "question": "Au Clos de Manthelon, une haie sur rue doit-elle mêler au moins trois variétés ?",
+      "reponse": true,
+      "explication": "Oui, trois au minimum, doublées d’un grillage vert de 1,50 m maximum, en retrait de 80 cm de la limite. Les alignements de thuyas d’une seule essence n’y sont donc pas possibles.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "zone-a-cloture-bois",
+      "question": "En zone agricole, la clôture doit-elle être faite de pieux de bois et de fils métalliques ?",
+      "reponse": true,
+      "explication": "Oui, et de rien d’autre : 1,20 m au maximum — 1,80 m en cas d’élevage déclaré. Grillages, piquets de fer et poteaux béton y sont expressément interdits.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone A",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "espaces-boises-classes",
+      "question": "Un espace boisé classé du PLU peut-il changer d’affectation ?",
+      "reponse": false,
+      "explication": "Non : tout changement y est interdit en zone naturelle. Le classement protège le boisement lui-même, indépendamment de ce que le propriétaire souhaiterait en faire.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone N",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "zone-nj-jardins",
+      "question": "Existe-t-il une zone de Mézières où l’on ne peut construire qu’un abri de jardin ?",
+      "reponse": true,
+      "explication": "Oui, la zone Nj — « jardins naturels ». Abris de 20 m² maximum et 2,50 m de haut, à 10 m au moins de la voie. La piscine et son local technique y sont explicitement admis.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement du secteur Nj",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "nappe-piezometre",
+      "question": "Le niveau de la nappe affiché dans MAT est-il mesuré à Mézières même ?",
+      "reponse": false,
+      "explication": "Non : il vient du piézomètre de Saint-Cyr-en-Val, le point de suivi public retenu pour la commune. MAT lit ses relevés sur Hub’Eau et les situe par rapport à l’année écoulée.",
+      "source": "Documentation technique de MAT — section Eau, piézomètre 03983X0267/PZ3 interrogé sur Hub’Eau",
+      "url": "https://hubeau.eaufrance.fr",
+      "categorie": "environnement"
+    },
+    {
+      "id": "vigieau-vigilance",
+      "question": "Le niveau « vigilance » de VigiEau interdit-il d’arroser son jardin ?",
+      "reponse": false,
+      "explication": "Non : c’est le plus bas des quatre niveaux — aucune interdiction, seulement des économies recommandées. Les vraies restrictions commencent au niveau « alerte », puis « alerte renforcée » et « crise ».",
+      "source": "VigiEau — service public d’information sur les restrictions d’eau",
+      "url": "https://vigieau.gouv.fr",
+      "categorie": "environnement"
+    },
+    {
+      "id": "vigieau-baisse-confirmee",
+      "question": "MAT annonce-t-elle immédiatement la fin d’une restriction d’eau ?",
+      "reponse": false,
+      "explication": "Non : une baisse n’est annoncée qu’une fois confirmée, pour éviter une fausse bonne nouvelle due à une réponse incomplète du service. Une hausse, elle, est notifiée sans attendre.",
+      "source": "Documentation de MAT — guide utilisateur, section « Météo et restrictions d’eau »",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "vigieau-eau-robinet",
+      "question": "Le niveau de restriction affiché dans MAT tient-il compte de l’eau du robinet ?",
+      "reponse": true,
+      "explication": "Oui. MAT retient le niveau le plus grave parmi toutes les zones couvrant le bourg, y compris celle de l’eau potable — quitte à afficher plus sévère que la zone géographique seule.",
+      "source": "Documentation de MAT — guide utilisateur, section « Météo et restrictions d’eau »",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "horaires-exceptionnels",
+      "question": "Une fermeture exceptionnelle de la mairie apparaît-elle dans l’application ?",
+      "reponse": true,
+      "explication": "Oui : les horaires exceptionnels sont saisis par la mairie et redescendent dans MAT, pour la mairie comme pour la déchetterie. Ils sont gardés sur le téléphone, donc lisibles hors ligne.",
+      "source": "Documentation technique de MAT — horaires exceptionnels administrables",
+      "url": "",
+      "categorie": "pratique"
+    },
+    {
+      "id": "mat-lecture-vocale",
+      "question": "MAT peut-elle lire les actualités à voix haute ?",
+      "reponse": true,
+      "explication": "Oui. Une fois la lecture vocale activée, l’ouverture d’une actualité la lit automatiquement, et une barre Pause / Arrêter reste accessible en bas de l’écran.",
+      "source": "Documentation de MAT — guide utilisateur, section « Accessibilité et personnalisation »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-animations-reduites",
+      "question": "MAT respecte-t-elle le réglage « Réduire les animations » de votre téléphone ?",
+      "reponse": true,
+      "explication": "Oui, sans que vous ayez rien à régler dans l’application — bandeau météo vivant, confettis et transitions entre fenêtres compris.",
+      "source": "Documentation de MAT — guide utilisateur, section « Accessibilité et personnalisation »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-mode-daltonien",
+      "question": "MAT propose-t-elle un mode daltonien ?",
+      "reponse": true,
+      "explication": "Oui, aux côtés du contraste élevé, de trois tailles de texte, de trois thèmes et de la lecture vocale. Ces réglages restent sur votre appareil d’une visite à l’autre.",
+      "source": "Documentation de MAT — guide utilisateur, section « Accessibilité et personnalisation »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-clavier-echap",
+      "question": "Les fenêtres de MAT se ferment-elles avec la touche Échap ?",
+      "reponse": true,
+      "explication": "Oui, et la tabulation reste piégée à l’intérieur de la fenêtre ouverte. À la fermeture, le focus revient exactement à l’endroit d’où vous l’aviez ouverte — précieux avec un lecteur d’écran.",
+      "source": "Documentation de MAT — guide utilisateur, section « Navigation au clavier »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-sv-sans-ia",
+      "question": "Le fait du jour que vous êtes en train de lire a-t-il été écrit par une intelligence artificielle ?",
+      "reponse": false,
+      "explication": "Non. Le corpus est versionné dans le dépôt, relu, et chaque entrée porte la source affichée sous cette réponse. Les rares entrées calculées sont de l’arithmétique pure. Aucun modèle de langage n’intervient à l’affichage.",
+      "source": "Documentation de MAT — ADR-0012, corpus vérifié sans IA à l’exécution",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-sv-une-reponse",
+      "question": "Peut-on corriger sa réponse au fait du jour après avoir vu la solution ?",
+      "reponse": false,
+      "explication": "Non : une seule réponse par appareil et par question. La répartition affichée doit refléter les premières intuitions, pas des votes rattrapés après lecture de la réponse.",
+      "source": "Documentation de MAT — spécification SFD-16, « Le saviez-vous ? »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mat-sv-cinq-reponses",
+      "question": "Faut-il au moins cinq réponses d’habitants pour que le pourcentage s’affiche ?",
+      "reponse": true,
+      "explication": "Oui. En deçà, une proportion ne veut rien dire et serait trompeuse — et quand le chiffre n’est pas disponible, il n’est jamais remplacé par « 0 % ».",
+      "source": "Documentation de MAT — spécification SFD-16, « Le saviez-vous ? »",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "pacs-deux-formulaires",
+      "question": "Le PACS se déclare-t-il avec un seul formulaire ?",
+      "reponse": false,
+      "explication": "Non, deux : la déclaration conjointe (cerfa 15725*03), avec attestations de non-parenté, non-alliance et résidence commune, puis une convention — type (cerfa 15726*02) ou personnalisée.",
+      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Démarches administratives",
+      "url": "",
+      "categorie": "demarches"
+    },
+    {
+      "id": "encombrants-reprise",
+      "question": "Un magasin est-il tenu de reprendre l’ancien appareil quand on en achète un neuf ?",
+      "reponse": true,
+      "explication": "Oui, pour les équipements électriques : c’est l’obligation de reprise « un pour un ». Sinon, les encombrants se déposent à la déchetterie de Cléry-Saint-André, sur inscription préalable.",
+      "source": "Communauté de communes des Terres du Val de Loire — encombrants et déchets d’équipements électriques",
+      "url": "https://portail-usagers.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "verre-apport-volontaire",
+      "question": "Le verre se met-il dans le bac jaune à Mézières ?",
+      "reponse": false,
+      "explication": "Non : le bac jaune prend les plastiques, cartons, papiers et métaux. Le verre va en point d’apport volontaire, comme les papiers-magazines et les vêtements.",
+      "source": "Communauté de communes des Terres du Val de Loire — guide du tri",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "bacs-dotation",
+      "question": "Un bac cassé pendant la collecte est-il remplacé par la Communauté de communes ?",
+      "reponse": true,
+      "explication": "Oui — comme la première dotation et l’échange de taille quand le foyer s’agrandit ou se réduit. La demande se fait auprès de la CCTVL, au 02 38 44 59 35.",
+      "source": "Communauté de communes des Terres du Val de Loire — dotation, échange et réparation de bacs",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "ub1-toiture-tuiles",
+      "question": "Au Clos de Manthelon, le nombre de tuiles au mètre carré est-il imposé ?",
+      "reponse": true,
+      "explication": "Oui : au moins 22 tuiles plates en terre cuite par mètre carré, sur des pentes de 40 à 45°, avec le sens du faîtage fixé par le plan parcellaire. Les tuiles couleur ardoise y sont interdites.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "abri-tole-ondulee",
+      "question": "Peut-on couvrir son abri de jardin en tôle ondulée à Mézières ?",
+      "reponse": false,
+      "explication": "Non : la tôle ondulée est interdite en zones Ua, Ub et 1AU. Le règlement y demande des matériaux d’aspect naturel — pierre, brique, parpaing enduit ou bois.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlements des zones Ua, Ub et 1AU",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "facade-blanc-pur",
+      "question": "Le PLU interdit-il le blanc pur en façade dans la zone résidentielle ?",
+      "reponse": true,
+      "explication": "Oui : en zone Ub, le blanc pur et les couleurs vives sont exclus. Le règlement n’y admet que les palettes traditionnelles.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone Ub",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "carrefour-cloture-120",
+      "question": "Une clôture peut-elle monter à 1,50 m jusqu’au coin de la rue ?",
+      "reponse": false,
+      "explication": "Non : au droit des carrefours, la hauteur tombe à 1,20 m sur vingt mètres de part et d’autre — pour que l’on voie arriver les voitures.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règles de clôture des zones Ua et Ub",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "enr-hauteur",
+      "question": "Des panneaux solaires en toiture peuvent-ils faire dépasser la hauteur maximale autorisée ?",
+      "reponse": false,
+      "explication": "Non, la question ne se pose pas : les ouvrages d’énergie renouvelable sont exclus du calcul de la hauteur maximale, dans toutes les zones du PLU. Une déclaration préalable reste nécessaire.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règles de hauteur et autorisations",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "zone-2au-reserve",
+      "question": "Une zone « à urbaniser » du PLU est-elle constructible ?",
+      "reponse": false,
+      "explication": "Pas toujours : la zone 2AU est une réserve foncière, inconstructible pour les particuliers. Il faut une révision du PLU pour l’ouvrir. Seule la zone 1AU se construit, et uniquement dans une opération d’ensemble.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlements des zones 1AU et 2AU",
+      "url": "",
+      "categorie": "urbanisme"
     }
   ]
 }

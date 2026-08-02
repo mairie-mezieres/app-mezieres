@@ -451,6 +451,10 @@ relus par la mairie, ou calculés (les distances, par exemple, sont de simples c
 géométrie). C'est un choix délibéré : sur une information que vous allez croire, il n'est
 pas question de prendre le moindre risque d'erreur.
 
+> 📋 **Pour la mairie.** La page `revue-saviez-vous.html` affiche le corpus complet dans
+> l'ordre où il passera, avec la date de chaque question, sa réponse et sa source. Elle sert
+> à relire l'ensemble **avant** publication — et à repérer une erreur avant les habitants.
+
 ### Le reste
 
 - **Une réponse par jour.** Une fois que vous avez répondu, la bonne réponse reste

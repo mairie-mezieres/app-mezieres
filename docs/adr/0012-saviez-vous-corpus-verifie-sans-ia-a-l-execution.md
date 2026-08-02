@@ -100,7 +100,8 @@ d'une année à l'autre ne provoque plus de saut.
 - **Le corpus doit être écrit à la main.** C'est le coût réel de cette décision,
   et il est assumé. À la livraison initiale, 46 entrées sourcées et 7 calculées,
   soit moins de deux mois avant répétition — l'objectif de 365 se construira
-  dans la durée.
+  dans la durée. Deuxième passe (août 2026) : 145 sourcées et 13 calculées, soit
+  un peu plus de cinq mois.
 - Les entrées dépendant de sources externes (INSEE, IGN, patrimoine) n'ont pas
   pu être rédigées dans l'environnement de développement, dont la politique
   réseau bloque l'accès à ces sources. Elles demandent soit un accès réseau,
@@ -138,6 +139,50 @@ eu lieu.** L'ADR posait la règle, le processus ne l'a pas appliquée — les en
 été livrées puis relues. La page de revue générée pour la mairie (liste complète,
 question, réponse, source, ordre de passage) doit être soumise **avant** la fusion,
 pas après. Une règle qu'aucune étape n'impose n'est qu'une intention.
+
+**Ce que la deuxième passe a appris (août 2026) :**
+
+L'objectif fixé était de passer à environ 250 entrées en s'appuyant sur l'INSEE
+(recensements de la commune depuis 1793), l'IGN (Cassini, état-major, vues
+aériennes 1950-1965), la base POP/Mérimée, Hub'Eau, VigiEau, Vigicrues et
+Wikipédia. **Aucune de ces sources n'était joignable** : la politique d'egress de
+l'environnement de développement répond 403 au CONNECT vers ces hôtes — vérifié
+un par un, y compris `geo.api.gouv.fr`, `service-public.fr` et `legifrance.gouv.fr`.
+Seul GitHub passe.
+
+La règle a tranché toute seule : **une source qu'on ne peut pas ouvrir ne produit
+pas d'entrée.** Le corpus s'est donc étendu à partir des seules sources
+consultables depuis le dépôt — règlement du PLU (`data/plu-data.json`), arbre de
+décision de MEL (`data/mel-tree.json`), trombinoscope, guide d'arrivée, annuaires
+des associations et des entreprises, documentation de MAT. 77 entrées, et non 175.
+
+Deux enseignements :
+
+1. **L'écart entre l'objectif et le livrable est une donnée, pas un échec à
+   masquer.** Atteindre 250 aurait supposé d'écrire des chiffres de mémoire —
+   exactement ce que cet ADR interdit, et exactement ce qui a produit l'erreur sur
+   la crèche. Le volume est négociable, la vérification ne l'est pas.
+2. **Le dépôt est une source sous-exploitée, mais ce n'est pas une source
+   certifiée.** Le règlement du PLU et l'arbre de décision de MEL sont validés par
+   la mairie sur le fond ; ils vieillissent. Toute entrée qui en provient cite la
+   mairie et vaut demande de relecture.
+
+Deux divergences de double source ont été relevées au passage et **volontairement
+exclues** du corpus, faute d'arbitrage : le rang des deux premiers adjoints (déjà
+signalé plus bas), et la liste des mairies équipées d'une station biométrique la
+plus proche — `lib/mel.js` dit Saint-Hilaire-Saint-Mesmin / Cléry-Saint-André /
+Orléans, `data/mel-tree.json` dit Meung-sur-Loire / Ardon / Orléans. À trancher
+par la mairie, puis à aligner des deux côtés.
+
+**La relecture avant fusion est enfin outillée.** L'ADR posait la règle depuis le
+premier jour ; rien ne la rendait praticable — personne ne relit un JSON de 1 300
+lignes en devinant l'ordre de passage. `revue-saviez-vous.html` affiche le corpus
+complet dans l'ordre réel, avec la date à laquelle chaque question tombera, sa
+réponse et sa source. Elle **n'implémente pas** l'ordonnancement : elle appelle
+`window.matSaviezVousInventaire()`, c'est-à-dire le module que voient les
+habitants. Une seconde implémentation aurait divergé, et la revue aurait fini par
+certifier autre chose que ce qui est affiché — la classe de bug que le dépôt
+connaît déjà pour la liste des associations et pour l'opérateur fibre.
 
 **Points de vigilance pour les futures évolutions :**
 

@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — « Le saviez-vous ? » v1.2.1
+   MAT — « Le saviez-vous ? » v1.3.0
    Un fait sur la commune par jour, avec sa source, et une
    question à laquelle on répond.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
@@ -24,7 +24,7 @@
 (function () {
   'use strict';
 
-  var SV_URL       = './data/saviez-vous.json?v=1.2.0';
+  var SV_URL       = './data/saviez-vous.json?v=1.3.0';
   var SV_ETAT_KEY  = 'mat_sv_v1';       // { jour, id, reponse }
   var SV_GRAINE    = 20260802;          // graine fixe : l'ordre ne doit jamais changer
   // Mise en service. La rotation compte les jours DEPUIS cette date, pour que
@@ -192,6 +192,115 @@
           source: 'IMCCE / Observatoire de Paris — éphémérides du système solaire',
           url: 'https://www.imcce.fr/'
         };
+      }
+    },
+    {
+      id: 'calc-rotation',
+      categorie: 'decouverte',
+      build: function () {
+        // Vitesse d'entraînement par la rotation terrestre à cette latitude :
+        // circonférence du parallèle ÷ durée du jour sidéral.
+        var v = (40075.017 * Math.cos(SV_LAT * Math.PI / 180)) / 23.9344696;
+        return {
+          question: 'Assis dans son fauteuil à Mézières, se déplace-t-on à plus de 1 000 km/h ?',
+          reponse: true,
+          explication: 'Oui : ' + _nombre(v) + ' km/h. C’est la vitesse à laquelle la rotation de la Terre '
+            + 'nous emporte à cette latitude — moins vite qu’à l’équateur, où elle atteint 1 674 km/h.',
+          source: 'Calcul depuis la latitude de la commune (47,822 N) — circonférence équatoriale 40 075 km, jour sidéral 23 h 56 min 4 s',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-tour-parallele',
+      categorie: 'decouverte',
+      build: function () {
+        var c = 40075.017 * Math.cos(SV_LAT * Math.PI / 180);
+        return {
+          question: 'En marchant plein est sans jamais dévier, faudrait-il parcourir plus de 30 000 km pour revenir à Mézières ?',
+          reponse: false,
+          explication: 'Non : ' + _nombre(c) + ' km suffiraient. Le tour du monde à la latitude de Mézières est '
+            + 'nettement plus court qu’à l’équateur, où il faudrait faire 40 075 km.',
+          source: 'Calcul depuis la latitude de la commune (47,822 N) — circonférence équatoriale 40 075 km',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-degre-longitude',
+      categorie: 'decouverte',
+      build: function () {
+        var d = 111.319 * Math.cos(SV_LAT * Math.PI / 180);
+        return {
+          question: 'Un degré de longitude représente-t-il la même distance à Mézières qu’à l’équateur ?',
+          reponse: false,
+          explication: 'Non : ' + _nombre(d) + ' km ici, contre 111 km à l’équateur. Les méridiens se rapprochent '
+            + 'en montant vers le pôle, alors qu’un degré de latitude, lui, vaut 111 km partout.',
+          source: 'Calcul depuis la latitude de la commune (47,822 N), un degré de longitude valant 111,319 km à l’équateur',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-greenwich',
+      categorie: 'decouverte',
+      build: function () {
+        var d = SV_LON * 111.319 * Math.cos(SV_LAT * Math.PI / 180);
+        return {
+          question: 'Mézières est-elle à plus de 100 km à l’est du méridien de Greenwich ?',
+          reponse: true,
+          explication: 'Oui : ' + _nombre(d) + ' km. La commune est à 1,808° de longitude est — le méridien de '
+            + 'référence passe donc nettement à l’ouest, du côté du Mans.',
+          source: 'Calcul depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-antipode',
+      categorie: 'decouverte',
+      build: function () {
+        var lat = -SV_LAT, lon = SV_LON - 180;
+        var d = _distance(lat, lon);
+        return {
+          question: 'En creusant tout droit sous Mézières, ressortirait-on en Australie ?',
+          reponse: false,
+          explication: 'Non, et de loin : l’antipode se situe par 47,8° de latitude SUD et 178,2° de longitude OUEST, '
+            + 'en plein océan, à ' + _nombre(d) + ' km en passant par la surface. C’est bien plus à l’est que '
+            + 'l’Australie, qui s’arrête à 154° de longitude est.',
+          source: 'Calcul de l’antipode et de la distance orthodromique depuis les coordonnées de la commune (47,822 N — 1,808 E)',
+          url: ''
+        };
+      }
+    },
+    {
+      id: 'calc-midi-solaire',
+      categorie: 'decouverte',
+      build: function () {
+        // Décalage de l'heure légale française sur le temps universel, lu au
+        // jour dit : +2 h en été, +1 h en hiver. Aucune donnée externe.
+        try {
+          var nom = new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Europe/Paris', timeZoneName: 'shortOffset'
+          }).format(new Date());
+          var m = /GMT([+-]\d+)/.exec(nom);
+          if (!m) return null;
+          var off = parseInt(m[1], 10);              // 1 ou 2
+          var corr = SV_LON * 4;                     // 4 min par degré de longitude
+          var minutes = off * 60 - corr;             // décalage du midi solaire moyen
+          var h = Math.floor(12 + minutes / 60);
+          var mn = Math.round(minutes % 60);
+          return {
+            question: 'À Mézières, le soleil est-il au plus haut à midi ?',
+            reponse: false,
+            explication: 'Non : plutôt vers ' + h + ' h ' + (mn < 10 ? '0' : '') + mn + ' aujourd’hui. '
+              + 'L’heure légale avance de ' + off + ' h sur le temps universel en ce moment, et la longitude de la '
+              + 'commune (1,808° est) ne rattrape que ' + Math.round(corr) + ' minutes. À quelques minutes près : '
+              + 'la Terre n’avance pas tout à fait d’un pas régulier sur son orbite.',
+            source: 'Calcul depuis la longitude de la commune (1,808 E), à raison de 4 minutes par degré, et du décalage horaire en vigueur à Paris',
+            url: ''
+          };
+        } catch (e) { return null; }
       }
     },
     {
@@ -451,6 +560,56 @@
     if (z) z.innerHTML = _revelationHtml(reponse);
     _envoyer(reponse);
     try { trackStat('saviez_vous_reponse'); } catch (e) {}
+  };
+
+  // Inventaire complet du corpus, dans l'ORDRE RÉEL de passage — la page de
+  // revue de la mairie (revue-saviez-vous.html) s'en sert pour relire ce qui
+  // sera affiché, et quand. On l'expose ici plutôt que de réimplémenter
+  // l'ordonnancement côté page : une deuxième implémentation finirait par
+  // diverger, et la revue mentirait alors sur ce que verront les habitants.
+  // C'est la même raison qui interdit une seconde liste d'associations.
+  //
+  // Les entrées calculées sont résolues telles qu'elles le seraient
+  // aujourd'hui ; celles qui ne peuvent pas l'être sont renvoyées avec
+  // `indisponible: true` plutôt que masquées, pour que le relecteur le voie.
+  window.matSaviezVousInventaire = function () {
+    return matFetch(SV_URL, { cache: 'no-cache' }, 8000)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (json) {
+        return _construire(json).map(function (e, i) {
+          if (typeof e._build !== 'function') {
+            return { rang: i, calculee: false, entree: e };
+          }
+          var r = null;
+          try { r = e._build(); } catch (_) { r = null; }
+          if (!r) {
+            return {
+              rang: i, calculee: true, indisponible: true,
+              entree: { id: e.id, categorie: e.categorie, question: '', explication: '', source: '', url: '' }
+            };
+          }
+          r.id = e.id;
+          r.categorie = e.categorie;
+          return { rang: i, calculee: true, entree: r };
+        });
+      });
+  };
+
+  // Date à laquelle une entrée de rang N passera, en repartant de l'origine.
+  // Exposée pour que la revue n'ait pas à redéclarer SV_ORIGINE.
+  window.matSaviezVousDatePassage = function (rang, taille) {
+    var aujourdhui = _jourDepuisOrigine();
+    var prochain = rang;
+    if (taille > 0 && rang < aujourdhui) {
+      // Prochain passage : on avance d'un nombre entier de cycles.
+      prochain = rang + Math.ceil((aujourdhui - rang) / taille) * taille;
+    }
+    return {
+      jour: prochain,
+      date: new Date(SV_ORIGINE + prochain * 86400000),
+      dejaVue: rang < aujourdhui,          // son premier passage est derrière nous
+      aujourdhui: prochain === aujourdhui
+    };
   };
 
   window.matSaviezVousInit = function () {
