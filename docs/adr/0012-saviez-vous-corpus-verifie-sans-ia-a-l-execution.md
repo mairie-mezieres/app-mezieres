@@ -1,4 +1,4 @@
-# ADR-0010 — « Le saviez-vous ? » : corpus vérifié, aucune IA à l'exécution
+# ADR-0012 — « Le saviez-vous ? » : corpus vérifié, aucune IA à l'exécution
 
 - **Date** : 2 août 2026
 - **Statut** : Accepté
@@ -54,9 +54,29 @@ contenu factuel. Un vrai/faux classique afficherait la contre-vérité à l'écr
 où elle serait lue et parfois mémorisée par qui ne fait pas défiler jusqu'à la
 réponse. Ici, c'est structurellement impossible.
 
-**La rotation est déterministe** : quantième du jour modulo la taille du corpus,
-sur un ordre mélangé une fois avec une graine fixe (`SV_GRAINE`). Tout le
-village voit le même fait le même jour.
+**La rotation est déterministe** : nombre de jours écoulés depuis la mise en
+service (`SV_ORIGINE`) modulo la taille du corpus. Tout le village voit le même
+fait le même jour.
+
+**L'ordre est éditorial, pas aléatoire.** Un mélange aveugle a été essayé puis
+abandonné : avec 18 entrées d'urbanisme sur 75, une question sur quatre portait
+sur les règles de construction, et elles tombaient dès les premiers jours. « Faut-il
+une déclaration pour une fenêtre de toit » est une information utile mais une
+mauvaise entrée en matière — la rubrique doit donner envie d'être ouverte.
+
+`_ordonner()` fait donc tourner les catégories à tour de rôle, dans un ordre
+allant du plus surprenant au plus aride : découvertes calculées, l'application
+elle-même, la vie communale, l'environnement, le pratique, les transports, la
+santé, les déchets, l'intercommunalité, l'habitat, les démarches, l'urbanisme.
+Deux entrées de même catégorie ne peuvent pas se suivre tant qu'il reste de la
+matière ailleurs. Le mélange par graine ne joue plus qu'**à l'intérieur** d'une
+catégorie.
+
+Le compte depuis une origine, et non depuis le 1er janvier, n'est pas un détail :
+avec un quantième d'année, le premier jour affiché aurait été la 213e entrée du
+cycle — soit sa fin, là où les catégories les plus fournies se retrouvent seules.
+L'ordre éditorial n'aurait alors servi à rien. Effet de bord bienvenu : le passage
+d'une année à l'autre ne provoque plus de saut.
 
 ## Conséquences
 
@@ -81,9 +101,11 @@ village voit le même fait le même jour.
   pu être rédigées dans l'environnement de développement, dont la politique
   réseau bloque l'accès à ces sources. Elles demandent soit un accès réseau,
   soit des exports fournis par la mairie.
-- La graine `SV_GRAINE` ne doit **jamais** changer : l'ordre du corpus est un
-  engagement implicite. La modifier ferait rejouer des faits déjà vus et en
-  sauterait d'autres.
+- Ni `SV_GRAINE` ni `SV_ORIGINE` ne doivent changer une fois la rubrique en
+  service depuis un moment : l'ordre du corpus est un engagement implicite, et
+  les modifier ferait rejouer des faits déjà vus tout en en sautant d'autres.
+  Ces deux constantes ont été ajustées le jour même de la mise en service,
+  quand personne n'avait vu plus d'une question — ce qui ne se représentera pas.
 
 **Points de vigilance pour les futures évolutions :**
 

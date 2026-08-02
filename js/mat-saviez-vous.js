@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — « Le saviez-vous ? » v1.0.0
+   MAT — « Le saviez-vous ? » v1.1.0
    Un fait sur la commune par jour, avec sa source, et une
    question à laquelle on répond.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
@@ -13,7 +13,7 @@
    il n'intervient JAMAIS à l'exécution. Même raison d'être que la constante
    ASSOCIATIONS côté backend et que l'ADR-0003 (conseils santé déterministes
    par seuil plutôt que générés) : sur des informations que l'habitant va
-   croire, on ne joue pas aux dés. Voir ADR-0010.
+   croire, on ne joue pas aux dés. Voir ADR-0012.
 
    Corollaire de rédaction : on n'affiche JAMAIS une affirmation fausse.
    L'entrée pose une QUESTION, et seule la révélation porte du contenu
@@ -24,9 +24,12 @@
 (function () {
   'use strict';
 
-  var SV_URL       = './data/saviez-vous.json?v=1.0.0';
+  var SV_URL       = './data/saviez-vous.json?v=1.1.0';
   var SV_ETAT_KEY  = 'mat_sv_v1';       // { jour, id, reponse }
   var SV_GRAINE    = 20260802;          // graine fixe : l'ordre ne doit jamais changer
+  // Mise en service. La rotation compte les jours DEPUIS cette date, pour que
+  // le premier jour affiché soit bien la première entrée de l'ordre éditorial.
+  var SV_ORIGINE   = Date.UTC(2026, 7, 2);
 
   // Coordonnées de la commune — mêmes valeurs que js/mat-eau8.js (_EAU_LAT/_EAU_LON).
   var SV_LAT = 47.822;
@@ -38,17 +41,24 @@
 
   // ── Outils ────────────────────────────────────────────────
 
-  // Quantième du jour dans l'année, ancré sur Paris — surtout pas l'heure
-  // locale de l'appareil (c'est le piège corrigé par l'ADR-0007).
-  function _jourDeLAnnee() {
+  // Nombre de jours écoulés depuis la mise en service, ancré sur Paris —
+  // surtout pas l'heure locale de l'appareil (c'est le piège de l'ADR-0007).
+  //
+  // ⚠️ On compte depuis une ORIGINE, pas depuis le 1er janvier. Avec un
+  // quantième d'année, le premier jour affiché aurait été le 213e du corpus —
+  // c'est-à-dire la fin du cycle, là où les catégories les plus fournies se
+  // retrouvent seules. L'ordre éditorial de _ordonner() n'aurait alors servi
+  // à rien. Compter depuis l'origine garantit qu'on entre par le début.
+  // Corollaire : le passage d'une année à l'autre ne provoque plus de saut.
+  function _jourDepuisOrigine() {
     try {
       var tz = { timeZone: 'Europe/Paris' };
       var f = function (opt) {
         return parseInt(new Intl.DateTimeFormat('fr-FR', Object.assign({}, tz, opt)).format(new Date()), 10);
       };
       var j = f({ day: 'numeric' }), m = f({ month: 'numeric' }), a = f({ year: 'numeric' });
-      var debut = Date.UTC(a, 0, 1);
-      return Math.floor((Date.UTC(a, m - 1, j) - debut) / 86400000);
+      var n = Math.floor((Date.UTC(a, m - 1, j) - SV_ORIGINE) / 86400000);
+      return n >= 0 ? n : 0;
     } catch (e) {
       return 0;
     }
@@ -62,7 +72,7 @@
       }).format(new Date());
       return p;
     } catch (e) {
-      return String(_jourDeLAnnee());
+      return String(_jourDepuisOrigine());
     }
   }
 
@@ -203,15 +213,58 @@
 
   // ── Construction du corpus ────────────────────────────────
 
+  // Ordre de passage des catégories, du plus surprenant au plus aride.
+  // C'est un choix ÉDITORIAL, pas technique : un mélange aveugle faisait
+  // tomber l'urbanisme — 18 entrées sur 75, soit près d'une sur quatre — dès
+  // les premiers jours. « Faut-il une déclaration pour une fenêtre de toit »
+  // est une information utile, mais c'est une mauvaise entrée en matière.
+  // On ouvre donc sur ce qui étonne (distances, Lune), puis l'app elle-même
+  // et la vie communale ; les règles d'urbanisme ferment la marche.
+  var SV_ORDRE_CATEGORIES = [
+    'decouverte', 'mat', 'vie-communale', 'environnement', 'pratique',
+    'transports', 'sante', 'dechets', 'intercommunalite', 'habitat',
+    'demarches', 'urbanisme'
+  ];
+
+  // Tour de rôle entre catégories : une entrée de chacune, puis on recommence.
+  // Deux entrées de même catégorie ne peuvent donc pas se suivre tant qu'il
+  // reste de la matière ailleurs. Les catégories épuisées sortent du tour, si
+  // bien que les plus fournies se retrouvent en fin de cycle — assumé : mieux
+  // vaut de l'urbanisme au bout de trois mois qu'au premier jour.
+  function _ordonner(entrees) {
+    var paquets = {}, ordre = [];
+    entrees.forEach(function (e) {
+      var c = e.categorie || 'divers';
+      if (!paquets[c]) { paquets[c] = []; }
+      paquets[c].push(e);
+    });
+    // Catégories connues d'abord, dans l'ordre voulu ; les inconnues ensuite,
+    // par ordre alphabétique pour rester déterministe si le corpus en ajoute.
+    var cles = SV_ORDRE_CATEGORIES.filter(function (c) { return paquets[c]; })
+      .concat(Object.keys(paquets).sort().filter(function (c) {
+        return SV_ORDRE_CATEGORIES.indexOf(c) === -1;
+      }));
+    // Mélange DANS chaque catégorie : la variété d'un cycle à l'autre sans
+    // toucher à l'ordre des catégories, qui lui est voulu.
+    cles.forEach(function (c) { paquets[c] = _melange(paquets[c], SV_GRAINE); });
+
+    var reste = true;
+    for (var tour = 0; reste; tour++) {
+      reste = false;
+      for (var i = 0; i < cles.length; i++) {
+        var p = paquets[cles[i]];
+        if (tour < p.length) { ordre.push(p[tour]); reste = true; }
+      }
+    }
+    return ordre;
+  }
+
   function _construire(json) {
     var fixes = (json && Array.isArray(json.entrees)) ? json.entrees : [];
     var calc = SV_CALCULES.map(function (c) {
-      return { id: c.id, _build: c.build };
+      return { id: c.id, _build: c.build, categorie: 'decouverte' };
     });
-    // Ordre stable, mélangé une fois : sans cela le corpus se déroulerait
-    // dans l'ordre du fichier, et toutes les entrées d'une même catégorie
-    // tomberaient la même semaine.
-    return _melange(fixes.concat(calc), SV_GRAINE);
+    return _ordonner(fixes.concat(calc));
   }
 
   // Résout l'entrée du jour. Si une entrée calculée ne peut pas se construire
@@ -219,7 +272,7 @@
   // jamais au hasard, sinon deux habitants verraient deux faits différents.
   function _entreeDuJour(liste) {
     if (!liste.length) return null;
-    var depart = _jourDeLAnnee() % liste.length;
+    var depart = _jourDepuisOrigine() % liste.length;
     for (var k = 0; k < liste.length; k++) {
       var e = liste[(depart + k) % liste.length];
       if (!e) continue;

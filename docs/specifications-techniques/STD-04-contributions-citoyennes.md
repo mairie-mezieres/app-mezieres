@@ -96,7 +96,7 @@ Alimente la ligne « X % des Macérien(ne)s ont répondu comme vous »
 - **Le contenu du fait n'est pas ici.** Le backend ne connaît que des identifiants et des
   compteurs ; les questions, réponses et sources vivent dans `data/saviez-vous.json` du
   dépôt frontend, versionnées et relues (voir
-  [ADR-0010](../adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md)).
+  [ADR-0012](../adr/0012-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md)).
 
 Le format d'identifiant (`^[a-z0-9-]{2,64}$`) est validé côté route : `safeId` de
 `lib/validate.js` ne vaut que pour des entiers. Le nombre de clés Redis est borné par la

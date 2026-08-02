@@ -9,7 +9,7 @@ parler avec ses voisins : un fait vérifiable sur la commune, posé sous forme d
 question à laquelle on répond, dont la révélation cite systématiquement **sa source**.
 
 Le contenu est **entièrement pré-rédigé et relu**. Aucune intelligence artificielle
-n'intervient au moment de l'affichage — voir [ADR-0010](../../adr/0010-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md).
+n'intervient au moment de l'affichage — voir [ADR-0012](../../adr/0012-saviez-vous-corpus-verifie-sans-ia-a-l-execution.md).
 
 ## 2. Acteurs concernés
 
@@ -100,22 +100,25 @@ Alors la rubrique n'est pas affichée
 - **RG-16.3 — Jamais d'affirmation fausse à l'écran.** Le corpus ne contient que des
   **questions** ; seule la révélation porte du contenu factuel. Une question se termine
   toujours par un point d'interrogation, ce qui est vérifié automatiquement.
-- **RG-16.4 — Rotation déterministe.** Le fait du jour est fonction du quantième du
-  jour (ancré sur Paris) et de l'ordre du corpus, mélangé une fois avec une graine
-  fixe. Tous les habitants voient le même fait le même jour.
-- **RG-16.5 — La graine d'ordonnancement ne change jamais.** La modifier ferait
-  rejouer des faits déjà vus et en sauterait d'autres.
-- **RG-16.6 — Une seule réponse par appareil et par fait**, sans retour arrière. La
+- **RG-16.4 — Rotation déterministe.** Le fait du jour est fonction du nombre de jours
+  écoulés depuis la mise en service (ancré sur Paris) et de l'ordre du corpus. Tous les
+  habitants voient le même fait le même jour.
+- **RG-16.5 — L'ordre est éditorial.** Les catégories passent à tour de rôle, du plus
+  surprenant au plus aride : deux questions d'urbanisme ne peuvent pas se suivre tant
+  qu'il reste de la matière ailleurs. Le hasard ne joue qu'à l'intérieur d'une catégorie.
+- **RG-16.6 — L'origine et la graine ne changent plus.** Les modifier ferait rejouer des
+  faits déjà vus et en sauterait d'autres.
+- **RG-16.7 — Une seule réponse par appareil et par fait**, sans retour arrière. La
   répartition doit refléter les premières intuitions, pas un vote corrigé après lecture
   de la réponse. Déduplication par `deviceId` (RG-T-6 du SFG).
-- **RG-16.7 — Pas de pourcentage sous cinq réponses.** En deçà, une proportion n'a pas
+- **RG-16.8 — Pas de pourcentage sous cinq réponses.** En deçà, une proportion n'a pas
   de sens et serait trompeuse.
-- **RG-16.8 — Le pourcentage est facultatif.** S'il n'est pas disponible, il n'est pas
+- **RG-16.9 — Le pourcentage est facultatif.** S'il n'est pas disponible, il n'est pas
   affiché — jamais remplacé par « 0 % » (RG-T-3 du SFG : ne jamais afficher une donnée
   erronée).
-- **RG-16.9 — Repliée par défaut.** L'ouverture est un geste volontaire ; rien
+- **RG-16.10 — Repliée par défaut.** L'ouverture est un geste volontaire ; rien
   d'agréable-mais-facultatif ne se place au-dessus du bouton Urgences.
-- **RG-16.10 — Aucune donnée personnelle.** Ni la question, ni la réponse, ni la
+- **RG-16.11 — Aucune donnée personnelle.** Ni la question, ni la réponse, ni la
   navigation ne sont rattachées à une identité : seul l'identifiant technique
   d'appareil sert à la déduplication.
 
