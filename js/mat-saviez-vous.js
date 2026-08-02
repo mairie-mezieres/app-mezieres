@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — « Le saviez-vous ? » v1.2.1
+   MAT — « Le saviez-vous ? » v1.2.2
    Un fait sur la commune par jour, avec sa source, et une
    question à laquelle on répond.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
@@ -464,5 +464,26 @@
         if (_entree) _peindre();
       })
       .catch(function () { /* corpus indisponible : la ligne ne s'affiche pas */ });
+  };
+
+  // ── Revue éditoriale ──────────────────────────────────────
+  // Exposé en LECTURE SEULE pour la page `saviez-vous.html`, qui permet à la
+  // mairie de relire tout le corpus — question, réponse, source, et surtout
+  // le JOUR où chaque entrée passera — avant la fusion.
+  //
+  // ⚠️ La page de revue rejoue l'ordre avec CE code, pas avec une copie.
+  // Une réimplémentation aurait divergé au premier changement de
+  // `_ordonner()`, et la mairie aurait relu un ordre qui n'est pas celui
+  // qu'elle verra : c'est exactement la double source qui a déjà fait
+  // diverger la liste des associations et l'opérateur fibre.
+  //
+  // L'ADR-0012 tire de la mise en service que la relecture par la mairie
+  // était prévue avant le merge et n'a pas eu lieu, faute d'outil pour la
+  // faire tenir. C'est cet outil.
+  window.matSaviezVousRevue = {
+    construire: _construire,                       // corpus + calculées, ordonné
+    ordreCategories: SV_ORDRE_CATEGORIES.slice(),  // copie : l'ordre reste interne
+    origine: SV_ORIGINE,                           // pour dater chaque passage
+    corpusUrl: SV_URL
   };
 })();

@@ -25,6 +25,7 @@ n'intervient au moment de l'affichage — voir [ADR-0012](../../adr/0012-saviez-
 - **US-16.4** — En tant que citoyen, je veux savoir combien d'habitants ont répondu comme moi afin de me situer.
 - **US-16.5** — En tant que citoyen, je ne veux pas que cette rubrique encombre mon écran d'accueil.
 - **US-16.6** — En tant qu'administrateur, je veux ajouter des faits sur la commune sans passer par un développeur.
+- **US-16.7** — En tant qu'administrateur, je veux **relire tout le corpus avant sa mise en ligne**, en sachant quel jour chaque question passera, afin de valider les réponses et leurs sources plutôt que de les découvrir en production.
 
 ## 4. Critères d'acceptation (Gherkin)
 
@@ -90,6 +91,22 @@ Alors elle occupe une seule ligne
 Alors la rubrique n'est pas affichée
 ```
 
+### US-16.7 — Relire le corpus avant publication
+
+```gherkin
+Étant donné que j'ouvre la page de revue « saviez-vous.html »
+Alors le corpus complet s'affiche dans l'ordre réel de passage
+Et chaque entrée indique le jour et la date auxquels elle sera affichée
+Et sa question, sa réponse, son explication et sa source
+
+Étant donné qu'une entrée est mal formée ou non sourcée
+Alors elle est signalée comme anomalie bloquante
+Et je peux filtrer la liste sur les seules anomalies
+
+Étant donné qu'une entrée est sourcée mais sans adresse web
+Alors elle est signalée comme avertissement, sans bloquer
+```
+
 ## 5. Règles de gestion
 
 - **RG-16.1 — Aucune IA à l'exécution.** Le fait affiché provient du corpus versionné
@@ -122,6 +139,10 @@ Alors la rubrique n'est pas affichée
 - **RG-16.11 — Aucune donnée personnelle.** Ni la question, ni la réponse, ni la
   navigation ne sont rattachées à une identité : seul l'identifiant technique
   d'appareil sert à la déduplication.
+- **RG-16.12 — Le corpus est relu AVANT la fusion**, sur la page `saviez-vous.html`,
+  qui en donne l'ordre de passage daté. La relecture porte sur ce qu'aucun test ne
+  peut vérifier : la réponse est-elle vraie ? La page rejoue l'ordre avec le code de
+  l'application, jamais avec une copie.
 
 ## 6. Données manipulées
 
@@ -129,6 +150,7 @@ Alors la rubrique n'est pas affichée
 |---|---|---|
 | Corpus | `data/saviez-vous.json` (dépôt, précaché) | `id`, `question`, `reponse` (booléen), `explication`, `source`, `url`, `categorie` |
 | Entrées calculées | `js/mat-saviez-vous.js` → `SV_CALCULES` | générateurs purs (distances, jours fériés) |
+| Page de revue | `saviez-vous.html` (interne, non précachée) | corpus daté, ordre de passage, anomalies |
 | Réponse du jour | `localStorage` → `mat_sv_v1` | `{ jour, id, reponse }` |
 | Déduplication | Redis → `mat:sv:votants:{id}` | ensemble de `deviceId` |
 | Répartition | Redis → `mat:sv:count:{id}` | `{ oui, non }` |

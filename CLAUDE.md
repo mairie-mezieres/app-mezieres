@@ -15,6 +15,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | Code, structure des fichiers, env, intégrations, **notifications push** (§8), **PWA/Service Worker** (§7), **webhook Facebook** (§9), CI/CD, ajout de feature (§12) | `docs/guide-technique.md` |
 | Comportement attendu côté habitant (actus, agenda, MEL, signalements, idées, notifs, hors-ligne, RGPD) | `docs/guide-utilisateur.md` |
 | **« Le saviez-vous ? »** — le fait du jour, le corpus, la règle « aucune IA à l'exécution » | `docs/specifications/sfd/SFD-16-le-saviez-vous.md` puis `docs/adr/0012-…` |
+| **Relire le corpus « Le saviez-vous ? » avant de le fusionner** (ordre de passage daté, sources, anomalies) | ouvrir `saviez-vous.html` — page interne, non précachée |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |

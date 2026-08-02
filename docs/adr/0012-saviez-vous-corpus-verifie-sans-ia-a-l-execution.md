@@ -139,6 +139,29 @@ eu lieu.** L'ADR posait la règle, le processus ne l'a pas appliquée — les en
 question, réponse, source, ordre de passage) doit être soumise **avant** la fusion,
 pas après. Une règle qu'aucune étape n'impose n'est qu'une intention.
 
+**La page de revue existe désormais : `saviez-vous.html`.**
+
+Le constat ci-dessus — « une règle qu'aucune étape n'impose n'est qu'une intention » —
+appelait un outil, pas une consigne de plus. La page liste **tout** le corpus dans
+l'ordre réel de passage, et pour chaque entrée : le **jour** et la **date** où elle
+sera affichée, la question, la réponse, l'explication, la source et son lien. Elle
+rejoue les contrôles de la CI (source absente, question sans « ? », identifiant en
+double…) et signale en plus les entrées **sans URL**, que la CI accepte mais qui
+privent l'habitant de toute vérification.
+
+Deux choix la rendent fiable :
+
+- Elle **n'implémente pas** l'ordre de passage : elle l'obtient de
+  `js/mat-saviez-vous.js` (`window.matSaviezVousRevue`). Une réimplémentation aurait
+  divergé au premier changement de `_ordonner()`, et la mairie aurait relu un ordre
+  qui n'est pas celui qu'elle verra — la double source déjà rencontrée sur les
+  associations et sur l'opérateur fibre.
+- Elle est **interne** : ni référencée depuis l'application, ni précachée par le
+  service worker, `noindex`. Elle ne pèse pas sur le chargement des habitants.
+
+Ce que la page ne fait pas, et ne peut pas faire : dire si une réponse est **vraie**.
+Aucun test ne le peut. C'est précisément le travail qu'elle rend praticable.
+
 **Points de vigilance pour les futures évolutions :**
 
 - Ajouter une entrée sans source fera **échouer la CI**. C'est voulu.
@@ -153,3 +176,14 @@ pas après. Une règle qu'aucune étape n'impose n'est qu'une intention.
   affirme l'inverse. C'est exactement le risque de double source que le
   `CLAUDE.md` du backend signale déjà pour les associations. À trancher par la
   mairie, puis à aligner des deux côtés.
+- **Le corpus vieillit, et rien ne le détecte.** L'entrée `cctvl-communes` affirme
+  que la Communauté de communes « en regroupe 27 ». Le découpage administratif
+  officiel publié par Etalab (redistribution du Code officiel géographique)
+  n'en liste plus que **25**, Mézières-lez-Cléry comprise — les communes nouvelles
+  ont fusionné depuis. Le chiffre était probablement juste à la création de la
+  CCTVL en 2017 ; il ne l'est plus. La question posée (« plus de 20 communes ? »)
+  reste vraie dans les deux cas, mais l'explication affiche un nombre faux.
+  **À vérifier par la mairie auprès de la CCTVL, puis à corriger.** Portée générale :
+  un fait sourcé n'est vrai qu'à une date, et le corpus ne porte aucune date de
+  péremption. C'est la même classe de problème que le site WordPress disparu et
+  que « Val de Loire Fibre ».
