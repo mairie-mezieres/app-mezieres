@@ -205,6 +205,39 @@ test('guide d’arrivée : l’adresse #guide ouvre la page directement', async 
   await expect(page.getByRole('heading', { name: /Dès votre arrivée/ })).toBeVisible();
 });
 
+// Liens des réponses de MEL. Signalé en production : la réponse « carte
+// d'identité » affichait « mairie-clery-saint-andre.fr » sans que rien ne
+// s'ouvre. Le linkifieur ne traitait que `https://…` et `www.…` — 14 règles
+// backend sur 27 contenaient un domaine nu, donc du texte mort. Et son motif
+// d'URL `[^\s<>]+` avalait la ponctuation collée derrière, cassant le href.
+test('MEL : adresses cliquables dans les réponses, sans faux positif', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window._melLinkify === 'function');
+
+  const hrefs = (html) => Array.from(html.matchAll(/href="([^"]+)"/g), (m) => m[1]);
+
+  // Domaine écrit nu → lien https, c'est le cas qui manquait.
+  expect(hrefs(await page.evaluate(() => window._melLinkify('Vérifiez sur valdeloire-fibre.fr ou appelez.'))))
+    .toEqual(['https://valdeloire-fibre.fr']);
+
+  // Ponctuation collée : elle ne doit pas entrer dans le href.
+  expect(hrefs(await page.evaluate(() => window._melLinkify('Téléservice (https://www.service-public.gouv.fr/particuliers/vosdroits/R16396) ou en mairie.'))))
+    .toEqual(['https://www.service-public.gouv.fr/particuliers/vosdroits/R16396']);
+
+  // Courriel → mailto, et surtout pas un lien vers le domaine.
+  expect(hrefs(await page.evaluate(() => window._melLinkify('Écrivez à mairie@mezieres-lez-clery.fr.'))))
+    .toEqual(['mailto:mairie@mezieres-lez-clery.fr']);
+
+  // Faux positifs : plaque, article de loi, nom de fichier, numéro de version.
+  expect(hrefs(await page.evaluate(() => window._melLinkify('Plaque AA123BB, art. R421-12, index.html, version 4.53.'))))
+    .toEqual([]);
+
+  // Un seul passage : pas de lien imbriqué dans le HTML produit.
+  const html = await page.evaluate(() => window._melLinkify('Voir https://exemple.fr et www.cnil.fr et soliha.fr'));
+  expect(html).not.toMatch(/<a[^>]*>[^<]*<a/);
+  expect(hrefs(html)).toEqual(['https://exemple.fr', 'https://www.cnil.fr', 'https://soliha.fr']);
+});
+
 test('accueil : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle').catch(() => {});

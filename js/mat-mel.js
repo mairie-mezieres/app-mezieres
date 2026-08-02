@@ -1093,14 +1093,49 @@ function pluSwitchTab(btn, tabId){
 // MEL — Réponses directes (catégories non-urbanisme)
 // ════════════════════════════════════════════════════════
 
+// Rend cliquables les adresses contenues dans une réponse de MEL.
+//
+// Les réponses sont rédigées en texte libre côté backend (DIRECT_RULES), donc
+// une adresse peut y apparaître sous plusieurs formes. Avant, seules
+// `https://…` et `www.…` devenaient des liens : un domaine écrit nu
+// (« valdeloire-fibre.fr ») s'affichait mais ne s'ouvrait pas — 14 règles sur
+// 27 étaient dans ce cas. Les courriels non plus n'étaient pas cliquables.
+//
+// ⚠️ UN SEUL passage, avec une alternance unique : en chaînant plusieurs
+// .replace(), le second re-matchait le HTML fabriqué par le premier (le
+// `href="https://…"` déjà inséré) et produisait des liens imbriqués.
+// L'ordre de l'alternance compte : le courriel doit passer AVANT le domaine
+// nu, sinon « mairie@exemple.fr » deviendrait un lien vers le domaine.
+const _MEL_LIEN = new RegExp(
+  '(https?:\\/\\/[^\\s<>]+)'                                        // 1. URL complète
+  + '|([a-z0-9._%+-]+@(?:[a-z0-9-]+\\.)+[a-z]{2,})'                 // 2. courriel
+  + '|(?<![\\w@.\\-\\/])(www\\.[^\\s<>]+)'                          // 3. www.…
+  + '|(?<![\\w@.\\-\\/])((?:[a-z0-9-]+\\.)+(?:gouv\\.fr|fr|com|org|eu)(?:\\/[^\\s<>]*)?)', // 4. domaine nu
+  'gi'
+);
+
+function _melLinkify(texte){
+  return String(texte==null?'':texte).replace(_MEL_LIEN, function(m, url, mail){
+    // La ponctuation qui suit l'adresse n'en fait pas partie. Le motif d'URL
+    // est volontairement large (`[^\s<>]+`) pour accepter les chemins et les
+    // paramètres ; sans ce rognage, « (voir https://exemple.fr) » produisait
+    // un href « https://exemple.fr) » — lien cassé, constaté en production.
+    let suffixe='';
+    const p=/[.,;:!?)\]»…]+$/.exec(m);
+    if(p){ suffixe=p[0]; m=m.slice(0,-suffixe.length); }
+    if(!m) return suffixe;
+    const style='color:var(--leaf);font-weight:700;word-break:break-all;';
+    if(mail) return '<a href="mailto:'+m+'" style="'+style+'">'+m+'</a>'+suffixe;
+    const href=/^https?:\/\//i.test(m)?m:'https://'+m;
+    return '<a href="'+href+'" target="_blank" rel="noopener noreferrer" style="'+style+'">'+m+'</a>'+suffixe;
+  });
+}
+
 function _renderDirectAnswer(answer){
   // answer peut être une string ou un objet {text, links:[{label,url,tel}]}
   if(typeof answer==='string'){
-    // Transformer URLs et tél en liens cliquables
-    let t=answer
-      .replace(/\n/g,'<br>')
-      .replace(/(https?:\/\/[^\s<>]+)/g,'<a href="$1" target="_blank" style="color:var(--leaf);font-weight:700;word-break:break-all;">$1</a>')
-      .replace(/(?<![\/\w@])((?:www\.)[^\s<>]+)/g,'<a href="https://$1" target="_blank" style="color:var(--leaf);font-weight:700;">$1</a>')
+    // Transformer URLs, courriels et tél en liens cliquables
+    let t=_melLinkify(answer.replace(/\n/g,'<br>'))
       .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
     return '<p style="margin:0 0 8px;line-height:1.6;">'+t+'</p>';
   }
