@@ -39,7 +39,13 @@ jobs:
           #    liens suivis par un humain et répondent 401/404 sans paramètres ;
           #  - laposte.fr et jimdosite.com, qui répondent 403 aux robots alors
           #    que leurs pages s'ouvrent normalement dans un navigateur (vérifié
-          #    à la main) — à ne pas confondre avec un lien réellement cassé.
+          #    à la main) — à ne pas confondre avec un lien réellement cassé ;
+          #  - logo.clearbit.com et google.com/s2/favicons : URL construites par
+          #    concaténation dans mat-entreprises.js, jamais valides hors contexte ;
+          #  - les pages d'inscription des hébergeurs citées par le kit de
+          #    réplication (Netlify, Cloudflare, GitHub, OVH…) : ce sont des
+          #    chaînes de documentation dans mat-partager.js, pas des liens de
+          #    l'application, et elles bloquent les robots.
           #
           # ⛔ NE JAMAIS écrire de commentaire À L'INTÉRIEUR du bloc `args: >-`
           # ci-dessous. Dans un scalaire replié YAML, « # » n'est PAS un
@@ -77,6 +83,13 @@ jobs:
             --exclude 'upstash\.io'
             --exclude 'laposte\.fr'
             --exclude 'jimdosite\.com'
+            --exclude 'logo\.clearbit\.com'
+            --exclude 'google\.com/s2/favicons'
+            --exclude 'app\.netlify\.com'
+            --exclude 'dash\.cloudflare\.com'
+            --exclude 'github\.com/signup'
+            --exclude 'ovhcloud\.com'
+            --exclude 'donnees\.roulez-eco\.fr'
             index.html admin.html architecture.html notif.html offline.html partager.html
             'js/*.js'
           format: markdown
