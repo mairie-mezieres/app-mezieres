@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — « Le saviez-vous ? » v1.0.0
+   MAT — « Le saviez-vous ? » v1.0.1
    Un fait sur la commune par jour, avec sa source, et une
    question à laquelle on répond.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
@@ -24,7 +24,7 @@
 (function () {
   'use strict';
 
-  var SV_URL       = './data/saviez-vous.json?v=1.0.0';
+  var SV_URL       = './data/saviez-vous.json?v=1.1.0';
   var SV_ETAT_KEY  = 'mat_sv_v1';       // { jour, id, reponse }
   var SV_GRAINE    = 20260802;          // graine fixe : l'ordre ne doit jamais changer
 

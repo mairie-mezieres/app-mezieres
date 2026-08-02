@@ -162,7 +162,7 @@
 // de conteneur .sv-bloc ou si le corpus est indisponible.
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-saviez-vous.js?v=1.0.0';
+  s.src = 'js/mat-saviez-vous.js?v=1.0.1';
   s.onload = function(){ try { if (typeof matSaviezVousInit === 'function') matSaviezVousInit(); } catch(e){} };
   document.head.appendChild(s);
 })();

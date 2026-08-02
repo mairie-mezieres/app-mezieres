@@ -416,6 +416,267 @@
       "source": "Météo-France — dispositif de vigilance météorologique",
       "url": "https://vigilance.meteofrance.fr",
       "categorie": "environnement"
+    },
+    {
+      "id": "poules-formalite",
+      "question": "Faut-il une autorisation pour installer un petit poulailler familial dans son jardin ?",
+      "reponse": false,
+      "explication": "Pas en dessous de 5 m² : comme toute annexe, c’est libre. De 5 à 20 m², déclaration préalable ; au-delà, permis de construire. Un élevage familial de quelques poules est autorisé, sous réserve du Règlement Sanitaire Départemental du Loiret.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme et Règlement Sanitaire Départemental du Loiret",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "ruches-declaration",
+      "question": "Faut-il déclarer ses ruches, même quand on n’en a qu’une ?",
+      "reponse": true,
+      "explication": "Oui. La déclaration est annuelle et obligatoire auprès de la Direction générale de l’alimentation, quel que soit le nombre de ruches.",
+      "source": "Direction générale de l’alimentation — déclaration annuelle de ruches",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/R16003",
+      "categorie": "environnement"
+    },
+    {
+      "id": "volailles-50",
+      "question": "Peut-on élever autant de volailles qu’on veut chez soi ?",
+      "reponse": false,
+      "explication": "Non : au-delà de cinquante volailles, des règles d’élevage supplémentaires s’appliquent. En deçà, il s’agit d’une basse-cour familiale.",
+      "source": "Mairie de Mézières-lez-Cléry — Règlement Sanitaire Départemental du Loiret",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "cni-mezieres",
+      "question": "Peut-on faire refaire sa carte d’identité à la mairie de Mézières ?",
+      "reponse": false,
+      "explication": "Non. Il faut une mairie équipée d’une station biométrique — Cléry-Saint-André, Saint-Hilaire-Saint-Mesmin ou Orléans par exemple. Le service officiel de l’ANTS géolocalise la plus proche.",
+      "source": "Agence nationale des titres sécurisés — géolocaliser une mairie habilitée",
+      "url": "https://passeport.ants.gouv.fr/services/geolocaliser-une-mairie-habilitee",
+      "categorie": "demarches"
+    },
+    {
+      "id": "passeport-delai",
+      "question": "Un passeport s’obtient-il en moins de deux semaines ?",
+      "reponse": false,
+      "explication": "Comptez plutôt trois à quatre semaines en période normale, et davantage avant l’été. La demande se dépose dans une mairie équipée d’une station biométrique, sur rendez-vous.",
+      "source": "Agence nationale des titres sécurisés",
+      "url": "https://passeport.ants.gouv.fr/services/geolocaliser-une-mairie-habilitee",
+      "categorie": "demarches"
+    },
+    {
+      "id": "cnil-cni",
+      "question": "La CNIL et la CNI, est-ce la même chose ?",
+      "reponse": false,
+      "explication": "Non, et la confusion est fréquente. La CNI est la carte nationale d’identité ; la CNIL est l’autorité indépendante qui veille à la protection des données personnelles.",
+      "source": "Commission nationale de l’informatique et des libertés",
+      "url": "https://www.cnil.fr",
+      "categorie": "demarches"
+    },
+    {
+      "id": "rgpd-recia",
+      "question": "La commune dispose-t-elle d’un délégué à la protection des données ?",
+      "reponse": true,
+      "explication": "Oui, via le GIP RECIA, groupement d’intérêt public dédié au numérique public en Centre-Val de Loire. Les demandes passent par la mairie, au 02 38 45 61 76.",
+      "source": "Mairie de Mézières-lez-Cléry — accompagnement RGPD par le GIP RECIA",
+      "url": "",
+      "categorie": "demarches"
+    },
+    {
+      "id": "procuration-bureau",
+      "question": "Quand on donne procuration, la personne vote-t-elle dans son propre bureau de vote ?",
+      "reponse": false,
+      "explication": "Non : votre mandataire vote dans VOTRE bureau de vote, à Mézières-lez-Cléry. C’est pourquoi il vaut mieux choisir quelqu’un de la commune.",
+      "source": "Service-public.fr — vote par procuration",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F1604",
+      "categorie": "demarches"
+    },
+    {
+      "id": "electorale-6e-vendredi",
+      "question": "Peut-on s’inscrire sur les listes électorales la veille d’une élection ?",
+      "reponse": false,
+      "explication": "Non. L’inscription est possible toute l’année, mais au plus tard le sixième vendredi précédant le scrutin.",
+      "source": "Service-public.fr — inscription sur les listes électorales",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F1965",
+      "categorie": "demarches"
+    },
+    {
+      "id": "electorale-automatique",
+      "question": "Un jeune recensé à 16 ans doit-il s’inscrire lui-même sur les listes électorales à 18 ans ?",
+      "reponse": false,
+      "explication": "Non, l’inscription est automatique — c’est l’un des effets du recensement citoyen. Il reste prudent de vérifier sa situation électorale en ligne.",
+      "source": "Service-public.fr — recensement citoyen et inscription d’office",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F870",
+      "categorie": "demarches"
+    },
+    {
+      "id": "recensement-attestation",
+      "question": "L’attestation de recensement est-elle demandée pour passer le permis de conduire ?",
+      "reponse": true,
+      "explication": "Oui, comme pour le baccalauréat et les concours publics. Le recensement se fait en mairie dans les trois mois suivant le seizième anniversaire, et déclenche la convocation à la Journée Défense et Citoyenneté.",
+      "source": "Service-public.fr — recensement citoyen obligatoire",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F870",
+      "categorie": "demarches"
+    },
+    {
+      "id": "pacs-notaire",
+      "question": "Le PACS ne peut-il s’enregistrer qu’en mairie ?",
+      "reponse": false,
+      "explication": "Non : en mairie de la commune de résidence commune — à Mézières-lez-Cléry sur rendez-vous — ou chez un notaire, au choix.",
+      "source": "Mairie de Mézières-lez-Cléry — base de connaissances de l’assistante MEL",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/F1618",
+      "categorie": "demarches"
+    },
+    {
+      "id": "adresse-teleservice",
+      "question": "Faut-il prévenir séparément les impôts, la CAF et l’assurance maladie quand on déménage ?",
+      "reponse": false,
+      "explication": "Non, un téléservice unique les prévient tous en une fois, avec les caisses de retraite et France Travail. Restent à faire séparément : employeur, banque, assurances, réexpédition du courrier et carte grise.",
+      "source": "Service-public.fr — téléservice « Je change de coordonnées »",
+      "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R11193",
+      "categorie": "demarches"
+    },
+    {
+      "id": "carte-grise-mois",
+      "question": "A-t-on un an pour mettre à jour l’adresse de sa carte grise après un déménagement ?",
+      "reponse": false,
+      "explication": "Non, un mois — et c’est obligatoire. La démarche se fait en ligne auprès de l’ANTS.",
+      "source": "Agence nationale des titres sécurisés — changement d’adresse sur un certificat d’immatriculation",
+      "url": "https://immatriculation.ants.gouv.fr",
+      "categorie": "demarches"
+    },
+    {
+      "id": "eau-cctvl",
+      "question": "L’eau potable de Mézières est-elle gérée par la commune ?",
+      "reponse": false,
+      "explication": "Non, par la Communauté de communes des Terres du Val de Loire, qui gère aussi l’assainissement collectif. Un seul numéro pour les deux : 02 38 44 59 35.",
+      "source": "Communauté de communes des Terres du Val de Loire",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "ecole-foret",
+      "question": "L’école de Mézières-lez-Cléry porte-t-elle un nom ?",
+      "reponse": true,
+      "explication": "Oui : l’école de la Forêt. L’inscription passe d’abord par la mairie, qui délivre le certificat d’inscription, puis par la direction de l’école pour l’admission.",
+      "source": "Mairie de Mézières-lez-Cléry — inscription scolaire",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "radiation-ecole",
+      "question": "Faut-il un certificat de radiation pour inscrire son enfant venant d’une autre école ?",
+      "reponse": true,
+      "explication": "Oui, avec le livret de famille, un justificatif de domicile de moins de trois mois et le carnet de santé à jour des vaccinations.",
+      "source": "Mairie de Mézières-lez-Cléry — inscription scolaire",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "marmousets",
+      "question": "Existe-t-il une crèche à Mézières-lez-Cléry ?",
+      "reponse": true,
+      "explication": "Oui : la crèche familiale Les Marmousets. La commune dispose aussi d’un centre de loisirs et d’un accueil périscolaire matin et soir.",
+      "source": "Mairie de Mézières-lez-Cléry — services à l’enfance",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "fibre-lysseo",
+      "question": "Le réseau fibre du Loiret est-il exploité par « Val de Loire Fibre » ?",
+      "reponse": false,
+      "explication": "Non — cet opérateur dessert l’Indre-et-Loire et le Loir-et-Cher. Dans le Loiret, c’est Lysséo. Une construction neuve doit être déclarée le plus tôt possible auprès de lui.",
+      "source": "Mairie de Mézières-lez-Cléry — vérifié en août 2026 auprès de l’opérateur départemental",
+      "url": "https://lysseo.fr",
+      "categorie": "pratique"
+    },
+    {
+      "id": "gnau-cerfa-cloture",
+      "question": "Le formulaire d’une déclaration préalable pour une clôture est-il le même que pour un abri de jardin ?",
+      "reponse": false,
+      "explication": "Non : le Cerfa 16702*02 est propre aux clôtures. Pour les autres déclarations préalables, c’est le Cerfa 13703 ; pour un permis de construire, le 13406.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "terrasse-plain-pied",
+      "question": "Couler une terrasse de plain-pied dans son jardin demande-t-il une déclaration ?",
+      "reponse": false,
+      "explication": "Non, tant qu’elle n’est ni couverte ni surélevée — sauf en secteur protégé. Dès qu’elle est surélevée, une déclaration préalable devient nécessaire.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "ravalement-teinte",
+      "question": "Repeindre sa façade dans la même teinte demande-t-il une déclaration ?",
+      "reponse": false,
+      "explication": "Non, à l’identique c’est libre — sauf en secteur protégé. Changer de teinte, poser un bardage ou modifier l’aspect de la façade demande en revanche une déclaration préalable.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "zone-n-constructible",
+      "question": "Peut-on construire librement en zone naturelle du PLU ?",
+      "reponse": false,
+      "explication": "Non, la zone N est quasi inconstructible. Certains secteurs autorisent des extensions limitées ou de petites annexes ; les règles varient d’un sous-secteur à l’autre.",
+      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "autorisation-3ans",
+      "question": "Une autorisation d’urbanisme reste-t-elle valable indéfiniment ?",
+      "reponse": false,
+      "explication": "Non : trois ans, qu’il s’agisse d’une déclaration préalable ou d’un permis de construire. Passé ce délai sans commencement de travaux, elle devient caduque.",
+      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
+      "url": "",
+      "categorie": "urbanisme"
+    },
+    {
+      "id": "soliha-gratuit",
+      "question": "L’accompagnement SOLIHA pour rénover son logement est-il payant ?",
+      "reponse": false,
+      "explication": "Non : gratuit et sans engagement. Étude du projet, conseils techniques, évaluation des aides mobilisables et assistance administrative — 02 38 77 87 21.",
+      "source": "Communauté de communes des Terres du Val de Loire — OPAH, opérateur SOLIHA",
+      "url": "https://www.ccterresduvaldeloire.fr",
+      "categorie": "habitat"
+    },
+    {
+      "id": "dechetterie-une-inscription",
+      "question": "Faut-il s’inscrire séparément à chaque déchetterie de la Communauté de communes ?",
+      "reponse": false,
+      "explication": "Non, une seule inscription vaut pour tous les sites. Elle est obligatoire pour Cléry-Saint-André, Meung-sur-Loire et Saint-Ay, où l’accès se fait par lecture de plaque.",
+      "source": "Communauté de communes des Terres du Val de Loire — gestion des accès déchetteries",
+      "url": "https://portail-usagers.ccterresduvaldeloire.fr",
+      "categorie": "dechets"
+    },
+    {
+      "id": "etat-civil-autre-commune",
+      "question": "Peut-on obtenir en mairie de Mézières un acte de naissance délivré par une autre commune ?",
+      "reponse": false,
+      "explication": "Non. Il faut s’adresser à la mairie qui a dressé l’acte, ou passer par service-public.fr. Mézières délivre les actes qu’elle a elle-même enregistrés.",
+      "source": "Mairie de Mézières-lez-Cléry — état civil",
+      "url": "https://www.service-public.fr/particuliers/vosdroits/N359",
+      "categorie": "demarches"
+    },
+    {
+      "id": "mat-licence-mit",
+      "question": "Une autre commune doit-elle payer pour reprendre l’application MAT ?",
+      "reponse": false,
+      "explication": "Non : le code est publié sous licence MIT, librement réutilisable. Le lien « Créer la vôtre », en bas de page, produit même le mode d’emploi complet.",
+      "source": "Dépôt public de MAT — fichier LICENSE",
+      "url": "",
+      "categorie": "mat"
+    },
+    {
+      "id": "mel-quota",
+      "question": "Peut-on poser autant de questions qu’on veut à MEL dans une journée ?",
+      "reponse": false,
+      "explication": "Non, le nombre de questions est plafonné chaque jour, pour maîtriser le coût du service. L’arbre de rubriques, lui, reste consultable sans limite : ses réponses sont pré-écrites et ne consomment rien.",
+      "source": "Documentation technique de MAT — quotas de l’assistante MEL",
+      "url": "",
+      "categorie": "mat"
     }
   ]
 }
