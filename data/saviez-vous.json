@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "maj": "2026-08-02",
-  "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0010.",
+  "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
     {
       "id": "cctvl-communes",
@@ -574,7 +574,7 @@
       "id": "marmousets",
       "question": "Mézières-lez-Cléry a-t-elle sa propre crèche ?",
       "reponse": false,
-      "explication": "Non : la crèche familiale Les Marmousets est située dans une commune voisine, dont Mézières est partenaire — les familles macériennes peuvent y prétendre à ce titre. Le centre de loisirs et l’accueil périscolaire, eux, sont bien sur la commune.",
+      "explication": "Non : la crèche familiale Les Marmousets se trouve à Cléry-Saint-André, dont Mézières est commune partenaire — les familles macériennes peuvent y prétendre à ce titre. Le centre de loisirs et l’accueil périscolaire, eux, sont bien sur la commune.",
       "source": "Mairie de Mézières-lez-Cléry — précision apportée par la commune, août 2026",
       "url": "",
       "categorie": "vie-communale"
