@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "maj": "2026-08-02",
-  "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0010.",
+  "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
     {
       "id": "cctvl-communes",
@@ -383,9 +383,9 @@
     },
     {
       "id": "procuration-mairie",
-      "question": "Peut-on établir une procuration de vote entièrement en ligne ?",
-      "reponse": false,
-      "explication": "Non. La demande se prépare en ligne, mais l’identité doit être vérifiée physiquement en gendarmerie, commissariat, tribunal ou consulat.",
+      "question": "Peut-on faire une procuration de vote sans se déplacer ?",
+      "reponse": true,
+      "explication": "Oui, si vous avez une identité numérique : la demande se fait entièrement en ligne sur maprocuration.gouv.fr, vérification d’identité comprise, via l’application France Identité. Sans elle, il faut encore se présenter en gendarmerie, commissariat, tribunal ou consulat.",
       "source": "Service-public.fr — vote par procuration",
       "url": "https://www.service-public.fr/particuliers/vosdroits/F1604",
       "categorie": "demarches"
@@ -572,10 +572,10 @@
     },
     {
       "id": "marmousets",
-      "question": "Existe-t-il une crèche à Mézières-lez-Cléry ?",
-      "reponse": true,
-      "explication": "Oui : la crèche familiale Les Marmousets. La commune dispose aussi d’un centre de loisirs et d’un accueil périscolaire matin et soir.",
-      "source": "Mairie de Mézières-lez-Cléry — services à l’enfance",
+      "question": "Mézières-lez-Cléry a-t-elle sa propre crèche ?",
+      "reponse": false,
+      "explication": "Non : la crèche familiale Les Marmousets se trouve à Cléry-Saint-André, dont Mézières est commune partenaire — les familles macériennes peuvent y prétendre à ce titre. Le centre de loisirs et l’accueil périscolaire, eux, sont bien sur la commune.",
+      "source": "Mairie de Mézières-lez-Cléry — précision apportée par la commune, août 2026",
       "url": "",
       "categorie": "vie-communale"
     },
