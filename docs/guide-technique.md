@@ -468,7 +468,9 @@ Deux points de vigilance pour qui reprendra ce code :
 - **L'ordre du corpus est éditorial, pas aléatoire.** `_ordonner()` fait tourner les
   catégories à tour de rôle (`SV_ORDRE_CATEGORIES`), du plus surprenant au plus aride :
   deux questions d'urbanisme ne peuvent pas se suivre tant qu'il reste de la matière
-  ailleurs. Le mélange par graine ne joue qu'**à l'intérieur** d'une catégorie.
+  ailleurs. À l'intérieur d'une catégorie, l'ordre est celui de **déclaration du corpus** —
+  aucun hasard. Un mélange y avait été essayé puis retiré : il plaçait au premier jour une
+  question sur les jours fériés en France, alors que la rubrique porte sur la commune.
   Motif : avec 18 entrées d'urbanisme sur 75, un mélange aveugle ouvrait la rubrique sur
   des règles de construction — utile, mais mauvaise entrée en matière.
 - **La rotation compte les jours depuis `SV_ORIGINE`**, pas depuis le 1er janvier. Avec

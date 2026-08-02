@@ -105,7 +105,8 @@ Alors la rubrique n'est pas affichée
   habitants voient le même fait le même jour.
 - **RG-16.5 — L'ordre est éditorial.** Les catégories passent à tour de rôle, du plus
   surprenant au plus aride : deux questions d'urbanisme ne peuvent pas se suivre tant
-  qu'il reste de la matière ailleurs. Le hasard ne joue qu'à l'intérieur d'une catégorie.
+  qu'il reste de la matière ailleurs. À l'intérieur d'une catégorie, l'ordre est celui de
+  déclaration du corpus — aucun hasard, pour que la mairie sache ce qui passera quand.
 - **RG-16.6 — L'origine et la graine ne changent plus.** Les modifier ferait rejouer des
   faits déjà vus et en sauterait d'autres.
 - **RG-16.7 — Une seule réponse par appareil et par fait**, sans retour arrière. La
