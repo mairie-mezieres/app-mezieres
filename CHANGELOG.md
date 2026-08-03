@@ -5,6 +5,75 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.55] — 3 août 2026
+
+### Ajouté
+- **Corpus « Le saviez-vous ? » : 75 → 184 entrées** (172 sourcées + 12 calculées), soit
+  six mois sans répétition. L'effort a porté sur les catégories les plus pauvres —
+  santé, transports, intercommunalité, habitat, environnement, vie communale — et non sur
+  l'urbanisme, déjà fourni. Les nouvelles entrées sont ajoutées **en fin de leur catégorie**,
+  l'ordre de déclaration valant ordre de passage (RG-16.5).
+- **Deux nouvelles catégories, `histoire` et `patrimoine`**, insérées dans
+  `SV_ORDRE_CATEGORIES` après `decouverte`. Elles ne pouvaient pas rejoindre `decouverte` :
+  le corpus fixe est concaténé **avant** les entrées calculées, si bien que des entrées
+  `decouverte` du JSON se seraient placées en tête de rotation — à rebours de la RG-16.5.
+- **Cinq entrées calculées** dans `SV_CALCULES` (`js/mat-saviez-vous.js`), toutes en
+  arithmétique pure dérivée des seules coordonnées de la commune : vitesse d'entraînement par
+  la rotation terrestre, tour du monde au parallèle de Mézières, longueur d'un degré de
+  longitude, distance au méridien de Greenwich, antipode.
+- **`revue-saviez-vous.html`** — page de relecture du corpus pour la mairie : question,
+  réponse, explication, source et **date de passage**, dans l'ordre réel de rotation, avec
+  filtres et mise en page d'impression. Elle interroge `window.matSaviezVousInventaire()`
+  plutôt que de réordonner le corpus de son côté : une seconde implémentation divergerait, et
+  la revue mentirait alors sur ce que voient les habitants. L'ADR-0012 exigeait cette relecture
+  **avant** la fusion ; jusqu'ici rien ne la rendait praticable.
+- **Trois tests Playwright** sur la page de revue (exhaustivité, filtre, axe-core).
+
+### Corrigé
+Trois erreurs relevées par la mairie sur la première version du corpus, et corrigées
+**partout où elles vivaient** — pas seulement dans le corpus :
+
+- **L'eau potable est gérée par le C3M**, syndicat intercommunal d'eau et d'assainissement
+  dont le siège est à Mézières (36 rue du Bourg), et non par la Communauté de communes.
+  Corrigé dans `data/saviez-vous.json`, dans `js/mat-guide-arrivee.js` et dans la règle
+  `energie_eau_compteurs` de `lib/mel.js` côté backend — MEL racontait la même erreur.
+- **Les mairies à station biométrique les plus proches sont Meung-sur-Loire, Ardon et
+  Orléans.** La divergence signalée dans l'ADR-0012 est tranchée : `data/mel-tree.json`,
+  édité par la mairie, fait foi. `lib/mel.js` disait Saint-Hilaire-Saint-Mesmin et
+  Cléry-Saint-André — commune qui n'est pas équipée ; corrigé côté backend aussi.
+- **L'inscription en déchèterie se fait par immatriculation** : une seule inscription vaut
+  pour tous les sites, mais chaque véhicule utilisé doit être enregistré.
+
+### Retiré
+- L'entrée calculée sur le **midi solaire** : sa formulation dépendait de la date
+  (heure d'été/hiver, et l'équation du temps décale le résultat de ±16 min selon la
+  saison). Un fait du jour ne peut pas être approximatif de façon variable.
+- Les trois questions sur les **prescriptions du Clos de Manthelon** : trop spécifiques à
+  un lotissement pour une rubrique lue par toute la commune.
+- Les questions portant sur des **tarifs communaux** (barnums, tables et chaises,
+  concessions de cimetière) : elles vieillissent au premier vote du conseil.
+- Deux questions de détail : le seuil de cinq réponses avant affichage du pourcentage, et
+  la hauteur de clôture au droit des carrefours.
+
+### Équilibre
+- Ramené à 84 « oui » pour 88 « non » sur le corpus sourcé, pour qu'aucune des deux
+  réponses ne devienne le réflexe gagnant.
+
+### Notes
+- Les sources externes visées (INSEE, IGN Géoplateforme, base POP/Mérimée, Hub'Eau,
+  VigiEau, Vigicrues, Wikipédia) **n'ont pas pu être ouvertes** depuis l'environnement de
+  développement : la politique d'egress refuse le CONNECT vers ces hôtes. Aucune entrée n'a
+  donc été rédigée à partir d'elles — la règle « pas de source ouvrable, pas d'entrée » l'a
+  emporté sur l'objectif de volume.
+- Le déblocage est venu de la mairie, qui a **fourni elle-même les extraits** : le texte de
+  la page Wikipédia de la commune (toponymie, administration, occupation des sols,
+  recensements depuis 1793, base Mérimée, personnalités) et le **bulletin 2026 du C3M**
+  (qualité de l'eau, gestes d'économie, loi Warsmann). C'est le mode d'emploi pour la suite :
+  tant que la politique réseau ne s'ouvre pas, le corpus s'enrichit d'exports transmis par
+  la commune, pas de données devinées.
+
+---
+
 ## [4.54] — 2 août 2026
 
 ### Ajouté

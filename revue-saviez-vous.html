@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1a3d2b">
+<title>Revue du corpus « Le saviez-vous ? » — MAT</title>
+<style>
+:root{
+  --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--mist:#d8f3dc;
+  --gold:#d4a843;--cream:#faf7f2;--warm:#f4f0ea;
+  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.10);
+  --oui:#166534;--oui-bg:#dcfce7;--non:#9a3412;--non-bg:#ffedd5;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--warm);color:var(--text);
+  font-family:'Nunito','Segoe UI',system-ui,sans-serif;font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+a{color:var(--leaf)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.hd{background:linear-gradient(160deg,var(--forest),var(--leaf));color:var(--cream);
+  padding:26px 20px calc(26px + env(safe-area-inset-top,0px));text-align:center}
+.hd h1{font-size:1.35rem;font-weight:900;line-height:1.25}
+.hd p{font-size:.86rem;color:rgba(255,255,255,.86);margin-top:8px;max-width:52rem;margin-left:auto;margin-right:auto}
+.hd a{color:#fff}
+
+.wrap{max-width:60rem;margin:0 auto;padding:18px 16px 60px}
+
+.avert{background:#fffbeb;border:1px solid #fcd34d;border-left:5px solid var(--gold);
+  border-radius:12px;padding:13px 15px;font-size:.83rem;line-height:1.6;margin-bottom:18px}
+.avert strong{color:#92400e}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;text-align:center}
+.stat b{display:block;font-size:1.4rem;font-weight:900;color:var(--forest);line-height:1.2}
+.stat span{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+
+.filtres{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:12px 14px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.filtres label{font-size:.76rem;font-weight:800;color:var(--muted)}
+.filtres input[type=search],.filtres select{font:inherit;font-size:.86rem;padding:7px 10px;
+  border:1px solid var(--border);border-radius:9px;background:var(--cream);color:var(--text);min-width:0}
+.filtres input[type=search]{flex:1 1 12rem}
+.filtres button{font:inherit;font-size:.78rem;font-weight:800;padding:7px 13px;border:1px solid var(--border);
+  border-radius:9px;background:var(--mist);color:var(--forest);cursor:pointer}
+
+.cat-liste{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.cat-pastille{font-size:.7rem;font-weight:800;background:var(--card);border:1px solid var(--border);
+  border-radius:999px;padding:4px 11px;color:var(--muted)}
+
+.entree{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;margin-bottom:11px;break-inside:avoid}
+.entree.aujourdhui{border:2px solid var(--sage);background:#f6fffa}
+.e-haut{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:7px}
+.e-rang{font-size:.7rem;font-weight:900;color:#fff;background:var(--leaf);border-radius:999px;padding:2px 9px}
+.e-date{font-size:.7rem;font-weight:800;color:var(--muted)}
+.e-cat{font-size:.66rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--forest);background:var(--mist);border-radius:999px;padding:2px 9px}
+.e-tag{font-size:.66rem;font-weight:800;border-radius:999px;padding:2px 9px;background:var(--warm);color:var(--muted)}
+.e-tag.alerte{background:#fee2e2;color:#991b1b}
+.e-q{font-size:1rem;font-weight:900;color:var(--forest);line-height:1.4}
+.e-rep{display:inline-block;font-size:.78rem;font-weight:900;border-radius:8px;padding:3px 11px;margin:9px 0 6px}
+.e-rep.oui{background:var(--oui-bg);color:var(--oui)}
+.e-rep.non{background:var(--non-bg);color:var(--non)}
+.e-expli{font-size:.87rem;line-height:1.65}
+.e-src{font-size:.74rem;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);word-break:break-word}
+.e-id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem;color:var(--muted)}
+
+.vide{text-align:center;padding:40px 16px;color:var(--muted);font-size:.9rem}
+
+@media print{
+  body{background:#fff}
+  .hd{background:none;color:#000;border-bottom:2px solid #000}
+  .hd a,.filtres,.avert{display:none!important}
+  .entree{border:1px solid #999;box-shadow:none;margin-bottom:7px;padding:9px 11px}
+  .e-rang,.e-cat{background:none;color:#000;border:1px solid #999}
+  .stat b{color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <h1>🤔 Revue du corpus « Le saviez-vous ? »</h1>
+  <p>La liste complète des questions, dans l’ordre exact où elles passeront, avec leur réponse
+     et leur source. Cette page sert à <strong>relire le corpus avant publication</strong>.
+     Elle n’est pas destinée aux habitants. — <a href="./">retour à l’application</a></p>
+</header>
+
+<div class="wrap">
+
+  <div class="avert">
+    <strong>À quoi sert cette page.</strong> L’ADR-0012 exige que chaque entrée soit relue par la
+    mairie <em>avant</em> la fusion, et non après : lors de la mise en service, deux erreurs
+    factuelles sont passées en production faute de cette relecture. Une entrée dont la source est
+    « Mairie de Mézières-lez-Cléry — … » vaut <strong>demande de vérification</strong>, pas
+    certificat de conformité : c’est de cette base qu’était venue l’erreur sur la crèche.
+    Signalez toute erreur à la mairie — elle sera corrigée dans le corpus versionné.
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div class="cat-liste" id="cats"></div>
+
+  <div class="filtres">
+    <input type="search" id="q" placeholder="Rechercher dans les questions, réponses et sources…"
+           aria-label="Rechercher dans le corpus">
+    <label for="cat">Catégorie</label>
+    <select id="cat" aria-label="Filtrer par catégorie"><option value="">toutes</option></select>
+    <label for="rep">Réponse</label>
+    <select id="rep" aria-label="Filtrer par réponse">
+      <option value="">les deux</option><option value="oui">Oui</option><option value="non">Non</option>
+    </select>
+    <button type="button" id="imprimer">🖨️ Imprimer</button>
+  </div>
+
+  <main id="liste" aria-live="polite"><div class="vide">Chargement du corpus…</div></main>
+</div>
+
+<script src="js/mat-config.js?v=1"></script>
+<script src="js/mat-utils.js?v=4.3.5"></script>
+<script src="js/mat-jours-feries.js?v=4.0.1"></script>
+<script src="js/mat-saviez-vous.js?v=1.3.0"></script>
+<script>
+(function () {
+  'use strict';
+
+  // Cette page ne réimplémente NI l'ordre du corpus NI les entrées calculées :
+  // elle interroge js/mat-saviez-vous.js, qui est aussi ce que voient les
+  // habitants. Une seconde implémentation finirait par diverger, et la revue
+  // mentirait alors sur ce qui sera réellement affiché.
+  var TOUT = [];
+
+  var MOIS = ['janvier','février','mars','avril','mai','juin',
+              'juillet','août','septembre','octobre','novembre','décembre'];
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function frDate(d) {
+    return d.getUTCDate() + ' ' + MOIS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  }
+
+  function carte(item) {
+    var e = item.entree;
+    var p = window.matSaviezVousDatePassage(item.rang, TOUT.length);
+    var tags = '';
+    if (item.calculee) tags += '<span class="e-tag">calculée</span>';
+    if (item.indisponible) tags += '<span class="e-tag alerte">non résoluble ici</span>';
+    if (!item.indisponible && !e.url) tags += '<span class="e-tag">source sans lien</span>';
+    if (p.aujourdhui) tags += '<span class="e-tag">🟢 aujourd’hui</span>';
+
+    if (item.indisponible) {
+      return '<article class="entree">'
+        + '<div class="e-haut"><span class="e-rang">n° ' + (item.rang + 1) + '</span>'
+        + '<span class="e-cat">' + esc(e.categorie) + '</span>' + tags + '</div>'
+        + '<div class="e-q">Entrée calculée non résoluble dans ce navigateur.</div>'
+        + '<div class="e-src"><span class="e-id">' + esc(e.id) + '</span></div>'
+        + '</article>';
+    }
+
+    var src = e.url
+      ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener noreferrer">' + esc(e.source) + ' ↗</a>'
+      : esc(e.source);
+
+    return '<article class="entree' + (p.aujourdhui ? ' aujourdhui' : '') + '">'
+      + '<div class="e-haut">'
+      +   '<span class="e-rang">n° ' + (item.rang + 1) + '</span>'
+      +   '<span class="e-date">' + (p.dejaVue ? 'revient le ' : 'passe le ') + frDate(p.date) + '</span>'
+      +   '<span class="e-cat">' + esc(e.categorie) + '</span>' + tags
+      + '</div>'
+      + '<div class="e-q">' + esc(e.question) + '</div>'
+      + '<div class="e-rep ' + (e.reponse ? 'oui' : 'non') + '">Réponse : '
+      +   (e.reponse ? 'Oui' : 'Non') + '</div>'
+      + '<div class="e-expli">' + esc(e.explication) + '</div>'
+      + '<div class="e-src">Source : ' + src + ' · <span class="e-id">' + esc(e.id) + '</span></div>'
+      + '</article>';
+  }
+
+  function filtrer() {
+    var q = document.getElementById('q').value.trim().toLowerCase();
+    var cat = document.getElementById('cat').value;
+    var rep = document.getElementById('rep').value;
+
+    var vus = TOUT.filter(function (it) {
+      var e = it.entree;
+      if (cat && e.categorie !== cat) return false;
+      if (rep === 'oui' && e.reponse !== true) return false;
+      if (rep === 'non' && e.reponse !== false) return false;
+      if (!q) return true;
+      return [e.question, e.explication, e.source, e.id].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+
+    document.getElementById('liste').innerHTML = vus.length
+      ? vus.map(carte).join('')
+      : '<div class="vide">Aucune entrée ne correspond à ce filtre.</div>';
+  }
+
+  function resume() {
+    var oui = 0, non = 0, sansLien = 0, calc = 0, cats = {};
+    TOUT.forEach(function (it) {
+      var e = it.entree;
+      if (it.indisponible) return;
+      if (e.reponse) oui++; else non++;
+      if (!e.url) sansLien++;
+      if (it.calculee) calc++;
+      cats[e.categorie] = (cats[e.categorie] || 0) + 1;
+    });
+
+    document.getElementById('stats').innerHTML =
+        '<div class="stat"><b>' + TOUT.length + '</b><span>entrées</span></div>'
+      + '<div class="stat"><b>' + oui + '</b><span>réponses Oui</span></div>'
+      + '<div class="stat"><b>' + non + '</b><span>réponses Non</span></div>'
+      + '<div class="stat"><b>' + calc + '</b><span>calculées</span></div>'
+      + '<div class="stat"><b>' + Object.keys(cats).length + '</b><span>catégories</span></div>'
+      + '<div class="stat"><b>' + Math.round(TOUT.length / 30.4) + '</b><span>mois avant répétition</span></div>';
+
+    var noms = Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a]; });
+    document.getElementById('cats').innerHTML = noms.map(function (c) {
+      return '<span class="cat-pastille">' + esc(c) + ' · ' + cats[c] + '</span>';
+    }).join('') + (sansLien ? '<span class="cat-pastille">sans lien de source · ' + sansLien + '</span>' : '');
+
+    var sel = document.getElementById('cat');
+    noms.slice().sort().forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+  }
+
+  ['q', 'cat', 'rep'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', filtrer);
+  });
+  document.getElementById('imprimer').addEventListener('click', function () { window.print(); });
+
+  window.matSaviezVousInventaire()
+    .then(function (liste) {
+      TOUT = liste;
+      resume();
+      filtrer();
+    })
+    .catch(function () {
+      document.getElementById('liste').innerHTML =
+        '<div class="vide">Le corpus n’a pas pu être chargé. Vérifiez que <code>data/saviez-vous.json</code> est accessible.</div>';
+    });
+})();
+</script>
+</body>
+</html>

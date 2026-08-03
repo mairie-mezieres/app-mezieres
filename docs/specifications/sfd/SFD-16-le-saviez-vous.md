@@ -25,6 +25,7 @@ n'intervient au moment de l'affichage — voir [ADR-0012](../../adr/0012-saviez-
 - **US-16.4** — En tant que citoyen, je veux savoir combien d'habitants ont répondu comme moi afin de me situer.
 - **US-16.5** — En tant que citoyen, je ne veux pas que cette rubrique encombre mon écran d'accueil.
 - **US-16.6** — En tant qu'administrateur, je veux ajouter des faits sur la commune sans passer par un développeur.
+- **US-16.7** — En tant que mairie, je veux **relire tout le corpus avant sa publication** — question, réponse, source et date de passage — afin de signer ce que l'application affirmera aux habitants.
 
 ## 4. Critères d'acceptation (Gherkin)
 
@@ -90,6 +91,18 @@ Alors elle occupe une seule ligne
 Alors la rubrique n'est pas affichée
 ```
 
+### US-16.7 — La relecture par la mairie
+
+```gherkin
+Étant donné que j'ouvre la page revue-saviez-vous.html
+Alors le corpus complet s'affiche dans l'ordre exact de passage
+Et chaque entrée montre sa question, sa réponse, son explication, sa source et sa date de passage
+Et les entrées calculées sont résolues et signalées comme telles
+
+Étant donné qu'une entrée calculée ne peut pas se résoudre dans ce navigateur
+Alors elle est affichée signalée « non résoluble » — jamais masquée silencieusement
+```
+
 ## 5. Règles de gestion
 
 - **RG-16.1 — Aucune IA à l'exécution.** Le fait affiché provient du corpus versionné
@@ -119,6 +132,13 @@ Alors la rubrique n'est pas affichée
   erronée).
 - **RG-16.10 — Repliée par défaut.** L'ouverture est un geste volontaire ; rien
   d'agréable-mais-facultatif ne se place au-dessus du bouton Urgences.
+- **RG-16.12 — Une source doit être ouvrable pour être citée.** Une donnée dont la source
+  n'a pas pu être consultée ne donne pas lieu à une entrée — quel que soit l'objectif de
+  volume. On ne déduit jamais un chiffre, et on ne recopie pas de mémoire.
+- **RG-16.13 — Relecture avant fusion.** Le corpus est soumis à la mairie via
+  `revue-saviez-vous.html` **avant** le merge, pas après. La page présente l'ordre réel de
+  passage ; elle interroge le module de la rubrique et ne réordonne rien de son côté, faute
+  de quoi elle finirait par montrer autre chose que ce que voient les habitants.
 - **RG-16.11 — Aucune donnée personnelle.** Ni la question, ni la réponse, ni la
   navigation ne sont rattachées à une identité : seul l'identifiant technique
   d'appareil sert à la déduplication.
@@ -129,6 +149,7 @@ Alors la rubrique n'est pas affichée
 |---|---|---|
 | Corpus | `data/saviez-vous.json` (dépôt, précaché) | `id`, `question`, `reponse` (booléen), `explication`, `source`, `url`, `categorie` |
 | Entrées calculées | `js/mat-saviez-vous.js` → `SV_CALCULES` | générateurs purs (distances, jours fériés) |
+| Page de revue | `revue-saviez-vous.html` | lecture seule ; consomme `window.matSaviezVousInventaire()` et `window.matSaviezVousDatePassage()` |
 | Réponse du jour | `localStorage` → `mat_sv_v1` | `{ jour, id, reponse }` |
 | Déduplication | Redis → `mat:sv:votants:{id}` | ensemble de `deviceId` |
 | Répartition | Redis → `mat:sv:count:{id}` | `{ oui, non }` |

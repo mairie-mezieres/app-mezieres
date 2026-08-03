@@ -65,9 +65,10 @@ une déclaration pour une fenêtre de toit » est une information utile mais une
 mauvaise entrée en matière — la rubrique doit donner envie d'être ouverte.
 
 `_ordonner()` fait donc tourner les catégories à tour de rôle, dans un ordre
-allant du plus surprenant au plus aride : découvertes calculées, l'application
-elle-même, la vie communale, l'environnement, le pratique, les transports, la
-santé, les déchets, l'intercommunalité, l'habitat, les démarches, l'urbanisme.
+allant du plus surprenant au plus aride : découvertes calculées, l'histoire de la
+commune, l'application elle-même, le patrimoine, la vie communale,
+l'environnement, le pratique, les transports, la santé, les déchets,
+l'intercommunalité, l'habitat, les démarches, l'urbanisme.
 Deux entrées de même catégorie ne peuvent pas se suivre tant qu'il reste de la
 matière ailleurs. À l'intérieur d'une catégorie, l'ordre est celui de **déclaration du corpus**.
 Un mélange y avait été essayé puis retiré : il plaçait au premier jour une question
@@ -100,7 +101,8 @@ d'une année à l'autre ne provoque plus de saut.
 - **Le corpus doit être écrit à la main.** C'est le coût réel de cette décision,
   et il est assumé. À la livraison initiale, 46 entrées sourcées et 7 calculées,
   soit moins de deux mois avant répétition — l'objectif de 365 se construira
-  dans la durée.
+  dans la durée. Deuxième passe (août 2026) : 172 sourcées et 12 calculées, soit
+  six mois.
 - Les entrées dépendant de sources externes (INSEE, IGN, patrimoine) n'ont pas
   pu être rédigées dans l'environnement de développement, dont la politique
   réseau bloque l'accès à ces sources. Elles demandent soit un accès réseau,
@@ -138,6 +140,95 @@ eu lieu.** L'ADR posait la règle, le processus ne l'a pas appliquée — les en
 été livrées puis relues. La page de revue générée pour la mairie (liste complète,
 question, réponse, source, ordre de passage) doit être soumise **avant** la fusion,
 pas après. Une règle qu'aucune étape n'impose n'est qu'une intention.
+
+**Ce que la deuxième passe a appris (août 2026) :**
+
+L'objectif fixé était de passer à environ 250 entrées en s'appuyant sur l'INSEE
+(recensements de la commune depuis 1793), l'IGN (Cassini, état-major, vues
+aériennes 1950-1965), la base POP/Mérimée, Hub'Eau, VigiEau, Vigicrues et
+Wikipédia. **Aucune de ces sources n'était joignable** : la politique d'egress de
+l'environnement de développement répond 403 au CONNECT vers ces hôtes — vérifié
+un par un, y compris `geo.api.gouv.fr`, `service-public.fr` et `legifrance.gouv.fr`.
+Seul GitHub passe.
+
+La règle a tranché toute seule : **une source qu'on ne peut pas ouvrir ne produit
+pas d'entrée.** Le corpus s'est donc étendu à partir des seules sources
+consultables depuis le dépôt — règlement du PLU (`data/plu-data.json`), arbre de
+décision de MEL (`data/mel-tree.json`), trombinoscope, guide d'arrivée, annuaires
+des associations et des entreprises, documentation de MAT. 77 entrées, et non 175.
+
+Deux enseignements :
+
+1. **L'écart entre l'objectif et le livrable est une donnée, pas un échec à
+   masquer.** Atteindre 250 aurait supposé d'écrire des chiffres de mémoire —
+   exactement ce que cet ADR interdit, et exactement ce qui a produit l'erreur sur
+   la crèche. Le volume est négociable, la vérification ne l'est pas.
+2. **Le dépôt est une source sous-exploitée, mais ce n'est pas une source
+   certifiée.** Le règlement du PLU et l'arbre de décision de MEL sont validés par
+   la mairie sur le fond ; ils vieillissent. Toute entrée qui en provient cite la
+   mairie et vaut demande de relecture.
+
+Deux divergences de double source ont été relevées au passage et **volontairement
+exclues** du corpus, faute d'arbitrage : le rang des deux premiers adjoints (déjà
+signalé plus bas), et la liste des mairies équipées d'une station biométrique la
+plus proche — `lib/mel.js` disait Saint-Hilaire-Saint-Mesmin / Cléry-Saint-André /
+Orléans, `data/mel-tree.json` dit Meung-sur-Loire / Ardon / Orléans.
+
+**La seconde a été tranchée par la mairie dès la relecture : `mel-tree.json` fait
+foi**, parce que c'est le document qu'elle édite elle-même. `lib/mel.js` a été
+aligné dessus, pour la CNI comme pour le passeport. La leçon est la même qu'en
+août pour la crèche : la divergence n'a pas été inventée par le corpus, elle
+dormait dans la base depuis longtemps — écrire des questions dessus est ce qui l'a
+rendue visible. **Le corpus est devenu, incidemment, un révélateur de double
+source.**
+
+### La relecture a bien eu lieu, et elle a servi
+
+Contrairement à la mise en service, la mairie a relu **avant** la fusion, sur la
+page de revue. Trois erreurs en sont sorties, dont deux qui vivaient ailleurs que
+dans le corpus :
+
+1. **L'eau potable relève du C3M**, syndicat intercommunal d'eau et
+   d'assainissement dont le siège est à Mézières même (36 rue du Bourg), et non de
+   la Communauté de communes. L'erreur était dans le corpus, dans
+   `js/mat-guide-arrivee.js`, **et** dans la règle `energie_eau_compteurs` de
+   `lib/mel.js` : MEL la racontait aux habitants. Les trois sont corrigés.
+2. **Les mairies à station biométrique** — voir ci-dessus.
+3. **L'inscription en déchèterie se fait par immatriculation** : une inscription
+   vaut pour tous les sites, mais chaque véhicule doit être enregistré. Nuance
+   absente de la formulation initiale.
+
+Aucune de ces trois erreurs n'aurait été rattrapée par le test d'intégrité : elles
+sont toutes correctement sourcées et bien formées. **Le test garantit la forme, la
+relecture garantit le fond — l'un ne remplace pas l'autre.**
+
+Un point reste ouvert et n'a volontairement pas été tranché ici : le C3M s'intitule
+« Syndicat Intercommunal d'Eau **et d'Assainissement** », alors que `mel-tree.json`
+attribue l'assainissement collectif et le SPANC à la CCTVL depuis 2018. Le corpus
+n'affirme rien sur ce point. À clarifier par la mairie.
+
+### Ce que la mairie a débloqué en fournissant des sources
+
+Le plafond de la première passe n'était pas la rédaction, c'était l'accès. La
+mairie l'a levé en **transmettant elle-même les documents** : le texte de la page
+Wikipédia de la commune et le bulletin 2026 du C3M. D'un coup, l'histoire du
+village (le décret de 1918, les recensements depuis 1793, le tumulus de la Butte
+des élus, Marlon Brando) et la qualité de l'eau sont devenues rédigeables.
+
+C'est le mode opératoire à retenir tant que la politique réseau ne s'ouvre pas :
+**le corpus s'enrichit de documents transmis, pas de données devinées.** Un bulletin
+municipal, un compte rendu de conseil, une plaquette de syndicat valent mieux qu'un
+accès API — ils sont déjà relus.
+
+**La relecture avant fusion est enfin outillée.** L'ADR posait la règle depuis le
+premier jour ; rien ne la rendait praticable — personne ne relit un JSON de 1 300
+lignes en devinant l'ordre de passage. `revue-saviez-vous.html` affiche le corpus
+complet dans l'ordre réel, avec la date à laquelle chaque question tombera, sa
+réponse et sa source. Elle **n'implémente pas** l'ordonnancement : elle appelle
+`window.matSaviezVousInventaire()`, c'est-à-dire le module que voient les
+habitants. Une seconde implémentation aurait divergé, et la revue aurait fini par
+certifier autre chose que ce qui est affiché — la classe de bug que le dépôt
+connaît déjà pour la liste des associations et pour l'opérateur fibre.
 
 **Points de vigilance pour les futures évolutions :**
 

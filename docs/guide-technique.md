@@ -481,6 +481,49 @@ Deux points de vigilance pour qui reprendra ce code :
   des faits déjà vus et en sauterait d'autres. Tout le village voit le même fait le même
   jour, c'est un engagement implicite.
 
+#### Relire le corpus avant de le fusionner
+
+`revue-saviez-vous.html` liste le corpus complet dans l'**ordre réel de passage**, avec la
+date à laquelle chaque question tombera, sa réponse, son explication et sa source. C'est
+l'outil de la relecture exigée par la RG-16.13 — qui a lieu **avant** le merge, pas après :
+la mise en service a montré qu'une règle qu'aucune étape n'impose n'est qu'une intention.
+
+La page **ne réordonne rien de son côté**. Elle appelle deux fonctions exposées par le
+module :
+
+| Fonction | Rôle |
+|---|---|
+| `window.matSaviezVousInventaire()` | Promesse → corpus ordonné, entrées calculées résolues, marquées `calculee` / `indisponible` |
+| `window.matSaviezVousDatePassage(rang, taille)` | `{ jour, date, dejaVue, aujourdhui }` pour un rang donné |
+
+C'est délibéré : une seconde implémentation de `_ordonner()` finirait par diverger, et la
+revue certifierait alors autre chose que ce que voient les habitants. Même raison d'être
+que la source unique pour les associations ou pour l'opérateur fibre. Si vous touchez à
+l'ordonnancement, la revue suit automatiquement — et les tests
+`revue : …` de `tests/e2e/saviez-vous.spec.js` le vérifient.
+
+⚠️ La page est **hors précache** : c'est un outil de la mairie, pas un écran habitant. Elle
+n'a donc pas à être disponible hors ligne, et n'alourdit pas l'app installée.
+
+**Ajouter des entrées.** Elles se placent **à la fin de leur catégorie** (l'ordre du tableau
+est l'ordre de passage) et chacune doit porter une source **réellement consultée**. Si la
+source ne peut pas être ouverte, l'entrée ne s'écrit pas : c'est la RG-16.12.
+
+INSEE, IGN, POP/Mérimée, Hub'Eau et Wikipédia sont inaccessibles depuis l'environnement de
+développement (403 au CONNECT). Le contournement qui marche n'est pas d'aller les chercher,
+c'est que **la mairie transmette le document** — un bulletin municipal, un extrait de page,
+une plaquette de syndicat. C'est ainsi que sont nées les catégories `histoire` et
+`patrimoine` et la série sur l'eau : à partir d'un texte fourni, pas d'un accès réseau.
+
+⚠️ **Une nouvelle catégorie doit être déclarée dans `SV_ORDRE_CATEGORIES`**, sinon elle est
+reléguée en fin de rotation par ordre alphabétique. Et attention au point suivant :
+`_construire()` fait `fixes.concat(calc)`, donc pour une catégorie qui contient **à la fois**
+des entrées du JSON et des entrées calculées, les entrées du JSON passent **avant** les
+calculées — quelle que soit la date d'ajout. C'est pourquoi `histoire` et `patrimoine` sont
+des catégories distinctes de `decouverte` : y verser des entrées JSON les aurait placées en
+tête de rotation, devant les distances calculées qui ouvrent la rubrique depuis sa mise en
+service.
+
 ### Régions `aria-live` — la règle du silence
 
 `js/mat-saviez-vous.js` introduit la **première région `aria-live` du dépôt**
