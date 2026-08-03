@@ -401,7 +401,7 @@ liste à cocher**.
 
 | Étape | Ce qu'on y trouve |
 |---|---|
-| **📦 Dès votre arrivée** | Se présenter en mairie, changement d'adresse, carte grise, ouverture des compteurs d'eau/électricité/gaz, demande des bacs gris et jaune, inscription à la déchetterie, éligibilité à la fibre |
+| **📦 Dès votre arrivée** | Se présenter en mairie, changement d'adresse, carte grise, ouverture des compteurs d'eau/électricité/gaz, demande des bacs gris et jaune, inscription à la déchetterie, raccordement à la fibre (réseau public Lysséo — et déclaration de l'adresse auprès de XpFibre / Loiret THD si le logement est une construction neuve) |
 | **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine/crèche, médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
 | **🌳 Bien vivre à Mézières** | Associations, entreprises et artisans, bus Rémi ligne 8, conseil municipal, règles avant travaux, aides à la rénovation (OPAH) |
 | **🔔 Rester informé** | Notifications, agenda, signalements, boîte à idées |

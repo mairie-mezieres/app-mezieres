@@ -467,7 +467,8 @@ const URL_LABELS = {
   'mezieres-lez-clery.fr':         '🌐 Site de la commune',
   'ccterresduvaldeloire.fr':        '🏘️ Site CCTVL',
   'portail-usagers.ccterresduvaldeloire.fr': '🔑 Portail usagers CCTVL',
-  'valdeloire-fibre.fr':            '🌐 Val de Loire Fibre',
+  'lysseo.fr':                      '🌐 Lysséo — réseau fibre du Loiret',
+  'xpfibre.com':                    '🌐 XpFibre / Loiret THD',
   'service-public.fr':              '📋 Service-Public.fr',
   'doctolib.fr':                    '🏥 Prendre RDV Doctolib',
   'remi-centrevaldeloire.fr':       '🚌 Horaires Rémi',
@@ -484,7 +485,7 @@ function urlToLabel(url) {
 }
 const KNOWN_DOMAINS = [
   'mezieres-lez-clery.fr','ccterresduvaldeloire.fr','portail-usagers.ccterresduvaldeloire.fr',
-  'valdeloire-fibre.fr','service-public.fr','doctolib.fr','remi-centrevaldeloire.fr',
+  'lysseo.fr','xpfibre.com','service-public.fr','doctolib.fr','remi-centrevaldeloire.fr',
   'mairie-clery-saint-andre.fr'
 ];
 

@@ -217,8 +217,8 @@ test('MEL : adresses cliquables dans les réponses, sans faux positif', async ({
   const hrefs = (html) => Array.from(html.matchAll(/href="([^"]+)"/g), (m) => m[1]);
 
   // Domaine écrit nu → lien https, c'est le cas qui manquait.
-  expect(hrefs(await page.evaluate(() => window._melLinkify('Vérifiez sur valdeloire-fibre.fr ou appelez.'))))
-    .toEqual(['https://valdeloire-fibre.fr']);
+  expect(hrefs(await page.evaluate(() => window._melLinkify('Vérifiez sur lysseo.fr ou appelez.'))))
+    .toEqual(['https://lysseo.fr']);
 
   // Ponctuation collée : elle ne doit pas entrer dans le href.
   expect(hrefs(await page.evaluate(() => window._melLinkify('Téléservice (https://www.service-public.gouv.fr/particuliers/vosdroits/R16396) ou en mairie.'))))
