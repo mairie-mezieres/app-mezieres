@@ -448,7 +448,7 @@
       "id": "cni-mezieres",
       "question": "Peut-on faire refaire sa carte d’identité à la mairie de Mézières ?",
       "reponse": false,
-      "explication": "Non. Il faut une mairie équipée d’une station biométrique — Cléry-Saint-André, Saint-Hilaire-Saint-Mesmin ou Orléans par exemple. Le service officiel de l’ANTS géolocalise la plus proche.",
+      "explication": "Non. Il faut une mairie équipée d’une station biométrique : les plus proches sont Meung-sur-Loire, Ardon ou Orléans. Le service officiel de l’ANTS géolocalise la plus proche et permet de prendre rendez-vous.",
       "source": "Agence nationale des titres sécurisés — géolocaliser une mairie habilitée",
       "url": "https://passeport.ants.gouv.fr/services/geolocaliser-une-mairie-habilitee",
       "categorie": "demarches"
@@ -547,9 +547,9 @@
       "id": "eau-cctvl",
       "question": "L’eau potable de Mézières est-elle gérée par la commune ?",
       "reponse": false,
-      "explication": "Non, par la Communauté de communes des Terres du Val de Loire, qui gère aussi l’assainissement collectif. Un seul numéro pour les deux : 02 38 44 59 35.",
-      "source": "Communauté de communes des Terres du Val de Loire",
-      "url": "https://www.ccterresduvaldeloire.fr",
+      "explication": "Non, par le C3M — le Syndicat Intercommunal d’Eau et d’Assainissement, qui dessert Cléry-Saint-André, Mareau-aux-Prés, Mézières-lez-Cléry et Les Muids. Contact : 02 38 45 35 64.",
+      "source": "C3M — Syndicat Intercommunal d’Eau et d’Assainissement, bulletin d’informations 2026",
+      "url": "",
       "categorie": "intercommunalite"
     },
     {
@@ -646,7 +646,7 @@
       "id": "dechetterie-une-inscription",
       "question": "Faut-il s’inscrire séparément à chaque déchetterie de la Communauté de communes ?",
       "reponse": false,
-      "explication": "Non, une seule inscription vaut pour tous les sites. Elle est obligatoire pour Cléry-Saint-André, Meung-sur-Loire et Saint-Ay, où l’accès se fait par lecture de plaque.",
+      "explication": "Non, une seule inscription vaut pour tous les sites — Cléry-Saint-André, Meung-sur-Loire et Saint-Ay, où l’accès se fait par lecture de plaque. En revanche, l’inscription se fait par immatriculation : chaque véhicule que vous utilisez doit être enregistré.",
       "source": "Communauté de communes des Terres du Val de Loire — gestion des accès déchetteries",
       "url": "https://portail-usagers.ccterresduvaldeloire.fr",
       "categorie": "dechets"
@@ -765,33 +765,6 @@
       "reponse": false,
       "explication": "Non, elle n’est plus proposée à la location. En revanche, la commune met à disposition des Macériens des barnums, des tables et des chaises.",
       "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
-      "url": "",
-      "categorie": "vie-communale"
-    },
-    {
-      "id": "barnum-tarif",
-      "question": "La commune loue-t-elle un barnum de 6 × 12 m pour moins de 150 € le week-end ?",
-      "reponse": true,
-      "explication": "Oui : 130 € le week-end pour le 6 × 12 m, et 110 € pour le 6 × 8 m. Un chèque de caution est demandé, restitué si aucune dégradation n’est constatée.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
-      "url": "",
-      "categorie": "vie-communale"
-    },
-    {
-      "id": "tables-chaises-tarif",
-      "question": "Une table et quatre chaises se louent-elles à la commune pour moins de 5 € le week-end ?",
-      "reponse": true,
-      "explication": "Oui : 2,50 € le week-end pour l’ensemble. De quoi équiper une communion sans se ruiner.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Location de matériel",
-      "url": "",
-      "categorie": "vie-communale"
-    },
-    {
-      "id": "cimetiere-concessions",
-      "question": "Une concession de cimetière de 50 ans coûte-t-elle exactement le double d’une concession de 30 ans ?",
-      "reponse": true,
-      "explication": "Oui : 300 € contre 150 €. Pour les concessions d’urnes, c’est 200 € contre 100 €.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Tarifs cimetière",
       "url": "",
       "categorie": "vie-communale"
     },
@@ -1066,24 +1039,6 @@
       "categorie": "environnement"
     },
     {
-      "id": "manthelon-arbre-250",
-      "question": "Au Clos de Manthelon, faut-il planter un arbre de haute tige tous les 250 m² ?",
-      "reponse": true,
-      "explication": "Oui, en plus des 30 % d’espaces verts. C’est l’un des rares endroits du règlement où le PLU prescrit une plantation, et non une interdiction.",
-      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
-      "url": "",
-      "categorie": "environnement"
-    },
-    {
-      "id": "manthelon-haie-varietes",
-      "question": "Au Clos de Manthelon, une haie sur rue doit-elle mêler au moins trois variétés ?",
-      "reponse": true,
-      "explication": "Oui, trois au minimum, doublées d’un grillage vert de 1,50 m maximum, en retrait de 80 cm de la limite. Les alignements de thuyas d’une seule essence n’y sont donc pas possibles.",
-      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
-      "url": "",
-      "categorie": "environnement"
-    },
-    {
       "id": "zone-a-cloture-bois",
       "question": "En zone agricole, la clôture doit-elle être faite de pieux de bois et de fils métalliques ?",
       "reponse": true,
@@ -1210,15 +1165,6 @@
       "categorie": "mat"
     },
     {
-      "id": "mat-sv-cinq-reponses",
-      "question": "Faut-il au moins cinq réponses d’habitants pour que le pourcentage s’affiche ?",
-      "reponse": true,
-      "explication": "Oui. En deçà, une proportion ne veut rien dire et serait trompeuse — et quand le chiffre n’est pas disponible, il n’est jamais remplacé par « 0 % ».",
-      "source": "Documentation de MAT — spécification SFD-16, « Le saviez-vous ? »",
-      "url": "",
-      "categorie": "mat"
-    },
-    {
       "id": "pacs-deux-formulaires",
       "question": "Le PACS se déclare-t-il avec un seul formulaire ?",
       "reponse": false,
@@ -1255,15 +1201,6 @@
       "categorie": "dechets"
     },
     {
-      "id": "ub1-toiture-tuiles",
-      "question": "Au Clos de Manthelon, le nombre de tuiles au mètre carré est-il imposé ?",
-      "reponse": true,
-      "explication": "Oui : au moins 22 tuiles plates en terre cuite par mètre carré, sur des pentes de 40 à 45°, avec le sens du faîtage fixé par le plan parcellaire. Les tuiles couleur ardoise y sont interdites.",
-      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — prescriptions du secteur Ub1, Clos de Manthelon",
-      "url": "",
-      "categorie": "urbanisme"
-    },
-    {
       "id": "abri-tole-ondulee",
       "question": "Peut-on couvrir son abri de jardin en tôle ondulée à Mézières ?",
       "reponse": false,
@@ -1278,15 +1215,6 @@
       "reponse": true,
       "explication": "Oui : en zone Ub, le blanc pur et les couleurs vives sont exclus. Le règlement n’y admet que les palettes traditionnelles.",
       "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlement de la zone Ub",
-      "url": "",
-      "categorie": "urbanisme"
-    },
-    {
-      "id": "carrefour-cloture-120",
-      "question": "Une clôture peut-elle monter à 1,50 m jusqu’au coin de la rue ?",
-      "reponse": false,
-      "explication": "Non : au droit des carrefours, la hauteur tombe à 1,20 m sur vingt mètres de part et d’autre — pour que l’on voie arriver les voitures.",
-      "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règles de clôture des zones Ua et Ub",
       "url": "",
       "categorie": "urbanisme"
     },
@@ -1307,6 +1235,321 @@
       "source": "PLU de Mézières-lez-Cléry approuvé le 30 janvier 2013 — règlements des zones 1AU et 2AU",
       "url": "",
       "categorie": "urbanisme"
+    },
+    {
+      "id": "nom-1918-poste",
+      "question": "Mézières a-t-elle pris le nom de « lez-Cléry » pour éviter des erreurs de courrier ?",
+      "reponse": true,
+      "explication": "Oui. En 1918, la Chambre de commerce de Paris demande que les localités homonymes complètent leur nom, pour la poste et le transport de marchandises. Le préfet du Loiret invite 82 communes à le faire, et Mézières devient Mézières-lez-Cléry par décret du 30 novembre 1918.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Politique et administration",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "nom-1918-refus",
+      "question": "Les 82 communes du Loiret invitées à compléter leur nom en 1918 ont-elles toutes accepté ?",
+      "reponse": false,
+      "explication": "Non : vingt-trois conseils municipaux ont refusé. Mézières, elle, a dit oui — d’où le « lez-Cléry » que nous portons encore.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Politique et administration",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "mezieres-en-sologne",
+      "question": "Le village s’est-il déjà appelé « Mézières en Sologne » ?",
+      "reponse": true,
+      "explication": "Oui, entre 1721 et 1784. La paroisse avait aussi été dite « de Saint Avy de Mézières », et « Maizières, païs de Sauloigne » en 1563.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Toponymie",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "toponymie-maceriae",
+      "question": "Le nom de Mézières est-il attesté depuis plus de mille ans ?",
+      "reponse": true,
+      "explication": "Oui : la forme latine « Maceriae » apparaît dès le Xe siècle, à propos d’une cellule que saint Avy s’y était constituée. On retrouve « Macherias » en 1022, puis « De Meseriis » en 1321.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Toponymie",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "cassini-mesierre",
+      "question": "Sur la carte de Cassini, le village s’écrivait-il déjà « Mézières » ?",
+      "reponse": false,
+      "explication": "Non : « Mesierre ». L’orthographe n’a été fixée qu’au fil des siècles — l’arrêté de 1801 retient « Mézières », le décret de 1918 y ajoute « lez-Cléry ».",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Toponymie",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "commune-1793",
+      "question": "Mézières est-elle une commune depuis la Révolution ?",
+      "reponse": true,
+      "explication": "Oui : la paroisse devient municipalité par le décret du 12 novembre 1789, puis « commune » au sens actuel par celui du 10 brumaire an II — le 31 octobre 1793.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Politique et administration",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "district-beaugency",
+      "question": "En 1789, Mézières dépendait-elle du district d’Orléans ?",
+      "reponse": false,
+      "explication": "Non, de celui de Beaugency, dans le canton de Cléry et le département du Loiret — alors que sous l’Ancien Régime, tout la rattachait à Orléans : le diocèse, le bailliage, le gouvernement et la généralité.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Circonscriptions de rattachement",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "val-ardoux-1998",
+      "question": "La Communauté de communes des Terres du Val de Loire est-elle la première intercommunalité de Mézières ?",
+      "reponse": false,
+      "explication": "Non. La commune a d’abord appartenu à la Communauté de communes du Val d’Ardoux, créée le 31 décembre 1998 — elle-même issue du SIVOM de la région de Cléry-Saint-André, né en décembre 1964. Le rattachement à la CCTVL date du 1er janvier 2017.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Politique et administration",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "population-1793",
+      "question": "Mézières comptait-elle plus de 500 habitants dès 1793 ?",
+      "reponse": true,
+      "explication": "Oui : 600 au premier recensement. La commune en compte environ 904 aujourd’hui — elle n’a donc gagné qu’un tiers d’habitants en plus de deux siècles.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Démographie (recensements INSEE), et Mairie de Mézières-lez-Cléry pour le chiffre 2026",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "population-declin",
+      "question": "La population de Mézières a-t-elle toujours augmenté depuis la Révolution ?",
+      "reponse": false,
+      "explication": "Non, loin de là. Après un maximum de 704 habitants en 1851, elle a décliné pendant près d’un siècle jusqu’à un creux de 383 en 1936 — soit presque la moitié perdue.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Démographie (recensements INSEE)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "population-doublee",
+      "question": "La population de Mézières a-t-elle plus que doublé depuis 1936 ?",
+      "reponse": true,
+      "explication": "Oui : de 383 habitants au creux de 1936 à 883 au recensement de 2023, et environ 904 aujourd’hui. L’essentiel du rattrapage s’est joué à partir des années 1980.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Démographie (recensements INSEE), et Mairie de Mézières-lez-Cléry pour le chiffre 2026",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "brando-malvoisine",
+      "question": "Une star hollywoodienne a-t-elle loué une propriété à Mézières-lez-Cléry ?",
+      "reponse": true,
+      "explication": "Oui : Marlon Brando y avait loué « la Malvoisine » pour y accueillir sa fille Cheyenne. Celle-ci y fut interpellée le 15 novembre 1991.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Personnalités liées à la commune",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "histoire"
+    },
+    {
+      "id": "eglise-1891",
+      "question": "L’église Saint-Avit est-elle restée dans son état du XVe siècle ?",
+      "reponse": false,
+      "explication": "Non : elle date bien du XVe siècle, mais elle a été reconstruite en 1891. Elle figure, comme plusieurs de ses objets, à la base Mérimée du ministère de la Culture.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "tumulus-epees",
+      "question": "A-t-on trouvé des épées volontairement tordues sous une butte de Mézières ?",
+      "reponse": true,
+      "explication": "Oui. Des fouilles menées au XIXe siècle dans le tumulus de la Butte des élus ont livré quatre tombes verticales, des épées tordues rituellement, des bijoux et de la monnaie dite gauloise — l’ensemble daté d’environ le Ve siècle.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "butte-des-elus",
+      "question": "La Butte des élus doit-elle son nom au conseil municipal ?",
+      "reponse": false,
+      "explication": "Non — c’est un tumulus préhistorique, aussi appelé Mont des élus, surmonté d’un amas rocheux et d’une statue de la Vierge. Il aurait pu servir une seconde fois de sépulture, bien après sa construction.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "borne-quatre-paroisses",
+      "question": "Existe-t-il à Mézières une borne routière qui pourrait dater du XIIIe siècle ?",
+      "reponse": true,
+      "explication": "Oui : la « borne des quatre paroisses », en calcaire, au lieu-dit du Bas des Vallées. Elle est inscrite à la base Mérimée.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "chateau-bailly",
+      "question": "Le château du Bailly date-t-il du Moyen Âge ?",
+      "reponse": false,
+      "explication": "Non, du Directoire — la fin du XVIIIe siècle. Il a été construit par les Tassin de Charsonville.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "colombier-plus-vieux",
+      "question": "Un colombier de la commune est-il plus ancien que le château auquel il appartient ?",
+      "reponse": true,
+      "explication": "Oui, de deux siècles : le colombier est du XVIIe siècle, le château du XIXe. Les deux figurent à la base Mérimée.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "tableau-abbe",
+      "question": "Un tableau de l’église représente-t-il un abbé guérissant un enfant ?",
+      "reponse": true,
+      "explication": "Oui, une peinture à l’huile du XVIIIe siècle. L’église conserve aussi une Assomption de la même époque, un christ en croix du XVIIIe et une statue en bois de saint Avit.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "puits-rolland",
+      "question": "Le hameau de Rolland abrite-t-il un puits classé au patrimoine ?",
+      "reponse": true,
+      "explication": "Oui : un puits en calcaire du XVIIIe siècle, recensé à la base Mérimée du ministère de la Culture.",
+      "source": "Wikipédia — Mézières-lez-Cléry, section Lieux et monuments (base Mérimée)",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "patrimoine"
+    },
+    {
+      "id": "sols-foret",
+      "question": "Mézières est-elle avant tout une commune agricole ?",
+      "reponse": false,
+      "explication": "Non, forestière : forêts et milieux semi-naturels occupent 60,6 % du territoire, dont 57,9 % de forêts. Les terres arables n’en couvrent que 14,3 %, et les zones agricoles hétérogènes 16,4 %.",
+      "source": "Wikipédia — Mézières-lez-Cléry, occupation des sols d’après Corine Land Cover 2018",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "environnement"
+    },
+    {
+      "id": "sols-urbanise",
+      "question": "Les zones urbanisées occupent-elles moins de 1 % du territoire communal ?",
+      "reponse": true,
+      "explication": "Oui : 0,8 %. En y ajoutant les zones industrielles, commerciales et les réseaux de communication, on atteint 1,2 % — tout le reste est forêt, culture ou prairie.",
+      "source": "Wikipédia — Mézières-lez-Cléry, occupation des sols d’après Corine Land Cover 2018",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "environnement"
+    },
+    {
+      "id": "sols-foret-progression",
+      "question": "La part de forêt a-t-elle progressé à Mézières depuis 1990 ?",
+      "reponse": true,
+      "explication": "Oui, un peu : les forêts et milieux semi-naturels passent de 59,8 % du territoire en 1990 à 60,6 % en 2018. Le village s’étend, mais pas aux dépens du bois.",
+      "source": "Wikipédia — Mézières-lez-Cléry, occupation des sols d’après Corine Land Cover",
+      "url": "https://fr.wikipedia.org/wiki/M%C3%A9zi%C3%A8res-lez-Cl%C3%A9ry",
+      "categorie": "environnement"
+    },
+    {
+      "id": "c3m-siege",
+      "question": "Le siège du syndicat des eaux se trouve-t-il à Cléry-Saint-André ?",
+      "reponse": false,
+      "explication": "Non, à Mézières-lez-Cléry — 36 rue du Bourg, la même adresse que l’école. Le C3M dessert pourtant quatre secteurs : Cléry-Saint-André, Mareau-aux-Prés, Mézières-lez-Cléry et Les Muids.",
+      "source": "C3M — Syndicat Intercommunal d’Eau et d’Assainissement, bulletin d’informations 2026",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "c3m-president",
+      "question": "Le président du syndicat des eaux est-il un élu de Mézières ?",
+      "reponse": true,
+      "explication": "Oui, un conseiller municipal de la commune — celui qui en est à son cinquième mandat. Mézières compte trois délégués titulaires au C3M, comme Mareau-aux-Prés en compte quatre et Cléry-Saint-André six.",
+      "source": "C3M — Syndicat Intercommunal d’Eau et d’Assainissement, bulletin d’informations 2026, mandature 2026-2032",
+      "url": "",
+      "categorie": "intercommunalite"
+    },
+    {
+      "id": "eau-pfas",
+      "question": "L’eau du robinet de Mézières contient-elle des PFAS, ces « polluants éternels » ?",
+      "reponse": false,
+      "explication": "Non : zéro détecté sur les vingt substances recherchées, pour une limite de 0,10 µg/L. Même constat pour les pesticides et le chlorure de vinyle, tous sous les seuils.",
+      "source": "C3M — bulletin d’informations 2026, campagne d’analyses de juin 2026",
+      "url": "https://eaupotable.sante.gouv.fr",
+      "categorie": "environnement"
+    },
+    {
+      "id": "eau-dure",
+      "question": "L’eau de Mézières est-elle une eau dure ?",
+      "reponse": true,
+      "explication": "Oui : environ 26 °f. C’est ce qui explique le calcaire dans les bouilloires. La dureté n’est pas un défaut sanitaire — elle n’a pas de limite de qualité réglementaire.",
+      "source": "C3M — bulletin d’informations 2026, campagne d’analyses de juin 2026",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "eau-controles",
+      "question": "L’eau distribuée a-t-elle fait l’objet de plus de 50 contrôles en 2025 ?",
+      "reponse": true,
+      "explication": "Oui : 52 contrôles en 2025, complétés par 11 points de mesure en juin 2026. Tous conformes, du captage au robinet.",
+      "source": "C3M — bulletin d’informations 2026, bilan 2025-2026",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "eau-nitrates",
+      "question": "Les nitrates approchent-ils la limite réglementaire dans l’eau de Mézières ?",
+      "reponse": false,
+      "explication": "Non, on en est très loin : environ 1,1 mg/L pour une limite fixée à 50 mg/L. La bactériologie, elle, ne relève aucune présence.",
+      "source": "C3M — bulletin d’informations 2026, campagne d’analyses de juin 2026",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "eau-controle-ars",
+      "question": "Le syndicat des eaux contrôle-t-il lui-même la qualité de l’eau qu’il distribue ?",
+      "reponse": false,
+      "explication": "Non : la surveillance est assurée par l’Agence régionale de santé et des laboratoires agréés, CARSO et Eurofins. Les analyses complètes sont publiques sur eaupotable.sante.gouv.fr.",
+      "source": "C3M — bulletin d’informations 2026, qualité de l’eau",
+      "url": "https://eaupotable.sante.gouv.fr",
+      "categorie": "environnement"
+    },
+    {
+      "id": "robinet-goutte",
+      "question": "Un robinet qui goutte gaspille-t-il plus de 100 litres d’eau par jour ?",
+      "reponse": true,
+      "explication": "Oui, jusqu’à 120 litres. À l’échelle d’une maison, fermer le robinet pendant le brossage des dents économise déjà jusqu’à 12 litres.",
+      "source": "C3M — bulletin d’informations 2026, fuites d’eau et bons gestes",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "bain-douche",
+      "question": "Un bain consomme-t-il trois fois plus d’eau qu’une douche de cinq minutes ?",
+      "reponse": true,
+      "explication": "Oui : 180 litres contre 60. Un récupérateur d’eau de pluie au jardin, lui, permet jusqu’à 50 % d’économie l’été.",
+      "source": "C3M — bulletin d’informations 2026, fuites d’eau et bons gestes",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "medicaments-wc",
+      "question": "Peut-on jeter ses médicaments périmés dans les toilettes ?",
+      "reponse": false,
+      "explication": "Jamais : ils partent dans les eaux usées et l’épuration ne retient pas tout. Rapportez-les en pharmacie.",
+      "source": "C3M — bulletin d’informations 2026, fuites d’eau et bons gestes",
+      "url": "",
+      "categorie": "environnement"
+    },
+    {
+      "id": "fuite-warsmann",
+      "question": "Après une fuite invisible chez soi, la facture d’eau est-elle due en totalité ?",
+      "reponse": false,
+      "explication": "Non : la loi Warsmann permet un dégrèvement en cas de surconsommation due à une fuite sur une canalisation non visible, après compteur. Faites réparer par un plombier professionnel dans le mois, puis transmettez la facture et l’attestation au service des eaux.",
+      "source": "C3M — bulletin d’informations 2026, loi Warsmann",
+      "url": "",
+      "categorie": "habitat"
+    },
+    {
+      "id": "detecter-fuite",
+      "question": "Peut-on repérer une fuite d’eau avec son seul compteur ?",
+      "reponse": true,
+      "explication": "Oui : relevez l’index le soir, puis au réveil sans avoir rien consommé pendant la nuit. Toute variation signale une fuite. Pensez aussi à couper l’eau extérieure avant les gelées.",
+      "source": "C3M — bulletin d’informations 2026, fuites d’eau et bons gestes",
+      "url": "",
+      "categorie": "pratique"
     }
   ]
 }

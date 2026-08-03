@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Guide d’arrivée des nouveaux habitants v1.0.0
+   MAT — Guide d’arrivée des nouveaux habitants v1.0.4
    Page « Je viens d’emménager » : check-list des démarches à faire
    en arrivant à Mézières-lez-Cléry, cochable et consultable
    hors-ligne. Feature 100 % additive, sans appel réseau.
@@ -54,8 +54,13 @@ var GUIDE_ETAPES = [
       },
       {
         id:'compteurs', ico:'💡', titre:'Ouvrez vos compteurs d’eau, d’électricité et de gaz',
-        texte:'Contactez les fournisseurs quelques jours avant l’emménagement pour la mise en service, et relevez les index le jour de votre arrivée. L’eau potable et l’assainissement collectif sont gérés par la communauté de communes.',
+        // ⚠️ L’eau potable relève du C3M (syndicat intercommunal des eaux, dont le
+        // siège est à Mézières), PAS de la communauté de communes — erreur relevée
+        // par la mairie en août 2026. L’assainissement collectif, lui, est bien
+        // suivi par la CCTVL. Corrigé aussi dans lib/mel.js côté backend.
+        texte:'Contactez les fournisseurs quelques jours avant l’emménagement pour la mise en service, et relevez les index le jour de votre arrivée. L’eau potable est gérée par le C3M, le syndicat intercommunal des eaux ; l’assainissement collectif relève de la communauté de communes.',
         liens:[
+          { label:'C3M — 02 38 45 35 64', tel:'0238453564' },
           { label:'CCTVL — 02 38 44 59 35', tel:'0238445935' },
           { label:'ccterresduvaldeloire.fr', url:'https://www.ccterresduvaldeloire.fr/' }
         ]

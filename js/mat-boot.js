@@ -169,6 +169,6 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-guide-arrivee.js?v=1.0.3';
+  s.src = 'js/mat-guide-arrivee.js?v=1.0.4';
   document.head.appendChild(s);
 })();

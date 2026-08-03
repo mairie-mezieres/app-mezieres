@@ -274,36 +274,6 @@
       }
     },
     {
-      id: 'calc-midi-solaire',
-      categorie: 'decouverte',
-      build: function () {
-        // Décalage de l'heure légale française sur le temps universel, lu au
-        // jour dit : +2 h en été, +1 h en hiver. Aucune donnée externe.
-        try {
-          var nom = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'Europe/Paris', timeZoneName: 'shortOffset'
-          }).format(new Date());
-          var m = /GMT([+-]\d+)/.exec(nom);
-          if (!m) return null;
-          var off = parseInt(m[1], 10);              // 1 ou 2
-          var corr = SV_LON * 4;                     // 4 min par degré de longitude
-          var minutes = off * 60 - corr;             // décalage du midi solaire moyen
-          var h = Math.floor(12 + minutes / 60);
-          var mn = Math.round(minutes % 60);
-          return {
-            question: 'À Mézières, le soleil est-il au plus haut à midi ?',
-            reponse: false,
-            explication: 'Non : plutôt vers ' + h + ' h ' + (mn < 10 ? '0' : '') + mn + ' aujourd’hui. '
-              + 'L’heure légale avance de ' + off + ' h sur le temps universel en ce moment, et la longitude de la '
-              + 'commune (1,808° est) ne rattrape que ' + Math.round(corr) + ' minutes. À quelques minutes près : '
-              + 'la Terre n’avance pas tout à fait d’un pas régulier sur son orbite.',
-            source: 'Calcul depuis la longitude de la commune (1,808 E), à raison de 4 minutes par degré, et du décalage horaire en vigueur à Paris',
-            url: ''
-          };
-        } catch (e) { return null; }
-      }
-    },
-    {
       id: 'calc-ferie',
       categorie: 'pratique',
       build: function () {
@@ -334,12 +304,19 @@
   // tomber l'urbanisme — 18 entrées sur 75, soit près d'une sur quatre — dès
   // les premiers jours. « Faut-il une déclaration pour une fenêtre de toit »
   // est une information utile, mais c'est une mauvaise entrée en matière.
-  // On ouvre donc sur ce qui étonne (distances, Lune), puis l'app elle-même
-  // et la vie communale ; les règles d'urbanisme ferment la marche.
+  // On ouvre donc sur ce qui étonne (distances, Lune), puis l'histoire de la
+  // commune, l'app elle-même, le patrimoine et la vie communale ; les règles
+  // d'urbanisme ferment la marche.
+  //
+  // `histoire` et `patrimoine` ont été séparées de `decouverte` en août 2026 :
+  // les faire entrer dans `decouverte` les aurait placées AVANT les entrées
+  // calculées, qui sont concaténées après le corpus fixe — c'est-à-dire en tête
+  // de rotation, à rebours de la règle « une nouvelle entrée se met à la fin de
+  // sa catégorie ». Deux catégories neuves coûtaient moins cher qu'une exception.
   var SV_ORDRE_CATEGORIES = [
-    'decouverte', 'mat', 'vie-communale', 'environnement', 'pratique',
-    'transports', 'sante', 'dechets', 'intercommunalite', 'habitat',
-    'demarches', 'urbanisme'
+    'decouverte', 'histoire', 'mat', 'patrimoine', 'vie-communale',
+    'environnement', 'pratique', 'transports', 'sante', 'dechets',
+    'intercommunalite', 'habitat', 'demarches', 'urbanisme'
   ];
 
   // Tour de rôle entre catégories : une entrée de chacune, puis on recommence.

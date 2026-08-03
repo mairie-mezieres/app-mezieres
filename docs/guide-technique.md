@@ -507,10 +507,22 @@ n'a donc pas à être disponible hors ligne, et n'alourdit pas l'app installée.
 
 **Ajouter des entrées.** Elles se placent **à la fin de leur catégorie** (l'ordre du tableau
 est l'ordre de passage) et chacune doit porter une source **réellement consultée**. Si la
-source ne peut pas être ouverte, l'entrée ne s'écrit pas : c'est la RG-16.12, et c'est ce
-qui a limité la deuxième passe du corpus à 77 nouvelles entrées au lieu des 175 visées —
-INSEE, IGN, POP/Mérimée, Hub'Eau et Wikipédia étant inaccessibles depuis l'environnement de
-développement.
+source ne peut pas être ouverte, l'entrée ne s'écrit pas : c'est la RG-16.12.
+
+INSEE, IGN, POP/Mérimée, Hub'Eau et Wikipédia sont inaccessibles depuis l'environnement de
+développement (403 au CONNECT). Le contournement qui marche n'est pas d'aller les chercher,
+c'est que **la mairie transmette le document** — un bulletin municipal, un extrait de page,
+une plaquette de syndicat. C'est ainsi que sont nées les catégories `histoire` et
+`patrimoine` et la série sur l'eau : à partir d'un texte fourni, pas d'un accès réseau.
+
+⚠️ **Une nouvelle catégorie doit être déclarée dans `SV_ORDRE_CATEGORIES`**, sinon elle est
+reléguée en fin de rotation par ordre alphabétique. Et attention au point suivant :
+`_construire()` fait `fixes.concat(calc)`, donc pour une catégorie qui contient **à la fois**
+des entrées du JSON et des entrées calculées, les entrées du JSON passent **avant** les
+calculées — quelle que soit la date d'ajout. C'est pourquoi `histoire` et `patrimoine` sont
+des catégories distinctes de `decouverte` : y verser des entrées JSON les aurait placées en
+tête de rotation, devant les distances calculées qui ouvrent la rubrique depuis sa mise en
+service.
 
 ### Régions `aria-live` — la règle du silence
 
