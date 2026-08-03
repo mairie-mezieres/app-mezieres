@@ -84,8 +84,11 @@ var GUIDE_ETAPES = [
         // l'arbre de décision de MEL, validé par la mairie (js/mat-mel.js, 3 entrées).
         // Ne pas réintroduire « Val de Loire Fibre » : ce réseau dessert
         // l'Indre-et-Loire et le Loir-et-Cher, pas le Loiret.
-        texte:'Le réseau fibre du département est géré par Lysséo. Vérifiez votre adresse, puis souscrivez auprès du fournisseur de votre choix. Pour une construction neuve, déclarez-la le plus tôt possible.',
-        liens:[ { label:'lysseo.fr', url:'https://lysseo.fr' } ]
+        texte:'Le réseau fibre du département est Lysséo — un réseau public : il porte l’infrastructure mais ne vend aucun abonnement. Vérifiez que votre adresse est raccordable, puis souscrivez auprès de l’opérateur de votre choix (Orange, SFR, Bouygues, Free…). Si vous emménagez dans une construction neuve, l’adresse doit d’abord être déclarée auprès de XpFibre / Loiret THD : tant qu’elle n’est pas enregistrée comme raccordable, aucun opérateur ne peut prendre votre commande.',
+        liens:[
+          { label:'lysseo.fr', url:'https://lysseo.fr' },
+          { label:'Déclarer une construction neuve', url:'https://www.xpfibre.com/loiret-thd' }
+        ]
       }
     ]
   },

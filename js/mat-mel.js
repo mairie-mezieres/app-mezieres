@@ -590,17 +590,26 @@ const _MEL_TREE_FALLBACK = {
   numerique:{
     label:"Numérique & Internet", ico:"📡", needZone:false,
     questions:[
+      // ⚠️ Lysséo n'est pas un fournisseur d'accès : c'est le réseau public fibre
+      // du Loiret, construit et exploité par Loiret THD / Loiret Fibre (groupe
+      // XpFibre) en délégation de service public du Département. Il ne vend aucun
+      // abonnement. Ne pas réécrire ces réponses comme si l'habitant pouvait
+      // « souscrire chez Lysséo », ni renvoyer vers la page d'accueil en décrivant
+      // un bouton « en haut à droite » : ces instructions de navigation cassent
+      // au premier changement de menu du site. Pointer les URL directes.
       {id:"fibre",ico:"🌐",label:"Raccordement fibre / Nouvelle construction",
-        directAnswer:{text:"Pour toute nouvelle construction, déclarez-la le plus tôt possible auprès du gestionnaire départemental du réseau fibre (Lysseo). Cliquez sur 'Déclarer une nouvelle construction' en haut à droite du site.",
-          links:[{label:"🌐 Déclarer une nouvelle construction — Lysseo",url:"https://lysseo.fr"}]}
+        directAnswer:{text:"Lysséo est le réseau public fibre du Loiret : il construit et gère l'infrastructure, mais ne vend aucun abonnement — les forfaits affichés sur son site sont ceux des opérateurs commerciaux présents sur le réseau.\n\n1️⃣ Déclarez d'abord votre construction neuve. Une maison neuve n'est pas automatiquement présente dans la base d'adresses de l'opérateur d'infrastructure : tant que la vôtre n'y figure pas comme « raccordable », aucun opérateur ne pourra enregistrer votre commande. La démarche se fait auprès de XpFibre / Loiret THD, ou via le formulaire de contact Lysséo. Prévoyez de joindre votre permis de construire, votre certificat de numérotation et un plan de masse localisant le regard et les fourreaux en limite de propriété.\n\n2️⃣ Une fois l'adresse déclarée éligible, souscrivez auprès de l'opérateur de votre choix (Orange, SFR, Bouygues, Free…). C'est son prestataire qui réalise le tirage de la fibre depuis le point de branchement de la voirie jusqu'au logement, en empruntant vos fourreaux existants. Aucun génie civil supplémentaire n'est à prévoir de votre côté, sous réserve que les fourreaux soient bien aiguillés et non obstrués — leur bon état relève du propriétaire sur la partie privative.\n\n3️⃣ De son côté, la mairie vérifie que la numérotation de votre parcelle a bien été transmise et intégrée à la Base Adresse Nationale : c'est la condition nécessaire à la prise en compte de votre adresse par l'opérateur d'infrastructure.",
+          links:[{label:"🏗️ Déclarer une nouvelle construction — XpFibre / Loiret THD",url:"https://www.xpfibre.com/loiret-thd"},
+                 {label:"✉️ Formulaire de contact Lysséo",url:"https://lysseo.fr/pagecontact/"},
+                 {label:"🏛️ Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"thd",ico:"📶",label:"Questions fibre (raccordement, éligibilité…)",
-        directAnswer:{text:"Pour toute question sur la fibre — raccordement, éligibilité, délais — contactez directement le service technique via le formulaire Lysseo.",
-          links:[{label:"📞 Contacter le service fibre Lysseo",url:"https://lysseo.fr/page-contact/41"}]}
+        directAnswer:{text:"Pour une question portant sur le réseau lui-même — adresse raccordable, avancement du déploiement, point de branchement — écrivez à Lysséo via son formulaire de contact.\n\n⚠️ Lysséo ne commercialise aucune offre : pour un abonnement, une facture, un rendez-vous d'installation ou une panne de votre ligne, votre interlocuteur est votre opérateur (Orange, SFR, Bouygues, Free…).",
+          links:[{label:"📞 Contacter Lysséo",url:"https://lysseo.fr/pagecontact/"}]}
       },
       {id:"probleme",ico:"🔧",label:"Problème sur les installations (armoires, câbles…)",
-        directAnswer:{text:"En cas de problème constaté sur les équipements du réseau (armoires de rue, boîtiers, câbles), faites une déclaration de dommage réseau sur Lysseo via le bouton en haut à droite.",
-          links:[{label:"🛠️ Déclarer un dommage réseau",url:"https://lysseo.fr"}]}
+        directAnswer:{text:"En cas de problème constaté sur les équipements du réseau public (armoires de rue, boîtiers, câbles arrachés), remplissez le formulaire de déclaration de dommage réseau de Lysséo.",
+          links:[{label:"🛠️ Déclarer un dommage réseau",url:"https://lysseo.fr/declaration-dommages-reseaux/45"}]}
       },
     ]
   },

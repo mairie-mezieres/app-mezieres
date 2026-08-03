@@ -5,6 +5,37 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.56] — 3 août 2026
+
+### Corrigé
+- **Fibre : le rôle de chacun était faux, dans les trois canaux à la fois.** L'app, le guide
+  d'arrivée et MEL présentaient Lysséo comme un guichet où l'habitant « vérifie son
+  éligibilité » et « déclare sa construction ». Lysséo est le **réseau public fibre du
+  Loiret**, exploité par **Loiret Fibre / XpFibre** en délégation de service public du
+  Département : opérateur d'**infrastructure**, il ne vend **aucun** abonnement. Les trois
+  entrées `numerique` de l'arbre de décision (`js/mat-mel.js` + `data/mel-tree.json`), la
+  fiche fibre du guide d'arrivée (`js/mat-guide-arrivee.js`) et la règle `fibre` de
+  `lib/mel.js` côté backend disent maintenant la même chose.
+- **L'étape préalable d'une construction neuve était absente partout.** Une adresse neuve
+  n'est pas connue de l'opérateur d'infrastructure : tant qu'elle n'y figure pas comme
+  « raccordable », **aucun opérateur ne peut enregistrer la commande**. La déclaration se
+  fait auprès de **XpFibre / Loiret THD** (permis de construire, certificat de numérotation,
+  plan de masse localisant regard et fourreaux). Le rôle de la mairie — faire remonter la
+  numérotation de la parcelle à la **Base Adresse Nationale** — est désormais énoncé.
+- **Deux liens fibre cassés ou fragiles.** `lysseo.fr/page-contact/41` n'est pas l'adresse du
+  formulaire de contact (`lysseo.fr/pagecontact/`), et deux réponses renvoyaient vers la page
+  d'accueil en décrivant un bouton « en haut à droite » — une instruction de navigation qui
+  casse au premier changement de menu. Les URL directes remplacent les deux.
+- **Résidu « Val de Loire Fibre » dans `js/mat-utils.js`.** Le nettoyage de la v4.55 avait
+  laissé `valdeloire-fibre.fr` — domaine inexistant — dans `URL_LABELS` et `KNOWN_DOMAINS` :
+  un domaine nu écrit dans une réponse MEL devenait donc un lien mort, tandis que `lysseo.fr`
+  n'était pas reconnu du tout. Remplacé par `lysseo.fr` et `xpfibre.com`.
+- **Backend : le prompt du topic `numerique` était resté à l'ère pré-fibre** (« l'offre
+  principale est le THD Radio / 4G fixe »). Il contredisait la règle directe située quelques
+  lignes plus haut : en mode IA, MEL orientait vers le THD Radio une commune fibrée.
+
+---
+
 ## [4.55] — 3 août 2026
 
 ### Ajouté

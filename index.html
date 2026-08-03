@@ -47,7 +47,7 @@ document.documentElement.style.background = bg;
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.3.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
-<script defer src="js/mat-utils.js?v=4.3.5"></script>
+<script defer src="js/mat-utils.js?v=4.3.6"></script>
 <script defer src="js/mat-core.js?v=4.3.3"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.8"></script>
@@ -57,7 +57,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.3.7"></script>
+<script defer src="js/mat-mel.js?v=4.3.8"></script>
 <script defer src="js/mat-perf.js?v=1.0.7"></script>
 <script defer src="js/mat-boot.js?v=4.4.1"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.55.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.56 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -445,7 +445,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.55.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.56</button>
 </div>
 </div>
 </div>
@@ -1648,6 +1648,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 3 ao&ucirc;t 2026 — v4.56</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Fibre&nbsp;: qui fait quoi, enfin dit clairement.</strong> <strong>Lyss&eacute;o n&rsquo;est pas un fournisseur d&rsquo;acc&egrave;s</strong>&nbsp;: c&rsquo;est le r&eacute;seau public fibre du Loiret, exploit&eacute; par Loiret&nbsp;Fibre&nbsp;/&nbsp;XpFibre en d&eacute;l&eacute;gation de service public du D&eacute;partement. Il construit et g&egrave;re l&rsquo;infrastructure, mais ne vend aucun abonnement&nbsp;&mdash; les forfaits visibles sur son site sont ceux des op&eacute;rateurs commerciaux. L&rsquo;application laissait croire qu&rsquo;on pouvait y souscrire</li>
+<li><strong>Construction neuve&nbsp;: l&rsquo;&eacute;tape pr&eacute;alable qui manquait.</strong> Une maison neuve n&rsquo;est pas automatiquement dans la base d&rsquo;adresses de l&rsquo;op&eacute;rateur d&rsquo;infrastructure&nbsp;; tant que la v&ocirc;tre n&rsquo;y figure pas comme &laquo;&nbsp;raccordable&nbsp;&raquo;, <strong>aucun op&eacute;rateur ne peut enregistrer votre commande</strong>. MEL explique d&eacute;sormais la d&eacute;marche aupr&egrave;s de <strong>XpFibre&nbsp;/&nbsp;Loiret&nbsp;THD</strong> et les pi&egrave;ces &agrave; joindre&nbsp;: permis de construire, certificat de num&eacute;rotation, plan de masse situant le regard et les fourreaux</li>
+<li><strong>Puis le raccordement lui-m&ecirc;me</strong>&nbsp;: une fois l&rsquo;adresse &eacute;ligible, vous souscrivez chez l&rsquo;op&eacute;rateur de votre choix et c&rsquo;est son prestataire qui tire la fibre jusqu&rsquo;au logement par vos fourreaux&nbsp;&mdash; sans g&eacute;nie civil suppl&eacute;mentaire, &agrave; condition qu&rsquo;ils soient aiguill&eacute;s et non obstru&eacute;s. Le r&ocirc;le de la mairie est rappel&eacute;&nbsp;: v&eacute;rifier que la num&eacute;rotation de votre parcelle est bien remont&eacute;e &agrave; la <strong>Base Adresse Nationale</strong></li>
+<li><strong>Deux liens r&eacute;par&eacute;s</strong>&nbsp;: le formulaire de contact Lyss&eacute;o et la d&eacute;claration de dommage r&eacute;seau pointaient vers une adresse obsol&egrave;te ou vers la page d&rsquo;accueil avec un &laquo;&nbsp;cliquez sur le bouton en haut &agrave; droite&nbsp;&raquo;. Ils m&egrave;nent maintenant directement au bon formulaire</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 3 ao&ucirc;t 2026 — v4.55.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>&laquo;&nbsp;Le saviez-vous&nbsp;?&nbsp;&raquo; passe de <strong>75 &agrave; 184 questions</strong>&nbsp;: six mois sans r&eacute;p&eacute;tition. De quoi apprendre que la cr&egrave;che des Marmousets n&rsquo;a pas de b&acirc;timent, que les femmes sont majoritaires au conseil municipal, ou que Marlon&nbsp;Brando a lou&eacute; une propri&eacute;t&eacute; dans la commune</li>
