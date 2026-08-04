@@ -5,6 +5,16 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.56.1] — 4 août 2026
+
+### Corrigé
+- **La carte « Prochaine manifestation » tronquait le nom du mois à trois lettres.** L'accueil
+  affichait « 30 AOÛ » au lieu de « 30 AOÛT ». En cause, une table d'abréviations codée en dur
+  dans `js/mat-widgets.js` (`MONTHS`), calibrée sur trois caractères : le seul mois de quatre
+  lettres y perdait le sien, et `jun` / `jul` étaient les abréviations **anglaises** de juin et
+  juillet. La carte utilise désormais `toLocaleDateString('fr-FR', {month:'short'})`, comme
+  `fmtShort` côté desktop (`js/mat-desktop.js`) — une seule source, plus de double table.
+
 ## [4.56] — 3 août 2026
 
 ### Corrigé
