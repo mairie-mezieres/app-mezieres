@@ -1184,7 +1184,12 @@ async function loadEventsLocaux() {
 }
 
 // ── Prochain événement (header) ──────────────────────────
-const MONTHS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+// Abréviation du mois : même source que le desktop (`fmtShort` de mat-desktop.js).
+// Ne PAS revenir à une table codée en dur tronquée à 3 lettres : « août » y devenait
+// « aoû » et « juin »/« juillet » y étaient orthographiés à l'anglaise (« jun »/« jul »).
+function shortMonth(date){
+  return date.toLocaleDateString('fr-FR', { month:'short' }).replace('.','');
+}
 
 async function loadEvents(){
   try{
@@ -1198,7 +1203,7 @@ async function loadEvents(){
     }
     var diff=Math.ceil((first.start-new Date())/(1000*60*60*24));
     var diffTxt=diff<=0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
-    document.getElementById('next-event-date').textContent=first.start.getDate()+' '+MONTHS[first.start.getMonth()];
+    document.getElementById('next-event-date').textContent=first.start.getDate()+' '+shortMonth(first.start);
     document.getElementById('next-event-name').textContent=first.summary;
     document.getElementById('next-event-days').textContent=diffTxt;
   }catch(e){
