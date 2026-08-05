@@ -5,6 +5,32 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.57] — 5 août 2026
+
+### Ajouté
+- **Les numéros d'urgence sont accessibles sur ordinateur.** Le bouton « 📞 Urgences » vivait
+  dans `.header`, que `css/mat-desktop.css` passe en `display:none` au-dessus de 1024 px :
+  `openNums()` n'avait donc **aucun** point d'entrée desktop. Nouveau bouton `.d-nav-urgence`
+  dans la barre de navigation, groupé avec Accessibilité dans `.d-nav-tools`. Même dégradé
+  rouge que sur mobile (blanc sur `#b91c1c` = 6,4:1, WCAG AA respecté).
+- **Carte « Je viens d'emménager » sur ordinateur** (`.d-guide-card`, colonne centrale). Le
+  guide d'arrivée n'était atteignable que par l'entrée « Nouveaux habitants » du menu ; il
+  porte maintenant le même libellé que sur mobile, là où l'habitant qui arrive le cherche.
+- **Aperçu de la galerie photos sur ordinateur** (`#dsk-photos`, colonne centrale) :
+  `loadPhotosDesktop()` affiche les 4 dernières photos, le clic ouvre `openGalerie()`, et le
+  diaporama plein écran se lance depuis la carte. La tuile mobile vivait dans `.content`,
+  également masqué au-dessus de 1024 px.
+- **Radio Mézières et le groupe « Ici c'est Mézières ! »** dans `.d-footer-links`.
+
+### Documentation
+- `docs/guide-utilisateur.md` §3 : nouvelle sous-section « Sur ordinateur » décrivant la mise
+  en page en trois colonnes et ce qui reste propre au téléphone (carburants, majordome).
+- `docs/guide-technique.md` §12 : nouvel item de checklist « Point d'entrée desktop », avec la
+  commande de comparaison des `open*()` mobile / desktop. Origine de ces trois oublis : rien
+  ne signale qu'une tuile ajoutée dans `.header` ou `.content` est invisible sur ordinateur.
+- `docs/guide-technique.md` : le point de bascule desktop était annoncé à **900 px** à deux
+  endroits alors que toutes les media queries sont à **1024 px**.
+
 ## [4.56.1] — 4 août 2026
 
 ### Corrigé

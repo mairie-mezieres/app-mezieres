@@ -44,7 +44,7 @@ document.documentElement.style.background = bg;
 })();
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.11.0">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.3.0">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.4.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.56.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.57 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -248,7 +248,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener noreferrer">🥾 Randonnées</a>
 <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener noreferrer">🌐 CCTVL</a>
 </nav>
+<div class="d-nav-tools">
+<button class="d-nav-urgence" onclick="openNums()" title="Numéros d'urgence et services de garde">📞 Urgences</button>
 <button class="d-nav-acc" onclick="openAccessibilite()" title="Accessibilité &amp; thème">♿ Accessibilité</button>
+</div>
 </div>
 </div>
 <div class="content">
@@ -376,6 +379,21 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 <div class="d-col d-col-center">
 <div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
+<button type="button" class="d-guide-card" onclick="openGuideArrivee()">
+<span class="d-guide-ico" aria-hidden="true">📦</span>
+<span class="d-guide-txt">
+<span class="d-guide-title">Je viens d’emménager</span>
+<span class="d-guide-sub">Guide d’arrivée des nouveaux habitants — démarches, écoles, déchets, fibre…</span>
+</span>
+<span class="d-guide-arrow" aria-hidden="true">→</span>
+</button>
+<div class="d-card" id="dsk-photos">
+<div class="d-card-hdr"><span>📸 Vos photos</span><button onclick="openPhotos()">Galerie →</button></div>
+<div class="d-card-body">
+<div id="dsk-photos-grid"><div class="d-loading">Chargement…</div></div>
+<button type="button" class="d-diapo-btn" onclick="launchDiapo()">▶ Lancer le diaporama plein écran</button>
+</div>
+</div>
 </div>
 <div class="d-col d-col-right">
 <div class="d-card" id="dsk-mairie">
@@ -441,11 +459,13 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="footer-perf" style="margin:0;justify-content:flex-start"></div>
 </div>
 <div class="d-footer-links">
+<a href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer" title="Radio Mézières sur Facebook">📻 Radio Mézières</a>
+<a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer" title="Groupe Facebook « Ici c'est Mézières ! »">🏘️ Communauté</a>
 <button onclick="openRgpd()">🔒 RGPD</button>
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.56.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.57</button>
 </div>
 </div>
 </div>
@@ -1579,7 +1599,7 @@ et accompagnée des documents suivants :
 </div>
 </template>
 </div>
-<script defer src="js/mat-desktop.js?v=4.1.4"></script>
+<script defer src="js/mat-desktop.js?v=4.2.0"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1648,6 +1668,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 5 ao&ucirc;t 2026 — v4.57</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Les num&eacute;ros d&rsquo;urgence arrivent sur ordinateur.</strong> Le bouton rouge &laquo;&nbsp;📞&nbsp;Urgences&nbsp;&raquo; n&rsquo;existait que sur t&eacute;l&eacute;phone&nbsp;: depuis un PC, il n&rsquo;y avait <strong>aucun moyen</strong> d&rsquo;acc&eacute;der aux num&eacute;ros de secours et aux services de garde. Il est d&eacute;sormais en haut &agrave; droite, &agrave; c&ocirc;t&eacute; d&rsquo;Accessibilit&eacute;</li>
+<li><strong>&laquo;&nbsp;Je viens d&rsquo;emm&eacute;nager&nbsp;&raquo; devient visible sur ordinateur.</strong> Le guide d&rsquo;arriv&eacute;e des nouveaux habitants ne se trouvait que derri&egrave;re le lien discret &laquo;&nbsp;Nouveaux habitants&nbsp;&raquo; du menu. Il a maintenant sa carte au centre de la page d&rsquo;accueil, avec le m&ecirc;me libell&eacute; que sur t&eacute;l&eacute;phone</li>
+<li><strong>La galerie photos aussi.</strong> Un aper&ccedil;u des quatre derni&egrave;res photos de la commune s&rsquo;affiche sur la page d&rsquo;accueil ordinateur&nbsp;; un clic ouvre la photo en grand, et le diaporama plein &eacute;cran se lance depuis la m&ecirc;me carte</li>
+<li>Enfin, <strong>Radio M&eacute;zi&egrave;res et le groupe &laquo;&nbsp;Ici c&rsquo;est M&eacute;zi&egrave;res&nbsp;!&nbsp;&raquo;</strong> sont accessibles depuis le pied de page sur ordinateur, comme ils l&rsquo;&eacute;taient d&eacute;j&agrave; sur t&eacute;l&eacute;phone</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 4 ao&ucirc;t 2026 — v4.56.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>&laquo;&nbsp;30&nbsp;ao&ucirc;t&nbsp;&raquo; et non plus &laquo;&nbsp;30&nbsp;ao&ucirc;&nbsp;&raquo;.</strong> La carte &laquo;&nbsp;Prochaine manifestation&nbsp;&raquo; de l&rsquo;accueil coupait le nom du mois &agrave; trois lettres&nbsp;: ao&ucirc;t y perdait son <em>t</em>, et juin&nbsp;/&nbsp;juillet s&rsquo;y affichaient &agrave; l&rsquo;anglaise (&laquo;&nbsp;jun&nbsp;&raquo;, &laquo;&nbsp;jul&nbsp;&raquo;). Les abr&eacute;viations sont maintenant celles du fran&ccedil;ais, et les m&ecirc;mes que sur la version ordinateur</li>

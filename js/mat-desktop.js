@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.1.1 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.2.0 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 
@@ -40,6 +40,7 @@ function _onLoadError(){
     loadMeteo();
     loadActus().then(function(){loadAgenda();});
     loadBusDesktop();
+    loadPhotosDesktop();
   },25000);
 }
 
@@ -165,6 +166,36 @@ function loadBusDesktop(){
     html+='<p class="d-bus-empty">Plus de bus aujourd\'hui</p>';
   }
   el.innerHTML=html;
+}
+
+/* ── photos (aperçu 4 vignettes) ─────────────────────────────── */
+// La galerie n'avait aucun point d'entrée desktop : sa tuile vit dans .content,
+// masqué au-dessus de 1024 px. On affiche ici les 4 photos les plus récentes ;
+// le clic ouvre la galerie plein écran de mat-photos.js sur la photo choisie.
+function loadPhotosDesktop(){
+  var el=qs('dsk-photos-grid');
+  if(!el)return;
+  fetch(API+'/photos',{signal:_to(8000)})
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(d){
+      var photos=(d&&Array.isArray(d.photos))?d.photos:[];
+      if(!photos.length){
+        el.innerHTML='<p class="d-empty" style="grid-column:1/-1">Aucune photo pour l\'instant</p>';
+        return;
+      }
+      var html='';
+      photos.slice(0,4).forEach(function(p){
+        if(!p||!p.url)return;
+        var src=(typeof matCloudImg==='function')?matCloudImg(p.url,300):p.url;
+        var id=JSON.stringify(String(p.id||'')).replace(/"/g,'&quot;');
+        html+='<img class="d-photo-thumb" src="'+escHtml(src)+'" loading="lazy"'+
+          ' alt="'+escHtml(p.desc||'Photo de la commune')+'"'+
+          ' onclick="openGalerie&&openGalerie('+id+')"'+
+          ' onerror="this.style.display=\'none\'">';
+      });
+      el.innerHTML=html;
+    })
+    .catch(function(){safeSet('dsk-photos-grid','<p class="d-empty" style="grid-column:1/-1">Chargement impossible</p>');_onLoadError();});
 }
 
 /* ── agenda (via ensureAgendaEvents du module mat-agenda) ────── */
@@ -304,6 +335,7 @@ function init(){
   loadMeteo();
   loadActus().then(function(){loadAgenda();});
   loadBusDesktop();
+  loadPhotosDesktop();
   renderHoraires();
   renderCollectes();
   renderElus();
