@@ -69,7 +69,7 @@ app-mezieres/
 │
 ├── css/
 │   ├── mat.css             Styles principaux (mobile + thèmes)
-│   ├── mat-desktop.css     Styles layout desktop (≥ 900 px)
+│   ├── mat-desktop.css     Styles layout desktop (≥ 1024 px)
 │   └── fonts.css           Polices auto-hébergées (Nunito)
 │
 ├── js/
@@ -944,7 +944,23 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
     Seule exception : un overlay dont le contenu est écrit par un chargement au boot
     (ex. `ov-sondages`, rempli par `loadSondages()` qui alimente aussi le badge) reste inline.
 - [ ] **JS** : créer ou modifier le fichier `js/mat-<feature>.js`
-- [ ] **CSS** : ajouter les styles dans `css/mat.css` (mobile) et/ou `css/mat-desktop.css` (desktop ≥ 900 px)
+- [ ] **CSS** : ajouter les styles dans `css/mat.css` (mobile) et/ou `css/mat-desktop.css` (desktop ≥ 1024 px)
+- [ ] **Point d'entrée desktop** : ⚠️ au-dessus de 1024 px, `.header` **et** `.content`
+  passent en `display:none` (`css/mat-desktop.css`). Une tuile ajoutée dans l'une des deux
+  est donc **invisible sur ordinateur**, sans erreur ni signe visible. Toute nouvelle
+  fonctionnalité a besoin de son propre point d'entrée desktop : un bouton de `.d-nav-links`,
+  une carte de `.d-main-grid`, ou un lien de `.d-footer-links`.
+  Vérification rapide de ce qui manque :
+  ```bash
+  # points d'entrée mobile absents du desktop
+  { awk 'NR>=151 && NR<=218' index.html; awk 'NR>=257 && NR<=362' index.html; } \
+    | grep -o 'open[A-Za-z]*(' | sort -u > /tmp/mob.txt
+  awk 'NR>=219 && NR<=256 || NR>=363 && NR<=470' index.html \
+    | grep -o 'open[A-Za-z]*(' | sort -u > /tmp/desk.txt
+  comm -23 /tmp/mob.txt /tmp/desk.txt
+  ```
+  (Les numéros de lignes bougent — ajuster aux bornes réelles de `.header`, `.content`,
+  `.d-nav` / `.d-main-grid` / `.d-footer`.)
 - [ ] **Backend** (si API nécessaire) : créer `routes/<feature>.js` et l'enregistrer dans `index.js`
 - [ ] **Service worker** : incrémenter `CACHE` dans `service-worker.js`
 - [ ] **MEL** : si la fonctionnalité appelle souvent les mêmes questions, ajouter une `DIRECT_RULE` dans `lib/mel.js`

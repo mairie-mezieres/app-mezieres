@@ -1,4 +1,4 @@
-/* MAT — Desktop v4.2.2 */
+/* MAT — Desktop v4.4.0 */
 .d-topbar,.d-nav,.d-hero,.d-stats,.d-main-grid,.d-rando-banner,.d-footer{display:none}
 .content{display:block}
 
@@ -68,6 +68,14 @@
   .d-nav-acc{background:#f0f4f8;border:1px solid var(--border,#e8f0ea);border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--forest);transition:background .15s;display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
   .d-nav-acc:hover{background:var(--mist)}
 
+  /* Urgences + accessibilité groupés à droite de la nav. Le bouton Urgences
+     n'existait que dans le header mobile, masqué au-dessus de 1024 px : les
+     numéros d'urgence étaient donc inatteignables sur ordinateur. Même
+     dégradé rouge que sur mobile (blanc sur #b91c1c → 6,4:1, AA respecté). */
+  .d-nav-tools{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .d-nav-urgence{background:linear-gradient(135deg,#b91c1c,#dc2626);border:none;border-radius:10px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:900;cursor:pointer;color:#fff;box-shadow:0 3px 10px rgba(185,28,28,.4);transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+  .d-nav-urgence:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(185,28,28,.5)}
+
   /* STATS */
   .d-stats{display:flex;background:#fff;border-bottom:1px solid var(--border,#e8f0ea);padding:0 32px;justify-content:center;gap:0}
   .d-stat{display:flex;align-items:center;gap:12px;padding:16px 40px;border-right:1px solid var(--border,#e8f0ea)}
@@ -133,6 +141,25 @@
   .d-countdown-item{text-align:center;background:rgba(255,255,255,.15);border-radius:10px;padding:8px 12px;min-width:48px}
   .d-countdown-n{font-size:1.4rem;font-weight:900;line-height:1}
   .d-countdown-l{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;opacity:.8}
+
+  /* GUIDE D'ARRIVÉE — la carte « Je viens d'emménager » vit dans .content,
+     masquée au-dessus de 1024 px : sur ordinateur le guide n'était atteignable
+     que par le lien discret « Nouveaux habitants » de la nav. On reprend ici le
+     libellé mobile, qui s'adresse directement à l'habitant qui arrive. */
+  .d-guide-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1px solid var(--border,#e8f0ea);border-left:4px solid var(--leaf);border-radius:18px;padding:16px 18px;margin-bottom:16px;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 2px 8px rgba(26,61,43,.05);transition:box-shadow .15s,transform .15s}
+  .d-guide-card:hover{box-shadow:0 6px 18px rgba(26,61,43,.12);transform:translateY(-1px)}
+  .d-guide-ico{font-size:1.8rem;flex-shrink:0;line-height:1}
+  .d-guide-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+  .d-guide-title{font-size:.92rem;font-weight:900;color:var(--forest);line-height:1.25}
+  .d-guide-sub{font-size:.72rem;color:var(--muted);line-height:1.45}
+  .d-guide-arrow{font-size:1.1rem;font-weight:900;color:var(--leaf);flex-shrink:0}
+
+  /* GALERIE PHOTOS — absente du desktop jusqu'ici (tuile dans .content). */
+  #dsk-photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .d-photo-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:10px;cursor:pointer;background:var(--mist);transition:opacity .15s}
+  .d-photo-thumb:hover{opacity:.85}
+  .d-diapo-btn{width:100%;margin-top:10px;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:9px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;cursor:pointer;transition:background .15s}
+  .d-diapo-btn:hover{background:var(--leaf)}
 
   /* AGENDA */
   .d-agenda-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f5f5f5;align-items:flex-start}
@@ -216,8 +243,8 @@
   .d-footer{display:flex;background:#1a3d2b;border-top:1px solid rgba(255,255,255,.1)}
   .d-footer-bottom{max-width:1400px;width:100%;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:5px 32px;font-size:.65rem;color:rgba(255,255,255,.8);flex-wrap:wrap;gap:6px}
   .d-footer-links{display:flex;gap:14px;align-items:center}
-  .d-footer-links button{background:none;border:none;color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;padding:0}
-  .d-footer-links button:hover{color:rgba(255,255,255,.95)}
+  .d-footer-links button,.d-footer-links a{background:none;border:none;color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;padding:0;text-decoration:none}
+  .d-footer-links button:hover,.d-footer-links a:hover{color:rgba(255,255,255,.95)}
 
   .app-splash{position:fixed!important}
 }
@@ -272,3 +299,10 @@ html.theme-sombre .d-mairie-actions a,html.theme-sombre .d-mairie-actions button
 html.theme-sombre .d-nav-acc{background:#2d3748;border-color:rgba(255,255,255,.08);color:#e2e8f0}
 html.theme-sombre .d-nav-cta-app{background:#2d3748;color:#e2e8f0}
 html.theme-sombre .d-featured-img{background:var(--forest)}
+html.theme-sombre .d-guide-card{background:#1e293b;border-color:rgba(255,255,255,.08);border-left-color:#34d399}
+html.theme-sombre .d-guide-title{color:#f1f5f9}
+html.theme-sombre .d-guide-sub{color:#94a3b8}
+html.theme-sombre .d-guide-arrow{color:#34d399}
+html.theme-sombre .d-diapo-btn{background:#2d3748;color:#f1f5f9}
+html.theme-sombre .d-diapo-btn:hover{background:#374151}
+html.theme-sombre .d-photo-thumb{background:#2d3748}

@@ -77,6 +77,22 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 
 Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondant.
 
+### Sur ordinateur
+
+Au-dessus de 1024 px de large, l'accueil adopte une mise en page en trois
+colonnes, avec un menu horizontal en haut. Le contenu est le même, réorganisé :
+
+| Où | Contenu |
+|----|---------|
+| **Menu du haut** | Nouveaux habitants, associations, entreprises, documents officiels, idées, sondages, PLUi-H-D, randonnées, CCTVL — puis, à droite, **📞 Urgences** et ♿ Accessibilité |
+| **Colonne de gauche** | « Le saviez-vous ? », actualités, bus Rémi, collectes |
+| **Colonne du centre** | Prochain événement, **« Je viens d'emménager »** (guide d'arrivée), **« Vos photos »** (aperçu des 4 dernières photos + diaporama) |
+| **Colonne de droite** | Horaires de la mairie, élus, MEL, signalement rapide |
+| **Pied de page** | Radio Mézières, groupe « Ici c'est Mézières ! », RGPD, contact admin, accessibilité, nouveautés |
+
+Quelques éléments restent propres au téléphone, parce qu'ils répondent à un
+usage mobile : le prix des carburants et la présentation du majordome MAT.
+
 **Le bandeau d'accueil est vivant** : il reflète la météo réelle de la commune —
 fine pluie animée quand il pleut, flocons quand il neige, éclairs en cas d'orage,
 brume par temps de brouillard, nuages qui dérivent doucement par temps nuageux ou
@@ -393,7 +409,8 @@ liste à cocher**.
 **Où le trouver :**
 - sur téléphone, la tuile **« Je viens d'emménager »** en tête de la section
   *Démarches et Services* de l'écran d'accueil ;
-- sur ordinateur, l'entrée **« 📦 Nouveaux habitants »** du menu ;
+- sur ordinateur, la carte **« Je viens d'emménager »** au centre de l'accueil, ou
+  l'entrée **« 📦 Nouveaux habitants »** du menu du haut ;
 - directement à l'adresse **`…/#guide`** — pratique pour un QR code imprimé dans le
   courrier d'accueil de la mairie.
 
