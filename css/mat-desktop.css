@@ -1,5 +1,9 @@
-/* MAT — Desktop v4.4.0 */
-.d-topbar,.d-nav,.d-hero,.d-stats,.d-main-grid,.d-rando-banner,.d-footer{display:none}
+/* MAT — Desktop v4.5.0 */
+/* ⚠️ Tout élément propre au desktop doit figurer ici, sinon il s'affiche AUSSI
+   sur mobile. .d-sv-bandeau y est parce qu'il a été sorti de .d-main-grid : il
+   héritait jusque-là du display:none de la grille, et sans cette ligne le bloc
+   « Le saviez-vous ? » apparaissait deux fois sur téléphone. */
+.d-topbar,.d-nav,.d-hero,.d-stats,.d-main-grid,.d-sv-bandeau,.d-rando-banner,.d-footer{display:none}
 .content{display:block}
 
 @media(min-width:1024px){
@@ -84,9 +88,14 @@
   .d-stat-n{font-size:1.6rem;font-weight:900;color:var(--forest);line-height:1}
   .d-stat-l{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--sage-ink)}
 
-  /* MAIN GRID */
+  /* MAIN GRID — trois colonnes thématiques de largeur égale : « la mairie au
+     quotidien » (horaires, bus, collectes), « la vie de la commune » (évènement,
+     actualités, photos), « vous aider » (guide d'arrivée, MEL, signalement,
+     élus). Avant, les cartes étaient réparties sans logique et la colonne de
+     gauche descendait 344 px plus bas que les deux autres. */
   .content{display:none}
-  .d-main-grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:20px;max-width:1400px;margin:24px auto;padding:0 32px;flex:1}
+  .d-main-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:1400px;margin:8px auto 24px;padding:0 32px;flex:1}
+  .d-col-titre{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--sage-ink);padding:0 4px 8px;border-bottom:2px solid var(--mist);margin-bottom:14px}
 
   /* CARD */
   .d-card{background:#fff;border-radius:18px;border:1px solid var(--border,#e8f0ea);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(26,61,43,.05)}
@@ -94,20 +103,24 @@
   /* « Le saviez-vous ? » sur PC : fond clair, à l'inverse du bandeau vert
      mobile. Les contrastes sont repris de la charte (--forest / --leaf sur
      blanc) — var(--muted) sur var(--mist) échouerait AXE. */
-  .d-col-left .sv-bloc{display:block;margin-bottom:16px}
-  .d-col-left .sv-bloc:empty{display:none}
-  .d-col-left .sv-ligne{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05);color:var(--forest)}
-  .d-col-left .sv-ligne-fait{color:var(--leaf)}
-  .d-col-left .sv-corps{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05)}
-  .d-col-left .sv-question{color:var(--forest)}
-  .d-col-left .sv-btn{background:var(--mist);color:var(--forest);box-shadow:inset 0 0 0 1px rgba(45,106,79,.25)}
-  .d-col-left .sv-verdict.sv-ok{color:var(--leaf)}
-  .d-col-left .sv-verdict.sv-ko{color:#b45309}
-  .d-col-left .sv-expli{color:var(--text)}
-  .d-col-left .sv-source{color:var(--muted)}
-  .d-col-left .sv-source a{color:var(--leaf)}
-  .d-col-left .sv-part{color:var(--leaf)}
-  .d-col-left .sv-vide{color:var(--muted)}
+  /* Replié, le bloc tient sur une ligne : il est en bandeau pleine largeur
+     au-dessus des trois colonnes, comme sur mobile où il est en tête de page.
+     Il n'appartenait à aucun des trois thèmes, et l'enfermer dans une colonne
+     la déséquilibrait dès qu'on le dépliait. */
+  .d-sv-bandeau{display:block;max-width:1400px;margin:20px auto 0;padding:0 32px}
+  .d-sv-bandeau:empty{display:none}
+  .d-sv-bandeau .sv-ligne{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05);color:var(--forest)}
+  .d-sv-bandeau .sv-ligne-fait{color:var(--leaf)}
+  .d-sv-bandeau .sv-corps{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05)}
+  .d-sv-bandeau .sv-question{color:var(--forest)}
+  .d-sv-bandeau .sv-btn{background:var(--mist);color:var(--forest);box-shadow:inset 0 0 0 1px rgba(45,106,79,.25)}
+  .d-sv-bandeau .sv-verdict.sv-ok{color:var(--leaf)}
+  .d-sv-bandeau .sv-verdict.sv-ko{color:#b45309}
+  .d-sv-bandeau .sv-expli{color:var(--text)}
+  .d-sv-bandeau .sv-source{color:var(--muted)}
+  .d-sv-bandeau .sv-source a{color:var(--leaf)}
+  .d-sv-bandeau .sv-part{color:var(--leaf)}
+  .d-sv-bandeau .sv-vide{color:var(--muted)}
   .d-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f0f4f0}
   .d-card-hdr span{font-size:.82rem;font-weight:900;color:var(--forest)}
   .d-card-hdr button{background:none;border:none;color:var(--sage-ink);font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:800;cursor:pointer}
@@ -155,8 +168,10 @@
   .d-guide-arrow{font-size:1.1rem;font-weight:900;color:var(--leaf);flex-shrink:0}
 
   /* GALERIE PHOTOS — absente du desktop jusqu'ici (tuile dans .content). */
-  #dsk-photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .d-photo-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:10px;cursor:pointer;background:var(--mist);transition:opacity .15s}
+  /* Une seule rangée de 4 : c'est un aperçu, la galerie est à un clic. En 2×2
+     la carte pesait 450 px et déséquilibrait la colonne à elle seule. */
+  #dsk-photos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .d-photo-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:10px;cursor:pointer;background:var(--mist);transition:opacity .15s}
   .d-photo-thumb:hover{opacity:.85}
   .d-diapo-btn{width:100%;margin-top:10px;background:var(--forest);color:#fff;border:none;border-radius:10px;padding:9px;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;cursor:pointer;transition:background .15s}
   .d-diapo-btn:hover{background:var(--leaf)}
@@ -306,3 +321,19 @@ html.theme-sombre .d-guide-arrow{color:#34d399}
 html.theme-sombre .d-diapo-btn{background:#2d3748;color:#f1f5f9}
 html.theme-sombre .d-diapo-btn:hover{background:#374151}
 html.theme-sombre .d-photo-thumb{background:#2d3748}
+html.theme-sombre .d-col-titre{color:#94a3b8;border-bottom-color:rgba(255,255,255,.12)}
+/* Le bandeau « Le saviez-vous ? » n'avait aucune règle sombre quand il vivait en
+   colonne de gauche : il restait blanc sur fond sombre. En pleine largeur, ça se
+   voit. */
+html.theme-sombre .d-sv-bandeau .sv-ligne,
+html.theme-sombre .d-sv-bandeau .sv-corps{background:#1e293b;border-color:rgba(255,255,255,.08);color:#f1f5f9}
+html.theme-sombre .d-sv-bandeau .sv-ligne-fait{color:#34d399}
+html.theme-sombre .d-sv-bandeau .sv-question{color:#f1f5f9}
+html.theme-sombre .d-sv-bandeau .sv-btn{background:#2d3748;color:#f1f5f9;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+html.theme-sombre .d-sv-bandeau .sv-verdict.sv-ok{color:#34d399}
+html.theme-sombre .d-sv-bandeau .sv-verdict.sv-ko{color:#fbbf24}
+html.theme-sombre .d-sv-bandeau .sv-expli{color:#e2e8f0}
+html.theme-sombre .d-sv-bandeau .sv-source,
+html.theme-sombre .d-sv-bandeau .sv-vide{color:#94a3b8}
+html.theme-sombre .d-sv-bandeau .sv-source a,
+html.theme-sombre .d-sv-bandeau .sv-part{color:#34d399}

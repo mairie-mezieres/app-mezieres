@@ -950,6 +950,25 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
   est donc **invisible sur ordinateur**, sans erreur ni signe visible. Toute nouvelle
   fonctionnalité a besoin de son propre point d'entrée desktop : un bouton de `.d-nav-links`,
   une carte de `.d-main-grid`, ou un lien de `.d-footer-links`.
+- [ ] **Choisir la bonne colonne desktop.** `.d-main-grid` a trois colonnes thématiques de
+  largeur égale, chacune introduite par un `.d-col-titre` :
+  `.d-col-left` = **la mairie au quotidien** (horaires, bus, collectes) · `.d-col-center` =
+  **la vie de la commune** (évènement, actualités, photos) · `.d-col-right` = **vous aider**
+  (guide d'arrivée, MEL, signalement, élus). Placer la carte selon son thème, pas selon la
+  place disponible. Ce qui n'entre dans aucun des trois va en bandeau pleine largeur
+  au-dessus de la grille (voir `.d-sv-bandeau`).
+- [ ] **Vérifier l'équilibre des colonnes après ajout.** Une carte trop haute fait déborder
+  sa colonne — c'est arrivé avec les actualités à 5 articles (583 px, contre 89 à 262 px pour
+  les autres cartes), qui creusaient un écart de 344 px. Les listes desktop sont des
+  **aperçus** : 3 actualités, 4 photos sur une rangée, le reste derrière « Toutes → ».
+  Mesure rapide, en console sur l'accueil ≥ 1024 px :
+  ```js
+  [...document.querySelectorAll('.d-col')].map(c => [
+    c.querySelector('.d-col-titre')?.textContent,
+    [...c.children].reduce((s, k) => s + k.getBoundingClientRect().height + 16, 0) | 0
+  ])
+  ```
+  Viser moins de ~200 px d'écart entre la plus haute et la plus basse.
   Vérification rapide de ce qui manque :
   ```bash
   # points d'entrée mobile absents du desktop
