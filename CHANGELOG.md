@@ -5,6 +5,30 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.58] — 6 août 2026
+
+### Modifié
+- **Grille desktop réorganisée par thème, colonnes de largeur égale.** Les cartes étaient
+  réparties sans logique et la colonne de gauche descendait **344 px** plus bas que les deux
+  autres (1114 px contre 770 et 781, mesuré à 1920 px). Trois colonnes désormais, chacune
+  introduite par un `.d-col-titre` : `.d-col-left` « 🏛️ La mairie au quotidien » (horaires,
+  bus, collectes), `.d-col-center` « 📰 La vie de la commune » (évènement, actualités,
+  photos), `.d-col-right` « 🤝 Vous aider » (guide d'arrivée, MEL, signalement, élus).
+  `grid-template-columns` passe de `1fr 1.15fr 1fr` à `1fr 1fr 1fr`.
+- **« Le saviez-vous ? » sort des colonnes** et devient un bandeau pleine largeur
+  (`.d-sv-bandeau`) au-dessus de la grille, comme sur mobile où il est en tête de page. Il
+  n'appartenait à aucun des trois thèmes, et l'enfermer dans une colonne la déséquilibrait
+  dès qu'on le dépliait.
+- **Densité des aperçus réduite** : `loadActus()` affiche 3 articles au lieu de 5 (carte
+  583 → 360 px), et `#dsk-photos-grid` passe de 2×2 à une rangée de 4 vignettes carrées
+  (450 → 214 px). Ce sont des aperçus — « Toutes → » et « Galerie → » ouvrent le reste.
+- Résultat mesuré : **789 / 843 / 668 px**, écart max ramené de 344 à **175 px**.
+
+### Corrigé
+- **Le bandeau « Le saviez-vous ? » restait blanc sur fond sombre.** Les règles
+  `.d-col-left .sv-*` n'avaient aucun pendant `html.theme-sombre` ; le défaut existait déjà
+  mais passait inaperçu dans une colonne étroite. Onze règles sombres ajoutées.
+
 ## [4.57] — 5 août 2026
 
 ### Ajouté

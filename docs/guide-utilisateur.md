@@ -80,15 +80,20 @@ Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondan
 ### Sur ordinateur
 
 Au-dessus de 1024 px de large, l'accueil adopte une mise en page en trois
-colonnes, avec un menu horizontal en haut. Le contenu est le même, réorganisé :
+colonnes de largeur égale, avec un menu horizontal en haut. Le contenu est le
+même, réorganisé **par thème** — chaque colonne porte son titre :
 
 | Où | Contenu |
 |----|---------|
 | **Menu du haut** | Nouveaux habitants, associations, entreprises, documents officiels, idées, sondages, PLUi-H-D, randonnées, CCTVL — puis, à droite, **📞 Urgences** et ♿ Accessibilité |
-| **Colonne de gauche** | « Le saviez-vous ? », actualités, bus Rémi, collectes |
-| **Colonne du centre** | Prochain événement, **« Je viens d'emménager »** (guide d'arrivée), **« Vos photos »** (aperçu des 4 dernières photos + diaporama) |
-| **Colonne de droite** | Horaires de la mairie, élus, MEL, signalement rapide |
+| **Bandeau pleine largeur** | « Le saviez-vous ? » — le fait du jour (voir §18) |
+| **🏛️ La mairie au quotidien** | Horaires de la mairie (+ téléphone, écrire), bus Rémi, collectes |
+| **📰 La vie de la commune** | Prochain évènement, actualités (3 derniers articles), « Vos photos » (aperçu des 4 dernières + diaporama) |
+| **🤝 Vous aider** | « Je viens d'emménager » (guide d'arrivée), MEL, signalement rapide, contacter vos élus |
 | **Pied de page** | Radio Mézières, groupe « Ici c'est Mézières ! », RGPD, contact admin, accessibilité, nouveautés |
+
+Les listes sont volontairement courtes — 3 actualités, 4 photos : ce sont des
+aperçus. « Toutes → » et « Galerie → » ouvrent la liste complète.
 
 Quelques éléments restent propres au téléphone, parce qu'ils répondent à un
 usage mobile : le prix des carburants et la présentation du majordome MAT.

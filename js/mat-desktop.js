@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.2.0 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.3.0 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 
@@ -86,7 +86,9 @@ function loadActus(){
         return;
       }
       var html='';
-      items.slice(0,5).forEach(function(a){
+      // 3 et non 5 : à 5 articles la carte pesait 583 px, plus que toute autre,
+      // et faisait déborder sa colonne. « Toutes → » est juste au-dessus.
+      items.slice(0,3).forEach(function(a){
         var img=a.photo?'<img src="'+escHtml(matCloudImg(a.photo,120))+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'';
         var rawDate=a.date||a.createdAt||'';
         var dateStr=rawDate?fmtShort(rawDate):'';
