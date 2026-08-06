@@ -44,7 +44,7 @@ document.documentElement.style.background = bg;
 })();
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.11.0">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.4.0">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.57 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.58 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -361,12 +361,13 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 </div>
 <main id="main-content">
+<section class="sv-bloc sv-bloc-d d-sv-bandeau" aria-label="Le saviez-vous ? Le fait du jour sur la commune"></section>
 <div class="d-main-grid">
 <div class="d-col d-col-left">
-<section class="sv-bloc sv-bloc-d" aria-label="Le saviez-vous ? Le fait du jour sur la commune"></section>
-<div class="d-card" id="dsk-actus">
-<div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
-<div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+<div class="d-col-titre">🏛️ La mairie au quotidien</div>
+<div class="d-card" id="dsk-mairie">
+<div class="d-card-hdr"><span>🏛️ Horaires de la mairie</span><button onclick="openContact()">Contacter →</button></div>
+<div class="d-card-body" id="dsk-mairie-body"></div>
 </div>
 <div class="d-card" id="dsk-bus">
 <div class="d-card-hdr"><span>🚌 Bus Rémi</span><button onclick="openRemi()">Tout voir →</button></div>
@@ -378,15 +379,12 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 </div>
 <div class="d-col d-col-center">
+<div class="d-col-titre">📰 La vie de la commune</div>
 <div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
-<button type="button" class="d-guide-card" onclick="openGuideArrivee()">
-<span class="d-guide-ico" aria-hidden="true">📦</span>
-<span class="d-guide-txt">
-<span class="d-guide-title">Je viens d’emménager</span>
-<span class="d-guide-sub">Guide d’arrivée des nouveaux habitants — démarches, écoles, déchets, fibre…</span>
-</span>
-<span class="d-guide-arrow" aria-hidden="true">→</span>
-</button>
+<div class="d-card" id="dsk-actus">
+<div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
+<div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+</div>
 <div class="d-card" id="dsk-photos">
 <div class="d-card-hdr"><span>📸 Vos photos</span><button onclick="openPhotos()">Galerie →</button></div>
 <div class="d-card-body">
@@ -396,14 +394,15 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 </div>
 <div class="d-col d-col-right">
-<div class="d-card" id="dsk-mairie">
-<div class="d-card-hdr"><span>🏛️ Mairie</span><button onclick="openContact()">Contacter →</button></div>
-<div class="d-card-body" id="dsk-mairie-body"></div>
-</div>
-<div class="d-card">
-<div class="d-card-hdr"><span>🏛️ Élus</span><button onclick="openConseil()">Voir tous →</button></div>
-<div class="d-card-body" id="dsk-elus-body"><div class="d-loading">Chargement…</div></div>
-</div>
+<div class="d-col-titre">🤝 Vous aider</div>
+<button type="button" class="d-guide-card" onclick="openGuideArrivee()">
+<span class="d-guide-ico" aria-hidden="true">📦</span>
+<span class="d-guide-txt">
+<span class="d-guide-title">Je viens d’emménager</span>
+<span class="d-guide-sub">Guide d’arrivée des nouveaux habitants — démarches, écoles, déchets, fibre…</span>
+</span>
+<span class="d-guide-arrow" aria-hidden="true">→</span>
+</button>
 <div class="d-mel-cta-panel">
 <div class="d-mel-hdr">
 <img src="img/MAT et MEL.webp" alt="MEL" class="d-mel-img" loading="lazy" onerror="this.style.display='none'">
@@ -423,6 +422,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openSignal()">🗑️ Propreté</button>
 </div>
 <button type="button" onclick="openSuivi('signalements')" style="display:block;width:100%;margin-top:8px;padding:7px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#1e40af;font-size:.75rem;cursor:pointer;font-family:inherit;text-align:center">📋 Suivi des signalements →</button>
+</div>
+<div class="d-card">
+<div class="d-card-hdr"><span>🏛️ Contacter vos élus</span><button onclick="openConseil()">Voir tous →</button></div>
+<div class="d-card-body" id="dsk-elus-body"><div class="d-loading">Chargement…</div></div>
 </div>
 </div>
 </div>
@@ -465,7 +468,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.57</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.58</button>
 </div>
 </div>
 </div>
@@ -1599,7 +1602,7 @@ et accompagnée des documents suivants :
 </div>
 </template>
 </div>
-<script defer src="js/mat-desktop.js?v=4.2.0"></script>
+<script defer src="js/mat-desktop.js?v=4.3.0"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1668,6 +1671,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 6 ao&ucirc;t 2026 — v4.58</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>La page d&rsquo;accueil sur ordinateur est r&eacute;organis&eacute;e par th&egrave;me.</strong> Les cartes &eacute;taient r&eacute;parties sans logique &mdash; les horaires du bus voisinaient avec le fait du jour, et la colonne de gauche descendait bien plus bas que les deux autres. Il y a maintenant <strong>trois colonnes de m&ecirc;me largeur</strong>, chacune avec son titre&nbsp;: <strong>🏛️ La mairie au quotidien</strong> (horaires, bus R&eacute;mi, collectes), <strong>📰 La vie de la commune</strong> (prochain &eacute;v&egrave;nement, actualit&eacute;s, photos) et <strong>🤝 Vous aider</strong> (guide d&rsquo;arriv&eacute;e, MEL, signalement, &eacute;lus)</li>
+<li><strong>&laquo;&nbsp;Le saviez-vous&nbsp;?&nbsp;&raquo; passe en bandeau</strong>, sur toute la largeur au-dessus des colonnes &mdash; comme sur t&eacute;l&eacute;phone, o&ugrave; il est en haut de page. Il s&rsquo;affiche enfin correctement en <strong>th&egrave;me sombre</strong>&nbsp;: il restait blanc sur fond sombre</li>
+<li>La carte <strong>Actualit&eacute;s</strong> montre les <strong>3 derniers articles</strong> au lieu de 5, et l&rsquo;aper&ccedil;u des <strong>photos</strong> tient sur une seule rang&eacute;e. Le bouton &laquo;&nbsp;Toutes&nbsp;&raquo; et la galerie compl&egrave;te sont toujours &agrave; un clic</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 5 ao&ucirc;t 2026 — v4.57</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les num&eacute;ros d&rsquo;urgence arrivent sur ordinateur.</strong> Le bouton rouge &laquo;&nbsp;📞&nbsp;Urgences&nbsp;&raquo; n&rsquo;existait que sur t&eacute;l&eacute;phone&nbsp;: depuis un PC, il n&rsquo;y avait <strong>aucun moyen</strong> d&rsquo;acc&eacute;der aux num&eacute;ros de secours et aux services de garde. Il est d&eacute;sormais en haut &agrave; droite, &agrave; c&ocirc;t&eacute; d&rsquo;Accessibilit&eacute;</li>
