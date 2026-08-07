@@ -402,6 +402,11 @@ La page comporte quatre parties :
    menu en version ordinateur), **sans attendre que vous ouvriez la page** ; elle disparaît une
    fois la page consultée.
 
+Dans la liste, **chaque document que vous n'avez pas encore ouvert porte sa propre pastille
+« Nouveau »** et un contour vert : quand plusieurs documents sont publiés, vous voyez d'un
+coup d'œil lequel vient d'arriver. Les pastilles restent affichées pendant toute votre visite
+et ont disparu à la suivante.
+
 Un document peut être soit hébergé par l'application, soit renvoyer vers le site de la CCTVL —
 la différence ne se voit pas à l'usage. Les documents déjà affichés une fois restent
 **consultables hors connexion**, comme le reste de la page.

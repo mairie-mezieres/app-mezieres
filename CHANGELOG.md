@@ -5,6 +5,36 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.60] — 7 août 2026
+
+### Corrigé
+- **Un document PDF envoyé depuis l'admin renvoyait `HTTP ERROR 401`.** Le fichier se
+  téléversait sans erreur, l'écran affichait « Document publié », la liste l'affichait — et
+  le lien était inouvrable. Cloudinary bloque **par défaut** la livraison des « types de
+  médias restreints », PDF en tête, et répond 401 sur l'URL nue : `resource_type: "raw"`
+  était nécessaire mais **pas suffisant**. L'URL de livraison est désormais **signée**
+  (`pluiDocUrl()`, backend), une URL signée étant délivrée même quand le type est restreint.
+  Elle n'est plus stockée mais reconstruite à chaque `GET /docs/plui` à partir du `publicId`,
+  ce qui répare sans migration les documents envoyés avant le correctif. Voir ADR-0014,
+  section « Mise à jour du 7 août 2026 ».
+
+### Ajouté
+- **Pastille « Nouveau » sur chaque document non encore consulté** (+ contour vert), et plus
+  seulement sur le bandeau d'accueil. Avec plusieurs documents publiés, rien n'indiquait
+  lequel venait d'arriver.
+
+### Modifié
+- **Le suivi « déjà vu » passe des identifiants de documents à la place d'une clé globale**
+  (`mat_plui_docs_seen` contient désormais un tableau d'`id`). L'ancienne clé
+  *date du plus récent + nombre* disait seulement « quelque chose a changé » : elle ne
+  permettait pas de savoir **quel** document était neuf, donc pas de le signaler dans la
+  liste. L'ancienne valeur est ignorée sans casse (repli sur « rien de vu »).
+- `GET /docs/plui` n'expose plus le `publicId` Cloudinary — détail interne — et renvoie à la
+  place un booléen `fichier` qui dit à l'admin si le document est hébergé (📎) ou pointé par
+  un lien (🔗).
+
+---
+
 ## [4.59] — 7 août 2026
 
 ### Ajouté

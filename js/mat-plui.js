@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Grand dossier PLUi-H-D v1.1.0
+   MAT — Grand dossier PLUi-H-D v1.2.0
    Page dédiée au Plan Local d’Urbanisme intercommunal (Habitat +
    Déplacements) porté par la CCTVL. Feature 100 % additive.
 
@@ -70,23 +70,32 @@ function _fetchDocs(){
     .catch(function(){ return PLUI_DOCS; });
 }
 
-// Clé de fraîcheur : date du document le plus récent + nombre de documents.
-// Change dès qu’un document est ajouté → le badge réapparaît.
-function _latestDocKey(){
-  if(!PLUI_DOCS.length) return null;
-  var latest = PLUI_DOCS.map(function(d){ return String(d.date || ''); }).sort().slice(-1)[0];
-  return latest + '|' + PLUI_DOCS.length;
+// On mémorise les identifiants des documents déjà vus, et non plus une seule
+// clé « date du plus récent + nombre ». Cette clé globale disait uniquement
+// « quelque chose a changé » : impossible d’en déduire QUEL document est neuf,
+// donc impossible de le signaler dans la liste. Un ensemble d’identifiants
+// répond aux deux questions à la fois.
+function _seenIds(){
+  try {
+    var arr = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
+    return Array.isArray(arr) ? arr.map(String) : [];
+  } catch(_) { return []; }   // ancienne valeur (chaîne « date|n ») → repart de zéro
+}
+
+function _isNewDoc(d, seen){
+  return seen.indexOf(String(d && d.id)) === -1;
 }
 
 function hasNewPluiDoc(){
-  var k = _latestDocKey();
-  if(!k) return false;
-  try { return localStorage.getItem(SEEN_KEY) !== k; } catch(_) { return true; }
+  if(!PLUI_DOCS.length) return false;
+  var seen = _seenIds();
+  return PLUI_DOCS.some(function(d){ return _isNewDoc(d, seen); });
 }
 
 function _markPluiSeen(){
-  var k = _latestDocKey();
-  try { if(k) localStorage.setItem(SEEN_KEY, k); } catch(_){}
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify(PLUI_DOCS.map(function(d){ return String(d.id); })));
+  } catch(_){}
 }
 
 // Affiche/masque les pastilles « Nouveau » (bandeau mobile + menu bureau).
@@ -153,12 +162,19 @@ function _renderDocs(){
     return;
   }
   var docs = PLUI_DOCS.slice().sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
+  // Les documents non encore consultés sont signalés individuellement. La liste
+  // est rendue AVANT _markPluiSeen(), donc les pastilles restent visibles
+  // pendant toute la visite — elles ne disparaissent qu’à la suivante.
+  var seen = _seenIds();
   el.innerHTML = docs.map(function(d){
+    var neuf = _isNewDoc(d, seen);
     return '<a href="' + _esc(d.url) + '" target="_blank" rel="noopener noreferrer" '
-      + 'style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1.5px solid var(--border);'
-      + 'border-radius:14px;text-decoration:none;color:var(--text);-webkit-tap-highlight-color:transparent">'
+      + 'style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:1.5px solid '
+      +   (neuf ? 'var(--leaf)' : 'var(--border)') + ';'
+      + 'border-radius:14px;text-decoration:none;color:var(--text);-webkit-tap-highlight-color:transparent;margin-bottom:10px">'
       + '<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">📄</div>'
       + '<div style="flex:1;min-width:0">'
+      +   (neuf ? '<div style="display:inline-block;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;padding:2px 8px;border-radius:999px;margin-bottom:5px">Nouveau</div>' : '')
       +   '<div style="font-weight:900;font-size:0.92rem;line-height:1.35;color:var(--forest)">' + _esc(d.titre) + '</div>'
       +   '<div style="font-size:0.72rem;color:var(--muted);margin-top:4px">📅 ' + _esc(_frDate(d.date)) + '</div>'
       + '</div>'
