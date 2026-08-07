@@ -92,6 +92,17 @@ opération d'édition ne prouve pas la justesse du résultat.
    par `ambTwinkle`, et dispersées dans le bandeau (des glyphes en flux normal
    partagent la même ordonnée — c'est la signature du bug).
 
+   ⚠️ Ce test est **mobile uniquement**, et le premier passage en CI l'a rappelé
+   en échouant sur `desktop-chromium` : le bandeau est masqué au-dessus de
+   1024 px (`css/mat-desktop.css` → `.header{display:none}`), donc tous les
+   `getBoundingClientRect()` y valent zéro. Détail à retenir : `position` et
+   `animation` s'y résolvaient malgré tout correctement, car `getComputedStyle`
+   renvoie la valeur calculée même sur un élément non rendu. **C'est bien la
+   géométrie — et elle seule — qui distingue une règle appliquée d'une règle
+   avalée**, puisque même sur un élément `position:static` les `top`/`left` posés
+   en style inline restent présents dans le style calculé. Le test se `skip`
+   explicitement quand le bandeau n'est pas affiché.
+
 ## Conséquences
 
 - Toute future accolade orpheline échoue en CI avant la revue, dans les trois
