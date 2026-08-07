@@ -395,10 +395,16 @@ La page comporte quatre parties :
    cours** (mise en avant) et les étapes à venir.
 3. **Donnez votre avis** — quatre moyens de participer à la concertation : cahier en mairie,
    mail, courrier, formulaire en ligne de la CCTVL.
-4. **Documents officiels** — la liste des documents du PLUi-H-D. Tant qu'aucun document n'est
-   publié, un message l'indique. **Dès qu'un nouveau document est disponible, une pastille
-   « Nouveau »** apparaît sur le bandeau d'accueil (et sur l'entrée du menu en version
-   ordinateur) ; elle disparaît une fois la page consultée.
+4. **Documents officiels** — la liste des documents du PLUi-H-D, **publiée par la mairie au
+   fil de l'eau** depuis son tableau de bord (à commencer par le dossier d'enquête publique).
+   Tant qu'aucun document n'est publié, un message l'indique. **Dès qu'un nouveau document est
+   disponible, une pastille « Nouveau »** apparaît sur le bandeau d'accueil (et sur l'entrée du
+   menu en version ordinateur), **sans attendre que vous ouvriez la page** ; elle disparaît une
+   fois la page consultée.
+
+Un document peut être soit hébergé par l'application, soit renvoyer vers le site de la CCTVL —
+la différence ne se voit pas à l'usage. Les documents déjà affichés une fois restent
+**consultables hors connexion**, comme le reste de la page.
 
 ---
 

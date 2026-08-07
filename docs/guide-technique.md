@@ -84,7 +84,7 @@ app-mezieres/
 │   ├── mat-trombi.js       Trombinoscope des élus
 │   ├── mat-associations.js Liste des associations
 │   ├── mat-entreprises.js  Annuaire des entreprises
-│   ├── mat-plui.js         Grand dossier PLUi-H-D (contenu embarqué)
+│   ├── mat-plui.js         Grand dossier PLUi-H-D (page embarquée ; documents via /docs/plui)
 │   ├── mat-guide-arrivee.js Guide d'arrivée des nouveaux habitants (embarqué)
 │   ├── mat-saviez-vous.js  « Le saviez-vous ? » — fait du jour (corpus + calculs)
 │   ├── mat-sondages.js     Sondages citoyens

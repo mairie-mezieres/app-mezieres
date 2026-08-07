@@ -5,6 +5,36 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.59] — 7 août 2026
+
+### Ajouté
+- **Les documents du PLUi-H-D s'administrent depuis le tableau de bord.** Nouvelle section
+  « Documents du PLUi-H-D » dans l'onglet 📁 Documents (`admin.html`) : titre, date, puis au
+  choix un **fichier PDF** (jusqu'à 4 Mo, hébergé via Cloudinary en `resource_type: "raw"`)
+  ou un **lien externe** sans limite de taille. Côté backend : `GET /docs/plui`,
+  `POST`/`DELETE /admin/docs/plui`, stockage `mat:docs:plui`, sur le patron des « documents
+  temporaires » de `routes/docs.js`. Voir ADR-0014.
+
+### Modifié
+- **`PLUI_DOCS` n'est plus une constante à éditer** (`js/mat-plui.js` v1.1.0). Le tableau
+  était vide et le serait resté : publier un document imposait un commit et un déploiement.
+  Il devient le miroir local de `GET /docs/plui`, réhydraté depuis `localStorage`
+  (`mat_plui_docs_cache`) — **la page reste consultable hors connexion**, ce qui aurait été
+  perdu en passant naïvement au réseau.
+- **La pastille « Nouveau » s'allume enfin au bon moment.** La liste est rafraîchie au
+  démarrage de l'application (différé de 2,5 s), et plus seulement à l'ouverture de la page :
+  chargée à l'ouverture, le badge ne se serait allumé qu'une fois la page déjà vue.
+
+### Sécurité / robustesse
+- Garde-fou de taille **dans le navigateur** avant tout envoi : un PDF de plus de 4 Mo est
+  refusé avec la marche à suivre (déposer sur Drive et coller le lien), plutôt que de laisser
+  partir une requête qui reviendrait en 413. `/admin/docs/plui` est ajouté à
+  `_isLargeBodyRoute` côté backend (6 Mo au lieu de 256 Ko).
+- Supprimer un document supprime aussi le fichier hébergé (pas de PDF orphelin) et l'action
+  est tracée au **journal d'audit**.
+
+---
+
 ## [4.58] — 6 août 2026
 
 ### Modifié

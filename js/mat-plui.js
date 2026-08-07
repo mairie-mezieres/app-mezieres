@@ -1,7 +1,13 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Grand dossier PLUi-H-D v1.0.0
+   MAT — Grand dossier PLUi-H-D v1.1.0
    Page dédiée au Plan Local d’Urbanisme intercommunal (Habitat +
    Déplacements) porté par la CCTVL. Feature 100 % additive.
+
+   v1.1.0 — la liste des documents officiels n’est plus écrite en dur :
+   elle vient de GET /docs/plui et s’administre depuis le tableau de bord
+   (onglet 📄 Documents). Le reste de la page — frise, textes, moyens de
+   participer — reste embarqué : il change au rythme d’un commit, pas
+   d’une décision de la mairie.
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
 (function(){
@@ -22,12 +28,47 @@ var PLUI_TIMELINE = [
 ];
 
 // ── Documents officiels ──────────────────────────────────────
-// VIDE pour l’instant. Ajouter un objet { titre, url, date } (date au
-// format AAAA-MM-JJ) affiche la liste ET déclenche le badge « Nouveau »
-// sur le bandeau mobile et l’entrée du menu bureau.
+// Administrés depuis le tableau de bord (onglet 📄 Documents → « Documents du
+// PLUi-H-D »). Chaque entrée : { id, titre, date (AAAA-MM-JJ), url }.
+// Ce tableau n’est plus une source à éditer : c’est le miroir local de
+// GET /docs/plui, réhydraté depuis localStorage au démarrage.
 var PLUI_DOCS = [];
 
-var SEEN_KEY = 'mat_plui_docs_seen';
+var SEEN_KEY  = 'mat_plui_docs_seen';
+var CACHE_KEY = 'mat_plui_docs_cache';
+
+// La page doit rester consultable hors connexion — c’est sa promesse depuis le
+// premier jour. On garde donc une copie locale de la dernière liste reçue :
+// sans réseau, on affiche celle-ci plutôt qu’un écran vide.
+function _readCache(){
+  try {
+    var raw = localStorage.getItem(CACHE_KEY);
+    var arr = raw ? JSON.parse(raw) : null;
+    return Array.isArray(arr) ? arr : [];
+  } catch(_) { return []; }
+}
+
+function _writeCache(docs){
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(docs)); } catch(_){}
+}
+
+PLUI_DOCS = _readCache();
+
+// Rafraîchit la liste depuis le backend. Silencieux en cas d’échec : le cache
+// prend le relais. Renvoie une promesse pour que openPlui() puisse re-rendre.
+function _fetchDocs(){
+  var api = (typeof window !== 'undefined' && window.MAT_API) || '';
+  if(!api) return Promise.resolve(PLUI_DOCS);
+  return fetch(api + '/docs/plui', { cache:'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d || !Array.isArray(d.docs)) return PLUI_DOCS;
+      PLUI_DOCS = d.docs;
+      _writeCache(PLUI_DOCS);
+      return PLUI_DOCS;
+    })
+    .catch(function(){ return PLUI_DOCS; });
+}
 
 // Clé de fraîcheur : date du document le plus récent + nombre de documents.
 // Change dès qu’un document est ajouté → le badge réapparaît.
@@ -133,10 +174,28 @@ window.openPlui = function(){
   if(typeof trackStat === 'function'){ try { trackStat('plui'); } catch(_){} }
   openOv('plui');
   _renderTimeline();
+  // On affiche d’abord ce qu’on a (cache), puis on rafraîchit : la page ne
+  // reste jamais bloquée sur « Chargement… » si le réseau est absent.
   _renderDocs();
-  // Consulter la page « éteint » le badge Nouveau.
-  _markPluiSeen();
-  refreshPluiBadge();
+  _fetchDocs().then(function(){
+    _renderDocs();
+    // Le marquage « vu » se fait APRÈS le rafraîchissement, sinon un document
+    // arrivé pendant la consultation serait considéré comme déjà lu.
+    _markPluiSeen();
+    refreshPluiBadge();
+  });
 };
+
+// Rafraîchissement d’arrière-plan au démarrage de l’application. Sans lui, la
+// pastille « Nouveau » ne pourrait s’allumer qu’après une première ouverture de
+// la page — c’est-à-dire jamais au bon moment. Différé pour ne pas concurrencer
+// les widgets d’accueil au premier rendu.
+setTimeout(function(){
+  _fetchDocs().then(function(){
+    refreshPluiBadge();
+    // Si la page est déjà ouverte quand la réponse arrive, on la met à jour.
+    if(document.getElementById('plui-docs')) _renderDocs();
+  });
+}, 2500);
 
 })();

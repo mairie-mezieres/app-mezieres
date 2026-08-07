@@ -332,6 +332,46 @@ tr:hover td{background:#f9fafb;}
         <div class="table-header"><span class="table-title">Documents temporaires</span></div>
         <div id="docs-admin-list"><div style="padding:20px;color:var(--muted);text-align:center">Chargement…</div></div>
       </div>
+
+      <div class="section-title">Documents du PLUi-H-D</div>
+      <div style="background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px">
+        <div class="section-title" style="margin-top:0">Ajouter un document</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;margin-bottom:12px">
+          Ces documents s'affichent dans la page « Grand dossier PLUi-H-D » de l'application.
+          Dès qu'un document est ajouté, une pastille <strong>« Nouveau »</strong> apparaît sur
+          l'accueil des habitants.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:600px">
+          <input id="plui-new-titre" type="text" placeholder="Titre *" maxlength="200"
+            style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+          <label style="font-size:0.76rem;font-weight:800;color:var(--muted)">Date du document *</label>
+          <input id="plui-new-date" type="date"
+            style="width:100%;max-width:220px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+
+          <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px">
+            <div style="font-size:0.76rem;font-weight:800;color:var(--muted);margin-bottom:6px">Option 1 — envoyer le fichier PDF (jusqu'à 4 Mo)</div>
+            <input id="plui-new-file" type="file" accept="application/pdf" onchange="onPluiFileChosen()"
+              style="width:100%;font-family:Nunito,sans-serif;font-size:0.82rem">
+            <div id="plui-file-info" style="font-size:0.76rem;color:var(--muted);margin-top:6px;min-height:1.2em"></div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);padding-top:12px">
+            <div style="font-size:0.76rem;font-weight:800;color:var(--muted);margin-bottom:6px">Option 2 — coller un lien (Drive, site de la CCTVL…) — sans limite de taille</div>
+            <input id="plui-new-url" type="url" placeholder="https://…"
+              style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:Nunito,sans-serif;font-size:0.86rem">
+          </div>
+
+          <button onclick="addPluiDoc()" id="plui-add-btn"
+            style="align-self:flex-start;background:var(--forest);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:Nunito,sans-serif;font-size:0.84rem;font-weight:800;cursor:pointer">
+            + Ajouter
+          </button>
+          <div id="plui-add-status" style="font-size:0.78rem;min-height:1.2em"></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Documents du PLUi-H-D</span></div>
+        <div id="plui-admin-list"><div style="padding:20px;color:var(--muted);text-align:center">Chargement…</div></div>
+      </div>
     </div>
   </div>
   <div class="tab-panel" id="tab-sondages">
@@ -2983,6 +3023,7 @@ async function loadDocsAdmin() {
   if (!el) return;
   el.innerHTML = '<div style="padding:20px;color:var(--muted);text-align:center">Chargement…</div>';
   loadFeaturedDocAdmin();
+  loadPluiDocsAdmin();
   try {
     const r = await apiGet('/docs/temp');
     renderDocsAdmin(r.docs || []);
@@ -3044,6 +3085,143 @@ async function deleteTempDoc(id) {
   try {
     const r = await apiDelete(`/admin/docs/temp/${id}`);
     renderDocsAdmin(r.docs || []);
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+// ── Documents du PLUi-H-D ───────────────────────────────────
+// Le backend plafonne le corps de requête à 6 Mo et l'encodage base64 gonfle le
+// fichier d'un tiers : au-delà de 4 Mo l'envoi échouerait en 413. On arrête donc
+// dans le navigateur, avec un message qui dit quoi faire à la place.
+const PLUI_MAX_FILE_BYTES = 4 * 1024 * 1024;
+
+function _pluiStatus(msg, color) {
+  const st = document.getElementById('plui-add-status');
+  if (!st) return;
+  st.textContent = msg;
+  st.style.color = color || 'var(--muted)';
+}
+
+function onPluiFileChosen() {
+  const input = document.getElementById('plui-new-file');
+  const info  = document.getElementById('plui-file-info');
+  const f = input && input.files && input.files[0];
+  if (!info) return;
+  if (!f) { info.textContent = ''; info.style.color = 'var(--muted)'; return; }
+  const mo = (f.size / 1024 / 1024).toFixed(1);
+  if (f.size > PLUI_MAX_FILE_BYTES) {
+    info.textContent = `⚠️ ${mo} Mo — trop lourd pour un envoi direct. Déposez le document sur Drive (ou sur le site de la CCTVL) et collez le lien dans l'option 2.`;
+    info.style.color = 'var(--red)';
+    input.value = '';
+    return;
+  }
+  info.textContent = `✅ ${f.name} — ${mo} Mo`;
+  info.style.color = 'var(--leaf)';
+}
+
+function _readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload  = () => resolve(fr.result);
+    fr.onerror = () => reject(new Error('Lecture du fichier impossible'));
+    fr.readAsDataURL(file);
+  });
+}
+
+async function loadPluiDocsAdmin() {
+  const el = document.getElementById('plui-admin-list');
+  if (!el) return;
+  try {
+    const r = await apiGet('/docs/plui');
+    renderPluiDocsAdmin(r.docs || []);
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);padding:12px">Erreur : ' + safe(e.message) + '</div>';
+  }
+}
+
+function renderPluiDocsAdmin(docs) {
+  const el = document.getElementById('plui-admin-list');
+  if (!el) return;
+  if (!docs.length) {
+    el.innerHTML = '<div style="padding:24px;color:var(--muted);font-size:0.84rem;text-align:center">Aucun document PLUi publié</div>';
+    return;
+  }
+  // Même tri que l'application : du plus récent au plus ancien.
+  const sorted = docs.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<tr style="background:var(--warm)">'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Titre</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Date</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Document</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:0.72rem;font-weight:900;color:var(--muted);text-transform:uppercase">Action</th>'
+    + '</tr>'
+    + sorted.map(function(d) {
+      const url = String(d.url || '');
+      return '<tr style="border-top:1px solid var(--border)">'
+        + '<td style="padding:10px 14px;font-weight:800;font-size:0.84rem">' + safe(d.titre) + '</td>'
+        + '<td style="padding:10px 14px;color:var(--muted);font-size:0.78rem;white-space:nowrap">' + safe(d.date || '—') + '</td>'
+        + '<td style="padding:10px 14px;font-size:0.75rem">'
+        +   (d.publicId ? '<span title="Fichier hébergé par l\'application" style="margin-right:6px">📎</span>' : '<span title="Lien externe" style="margin-right:6px">🔗</span>')
+        +   '<a href="' + safeUrl(url) + '" target="_blank" style="color:var(--leaf)">' + safe(url.length > 50 ? url.substring(0, 50) + '…' : url) + '</a></td>'
+        + '<td style="padding:10px 14px"><button onclick="deletePluiDoc(' + d.id + ')" style="background:#ef4444;color:white;border:none;border-radius:8px;padding:6px 12px;font-family:Nunito,sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer">Supprimer</button></td>'
+        + '</tr>';
+    }).join('')
+    + '</table>';
+}
+
+async function addPluiDoc() {
+  const titre = (document.getElementById('plui-new-titre').value || '').trim();
+  const date  = (document.getElementById('plui-new-date').value  || '').trim();
+  const url   = (document.getElementById('plui-new-url').value   || '').trim();
+  const fileInput = document.getElementById('plui-new-file');
+  const file  = fileInput && fileInput.files && fileInput.files[0];
+  const btn   = document.getElementById('plui-add-btn');
+
+  if (!titre)        return _pluiStatus('⚠️ Titre requis', 'var(--red)');
+  if (!date)         return _pluiStatus('⚠️ Date requise', 'var(--red)');
+  if (!file && !url) return _pluiStatus('⚠️ Choisissez un fichier PDF ou collez un lien', 'var(--red)');
+  if (file && url)   return _pluiStatus('⚠️ Choisissez soit un fichier, soit un lien — pas les deux', 'var(--red)');
+  if (file && file.size > PLUI_MAX_FILE_BYTES) {
+    return _pluiStatus('⚠️ Fichier trop lourd — déposez-le sur Drive et collez le lien', 'var(--red)');
+  }
+
+  const body = { titre, date };
+  if (file) {
+    if (file.type !== 'application/pdf') return _pluiStatus('⚠️ Seuls les fichiers PDF sont acceptés', 'var(--red)');
+    _pluiStatus('Lecture du fichier…');
+    try { body.fileB64 = await _readFileAsDataUrl(file); }
+    catch(e) { return _pluiStatus('❌ ' + e.message, 'var(--red)'); }
+  } else {
+    body.url = url;
+  }
+
+  if (btn) btn.disabled = true;
+  _pluiStatus(file ? 'Envoi du document en cours…' : 'Ajout en cours…');
+  try {
+    const r = await apiPost('/admin/docs/plui', body);
+    if (!r.ok) throw new Error(r.error || 'Erreur');
+    document.getElementById('plui-new-titre').value = '';
+    document.getElementById('plui-new-date').value  = '';
+    document.getElementById('plui-new-url').value   = '';
+    if (fileInput) fileInput.value = '';
+    const info = document.getElementById('plui-file-info');
+    if (info) info.textContent = '';
+    _pluiStatus('✅ Document publié', 'var(--leaf)');
+    setTimeout(() => _pluiStatus(''), 3000);
+    renderPluiDocsAdmin(r.docs || []);
+  } catch(e) {
+    _pluiStatus('❌ ' + e.message, 'var(--red)');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function deletePluiDoc(id) {
+  if (!confirm('Supprimer ce document du PLUi ?\n\nS\'il a été envoyé depuis cet écran, le fichier sera aussi supprimé.')) return;
+  try {
+    const r = await apiDelete(`/admin/docs/plui/${id}`);
+    renderPluiDocsAdmin(r.docs || []);
   } catch(e) {
     alert('Erreur : ' + e.message);
   }

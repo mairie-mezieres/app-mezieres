@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.58 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.59 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -468,7 +468,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.58</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.59</button>
 </div>
 </div>
 </div>
@@ -1671,6 +1671,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 7 ao&ucirc;t 2026 — v4.59</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Les documents du PLUi-H-D sont enfin publiables.</strong> La page &laquo;&nbsp;Grand dossier&nbsp;&raquo; annon&ccedil;ait &laquo;&nbsp;les documents seront publi&eacute;s ici prochainement&nbsp;&raquo; sans que rien ne puisse jamais s&rsquo;y ajouter&nbsp;: la liste &eacute;tait fig&eacute;e dans le code de l&rsquo;application. La mairie peut d&eacute;sormais y d&eacute;poser un document quand elle en re&ccedil;oit un &mdash; &agrave; commencer par le dossier d&rsquo;<strong>enqu&ecirc;te publique</strong></li>
+<li><strong>La pastille rouge &laquo;&nbsp;Nouveau&nbsp;&raquo; fonctionne pour de bon.</strong> Elle s&rsquo;allume sur l&rsquo;accueil d&egrave;s qu&rsquo;un document est mis en ligne, sans attendre que vous ouvriez la page, et s&rsquo;&eacute;teint une fois que vous l&rsquo;avez consult&eacute;e</li>
+<li>Les documents d&eacute;j&agrave; vus restent <strong>consultables hors connexion</strong>, comme le reste de la page</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 6 ao&ucirc;t 2026 — v4.58</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>La page d&rsquo;accueil sur ordinateur est r&eacute;organis&eacute;e par th&egrave;me.</strong> Les cartes &eacute;taient r&eacute;parties sans logique &mdash; les horaires du bus voisinaient avec le fait du jour, et la colonne de gauche descendait bien plus bas que les deux autres. Il y a maintenant <strong>trois colonnes de m&ecirc;me largeur</strong>, chacune avec son titre&nbsp;: <strong>🏛️ La mairie au quotidien</strong> (horaires, bus R&eacute;mi, collectes), <strong>📰 La vie de la commune</strong> (prochain &eacute;v&egrave;nement, actualit&eacute;s, photos) et <strong>🤝 Vous aider</strong> (guide d&rsquo;arriv&eacute;e, MEL, signalement, &eacute;lus)</li>
