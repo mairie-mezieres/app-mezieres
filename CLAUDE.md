@@ -17,6 +17,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **« Le saviez-vous ? »** — le fait du jour, le corpus, la règle « aucune IA à l'exécution » | `docs/specifications/sfd/SFD-16-le-saviez-vous.md` puis `docs/adr/0012-…` |
 | **Relire le corpus « Le saviez-vous ? » avant de le fusionner** (obligatoire, RG-16.13) | ouvrir `revue-saviez-vous.html` — corpus complet, ordre réel de passage, réponse et source |
 | **Fibre** — qui fait quoi (Lysséo ≠ fournisseur d'accès), raccordement d'une construction neuve | `docs/adr/0013-fibre-operateur-d-infrastructure-et-fournisseur-d-acces.md` |
+| **Documents du PLUi-H-D** — publiés par la mairie depuis l'admin (⚠️ **ne plus éditer `PLUI_DOCS` à la main**), cache hors-ligne, pastille « Nouveau » | `docs/adr/0014-documents-plui-administrables-page-embarquee.md` puis `chatbot-mairie-mezieres/GUIDE-ADMIN.md` §6quater |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
