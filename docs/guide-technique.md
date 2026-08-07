@@ -629,8 +629,18 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   (`.amb-flare-ray`, angle et longueur posés en JS) et chaîne de cercles irisés
   (`.amb-flare-ghost`) alignés sur l'axe du reflet — + teinte `amb-sunny` en
   plein jour ; étoiles scintillantes
-  (`.amb-star`, réutilise `ambTwinkle`) en phase `night`. Rien à l'aube/crépuscule
-  (la teinte de phase suffit).
+  (`.amb-star`, réutilise `ambTwinkle`) en phase `night` (13 étoiles, éclat 1) et,
+  en retrait, à l'**aube et au crépuscule** (`stars-dim` : 6 étoiles, éclat 0,5).
+  Sans ces dernières, le bandeau restait vide ~80 min autour du coucher — soit
+  l'heure où l'app est le plus consultée.
+  ⚠️ **`.amb-star` est une règle à surveiller.** Une accolade fermante orpheline
+  laissée juste au-dessus d'elle dans `css/mat.css` l'a rendue morte de la v4.52.1
+  à la v4.60 : le parseur CSS consomme le `}` surnuméraire **avec le sélecteur qui
+  suit**, donc une seule règle disparaît et le reste du fichier s'applique
+  normalement. Les `✦` étaient bien posés par le JS, mais en `position:static` et
+  sans scintillement — invisibles. Les tests d'ambiance passaient tous, car ils
+  n'assertaient que `dataset.kind` (la composition), jamais le rendu. Depuis :
+  `scripts/check-css.js` en CI + un test E2E sur le style calculé. Voir **ADR-0015**.
 - **Composition des effets** (`_ambCompose()`, v4.50) — la couche peut désormais
   superposer plusieurs effets, sa clé est leur jointure (`dataset.kind` =
   `"stars+noel"`). Règles :
@@ -822,7 +832,7 @@ Les workflows dans `.github/workflows/` :
 
 | Workflow | Déclencheur | Description |
 |----------|-------------|-------------|
-| `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) |
+| `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) **+ structure CSS** (`scripts/check-css.js` : équilibre des accolades — une accolade orpheline fait disparaître silencieusement la règle suivante, ADR-0015) |
 | `e2e.yml` | push/PR sur `main`, `claude/**` | Tests Playwright : 4 tests × 2 navigateurs (Desktop Chrome, Pixel 7) |
 | `lighthouse.yml` | push sur `main` + hebdo (cron) | Audit Lighthouse (performance, accessibilité, SEO) |
 | `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app |

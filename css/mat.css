@@ -1305,8 +1305,14 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
   100%{transform:translate(122vw,6px) rotate(-6deg)}
 }
 
-}
-
+/* Étoiles du ciel dégagé (nuit, aube, crépuscule) et étoiles dorées de Noël.
+   ⚠️ Une accolade fermante ORPHELINE juste au-dessus de cette règle l'a rendue
+   morte pendant une semaine (v4.52.1 → v4.60) : le parseur CSS avale le `}`
+   surnuméraire *avec le sélecteur qui suit*, et une seule règle disparaît
+   silencieusement — les suivantes s'appliquent, donc rien ne saute aux yeux.
+   Les `✦` étaient bien posés par mat-ambiance.js, mais en `position:static`,
+   couleur héritée sombre, sans scintillement : invisibles. Voir ADR-0015 ;
+   l'équilibre des accolades est désormais vérifié en CI (scripts/check-css.js). */
 .amb-star{position:absolute;color:rgba(255,255,255,0.92);text-shadow:0 0 5px rgba(255,255,255,0.55);animation:ambTwinkle 2.4s ease-in-out infinite;}
 
 /* Calendrier festif (mêmes règles : décoratif, aria-hidden, jamais si

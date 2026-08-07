@@ -29,3 +29,9 @@ jobs:
         run: |
           find js/ -name '*.js' | sort | xargs -I{} node --check {}
           node --check service-worker.js
+
+      # Une accolade orpheline dans une feuille de style ne casse pas la page :
+      # elle fait disparaître SILENCIEUSEMENT la seule règle qui la suit. Les
+      # étoiles du ciel nocturne ont ainsi été invisibles une semaine. ADR-0015.
+      - name: Structure check (css/)
+        run: node scripts/check-css.js

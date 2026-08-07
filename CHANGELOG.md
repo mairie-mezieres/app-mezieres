@@ -5,6 +5,38 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.61] — 7 août 2026
+
+### Corrigé
+- **Les étoiles du ciel dégagé ne s'affichaient plus depuis le 1ᵉʳ août** (v4.52.1), la nuit
+  comme à l'aube et au crépuscule, décor de Noël compris. La suppression de l'effet d'été
+  « poussière de lumière » avait laissé une **accolade fermante orpheline** dans
+  `css/mat.css`, juste au-dessus de `.amb-star`. Le parseur CSS ne se contente pas d'ignorer
+  un `}` surnuméraire : il le consomme **avec le sélecteur qui suit** — une seule règle
+  disparaît, silencieusement, et le reste du fichier continue de s'appliquer. Les `✦`
+  étaient donc bien créés par `js/mat-ambiance.js`, mais rendus en `position:static`,
+  empilés en haut du bandeau, à la couleur de texte héritée et sans scintillement :
+  invisibles sur le dégradé de nuit. Voir **ADR-0015**.
+
+### Ajouté
+- **Contrôle de structure des feuilles de style en CI** (`scripts/check-css.js`, branché sur
+  le job `syntax-check` de `ci.yml`) : l'équilibre des accolades de `css/**.css` est vérifié
+  à chaque push. Sans dépendance. La CI ne portait jusqu'ici que sur la syntaxe JS.
+- **Test E2E sur le rendu des étoiles**, et plus seulement sur leur composition. Les onze
+  tests de `tests/e2e/ambiance.spec.js` assertaient sur `dataset.kind` — ils sont tous restés
+  au vert pendant les six jours du bug. Le nouveau test vérifie le **style calculé**
+  (`position`, `animation`) et la dispersion des étoiles dans le bandeau.
+
+### Documentation
+- `docs/adr/0015-accolade-orpheline-css-avale-la-regle-suivante.md` — mécanisme exact,
+  pourquoi les trois filets (CI, tests, relecture) ont laissé passer, et alternatives écartées.
+- `docs/guide-technique.md` §7 — les étoiles d'aube/crépuscule (`stars-dim`) y étaient encore
+  décrites comme inexistantes ; avertissement ajouté sur `.amb-star`, et `ci.yml` mis à jour
+  dans le tableau des workflows.
+- `CLAUDE.md` — deux règles ajoutées à la section « Édition de fichiers ».
+
+---
+
 ## [4.60] — 7 août 2026
 
 ### Corrigé
