@@ -96,3 +96,33 @@ Trois conséquences retenues explicitement :
   et la livraison est bloquée. L'extension `.pdf` doit figurer dans le
   `public_id`, sans quoi le fichier est servi en binaire anonyme au lieu de
   s'ouvrir dans le navigateur.
+
+## Mise à jour du 7 août 2026 — l'URL doit être signée
+
+Le premier document envoyé depuis l'admin s'est bien téléversé, et son lien a
+répondu **HTTP 401** dans le navigateur. Le formulaire disait « Document
+publié », la liste l'affichait, et personne ne pouvait l'ouvrir : la pire forme
+de panne, celle qui se présente comme un succès.
+
+Cause : Cloudinary bloque **par défaut** la livraison des « types de médias
+restreints », PDF en tête, et répond 401 sur l'URL nue. `resource_type: "raw"`
+était nécessaire mais **pas suffisant** — la conséquence notée ci-dessus était
+donc incomplète. Le contournement documenté par Cloudinary est la **signature de
+l'URL** : une URL signée est délivrée même quand le type est restreint.
+
+Deux façons de s'en sortir, et le choix retenu :
+
+| | |
+|---|---|
+| Décocher la restriction dans la console Cloudinary | Corrige tout d'un coup, mais c'est un réglage de compte invisible depuis le code : la prochaine personne qui déploiera MAT pour une autre commune retombera exactement dans le même piège, sans rien pour l'avertir |
+| **Signer l'URL côté serveur** *(retenu)* | Le correctif vit dans le dépôt, se teste, et fonctionne quel que soit le réglage du compte |
+
+Conséquence de conception : **l'URL de livraison n'est plus stockée**. Elle est
+reconstruite signée à chaque lecture de `GET /docs/plui`, à partir du seul
+`publicId` (`pluiDocUrl()` dans `lib/cloudinary.js`). Deux bénéfices : les
+documents envoyés avant le correctif sont réparés sans migration de données, et
+une rotation de la clé Cloudinary ne laisse pas derrière elle des liens morts
+figés en base. Un document ajouté par lien externe garde évidemment le sien.
+
+Verrouillé par `test/plui-url-signee.test.js` — `cloudinary.url()` ne fait que
+construire une chaîne, le test reste donc déterministe et hors-ligne.

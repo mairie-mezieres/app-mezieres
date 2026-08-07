@@ -151,7 +151,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-plui.js?v=1.1.0';
+  s.src = 'js/mat-plui.js?v=1.2.0';
   s.onload = function(){ try { if (typeof refreshPluiBadge === 'function') refreshPluiBadge(); } catch(e){} };
   document.head.appendChild(s);
 })();
