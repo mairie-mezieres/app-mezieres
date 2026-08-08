@@ -117,3 +117,12 @@ et `git add -A` ne dit rien de la taille de ce qu'il ajoute.
    Des dizaines de milliers de lignes ajoutées sur un fichier de doc = STOP.
 5. Ne pas se fier au succès d'un script pour conclure que le résultat est correct :
    **relire le fichier** (ou au minimum sa taille et ses titres de section).
+6. **En CSS, après avoir supprimé un bloc, compter les accolades.** Une accolade
+   fermante orpheline ne casse pas la page : le parseur la consomme **avec le
+   sélecteur qui suit**, donc **une seule règle disparaît**, silencieusement, et
+   tout le reste du fichier continue de s'appliquer. C'est ainsi que les étoiles
+   du ciel nocturne sont restées invisibles six jours (v4.52.1 → v4.60). Lancer
+   `node scripts/check-css.js` — la CI le fait aussi. Voir ADR-0015.
+7. **Un test qui n'interroge que le JS ne prouve pas qu'un effet est visible.**
+   Quand un effet est produit par du JS mais habillé par du CSS, asserter le
+   **style calculé** (`getComputedStyle`), pas seulement l'état interne.

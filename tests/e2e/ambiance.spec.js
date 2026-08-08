@@ -84,6 +84,54 @@ test('ciel dégagé la nuit → étoiles', async ({ page }) => {
   expect(r.sunny).toBe(false);
 });
 
+// Les étoiles étaient bien COMPOSÉES (`dataset.kind === 'stars'`) mais pas
+// PEINTES : une accolade orpheline dans mat.css avalait la règle `.amb-star`
+// (v4.52.1 → v4.60). Les `✦` restaient en `position:static`, empilés en haut à
+// gauche, couleur héritée sombre, sans scintillement — invisibles sur le
+// dégradé de nuit. Tous les tests d'ambiance passaient : aucun ne regardait le
+// rendu. Vérifier le style calculé, pas seulement la composition. ADR-0015.
+//
+// ⚠️ Test MOBILE uniquement. Le bandeau est masqué au-dessus de 1024 px
+// (`css/mat-desktop.css` → `.header{display:none}`) : l'ambiance est un effet
+// mobile/PWA. Sur `desktop-chromium`, tous les `getBoundingClientRect()`
+// valent zéro et la vérification de dispersion ne peut pas aboutir — alors même
+// que `position` et `animation` s'y résolvent normalement, `getComputedStyle`
+// renvoyant la valeur calculée y compris sur un élément non rendu. C'est
+// précisément pourquoi la géométrie est vérifiée : elle seule distingue une
+// règle appliquée d'une règle avalée.
+test('les étoiles de la nuit sont réellement peintes, pas seulement composées', async ({ page }) => {
+  const r = await ambianceAt(page, '23:30', 0);
+  expect(r.particules).toBe('stars');
+
+  const bandeauVisible = await page.evaluate(() => {
+    const h = document.querySelector('.header');
+    return !!h && getComputedStyle(h).display !== 'none';
+  });
+  test.skip(!bandeauVisible, 'bandeau masqué au-delà de 1024 px — ambiance mobile/PWA');
+
+  const etoiles = await page.evaluate(() => {
+    const els = Array.from(document.querySelectorAll('.header-amb .amb-star'));
+    if (!els.length) return null;
+    const c = getComputedStyle(els[0]);
+    const r0 = els[0].getBoundingClientRect();
+    const r1 = els[els.length - 1].getBoundingClientRect();
+    return {
+      nombre: els.length,
+      position: c.position,
+      animation: c.animationName,
+      // `position:static` empile les glyphes dans le flux : ils partagent
+      // alors la même ordonnée, alors que le JS leur pose des `top` variés.
+      dispersees: Math.abs(r0.top - r1.top) > 1 || Math.abs(r0.left - r1.left) > 1,
+    };
+  });
+
+  expect(etoiles, 'aucune étoile dans le DOM').not.toBeNull();
+  expect(etoiles.nombre).toBeGreaterThan(1);
+  expect(etoiles.position).toBe('absolute');
+  expect(etoiles.animation).toBe('ambTwinkle');
+  expect(etoiles.dispersees, 'les étoiles ne sont pas positionnées dans le bandeau').toBe(true);
+});
+
 // Le bandeau restait vide ~80 min autour du coucher — l'heure la plus consultée.
 test('crépuscule → teinte dorée ET premières étoiles', async ({ page }) => {
   // 21h20, soit 16 min avant le coucher du jour (21h36) → fenêtre ±40 min
