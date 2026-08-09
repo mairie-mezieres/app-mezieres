@@ -222,21 +222,78 @@ function chargerRegles(){
     .catch(function(){ PLU = null; });
 }
 
-/* ── Zonage : Géoportail de l'Urbanisme via apicarto ────────────── */
-function chargerZones(){
-  var url = 'https://apicarto.ign.fr/api/gpu/zone-urba?insee=' + INSEE;
-  return fetch(url)
-    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+/* ── Zonage : Géoportail de l'Urbanisme via apicarto ─────────────
+   ⚠️ `zone-urba` n'accepte PAS de paramètre `insee` — la première version
+   de cette maquette l'interrogeait ainsi, la requête partait en erreur et
+   le `.catch()` l'avalait en silence : ni zonage, ni légende, ni message.
+   L'appel attend une **partition** (`DU_45203`) ou une **géométrie**.
+
+   On procède donc en trois temps, du plus sûr au plus tolérant, et on
+   retient le motif d'échec de chaque étape pour pouvoir l'afficher —
+   « PLU non publié » et « ma requête était mauvaise » ne se soignent pas
+   de la même façon. */
+var GPU = 'https://apicarto.ign.fr/api/gpu/';
+var zonesDiag = '';        // motif lisible en cas d'échec
+
+function _gpuFetch(url){
+  return fetch(url).then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  });
+}
+
+/* Étape 1 — la commune a-t-elle un document d'urbanisme, et lequel ? */
+function _gpuPartition(){
+  return _gpuFetch(GPU + 'municipality?insee=' + INSEE)
     .then(function(fc){
-      if (!fc || !fc.features || !fc.features.length) throw new Error('vide');
-      ZONES = fc;
+      var p = fc && fc.features && fc.features[0] && fc.features[0].properties;
+      if (!p) { zonesDiag = 'commune absente du Géoportail de l\'Urbanisme'; return null; }
+      if (p.is_rnu === true || p.is_rnu === 'true'){
+        zonesDiag = 'commune au RNU — pas de document d\'urbanisme opposable';
+        return null;
+      }
+      return p.partition || null;
+    })
+    .catch(function(e){ zonesDiag = 'appel « municipality » : ' + e.message; return null; });
+}
+
+/* Étape 2 et 3 — les zones, par partition puis par emprise géographique. */
+function _gpuZones(partition){
+  if (partition) return _gpuFetch(GPU + 'zone-urba?partition=' + encodeURIComponent(partition));
+  var geom = { type:'Polygon', coordinates:[[
+    [BBOX.w, BBOX.s], [BBOX.e, BBOX.s], [BBOX.e, BBOX.n], [BBOX.w, BBOX.n], [BBOX.w, BBOX.s]
+  ]]};
+  return _gpuFetch(GPU + 'zone-urba?geom=' + encodeURIComponent(JSON.stringify(geom)));
+}
+
+function chargerZones(){
+  return _gpuPartition()
+    .then(function(partition){
+      return _gpuZones(partition)
+        .catch(function(e){
+          /* Une partition qui échoue mérite une seconde chance par géométrie. */
+          if (!partition) throw e;
+          return _gpuZones(null);
+        });
+    })
+    .then(function(fc){
+      if (!fc || !fc.features || !fc.features.length){
+        zonesDiag = zonesDiag || 'aucune zone renvoyée pour cette commune';
+        throw new Error(zonesDiag);
+      }
       fc.features.forEach(function(f){
         var p = f.properties || {};
         f.properties.mat_code = normaliserZone(p.libelle || p.typezone || '');
       });
+      ZONES = fc;
+      zonesDiag = '';
       return true;
     })
-    .catch(function(){ ZONES = null; return false; });
+    .catch(function(e){
+      ZONES = null;
+      zonesDiag = zonesDiag || (e && e.message) || 'raison inconnue';
+      return false;
+    });
 }
 
 /* Le libellé du GPU (« UA », « Ub1 », « 1AUb »…) doit retomber sur une des
@@ -605,10 +662,16 @@ map.on('load', function(){
           if (etat.mode === 'demo'){
             statut('⚠️ <b>Bâti simulé</b> — ni l\'IGN ni OpenStreetMap n\'ont répondu. '
                  + 'Le moteur 3D et l\'interface sont réels, les bâtiments non.');
-          } else {
-            statut(n + ' bâtiments · hauteurs ' + src
-                 + (okZones ? ' · zonage du PLU chargé' : ' · <b>zonage indisponible</b> (PLU non publié au Géoportail ?)'), false);
+          } else if (okZones){
+            statut(n + ' bâtiments · hauteurs ' + src + ' · '
+                 + ZONES.features.length + ' zones du PLU', false);
             setTimeout(function(){ statut('', true); }, 6000);
+          } else {
+            /* Un échec ne s'efface pas tout seul : c'est précisément le
+               message qu'il faut avoir le temps de lire. Il reste
+               refermable d'un clic. */
+            statut(n + ' bâtiments · hauteurs ' + src
+                 + ' — <b>zonage du PLU indisponible</b><br>' + esc(zonesDiag), false);
           }
           if (!okZones) document.getElementById('legend').classList.remove('on');
         });
