@@ -33,6 +33,9 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--text
   font-family:inherit;font-size:.74rem;font-weight:800;padding:8px 12px;border-radius:999px;
   box-shadow:var(--shadow-lg);cursor:pointer;display:flex;align-items:center;gap:7px;backdrop-filter:blur(6px)}
 .tbtn[aria-pressed="true"]{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+/* `display:flex` ci-dessus l'emporte sur le `display:none` que le navigateur
+   applique à [hidden] — sans cette règle, un bouton masqué reste visible. */
+.tbtn[hidden]{display:none}
 .tbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
 /* ── Légende ─────────────────────────────────────────── */
@@ -135,7 +138,12 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--text
    ════════════════════════════════════════════════════════════════════ */
 
 var CENTRE = [1.8080, 47.8220];      // lon, lat — Mézières-lez-Cléry
-var INSEE  = '45203';
+/* ⚠️ 45204 = Mézières-lez-Cléry. 45203 est MEUNG-SUR-LOIRE — la maquette a
+   d'abord affiché, sans le dire, le zonage de la commune voisine drapé sur la
+   photo aérienne de Mézières. Le nom renvoyé par le Géoportail est désormais
+   affiché à l'écran pour que l'erreur ne puisse plus passer inaperçue. */
+var INSEE  = '45204';
+var communeGPU = '';
 var BBOX   = { w: 1.762, s: 47.792, e: 1.856, n: 47.852 };
 
 /* Couleurs des 13 zones du PLU communal. */
@@ -249,6 +257,8 @@ function _gpuPartition(){
     .then(function(fc){
       var p = fc && fc.features && fc.features[0] && fc.features[0].properties;
       if (!p) { zonesDiag = 'commune absente du Géoportail de l\'Urbanisme'; return null; }
+      /* Le nom renvoyé prouve de quelle commune vient le zonage affiché. */
+      communeGPU = p.name || p.nom || p.commune || p.libelle || '';
       if (p.is_rnu === true || p.is_rnu === 'true'){
         zonesDiag = 'commune au RNU — pas de document d\'urbanisme opposable';
         return null;
@@ -551,7 +561,7 @@ function poserZones(){
      rester facultatif, sinon MapLibre lève « layer 'bati' does not exist ». */
   var sous = map.getLayer('bati') ? 'bati' : undefined;
   map.addLayer({ id:'zones-fill', type:'fill', source:'zones',
-    paint:{ 'fill-color':couleur, 'fill-opacity':0.42 } }, sous);
+    paint:{ 'fill-color':couleur, 'fill-opacity':0.36 } }, sous);
   map.addLayer({ id:'zones-line', type:'line', source:'zones',
     paint:{ 'line-color':couleur, 'line-width':1.6, 'line-opacity':0.9 } }, sous);
   etat.zones = true;
@@ -566,15 +576,31 @@ function poserBati(fc){
   map.addLayer({
     id:'bati', type:'fill-extrusion', source:'bati',
     paint:{
+      /* Parti pris : la maquette d'architecte. Un bâti crème, presque blanc,
+         qui se détache du zonage coloré au sol au lieu de rivaliser avec lui.
+         Les teintes ne varient que légèrement avec la hauteur, pour donner du
+         relief sans transformer le village en camaïeu de marron. */
       'fill-extrusion-color':[
         'interpolate',['linear'],['get','mat_h'],
-        3,'#f2ede4', 8,'#e4d9c8', 14,'#cbb79b', 25,'#a8906f'
+        3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8'
       ],
       'fill-extrusion-height':['get','mat_h'],
       'fill-extrusion-base':0,
-      'fill-extrusion-opacity':0.94,
+      'fill-extrusion-opacity':1,
+      /* Le dégradé vertical assombrit le pied des murs : c'est le seul
+         ombrage dont dispose MapLibre. ⚠️ Les propriétés d'occlusion
+         ambiante (`fill-extrusion-ambient-occlusion-*`) appartiennent à
+         Mapbox GL, pas à MapLibre 5 : elles ne font rien ici et remplissent
+         la console d'erreurs de validation. Le relief vient donc de la
+         lumière rasante réglée par `setLight`. */
       'fill-extrusion-vertical-gradient':true
     }
+  });
+  /* Liseré sombre à la base : détache chaque bâtiment du sol et empêche les
+     maisons mitoyennes de fondre en un seul bloc. */
+  map.addLayer({
+    id:'bati-contour', type:'line', source:'bati',
+    paint:{ 'line-color':'#6b5a45', 'line-width':0.6, 'line-opacity':0.35 }
   });
   map.addLayer({
     id:'bati-sel', type:'fill-extrusion', source:'bati',
@@ -700,7 +726,8 @@ function ouvrirDiagnostic(){
   }
 
   out += '<div class="sec">Zonage du PLU</div><div class="rows"><div class="row">'
-      +  '<span class="c">Géoportail de l\'Urbanisme'
+      +  '<span class="c">Géoportail de l\'Urbanisme — commune <b>'
+      +  esc(communeGPU || ('INSEE ' + INSEE)) + '</b>'
       +  (ZONES ? '' : '<br><span style="font-weight:600;color:var(--muted)">' + esc(zonesDiag) + '</span>')
       +  '</span><span class="a ' + (ZONES ? 'ok' : 'pc') + '">'
       +  (ZONES ? ZONES.features.length + ' zones' : 'échec') + '</span></div></div>';
@@ -764,7 +791,36 @@ bascule('btn-fond', function(on){
    Utile pour montrer la maquette là où le réseau n'est pas sûr. */
 var FORCE_DEMO = /[?&]demo=1/.test(location.search);
 
+/* Un lent travelling à l'arrivée : c'est ce qui fait comprendre en une
+   seconde qu'on est en trois dimensions et pas devant une image. Court,
+   interruptible au moindre geste, et supprimé si « Réduire les animations »
+   est actif — la règle vaut ici comme dans l'application. */
+function survolInitial(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var stop = function(){ map.stop(); };
+  map.once('mousedown', stop); map.once('touchstart', stop); map.once('wheel', stop);
+  map.easeTo({ bearing: map.getBearing() + 26, pitch: 66, zoom: map.getZoom() + 0.45,
+               duration: 5200, easing: function(t){ return t * (2 - t); } });
+}
+
+/* Ciel et lumière — le fond plat coupait net à l'horizon, ce qui écrasait
+   tout le relief. Les deux réglages sont conditionnels : une version de
+   MapLibre plus ancienne les ignore au lieu de casser la page. */
+function poserAmbiance(){
+  if (map.setSky) map.setSky({
+    'sky-color':'#8fb8dd', 'horizon-color':'#e8eef2', 'fog-color':'#eef2f0',
+    'sky-horizon-blend':0.6, 'horizon-fog-blend':0.5, 'fog-ground-blend':0.15,
+    'atmosphere-blend':['interpolate',['linear'],['zoom'], 0,0, 12,0.4, 16,0.85]
+  });
+  /* Soleil bas du sud-ouest : des ombres portées longues, comme en fin
+     d'après-midi — c'est l'éclairage qui flatte le plus une maquette. */
+  if (map.setLight) map.setLight({
+    anchor:'map', position:[1.4, 215, 42], color:'#fff6e8', intensity:0.42
+  });
+}
+
 map.on('load', function(){
+  poserAmbiance();
   statut('Chargement des données de l\'IGN…');
   if (FORCE_DEMO){
     etat.mode = 'demo';
@@ -802,6 +858,7 @@ map.on('load', function(){
           if (audit.souci === 'axes inversés (latitude en premier)') inverserAxes(fc);
           window.__audit = audit;
           poserBati(fc);
+          survolInitial();
           var n = fc.features.length;
           var src = fc.features[0] && fc.features[0].properties.mat_src;
           document.getElementById('btn-diag').hidden = false;
@@ -810,7 +867,8 @@ map.on('load', function(){
                  + '<br>Touchez « 🔎 Détail ».');
           } else if (okZones){
             statut(n + ' bâtiments · hauteurs ' + src + ' · '
-                 + ZONES.features.length + ' zones du PLU', false);
+                 + ZONES.features.length + ' zones du PLU'
+                 + (communeGPU ? ' de <b>' + esc(communeGPU) + '</b>' : ''), false);
             setTimeout(function(){ statut('', true); }, 6000);
           } else {
             /* Un échec ne s'efface pas tout seul : c'est précisément le
