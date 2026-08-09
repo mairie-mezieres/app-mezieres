@@ -46,14 +46,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   la page revient à 1 837 px — soit celle d'avant le lot (1 838 px), avec 100 % du texte
   lisible. Verrouillé par un test par rangée.
 - Apostrophe droite ASCII dans « Ici c'est Mézières ! » remplacée par U+2019.
-- **Date du badge performances en jj/mm** (`js/mat-perf.js`) : l'année faisait basculer le
-  pied de page sur une ligne supplémentaire une fois la typographie au plancher. La date
-  complète reste dans l'attribut `title`. Insuffisant pour tenir sur une seule ligne sous
-  390 px — il faudrait abréger « Access » et « Pratiques », ce qui échouerait encore à
-  320 px et rendrait ces libellés obscurs. Laissé sur deux lignes.
-- **Libellés du badge en toutes lettres** : « Perf » → « Performances », « Access » →
-  « Accessibilité ». Mesuré sans coût : le bloc fait toujours 41 px sur mobile (2 lignes,
-  320 → 412 px) et 18 px en desktop (1 ligne, 1280 → 1440 px), sans débordement.
+- **Libellés du badge performances en toutes lettres** (`js/mat-perf.js`) : « Perf » →
+  « Performances », « Access » → « Accessibilité », « Pratiques » → « Bonnes pratiques ».
+  Le badge occupant de toute façon deux lignes en mobile, l'abréviation ne faisait plus
+  gagner de place et rendait ces libellés obscurs pour un habitant. Date conservée en
+  **jj/mm/aaaa**, avec un `title` qui précise ce qu'elle désigne.
+  Coût mesuré : à 360, 390 et 412 px le badge reste sur 2 lignes (41 px) ; à **320 px** il
+  passe à 3 lignes (+23 px) ; en desktop il reste sur 1 ligne, mais la rangée basse du pied
+  de page passe de 28 à 50 px à 1 280 px (elle ne bougeait pas à 1 440 px). Aucun
+  débordement horizontal à aucune largeur.
 
 ### Ajouté
 - **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte
