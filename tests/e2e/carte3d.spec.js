@@ -5,16 +5,40 @@ const AxeBuilder = require('@axe-core/playwright').default;
 /*
  * Carte 3D du village (overlay ov-carte3d).
  *
- * Les tests tournent SANS backend et sans accès aux serveurs de l'IGN : ils
- * portent donc sur ce qui doit tenir quoi qu'il arrive — l'ouverture de
+ * Les tests portent sur ce qui doit tenir quoi qu'il arrive — l'ouverture de
  * l'overlay, l'absence de chargement de MapLibre au démarrage, l'accessibilité,
  * et le fait qu'aucun bâtiment inventé n'apparaisse quand les sources sont
  * muettes (ADR-0018).
+ *
+ * ⚠️ Les hôtes externes sont COUPÉS, comme dans smoke.spec.js. Sans cela, le
+ * test « aucun bâtiment inventé » dépend de l'environnement : il passait en
+ * local (réseau fermé) et échouait en CI, où le runner GitHub atteint
+ * réellement l'IGN et charge donc de vrais bâtiments. Un test dont le verdict
+ * change avec la connexion ne prouve rien.
  *
  * Leçon des étoiles invisibles (ADR-0015) : on assert le STYLE CALCULÉ, pas
  * seulement l'attribut — `.c3d-btn{display:flex}` l'emporte sur le display:none
  * que le navigateur applique à [hidden].
  */
+
+const HOTES_EXTERNES = [
+  'onrender.com', 'googleapis.com', 'gstatic.com', 'open-meteo.com',
+  'facebook.com', 'api-adresse.data.gouv.fr', 'apicarto.ign.fr',
+  'data.geopf.fr', 'cadastre.data.gouv.fr', 'geoportail-urbanisme',
+  'raw.githubusercontent.com', 'res.cloudinary.com', 'data.education.gouv.fr',
+  'sentry.io', 'overpass-api.de', 'openstreetmap.org'
+];
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('mat_onboarded_v3', '1');
+  });
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (HOTES_EXTERNES.some((h) => url.includes(h))) return route.abort();
+    return route.continue();
+  });
+});
 
 async function ouvrirAccueil(page) {
   await page.goto('/');
@@ -49,14 +73,16 @@ test.describe('Carte 3D', () => {
     await expect(ov).toHaveClass(/open/);
     await expect(page.locator('#c3d-map')).toBeVisible();
 
-    // Sans réseau, aucune source ne répond : la carte ne doit surtout pas
-    // fabriquer un village de substitution.
-    await page.waitForTimeout(2500);
+    // Sources coupées : la carte ne doit surtout pas fabriquer un village de
+    // substitution. On attend l'apparition du bouton de diagnostic — signal
+    // déterministe de fin de chargement — plutôt qu'un délai arbitraire.
+    await expect(page.locator('#c3d-btn-diag')).toBeVisible({ timeout: 20000 });
     const batiments = await page.evaluate(() => {
       const m = window._c3dMap;
       return m && m.getSource && m.getSource('bati') ? 'présent' : 'absent';
     });
     expect(batiments).toBe('absent');
+    await expect(page.locator('#c3d-statut')).toContainText('Aucun bâtiment chargé');
 
     // Un seul gestionnaire d'Échap a le droit de fermer un overlay (ADR-0011).
     await page.keyboard.press('Escape');
