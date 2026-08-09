@@ -31,6 +31,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   (`.top-card` 8→7 px, `.sec` 12/8→9/6 px, `.top-badge` 2→1 px) : **tuiles à 95–96 px et
   page à 1 795 px, soit +1,7 % au lieu de +6,2 %** — sans toucher à une seule taille de
   police.
+- **Marges des cartes resserrées** (`.card` padding 14→10 px, gap icône/texte 11→9 px).
+  La vérification initiale ayant été faite à 412 px, elle était aveugle au cas courant :
+  à **360 px**, deux cartes par ligne ne laissent que ~130 px de texte utile et les
+  sous-titres coupés passaient de 2 à **10 sur 15**. Ces 6 px récupérés les ramènent à
+  5 sur 15, et la page à **+1,3 %** contre `main` (1 838 → 1 862 px) au lieu de +2,9 %.
+  Les **libellés** qui se coupent (« Sondage citoyen », « Vos photos »…) se coupaient
+  **déjà avant** : `.ct-label` n'a pas été modifié.
 
 ### Ajouté
 - **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte

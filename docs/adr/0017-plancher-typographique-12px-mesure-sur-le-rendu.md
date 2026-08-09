@@ -113,6 +113,32 @@ Leçon : quand une valeur de `font-size` augmente, vérifier d'abord si le
 `line-height` est hérité. Un `1.5` global appliqué à des micro-libellés coûte
 plus cher que la police elle-même.
 
+**7. Mesurer aux largeurs étroites, pas seulement sur l'appareil par défaut.**
+
+Toute la vérification initiale a été faite à **412 px** (Pixel 7, appareil par
+défaut de Playwright). À cette largeur, **0 sous-titre sur 15** passe à la
+ligne — la mise en page paraissait intacte. Sur un téléphone réel à 360 px,
+**10 sur 15** débordaient. La vérification était aveugle au cas le plus courant.
+
+Correction : marges horizontales de `.card` 14 → 10 px et gap icône/texte
+11 → 9 px. À 360 px, deux cartes par ligne ne laissent que ~130 px de texte
+utile ; ces 6 px récupérés ramènent les sous-titres coupés de 10 à **5 sur 15**.
+Aucune taille de police ni la taille de l'icône ne sont touchées.
+
+Comparaison honnête contre `main`, à 360 px :
+
+| | avant le lot | après |
+|---|---|---|
+| Libellés sur 2 lignes | 6/17 | **6/17 — identique** |
+| Sous-titres sur 2 lignes | 2/15 | 5/15 |
+| Hauteur de page | 1 838 px | 1 862 px (+1,3 %) |
+| Cartes | 72/73/75/89 | 72/75/76/91 |
+
+Les libellés qui se coupent (« Sondage citoyen », « Vos photos », « Contacter
+vos élus », « Signaler un bug », « Radio Mézières ») **se coupaient déjà
+avant** : `.ct-label` n'a pas été modifié. C'est un défaut de densité
+préexistant du gabarit à deux colonnes, indépendant de ce lot.
+
 L'interlettrage a été testé (`.08em` → `0`) : **aucun effet** sur le retour à
 la ligne de « Prochaine manifestation », qui passe de 1 à 2 lignes à 12 px quoi
 qu'on fasse. Comme les tuiles sont en grille, cette seule tuile impose sa

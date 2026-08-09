@@ -167,7 +167,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:0;}
 
 /* ── Cartes boutons ── */
-.card{display:flex;align-items:center;gap:11px;background:var(--card);border-radius:var(--r);padding:14px 14px;text-decoration:none;color:var(--text);border:none;width:100%;text-align:left;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
+/* ⚠️ Marges horizontales resserrées (14→10 px) et gap icône/texte (11→9 px)
+   au passage au plancher de 12 px : à 360 px de large, deux cartes par ligne
+   ne laissent que ~130 px de texte utile. Sans ce gain de 6 px, les
+   sous-titres passaient de 2 à 10 sur 15 à couper sur deux lignes ; avec, on
+   retombe à 5. Aucune taille de police ni l'icône ne sont touchées. */
+.card{display:flex;align-items:center;gap:9px;background:var(--card);border-radius:var(--r);padding:14px 10px;text-decoration:none;color:var(--text);border:none;width:100%;text-align:left;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
 .card:active{transform:scale(0.97);}
 .ico{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .ct{flex:1;min-width:0;}
