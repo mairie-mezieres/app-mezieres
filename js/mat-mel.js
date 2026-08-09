@@ -600,12 +600,12 @@ const _MEL_TREE_FALLBACK = {
       {id:"fibre",ico:"🌐",label:"Raccordement fibre / Nouvelle construction",
         directAnswer:{text:"Lysséo est le réseau public fibre du Loiret : il construit et gère l'infrastructure, mais ne vend aucun abonnement — les forfaits affichés sur son site sont ceux des opérateurs commerciaux présents sur le réseau.\n\n1️⃣ Déclarez d'abord votre construction neuve. Une maison neuve n'est pas automatiquement présente dans la base d'adresses de l'opérateur d'infrastructure : tant que la vôtre n'y figure pas comme « raccordable », aucun opérateur ne pourra enregistrer votre commande. La démarche se fait auprès de XpFibre / Loiret THD, ou via le formulaire de contact Lysséo. Prévoyez de joindre votre permis de construire, votre certificat de numérotation et un plan de masse localisant le regard et les fourreaux en limite de propriété.\n\n2️⃣ Une fois l'adresse déclarée éligible, souscrivez auprès de l'opérateur de votre choix (Orange, SFR, Bouygues, Free…). C'est son prestataire qui réalise le tirage de la fibre depuis le point de branchement de la voirie jusqu'au logement, en empruntant vos fourreaux existants. Aucun génie civil supplémentaire n'est à prévoir de votre côté, sous réserve que les fourreaux soient bien aiguillés et non obstrués — leur bon état relève du propriétaire sur la partie privative.\n\n3️⃣ De son côté, la mairie vérifie que la numérotation de votre parcelle a bien été transmise et intégrée à la Base Adresse Nationale : c'est la condition nécessaire à la prise en compte de votre adresse par l'opérateur d'infrastructure.",
           links:[{label:"🏗️ Déclarer une nouvelle construction — XpFibre / Loiret THD",url:"https://www.xpfibre.com/loiret-thd"},
-                 {label:"✉️ Formulaire de contact Lysséo",url:"https://lysseo.fr/pagecontact/"},
+                 {label:"🌐 Lysséo — site officiel",url:"https://lysseo.fr"},
                  {label:"🏛️ Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"thd",ico:"📶",label:"Questions fibre (raccordement, éligibilité…)",
         directAnswer:{text:"Pour une question portant sur le réseau lui-même — adresse raccordable, avancement du déploiement, point de branchement — écrivez à Lysséo via son formulaire de contact.\n\n⚠️ Lysséo ne commercialise aucune offre : pour un abonnement, une facture, un rendez-vous d'installation ou une panne de votre ligne, votre interlocuteur est votre opérateur (Orange, SFR, Bouygues, Free…).",
-          links:[{label:"📞 Contacter Lysséo",url:"https://lysseo.fr/pagecontact/"}]}
+          links:[{label:"🌐 Lysséo — site officiel",url:"https://lysseo.fr"}]}
       },
       {id:"probleme",ico:"🔧",label:"Problème sur les installations (armoires, câbles…)",
         directAnswer:{text:"En cas de problème constaté sur les équipements du réseau public (armoires de rue, boîtiers, câbles arrachés), remplissez le formulaire de déclaration de dommage réseau de Lysséo.",

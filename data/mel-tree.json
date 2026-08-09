@@ -577,8 +577,8 @@
               "url": "https://www.xpfibre.com/loiret-thd"
             },
             {
-              "label": "✉️ Formulaire de contact Lysséo",
-              "url": "https://lysseo.fr/pagecontact/"
+              "label": "🌐 Lysséo — site officiel",
+              "url": "https://lysseo.fr"
             },
             {
               "label": "🏛️ Mairie : 02 38 45 61 76",
@@ -595,8 +595,8 @@
           "text": "Pour une question portant sur le réseau lui-même — adresse raccordable, avancement du déploiement, point de branchement — écrivez à Lysséo via son formulaire de contact.\n\n⚠️ Lysséo ne commercialise aucune offre : pour un abonnement, une facture, un rendez-vous d'installation ou une panne de votre ligne, votre interlocuteur est votre opérateur (Orange, SFR, Bouygues, Free…).",
           "links": [
             {
-              "label": "📞 Contacter Lysséo",
-              "url": "https://lysseo.fr/pagecontact/"
+              "label": "🌐 Lysséo — site officiel",
+              "url": "https://lysseo.fr"
             }
           ]
         }
