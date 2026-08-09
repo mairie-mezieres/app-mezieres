@@ -112,11 +112,15 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 /* ── Météo strip ── */
 .header-bottom-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:4px;width:100%;}
-.top-card{border-radius:14px;padding:8px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box;}
-.top-title{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);}
+.top-card{border-radius:14px;padding:7px 10px;cursor:pointer;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box;}
+/* ⚠️ line-height explicite : sans lui ces libellés héritent du 1.5 de la
+   racine, soit 18 px de hauteur de ligne à 12 px de texte — alors que leurs
+   voisins immédiats (.top-main, .ct-label) sont à 1.15–1.2. C'est ce qui
+   faisait enfler les tuiles de 30 % au passage au plancher de 12 px. */
+.top-title{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;line-height:1.2;color:rgba(255,255,255,.72);}
 .top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
 .top-sub{font-size:0.75rem;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:2px 6px;border-radius:999px;font-size:0.75rem;font-weight:900;background:rgba(255,255,255,.16);color:#fff;}
+.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:1px 6px;line-height:1.35;border-radius:999px;font-size:0.75rem;font-weight:900;background:rgba(255,255,255,.16);color:#fff;}
 .top-meteo{background:linear-gradient(135deg,#2563eb,#38bdf8);}
 .top-dechets{background:linear-gradient(135deg,#15803d,#22c55e);}
 .top-mairie{background:linear-gradient(135deg,#7c3aed,#a855f7);}
@@ -147,7 +151,7 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
-.sec{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);padding:12px 2px 8px;}
+.sec{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;line-height:1.2;color:var(--muted);padding:9px 2px 6px;}
 /* Bandeau « Grand dossier » PLUi-H-D (accueil mobile) — accessible seniors :
    grand texte, fort contraste sur dégradé forêt→feuille, zone tap large. */
 .plui-banner{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;box-sizing:border-box;margin:6px 0 4px;padding:18px 18px 20px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--forest) 0%,var(--leaf) 100%);box-shadow:0 8px 24px rgba(26,61,43,0.28);color:#fff;font-family:'Nunito',sans-serif;text-align:left;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;}
@@ -168,7 +172,7 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .ico{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
 .ct{flex:1;min-width:0;}
 .ct-label{font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
-.ct-sub{font-size:0.75rem;color:var(--muted);font-weight:600;margin-top:1px;}
+.ct-sub{font-size:0.75rem;color:var(--muted);font-weight:600;line-height:1.25;margin-top:1px;}
 .notif-status-on{color:#16a34a !important;font-weight:900 !important;}
 .notif-status-off{color:#dc2626 !important;font-weight:900 !important;}
 .notif-status-loading{color:#b45309 !important;font-weight:900 !important;}

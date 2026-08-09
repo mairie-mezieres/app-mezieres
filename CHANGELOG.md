@@ -23,6 +23,14 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   mais piège silencieux pour toute addition future. `body{font-size:1rem}`.
 - Géométrie des pastilles portée de 18 à **20 px** (`.notif-badge`, `#sondages-badge`,
   `#photos-badge`) : à 12 px de texte, le chiffre ne tenait plus dans un rond de 18 px.
+- **`line-height` manquant sur `.top-title`, `.sec` et `.ct-sub`** : ces règles héritaient
+  du `1.5` de la racine, soit 18 px de hauteur de ligne pour 12 px de texte, quand leurs
+  voisins du même composant (`.top-main` 1.15, `.ct-label` 1.2) étaient serrés. Invisible
+  à 9,9 px, c'est devenu la moitié de l'enflure au passage à 12 px : les tuiles du header
+  montaient à 106 px. Avec `line-height:1.2`/`1.25` et un rognage mineur des marges
+  (`.top-card` 8→7 px, `.sec` 12/8→9/6 px, `.top-badge` 2→1 px) : **tuiles à 95–96 px et
+  page à 1 795 px, soit +1,7 % au lieu de +6,2 %** — sans toucher à une seule taille de
+  police.
 
 ### Ajouté
 - **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte

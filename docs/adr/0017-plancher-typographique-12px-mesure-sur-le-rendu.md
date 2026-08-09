@@ -92,6 +92,33 @@ insensible au réglage d'accessibilité, en silence.
 `min-width:18px; height:18px; line-height:18px` avec un texte à 12 px ne tient
 plus. Un test vérifie que le contenu ne déborde pas du rond.
 
+**6. `line-height` explicite là où il manquait — le vrai coupable de l'enflure.**
+
+Premier jet du plancher : les tuiles du header passaient de 81 à **106 px**
+(+30 %), assez pour que le résultat soit jugé « trop gros ». Le réflexe aurait
+été de redescendre sous 12 px. La cause était ailleurs.
+
+`.top-title`, `.sec` et `.ct-sub` **ne déclaraient aucun `line-height`** : ils
+héritaient donc du `1.5` de la racine, soit **18 px de hauteur de ligne pour
+12 px de texte** — alors que leurs voisins immédiats dans le même composant
+(`.top-main` à 1.15, `.ct-label` à 1.2) étaient serrés. À 9,9 px le surplus
+passait inaperçu ; à 12 px il devenait la moitié de l'enflure.
+
+Poser `line-height:1.2` / `1.25` sur ces trois règles, plus un rognage mineur
+des marges (`.top-card` 8→7 px, `.sec` 12/8→9/6 px, `.top-badge` 2→1 px),
+ramène les tuiles à **95–96 px** et la page à **1 795 px — soit +1,7 % contre
++6,2 %**, sans toucher à une seule taille de police.
+
+Leçon : quand une valeur de `font-size` augmente, vérifier d'abord si le
+`line-height` est hérité. Un `1.5` global appliqué à des micro-libellés coûte
+plus cher que la police elle-même.
+
+L'interlettrage a été testé (`.08em` → `0`) : **aucun effet** sur le retour à
+la ligne de « Prochaine manifestation », qui passe de 1 à 2 lignes à 12 px quoi
+qu'on fasse. Comme les tuiles sont en grille, cette seule tuile impose sa
+hauteur aux quatre. Non résolu — le seul levier restant serait de raccourcir le
+libellé, hors périmètre.
+
 ## Vérification
 
 Mesure avant / après sur le rendu, même page, même appareil simulé :
@@ -102,16 +129,20 @@ Mesure avant / après sur le rendu, même page, même appareil simulé :
 | Caractères sous 12 px | 1 044 | **0** |
 | Débordement horizontal | non | non |
 | Conteneurs qui rognent | aucun | aucun |
-| Hauteur de page | 1 765 px | 1 875 px (+6,2 %) |
-| Tuiles du header | 81/81/82/82 | 106/106/104/104 |
+| Hauteur de page | 1 765 px | **1 795 px (+1,7 %)** |
+| Tuiles du header | 81/81/82/82 | **96/96/95/95** |
+| Cartes d'accueil | 72–75 px | 72–76 px |
+
+(Sans la correction des `line-height` du point 6 : 1 875 px et 106/106/104/104.)
 
 Suite complète : 119 passés, 17 sautés, 0 échec.
 
 ## Conséquences
 
-- Les tuiles du header grandissent de ~30 % en hauteur. C'est le changement
-  visuel principal, et il est assumé : `.top-card` a un `min-height:72px` avec
-  du mou, aucun contenu n'est rogné.
+- Les tuiles du header grandissent de ~17 % en hauteur (81 → 95 px). C'est le
+  changement visuel principal, et il est assumé : `.top-card` a un
+  `min-height:72px` avec du mou, aucun contenu n'est rogné. La page entière ne
+  s'allonge que de 1,7 %.
 - `.plui-banner` présente un `scrollWidth` supérieur de 30 px à son
   `clientWidth`. **Ce comportement préexistait** (mesuré identique sur le code
   d'origine), il est clippé par `overflow:hidden` et la pastille agrandie n'est
