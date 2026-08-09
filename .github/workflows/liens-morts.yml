@@ -45,7 +45,11 @@ jobs:
           #  - les pages d'inscription des hébergeurs citées par le kit de
           #    réplication (Netlify, Cloudflare, GitHub, OVH…) : ce sont des
           #    chaînes de documentation dans mat-partager.js, pas des liens de
-          #    l'application, et elles bloquent les robots.
+          #    l'application, et elles bloquent les robots ;
+          #  - legifrance.gouv.fr : refuse les robots (403) alors que l'article
+          #    cité comme source par « Le saviez-vous ? » s'ouvre normalement ;
+          #  - mairie-nomdeville.fr : adresse d'EXEMPLE dans le texte du kit de
+          #    réplication, volontairement fictive.
           #
           # ⛔ NE JAMAIS écrire de commentaire À L'INTÉRIEUR du bloc `args: >-`
           # ci-dessous. Dans un scalaire replié YAML, « # » n'est PAS un
@@ -90,6 +94,8 @@ jobs:
             --exclude 'github\.com/signup'
             --exclude 'ovhcloud\.com'
             --exclude 'donnees\.roulez-eco\.fr'
+            --exclude 'legifrance\.gouv\.fr'
+            --exclude 'mairie-nomdeville\.fr'
             index.html admin.html architecture.html notif.html offline.html partager.html
             'js/*.js'
           format: markdown
