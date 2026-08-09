@@ -104,6 +104,7 @@ html,body{height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--text
   <button class="tbtn" id="btn-zones" aria-pressed="true">🗺️ <span>Zonage du PLU</span></button>
   <button class="tbtn" id="btn-bati" aria-pressed="true">🏠 <span>Bâtiments 3D</span></button>
   <button class="tbtn" id="btn-fond" aria-pressed="true">🛰️ <span>Vue aérienne</span></button>
+  <button class="tbtn" id="btn-diag" hidden>🔎 <span>Détail des sources</span></button>
 </div>
 
 <details class="legend on" id="legend">
@@ -313,28 +314,77 @@ function normaliserZone(lib){
   return v;
 }
 
-/* ── Bâti : BD TOPO IGN (hauteurs réelles), repli OpenStreetMap ─── */
-function chargerBatiIGN(){
-  var url = 'https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature'
-          + '&TYPENAMES=BDTOPO_V3:batiment&SRSNAME=EPSG:4326&outputFormat=application/json'
-          + '&count=6000&BBOX=' + [BBOX.s, BBOX.w, BBOX.n, BBOX.e].join(',') + ',EPSG:4326';
-  return fetch(url)
-    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(fc){
-      if (!fc || !fc.features || !fc.features.length) throw new Error('vide');
-      fc.features.forEach(function(f){
-        var p = f.properties || {};
-        var h = parseFloat(p.hauteur);
-        if (!isFinite(h) || h <= 0){
-          var et = parseFloat(p.nombre_d_etages);
-          h = isFinite(et) && et > 0 ? (et * 2.8 + 1.2) : 6;
-        }
-        f.properties.mat_h = Math.max(2.5, Math.min(h, 40));
-        f.properties.mat_src = 'IGN';
-      });
-      return fc;
-    });
+/* ── Bâti : BD TOPO IGN (hauteurs réelles), repli OpenStreetMap ───
+   Le premier essai unique ne disait jamais POURQUOI il échouait : on
+   tombait directement sur le bâti simulé, posé sur une vraie photo. On
+   tente désormais plusieurs formulations de la requête, et chaque essai
+   consigne son résultat exact dans `journal`, consultable à l'écran. */
+var journal = [];        // [{nom, ok, detail, n}]
+
+function noter(nom, ok, detail, n){
+  journal.push({ nom:nom, ok:!!ok, detail:detail || '', n:n || 0 });
 }
+
+/* Un serveur OGC renvoie ses erreurs en XML, pas en JSON : sans lire ce
+   corps, on perd la seule phrase qui explique le refus. */
+function _lireErreur(r){
+  return r.text().then(function(t){
+    var m = t.match(/<(?:ows:)?ExceptionText[^>]*>([\s\S]*?)<\//i);
+    return 'HTTP ' + r.status + (m ? ' — ' + m[1].trim().slice(0, 160) : '');
+  }).catch(function(){ return 'HTTP ' + r.status; });
+}
+
+function _wfs(nom, url){
+  return fetch(url).then(function(r){
+    if (!r.ok) return _lireErreur(r).then(function(d){ throw new Error(d); });
+    return r.json();
+  }).then(function(fc){
+    if (!fc || !fc.features || !fc.features.length) throw new Error('réponse vide');
+    noter(nom, true, 'ok', fc.features.length);
+    return fc;
+  }).catch(function(e){
+    noter(nom, false, e.message);
+    throw e;
+  });
+}
+
+/* Trois formulations, de la plus sûre à la plus ancienne.
+   CRS:84 impose l'ordre longitude,latitude — sans ambiguïté. WFS 2.0 avec
+   EPSG:4326 impose au contraire latitude,longitude, d'où la bascule de
+   l'ordre du BBOX entre les deux variantes. */
+function chargerBatiIGN(){
+  var base = 'https://data.geopf.fr/wfs/ows?SERVICE=WFS&REQUEST=GetFeature'
+           + '&outputFormat=application/json';
+  var essais = [
+    ['IGN BD TOPO (CRS:84)',
+      base + '&VERSION=2.0.0&TYPENAMES=BDTOPO_V3:batiment&SRSNAME=CRS:84&count=6000'
+           + '&BBOX=' + [BBOX.w, BBOX.s, BBOX.e, BBOX.n].join(',') + ',CRS:84'],
+    ['IGN BD TOPO (EPSG:4326)',
+      base + '&VERSION=2.0.0&TYPENAMES=BDTOPO_V3:batiment&SRSNAME=EPSG:4326&count=6000'
+           + '&BBOX=' + [BBOX.s, BBOX.w, BBOX.n, BBOX.e].join(',') + ',EPSG:4326'],
+    ['IGN BD TOPO (WFS 1.1)',
+      base + '&VERSION=1.1.0&TYPENAME=BDTOPO_V3:batiment&SRSNAME=EPSG:4326&maxFeatures=6000'
+           + '&BBOX=' + [BBOX.s, BBOX.w, BBOX.n, BBOX.e].join(',')]
+  ];
+  var chaine = Promise.reject(new Error('init'));
+  essais.forEach(function(e){
+    chaine = chaine.catch(function(){ return _wfs(e[0], e[1]); });
+  });
+  return chaine.then(function(fc){
+    fc.features.forEach(function(f){
+      var p = f.properties || {};
+      var h = parseFloat(p.hauteur);
+      if (!isFinite(h) || h <= 0){
+        var et = parseFloat(p.nombre_d_etages != null ? p.nombre_d_etages : p.nombre_etages);
+        h = isFinite(et) && et > 0 ? (et * 2.8 + 1.2) : 6;
+      }
+      f.properties.mat_h = Math.max(2.5, Math.min(h, 40));
+      f.properties.mat_src = 'IGN';
+    });
+    return fc;
+  });
+}
+
 function chargerBatiOSM(){
   var q = '[out:json][timeout:25];(way["building"](' + [BBOX.s,BBOX.w,BBOX.n,BBOX.e].join(',') + '););out geom;';
   return fetch('https://overpass-api.de/api/interpreter', {
@@ -357,9 +407,43 @@ function chargerBatiOSM(){
           geometry:{ type:'Polygon', coordinates:[ e.geometry.map(function(g){ return [g.lon, g.lat]; }) ] }
         };
       });
-    if (!feats.length) throw new Error('vide');
+    if (!feats.length) throw new Error('réponse vide');
+    noter('OpenStreetMap (Overpass)', true, 'ok', feats.length);
     return { type:'FeatureCollection', features:feats };
+  })
+  .catch(function(e){ noter('OpenStreetMap (Overpass)', false, e.message); throw e; });
+}
+
+/* Contrôle de position : Mézières est à lon ≈ 1,81 / lat ≈ 47,82. Des
+   valeurs hors de cette fenêtre signent soit une inversion des axes
+   (lon ≈ 47,8), soit une projection non convertie (Lambert-93, 6 chiffres). */
+function auditGeom(fc){
+  var minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  function pt(c){
+    if (typeof c[0] === 'number'){
+      minX = Math.min(minX, c[0]); maxX = Math.max(maxX, c[0]);
+      minY = Math.min(minY, c[1]); maxY = Math.max(maxY, c[1]);
+    } else { c.forEach(pt); }
+  }
+  fc.features.forEach(function(f){ if (f.geometry) pt(f.geometry.coordinates); });
+  var a = { minX:minX, maxX:maxX, minY:minY, maxY:maxY, souci:'' };
+  if (Math.abs(maxX) > 180 || Math.abs(maxY) > 90) a.souci = 'projection non convertie (Lambert-93 ?)';
+  else if (minX > 40 && maxY < 10)                 a.souci = 'axes inversés (latitude en premier)';
+  else if (maxX < BBOX.w - 0.05 || minX > BBOX.e + 0.05 ||
+           maxY < BBOX.s - 0.05 || minY > BBOX.n + 0.05) a.souci = 'emprise hors commune';
+  return a;
+}
+
+/* Inversion détectée : on remet les couples dans l'ordre GeoJSON. */
+function inverserAxes(fc){
+  function inv(c){
+    if (typeof c[0] === 'number') return [c[1], c[0]];
+    return c.map(inv);
+  }
+  fc.features.forEach(function(f){
+    if (f.geometry) f.geometry.coordinates = inv(f.geometry.coordinates);
   });
+  return fc;
 }
 
 /* ── Mode démonstration ─────────────────────────────────────────
@@ -462,10 +546,14 @@ function poserZones(){
   var couleur = ['match', ['get','mat_code']];
   Object.keys(COULEURS).forEach(function(k){ couleur.push(k, COULEURS[k]); });
   couleur.push(DEFAUT);
+  /* Le zonage se glisse SOUS le bâti quand celui-ci existe — mais il peut
+     désormais ne jamais arriver (source indisponible). `beforeId` doit donc
+     rester facultatif, sinon MapLibre lève « layer 'bati' does not exist ». */
+  var sous = map.getLayer('bati') ? 'bati' : undefined;
   map.addLayer({ id:'zones-fill', type:'fill', source:'zones',
-    paint:{ 'fill-color':couleur, 'fill-opacity':0.42 } }, 'bati');
+    paint:{ 'fill-color':couleur, 'fill-opacity':0.42 } }, sous);
   map.addLayer({ id:'zones-line', type:'line', source:'zones',
-    paint:{ 'line-color':couleur, 'line-width':1.6, 'line-opacity':0.9 } }, 'bati');
+    paint:{ 'line-color':couleur, 'line-width':1.6, 'line-opacity':0.9 } }, sous);
   etat.zones = true;
 }
 
@@ -579,6 +667,49 @@ function esc(s){
   });
 }
 
+/* ── Panneau de diagnostic ───────────────────────────────────────
+   Chaque source interrogée, dans l'ordre, avec le motif exact de son
+   refus. C'est ce qui manquait : la maquette basculait sur un bâti
+   simulé sans jamais dire pourquoi. */
+function ouvrirDiagnostic(){
+  document.getElementById('sh-zone').textContent = '🔎';
+  document.getElementById('sh-title').firstChild.nodeValue = 'Détail des sources';
+  document.getElementById('sh-sub').textContent = 'Ce que chaque service a répondu';
+
+  var out = '<div class="sec">Bâtiments</div><div class="rows">';
+  if (!journal.length){
+    out += '<div class="row"><span class="c">Aucune source interrogée</span></div>';
+  }
+  journal.forEach(function(e){
+    out += '<div class="row"><span class="c">' + esc(e.nom)
+        +  '<br><span style="font-weight:600;color:var(--muted)">' + esc(e.detail) + '</span></span>'
+        +  '<span class="a ' + (e.ok ? 'ok' : 'pc') + '">'
+        +  (e.ok ? e.n + ' bâtiments' : 'échec') + '</span></div>';
+  });
+  out += '</div>';
+
+  var a = window.__audit;
+  if (a){
+    out += '<div class="sec">Position des bâtiments reçus</div>'
+        +  '<dl class="kv">'
+        +  '<dt>Longitudes</dt><dd>' + a.minX.toFixed(4) + ' → ' + a.maxX.toFixed(4) + '</dd>'
+        +  '<dt>Latitudes</dt><dd>' + a.minY.toFixed(4) + ' → ' + a.maxY.toFixed(4) + '</dd>'
+        +  '<dt>Attendu</dt><dd>lon ' + BBOX.w + ' → ' + BBOX.e + ' · lat ' + BBOX.s + ' → ' + BBOX.n + '</dd>'
+        +  '</dl>';
+    out += '<div class="warn">' + (a.souci ? '⚠️ ' + esc(a.souci) : '✅ Emprise cohérente avec la commune.') + '</div>';
+  }
+
+  out += '<div class="sec">Zonage du PLU</div><div class="rows"><div class="row">'
+      +  '<span class="c">Géoportail de l\'Urbanisme'
+      +  (ZONES ? '' : '<br><span style="font-weight:600;color:var(--muted)">' + esc(zonesDiag) + '</span>')
+      +  '</span><span class="a ' + (ZONES ? 'ok' : 'pc') + '">'
+      +  (ZONES ? ZONES.features.length + ' zones' : 'échec') + '</span></div></div>';
+
+  document.getElementById('sh-body').innerHTML = out;
+  document.getElementById('sheet').classList.add('on');
+}
+document.getElementById('btn-diag').onclick = ouvrirDiagnostic;
+
 document.getElementById('sh-close').onclick = function(){
   document.getElementById('sheet').classList.remove('on');
   if (map.getLayer('bati-sel')) map.setFilter('bati-sel', ['==','mat_id','']);
@@ -652,16 +783,31 @@ map.on('load', function(){
     .then(function(okZones){
       return chargerBatiIGN()
         .catch(function(){ statut('BD TOPO indisponible — repli OpenStreetMap…'); return chargerBatiOSM(); })
-        .catch(function(){ etat.mode = 'demo'; return batiDemo(); })
+        /* ⚠️ Plus de repli sur le bâti simulé ici. Poser un village fictif
+           par-dessus une vraie photo aérienne et un vrai zonage ne dégrade
+           pas l'affichage : il le rend faux, et rien ne le distingue à l'œil
+           d'une donnée exacte. Mieux vaut aucun bâtiment, et le dire. */
+        .catch(function(){ return null; })
         .then(function(fc){
-          poserBati(fc);
           poserZones();
           poserLegende();
+          if (!fc){
+            statut('<b>Aucun bâtiment chargé</b> — ni l\'IGN ni OpenStreetMap n\'ont répondu.'
+                 + (okZones ? ' Le zonage du PLU et la photo aérienne, eux, sont réels.' : '')
+                 + '<br>Touchez « 🔎 Détail » pour savoir pourquoi.');
+            document.getElementById('btn-diag').hidden = false;
+            return;
+          }
+          var audit = auditGeom(fc);
+          if (audit.souci === 'axes inversés (latitude en premier)') inverserAxes(fc);
+          window.__audit = audit;
+          poserBati(fc);
           var n = fc.features.length;
           var src = fc.features[0] && fc.features[0].properties.mat_src;
-          if (etat.mode === 'demo'){
-            statut('⚠️ <b>Bâti simulé</b> — ni l\'IGN ni OpenStreetMap n\'ont répondu. '
-                 + 'Le moteur 3D et l\'interface sont réels, les bâtiments non.');
+          document.getElementById('btn-diag').hidden = false;
+          if (audit.souci){
+            statut(n + ' bâtiments — <b>position douteuse</b> : ' + esc(audit.souci)
+                 + '<br>Touchez « 🔎 Détail ».');
           } else if (okZones){
             statut(n + ' bâtiments · hauteurs ' + src + ' · '
                  + ZONES.features.length + ' zones du PLU', false);
