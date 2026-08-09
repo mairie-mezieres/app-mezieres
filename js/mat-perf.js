@@ -20,7 +20,12 @@ async function loadPerfBadge() {
       A: '#74c69d', B: '#95d5b2', C: '#ffe08a',
       D: '#ffd166', E: '#ffb38a', F: '#ff9999', G: '#ff9999'
     };
-    const dateStr = d.date ? d.date.split('-').reverse().join('/') : '';
+    // Jour/mois seulement : l'année faisait basculer le badge sur une 3ᵉ ligne
+    // du pied de page à 360 px, une fois la typographie passée au plancher de
+    // 12 px. La date complète reste dans l'attribut title.
+    const dp = d.date ? d.date.split('-') : null;
+    const dateStr = dp && dp.length === 3 ? dp[2] + '/' + dp[1] : '';
+    const dateTitle = dp && dp.length === 3 ? 'Mesuré le ' + dp[2] + '/' + dp[1] + '/' + dp[0] : '';
     const showEco = d.grade && d.ecoindex >= 40;
     const col = gradeColors[d.grade] || 'var(--sage)';
 
@@ -31,7 +36,7 @@ async function loadPerfBadge() {
       `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Perf&nbsp;${d.performance}</span>` +
       `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Access&nbsp;${d.accessibility}</span>` +
       `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Pratiques&nbsp;${d.bestPractices}</span>` +
-      (dateStr ? `<span class="fp-date">${dateStr}</span>` : '');
+      (dateStr ? `<span class="fp-date" title="${dateTitle}">${dateStr}</span>` : '');
 
     els.forEach(el => { el.innerHTML = html; });
   } catch (_) {}

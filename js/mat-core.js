@@ -421,7 +421,11 @@ function updateInstallBtn(){
   if(btn) btn.onclick=()=>openOv('bug');
   if(ico) ico.textContent='🐞';
   if(label) label.textContent='Signaler un bug';
-  if(sub) sub.textContent="On s'en occupe !";
+  // Le sous-titre a été retiré du gabarit (v4.63) : le libellé « Signaler un
+  // bug » tient déjà sur deux lignes à 360 px, un sous-titre en ajoutait deux
+  // de plus et déséquilibrait la rangée. `sub` reste résolu et gardé pour ne
+  // pas casser un gabarit répliqué qui l'aurait conservé.
+  if(sub) sub.textContent='On s’en occupe !';
 }
 function installOrBug(){ openBug(); }
 

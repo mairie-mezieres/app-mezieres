@@ -142,6 +142,52 @@ for (const mode of ['normal', 'font-xl']) {
   });
 }
 
+// ── Égalité de hauteur des cartes, par rangée ──────────────────────────
+//
+// Les cartes de `.grid2` vont deux par ligne. Si l'une déborde d'une ligne de
+// plus que sa voisine, la grille étire les deux et la rangée paraît bancale.
+// C'est ce qui s'est produit au passage au plancher de 12 px : les sous-titres
+// coupés sont passés de 2 à 10 sur 15 à 360 px.
+//
+// Corrigé en retirant quatre sous-titres devenus superflus (« Votre avis
+// compte », « On s'en occupe ! »), en fusionnant « Entreprises » +
+// « Artisans & services » en un seul libellé, et en resserrant les marges des
+// cartes. Ce test empêche qu'un libellé rallongé le casse à nouveau sans
+// que personne ne le voie.
+//
+// ⚠️ 412 px (l'appareil par défaut de Playwright) ne suffit pas : à cette
+// largeur aucun sous-titre ne débordait, alors que 10 sur 15 débordaient sur
+// un téléphone réel à 360 px. On mesure donc les largeurs étroites.
+for (const W of [320, 360, 390]) {
+  test(`cartes : rangées de hauteur égale à ${W} px`, async ({ page }) => {
+    await mobileSeulement(page);
+    await page.setViewportSize({ width: W, height: 850 });
+    await page.waitForTimeout(400);
+
+    const bancales = await page.evaluate(() => {
+      const out = [];
+      document.querySelectorAll('.grid2').forEach((g) => {
+        const cartes = [...g.children];
+        for (let i = 0; i + 1 < cartes.length; i += 2) {
+          const [a, b] = [cartes[i], cartes[i + 1]];
+          const ha = Math.round(a.getBoundingClientRect().height);
+          const hb = Math.round(b.getBoundingClientRect().height);
+          if (Math.abs(ha - hb) > 1) {
+            const nom = (el) => {
+              const l = el.querySelector('.ct-label');
+              return l ? l.textContent.trim() : '?';
+            };
+            out.push(`${nom(a)} (${ha}px) ≠ ${nom(b)} (${hb}px)`);
+          }
+        }
+      });
+      return out;
+    });
+
+    expect(bancales, `rangées de hauteurs inégales à ${W} px`).toEqual([]);
+  });
+}
+
 // Les pastilles ont une géométrie figée (min-width/height/line-height) : un
 // texte agrandi doit continuer à tenir dans le rond, pas déborder du cercle.
 test('pastilles : le contenu tient dans la géométrie figée', async ({ page }) => {

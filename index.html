@@ -48,7 +48,7 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
-<script defer src="js/mat-core.js?v=4.3.4"></script>
+<script defer src="js/mat-core.js?v=4.3.5"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.8"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
@@ -58,7 +58,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.3.8"></script>
-<script defer src="js/mat-perf.js?v=1.0.7"></script>
+<script defer src="js/mat-perf.js?v=1.0.8"></script>
 <script defer src="js/mat-boot.js?v=4.4.1"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -298,7 +298,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </button>
 <button class="card" onclick="openSondages()">
 <div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
-<div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
+<div class="ct"><div class="ct-label">Sondage citoyen</div></div>
 </button>
 <div class="card" style="padding:0;overflow:hidden;gap:0">
 <div onclick="openPhotos()" role="button" tabindex="0" aria-label="Ouvrir la galerie de photos de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotos();}" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
@@ -322,7 +322,6 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
 <div class="ct">
 <div class="ct-label" id="iob-label">Signaler un bug</div>
-<div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
 </div>
 </button>
 </div>
@@ -334,7 +333,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </a>
 <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer">
 <div class="ico ico-communaute">🏘️</div>
-<div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+<div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c’est Mézières</div></div>
 </a>
 </div>
 <div class="sec">Associations &amp; Entreprises</div>
@@ -345,7 +344,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </button>
 <button class="card" onclick="openEntreprises()">
 <div class="ico" style="background:#e8f0fe">🛠️</div>
-<div class="ct"><div class="ct-label">Entreprises</div><div class="ct-sub">Artisans &amp; services</div></div>
+<div class="ct"><div class="ct-label">Entreprises &amp; services</div></div>
 </button>
 </div>
 <div class="sec" style="margin-top:18px">Sorties locales</div>
@@ -1676,6 +1675,7 @@ et accompagnée des documents suivants :
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Tout le texte de l&rsquo;accueil est plus grand.</strong> Sept lignes sur dix &eacute;taient affich&eacute;es sous 12&nbsp;pixels &mdash; les sous-titres des cartes, le jour de collecte des d&eacute;chets, l&rsquo;heure d&rsquo;ouverture de la mairie, le prochain bus. C&rsquo;&eacute;tait particuli&egrave;rement p&eacute;nible &agrave; lire sur t&eacute;l&eacute;phone. Plus aucun texte de la page d&rsquo;accueil n&rsquo;est d&eacute;sormais sous cette taille</li>
 <li><strong>Le r&eacute;glage &laquo;&nbsp;Taille du texte&nbsp;&raquo; agit maintenant partout.</strong> Certaines zones pouvaient rester &agrave; leur taille d&rsquo;origine quand vous choisissiez &laquo;&nbsp;grand&nbsp;&raquo; ou &laquo;&nbsp;tr&egrave;s grand&nbsp;&raquo;. Le r&eacute;glage s&rsquo;applique d&eacute;sormais &agrave; l&rsquo;ensemble de l&rsquo;application</li>
+<li><strong>Les cartes de l&rsquo;accueil sont toutes &agrave; la m&ecirc;me hauteur.</strong> Certaines d&eacute;bordaient d&rsquo;une ligne sur leur voisine, ce qui donnait des rang&eacute;es bancales. Quelques sous-titres redondants ont &eacute;t&eacute; retir&eacute;s&nbsp;: la carte &laquo;&nbsp;Entreprises&nbsp;&raquo; devient &laquo;&nbsp;Entreprises &amp; services&nbsp;&raquo;</li>
 <li>Les pastilles rouges de notification sont l&eacute;g&egrave;rement plus grandes, pour que le chiffre reste lisible</li>
 </ul>
 </div>

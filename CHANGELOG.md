@@ -38,6 +38,17 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   5 sur 15, et la page à **+1,3 %** contre `main` (1 838 → 1 862 px) au lieu de +2,9 %.
   Les **libellés** qui se coupent (« Sondage citoyen », « Vos photos »…) se coupaient
   **déjà avant** : `.ct-label` n'a pas été modifié.
+- **Rangées de cartes de hauteurs inégales.** Quatre sous-titres retirés ou fusionnés pour
+  que chaque carte tienne sur deux lignes : « Votre avis compte » (Sondage citoyen) et
+  « On s'en occupe ! » (Signaler un bug) supprimés, « Ici c'est Mézières ! » → « Ici c'est
+  Mézières », et « Entreprises » + « Artisans & services » fusionnés en « Entreprises &
+  services ». **Toutes les rangées ont désormais la même hauteur à 320, 360 et 390 px**, et
+  la page revient à 1 837 px — soit celle d'avant le lot (1 838 px), avec 100 % du texte
+  lisible. Verrouillé par un test par rangée.
+- Apostrophe droite ASCII dans « Ici c'est Mézières ! » remplacée par U+2019.
+- **Date du badge performances en jj/mm** (`js/mat-perf.js`) : l'année faisait basculer le
+  pied de page sur une ligne supplémentaire une fois la typographie au plancher. La date
+  complète reste dans l'attribut `title`.
 
 ### Ajouté
 - **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte
