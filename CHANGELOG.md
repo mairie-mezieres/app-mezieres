@@ -5,6 +5,73 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.63] — 9 août 2026
+
+### Corrigé
+- **70,5 % du texte peint sur l'accueil était sous 12 px** (Lighthouse mobile : « Document
+  doesn't use legible font sizes — 29.6% legible text »). Mesure indépendante sur le rendu
+  réel : 1 066 caractères visibles sur 1 491. Les plus gros volumes étaient `.ct-sub` à
+  **9,9 px** (les sous-titres qui disent à quoi sert chaque carte), `.sec` à 9,9 px et
+  `.top-sub` à **10,1 px** (« Prochaine ouverture lundi à 14 h »). Plancher de **12 px
+  (0.75rem)** appliqué à 40 règles de `css/mat.css`, aux styles inline correspondants
+  d'`index.html` et à deux chaînes de `js/mat-core.js`. **Après : 100 % du texte ≥ 12 px.**
+- **`body` ne suivait pas le réglage « Taille du texte ».** `html,body{font-size:16px}`
+  posait la taille sur les deux éléments, alors que `html.font-large` / `html.font-xl` ne
+  redéfinissent que `html` : `body` restait figé à 16 px dans les trois modes (vérifié :
+  racine 22 px, body 16 px). Tout élément **sans `font-size` explicite** héritait donc de
+  16 px sans jamais échelonner. Impact nul à ce jour — ce code déclare une taille partout —
+  mais piège silencieux pour toute addition future. `body{font-size:1rem}`.
+- Géométrie des pastilles portée de 18 à **20 px** (`.notif-badge`, `#sondages-badge`,
+  `#photos-badge`) : à 12 px de texte, le chiffre ne tenait plus dans un rond de 18 px.
+- **`line-height` manquant sur `.top-title`, `.sec` et `.ct-sub`** : ces règles héritaient
+  du `1.5` de la racine, soit 18 px de hauteur de ligne pour 12 px de texte, quand leurs
+  voisins du même composant (`.top-main` 1.15, `.ct-label` 1.2) étaient serrés. Invisible
+  à 9,9 px, c'est devenu la moitié de l'enflure au passage à 12 px : les tuiles du header
+  montaient à 106 px. Avec `line-height:1.2`/`1.25` et un rognage mineur des marges
+  (`.top-card` 8→7 px, `.sec` 12/8→9/6 px, `.top-badge` 2→1 px) : **tuiles à 95–96 px et
+  page à 1 795 px, soit +1,7 % au lieu de +6,2 %** — sans toucher à une seule taille de
+  police.
+- **Marges des cartes resserrées** (`.card` padding 14→10 px, gap icône/texte 11→9 px).
+  La vérification initiale ayant été faite à 412 px, elle était aveugle au cas courant :
+  à **360 px**, deux cartes par ligne ne laissent que ~130 px de texte utile et les
+  sous-titres coupés passaient de 2 à **10 sur 15**. Ces 6 px récupérés les ramènent à
+  5 sur 15, et la page à **+1,3 %** contre `main` (1 838 → 1 862 px) au lieu de +2,9 %.
+  Les **libellés** qui se coupent (« Sondage citoyen », « Vos photos »…) se coupaient
+  **déjà avant** : `.ct-label` n'a pas été modifié.
+- **Rangées de cartes de hauteurs inégales.** Quatre sous-titres retirés ou fusionnés pour
+  que chaque carte tienne sur deux lignes : « Votre avis compte » (Sondage citoyen) et
+  « On s'en occupe ! » (Signaler un bug) supprimés, « Ici c'est Mézières ! » → « Ici c'est
+  Mézières », et « Entreprises » + « Artisans & services » fusionnés en « Entreprises &
+  services ». **Toutes les rangées ont désormais la même hauteur à 320, 360 et 390 px**, et
+  la page revient à 1 837 px — soit celle d'avant le lot (1 838 px), avec 100 % du texte
+  lisible. Verrouillé par un test par rangée.
+- Apostrophe droite ASCII dans « Ici c'est Mézières ! » remplacée par U+2019.
+- **Libellés du badge performances en toutes lettres** (`js/mat-perf.js`) : « Perf » →
+  « Performances », « Access » → « Accessibilité », « Pratiques » → « Bonnes pratiques ».
+  Le badge occupant de toute façon deux lignes en mobile, l'abréviation ne faisait plus
+  gagner de place et rendait ces libellés obscurs pour un habitant. Date conservée en
+  **jj/mm/aaaa**, avec un `title` qui précise ce qu'elle désigne.
+  Coût mesuré : à 360, 390 et 412 px le badge reste sur 2 lignes (41 px) ; à **320 px** il
+  passe à 3 lignes (+23 px) ; en desktop il reste sur 1 ligne, mais la rangée basse du pied
+  de page passe de 28 à 50 px à 1 280 px (elle ne bougeait pas à 1 440 px). Aucun
+  débordement horizontal à aucune largeur.
+
+### Ajouté
+- **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte
+  réellement peint, et non la feuille de style. Nécessaire : `.mat-version` était déclarée
+  à `0.5rem` dans `mat.css` **et** à `0.52rem` en inline dans `index.html`, l'inline
+  gagnant. Couvre le plancher dans les trois modes de taille, le suivi `body`/racine,
+  l'absence de débordement horizontal et de rognage vertical, et la tenue des pastilles.
+
+### Notes
+- **Non traité dans ce lot** : les 31 déclarations sous 12 px de `css/mat-desktop.css`, les
+  overlays de `css/mat.css`, `admin.html` (109), et les pages secondaires. Les tests
+  typographiques sont explicitement bornés à l'écran mobile/PWA. Voir **ADR-0017**.
+- Le multiplicateur d'accessibilité fonctionnait déjà : 98 % des déclarations du dépôt sont
+  en `rem`. Seuls 2,7 % du texte étaient figés, et exclusivement des emojis d'icônes.
+
+---
+
 ## [4.62] — 9 août 2026
 
 ### Corrigé

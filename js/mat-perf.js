@@ -20,6 +20,9 @@ async function loadPerfBadge() {
       A: '#74c69d', B: '#95d5b2', C: '#ffe08a',
       D: '#ffd166', E: '#ffb38a', F: '#ff9999', G: '#ff9999'
     };
+    // Date complète jj/mm/aaaa. Le badge tient sur deux lignes en mobile de
+    // toute façon (mesuré de 320 à 412 px) : raccourcir en jj/mm n'y changeait
+    // rien et rendait la mesure moins situable dans le temps.
     const dateStr = d.date ? d.date.split('-').reverse().join('/') : '';
     const showEco = d.grade && d.ecoindex >= 40;
     const col = gradeColors[d.grade] || 'var(--sage)';
@@ -28,10 +31,10 @@ async function loadPerfBadge() {
       (showEco
         ? `<span class="fp-eco" style="color:${col}" title="Éco-index : sobriété numérique (poids, DOM, requêtes) — ${d.ecoindex}/100, note ${d.grade}">🌿&nbsp;Éco&nbsp;${d.grade}&nbsp;${d.ecoindex}</span>`
         : '') +
-      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Perf&nbsp;${d.performance}</span>` +
-      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Access&nbsp;${d.accessibility}</span>` +
-      `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Pratiques&nbsp;${d.bestPractices}</span>` +
-      (dateStr ? `<span class="fp-date">${dateStr}</span>` : '');
+      `<span title="Performance Lighthouse : vitesse de chargement — ${d.performance}/100">⚡&nbsp;Performances&nbsp;${d.performance}</span>` +
+      `<span title="Accessibilité Lighthouse : conformité RGAA/WCAG — ${d.accessibility}/100">♿&nbsp;Accessibilité&nbsp;${d.accessibility}</span>` +
+      `<span title="Bonnes pratiques (sécurité, HTTPS, absence d'erreurs) — ${d.bestPractices}/100">✅&nbsp;Bonnes&nbsp;pratiques&nbsp;${d.bestPractices}</span>` +
+      (dateStr ? `<span class="fp-date" title="Date de la dernière mesure Lighthouse et Éco-index">${dateStr}</span>` : '');
 
     els.forEach(el => { el.innerHTML = html; });
   } catch (_) {}
