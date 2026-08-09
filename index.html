@@ -43,7 +43,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.11.0">
+<link rel="stylesheet" href="css/mat.css?v=4.12.0">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
@@ -154,26 +154,26 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.61 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.62 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
-<img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
+<img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
 </div>
 <div class="header-bottom-grid">
-<div class="top-card top-mairie mairie-strip" onclick="openContact()">
+<div class="top-card top-mairie mairie-strip" onclick="openContact()" role="button" tabindex="0" aria-label="Voir les horaires et les coordonnées de la mairie" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openContact();}">
 <div class="top-title">Mairie</div>
 <div class="top-main" id="mairie-status">Chargement…</div>
 <div class="top-sub" id="mairie-desc"></div>
 <div class="top-badge" id="mairie-badge">Horaires</div>
 </div>
-<div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
+<div class="top-card top-meteo meteo-strip" onclick="openMeteo()" role="button" tabindex="0" aria-label="Voir la météo détaillée de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMeteo();}">
 <div class="top-title">Météo</div>
 <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
 <div class="top-sub" id="meteo-desc"></div>
 <div class="top-badge" id="meteo-alerte">Aucune alerte</div>
 <div id="meteo-ico" style="position:absolute;right:10px;top:8px;font-size:1.15rem">🌤️</div>
 </div>
-<div class="top-card top-dechets dechets-strip" onclick="openDechets()">
+<div class="top-card top-dechets dechets-strip" onclick="openDechets()" role="button" tabindex="0" aria-label="Voir le calendrier des collectes de déchets" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDechets();}">
 <div class="top-title">Déchets</div>
 <div class="dechet-row">
 <span class="dechet-dot dechet-dot-noir"></span>
@@ -187,7 +187,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
 </div>
-<div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
+<div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()" role="button" tabindex="0" aria-label="Voir la prochaine manifestation dans l’agenda" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAgendaFromTopEvent();}">
 <div class="top-title">Prochaine manifestation</div>
 <div class="event-date" id="next-event-date">Chargement…</div>
 <div class="event-name" id="next-event-name"></div>
@@ -301,9 +301,9 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
 </button>
 <div class="card" style="padding:0;overflow:hidden;gap:0">
-<div onclick="openPhotos()" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
+<div onclick="openPhotos()" role="button" tabindex="0" aria-label="Ouvrir la galerie de photos de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotos();}" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
 <div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
-<div class="ct"><div class="ct-label">Vos photos</div><div class="ct-sub">Galerie communale</div></div>
+<div class="ct"><div class="ct-label">Vos photos</div></div>
 </div>
 <button onclick="launchDiapo()" title="Lancer le diaporama plein écran" aria-label="Diaporama" style="flex-shrink:0;border:none;border-left:1px solid var(--border);background:none;padding:0 16px;height:100%;cursor:pointer;font-size:1.3rem;color:var(--muted);font-family:inherit;align-self:stretch;display:flex;align-items:center">▶</button>
 </div>
@@ -468,7 +468,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.61</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.62</button>
 </div>
 </div>
 </div>
@@ -658,6 +658,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <li>Thèmes clair, sombre et bleu</li>
 <li>Aide contextuelle et parcours d'accueil guidé</li>
 <li>Langue de la page déclarée (français), focus clavier visible</li>
+<li>Navigation compl&egrave;te au clavier&nbsp;: toutes les tuiles et cartes de l&rsquo;accueil s&rsquo;ouvrent avec Entr&eacute;e ou Espace, et l&rsquo;&eacute;l&eacute;ment s&eacute;lectionn&eacute; est entour&eacute; d&rsquo;un cadre visible (y compris en contraste &eacute;lev&eacute; et th&egrave;me sombre)</li>
 </ul>
 <p style="margin:10px 0 4px"><strong>Établissement de cette déclaration</strong></p>
 <p style="margin:0 0 6px">Déclaration établie le 29&nbsp;mai&nbsp;2026 par auto-évaluation. Un audit RGAA complet est envisagé pour formaliser le niveau de conformité.</p>
@@ -784,7 +785,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <button type="button" class="photo-btn secondary" onclick="document.getElementById('signal-photo-input').click()">🖼️ Choisir dans la galerie</button>
 </div>
 <div class="photo-help">Astuce : vous pouvez envoyer une photo prise sur place ou une image déjà enregistrée.</div>
-<img id="signal-photo-preview" class="photo-preview">
+<img id="signal-photo-preview" class="photo-preview" alt="Aperçu de la photo jointe au signalement">
 <button type="button" id="signal-photo-remove" class="photo-remove-btn" onclick="removeSignalPhoto()">🗑️ Retirer l'image</button>
 </div>
 <div class="form-group">
@@ -1072,7 +1073,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <button type="button" class="photo-btn secondary" onclick="document.getElementById('bug-photo-input').click()">🖼️ Choisir une capture</button>
 </div>
 <div class="photo-help">Une capture d'écran aide beaucoup pour diagnostiquer le problème.</div>
-<img id="bug-photo-preview" class="photo-preview">
+<img id="bug-photo-preview" class="photo-preview" alt="Aperçu de la photo jointe au rapport">
 <button type="button" id="bug-photo-remove" class="photo-remove-btn" onclick="removeBugPhoto()">🗑️ Retirer l'image</button>
 </div>
 <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
@@ -1614,7 +1615,7 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="margin-bottom:16px;border:1px solid var(--border);border-radius:12px;padding:12px">
 <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:10px">📤 Partager une photo de la commune</div>
-<div id="photo-upload-area" style="position:relative;border:2px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;min-height:120px;display:flex;align-items:center;justify-content:center;background:var(--mist)" onclick="document.getElementById('photo-upload-input').click()">
+<div id="photo-upload-area" role="button" tabindex="0" aria-label="Choisir une photo à partager" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('photo-upload-input').click();}" style="position:relative;border:2px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;min-height:120px;display:flex;align-items:center;justify-content:center;background:var(--mist)" onclick="document.getElementById('photo-upload-input').click()">
 <div id="photo-upload-placeholder" style="text-align:center;padding:20px;color:var(--muted)">
 <div style="font-size:2rem;margin-bottom:6px">📸</div>
 <div style="font-size:.78rem">Appuyez pour choisir une photo</div>
@@ -1671,6 +1672,16 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.62</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>L&rsquo;application se pilote enti&egrave;rement au clavier.</strong> Les quatre tuiles color&eacute;es du haut de page &mdash; Mairie, M&eacute;t&eacute;o, D&eacute;chets et Prochaine manifestation &mdash; ne r&eacute;pondaient qu&rsquo;au doigt ou &agrave; la souris. Elles s&rsquo;ouvrent d&eacute;sormais aussi avec les touches Entr&eacute;e et Espace, comme le reste de l&rsquo;application. M&ecirc;me chose pour la photo de MAT et MEL en haut de l&rsquo;&eacute;cran, qui donne acc&egrave;s &agrave; la pr&eacute;sentation &laquo;&nbsp;Qui suis-je&nbsp;?&nbsp;&raquo;</li>
+<li><strong>Partager une photo ne demande plus la souris.</strong> Dans la galerie, la zone &laquo;&nbsp;Appuyez pour choisir une photo&nbsp;&raquo; &eacute;tait le seul chemin possible et restait hors d&rsquo;atteinte au clavier&nbsp;: envoyer une photo &eacute;tait tout simplement impossible sans &eacute;cran tactile ni souris. C&rsquo;est corrig&eacute;</li>
+<li><strong>On voit o&ugrave; l&rsquo;on se trouve.</strong> Un cadre net entoure d&eacute;sormais l&rsquo;&eacute;l&eacute;ment s&eacute;lectionn&eacute; pendant une navigation au clavier, y compris en mode contraste &eacute;lev&eacute; et en th&egrave;me sombre. Rien ne change au toucher ni &agrave; la souris</li>
+<li><strong>Les photos jointes sont d&eacute;crites &agrave; voix haute.</strong> Les aper&ccedil;us d&rsquo;image des formulaires de signalement et de contact sont maintenant annonc&eacute;s par les lecteurs d&rsquo;&eacute;cran</li>
+<li>Le bouton <strong>Vos photos</strong> de l&rsquo;accueil retrouve la m&ecirc;me hauteur que ses voisins</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 7 ao&ucirc;t 2026 — v4.61</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les &eacute;toiles sont de retour dans le ciel de nuit.</strong> Par temps d&eacute;gag&eacute;, le bandeau d&rsquo;accueil devait se remplir d&rsquo;&eacute;toiles scintillantes &agrave; la tomb&eacute;e du jour&nbsp;: elles n&rsquo;apparaissaient plus depuis le 1<sup>er</sup> ao&ucirc;t. On les revoit d&eacute;sormais la nuit, ainsi qu&rsquo;&agrave; l&rsquo;aube et au cr&eacute;puscule &mdash; et les &eacute;toiles dor&eacute;es du d&eacute;cor de No&euml;l retrouvent leur &eacute;clat elles aussi</li>

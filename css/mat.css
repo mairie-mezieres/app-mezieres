@@ -1358,6 +1358,52 @@ html.theme-bleu:not(.high-contrast):not(.colorblind-mode) .header.amb-sunny{back
    l'ouverture/fermeture des overlays sur les navigateurs compatibles. */
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.22s;}
 
+/* ══════════════════════════════════════════════════════════════
+   RGAA 10.7 / WCAG 2.4.7 — Anneau de focus clavier
+   ──────────────────────────────────────────────────────────────
+   Plusieurs conteneurs cliquables (bandeaux du header, carte
+   photos, ligne de version…) ont reçu role="button" + tabindex="0"
+   pour être atteignables au clavier. Sans anneau visible, ce gain
+   est inutilisable : on ne sait pas où on se trouve.
+
+   Le sélecteur cible [role="button"] plutôt que chaque classe :
+   spécificité 0-2-0, il l'emporte donc sur les `outline:none`
+   posés plus haut sur .bus-strip et .fuel-strip — qui étaient
+   eux-mêmes un défaut (focus signalé par un simple changement de
+   fond à peine perceptible).
+
+   :focus-visible et non :focus → l'anneau n'apparaît JAMAIS au
+   clic ni au toucher, uniquement en navigation clavier. Aucun
+   changement visuel pour la souris et le tactile.
+   ══════════════════════════════════════════════════════════════ */
+.mat-a11y-ring:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(26,61,43,.55);
+  border-radius: 12px;
+}
+
+/* Sur fond clair (overlays, cartes crème), l'anneau blanc disparaîtrait :
+   on inverse — trait vert forêt cerné de blanc. */
+.panel-body [role="button"]:focus-visible,
+.content [role="button"]:focus-visible {
+  outline-color: var(--forest);
+  box-shadow: 0 0 0 6px rgba(255,255,255,.9);
+}
+
+html.high-contrast .mat-a11y-ring:focus-visible,
+html.high-contrast [role="button"]:focus-visible {
+  outline: 4px solid #000;
+  box-shadow: 0 0 0 7px #ff0;
+}
+
+html.theme-sombre .panel-body [role="button"]:focus-visible,
+html.theme-sombre .content [role="button"]:focus-visible {
+  outline-color: #7CB342;
+  box-shadow: 0 0 0 6px rgba(0,0,0,.75);
+}
+
 /* WCAG 2.1 — Respect du paramètre système "Réduire les animations".
    Court-circuite toutes les keyframes et transitions pour les utilisateurs
    sensibles au mouvement (vestibulaire, motion sickness). */

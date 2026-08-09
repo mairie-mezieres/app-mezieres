@@ -24,6 +24,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **« Est-ce qu'une alerte CERT-FR nous concerne ? »**, inventaire des domaines/hébergeurs/technologies, prestataires | `docs/surface-exposition.md` |
 | Historique des versions techniques | `CHANGELOG.md` |
 | Présentation générale du frontend | `README.md` |
+| **Accessibilité clavier** — pourquoi `role="button"` et pas `<button>`, pourquoi axe ne voit pas un `<div onclick>`, quelles exceptions sont admises | `docs/adr/0016-clavier-axe-ne-voit-pas-un-div-onclick.md` puis `tests/e2e/accessibilite-clavier.spec.js` |
 | **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |
 | **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
 

@@ -5,6 +5,41 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.62] — 9 août 2026
+
+### Corrigé
+- **Neuf éléments interactifs étaient hors de portée du clavier** (RGAA 7.3 / WCAG 2.1.1),
+  dont les quatre tuiles du haut de l'accueil (`.mairie-strip`, `.meteo-strip`,
+  `.dechets-strip`, `.event-strip`), la photo `img.mat-img` qui est le **seul** accès à
+  l'overlay « Qui suis-je ? », et la zone de dépôt de `#photo-upload-area` — dont
+  l'`<input type="file">` est en `display:none`, ce qui rendait le partage d'une photo
+  **impossible** sans écran tactile ni souris. Tous étaient des `<div onclick>` : pour
+  axe-core, des conteneurs inertes. Les tests d'accessibilité étaient donc au vert.
+  Le motif correct (`role="button"` + `tabindex="0"` + `onkeydown` avec `preventDefault()`)
+  existait déjà dans `index.html`, appliqué à `.bus-strip` et `.fuel-strip` seulement.
+  Voir **ADR-0016**.
+- **Le focus clavier n'était pas signalé de façon suffisante.** `.bus-strip` et
+  `.fuel-strip` portaient `outline:none` et ne marquaient le focus que par un changement
+  de fond à peine perceptible. Nouvel anneau sur `[role="button"]:focus-visible`
+  (spécificité 0-2-0, il l'emporte sur ces `outline:none`), avec variantes contraste élevé
+  et thème sombre. `:focus-visible` : rien ne change au clic ni au toucher.
+- **Aperçus de photo jointe sans `alt`** (`#signal-photo-preview`, `#bug-photo-preview`).
+
+### Ajouté
+- **`tests/e2e/accessibilite-clavier.spec.js`** — 14 tests, dont un **test de propriété**
+  qui énumère tous les `[onclick]` du DOM et échoue si l'un d'eux n'est ni nativement
+  focusable, ni doté d'un `tabindex`, ni couvert par une exception documentée (fonds
+  d'overlay, conteneur dont un descendant focusable porte l'action). C'est ce test qui a
+  trouvé `img.mat-img` après le premier passage de corrections manuelles.
+- Mention de la navigation clavier dans la **déclaration RGAA** de l'application et dans
+  `docs/guide-utilisateur.md` §10.
+
+### Modifié
+- Le bouton **Vos photos** de l'accueil perd son sous-titre « Galerie communale » : sa
+  hauteur s'alignait mal sur celle des cartes voisines.
+
+---
+
 ## [4.61] — 7 août 2026
 
 ### Corrigé

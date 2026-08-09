@@ -249,6 +249,21 @@ la touche **Échap** ferme la fenêtre ouverte, la tabulation (**Tab**) reste à
 fenêtre tant qu'elle est ouverte, et le focus revient automatiquement à l'endroit d'où vous
 l'aviez ouverte. Utile aussi avec un lecteur d'écran.
 
+Depuis la **v4.62**, l'accueil lui-même s'ouvre au clavier. Se déplacer avec **Tab**, puis
+appuyer sur **Entrée** ou **Espace**, permet d'ouvrir :
+
+- les quatre tuiles colorées du haut de page — **Mairie**, **Météo**, **Déchets**,
+  **Prochaine manifestation** ;
+- la photo de **MAT et MEL** en haut de l'écran, qui mène à la présentation « Qui suis-je ? » ;
+- la carte **Vos photos** et, dans la galerie, la zone d'envoi d'une photo — celle-ci
+  n'était accessible qu'au doigt ou à la souris, ce qui rendait le partage d'une photo
+  impossible sans écran tactile ;
+- la ligne de version, qui ouvre les nouveautés.
+
+Pendant une navigation au clavier, l'élément sélectionné est entouré d'un **cadre net**, y
+compris en mode contraste élevé et en thème sombre. Ce cadre n'apparaît jamais au toucher ni
+à la souris.
+
 ---
 
 ## 11. Utiliser l'application sans connexion
