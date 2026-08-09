@@ -387,13 +387,14 @@ Depuis l'écran d'accueil, un **bandeau « Grand dossier »** ouvre une page dé
 document qui décidera d'ici 2040 où l'on pourra construire, comment se loger et se déplacer
 sur le territoire des 25 communes de la CCTVL.
 
-La page comporte quatre parties :
+La page comporte cinq parties :
 
 1. **C'est quoi ?** — une explication simple du dossier et de son calendrier (approbation
    prévue fin 2028).
 2. **Où en est-on ?** — une frise chronologique montrant les étapes passées, l'**étape en
    cours** (mise en avant) et les étapes à venir.
-3. **Donnez votre avis** — quatre moyens de participer à la concertation : cahier en mairie,
+3. **Voir le zonage actuel en 3D** — voir §16 bis.
+4. **Donnez votre avis** — quatre moyens de participer à la concertation : cahier en mairie,
    mail, courrier, formulaire en ligne de la CCTVL.
 4. **Documents officiels** — la liste des documents du PLUi-H-D, **publiée par la mairie au
    fil de l'eau** depuis son tableau de bord (à commencer par le dossier d'enquête publique).
@@ -410,6 +411,44 @@ et ont disparu à la suivante.
 Un document peut être soit hébergé par l'application, soit renvoyer vers le site de la CCTVL —
 la différence ne se voit pas à l'usage. Les documents déjà affichés une fois restent
 **consultables hors connexion**, comme le reste de la page.
+
+---
+
+## 16 bis. Le village en 3D
+
+*(Ajouté en août 2026.)*
+
+Depuis la page PLUi-H-D, le bloc **« 🏘️ Voir le zonage actuel en 3D »** ouvre une vue en
+relief de Mézières : la photo aérienne de l'IGN au sol, les bâtiments du village en volume,
+et par-dessus le **zonage du plan local d'urbanisme**, chaque zone dans sa couleur. On fait
+pivoter la vue au doigt, on l'incline, on s'approche.
+
+**Touchez un bâtiment** : une fiche s'ouvre avec sa zone (centre-bourg, habitat résidentiel,
+agricole, naturelle…), l'emprise au sol autorisée, la hauteur maximale, le recul par rapport
+à la voie et les règles de clôture — puis, pour les projets les plus courants (abri de
+jardin, piscine, extension, panneaux solaires), s'il faut **ne rien faire**, une
+**déclaration préalable** ou un **permis de construire**.
+
+Trois interrupteurs en bas à gauche permettent d'éteindre le zonage, les bâtiments, ou de
+passer de la photo aérienne au plan.
+
+**Depuis MEL.** Dans « Urbanisme & Construction », une fois votre adresse saisie et votre
+zone trouvée, un bouton **« 🏘️ Voir ma zone sur la carte 3D »** ouvre la carte centrée sur
+chez vous, avec un repère. Vous n'avez pas à ressaisir l'adresse.
+
+**Ce qu'il faut savoir :**
+
+- Le zonage affiché est celui du **PLU actuellement en vigueur** — le PLUi-H-D, lui, est
+  encore en préparation. Le nom de la commune servie est affiché à l'écran.
+- C'est une **information, pas une autorisation**. Seul le service urbanisme de la mairie
+  fait foi.
+- **Cette page a besoin d'une connexion**, contrairement au reste de l'application : les
+  images et le zonage sont fournis en direct par l'IGN. Si une information manque, la page
+  vous le dit et un bouton « 🔎 Détail des sources » explique laquelle et pourquoi — elle
+  n'affiche jamais de bâtiments approximatifs à la place.
+- **Rien n'est envoyé.** Votre position n'est transmise ni à la mairie ni à personne.
+- Si vous avez activé **« Réduire les animations »** dans l'écran Personnalisation, le
+  mouvement d'arrivée est supprimé.
 
 ---
 

@@ -5,6 +5,53 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.62] — 9 août 2026
+
+### Ajouté
+- **Le village en 3D** (`js/mat-carte3d.js`, overlay `ov-carte3d`). Le bâti de Mézières en
+  relief sur l'orthophoto de l'IGN, avec le **zonage du PLU drapé au sol**. Toucher un
+  bâtiment ouvre sa zone et les règles qui s'y appliquent — emprise, hauteur, recul,
+  clôtures, puis abri de jardin, piscine, extension et panneaux solaires avec « rien à
+  faire / déclaration / permis ». Ces règles viennent de `data/plu-data.json`, le fichier
+  qui alimente déjà MEL : aucune donnée n'a été dupliquée.
+- **Deux portes d'entrée.** La page PLUi-H-D ouvre la vue d'ensemble ; **MEL** propose
+  « 🏘️ Voir ma zone sur la carte 3D » une fois la zone détectée, et transmet les
+  coordonnées **déjà trouvées** par `melFindZoneByAddr` / `melFindZoneByGPS`. La recherche
+  d'adresse n'est pas réimplémentée.
+- **Panneau « 🔎 Détail des sources »** : chaque service interrogé et le motif exact de son
+  refus, `ExceptionText` XML des serveurs OGC compris.
+- **Le nom de la commune servie par le Géoportail est affiché.** Voir ci-dessous.
+- `tests/e2e/carte3d.spec.js` — 5 tests × 2 formats : MapLibre absent au démarrage, entrée
+  depuis la page PLUi-H-D, fermeture par Échap, bouton de diagnostic masqué vérifié sur le
+  **style calculé**, et audit axe sans violation sérieuse.
+
+### Corrigé
+- **Le zonage affiché n'était pas celui de Mézières.** Le code INSEE utilisé était `45203`,
+  qui est **Meung-sur-Loire** ; Mézières-lez-Cléry est `45204`. Le plan de la commune
+  voisine se trouvait drapé sur la photo aérienne de Mézières, sans aucun signe distinctif.
+  Le nom de commune renvoyé par le Géoportail est désormais affiché à l'écran pour qu'une
+  telle divergence ne puisse plus passer inaperçue.
+- **Le zonage ne se chargeait pas du tout au départ** : la requête passait `insee` à
+  l'appel `zone-urba`, qui n'accepte que `partition` ou `geom`. L'erreur était avalée en
+  silence — ni zonage, ni légende, ni message. Trois tentatives enchaînées désormais, et
+  le motif d'échec est conservé et affiché.
+
+### Sécurité / robustesse
+- **Aucune donnée n'est inventée pour combler un trou.** Un village de substitution était
+  dessiné quand les sources ne répondaient pas : sur la commune, cela a produit de fausses
+  maisons par-dessus les vrais champs et le vrai zonage. Supprimé. Quand une source manque,
+  il n'y a aucun bâtiment, et c'est écrit. Voir **ADR-0016**.
+- **MapLibre GL (~1 Mo) n'est chargé qu'à la première ouverture de la carte** et n'est pas
+  précaché par le service worker. L'Éco-index de l'accueil est donc inchangé. Conséquence
+  assumée : la carte 3D ne fonctionne pas hors connexion, contrairement au reste de l'app.
+
+### Documentation
+- `docs/adr/0016-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md`
+- `docs/specifications/sfd/SFD-17-carte-3d-du-village.md`
+- `docs/guide-utilisateur.md`, `docs/guide-technique.md`, `CLAUDE.md` (tableau d'aiguillage)
+
+---
+
 ## [4.61] — 7 août 2026
 
 ### Corrigé

@@ -18,6 +18,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **Relire le corpus « Le saviez-vous ? » avant de le fusionner** (obligatoire, RG-16.13) | ouvrir `revue-saviez-vous.html` — corpus complet, ordre réel de passage, réponse et source |
 | **Fibre** — qui fait quoi (Lysséo ≠ fournisseur d'accès), raccordement d'une construction neuve | `docs/adr/0013-fibre-operateur-d-infrastructure-et-fournisseur-d-acces.md` |
 | **Documents du PLUi-H-D** — publiés par la mairie depuis l'admin (⚠️ **ne plus éditer `PLUI_DOCS` à la main**), cache hors-ligne, pastille « Nouveau » | `docs/adr/0014-documents-plui-administrables-page-embarquee.md` puis `chatbot-mairie-mezieres/GUIDE-ADMIN.md` §6quater |
+| **Carte 3D du village** — zonage PLU, MapLibre chargé à la demande, ⚠️ **INSEE 45204** (45203 = Meung-sur-Loire), règle « aucune donnée inventée » | `docs/adr/0016-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md` puis `docs/specifications/sfd/SFD-17-carte-3d-du-village.md` |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |

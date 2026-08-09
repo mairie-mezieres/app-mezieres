@@ -85,6 +85,7 @@ app-mezieres/
 │   ├── mat-associations.js Liste des associations
 │   ├── mat-entreprises.js  Annuaire des entreprises
 │   ├── mat-plui.js         Grand dossier PLUi-H-D (page embarquée ; documents via /docs/plui)
+│   ├── mat-carte3d.js      Carte 3D du village + zonage PLU (MapLibre chargé à la demande)
 │   ├── mat-guide-arrivee.js Guide d'arrivée des nouveaux habitants (embarqué)
 │   ├── mat-saviez-vous.js  « Le saviez-vous ? » — fait du jour (corpus + calculs)
 │   ├── mat-sondages.js     Sondages citoyens
@@ -96,6 +97,11 @@ app-mezieres/
 │   ├── mat-jours-feries.js Calcul jours fériés français
 │   ├── mat-partager.js     Logique du générateur partager.html
 │   └── mat-utils.js        Utilitaires communs
+│
+├── vendor/                 Bibliothèques auto-hébergées (pas de CDN)
+│   ├── leaflet/            Cartes 2D (signalements, suivi)
+│   ├── maplibre/           Rendu 3D — ~1 Mo, chargé À LA DEMANDE, non précaché (ADR-0016)
+│   └── sentry/             Remontée d'erreurs
 │
 ├── docs/
 │   ├── guide-utilisateur.md  Guide citoyen

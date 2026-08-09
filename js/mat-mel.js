@@ -1343,6 +1343,24 @@ function _appendCadastreBtn(){
   btn.innerHTML='🗺️ Ouvrir la carte cadastrale';
   btn.onclick=melShowCadastreData;
   el.appendChild(btn);
+  _appendCarte3dBtn(el);
+}
+
+// Passerelle vers la carte 3D. On NE refait PAS de recherche d'adresse :
+// melFindZoneByAddr / melFindZoneByGPS ont déjà obtenu les coordonnées et la
+// zone, on les transmet telles quelles. MEL répond pour un point ; la carte
+// montre ce qu'il y a autour — les deux se complètent au lieu de se doubler.
+function _appendCarte3dBtn(el){
+  if(!el||el.querySelector('.mel-carte3d-btn'))return;
+  if(typeof window.matOuvrirCarte3D!=='function')return;   // module non chargé
+  const b=document.createElement('button');
+  b.className='mel-carte3d-btn';
+  b.style.cssText='margin-top:8px;width:100%;background:var(--mist);border:1px solid var(--sage);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:0.76rem;font-weight:800;color:var(--forest);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px';
+  b.innerHTML='🏘️ Voir ma zone sur la carte 3D';
+  b.onclick=function(){
+    window.matOuvrirCarte3D({ lat:_melLat, lon:_melLon, zone:_melZoneNorm||_melZone });
+  };
+  el.appendChild(b);
 }
 
 async function melShowCadastreData(){
