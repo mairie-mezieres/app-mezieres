@@ -43,12 +43,12 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.11.0">
+<link rel="stylesheet" href="css/mat.css?v=4.13.0">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
-<script defer src="js/mat-core.js?v=4.3.3"></script>
+<script defer src="js/mat-core.js?v=4.3.5"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.8"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
@@ -57,8 +57,8 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.3.8"></script>
-<script defer src="js/mat-perf.js?v=1.0.7"></script>
+<script defer src="js/mat-mel.js?v=4.3.9"></script>
+<script defer src="js/mat-perf.js?v=1.0.8"></script>
 <script defer src="js/mat-boot.js?v=4.4.1"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -154,26 +154,26 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.62 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
-<div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.64 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
-<img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
+<img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
 </div>
 <div class="header-bottom-grid">
-<div class="top-card top-mairie mairie-strip" onclick="openContact()">
+<div class="top-card top-mairie mairie-strip" onclick="openContact()" role="button" tabindex="0" aria-label="Voir les horaires et les coordonnées de la mairie" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openContact();}">
 <div class="top-title">Mairie</div>
 <div class="top-main" id="mairie-status">Chargement…</div>
 <div class="top-sub" id="mairie-desc"></div>
 <div class="top-badge" id="mairie-badge">Horaires</div>
 </div>
-<div class="top-card top-meteo meteo-strip" onclick="openMeteo()">
+<div class="top-card top-meteo meteo-strip" onclick="openMeteo()" role="button" tabindex="0" aria-label="Voir la météo détaillée de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMeteo();}">
 <div class="top-title">Météo</div>
 <div class="top-main" id="meteo-temp"><span class="meteo-loading">Chargement…</span></div>
 <div class="top-sub" id="meteo-desc"></div>
 <div class="top-badge" id="meteo-alerte">Aucune alerte</div>
 <div id="meteo-ico" style="position:absolute;right:10px;top:8px;font-size:1.15rem">🌤️</div>
 </div>
-<div class="top-card top-dechets dechets-strip" onclick="openDechets()">
+<div class="top-card top-dechets dechets-strip" onclick="openDechets()" role="button" tabindex="0" aria-label="Voir le calendrier des collectes de déchets" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openDechets();}">
 <div class="top-title">Déchets</div>
 <div class="dechet-row">
 <span class="dechet-dot dechet-dot-noir"></span>
@@ -187,7 +187,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 <div class="dechet-row" id="dechet-dechetterie"><span class="dechet-ico" id="dech-ico">🔴</span><span id="dechetterie-text">Chargement…</span></div>
 </div>
-<div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()">
+<div class="top-card top-event event-strip" onclick="openAgendaFromTopEvent()" role="button" tabindex="0" aria-label="Voir la prochaine manifestation dans l’agenda" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAgendaFromTopEvent();}">
 <div class="top-title">Prochaine manifestation</div>
 <div class="event-date" id="next-event-date">Chargement…</div>
 <div class="event-name" id="next-event-name"></div>
@@ -297,13 +297,13 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
 </button>
 <button class="card" onclick="openSondages()">
-<div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
-<div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
+<div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+<div class="ct"><div class="ct-label">Sondage citoyen</div></div>
 </button>
 <div class="card" style="padding:0;overflow:hidden;gap:0">
-<div onclick="openPhotos()" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
-<div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
-<div class="ct"><div class="ct-label">Vos photos</div><div class="ct-sub">Galerie communale</div></div>
+<div onclick="openPhotos()" role="button" tabindex="0" aria-label="Ouvrir la galerie de photos de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotos();}" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
+<div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+<div class="ct"><div class="ct-label">Vos photos</div></div>
 </div>
 <button onclick="launchDiapo()" title="Lancer le diaporama plein écran" aria-label="Diaporama" style="flex-shrink:0;border:none;border-left:1px solid var(--border);background:none;padding:0 16px;height:100%;cursor:pointer;font-size:1.3rem;color:var(--muted);font-family:inherit;align-self:stretch;display:flex;align-items:center">▶</button>
 </div>
@@ -322,7 +322,6 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</div>
 <div class="ct">
 <div class="ct-label" id="iob-label">Signaler un bug</div>
-<div class="ct-sub" id="iob-sub">On s&#39;en occupe !</div>
 </div>
 </button>
 </div>
@@ -334,7 +333,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </a>
 <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer">
 <div class="ico ico-communaute">🏘️</div>
-<div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c'est Mézières !</div></div>
+<div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c’est Mézières</div></div>
 </a>
 </div>
 <div class="sec">Associations &amp; Entreprises</div>
@@ -345,7 +344,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </button>
 <button class="card" onclick="openEntreprises()">
 <div class="ico" style="background:#e8f0fe">🛠️</div>
-<div class="ct"><div class="ct-label">Entreprises</div><div class="ct-sub">Artisans &amp; services</div></div>
+<div class="ct"><div class="ct-label">Entreprises &amp; services</div></div>
 </button>
 </div>
 <div class="sec" style="margin-top:18px">Sorties locales</div>
@@ -468,7 +467,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.62</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.64</button>
 </div>
 </div>
 </div>
@@ -658,6 +657,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <li>Thèmes clair, sombre et bleu</li>
 <li>Aide contextuelle et parcours d'accueil guidé</li>
 <li>Langue de la page déclarée (français), focus clavier visible</li>
+<li>Navigation compl&egrave;te au clavier&nbsp;: toutes les tuiles et cartes de l&rsquo;accueil s&rsquo;ouvrent avec Entr&eacute;e ou Espace, et l&rsquo;&eacute;l&eacute;ment s&eacute;lectionn&eacute; est entour&eacute; d&rsquo;un cadre visible (y compris en contraste &eacute;lev&eacute; et th&egrave;me sombre)</li>
 </ul>
 <p style="margin:10px 0 4px"><strong>Établissement de cette déclaration</strong></p>
 <p style="margin:0 0 6px">Déclaration établie le 29&nbsp;mai&nbsp;2026 par auto-évaluation. Un audit RGAA complet est envisagé pour formaliser le niveau de conformité.</p>
@@ -784,7 +784,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <button type="button" class="photo-btn secondary" onclick="document.getElementById('signal-photo-input').click()">🖼️ Choisir dans la galerie</button>
 </div>
 <div class="photo-help">Astuce : vous pouvez envoyer une photo prise sur place ou une image déjà enregistrée.</div>
-<img id="signal-photo-preview" class="photo-preview">
+<img id="signal-photo-preview" class="photo-preview" alt="Aperçu de la photo jointe au signalement">
 <button type="button" id="signal-photo-remove" class="photo-remove-btn" onclick="removeSignalPhoto()">🗑️ Retirer l'image</button>
 </div>
 <div class="form-group">
@@ -1072,7 +1072,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <button type="button" class="photo-btn secondary" onclick="document.getElementById('bug-photo-input').click()">🖼️ Choisir une capture</button>
 </div>
 <div class="photo-help">Une capture d'écran aide beaucoup pour diagnostiquer le problème.</div>
-<img id="bug-photo-preview" class="photo-preview">
+<img id="bug-photo-preview" class="photo-preview" alt="Aperçu de la photo jointe au rapport">
 <button type="button" id="bug-photo-remove" class="photo-remove-btn" onclick="removeBugPhoto()">🗑️ Retirer l'image</button>
 </div>
 <button class="submit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)" onclick="submitBug()">📤 Envoyer le rapport</button>
@@ -1658,7 +1658,7 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="margin-bottom:16px;border:1px solid var(--border);border-radius:12px;padding:12px">
 <div style="font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:10px">📤 Partager une photo de la commune</div>
-<div id="photo-upload-area" style="position:relative;border:2px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;min-height:120px;display:flex;align-items:center;justify-content:center;background:var(--mist)" onclick="document.getElementById('photo-upload-input').click()">
+<div id="photo-upload-area" role="button" tabindex="0" aria-label="Choisir une photo à partager" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('photo-upload-input').click();}" style="position:relative;border:2px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;min-height:120px;display:flex;align-items:center;justify-content:center;background:var(--mist)" onclick="document.getElementById('photo-upload-input').click()">
 <div id="photo-upload-placeholder" style="text-align:center;padding:20px;color:var(--muted)">
 <div style="font-size:2rem;margin-bottom:6px">📸</div>
 <div style="font-size:.78rem">Appuyez pour choisir une photo</div>
@@ -1715,12 +1715,31 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
-<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.62</div>
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.64</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le village en 3D.</strong> Depuis la page PLUi-H-D, vous pouvez d&eacute;sormais survoler M&eacute;zi&egrave;res en relief, avec le zonage du plan local d&rsquo;urbanisme color&eacute; au sol. On voit d&rsquo;un coup d&rsquo;&oelig;il o&ugrave; s&rsquo;arr&ecirc;te le constructible et o&ugrave; commencent les zones agricoles et naturelles</li>
 <li><strong>Touchez un b&acirc;timent, vous obtenez ses r&egrave;gles.</strong> Sa zone, l&rsquo;emprise au sol, la hauteur maximale, le recul sur voie, les cl&ocirc;tures &mdash; puis abri de jardin, piscine, extension et panneaux solaires, avec &agrave; chaque fois &laquo;&nbsp;rien &agrave; faire&nbsp;&raquo;, &laquo;&nbsp;d&eacute;claration&nbsp;&raquo; ou &laquo;&nbsp;permis&nbsp;&raquo;</li>
 <li><strong>MEL vous y emm&egrave;ne.</strong> Apr&egrave;s avoir trouv&eacute; votre zone dans &laquo;&nbsp;Urbanisme &amp; Construction&nbsp;&raquo;, un bouton ouvre la carte centr&eacute;e sur votre adresse</li>
 <li>Les images de la carte sont celles de l&rsquo;IGN et le zonage vient du G&eacute;oportail de l&rsquo;Urbanisme. La carte a besoin d&rsquo;une connexion&nbsp;: le reste de l&rsquo;application continue de fonctionner hors ligne</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.63</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Tout le texte de l&rsquo;accueil est plus grand.</strong> Sept lignes sur dix &eacute;taient affich&eacute;es sous 12&nbsp;pixels &mdash; les sous-titres des cartes, le jour de collecte des d&eacute;chets, l&rsquo;heure d&rsquo;ouverture de la mairie, le prochain bus. C&rsquo;&eacute;tait particuli&egrave;rement p&eacute;nible &agrave; lire sur t&eacute;l&eacute;phone. Plus aucun texte de la page d&rsquo;accueil n&rsquo;est d&eacute;sormais sous cette taille</li>
+<li><strong>Le r&eacute;glage &laquo;&nbsp;Taille du texte&nbsp;&raquo; agit maintenant partout.</strong> Certaines zones pouvaient rester &agrave; leur taille d&rsquo;origine quand vous choisissiez &laquo;&nbsp;grand&nbsp;&raquo; ou &laquo;&nbsp;tr&egrave;s grand&nbsp;&raquo;. Le r&eacute;glage s&rsquo;applique d&eacute;sormais &agrave; l&rsquo;ensemble de l&rsquo;application</li>
+<li><strong>Les cartes de l&rsquo;accueil sont toutes &agrave; la m&ecirc;me hauteur.</strong> Certaines d&eacute;bordaient d&rsquo;une ligne sur leur voisine, ce qui donnait des rang&eacute;es bancales. Quelques sous-titres redondants ont &eacute;t&eacute; retir&eacute;s&nbsp;: la carte &laquo;&nbsp;Entreprises&nbsp;&raquo; devient &laquo;&nbsp;Entreprises &amp; services&nbsp;&raquo;</li>
+<li>Les pastilles rouges de notification sont l&eacute;g&egrave;rement plus grandes, pour que le chiffre reste lisible</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.62</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>L&rsquo;application se pilote enti&egrave;rement au clavier.</strong> Les quatre tuiles color&eacute;es du haut de page &mdash; Mairie, M&eacute;t&eacute;o, D&eacute;chets et Prochaine manifestation &mdash; ne r&eacute;pondaient qu&rsquo;au doigt ou &agrave; la souris. Elles s&rsquo;ouvrent d&eacute;sormais aussi avec les touches Entr&eacute;e et Espace, comme le reste de l&rsquo;application. M&ecirc;me chose pour la photo de MAT et MEL en haut de l&rsquo;&eacute;cran, qui donne acc&egrave;s &agrave; la pr&eacute;sentation &laquo;&nbsp;Qui suis-je&nbsp;?&nbsp;&raquo;</li>
+<li><strong>Partager une photo ne demande plus la souris.</strong> Dans la galerie, la zone &laquo;&nbsp;Appuyez pour choisir une photo&nbsp;&raquo; &eacute;tait le seul chemin possible et restait hors d&rsquo;atteinte au clavier&nbsp;: envoyer une photo &eacute;tait tout simplement impossible sans &eacute;cran tactile ni souris. C&rsquo;est corrig&eacute;</li>
+<li><strong>On voit o&ugrave; l&rsquo;on se trouve.</strong> Un cadre net entoure d&eacute;sormais l&rsquo;&eacute;l&eacute;ment s&eacute;lectionn&eacute; pendant une navigation au clavier, y compris en mode contraste &eacute;lev&eacute; et en th&egrave;me sombre. Rien ne change au toucher ni &agrave; la souris</li>
+<li><strong>Les photos jointes sont d&eacute;crites &agrave; voix haute.</strong> Les aper&ccedil;us d&rsquo;image des formulaires de signalement et de contact sont maintenant annonc&eacute;s par les lecteurs d&rsquo;&eacute;cran</li>
+<li>Le bouton <strong>Vos photos</strong> de l&rsquo;accueil retrouve la m&ecirc;me hauteur que ses voisins</li>
 </ul>
 </div>
 <div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">

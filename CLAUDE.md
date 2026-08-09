@@ -18,13 +18,15 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **Relire le corpus « Le saviez-vous ? » avant de le fusionner** (obligatoire, RG-16.13) | ouvrir `revue-saviez-vous.html` — corpus complet, ordre réel de passage, réponse et source |
 | **Fibre** — qui fait quoi (Lysséo ≠ fournisseur d'accès), raccordement d'une construction neuve | `docs/adr/0013-fibre-operateur-d-infrastructure-et-fournisseur-d-acces.md` |
 | **Documents du PLUi-H-D** — publiés par la mairie depuis l'admin (⚠️ **ne plus éditer `PLUI_DOCS` à la main**), cache hors-ligne, pastille « Nouveau » | `docs/adr/0014-documents-plui-administrables-page-embarquee.md` puis `chatbot-mairie-mezieres/GUIDE-ADMIN.md` §6quater |
-| **Carte 3D du village** — zonage PLU, MapLibre chargé à la demande, ⚠️ **INSEE 45204** (45203 = Meung-sur-Loire), règle « aucune donnée inventée » | `docs/adr/0016-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md` puis `docs/specifications/sfd/SFD-17-carte-3d-du-village.md` |
+| **Carte 3D du village** — zonage PLU, MapLibre chargé à la demande, ⚠️ **INSEE 45204** (45203 = Meung-sur-Loire), règle « aucune donnée inventée » | `docs/adr/0018-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md` puis `docs/specifications/sfd/SFD-17-carte-3d-du-village.md` |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |
 | **« Est-ce qu'une alerte CERT-FR nous concerne ? »**, inventaire des domaines/hébergeurs/technologies, prestataires | `docs/surface-exposition.md` |
 | Historique des versions techniques | `CHANGELOG.md` |
 | Présentation générale du frontend | `README.md` |
+| **Accessibilité clavier** — pourquoi `role="button"` et pas `<button>`, pourquoi axe ne voit pas un `<div onclick>`, quelles exceptions sont admises | `docs/adr/0016-clavier-axe-ne-voit-pas-un-div-onclick.md` puis `tests/e2e/accessibilite-clavier.spec.js` |
+| **Taille du texte** — plancher de 12 px, pourquoi pas 16 px, pourquoi `body{font-size:1rem}`, ce qui reste à traiter (desktop, overlays, admin) | `docs/adr/0017-plancher-typographique-12px-mesure-sur-le-rendu.md` puis `tests/e2e/typographie.spec.js` |
 | **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |
 | **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
 

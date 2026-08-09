@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.62.0';
+const CACHE = 'mat-v4.64.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -22,10 +22,10 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.11.0',
+  './css/mat.css?v=4.13.0',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.6',
-  './js/mat-core.js?v=4.3.3'
+  './js/mat-core.js?v=4.3.5'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -33,12 +33,12 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.11.0',
+  './css/mat.css?v=4.13.0',
   './css/mat-desktop.css?v=4.5.0',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.6',
-  './js/mat-core.js?v=4.3.3',
+  './js/mat-core.js?v=4.3.5',
   './js/mat-accessibility.js?v=4.3.8',
   './js/mat-widgets.js?v=4.4.8',
   './js/mat-ambiance.js?v=1.8.0',
@@ -47,7 +47,7 @@ const PRECACHE_URLS = [
   './js/mat-photos.js?v=1.3.4',
   './js/mat-actus.js?v=4.4.9',
   './js/mat-trombi.js?v=4.2.7',
-  './js/mat-mel.js?v=4.3.8',
+  './js/mat-mel.js?v=4.3.9',
   './js/mat-boot.js?v=4.4.1',
   './js/mat-pwa-notif.js?v=4.2.8',
   './js/mat-dechets-notif.js?v=4.2.9',
@@ -61,13 +61,13 @@ const PRECACHE_URLS = [
   // `vendor/maplibre/maplibre-gl.js` (~1 Mo) : le précacher triplerait le
   // poids d'installation de l'application pour une page que la plupart des
   // habitants n'ouvriront jamais. Conséquence assumée : la carte 3D ne
-  // fonctionne pas hors connexion, et elle le dit. Voir ADR-0016.
+  // fonctionne pas hors connexion, et elle le dit. Voir ADR-0018.
   './js/mat-carte3d.js?v=1.0.0',
   './js/mat-guide-arrivee.js?v=1.0.5',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.3.0',
   './data/plu-data.json?v=4.2.3',
-  './data/mel-tree.json?v=4.2.4',
+  './data/mel-tree.json?v=4.2.5',
   './data/saviez-vous.json?v=1.3.0',
   './img/mat-header.webp',
   './img/MAT et MEL.webp',

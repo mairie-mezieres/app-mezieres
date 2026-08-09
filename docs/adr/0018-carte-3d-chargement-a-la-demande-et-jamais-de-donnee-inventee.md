@@ -1,4 +1,4 @@
-# ADR-0016 — Carte 3D : chargement à la demande, et jamais de donnée inventée
+# ADR-0018 — Carte 3D : chargement à la demande, et jamais de donnée inventée
 
 - **Date** : 9 août 2026
 - **Statut** : Accepté

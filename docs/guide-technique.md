@@ -100,7 +100,7 @@ app-mezieres/
 │
 ├── vendor/                 Bibliothèques auto-hébergées (pas de CDN)
 │   ├── leaflet/            Cartes 2D (signalements, suivi)
-│   ├── maplibre/           Rendu 3D — ~1 Mo, chargé À LA DEMANDE, non précaché (ADR-0016)
+│   ├── maplibre/           Rendu 3D — ~1 Mo, chargé À LA DEMANDE, non précaché (ADR-0018)
 │   └── sentry/             Remontée d'erreurs
 │
 ├── docs/

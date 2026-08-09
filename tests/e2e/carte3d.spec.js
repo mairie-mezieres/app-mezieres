@@ -9,7 +9,7 @@ const AxeBuilder = require('@axe-core/playwright').default;
  * portent donc sur ce qui doit tenir quoi qu'il arrive — l'ouverture de
  * l'overlay, l'absence de chargement de MapLibre au démarrage, l'accessibilité,
  * et le fait qu'aucun bâtiment inventé n'apparaisse quand les sources sont
- * muettes (ADR-0016).
+ * muettes (ADR-0018).
  *
  * Leçon des étoiles invisibles (ADR-0015) : on assert le STYLE CALCULÉ, pas
  * seulement l'attribut — `.c3d-btn{display:flex}` l'emporte sur le display:none
@@ -26,7 +26,7 @@ test.describe('Carte 3D', () => {
   test('MapLibre n’est pas chargé au démarrage', async ({ page }) => {
     await ouvrirAccueil(page);
     // Le module léger doit être là, la bibliothèque lourde non : c'est toute
-    // la raison du chargement à la demande (ADR-0016).
+    // la raison du chargement à la demande (ADR-0018).
     await page.waitForFunction(() => typeof window.matOuvrirCarte3D === 'function');
     expect(await page.evaluate(() => typeof window.maplibregl)).toBe('undefined');
     const scripts = await page.evaluate(() =>

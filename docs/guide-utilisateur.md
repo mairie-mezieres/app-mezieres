@@ -237,6 +237,12 @@ Le panneau **Accessibilité & Personnalisation** (icône ♿) propose plusieurs 
 
 Ces réglages sont sauvegardés sur votre appareil et persistent entre les visites.
 
+Depuis la **v4.63**, aucun texte de la page d'accueil n'est affiché sous **12 pixels**.
+Auparavant, sept lignes sur dix l'étaient — dont le jour de collecte des déchets, l'heure
+d'ouverture de la mairie et les sous-titres des cartes. Le réglage « Taille du texte »
+ci-dessus s'applique par-dessus ce plancher et agit désormais sur l'ensemble de
+l'application, y compris les zones qui pouvaient rester à leur taille d'origine.
+
 Par ailleurs, toutes les animations décoratives de l'application (bandeau météo
 vivant, confettis, transitions entre fenêtres) respectent le réglage système
 **« Réduire les animations »** de votre téléphone : si vous l'avez activé, elles
@@ -248,6 +254,21 @@ Les fenêtres (actualités, agenda, accessibilité…) sont utilisables **entiè
 la touche **Échap** ferme la fenêtre ouverte, la tabulation (**Tab**) reste à l'intérieur de la
 fenêtre tant qu'elle est ouverte, et le focus revient automatiquement à l'endroit d'où vous
 l'aviez ouverte. Utile aussi avec un lecteur d'écran.
+
+Depuis la **v4.62**, l'accueil lui-même s'ouvre au clavier. Se déplacer avec **Tab**, puis
+appuyer sur **Entrée** ou **Espace**, permet d'ouvrir :
+
+- les quatre tuiles colorées du haut de page — **Mairie**, **Météo**, **Déchets**,
+  **Prochaine manifestation** ;
+- la photo de **MAT et MEL** en haut de l'écran, qui mène à la présentation « Qui suis-je ? » ;
+- la carte **Vos photos** et, dans la galerie, la zone d'envoi d'une photo — celle-ci
+  n'était accessible qu'au doigt ou à la souris, ce qui rendait le partage d'une photo
+  impossible sans écran tactile ;
+- la ligne de version, qui ouvre les nouveautés.
+
+Pendant une navigation au clavier, l'élément sélectionné est entouré d'un **cadre net**, y
+compris en mode contraste élevé et en thème sombre. Ce cadre n'apparaît jamais au toucher ni
+à la souris.
 
 ---
 

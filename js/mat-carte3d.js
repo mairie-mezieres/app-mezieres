@@ -11,7 +11,7 @@
    ⚠️ MapLibre GL pèse ~1 Mo. Il n'est JAMAIS chargé au démarrage : le
    module ne va le chercher qu'à la première ouverture de la carte, et
    la bibliothèque n'est pas précachée par le service worker. Voir
-   ADR-0016. C'est aussi pourquoi ce module ne s'exécute pas tout seul.
+   ADR-0018. C'est aussi pourquoi ce module ne s'exécute pas tout seul.
 
    ⚠️ INSEE de Mézières-lez-Cléry = 45204. 45203 est MEUNG-SUR-LOIRE.
    La maquette a d'abord affiché le zonage du voisin sur la photo
@@ -276,7 +276,7 @@ function _c3dBatiOSM(){
    cette fenêtre, ce sont soit des axes inversés, soit une projection non
    convertie. ⚠️ Aucun bâti de remplacement n'est inventé ici : dessiner de
    fausses maisons sur une vraie photo ne dégrade pas l'affichage, il le
-   rend faux. Voir ADR-0016. */
+   rend faux. Voir ADR-0018. */
 function _c3dAudit(fc){
   var minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
   function pt(c){

@@ -14,7 +14,7 @@ question, que MEL ne sait pas traiter : **où s'arrête le constructible, qu'y a
 autour de chez moi, pourquoi la limite passe là**. Les deux se complètent ; la carte ne
 duplique ni la recherche d'adresse ni les règles.
 
-Choix d'architecture : [ADR-0016](../../adr/0016-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md).
+Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md).
 
 ## 2. Acteurs concernés
 
