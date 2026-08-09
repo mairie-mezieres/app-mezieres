@@ -43,12 +43,12 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.12.0">
+<link rel="stylesheet" href="css/mat.css?v=4.13.0">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
-<script defer src="js/mat-core.js?v=4.3.3"></script>
+<script defer src="js/mat-core.js?v=4.3.4"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.8"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
@@ -154,8 +154,8 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.52rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.62 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
-<div id="install-count-badge" style="display:none;font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.63 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
 </div>
@@ -297,12 +297,12 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Vos idées</div><div class="ct-sub">Boîte à idées</div></div>
 </button>
 <button class="card" onclick="openSondages()">
-<div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+<div class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
 <div class="ct"><div class="ct-label">Sondage citoyen</div><div class="ct-sub">Votre avis compte</div></div>
 </button>
 <div class="card" style="padding:0;overflow:hidden;gap:0">
 <div onclick="openPhotos()" role="button" tabindex="0" aria-label="Ouvrir la galerie de photos de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotos();}" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
-<div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;align-items:center;justify-content:center;line-height:18px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
+<div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
 <div class="ct"><div class="ct-label">Vos photos</div></div>
 </div>
 <button onclick="launchDiapo()" title="Lancer le diaporama plein écran" aria-label="Diaporama" style="flex-shrink:0;border:none;border-left:1px solid var(--border);background:none;padding:0 16px;height:100%;cursor:pointer;font-size:1.3rem;color:var(--muted);font-family:inherit;align-self:stretch;display:flex;align-items:center">▶</button>
@@ -468,7 +468,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.62</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.63</button>
 </div>
 </div>
 </div>
@@ -1672,6 +1672,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.63</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Tout le texte de l&rsquo;accueil est plus grand.</strong> Sept lignes sur dix &eacute;taient affich&eacute;es sous 12&nbsp;pixels &mdash; les sous-titres des cartes, le jour de collecte des d&eacute;chets, l&rsquo;heure d&rsquo;ouverture de la mairie, le prochain bus. C&rsquo;&eacute;tait particuli&egrave;rement p&eacute;nible &agrave; lire sur t&eacute;l&eacute;phone. Plus aucun texte de la page d&rsquo;accueil n&rsquo;est d&eacute;sormais sous cette taille</li>
+<li><strong>Le r&eacute;glage &laquo;&nbsp;Taille du texte&nbsp;&raquo; agit maintenant partout.</strong> Certaines zones pouvaient rester &agrave; leur taille d&rsquo;origine quand vous choisissiez &laquo;&nbsp;grand&nbsp;&raquo; ou &laquo;&nbsp;tr&egrave;s grand&nbsp;&raquo;. Le r&eacute;glage s&rsquo;applique d&eacute;sormais &agrave; l&rsquo;ensemble de l&rsquo;application</li>
+<li>Les pastilles rouges de notification sont l&eacute;g&egrave;rement plus grandes, pour que le chiffre reste lisible</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.62</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>L&rsquo;application se pilote enti&egrave;rement au clavier.</strong> Les quatre tuiles color&eacute;es du haut de page &mdash; Mairie, M&eacute;t&eacute;o, D&eacute;chets et Prochaine manifestation &mdash; ne r&eacute;pondaient qu&rsquo;au doigt ou &agrave; la souris. Elles s&rsquo;ouvrent d&eacute;sormais aussi avec les touches Entr&eacute;e et Espace, comme le reste de l&rsquo;application. M&ecirc;me chose pour la photo de MAT et MEL en haut de l&rsquo;&eacute;cran, qui donne acc&egrave;s &agrave; la pr&eacute;sentation &laquo;&nbsp;Qui suis-je&nbsp;?&nbsp;&raquo;</li>

@@ -5,6 +5,41 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.63] — 9 août 2026
+
+### Corrigé
+- **70,5 % du texte peint sur l'accueil était sous 12 px** (Lighthouse mobile : « Document
+  doesn't use legible font sizes — 29.6% legible text »). Mesure indépendante sur le rendu
+  réel : 1 066 caractères visibles sur 1 491. Les plus gros volumes étaient `.ct-sub` à
+  **9,9 px** (les sous-titres qui disent à quoi sert chaque carte), `.sec` à 9,9 px et
+  `.top-sub` à **10,1 px** (« Prochaine ouverture lundi à 14 h »). Plancher de **12 px
+  (0.75rem)** appliqué à 40 règles de `css/mat.css`, aux styles inline correspondants
+  d'`index.html` et à deux chaînes de `js/mat-core.js`. **Après : 100 % du texte ≥ 12 px.**
+- **`body` ne suivait pas le réglage « Taille du texte ».** `html,body{font-size:16px}`
+  posait la taille sur les deux éléments, alors que `html.font-large` / `html.font-xl` ne
+  redéfinissent que `html` : `body` restait figé à 16 px dans les trois modes (vérifié :
+  racine 22 px, body 16 px). Tout élément **sans `font-size` explicite** héritait donc de
+  16 px sans jamais échelonner. Impact nul à ce jour — ce code déclare une taille partout —
+  mais piège silencieux pour toute addition future. `body{font-size:1rem}`.
+- Géométrie des pastilles portée de 18 à **20 px** (`.notif-badge`, `#sondages-badge`,
+  `#photos-badge`) : à 12 px de texte, le chiffre ne tenait plus dans un rond de 18 px.
+
+### Ajouté
+- **`tests/e2e/typographie.spec.js`** — 7 tests qui mesurent le **style calculé** du texte
+  réellement peint, et non la feuille de style. Nécessaire : `.mat-version` était déclarée
+  à `0.5rem` dans `mat.css` **et** à `0.52rem` en inline dans `index.html`, l'inline
+  gagnant. Couvre le plancher dans les trois modes de taille, le suivi `body`/racine,
+  l'absence de débordement horizontal et de rognage vertical, et la tenue des pastilles.
+
+### Notes
+- **Non traité dans ce lot** : les 31 déclarations sous 12 px de `css/mat-desktop.css`, les
+  overlays de `css/mat.css`, `admin.html` (109), et les pages secondaires. Les tests
+  typographiques sont explicitement bornés à l'écran mobile/PWA. Voir **ADR-0017**.
+- Le multiplicateur d'accessibilité fonctionnait déjà : 98 % des déclarations du dépôt sont
+  en `rem`. Seuls 2,7 % du texte étaient figés, et exclusivement des emojis d'icônes.
+
+---
+
 ## [4.62] — 9 août 2026
 
 ### Corrigé

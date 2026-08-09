@@ -237,6 +237,12 @@ Le panneau **Accessibilité & Personnalisation** (icône ♿) propose plusieurs 
 
 Ces réglages sont sauvegardés sur votre appareil et persistent entre les visites.
 
+Depuis la **v4.63**, aucun texte de la page d'accueil n'est affiché sous **12 pixels**.
+Auparavant, sept lignes sur dix l'étaient — dont le jour de collecte des déchets, l'heure
+d'ouverture de la mairie et les sous-titres des cartes. Le réglage « Taille du texte »
+ci-dessus s'applique par-dessus ce plancher et agit désormais sur l'ensemble de
+l'application, y compris les zones qui pouvaient rester à leur taille d'origine.
+
 Par ailleurs, toutes les animations décoratives de l'application (bandeau météo
 vivant, confettis, transitions entre fenêtres) respectent le réglage système
 **« Réduire les animations »** de votre téléphone : si vous l'avez activé, elles
