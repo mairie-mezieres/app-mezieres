@@ -70,7 +70,7 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 | **En-tête** | Statut de la mairie (ouverte / fermée), météo locale, prochain ramassage des poubelles, prochain événement, passage du bus Rémi (ligne 8), prix des carburants |
 | **« Le saviez-vous ? »** | Sous les boutons Urgences et Personnalisation : le fait du jour sur la commune, sourcé, avec une question à laquelle répondre (voir §18) |
 | **Grand dossier PLUi-H-D** | Bandeau mis en avant menant à la page de suivi du Plan Local d'Urbanisme intercommunal (voir §16) |
-| **Démarches et services** | Accès à MEL (assistante virtuelle) et aux documents officiels de la commune |
+| **Démarches et services** | Quatre accès : MEL (assistante virtuelle), « Je viens d'emménager », « Mon village en 3D » (voir §16 bis) et les documents officiels |
 | **Actualité et calendrier** | Dernières nouvelles et agenda |
 | **Participez** | Boîte à idées et sondages citoyens |
 | **Signalements et contacts** | Signaler un problème, contacter les élus |
@@ -85,11 +85,11 @@ même, réorganisé **par thème** — chaque colonne porte son titre :
 
 | Où | Contenu |
 |----|---------|
-| **Menu du haut** | Nouveaux habitants, associations, entreprises, documents officiels, idées, sondages, PLUi-H-D, randonnées, CCTVL — puis, à droite, **📞 Urgences** et ♿ Accessibilité |
+| **Menu du haut** | Nouveaux habitants, associations, entreprises, documents officiels, idées, sondages, PLUi-H-D, « Mon village en 3D », randonnées, CCTVL — puis, à droite, **📞 Urgences** et ♿ Accessibilité |
 | **Bandeau pleine largeur** | « Le saviez-vous ? » — le fait du jour (voir §18) |
 | **🏛️ La mairie au quotidien** | Horaires de la mairie (+ téléphone, écrire), bus Rémi, collectes |
 | **📰 La vie de la commune** | Prochain évènement, actualités (3 derniers articles), « Vos photos » (aperçu des 4 dernières + diaporama) |
-| **🤝 Vous aider** | « Je viens d'emménager » (guide d'arrivée), MEL, signalement rapide, contacter vos élus |
+| **🤝 Vous aider** | « Je viens d'emménager » (guide d'arrivée), « Mon village en 3D », MEL, signalement rapide, contacter vos élus |
 | **Pied de page** | Radio Mézières, groupe « Ici c'est Mézières ! », RGPD, contact admin, accessibilité, nouveautés |
 
 Les listes sont volontairement courtes — 3 actualités, 4 photos : ce sont des
@@ -435,14 +435,17 @@ la différence ne se voit pas à l'usage. Les documents déjà affichés une foi
 
 ---
 
-## 16 bis. Le village en 3D
+## 16 bis. Mon village en 3D
 
 *(Ajouté en août 2026.)*
 
-Depuis la page PLUi-H-D, le bloc **« 🏘️ Voir le zonage actuel en 3D »** ouvre une vue en
-relief de Mézières : la photo aérienne de l'IGN au sol, les bâtiments du village en volume,
+Depuis l'écran d'accueil, la tuile **« 🏘️ Mon village en 3D »** (rubrique « Démarches et
+Services », sous MEL) ouvre une vue en relief de Mézières : la photo aérienne de l'IGN au sol, les bâtiments du village en volume,
 et par-dessus le **zonage du plan local d'urbanisme**, chaque zone dans sa couleur. On fait
 pivoter la vue au doigt, on l'incline, on s'approche.
+
+On y accède aussi depuis la page **PLUi-H-D**, section « 🏘️ Mon village en 3D » — et,
+sur ordinateur, depuis la colonne « 🤝 Vous aider » et le menu du haut.
 
 **Touchez un bâtiment** : une fiche s'ouvre avec sa zone (centre-bourg, habitat résidentiel,
 agricole, naturelle…), l'emprise au sol autorisée, la hauteur maximale, le recul par rapport

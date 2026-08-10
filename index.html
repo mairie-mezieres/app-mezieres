@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.64 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.65 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -245,6 +245,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
 <button onclick="openPlui()" style="position:relative">🗺️ PLUi-H-D<span id="plui-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
+<button onclick="matOuvrirCarte3D()">🏘️ Mon village en 3D</button>
 <a href="https://mairie-mezieres.github.io/randonnees/rando.html" target="_blank" rel="noopener noreferrer">🥾 Randonnées</a>
 <a href="https://www.ccterresduvaldeloire.fr/" target="_blank" rel="noopener noreferrer">🌐 CCTVL</a>
 </nav>
@@ -262,17 +263,23 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <span class="plui-sub">Suivez l’étude et donnez votre avis</span>
 </button>
 <div class="sec">Démarches et Services</div>
-<button class="card simple-card" onclick="openGuideArrivee()" style="margin-bottom:9px">
-<div class="ico" style="background:#e8f5e9">📦</div>
-<div class="ct"><div class="ct-label">Je viens d’emménager</div><div class="ct-sub">Guide d’arrivée des nouveaux habitants</div></div>
-</button>
-<div class="grid2">
+<div class="grid2" style="margin-bottom:9px">
 <button class="card simple-card mel-entry" onclick="openMel()">
 <div class="ico ico-mel mel-wiggle">👩‍💼</div>
 <div class="ct">
 <div class="ct-label">MEL</div>
 <div class="ct-sub">Vos démarches</div>
 </div>
+</button>
+<button class="card simple-card" onclick="openGuideArrivee()">
+<div class="ico" style="background:#e8f5e9">📦</div>
+<div class="ct"><div class="ct-label">Je viens d’emménager</div><div class="ct-sub">Guide d’arrivée</div></div>
+</button>
+</div>
+<div class="grid2">
+<button class="card" onclick="matOuvrirCarte3D()">
+<div class="ico" style="background:#e3f2fd">🏘️</div>
+<div class="ct"><div class="ct-label">Mon village en 3D</div><div class="ct-sub">Zonage du PLU</div></div>
 </button>
 <button class="card" onclick="openDocs()">
 <div class="ico" style="background:#e8f5e9">📁</div>
@@ -402,6 +409,14 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </span>
 <span class="d-guide-arrow" aria-hidden="true">→</span>
 </button>
+<button type="button" class="d-guide-card" onclick="matOuvrirCarte3D()">
+<span class="d-guide-ico" aria-hidden="true">🏘️</span>
+<span class="d-guide-txt">
+<span class="d-guide-title">Mon village en 3D</span>
+<span class="d-guide-sub">Le bourg en relief avec le zonage du PLU — touchez un bâtiment pour voir ce qu’on a le droit d’y construire.</span>
+</span>
+<span class="d-guide-arrow" aria-hidden="true">→</span>
+</button>
 <div class="d-mel-cta-panel">
 <div class="d-mel-hdr">
 <img src="img/MAT et MEL.webp" alt="MEL" class="d-mel-img" loading="lazy" onerror="this.style.display='none'">
@@ -467,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.64</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.65</button>
 </div>
 </div>
 </div>
@@ -1428,10 +1443,10 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 
 <!-- BLOC 2bis — Voir le zonage en 3D -->
 <section style="margin-bottom:22px">
-<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">🏘️ Voir le zonage actuel en 3D</h3>
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">🏘️ Mon village en 3D</h3>
 <button onclick="matOuvrirCarte3D()" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px;background:var(--mist);border:1.5px solid var(--sage);border-radius:14px;text-align:left;font-family:inherit;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">
 <div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">🗺️</div>
-<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Le village en relief</div><div style="font-size:0.8rem;color:var(--sage-ink);margin-top:3px;line-height:1.4">Survolez la commune, touchez un bâtiment&nbsp;: sa zone et ce qu’on a le droit d’y construire.</div></div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Voir le zonage en relief</div><div style="font-size:0.8rem;color:var(--sage-ink);margin-top:3px;line-height:1.4">Survolez la commune, touchez un bâtiment&nbsp;: sa zone et ce qu’on a le droit d’y construire.</div></div>
 <div style="font-size:1.2rem;flex-shrink:0;opacity:0.8" aria-hidden="true">→</div>
 </button>
 <p style="font-size:0.76rem;color:var(--muted);margin:8px 2px 0;line-height:1.45">Zonage du PLU actuel, publié au Géoportail de l’Urbanisme. Le PLUi-H-D, lui, est encore en préparation.</p>
@@ -1472,12 +1487,12 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 </div>
 </template>
 </div>
-<div class="ov" id="ov-carte3d" onclick="ovClick('carte3d',event)" aria-label="Le village en 3D">
+<div class="ov" id="ov-carte3d" onclick="ovClick('carte3d',event)" aria-label="Mon village en 3D">
 <template data-lazy-ov>
 <div class="panel c3d-panel">
 <div class="panel-hdr">
 <div class="panel-ico" style="background:rgba(255,255,255,0.15)">🏘️</div>
-<div class="panel-title">Le village en 3D</div>
+<div class="panel-title">Mon village en 3D</div>
 <button class="panel-close" aria-label="Fermer" onclick="closeOv('carte3d')">✕</button>
 </div>
 <div class="c3d-wrap">
@@ -1715,6 +1730,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.65</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>&laquo;&nbsp;Mon village en 3D&nbsp;&raquo; est maintenant sur l&rsquo;accueil.</strong> La vue en relief de M&eacute;zi&egrave;res avec le zonage du PLU &eacute;tait cach&eacute;e dans le grand dossier PLUi-H-D&nbsp;: elle a d&eacute;sormais sa tuile dans &laquo;&nbsp;D&eacute;marches et Services&nbsp;&raquo;, sous MEL. Sur ordinateur, elle appara&icirc;t dans la colonne &laquo;&nbsp;Vous aider&nbsp;&raquo; et dans le menu du haut</li>
+<li><strong>La rubrique &laquo;&nbsp;D&eacute;marches et Services&nbsp;&raquo; est r&eacute;organis&eacute;e.</strong> MEL passe en premier, &laquo;&nbsp;Je viens d&rsquo;em&eacute;nager&nbsp;&raquo; devient une tuile normale au lieu d&rsquo;un bandeau pleine largeur, et les quatre acc&egrave;s tiennent d&eacute;sormais dans une grille r&eacute;guli&egrave;re</li>
+<li>La fonctionnalit&eacute; porte partout le m&ecirc;me nom, &laquo;&nbsp;Mon village en 3D&nbsp;&raquo;&nbsp;: sur la tuile, en titre d&rsquo;&eacute;cran et dans la page PLUi-H-D</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.64</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le village en 3D.</strong> Depuis la page PLUi-H-D, vous pouvez d&eacute;sormais survoler M&eacute;zi&egrave;res en relief, avec le zonage du plan local d&rsquo;urbanisme color&eacute; au sol. On voit d&rsquo;un coup d&rsquo;&oelig;il o&ugrave; s&rsquo;arr&ecirc;te le constructible et o&ugrave; commencent les zones agricoles et naturelles</li>
