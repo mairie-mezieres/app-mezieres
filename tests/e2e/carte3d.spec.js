@@ -345,6 +345,92 @@ test.describe('Carte 3D', () => {
     expect(r.err, 'une commune muette doit porter un motif, jamais rester vide').toBeTruthy();
   });
 
+  test('territoire : jamais un contour entier dans une URL', async ({ page }) => {
+    /*
+     * Relevé sur le terrain : les quatre communes de la première vague
+     * échouaient toutes en « Failed to fetch » — pas une erreur HTTP, un refus
+     * de la pile réseau. Un contour communal compte des milliers de sommets ;
+     * sérialisé dans une chaîne de requête, il produit une URL démesurée.
+     *
+     * On interroge donc sur le RECTANGLE englobant (5 points), et l'exactitude
+     * est rétablie par le découpage sur le vrai contour.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTerrZonesDe === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(async () => {
+      // Contour réaliste : 2 000 sommets, comme en renvoie le Géoportail.
+      const anneau = [];
+      for (let i = 0; i < 2000; i++) {
+        const a = i / 2000 * Math.PI * 2;
+        anneau.push([1.80 + Math.cos(a) * 0.04123456, 47.82 + Math.sin(a) * 0.03987654]);
+      }
+      anneau.push(anneau[0]);
+      const contour = { type: 'Polygon', coordinates: [anneau] };
+
+      const urls = [];
+      const vrai = window.fetch;
+      window.fetch = function (url) {
+        urls.push(String(url));
+        return Promise.resolve(new Response(JSON.stringify(
+          { type: 'FeatureCollection', features: [] }), { status: 200 }));
+      };
+      const c = { insee: '45204', nom: 'Test', partition: '', rnu: false,
+                  geom: contour, nZones: 0, err: '' };
+      await window._c3dTerrZonesDe(c);
+      window.fetch = vrai;
+
+      const zoneUrls = urls.filter(u => /zone-urba/.test(u));
+      return { sommetsContour: anneau.length,
+               urlMax: Math.max(0, ...urls.map(u => u.length)),
+               aInterroge: zoneUrls.length > 0 };
+    });
+
+    expect(r.sommetsContour).toBe(2001);
+    expect(r.aInterroge, 'le zonage doit tout de même être demandé').toBe(true);
+    // 5 points suffisent : une URL saine reste très en deçà des limites usuelles.
+    expect(r.urlMax, `URL de ${r.urlMax} caractères — un contour entier a dû s’y glisser`)
+      .toBeLessThan(2000);
+  });
+
+  test('territoire : une commune au RNU n’est pas une panne', async ({ page }) => {
+    /*
+     * `municipality?geom=` ne renvoie ni `partition` ni `is_rnu` ; seul
+     * `municipality?insee=` fait autorité. Sans ce second appel, une commune
+     * sans PLU était comptée parmi les « sans zonage », c'est-à-dire présentée
+     * comme une panne — alors qu'elle est parfaitement en règle.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTerrZonesDe === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(async () => {
+      const carre = { type: 'Polygon', coordinates: [[[1.80, 47.82], [1.81, 47.82],
+                                                      [1.81, 47.83], [1.80, 47.83], [1.80, 47.82]]] };
+      const vrai = window.fetch;
+      window.fetch = function (url) {
+        const u = String(url);
+        // Le second appel, par code INSEE, révèle le statut RNU.
+        if (u.indexOf('municipality?insee=') > -1)
+          return Promise.resolve(new Response(JSON.stringify({ type: 'FeatureCollection',
+            features: [{ type: 'Feature', properties: { name: 'Test', is_rnu: true }, geometry: carre }] }),
+            { status: 200 }));
+        return Promise.resolve(new Response(JSON.stringify(
+          { type: 'FeatureCollection', features: [] }), { status: 200 }));
+      };
+      const c = { insee: '45204', nom: 'Test', partition: '', rnu: false,
+                  geom: carre, nZones: 0, err: '' };
+      await window._c3dTerrZonesDe(c);
+      window.fetch = vrai;
+      return { rnu: c.rnu, err: c.err, via: c.via };
+    });
+
+    expect(r.rnu, 'le statut RNU doit être reconnu via l’appel par code INSEE').toBe(true);
+    expect(r.err, 'une commune au RNU ne porte aucune erreur').toBe('');
+    expect(r.via).toBe('RNU');
+  });
+
   test('territoire : sources coupées, aucune commune n’est inventée', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());

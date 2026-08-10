@@ -106,6 +106,32 @@ découlent, écrites dans SFD-17 : zéro donnée n'est jamais un succès (RG-17.
 être vu doit être lisible sur le fond réel (RG-17.25), et aucun panneau ne recouvre le
 bouton de diagnostic.
 
+## Ce que le panneau de diagnostic a livré (v4.73)
+
+La v4.72 a rendu la vue bavarde. Dès l'ouverture suivante, le panneau « 🔎 Détail des
+sources » a donné, commune par commune, de quoi trancher — sans que j'aie accès à l'IGN :
+
+- **`Failed to fetch` sur Baccon, Baule, Beauce-la-Romaine, Beaugency** — les quatre
+  premières par ordre alphabétique, c'est-à-dire **la première vague de quatre**. Pas une
+  erreur HTTP : un refus de la pile réseau. Cause : le contour communal entier était placé
+  dans la chaîne de requête. Un test reproduisant un contour de 2 000 sommets mesure
+  **94 032 caractères d'URL**. Corrigé en interrogeant le **rectangle englobant** (5 points),
+  l'exactitude étant rétablie par le découpage sur le vrai contour.
+- **`aucune zone renvoyée` sur neuf communes** — requête aboutie, réponse vide. Cause :
+  `municipality?geom=` ne renvoie **ni `partition` ni `is_rnu`**. Plusieurs de ces communes
+  ne sont pas en panne : elles relèvent du **RNU**. Corrigé par un appel
+  `municipality?insee=` pour toute commune restée muette — l'endpoint qui fait autorité —
+  d'où l'on tire la partition *et* le statut RNU.
+- **Et une bonne nouvelle** : « 25 communes sur 25 ». Les quatre noms sur lesquels un doute
+  avait été exprimé (Beauce-la-Romaine, Binas, Villermain, Saint-Laurent-des-Bois) sont
+  reconnus par le Géoportail. **La liste de la mairie était juste, et c'est l'application
+  qui l'a établi** — exactement ce que RG-17.20 visait : ne pas corriger la liste au jugé,
+  mais donner de quoi la vérifier.
+
+Le coût de la v4.72 se rembourse ici en entier : sans elle, ces deux causes auraient
+demandé plusieurs allers-retours à l'aveugle. **Rendre un échec lisible vaut mieux que le
+prévenir à moitié.**
+
 ## Alternatives écartées
 
 - **Coder les 25 codes INSEE en dur.** Plus simple, plus rapide, invérifiable. Voir

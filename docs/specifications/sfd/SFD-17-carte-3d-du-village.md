@@ -135,13 +135,27 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   couperait des communes ou les noierait ; `fitBounds` sur ce qui est réellement arrivé ne
   peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle, et le fond bascule sur
   le **plan IGN** : à 30 km, la photo aérienne n'est qu'un tapis de parcelles.
-- **RG-17.24 — deux chemins pour le zonage, jamais d'abandon silencieux.**
-  `municipality?geom=` ne renvoie pas forcément `partition` : à défaut, le zonage est
-  demandé **par contour de commune**, puis découpé sur ce contour (la requête par emprise
-  ramène aussi le zonage des voisines). **Zéro zone n'est pas un succès** : la commune porte
-  un motif affiché dans le panneau, et si le territoire entier est muet le bandeau l'annonce
-  et **désigne le bouton** « 🔎 Détail des sources ». Un écran vide qui ne se dénonce pas est
-  la faute la plus coûteuse : elle a coûté une version.
+- **RG-17.24 — trois chemins pour le zonage, jamais d'abandon silencieux.**
+  `municipality?geom=` renvoie le nom, le code INSEE et le contour, mais **ni `partition` ni
+  `is_rnu`** : seul `municipality?insee=` fait autorité. La chaîne est donc — partition
+  connue → sinon `municipality?insee=` (qui donne la partition **et** le statut RNU) →
+  sinon interrogation par **emprise rectangulaire**, découpée sur le vrai contour (la
+  requête par emprise ramène aussi le zonage des voisines).
+  **Zéro zone n'est pas un succès** : la commune porte un motif affiché dans le panneau, et
+  si le territoire entier est muet le bandeau l'annonce et **désigne le bouton**
+  « 🔎 Détail des sources ». Un écran vide qui ne se dénonce pas est la faute la plus
+  coûteuse : elle a coûté une version — et c'est ce panneau qui a livré les deux causes
+  réelles à la version suivante.
+- **RG-17.24 bis — une commune au RNU n'est pas en panne.** Elle n'a pas de PLU, ce qui est
+  une information et non une erreur : elle ne compte ni dans les échecs du bandeau, ni comme
+  « sans zonage » dans la liste.
+- **RG-17.26 — jamais une géométrie complète dans une URL.** Un contour communal du
+  Géoportail compte des milliers de sommets ; sérialisé et encodé dans une chaîne de
+  requête, il produit une URL de plusieurs dizaines de milliers de caractères que la pile
+  réseau refuse — sans rendre d'erreur HTTP, seulement « Failed to fetch ». **Mesuré : 94 032
+  caractères** pour un contour de 2 000 sommets. On interroge sur le **rectangle englobant**
+  (5 points) et l'on rétablit l'exactitude par le découpage. Verrouillé par un test qui
+  plafonne la longueur d'URL.
 - **RG-17.25 — ce qui doit être vu doit être lisible sur le fond réel.** Un trait gris foncé
   de 1,1 px sur une photo aérienne est invisible : les 25 contours étaient tracés et l'écran
   paraissait n'en montrer aucun. Les limites portent donc un liseré sombre large sous un

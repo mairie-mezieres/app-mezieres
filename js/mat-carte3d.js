@@ -818,19 +818,47 @@ function _c3dTerrCommunes(){
     .then(function(fc){ return (fc && fc.features) || []; });
 }
 
-/* Le zonage d'UNE commune. Une commune au RNU n'a pas de document : ce n'est
-   pas une erreur, c'est une information — elle est affichée comme telle.
+/* Emprise rectangulaire d'une géométrie, en 5 points.
 
-   ⚠️ Deux chemins, parce qu'un seul ne suffit pas. `municipality?geom=` ne
-   renvoie pas forcément le champ `partition` (contrairement à
-   `municipality?insee=`). La première version abandonnait alors EN SILENCE :
-   les 25 contours s'affichaient, aucun zonage n'arrivait, et le panneau
-   annonçait « en cours… » indéfiniment. Un échec muet est le pire des échecs
-   — c'est la leçon d'ADR-0018, et elle s'applique ici aussi.
+   ⚠️ Ne JAMAIS mettre un contour communal complet dans une URL. Un contour du
+   Géoportail compte des centaines à des milliers de sommets ; sérialisé en
+   JSON puis encodé dans une chaîne de requête, il produit une URL de plusieurs
+   dizaines de milliers de caractères, que la pile réseau refuse — le navigateur
+   ne rend même pas une erreur HTTP, seulement « Failed to fetch ».
+   C'est ce qui est arrivé en v4.72 : les quatre premières communes de la
+   première vague (Baccon, Baule, Beauce-la-Romaine, Beaugency) échouaient
+   toutes ainsi. On interroge donc sur le RECTANGLE — 5 points — et l'exactitude
+   est rétablie ensuite par le découpage sur le vrai contour. */
+function _c3dBBoxGeom(geom){
+  if (!geom) return null;
+  var polys = geom.type === 'Polygon' ? [geom.coordinates]
+            : geom.type === 'MultiPolygon' ? geom.coordinates : [];
+  var w = 180, s = 90, e = -180, n = -90, vus = 0;
+  polys.forEach(function(anneaux){
+    (anneaux[0] || []).forEach(function(p){
+      if (p[0] < w) w = p[0]; if (p[0] > e) e = p[0];
+      if (p[1] < s) s = p[1]; if (p[1] > n) n = p[1];
+      vus++;
+    });
+  });
+  if (!vus) return null;
+  return { type:'Polygon', coordinates:[[[w,s],[e,s],[e,n],[w,n],[w,s]]] };
+}
 
-   À défaut de partition, on interroge donc par GÉOMÉTRIE, puis on découpe sur
-   le contour de la commune : la requête par emprise ramène aussi le zonage des
-   voisines, et draper le PLU du voisin serait la faute du 45203/45204. */
+/* Le zonage d'UNE commune, en trois chemins — parce qu'aucun ne suffit seul.
+
+   Ce que le diagnostic a montré sur le terrain (v4.72, 25 communes) :
+     • `municipality?geom=` renvoie le nom, le code INSEE et le contour, mais
+       NI `partition` NI `is_rnu` — contrairement à `municipality?insee=` ;
+     • une commune au RNU n'a pas de zonage : ce n'est pas une panne, c'est
+       une information, et l'afficher comme un « échec » est faux ;
+     • une URL contenant un contour entier échoue au niveau réseau.
+
+   D'où la chaîne : partition connue → sinon `municipality?insee=` pour obtenir
+   la partition ET le statut RNU faisant autorité → sinon interrogation par
+   emprise rectangulaire, découpée sur le vrai contour (la requête par emprise
+   ramène le zonage des voisines, et draper le PLU du voisin serait la faute
+   du 45203/45204). */
 function _c3dTerrZonesDe(c){
   if (c.rnu) { c.via = 'RNU'; return Promise.resolve([]); }
 
@@ -852,26 +880,66 @@ function _c3dTerrZonesDe(c){
        confondait à l'écran avec une commune encore en cours de chargement.
        À l'inverse, un repli qui réussit efface l'échec du premier chemin. */
     if (out.length) c.err = '';
-    else if (!c.err) c.err = 'aucune zone renvoyée';
     return out;
   }
 
-  function parGeometrie(){
-    if (!c.geom) { c.err = c.err || 'ni partition ni contour'; return []; }
-    return _c3dJson(C3D_GPU + 'zone-urba?geom=' + encodeURIComponent(JSON.stringify(c.geom)))
-      .then(function(fc){ return habiller((fc && fc.features) || [], 'contour', true); })
+  /* Une panne réseau passagère ne doit pas condamner une commune pour la
+     session : sur un téléphone, quatre requêtes simultanées en échouent une
+     de temps en temps. Un seul second essai, sans insister. */
+  function jsonRessaye(url){
+    return _c3dJson(url).catch(function(e){
+      if (!/failed to fetch|networkerror|load failed/i.test((e && e.message) || '')) throw e;
+      return _c3dJson(url);
+    });
+  }
+
+  function parPartition(part, via){
+    return jsonRessaye(C3D_GPU + 'zone-urba?partition=' + encodeURIComponent(part))
+      .then(function(fc){
+        var out = (fc && fc.features) || [];
+        return out.length ? habiller(out, via, false) : null;   // null = essayer la suite
+      })
+      .catch(function(e){ c.err = (e && e.message) || 'échec'; return null; });
+  }
+
+  /* `municipality?insee=` fait autorité : c'est lui qui porte `partition` et
+     `is_rnu`. Le code INSEE vient du Géoportail, jamais d'une supposition. */
+  function parInsee(){
+    if (!c.insee) return null;
+    return jsonRessaye(C3D_GPU + 'municipality?insee=' + encodeURIComponent(c.insee))
+      .then(function(fc){
+        var p = (fc && fc.features && fc.features[0] && fc.features[0].properties) || null;
+        if (!p) return null;
+        if (p.is_rnu === true || p.is_rnu === 'true'){
+          c.rnu = true; c.via = 'RNU'; c.err = ''; c.nZones = 0;
+          return [];                                  // tableau = terminé, sans erreur
+        }
+        if (!p.partition) return null;
+        c.partition = p.partition;
+        return parPartition(p.partition, 'partition (via INSEE)');
+      })
+      .catch(function(e){ c.err = c.err || (e && e.message) || 'échec'; return null; });
+  }
+
+  function parEmprise(){
+    var bbox = _c3dBBoxGeom(c.geom);
+    if (!bbox){ c.err = c.err || 'ni partition ni contour'; return []; }
+    return jsonRessaye(C3D_GPU + 'zone-urba?geom=' + encodeURIComponent(JSON.stringify(bbox)))
+      .then(function(fc){ return habiller((fc && fc.features) || [], 'emprise', true); })
       .catch(function(e){ c.err = (e && e.message) || 'échec'; return []; });
   }
 
-  if (!c.partition) return Promise.resolve().then(parGeometrie);
-
-  return _c3dJson(C3D_GPU + 'zone-urba?partition=' + encodeURIComponent(c.partition))
-    .then(function(fc){
-      var out = (fc && fc.features) || [];
-      if (!out.length) return parGeometrie();      // partition connue mais muette
-      return habiller(out, 'partition', false);
-    })
-    .catch(function(e){ c.err = (e && e.message) || 'échec'; return parGeometrie(); });
+  /* Enchaînement : chaque étape renvoie un tableau si elle conclut, `null` si
+     elle passe la main. La dernière conclut toujours. */
+  return Promise.resolve()
+    .then(function(){ return c.partition ? parPartition(c.partition, 'partition') : null; })
+    .then(function(r){ return r || parInsee(); })
+    .then(function(r){ return r || parEmprise(); })
+    .then(function(r){
+      var out = r || [];
+      if (!out.length && !c.rnu && !c.err) c.err = 'aucune zone renvoyée';
+      return out;
+    });
 }
 
 /* Chargement par vagues de quatre : 25 requêtes lancées d'un coup, c'est
@@ -915,7 +983,10 @@ function _c3dTerrCharger(){
     .then(function(){
       _c3dTerrEtat = 'pret';
       var rnu = _c3dTerr.filter(function(c){ return c.rnu; }).length;
-      var ko  = _c3dTerr.filter(function(c){ return c.err; }).length;
+      /* Une commune au RNU n'est PAS en échec : elle n'a simplement pas de PLU.
+         Les compter ensemble annonçait « 13 sans zonage » là où plusieurs
+         étaient parfaitement en règle. */
+      var ko  = _c3dTerr.filter(function(c){ return c.err && !c.rnu; }).length;
       var nz  = _c3dTerrZones.features.length;
       _c3dNoter('Géoportail — zonages du territoire', nz > 0,
         (_c3dTerr.length - rnu - ko) + ' commune(s) avec zonage', nz, nz);
@@ -1008,9 +1079,12 @@ function _c3dTerrPanneau(){
   var ul = document.getElementById('c3d-terr-liste');
   if (!ul) return;
   var lignes = (_c3dTerr || []).map(function(c){
+    /* Le RNU passe AVANT l'erreur : une commune sans PLU n'est pas en panne,
+       et l'afficher comme un échec est faux. */
     var etat = c.rnu ? '<em>au RNU — pas de PLU</em>'
+             : c.nZones ? (c.nZones + ' secteurs')
              : c.err ? '<em>' + _c3dEsc(c.err) + '</em>'
-             : c.nZones ? (c.nZones + ' secteurs') : '<em>en cours…</em>';
+             : '<em>en cours…</em>';
     return '<li' + (c.insee === C3D_INSEE ? ' class="c3d-terr-moi"' : '') + '>'
          + '<span>' + _c3dEsc(c.nom) + '</span> <small>' + etat + '</small></li>';
   });
