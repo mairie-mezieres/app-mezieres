@@ -1475,6 +1475,20 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .c3d-legende i{width:12px;height:12px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(0,0,0,0.15)}
 .c3d-legende li span span{color:var(--muted);font-weight:600}
 
+/* Panneau du territoire : 25 communes, donc plus large que la légende du PLU
+   et défilable. ⚠️ Plancher typographique de 12 px (0.75rem) — ADR-0017 :
+   ne RIEN descendre en dessous, même pour faire tenir la liste. */
+.c3d-terr{max-width:min(74vw,320px);max-height:min(58vh,420px);overflow-y:auto}
+.c3d-terr-avert{margin:0;padding:0 12px 9px;font-size:0.75rem;line-height:1.45;color:var(--muted)}
+.c3d-terr-avert b{color:var(--text)}
+.c3d-terr-liste{border-top:1px solid var(--border);padding-top:9px!important;margin-top:2px!important}
+.c3d-terr-liste li{justify-content:space-between;gap:10px;align-items:baseline}
+.c3d-terr-liste small{color:var(--muted);font-weight:600;font-size:0.75rem;
+  text-align:right;flex:0 0 auto}
+.c3d-terr-liste li.c3d-terr-moi span{color:var(--leaf)}
+.c3d-terr-liste li.c3d-terr-moi{background:var(--mist);border-radius:7px;
+  padding:3px 6px;margin:-3px -6px}
+
 .c3d-pin{width:18px;height:18px;border-radius:50%;background:var(--gold);
   border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35)}
 

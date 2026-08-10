@@ -220,6 +220,109 @@ test.describe('Carte 3D', () => {
     expect(debord.hors, `${debord.hors} sommet(s) de toit hors de l’emprise sur ${debord.sommets}`).toBe(0);
   });
 
+  test('territoire : les communes viennent du Géoportail, jamais d’une supposition', async ({ page }) => {
+    /*
+     * ⚠️ Le cœur de la garantie « aucun code INSEE inventé ». Les 25 NOMS
+     * viennent de la mairie ; les codes, contours et partitions doivent venir
+     * du Géoportail. `_c3dApparier` est la charnière : elle ne doit retenir
+     * que ce que le service a réellement renvoyé, et signaler le reste.
+     *
+     * Fonction pure → testable sans réseau, alors que tout le reste de cette
+     * vue est invérifiable ici (apicarto est bloqué).
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dApparier === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      const f = (name, extra) => ({ type: 'Feature', properties: Object.assign({ name }, extra || {}),
+                                    geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] } });
+      const res = window._c3dApparier([
+        // casse et accents différents de la liste de la mairie
+        f('MEZIERES-LEZ-CLERY', { insee: '45204', partition: 'DU_45204' }),
+        f('Épieds-en-Beauce',   { insee: '45131', partition: 'DU_45131' }),
+        f('Baule',              { insee: '45025', is_rnu: true }),
+        // une commune voisine hors CCTVL : ne doit PAS entrer
+        f('Orléans',            { insee: '45234', partition: 'DU_45234' }),
+        // un doublon : ne doit pas compter deux fois
+        f('Baule',              { insee: '45025' })
+      ]);
+      return {
+        noms: res.trouvees.map(c => c.nom),
+        insee: res.trouvees.map(c => c.insee),
+        rnu: res.trouvees.filter(c => c.rnu).map(c => c.nom),
+        nbManquantes: res.manquantes.length,
+        orleans: res.trouvees.some(c => /orl/i.test(c.nom)),
+        // aucune commune retenue ne doit porter un code que le service n'a pas donné
+        inventes: res.trouvees.filter(c => !c.insee).length,
+        total: window.C3D_CCTVL.length
+      };
+    });
+
+    expect(r.total, 'les 25 communes de la CCTVL sont listées').toBe(25);
+    expect(r.orleans, 'une commune hors CCTVL ne doit pas être retenue').toBe(false);
+    expect(r.noms.length, 'trois communes appariées, sans doublon').toBe(3);
+    expect(r.insee.sort()).toEqual(['45025', '45131', '45204']);
+    expect(r.rnu, 'le RNU est une information, pas une erreur').toEqual(['Baule']);
+    expect(r.inventes, 'aucun code INSEE ne doit être fabriqué').toBe(0);
+    // 25 attendues − 3 trouvées = 22 signalées, jamais silencieusement oubliées
+    expect(r.nbManquantes, 'les communes non placées doivent être signalées').toBe(22);
+  });
+
+  test('territoire : « AU » n’est pas rangé en agricole', async ({ page }) => {
+    /*
+     * Les codes de zones diffèrent d'un PLU à l'autre : à cette échelle on ne
+     * peut colorer que par le type normalisé. Or « AU » commence par un « A »,
+     * et une zone à urbaniser peinte en agricole raconterait exactement
+     * l'inverse de la réalité — sur la carte du territoire que porte le maire.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTypeZone === 'function', null, { timeout: 30000 });
+
+    const cas = await page.evaluate(() => ({
+      au:      window._c3dTypeZone({ typezone: 'AU' }),
+      au1:     window._c3dTypeZone({ typezone: '1AU' }),
+      auLong:  window._c3dTypeZone({ typezone: 'A urbaniser' }),
+      u:       window._c3dTypeZone({ typezone: 'U' }),
+      ua:      window._c3dTypeZone({ typezone: 'Ua' }),
+      a:       window._c3dTypeZone({ typezone: 'A' }),
+      ah:      window._c3dTypeZone({ typezone: 'Ah' }),
+      n:       window._c3dTypeZone({ typezone: 'N' }),
+      nj:      window._c3dTypeZone({ typezone: 'Nj' }),
+      libelle: window._c3dTypeZone({ libelle: 'Ub1' }),
+      vide:    window._c3dTypeZone({})
+    }));
+
+    expect(cas.au).toBe('AU');
+    expect(cas.au1, '« 1AU » commence par un chiffre : la famille reste AU').toBe('AU');
+    expect(cas.auLong).toBe('AU');
+    expect(cas.u).toBe('U');
+    expect(cas.ua).toBe('U');
+    expect(cas.a).toBe('A');
+    expect(cas.ah).toBe('A');
+    expect(cas.n).toBe('N');
+    expect(cas.nj).toBe('N');
+    expect(cas.libelle, 'à défaut de typezone, le libellé sert de repli').toBe('U');
+    expect(cas.vide, 'sans information, aucune famille n’est devinée').toBe('');
+  });
+
+  test('territoire : sources coupées, aucune commune n’est inventée', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await expect(page.locator('#c3d-btn-terr')).toBeVisible();
+    await page.locator('#c3d-btn-terr').click();
+    // Le Géoportail est coupé : la vue doit le dire, et ne rien dessiner.
+    await expect(page.locator('#c3d-statut')).toContainText('Territoire indisponible', { timeout: 20000 });
+    const dessine = await page.evaluate(() => {
+      const m = window._c3dMap;
+      return { source: !!(m.getSource && m.getSource('terr-zones')),
+               communes: (window._c3dTerr || []).length };
+    });
+    expect(dessine.communes, 'aucune commune ne doit apparaître sans réponse du service').toBe(0);
+    expect(dessine.source, 'aucune couche de territoire posée sans données').toBe(false);
+  });
+
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());

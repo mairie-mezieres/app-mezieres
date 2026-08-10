@@ -43,7 +43,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.13.0">
+<link rel="stylesheet" href="css/mat.css?v=4.14.0">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
@@ -59,7 +59,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.4.0"></script>
 <script defer src="js/mat-perf.js?v=1.0.8"></script>
-<script defer src="js/mat-boot.js?v=4.7.0"></script>
+<script defer src="js/mat-boot.js?v=4.8.0"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.70 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.71 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.70</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.71</button>
 </div>
 </div>
 </div>
@@ -1501,6 +1501,7 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <div class="c3d-outils">
 <button class="c3d-btn" id="c3d-btn-zones" aria-pressed="true">🗺️ <span>Zonage du PLU</span></button>
 <button class="c3d-btn" id="c3d-btn-bati" aria-pressed="true">🏠 <span>Bâtiments</span></button>
+<button class="c3d-btn" id="c3d-btn-terr" aria-pressed="false">🗺️ <span>Le territoire</span></button>
 <button class="c3d-btn" id="c3d-btn-fond" aria-pressed="true">🛰️ <span>Vue aérienne</span></button>
 <button class="c3d-btn" id="c3d-btn-ici">📍 <span>Où suis-je</span></button>
 <button class="c3d-btn" id="c3d-btn-diag" hidden>🔎 <span>Détail des sources</span></button>
@@ -1508,6 +1509,12 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <details class="c3d-legende" id="c3d-legende" hidden>
 <summary>Zones du PLU</summary>
 <ul id="c3d-legende-liste"></ul>
+</details>
+<details class="c3d-legende c3d-terr" id="c3d-terr" hidden>
+<summary>Les 25 communes des Terres du Val de Loire</summary>
+<p class="c3d-terr-avert">Chaque commune a <b>son propre PLU</b>, avec ses propres règles&nbsp;: le PLUi-H-D est en cours d’élaboration et n’est pas encore le document en vigueur. Les couleurs montrent les <b>quatre grandes familles de zones</b>, communes à tous les PLU. Les règles de construction affichées par l’application sont celles de <b>Mézières-lez-Cléry uniquement</b>.</p>
+<ul id="c3d-terr-legende"></ul>
+<ul id="c3d-terr-liste" class="c3d-terr-liste"></ul>
 </details>
 <section class="c3d-fiche" id="c3d-fiche" aria-live="polite">
 <div class="c3d-fiche-hdr">
@@ -1731,6 +1738,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.71</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>D&eacute;couvrez tout le territoire.</strong> Un nouveau bouton &laquo;&nbsp;🗺️ Le territoire&nbsp;&raquo; dans la carte 3D prend du recul et montre les <strong>25 communes des Terres du Val de Loire</strong>, avec le zonage de chacune. M&eacute;zi&egrave;res y est cercl&eacute;e de blanc. Un panneau donne, commune par commune, le nombre de secteurs de son plan d&rsquo;urbanisme</li>
+<li><strong>Ce sont bien 25 plans distincts.</strong> Chaque commune a aujourd&rsquo;hui son propre PLU&nbsp;: le plan intercommunal (PLUi-H-D) est en cours d&rsquo;&eacute;laboration. Les r&egrave;gles de construction affich&eacute;es par l&rsquo;application restent celles de M&eacute;zi&egrave;res uniquement</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.70</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les maisons ont de vrais toits en pente.</strong> Plus de toits plats&nbsp;: chaque maison porte d&eacute;sormais un toit &agrave; deux pans, avec un fa&icirc;tage dans le sens de la longueur. De pr&egrave;s, on distingue m&ecirc;me les rang&eacute;es de tuiles</li>
