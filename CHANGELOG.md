@@ -5,6 +5,44 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.70] — 10 août 2026
+
+### Ajouté
+- **De vrais toits en pente sur la carte 3D.** MapLibre ne sait extruder que des prismes à
+  sommet plat — mais rien n'interdit d'en empiler. Un toit à deux pentes est approché par
+  des **tranches horizontales** de ≈ 30 cm, de plus en plus étroites, entre le haut des murs
+  et le faîtage, ce dernier posé le long du **grand axe de l'emprise**. De 4 à 12 tranches
+  selon la hauteur : une annexe n'a pas besoin d'autant de marches qu'un clocher.
+  Les arêtes des tranches se lisent de près comme des **rangées de tuiles** — effet non
+  recherché mais heureux, et exprimé en mètres, donc stable à tous les zooms.
+- **Un test vérifie qu'un toit ne déborde jamais de son bâtiment.** Le découpage porte sur
+  l'emprise réelle et jamais sur son rectangle englobant : sur une maison en L, un toit posé
+  sur le rectangle couvrirait la cour.
+
+### Retiré
+- **La trame de fenêtres sur les façades, introduite en v4.69.** `fill-extrusion-pattern`
+  répète son motif en **pixels**, pas en mètres : le nombre de rangées grandit avec le zoom,
+  et une maison de 6 m finissait par ressembler à un immeuble de six étages. MapLibre
+  n'offre aucun ancrage métrique — il n'y avait rien à régler, seulement à retirer. Un rendu
+  dégradé est acceptable, un rendu faux ne l'est pas.
+
+### Corrigé
+- **Cliquer sur une maison n'ouvrait plus sa fiche depuis la v4.69.**
+  `queryRenderedFeatures` n'interroge que la couche `bati` ; pour porter la texture,
+  l'habitat était passé dans une couche `bati-tex` séparée, et devenait donc inclicable —
+  le cas le plus courant. La suppression de la texture ramène tous les murs dans une seule
+  couche. Aucun test ne couvrait le clic ; la maquette de rendu, elle, ne clique pas.
+- **Les maisons retrouvent leur teinte selon la hauteur.** `fill-extrusion-pattern`
+  remplaçant `fill-extrusion-color`, l'habitat était le seul type à ne plus être coloré.
+
+### Note technique
+- L'industriel et le bâti hors commune gardent une **casquette plate** : toitures réellement
+  plates pour l'un, arrière-plan assumé pour l'autre — et ≈ 32 000 polygones économisés.
+  Les filtres des deux couches de toiture sont **exactement complémentaires**, sans quoi les
+  volumes se superposeraient. Voir **ADR-0020**.
+
+---
+
 ## [4.69] — 10 août 2026
 
 ### Ajouté

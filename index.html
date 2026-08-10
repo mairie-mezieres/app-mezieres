@@ -59,7 +59,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.4.0"></script>
 <script defer src="js/mat-perf.js?v=1.0.8"></script>
-<script defer src="js/mat-boot.js?v=4.6.0"></script>
+<script defer src="js/mat-boot.js?v=4.7.0"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.69 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.70 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.69</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.70</button>
 </div>
 </div>
 </div>
@@ -1731,11 +1731,17 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.70</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Les maisons ont de vrais toits en pente.</strong> Plus de toits plats&nbsp;: chaque maison porte d&eacute;sormais un toit &agrave; deux pans, avec un fa&icirc;tage dans le sens de la longueur. De pr&egrave;s, on distingue m&ecirc;me les rang&eacute;es de tuiles</li>
+<li><strong>Les fen&ecirc;tres dessin&eacute;es sur les murs ont &eacute;t&eacute; retir&eacute;es.</strong> Elles se multipliaient quand on zoomait, au point de faire ressembler une maison de plain-pied &agrave; un immeuble. Les murs sont de nouveau unis, et retrouvent leur teinte selon la hauteur du b&acirc;timent</li>
+<li><strong>Cliquer sur une maison rouvre bien sa fiche.</strong> Depuis la version pr&eacute;c&eacute;dente, les maisons ne r&eacute;pondaient plus au clic&nbsp;: c&rsquo;est corrig&eacute;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.69</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
-<li><strong>Les b&acirc;timents de la carte 3D ont des toits.</strong> Tuile sur les maisons, ardoise sur l&rsquo;&eacute;glise et les b&acirc;timents remarquables, bac acier sur les hangars&nbsp;: le village se lit enfin de trois quarts, au lieu d&rsquo;un damier de bo&icirc;tes &agrave; toit plat</li>
 <li><strong>Une maison, un hangar et l&rsquo;&eacute;glise ne se ressemblent plus.</strong> La carte utilise d&eacute;sormais la nature de chaque b&acirc;timent d&eacute;j&agrave; fournie par l&rsquo;IGN (habitation, agricole, industriel, cultuel, annexe) pour les distinguer par la couleur et la hauteur de toit</li>
-<li><strong>Les maisons ont des fa&ccedil;ades.</strong> Une trame de fen&ecirc;tres, dessin&eacute;e par l&rsquo;application elle-m&ecirc;me — aucune image t&eacute;l&eacute;charg&eacute;e, aucun octet de plus — habille les seuls b&acirc;timents d&rsquo;habitation de la commune</li>
 </ul>
 </div>
 <div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">

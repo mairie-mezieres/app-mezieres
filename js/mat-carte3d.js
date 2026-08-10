@@ -253,10 +253,10 @@ function _c3dSansAccent(s){
                : String(s || '').toLowerCase();
 }
 
-/* Hauteur de la « casquette » de toit, en mètres. MapLibre ne sait pas
-   faire de pente : une bande colorée au sommet du volume se lit malgré
-   tout comme un toit dès qu'on prend du recul. */
-var C3D_TOITS = { culte:3.2, remarquable:2.6, habitat:1.3, agricole:0.9, industriel:0.8, annexe:0.4 };
+/* Hauteur du toit, en mètres, du haut des murs au faîtage.
+   ⚠️ Ce n'est pas une donnée : la BD TOPO ignore tout des toitures. Ces
+   valeurs sont des ordres de grandeur de bâti rural — voir RG-17.15. */
+var C3D_TOITS = { culte:5.5, remarquable:4.5, habitat:2.6, agricole:1.8, industriel:0.6, annexe:1.0 };
 
 function _c3dTypeBati(p){
   var n = _c3dSansAccent(p.nature);
@@ -492,27 +492,129 @@ function _c3dPoserZones(){
     paint:{ 'line-color':couleur, 'line-width':1.6, 'line-opacity':0.9 } }, sous);
 }
 
-/* Texture de façade — deux rangées de fenêtres, générée en mémoire.
-   Aucune image n'est téléchargée : 16 × 16 pixels calculés à la volée, donc
-   zéro octet ajouté au poids de l'application. */
-function _c3dImageFacade(){
-  if (_c3dMap.hasImage && _c3dMap.hasImage('c3d-facade')) return;
-  var w = 16, h = 16, data = new Uint8Array(w * h * 4);
-  for (var y = 0; y < h; y++){
-    for (var x = 0; x < w; x++){
-      var i = (y * w + x) * 4;
-      var fenetre = (x % 8 >= 2 && x % 8 <= 5) && (y % 8 >= 3 && y % 8 <= 6);
-      var c = fenetre ? [96, 112, 128] : [245, 238, 225];
-      data[i] = c[0]; data[i + 1] = c[1]; data[i + 2] = c[2]; data[i + 3] = 255;
+/* ── Toits en pente ────────────────────────────────────────────────────
+   MapLibre ne sait extruder que des prismes à sommet PLAT. Un toit à deux
+   pentes est donc approché par des TRANCHES horizontales de plus en plus
+   étroites, empilées du haut des murs jusqu'au faîtage. De près, les arêtes
+   des tranches se lisent comme des rangées de tuiles ; de loin, comme une
+   pente franche.
+
+   ⚠️ La forme d'un toit N'EST PAS une donnée. La BD TOPO donne l'emprise au
+   sol et la hauteur, rien d'autre. Le faîtage est posé le long du GRAND AXE
+   de l'emprise — vrai pour la plupart des maisons de village, faux pour
+   certaines. C'est un procédé de lisibilité, au même titre que la couleur
+   des zones du PLU, jamais une information sur une construction précise.
+   Voir RG-17.15 : cela ne doit jamais être présenté comme la toiture réelle.
+
+   ⚠️ Pourquoi pas une texture de façade : `fill-extrusion-pattern` répète le
+   motif en PIXELS, pas en mètres. Le nombre de rangées de fenêtres grandit
+   donc avec le zoom, et une maison de 6 m finit par ressembler à un immeuble
+   de six étages. MapLibre n'offre aucun ancrage du motif sur la taille réelle
+   du bâtiment : l'essai de la v4.69 a été retiré. Voir ADR-0020. */
+
+var C3D_PENTE_TRANCHE = 0.30;              // hauteur visée d'une tranche (m)
+var C3D_PENTE_MIN = 4, C3D_PENTE_MAX = 12; // une annexe n'a pas besoin d'autant
+                                           // de marches qu'un clocher
+
+/* Repère métrique local. Un degré de longitude et un degré de latitude ne
+   couvrent pas la même distance : découper en degrés donnerait des pentes
+   fausses, d'autant plus que le bâtiment est orienté est-ouest. */
+function _c3dRepere(lon0, lat0){
+  var kx = 111320 * Math.cos(lat0 * Math.PI / 180), ky = 110540;
+  return {
+    vers: function(p){ return [(p[0] - lon0) * kx, (p[1] - lat0) * ky]; },
+    de:   function(p){ return [lon0 + p[0] / kx, lat0 + p[1] / ky]; }
+  };
+}
+
+/* Sutherland–Hodgman : ne garde du polygone que le demi-plan n·p ≤ c.
+   Le découpage se fait sur l'emprise RÉELLE, jamais sur son rectangle
+   englobant : un toit ne peut donc pas déborder du bâtiment. */
+function _c3dClip(poly, nx, ny, c){
+  var out = [];
+  for (var i = 0; i < poly.length; i++){
+    var a = poly[i], b = poly[(i + 1) % poly.length];
+    var da = nx * a[0] + ny * a[1] - c, db = nx * b[0] + ny * b[1] - c;
+    if (da <= 0) out.push(a);
+    if ((da < 0 && db > 0) || (da > 0 && db < 0)){
+      var t = da / (da - db);
+      out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]);
     }
   }
-  try { _c3dMap.addImage('c3d-facade', { width:w, height:h, data:data }); } catch(_){}
+  return out;
+}
+
+/* Grand axe de l'emprise = orientation du faîtage. On prend la direction qui
+   minimise l'aire de la boîte englobante orientée ; pour un bâti rectangulaire
+   — l'immense majorité — c'est exactement la longueur de la maison. */
+function _c3dGrandAxe(pts){
+  var best = null;
+  for (var i = 0; i < pts.length; i++){
+    var a = pts[i], b = pts[(i + 1) % pts.length];
+    var dx = b[0] - a[0], dy = b[1] - a[1], L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 0.2) continue;                       // arête négligeable
+    var ux = dx / L, uy = dy / L;
+    var u0 = Infinity, u1 = -Infinity, v0 = Infinity, v1 = -Infinity;
+    for (var j = 0; j < pts.length; j++){
+      var u =  pts[j][0] * ux + pts[j][1] * uy;
+      var v = -pts[j][0] * uy + pts[j][1] * ux;
+      if (u < u0) u0 = u; if (u > u1) u1 = u;
+      if (v < v0) v0 = v; if (v > v1) v1 = v;
+    }
+    var aire = (u1 - u0) * (v1 - v0);
+    if (!best || aire < best.aire)
+      best = { aire:aire, nx:-uy, ny:ux, centre:(v0 + v1) / 2, demi:(v1 - v0) / 2 };
+  }
+  return best;
+}
+
+/* Empile les tranches d'un anneau. Renvoie le nombre de tranches produites. */
+function _c3dTranches(ring, p, out){
+  if (!ring || ring.length < 4) return 0;
+  var rep = _c3dRepere(ring[0][0], ring[0][1]), pts = [];
+  for (var i = 0; i < ring.length - 1; i++) pts.push(rep.vers(ring[i]));
+  if (pts.length < 3) return 0;
+  var axe = _c3dGrandAxe(pts);
+  if (!axe || !(axe.demi > 0.1)) return 0;
+
+  var ht = p.mat_toit || 1.2;
+  var n = Math.max(C3D_PENTE_MIN,
+          Math.min(C3D_PENTE_MAX, Math.round(ht / C3D_PENTE_TRANCHE)));
+  var faites = 0;
+  for (var t = 0; t < n; t++){
+    var marge = axe.demi * (t / n);
+    var q = _c3dClip(pts, axe.nx, axe.ny, axe.centre + axe.demi - marge);
+    q = _c3dClip(q, -axe.nx, -axe.ny, -(axe.centre - axe.demi + marge));
+    if (q.length < 3) break;                     // tranche dégénérée : on arrête
+    var co = [];
+    for (var m = 0; m < q.length; m++) co.push(rep.de(q[m]));
+    co.push(co[0]);
+    out.push({ type:'Feature', properties:{
+      mat_type: p.mat_type, mat_dans: p.mat_dans,
+      mat_b: p.mat_h + ht * (t / n),
+      mat_t: p.mat_h + ht * ((t + 1) / n)
+    }, geometry:{ type:'Polygon', coordinates:[co] } });
+    faites++;
+  }
+  return faites;
+}
+
+function _c3dToitsPente(fc){
+  var out = [];
+  for (var k = 0; k < fc.features.length; k++){
+    var f = fc.features[k], g = f.geometry;
+    if (!g) continue;
+    if (g.type === 'Polygon') _c3dTranches(g.coordinates[0], f.properties, out);
+    else if (g.type === 'MultiPolygon')
+      for (var j = 0; j < g.coordinates.length; j++)
+        _c3dTranches(g.coordinates[j][0], f.properties, out);
+  }
+  return { type:'FeatureCollection', features:out };
 }
 
 function _c3dPoserBati(fc){
   if (_c3dMap.getSource('bati')) return;
   _c3dMap.addSource('bati', { type:'geojson', data:fc });
-  _c3dImageFacade();
 
   var commun = {
     'fill-extrusion-height':['get','mat_h'],
@@ -521,15 +623,22 @@ function _c3dPoserBati(fc){
     'fill-extrusion-vertical-gradient':true
   };
 
-  /* ⚠️ `fill-extrusion-pattern` REMPLACE `fill-extrusion-color` : une façade
-     texturée ne peut pas être aussi teintée selon le type. D'où deux couches
-     aux filtres DISJOINTS — aucun bâtiment n'est peint deux fois, donc aucun
-     conflit d'affichage entre volumes superposés.
-     Les fenêtres sont réservées à l'habitat : un hangar ou une église à
-     rangées de fenêtres serait faux. */
-  var estHabitat = ['all', ['==', ['get','mat_type'], 'habitat'], ['==', ['get','mat_dans'], 1]];
+  /* Un toit en pente pour la commune, sauf l'industriel — dont les toitures
+     sont réellement plates ou très peu inclinées. Le bâti hors commune garde
+     une simple casquette : il est volontairement en arrière-plan, et c'est
+     autant de géométrie en moins (≈ 8 000 polygones au lieu de 40 000). */
+  var aPente = function(p){
+    return p.mat_dans === 1 && p.mat_type !== 'industriel';
+  };
+  var pentus = { type:'FeatureCollection', features:fc.features.filter(function(f){
+    return aPente(f.properties);
+  })};
+  _c3dMap.addSource('toits', { type:'geojson', data:_c3dToitsPente(pentus) });
 
-  /* Murs teintés — tout sauf l'habitat de la commune.
+  /* Murs — une seule couche, donc un seul clic à gérer.
+     ⚠️ En v4.69, l'habitat vivait dans une couche `bati-tex` séparée pour
+     porter une texture. `queryRenderedFeatures` n'interrogeant que `bati`,
+     cliquer sur une MAISON n'ouvrait plus sa fiche — le cas le plus courant.
      ⚠️ La distinction passe par la COULEUR, jamais par l'opacité :
      `fill-extrusion-opacity` n'accepte aucune expression basée sur les
      données (« data expressions not supported ») et MapLibre refuse alors la
@@ -538,7 +647,6 @@ function _c3dPoserBati(fc){
      absente de MapLibre. Vérifié par test (`carte3d.spec.js`). */
   _c3dMap.addLayer({
     id:'bati', type:'fill-extrusion', source:'bati',
-    filter:['!', estHabitat],
     paint: Object.assign({
       'fill-extrusion-color':['case', ['==', ['get','mat_dans'], 0], '#cfd6cd',
         ['match', ['get','mat_type'],
@@ -552,28 +660,39 @@ function _c3dPoserBati(fc){
     }, commun)
   });
 
-  /* Murs texturés — l'habitat de la commune uniquement. */
+  /* Couleur de couverture : tuile sur l'habitat, ardoise sur l'église et les
+     bâtiments remarquables, bac acier sur les hangars. Partagée par les deux
+     couches de toiture pour qu'un bâtiment ne change pas de teinte selon
+     qu'il a une pente ou une casquette. */
+  var couvertures = ['case', ['==', ['get','mat_dans'], 0], '#b9bfb8',
+    ['match', ['get','mat_type'],
+      'culte',       '#5b6570',
+      'remarquable', '#5b6570',
+      'agricole',    '#8f9490',
+      'industriel',  '#9aa0a0',
+      'annexe',      '#9c6b52',
+      '#a8533f']];
+
+  /* Les toits en pente : une pile de tranches entre `mat_b` et `mat_t`. */
   _c3dMap.addLayer({
-    id:'bati-tex', type:'fill-extrusion', source:'bati',
-    filter: estHabitat,
-    paint: Object.assign({ 'fill-extrusion-pattern':'c3d-facade' }, commun)
+    id:'bati-toit', type:'fill-extrusion', source:'toits',
+    paint:{
+      'fill-extrusion-color': couvertures,
+      'fill-extrusion-base':['get','mat_b'],
+      'fill-extrusion-height':['get','mat_t'],
+      'fill-extrusion-opacity':1,
+      'fill-extrusion-vertical-gradient':true
+    }
   });
 
-  /* Les toits : une seconde extrusion qui démarre au sommet des murs.
-     MapLibre ne sait pas faire de pente, mais une casquette colorée se lit
-     comme un toit dès qu'on prend du recul — tuile sur l'habitat, ardoise
-     sur l'église, bac acier sur les hangars. */
+  /* Casquette plate — le bâti hors commune et l'industriel, qui n'ont pas de
+     tranches. Le filtre est l'exact complément de `aPente` : aucun bâtiment
+     ne reçoit les deux, sans quoi les volumes se superposeraient. */
   _c3dMap.addLayer({
-    id:'bati-toit', type:'fill-extrusion', source:'bati',
+    id:'bati-toit-plat', type:'fill-extrusion', source:'bati',
+    filter:['any', ['!=', ['get','mat_dans'], 1], ['==', ['get','mat_type'], 'industriel']],
     paint:{
-      'fill-extrusion-color':['case', ['==', ['get','mat_dans'], 0], '#b9bfb8',
-        ['match', ['get','mat_type'],
-          'culte',       '#5b6570',
-          'remarquable', '#5b6570',
-          'agricole',    '#8f9490',
-          'industriel',  '#9aa0a0',
-          'annexe',      '#9c6b52',
-          '#a8533f']],
+      'fill-extrusion-color': couvertures,
       'fill-extrusion-base':['get','mat_h'],
       'fill-extrusion-height':['+', ['get','mat_h'], ['get','mat_toit']],
       'fill-extrusion-opacity':1,
@@ -737,7 +856,7 @@ function _c3dBrancher(){
     if (lg) lg.hidden = !(on && _c3dZones);
   });
   bascule('c3d-btn-bati', function(on){
-    ['bati','bati-tex','bati-toit','bati-contour'].forEach(function(l){
+    ['bati','bati-toit','bati-toit-plat','bati-contour'].forEach(function(l){
       if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
     });
   });
