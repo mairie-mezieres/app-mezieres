@@ -5,6 +5,35 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.65] — 9 août 2026
+
+### Modifié
+- **« Mon village en 3D » sort du grand dossier PLUi-H-D et rejoint l'accueil.** La carte
+  n'était atteignable qu'après avoir ouvert le dossier PLUi — autant dire jamais découverte.
+  Elle a désormais sa tuile dans « Démarches et Services », sous MEL.
+- **Rubrique « Démarches et Services » réorganisée en grille régulière** : MEL et « Je viens
+  d'emménager » sur la première rangée, « Mon village en 3D » et « Documents officiels » sur
+  la seconde. « Je viens d'emménager » perd son bandeau pleine largeur — beaucoup de surface
+  pour un sujet qui concerne quelques foyers par an — et son sous-titre passe de « Guide
+  d'arrivée des nouveaux habitants » à « Guide d'arrivée ». Les rangées restent de hauteur
+  égale à 320, 360 et 390 px (tests de v4.63 au vert).
+- **Sur ordinateur**, la carte apparaît dans la colonne « 🤝 Vous aider » et dans le menu du
+  haut, à côté de PLUi-H-D. Sans quoi elle serait restée invisible aux visiteurs sur écran
+  large, la grille de cartes étant propre au téléphone.
+- **Un seul nom partout : « Mon village en 3D ».** Trois formulations cohabitaient — titre
+  d'écran « Le village en 3D », bloc PLUi « Voir le zonage actuel en 3D », et l'intitulé
+  souhaité pour la tuile. Une divergence de nom est le premier pas vers une divergence de
+  contenu. Le bouton de MEL devient « 🏘️ Voir ma zone en 3D » : c'est une action, pas un
+  second nom de la fonctionnalité.
+
+### Ajouté
+- Trois tests dans `tests/e2e/carte3d.spec.js` : présence de la tuile d'accueil **après**
+  celle de MEL (mise en page téléphone), présence dans la colonne « Vous aider » et dans le
+  menu (mise en page ordinateur), et unicité du nom entre la tuile, le titre d'écran et
+  l'attribut d'accessibilité.
+
+---
+
 ## [4.64] — 9 août 2026
 
 ### Ajouté
@@ -49,6 +78,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 - `docs/adr/0018-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md`
 - `docs/specifications/sfd/SFD-17-carte-3d-du-village.md`
 - `docs/guide-utilisateur.md`, `docs/guide-technique.md`, `CLAUDE.md` (tableau d'aiguillage)
+
 ---
 
 ## [4.63] — 9 août 2026

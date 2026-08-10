@@ -65,10 +65,20 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 
 ## 5. Parcours
 
-1. **Depuis la page PLUi-H-D** → bloc « 🏘️ Voir le zonage actuel en 3D » → vue d'ensemble
-   du bourg.
-2. **Depuis MEL** → « Urbanisme & Construction » → adresse ou GPS → zone détectée →
-   bouton « 🏘️ Voir ma zone sur la carte 3D » → carte centrée, repère posé sur l'adresse.
+1. **Depuis l'écran d'accueil** → rubrique « Démarches et Services », tuile
+   « 🏘️ Mon village en 3D », placée **sous MEL** → vue d'ensemble du bourg. C'est la porte
+   principale : la carte n'était auparavant atteignable qu'à travers le dossier PLUi-H-D,
+   donc en pratique jamais découverte.
+2. **Depuis la page PLUi-H-D** → section « 🏘️ Mon village en 3D » → même vue d'ensemble.
+3. **Depuis MEL** → « Urbanisme & Construction » → adresse ou GPS → zone détectée →
+   bouton « 🏘️ Voir ma zone en 3D » → carte centrée, repère posé sur l'adresse.
+4. **Sur ordinateur** → colonne « 🤝 Vous aider » et menu du haut. La grille de cartes
+   étant propre au téléphone, sans ces deux entrées la carte serait invisible au-delà de
+   1024 px.
+
+**RG-17.10 — un seul nom.** La fonctionnalité s'appelle « Mon village en 3D » partout :
+tuile d'accueil, titre d'écran, `aria-label`, section de la page PLUi-H-D. Le bouton de MEL
+(« Voir ma zone en 3D ») nomme une **action**, pas la fonctionnalité. Verrouillé par un test.
 
 ## 6. Données et interfaces
 

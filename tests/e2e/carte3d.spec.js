@@ -61,8 +61,45 @@ test.describe('Carte 3D', () => {
   test('la page PLUi-H-D propose la carte', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.openPlui());
-    const bouton = page.locator('#ov-plui button', { hasText: 'Le village en relief' });
+    const bouton = page.locator('#ov-plui button', { hasText: 'Voir le zonage en relief' });
     await expect(bouton).toBeVisible();
+  });
+
+  // La grille de cartes est celle du téléphone : au-delà de 1024 px, la mise
+  // en page desktop prend le relais et la masque. Le test est donc borné,
+  // comme celui des étoiles du bandeau.
+  test('l’accueil propose la carte, sous MEL', async ({ page, viewport }) => {
+    test.skip(!viewport || viewport.width >= 1024, 'mise en page téléphone uniquement');
+    await ouvrirAccueil(page);
+    const tuile = page.locator('.content button.card', { hasText: 'Mon village en 3D' });
+    await expect(tuile).toBeVisible();
+    // La tuile doit venir APRÈS celle de MEL : c'est la hiérarchie voulue
+    // dans « Démarches et Services ».
+    const ordre = await page.evaluate(() => {
+      const cartes = [...document.querySelectorAll('.content button.card')];
+      const i = cartes.findIndex(c => c.textContent.includes('MEL'));
+      const j = cartes.findIndex(c => c.textContent.includes('Mon village en 3D'));
+      return { i, j };
+    });
+    expect(ordre.i).toBeGreaterThanOrEqual(0);
+    expect(ordre.j).toBeGreaterThan(ordre.i);
+  });
+
+  test('sur ordinateur, la carte est dans « Vous aider » et dans le menu', async ({ page, viewport }) => {
+    test.skip(!viewport || viewport.width < 1024, 'mise en page ordinateur uniquement');
+    await ouvrirAccueil(page);
+    await expect(page.locator('.d-col-right button', { hasText: 'Mon village en 3D' })).toBeVisible();
+    await expect(page.locator('.d-nav-links button', { hasText: 'Mon village en 3D' })).toBeVisible();
+  });
+
+  test('un seul nom pour la fonctionnalité, partout', async ({ page }) => {
+    // Trois formulations différentes avaient cohabité (tuile, titre d'écran,
+    // bloc PLUi). Une divergence de nom est le premier pas vers une
+    // divergence de contenu — on la verrouille.
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await expect(page.locator('#ov-carte3d .panel-title')).toHaveText('Mon village en 3D');
+    await expect(page.locator('#ov-carte3d')).toHaveAttribute('aria-label', 'Mon village en 3D');
   });
 
   test('l’overlay s’ouvre, se ferme avec Échap, et n’invente aucun bâtiment', async ({ page }) => {
