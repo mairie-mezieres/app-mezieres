@@ -5,6 +5,38 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.75] — 10 août 2026
+
+### Corrigé
+- **Une version déployée avec succès paraissait n'être jamais arrivée.** La v4.74.1 a été
+  fusionnée, la CI est passée, GitHub Pages l'a publiée — et l'application a continué
+  d'afficher **v4.74**, parce que seuls le cache du service worker et les `?v=` des modules
+  avaient été incrémentés, pas le numéro visible. Le porteur, qui cherchait le nouveau
+  numéro sur son téléphone, ne pouvait conclure qu'une chose : « ça ne se charge pas ».
+
+- **La recherche de carte communale n'était jamais lancée.** Un tableau **vide est truthy**
+  en JavaScript : l'interrogation par emprise ramène le zonage des communes voisines, le
+  découpage sur le contour les élimine toutes, et le résultat `[]` arrêtait la chaîne juste
+  avant l'étape « carte communale ». Le journal restait donc vide, et le panneau de
+  diagnostic n'affichait aucune ligne — ce qui a fait croire, à juste titre, que le code
+  n'était pas déployé. La chaîne teste maintenant la **longueur**, pas la vérité du tableau.
+- **Cliquer sur une commune sans zonage ne répondait rien.** Le clic n'interrogeait que la
+  couche du zonage ; une commune sans PLU n'a aucun polygone à toucher, donc l'écran restait
+  muet — précisément sur les communes dont on se demande pourquoi elles sont vides. Le clic
+  retombe désormais sur le **contour communal**, et nomme la commune en expliquant son état.
+
+### Ajouté
+- **`scripts/check-cache-bust.js` refuse désormais un cache qui change en silence.** Si
+  `CACHE` bouge dans `service-worker.js`, le numéro affiché dans `index.html` — bandeau
+  mobile **et** bouton « 🆕 » du bureau — doit bouger aussi. Le contrôle échoue en CI sinon,
+  avec le geste exact à faire.
+  Le numéro affiché est le **seul** moyen qu'a un habitant de savoir ce qu'il a en main :
+  `index.html` n'est pas versionné, le cache est invisible, et « fermer puis rouvrir l'app »
+  ne dit rien de ce qu'on a reçu. Un déploiement muet est indistinguable d'un déploiement
+  raté — pour le porteur comme pour moi.
+
+---
+
 ## [4.74.1] — 10 août 2026
 
 ### Corrigé

@@ -59,7 +59,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.4.0"></script>
 <script defer src="js/mat-perf.js?v=1.0.8"></script>
-<script defer src="js/mat-boot.js?v=4.9.1"></script>
+<script defer src="js/mat-boot.js?v=4.10.0"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.74 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.75 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.74</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.75</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.75</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le num&eacute;ro de version affich&eacute; change d&eacute;sormais &agrave; chaque mise &agrave; jour.</strong> Une correction avait &eacute;t&eacute; d&eacute;ploy&eacute;e sans que le num&eacute;ro bouge&nbsp;: impossible de savoir si on l&rsquo;avait re&ccedil;ue. C&rsquo;est ce num&eacute;ro, en haut de l&rsquo;&eacute;cran, qui vous dit ce que vous avez en main</li>
+<li><strong>La recherche des cartes communales est enfin lanc&eacute;e</strong> pour les communes sans PLU, et dit ce qu&rsquo;elle trouve — commune par commune — dans &laquo;&nbsp;🔎 D&eacute;tail des sources&nbsp;&raquo;</li>
+<li><strong>Toucher une commune sans zonage affiche enfin son nom.</strong> L&rsquo;&eacute;cran restait muet sur ces communes-l&agrave;&nbsp;; il indique d&eacute;sormais leur nom et pourquoi elles n&rsquo;ont pas de zonage &agrave; montrer</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.74</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les cartes communales s&rsquo;affichent aussi.</strong> Les plus petites communes du territoire n&rsquo;ont pas de PLU mais une <strong>carte communale</strong>, un document plus simple&nbsp;: l&rsquo;application la montre d&eacute;sormais, avec ses propres couleurs (constructible ou non)</li>

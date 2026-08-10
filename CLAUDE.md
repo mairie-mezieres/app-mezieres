@@ -72,6 +72,14 @@ Cas typiques :
 
 3. **Bumper le cache SW** dans `service-worker.js` : `mat-vX.Y.Z` → `mat-vX.Y.Z+1` pour que les utilisateurs existants reçoivent la notification de mise à jour.
 
+> ⛔ **Le cache bouge ⇒ le numéro AFFICHÉ bouge.** Pas d'exception, même pour un
+> correctif. La v4.74.1 a été fusionnée, testée, déployée avec succès… en continuant
+> d'afficher `v4.74` : le porteur cherchait le nouveau numéro sur son téléphone et a
+> conclu, à juste titre, que rien n'était arrivé. `index.html` n'étant pas versionné et
+> le cache étant invisible, **ce numéro est le seul signal dont dispose un habitant**.
+> Un déploiement muet est indistinguable d'un déploiement raté.
+> `node scripts/check-cache-bust.js` le refuse désormais (contrôle 3), et la CI aussi.
+
 ### Changements considérés comme significatifs
 - Nouvelle fonctionnalité visible par les habitants
 - Amélioration de performance ou de chargement notable

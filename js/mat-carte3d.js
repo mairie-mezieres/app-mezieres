@@ -1032,12 +1032,25 @@ function _c3dTerrZonesDe(c){
   }
 
   /* Enchaînement : chaque étape renvoie un tableau si elle conclut, `null` si
-     elle passe la main. La dernière conclut toujours. */
+     elle passe la main. La dernière conclut toujours.
+
+     ⚠️ Un tableau VIDE est truthy en JavaScript. `parEmprise` interroge une
+     emprise rectangulaire puis découpe sur le contour : quand la commune n'a
+     pas de PLU, la réponse contient le zonage des VOISINES, que le découpage
+     élimine intégralement — `habiller` rend alors `[]`, et un simple
+     `r || suite()` s'arrêtait là. La recherche de carte communale n'était
+     jamais lancée, et son journal restait vide : le panneau de diagnostic
+     n'affichait aucune ligne, ce qui a fait croire que le code n'était pas
+     déployé. On teste donc la LONGUEUR, pas la vérité du tableau. */
+  function suite(r){
+    if (c.rnu) return r || [];          // RNU : terminé, et sans erreur
+    return (r && r.length) ? r : null;  // vide = on continue la chaîne
+  }
   return Promise.resolve()
     .then(function(){ return c.partition ? parPartition(c.partition, 'partition') : null; })
-    .then(function(r){ return r || parInsee(); })
-    .then(function(r){ return r || parEmprise(); })
-    .then(function(r){ return r || parCarteCommunale(); })
+    .then(function(r){ return suite(r) || parInsee(); })
+    .then(function(r){ return suite(r) || parEmprise(); })
+    .then(function(r){ return suite(r) || parCarteCommunale(); })
     .then(function(r){
       var out = r || [];
       /* Sans PLU ET sans carte communale, on ne conclut PAS à une panne : on
@@ -1464,6 +1477,50 @@ function _c3dOuvrirDiag(){
   document.getElementById('c3d-fiche').classList.add('on');
 }
 
+/* Clic en vue territoire.
+
+   ⚠️ La première version n'interrogeait que la couche du ZONAGE. Une commune
+   sans PLU n'a aucun polygone de zonage : le clic ne rencontrait rien, et
+   l'écran restait muet — précisément sur les communes dont on se demande
+   pourquoi elles sont vides. Dix des vingt-cinq étaient dans ce cas.
+
+   On retombe donc sur le CONTOUR communal, testé en JavaScript
+   (`_c3dDansGeom`) plutôt que par `queryRenderedFeatures` : les contours sont
+   dessinés par des couches de type `line`, qu'un doigt ne touche presque
+   jamais. Aucune commune ne peut ainsi rester silencieuse. */
+function _c3dClicTerritoire(lngLat, point){
+  /* 1. Une zone de PLU sous le doigt : c'est le plus précis.
+     Le test du contour, lui, ne dépend pas de la carte — d'où la garde. */
+  if (_c3dMap && _c3dMap.getLayer('terr-fill')){
+    var t = _c3dMap.queryRenderedFeatures(point, { layers:['terr-fill'] })[0];
+    if (t){
+      var tz = t.properties.mat_tz;
+      var lib = C3D_TYPEZONE[tz] ? C3D_TYPEZONE[tz].lib : 'type non renseigné';
+      _c3dStatut('<b>' + _c3dEsc(t.properties.mat_com) + '</b> — ' + _c3dEsc(lib)
+        + (Number(t.properties.mat_moi) === 1
+            ? '<br>Revenez au village pour les règles qui s\'y appliquent.'
+            : '<br>Les règles de construction de cette commune ne sont pas dans l\'application.'));
+      return true;
+    }
+  }
+  /* 2. Sinon, la commune elle-même — et l'on dit ce qu'on sait d'elle. */
+  var com = null;
+  for (var i = 0; i < (_c3dTerr || []).length; i++){
+    if (_c3dDansGeom(lngLat, _c3dTerr[i].geom)) { com = _c3dTerr[i]; break; }
+  }
+  if (!com) return false;
+  var etat = com.rnu     ? 'au RNU — pas de plan local d\'urbanisme'
+           : com.sansDoc ? 'pas de PLU au Géoportail de l\'Urbanisme'
+           : com.err     ? 'zonage indisponible — ' + com.err
+           : com.nZones  ? com.nZones + ' secteurs' + (com.cc ? ' (carte communale)' : '')
+           : 'zonage en cours de chargement…';
+  _c3dStatut('<b>' + _c3dEsc(com.nom) + '</b> — ' + _c3dEsc(etat)
+    + (com.sansDoc || com.rnu
+        ? '<br>Cette commune n\'a pas de zonage à afficher : ce n\'est pas une panne.'
+        : ''));
+  return true;
+}
+
 /* ── Interactions ──────────────────────────────────────────────── */
 function _c3dBrancher(){
   _c3dMap.on('click', function(e){
@@ -1472,15 +1529,7 @@ function _c3dBrancher(){
        PLU de Mézières à Baule ou à Tavers : `data/plu-data.json` ne décrit
        que Mézières. Voir RG-17.21. */
     if (_c3dTerrActif){
-      if (!_c3dMap.getLayer('terr-fill')) return;
-      var t = _c3dMap.queryRenderedFeatures(e.point, { layers:['terr-fill'] })[0];
-      if (!t) return;
-      var tz = t.properties.mat_tz;
-      var lib = C3D_TYPEZONE[tz] ? C3D_TYPEZONE[tz].lib : 'type non renseigné';
-      _c3dStatut('<b>' + _c3dEsc(t.properties.mat_com) + '</b> — ' + _c3dEsc(lib)
-        + (Number(t.properties.mat_moi) === 1
-            ? '<br>Revenez au village pour les règles qui s\'y appliquent.'
-            : '<br>Les règles de construction de cette commune ne sont pas dans l\'application.'));
+      _c3dClicTerritoire([e.lngLat.lng, e.lngLat.lat], e.point);
       return;
     }
     if (!_c3dMap.getLayer('bati')) return;
