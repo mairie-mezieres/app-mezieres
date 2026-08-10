@@ -19,6 +19,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **Fibre** — qui fait quoi (Lysséo ≠ fournisseur d'accès), raccordement d'une construction neuve | `docs/adr/0013-fibre-operateur-d-infrastructure-et-fournisseur-d-acces.md` |
 | **Documents du PLUi-H-D** — publiés par la mairie depuis l'admin (⚠️ **ne plus éditer `PLUI_DOCS` à la main**), cache hors-ligne, pastille « Nouveau » | `docs/adr/0014-documents-plui-administrables-page-embarquee.md` puis `chatbot-mairie-mezieres/GUIDE-ADMIN.md` §6quater |
 | **Carte 3D du village** — zonage PLU, MapLibre chargé à la demande, ⚠️ **INSEE 45204** (45203 = Meung-sur-Loire), règle « aucune donnée inventée » | `docs/adr/0018-carte-3d-chargement-a-la-demande-et-jamais-de-donnee-inventee.md` puis `docs/specifications/sfd/SFD-17-carte-3d-du-village.md` |
+| **Rendu du bâti 3D** — toits en pente par tranches, pourquoi pas de texture de façade, pourquoi les murs tiennent en **une seule** couche (le clic) | `docs/adr/0020-toits-en-pente-par-tranches-et-abandon-de-la-texture-de-facade.md` puis `SFD-17` §RG-17.14 à RG-17.18 |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |

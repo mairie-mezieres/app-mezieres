@@ -128,18 +128,96 @@ test.describe('Carte 3D', () => {
       ]};
       window._c3dPoserBati(fc);
       const m = window._c3dMap;
-      return { bati: !!m.getLayer('bati'), tex: !!m.getLayer('bati-tex'),
-               toit: !!m.getLayer('bati-toit'), contour: !!m.getLayer('bati-contour'),
-               image: m.hasImage ? m.hasImage('c3d-facade') : null };
+      const toits = m.getSource('toits').serialize().data.features;
+      // Largeur au sol d'une tranche, en degrés de latitude : sert à vérifier
+      // que la pile RÉTRÉCIT — c'est ce qui fait la pente.
+      const larg = (f) => {
+        const ys = f.geometry.coordinates[0].map(c => c[1]);
+        return Math.max(...ys) - Math.min(...ys);
+      };
+      const pileMaison = toits.filter(f => f.properties.mat_type === 'habitat');
+      return {
+        bati: !!m.getLayer('bati'), toit: !!m.getLayer('bati-toit'),
+        plat: !!m.getLayer('bati-toit-plat'), contour: !!m.getLayer('bati-contour'),
+        // La maison est bien découpée en tranches empilées…
+        tranches: pileMaison.length,
+        // …qui montent bord à bord, sans trou ni recouvrement…
+        continue: pileMaison.every((f, i, a) =>
+          i === 0 || Math.abs(f.properties.mat_b - a[i - 1].properties.mat_t) < 1e-6),
+        // …et rétrécissent : la dernière est plus étroite que la première.
+        retrecit: pileMaison.length > 1 && larg(pileMaison[pileMaison.length - 1]) < larg(pileMaison[0]),
+        // Le toit part du haut des murs, jamais du sol.
+        basAuSommet: Math.abs(pileMaison[0].properties.mat_b - 8) < 1e-6,
+        // Hors commune et industriel : pas de tranches, donc pas de pente.
+        horsCommune: toits.filter(f => f.properties.mat_dans === 0).length
+      };
     });
 
     expect(pose.bati, 'la couche « bati » doit exister').toBe(true);
-    expect(pose.tex, 'la couche texturée « bati-tex » doit exister').toBe(true);
-    expect(pose.toit, 'la couche des toits « bati-toit » doit exister').toBe(true);
+    expect(pose.toit, 'la couche des toits en pente doit exister').toBe(true);
+    expect(pose.plat, 'la couche des casquettes plates doit exister').toBe(true);
     expect(pose.contour, 'la couche « bati-contour » doit exister').toBe(true);
-    expect(pose.image, 'la texture de façade doit être enregistrée').toBe(true);
+    expect(pose.tranches, 'la maison doit être coiffée de plusieurs tranches').toBeGreaterThan(3);
+    expect(pose.continue, 'les tranches doivent s’empiler sans trou').toBe(true);
+    expect(pose.retrecit, 'la pile doit rétrécir vers le faîtage — sinon ce n’est pas une pente').toBe(true);
+    expect(pose.basAuSommet, 'le toit doit démarrer au sommet des murs').toBe(true);
+    expect(pose.horsCommune, 'le bâti hors commune garde une casquette plate').toBe(0);
     const refus = erreurs.filter(e => /paint|layers\.bati|not supported|unknown property/i.test(e));
     expect(refus, refus.join(' | ')).toEqual([]);
+  });
+
+  test('un toit ne déborde jamais de son bâtiment', async ({ page }) => {
+    /*
+     * Le faîtage est posé le long du grand axe de l'emprise. Une approche
+     * naïve — coiffer le rectangle englobant — ferait déborder le toit d'une
+     * maison en L au-dessus de la cour. Le découpage se fait donc sur
+     * l'emprise réelle : chaque tranche doit rester dans le polygone d'origine.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const debord = await page.evaluate(() => {
+      // Un bâtiment en L, cas où un toit posé sur la boîte englobante
+      // couvrirait un vide.
+      const L = 1.8079, T = 47.8219, d = 0.0003;
+      const enL = [[L, T], [L + d, T], [L + d, T + d / 2], [L + d / 2, T + d / 2],
+                   [L + d / 2, T + d], [L, T + d], [L, T]];
+      const fc = { type:'FeatureCollection', features:[
+        { type:'Feature', properties:{ mat_h:7, mat_dans:1, mat_type:'habitat', mat_toit:2.6 },
+          geometry:{ type:'Polygon', coordinates:[enL] } }
+      ]};
+      const toits = window._c3dToitsPente(fc);
+      // Test du point dans le polygone, par lancer de rayon.
+      const dedans = (p, poly) => {
+        let ok = false;
+        for (let i = 0, j = poly.length - 2; i < poly.length - 1; j = i++) {
+          const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+          if ((yi > p[1]) !== (yj > p[1]) &&
+              p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi) ok = !ok;
+        }
+        return ok;
+      };
+      const marge = 1e-9;
+      let hors = 0, sommets = 0;
+      for (const f of toits.features)
+        for (const p of f.geometry.coordinates[0]) {
+          sommets++;
+          // Un sommet posé exactement sur le bord compte comme dedans.
+          const surBord = enL.some(q => Math.abs(q[0] - p[0]) < marge && Math.abs(q[1] - p[1]) < marge);
+          if (!surBord && !dedans(p, enL) && !enL.some((q, i) => {
+            const r = enL[(i + 1) % (enL.length - 1)];
+            const dx = r[0] - q[0], dy = r[1] - q[1];
+            const t = ((p[0] - q[0]) * dx + (p[1] - q[1]) * dy) / (dx * dx + dy * dy);
+            if (t < -1e-6 || t > 1 + 1e-6) return false;
+            return Math.hypot(q[0] + t * dx - p[0], q[1] + t * dy - p[1]) < 1e-9;
+          })) hors++;
+        }
+      return { hors, sommets, tranches: toits.features.length };
+    });
+
+    expect(debord.tranches, 'le bâtiment en L doit recevoir des tranches').toBeGreaterThan(3);
+    expect(debord.hors, `${debord.hors} sommet(s) de toit hors de l’emprise sur ${debord.sommets}`).toBe(0);
   });
 
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {

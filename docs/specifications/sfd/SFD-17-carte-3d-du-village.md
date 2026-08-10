@@ -89,17 +89,28 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   commercial », qui contient les trois mots à la fois : c'est `usage_1` qui doit être lu
   **en premier**, sans quoi une usine devient un hangar agricole.
 - **RG-17.15 — les toits sont une lecture, pas une mesure.** La BD TOPO ne dit rien de la
-  forme ni de la pente des toitures. La casquette colorée posée au sommet de chaque volume
-  (couche `bati-toit`, entre `mat_h` et `mat_h + mat_toit`) est un **procédé de lisibilité**,
-  pas une restitution du bâti réel — au même titre que la couleur des zones du PLU. Elle ne
-  doit jamais être présentée comme une information sur la toiture d'un bâtiment donné.
-- **RG-17.16 — la texture de façade est dessinée localement.** La trame de fenêtres des
-  bâtiments d'habitation est générée en mémoire par l'application (`map.addImage`) : aucune
-  image n'est téléchargée, le poids de la page est inchangé.
-  ⚠️ `fill-extrusion-pattern` **remplace** `fill-extrusion-color`. Façade texturée et teinte
-  par catégorie ne peuvent donc pas cohabiter sur une même couche : les deux couches
-  `bati` et `bati-tex` portent des **filtres disjoints**, faute de quoi les volumes se
-  superposent et scintillent.
+  forme, de la pente ni de l'orientation des toitures. Le toit à deux pentes est approché
+  par des **tranches horizontales** de plus en plus étroites (≈ 30 cm chacune, de 4 à 12
+  selon la hauteur), empilées entre le haut des murs et le faîtage, ce dernier posé le long
+  du **grand axe de l'emprise**. C'est un **procédé de lisibilité**, au même titre que la
+  couleur des zones du PLU, et il ne doit **jamais** être présenté comme une information
+  sur la toiture d'une construction donnée. Voir ADR-0020.
+- **RG-17.16 — un toit ne déborde jamais de son bâtiment.** Les tranches sont obtenues en
+  découpant l'**emprise réelle**, jamais son rectangle englobant : sur une maison en L, un
+  toit posé sur le rectangle couvrirait la cour. Verrouillé par un test qui échoue si l'on
+  repasse au rectangle.
+- **RG-17.17 — pas de texture ancrée sur les pixels.** `fill-extrusion-pattern` répète son
+  motif en **pixels**, pas en mètres : le nombre de rangées de fenêtres augmente avec le
+  zoom, et une maison de 6 m finit par ressembler à un immeuble. MapLibre n'offre aucun
+  ancrage métrique — l'essai de la v4.69 a donc été **retiré**, pas réglé. Le grain de
+  « tuiles » produit par les arêtes des tranches, lui, est exprimé en mètres et reste juste
+  à tous les zooms.
+- **RG-17.18 — les murs tiennent en une seule couche.** `queryRenderedFeatures` n'interroge
+  que `bati` : tout bâtiment sorti de cette couche devient **inclicable**. En v4.69,
+  l'habitat était passé dans une couche `bati-tex` pour porter une texture, et cliquer sur
+  une maison — le cas le plus courant — n'ouvrait plus sa fiche. Les couches de toiture
+  (`bati-toit` en pente, `bati-toit-plat` pour l'industriel et le hors-commune) portent des
+  filtres **exactement complémentaires**, faute de quoi les volumes se superposent.
 
 ## 5. Parcours
 
@@ -143,7 +154,14 @@ bouton de diagnostic vérifié sur le **style calculé**, audit axe.
 
 Le test « la couche des bâtiments est acceptée par MapLibre » pose un jeu d'essai
 comportant une maison, une église, un hangar et un bâtiment hors commune, puis vérifie que
-les **quatre** couches (`bati`, `bati-tex`, `bati-toit`, `bati-contour`) existent, que la
-texture de façade est enregistrée, et qu'aucune erreur de validation n'est remontée. Il ne
-demande aucun réseau — seulement la bibliothèque servie en local — et c'est précisément
-pour cela qu'il est capable de voir ce qu'aucun autre test ne voyait (v4.68).
+les quatre couches (`bati`, `bati-toit`, `bati-toit-plat`, `bati-contour`) existent,
+qu'aucune erreur de validation n'est remontée, et que la pile de tranches de la maison
+**monte bord à bord et rétrécit** vers le faîtage — sans quoi ce n'est pas une pente.
+
+Le test « un toit ne déborde jamais de son bâtiment » pose une maison en L et vérifie que
+tous les sommets des tranches restent dans l'emprise (RG-17.16).
+
+Ces tests ne demandent aucun réseau — seulement la bibliothèque servie en local — et c'est
+précisément pour cela qu'ils voient ce qu'aucun autre test ne voyait (v4.68). Chacun a été
+**vérifié en le faisant échouer** sur le défaut qu'il prétend attraper : pile qui ne
+rétrécit pas, et toit posé sur le rectangle englobant.
