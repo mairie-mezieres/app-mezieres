@@ -437,6 +437,55 @@ test.describe('Carte 3D', () => {
     expect(r.via).toBe('RNU');
   });
 
+  test('territoire : la recherche de carte communale laisse une trace lisible', async ({ page }) => {
+    /*
+     * Confirmé par la mairie : Le Bardon relève d'une carte communale, pas d'un
+     * PLU. L'hypothèse était juste — mais la tentative écrivait son motif
+     * d'échec dans une variable que RIEN ne lisait. L'écran annonçait « pas de
+     * PLU » sans pouvoir dire si le service avait répondu vide, renvoyé une
+     * erreur, ou n'existait pas sous ce nom.
+     *
+     * C'est exactement la faute que le panneau de diagnostic existe pour
+     * empêcher. Ce test la rend impossible : chaque tentative doit laisser une
+     * trace, et cette trace doit être exploitable.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTerrZonesDe === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(async () => {
+      const carre = { type: 'Polygon', coordinates: [[[1.80, 47.82], [1.81, 47.82],
+                                                      [1.81, 47.83], [1.80, 47.83], [1.80, 47.82]]] };
+      const vus = [];
+      const vrai = window.fetch;
+      window.fetch = function (url) {
+        const u = String(url);
+        vus.push(u);
+        // Le service des cartes communales répond en erreur : c'est ce motif
+        // qui doit remonter jusqu'à l'écran.
+        if (u.indexOf('secteur-cc') > -1)
+          return Promise.resolve(new Response('<ExceptionText>couche inconnue</ExceptionText>',
+            { status: 404 }));
+        return Promise.resolve(new Response(JSON.stringify(
+          { type: 'FeatureCollection', features: [] }), { status: 200 }));
+      };
+      const c = { insee: '45020', nom: 'Le Bardon', partition: '', rnu: false,
+                  geom: carre, nZones: 0, err: '' };
+      await window._c3dTerrZonesDe(c);
+      window.fetch = vrai;
+      return { journal: c.ccJournal || [], sansDoc: !!c.sansDoc,
+               aTenteCc: vus.some(u => /secteur-cc/.test(u)),
+               aTenteDocument: vus.some(u => /document\?insee=/.test(u)) };
+    });
+
+    expect(r.aTenteCc, 'une carte communale doit être cherchée').toBe(true);
+    expect(r.aTenteDocument, 'à défaut, le Géoportail doit être interrogé sur ses documents').toBe(true);
+    expect(r.journal.length, 'chaque tentative doit laisser une trace').toBeGreaterThan(1);
+    expect(r.journal.join(' '), 'le motif exact du service doit remonter')
+      .toMatch(/couche inconnue|404/);
+    expect(r.sansDoc, 'et la commune reste annoncée sans PLU, pas en panne').toBe(true);
+  });
+
   test('territoire : sources coupées, aucune commune n’est inventée', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());

@@ -5,6 +5,26 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.74.1] — 10 août 2026
+
+### Corrigé
+- **La recherche de carte communale avalait son motif d'échec.** Confirmé par la mairie :
+  Le Bardon relève d'une **carte communale** approuvée en 2011, pas d'un PLU — l'hypothèse
+  de la v4.74 était juste. Mais la tentative écrivait son motif d'erreur dans une variable
+  que **rien ne lisait** : l'écran annonçait « pas de PLU » sans pouvoir dire si le service
+  avait répondu vide, renvoyé une erreur, ou n'existait pas sous ce nom. C'est exactement la
+  faute que le panneau de diagnostic existe pour empêcher. Chaque tentative laisse désormais
+  une **trace lisible**, affichée dans « 🔎 Détail des sources ».
+- **Un second chemin pour les cartes communales** : à défaut de réponse par emprise, le
+  Géoportail est interrogé sur les **documents** qui couvrent la commune, et chaque partition
+  annoncée est essayée. La partition d'une carte communale n'a aucune raison d'avoir la
+  forme de celle d'un PLU.
+- **« 25 retenus dans la commune »** était une phrase fausse sur les lignes du territoire :
+  on n'y découpe pas sur Mézières, on apparie 25 communes parmi celles que l'emprise a
+  ramenées. Le chiffre était juste, la phrase non — elle devient « 25 retenues sur 151 ».
+
+---
+
 ## [4.74] — 10 août 2026
 
 ### Corrigé
