@@ -5,6 +5,38 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.66] — 10 août 2026
+
+### Corrigé
+- **Les compteurs annoncés par la carte 3D étaient faux.** Le bandeau affichait « 4 382
+  bâtiments · 185 zones du PLU de Mézières-lez-Cléry ». Or l'emprise interrogée fait
+  **7 km sur 6,7 km** et déborde sur Cléry-Saint-André, Mareau-aux-Prés et Dry : ces chiffres
+  couvraient quatre communes tout en étant attribués à une seule. Et le Géoportail renvoyant
+  **un polygone par secteur**, « 185 zones » laissait croire à 185 règles différentes alors
+  qu'il n'y a qu'une douzaine de zones. Le bandeau annonce désormais les **bâtiments
+  réellement situés dans la commune** et le nombre de **zones distinctes**.
+- **Le zonage des communes voisines pouvait s'afficher comme s'il était le nôtre.** Quand la
+  requête par partition échouait, le repli géographique ramenait le PLU de tout le secteur.
+  Le zonage est maintenant découpé sur le **contour réel de la commune**, renvoyé par le
+  Géoportail. C'est la même classe d'erreur que l'INSEE 45203, et elle est refermée.
+- **Restrictions sécheresse : le code INSEE interrogé était celui de Meung-sur-Loire.**
+  `_EAU_INSEE` valait `45203` ; Mézières-lez-Cléry est `45204`. Le module retenant le niveau
+  le plus sévère entre la requête par coordonnées (correcte) et celle par commune, une
+  restriction d'eau qui n'était pas la nôtre a pu être affichée. Corrigé aussi côté backend.
+- **La carte « Communauté » portait la même icône 🏘️ que « Mon village en 3D »** : deux
+  entrées voisines qu'on hésitait à distinguer. Elle passe à 👥.
+
+### Ajouté
+- **Bouton « 📍 Où suis-je »** dans la carte 3D : centre la vue sur votre position et affiche
+  la zone du PLU correspondante. La position **ne quitte pas le navigateur** — aucune requête
+  réseau, rien n'est transmis à la commune. Si vous êtes hors de la commune, c'est dit.
+- **La limite communale est tracée** sur la carte, et les bâtiments des communes voisines
+  sont **estompés** : ils situent Mézières dans son territoire sans se faire passer pour elle.
+- Trois tests : présence du bouton « Où suis-je », et **garde-fou contre les icônes en
+  double** parmi les cartes d'accueil — c'est ce doublon qui avait été signalé.
+
+---
+
 ## [4.65] — 9 août 2026
 
 ### Modifié

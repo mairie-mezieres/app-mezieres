@@ -39,6 +39,10 @@ var C3D_DEFAUT = '#9aa5a0';
 var _c3dMap = null, _c3dPlu = null, _c3dZones = null, _c3dCommune = '';
 var _c3dJournal = [], _c3dDiag = '', _c3dPret = false, _c3dLibPromise = null;
 var _c3dMarqueur = null;
+/* Contour de la commune, renvoyé par l'appel `municipality`. Sert à ne
+   compter et à ne draper QUE ce qui est à Mézières : l'emprise interrogée
+   fait 7 km sur 6,7 km et déborde largement sur Cléry, Mareau et Dry. */
+var _c3dContour = null;
 
 function _c3dEsc(s){
   if (typeof esc === 'function') return esc(s == null ? '—' : s);
@@ -93,6 +97,19 @@ function _c3dDansGeom(pt, geom){
   }
   return false;
 }
+/* Centre approximatif d'une géométrie : moyenne des sommets de l'anneau
+   extérieur. Suffisant pour dire « cet objet appartient à la commune » —
+   on ne cherche pas un centroïde exact. */
+function _c3dCentroide(geom){
+  if (!geom) return [0, 0];
+  var anneau = geom.type === 'Polygon' ? geom.coordinates[0]
+             : geom.type === 'MultiPolygon' ? geom.coordinates[0][0] : null;
+  if (!anneau || !anneau.length) return [0, 0];
+  var x = 0, y = 0;
+  for (var i = 0; i < anneau.length; i++){ x += anneau[i][0]; y += anneau[i][1]; }
+  return [x / anneau.length, y / anneau.length];
+}
+
 /* Les zones sont ajoutées de la plus grande à la plus petite : on parcourt
    à l'envers pour que la plus précise l'emporte sous un point donné. */
 function _c3dZoneSous(pt){
@@ -145,6 +162,8 @@ function _c3dPartition(){
       var p = fc && fc.features && fc.features[0] && fc.features[0].properties;
       if (!p) { _c3dDiag = 'commune absente du Géoportail de l\'Urbanisme'; return null; }
       _c3dCommune = p.name || p.nom || p.commune || p.libelle || '';
+      var g = fc.features[0].geometry;
+      if (g && (g.type === 'Polygon' || g.type === 'MultiPolygon')) _c3dContour = g;
       if (p.is_rnu === true || p.is_rnu === 'true'){
         _c3dDiag = 'commune au RNU — pas de document d\'urbanisme opposable';
         return null;
@@ -178,6 +197,15 @@ function _c3dChargerZones(){
         var p = f.properties || {};
         f.properties.mat_code = _c3dNormZone(p.libelle || p.typezone || '');
       });
+      /* ⚠️ Le repli par géométrie interroge la BBOX, pas la commune : il
+         ramène le zonage de Cléry, Mareau et Dry. Draper le PLU du voisin
+         sur Mézières, c'est la même faute que l'INSEE 45203 — on découpe. */
+      if (_c3dContour){
+        var dedans = fc.features.filter(function(f){
+          return _c3dDansGeom(_c3dCentroide(f.geometry), _c3dContour);
+        });
+        if (dedans.length) fc = { type:'FeatureCollection', features:dedans };
+      }
       _c3dZones = fc; _c3dDiag = '';
       _c3dNoter('Géoportail de l\'Urbanisme', true, _c3dCommune || ('INSEE ' + C3D_INSEE), fc.features.length);
       return true;
@@ -241,8 +269,23 @@ function _c3dBatiIGN(){
       f.properties.mat_h = Math.max(2.5, Math.min(h, 40));
       f.properties.mat_src = 'IGN';
     });
-    return fc;
+    return _c3dMarquerCommune(fc);
   });
+}
+
+/* Les bâtiments des communes voisines restent affichés — sans eux, le
+   village flotterait dans le vide et on ne verrait plus son insertion dans
+   le territoire. Mais ils sont MARQUÉS : estompés à l'écran, et surtout
+   exclus du décompte. Annoncer « 4 382 bâtiments de Mézières-lez-Cléry »
+   quand l'emprise couvre quatre communes est faux. */
+function _c3dMarquerCommune(fc){
+  fc.mat_nCommune = 0;
+  fc.features.forEach(function(f){
+    var dedans = _c3dContour ? _c3dDansGeom(_c3dCentroide(f.geometry), _c3dContour) : true;
+    f.properties.mat_dans = dedans ? 1 : 0;
+    if (dedans) fc.mat_nCommune++;
+  });
+  return fc;
 }
 function _c3dBatiOSM(){
   var q = '[out:json][timeout:25];(way["building"]('
@@ -267,7 +310,7 @@ function _c3dBatiOSM(){
       });
     if (!feats.length) throw new Error('réponse vide');
     _c3dNoter('OpenStreetMap', true, 'ok', feats.length);
-    return { type:'FeatureCollection', features:feats };
+    return _c3dMarquerCommune({ type:'FeatureCollection', features:feats });
   })
   .catch(function(e){ _c3dNoter('OpenStreetMap', false, e.message); throw e; });
 }
@@ -345,6 +388,17 @@ function _c3dAmbiance(){
   });
 }
 
+/* Limite communale : sans elle, impossible de savoir où s'arrête Mézières
+   — et c'est précisément une des questions auxquelles la carte doit répondre. */
+function _c3dPoserContour(){
+  if (!_c3dContour || _c3dMap.getSource('contour')) return;
+  _c3dMap.addSource('contour', { type:'geojson',
+    data:{ type:'Feature', properties:{}, geometry:_c3dContour } });
+  _c3dMap.addLayer({ id:'contour-ligne', type:'line', source:'contour',
+    paint:{ 'line-color':'#1a3d2b', 'line-width':2.4, 'line-opacity':0.75,
+            'line-dasharray':[2, 1.4] } });
+}
+
 function _c3dPoserZones(){
   if (!_c3dZones || _c3dMap.getSource('zones')) return;
   _c3dMap.addSource('zones', { type:'geojson', data:_c3dZones });
@@ -372,7 +426,9 @@ function _c3dPoserBati(fc){
         3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8'],
       'fill-extrusion-height':['get','mat_h'],
       'fill-extrusion-base':0,
-      'fill-extrusion-opacity':1,
+      /* Les bâtiments des communes voisines sont estompés : ils situent
+         Mézières dans son territoire sans se faire passer pour elle. */
+      'fill-extrusion-opacity':['case', ['==', ['get','mat_dans'], 0], 0.45, 1],
       'fill-extrusion-vertical-gradient':true
     }
   });
@@ -523,10 +579,39 @@ function _c3dBrancher(){
     var t = document.querySelector('#c3d-btn-fond span');
     if (t) t.textContent = on ? 'Vue aérienne' : 'Plan';
   });
+  var g = document.getElementById('c3d-btn-ici');
+  if (g) g.onclick = _c3dLocaliser;
   var d = document.getElementById('c3d-btn-diag');
   if (d) d.onclick = _c3dOuvrirDiag;
   var x = document.getElementById('c3d-fiche-fermer');
   if (x) x.onclick = _c3dFermerFiche;
+}
+
+/* « Où suis-je » — la position ne sort pas du navigateur : elle sert
+   uniquement à centrer la carte et à lire la zone dans le zonage déjà
+   chargé. Aucune requête réseau, rien n'est transmis à la commune. */
+function _c3dLocaliser(){
+  if (!navigator.geolocation){
+    _c3dStatut('⚠️ La localisation n\'est pas disponible sur cet appareil.');
+    return;
+  }
+  _c3dStatut('📍 Localisation en cours…');
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var pt = [pos.coords.longitude, pos.coords.latitude];
+    /* Hors commune, on le dit : la carte ne porte que le PLU de Mézières,
+       et laisser croire le contraire serait trompeur. */
+    if (_c3dContour && !_c3dDansGeom(pt, _c3dContour)){
+      _c3dViser(pt);
+      _c3dStatut('📍 Vous êtes <b>hors de la commune</b> — le zonage affiché '
+               + 'est celui de ' + _c3dEsc(_c3dCommune || 'Mézières-lez-Cléry') + '.');
+      return;
+    }
+    _c3dViser(pt);
+  }, function(err){
+    _c3dStatut(err && err.code === 1
+      ? '⚠️ Localisation refusée. Vous pouvez l\'autoriser dans les réglages du navigateur.'
+      : '⚠️ Position introuvable. Réessayez à l\'extérieur.');
+  }, { enableHighAccuracy:true, timeout:9000, maximumAge:60000 });
 }
 
 /* Travelling d'arrivée : ce qui fait comprendre en une seconde qu'on est en
@@ -552,6 +637,7 @@ function _c3dCharger(){
         .catch(function(){ return null; })
         .then(function(fc){
           _c3dPoserZones();
+          _c3dPoserContour();
           _c3dPoserLegende();
           var btnDiag = document.getElementById('c3d-btn-diag');
           if (btnDiag) btnDiag.hidden = false;
@@ -569,8 +655,17 @@ function _c3dCharger(){
           if (a.souci){
             _c3dStatut(fc.features.length + ' bâtiments — <b>position douteuse</b> : ' + _c3dEsc(a.souci));
           } else if (okZones){
-            _c3dStatut(fc.features.length + ' bâtiments · ' + _c3dZones.features.length
-              + ' zones du PLU de <b>' + _c3dEsc(_c3dCommune || 'la commune') + '</b>');
+            /* Le Géoportail renvoie un POLYGONE par secteur : une même zone
+               Ua peut en compter vingt. Annoncer « 185 zones » laissait
+               croire à 185 règles différentes. On compte les zones
+               distinctes, et les bâtiments réellement dans la commune. */
+            var codes = {};
+            _c3dZones.features.forEach(function(f){ codes[f.properties.mat_code] = 1; });
+            var nZones = Object.keys(codes).length;
+            var nBati = fc.mat_nCommune != null ? fc.mat_nCommune : fc.features.length;
+            _c3dStatut('<b>' + _c3dEsc(_c3dCommune || 'la commune') + '</b> · '
+              + nBati + ' bâtiments · ' + nZones + (nZones > 1 ? ' zones' : ' zone')
+              + ' du PLU');
             setTimeout(function(){ _c3dStatut('', true); }, 6000);
           } else {
             _c3dStatut(fc.features.length + ' bâtiments — <b>zonage du PLU indisponible</b><br>'

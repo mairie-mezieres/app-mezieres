@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.65 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.66 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -339,7 +339,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
 </a>
 <a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer">
-<div class="ico ico-communaute">🏘️</div>
+<div class="ico ico-communaute">👥</div>
 <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c’est Mézières</div></div>
 </a>
 </div>
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.65</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.66</button>
 </div>
 </div>
 </div>
@@ -1502,6 +1502,7 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <button class="c3d-btn" id="c3d-btn-zones" aria-pressed="true">🗺️ <span>Zonage du PLU</span></button>
 <button class="c3d-btn" id="c3d-btn-bati" aria-pressed="true">🏠 <span>Bâtiments</span></button>
 <button class="c3d-btn" id="c3d-btn-fond" aria-pressed="true">🛰️ <span>Vue aérienne</span></button>
+<button class="c3d-btn" id="c3d-btn-ici">📍 <span>Où suis-je</span></button>
 <button class="c3d-btn" id="c3d-btn-diag" hidden>🔎 <span>Détail des sources</span></button>
 </div>
 <details class="c3d-legende" id="c3d-legende" hidden>
@@ -1730,6 +1731,16 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.66</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Un bouton &laquo;&nbsp;O&ugrave; suis-je&nbsp;&raquo; dans la carte 3D.</strong> Il centre la vue sur votre position et affiche la zone du PLU o&ugrave; vous vous trouvez. Votre position <strong>ne quitte pas votre t&eacute;l&eacute;phone</strong>&nbsp;: elle n&rsquo;est transmise ni &agrave; la mairie ni &agrave; personne</li>
+<li><strong>Les chiffres affich&eacute;s par la carte 3D &eacute;taient faux.</strong> Elle annon&ccedil;ait plus de 4&nbsp;000 b&acirc;timents et 185 zones &laquo;&nbsp;de M&eacute;zi&egrave;res-lez-Cl&eacute;ry&nbsp;&raquo; alors que ces chiffres couvraient aussi Cl&eacute;ry, Mareau et Dry. La carte compte d&eacute;sormais ce qui est vraiment dans la commune</li>
+<li><strong>La limite de la commune est trac&eacute;e</strong> sur la carte, et les maisons des communes voisines sont estomp&eacute;es&nbsp;: on voit enfin o&ugrave; s&rsquo;arr&ecirc;te M&eacute;zi&egrave;res</li>
+<li><strong>Les restrictions d&rsquo;eau affich&eacute;es n&rsquo;&eacute;taient pas toujours les n&ocirc;tres.</strong> Une erreur de code de commune pouvait faire remonter les restrictions s&eacute;cheresse de Meung-sur-Loire. C&rsquo;est corrig&eacute;</li>
+<li>La carte &laquo;&nbsp;Communaut&eacute;&nbsp;&raquo; change d&rsquo;ic&ocirc;ne&nbsp;: elle portait la m&ecirc;me que &laquo;&nbsp;Mon village en 3D&nbsp;&raquo;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.65</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>&laquo;&nbsp;Mon village en 3D&nbsp;&raquo; est maintenant sur l&rsquo;accueil.</strong> La vue en relief de M&eacute;zi&egrave;res avec le zonage du PLU &eacute;tait cach&eacute;e dans le grand dossier PLUi-H-D&nbsp;: elle a d&eacute;sormais sa tuile dans &laquo;&nbsp;D&eacute;marches et Services&nbsp;&raquo;, sous MEL. Sur ordinateur, elle appara&icirc;t dans la colonne &laquo;&nbsp;Vous aider&nbsp;&raquo; et dans le menu du haut</li>

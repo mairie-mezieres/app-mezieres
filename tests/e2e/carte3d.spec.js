@@ -92,6 +92,29 @@ test.describe('Carte 3D', () => {
     await expect(page.locator('.d-nav-links button', { hasText: 'Mon village en 3D' })).toBeVisible();
   });
 
+  test('le bouton « Où suis-je » est proposé', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await expect(page.locator('#c3d-btn-ici')).toBeVisible();
+  });
+
+  test('aucune carte d’accueil ne partage son icône avec une autre', async ({ page, viewport }) => {
+    test.skip(!viewport || viewport.width >= 1024, 'mise en page téléphone uniquement');
+    // « Communauté » et « Mon village en 3D » portaient toutes deux 🏘️ :
+    // deux entrées différentes qui se ressemblent, on hésite avant de toucher.
+    await ouvrirAccueil(page);
+    const doublons = await page.evaluate(() => {
+      const vues = {}, dbl = [];
+      document.querySelectorAll('.content .card .ico').forEach(el => {
+        const ico = (el.textContent || '').trim();
+        if (!ico) return;
+        if (vues[ico]) dbl.push(ico); else vues[ico] = 1;
+      });
+      return dbl;
+    });
+    expect(doublons, 'icônes en double : ' + doublons.join(' ')).toEqual([]);
+  });
+
   test('un seul nom pour la fonctionnalité, partout', async ({ page }) => {
     // Trois formulations différentes avaient cohabité (tuile, titre d'écran,
     // bloc PLUi). Une divergence de nom est le premier pas vers une
