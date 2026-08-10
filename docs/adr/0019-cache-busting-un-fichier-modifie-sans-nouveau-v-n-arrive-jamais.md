@@ -70,6 +70,18 @@ qu'il corrige, d'où l'annonce explicite dans sa sortie.
 rien du `?v=` de chaque module. La règle y est ajoutée : **modifier
 `js/xxx.js`, c'est incrémenter son `?v=` aux trois endroits**.
 
+### 3. La cascade fait partie de la règle
+
+Les modules différés (`mat-carte3d.js`, `mat-saviez-vous.js`, `mat-plui.js`…) voient
+leur URL écrite **dans `js/mat-boot.js`**. Bumper l'un d'eux modifie donc
+`mat-boot.js`, **qui doit être bumpé à son tour** : sans cela, l'habitant reçoit
+l'ancien boot en cache, lequel réclame l'ancienne version du module — et le
+correctif n'arrive pas, exactement comme si l'on n'avait rien bumpé.
+
+Ce n'est pas une hypothèse : **le contrôle a attrapé ce cas dès sa première
+exécution en CI**, sur le commit qui l'introduisait. `mat-boot.js` avait été
+modifié pour pointer `mat-carte3d.js?v=1.2.1` en gardant son propre `?v=4.5.0`.
+
 ## Alternatives écartées
 
 - **Supprimer les `?v=` et se fier au `CACHE`** — le bump de `CACHE` vide bien
