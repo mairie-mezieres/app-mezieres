@@ -20,6 +20,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Historique complet : `scripts/check-cache-bust.js` compare la
+          # branche à `origin/main` pour repérer un module modifié dont le
+          # `?v=` n'a pas bougé. Avec un clone superficiel, ce contrôle
+          # s'ignore silencieusement — donc ne sert à rien.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -35,3 +41,12 @@ jobs:
       # étoiles du ciel nocturne ont ainsi été invisibles une semaine. ADR-0015.
       - name: Structure check (css/)
         run: node scripts/check-css.js
+
+      # Le service worker sert la copie en cache tant que l'URL est identique.
+      # `mat-boot.js` a été modifié trois fois sans que son `?v=` bouge : les
+      # habitants ont reçu l'ancien module pendant deux versions, avec un
+      # bouton visible mais mort. Voir ADR-0019.
+      - name: Cache-busting check (?v=)
+        run: node scripts/check-cache-bust.js
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}

@@ -137,8 +137,9 @@ function _c3dChargerRegles(){
    retient le motif d'échec de chaque étape. */
 var C3D_GPU = 'https://apicarto.ign.fr/api/gpu/';
 
-function _c3dNoter(nom, ok, detail, n){
-  _c3dJournal.push({ nom:nom, ok:!!ok, detail:detail || '', n:n || 0 });
+function _c3dNoter(nom, ok, detail, n, retenu){
+  _c3dJournal.push({ nom:nom, ok:!!ok, detail:detail || '', n:n || 0,
+                     retenu: retenu == null ? null : retenu });
 }
 
 /* Un serveur OGC renvoie ses erreurs en XML : sans lire ce corps, on perd
@@ -197,6 +198,7 @@ function _c3dChargerZones(){
         var p = f.properties || {};
         f.properties.mat_code = _c3dNormZone(p.libelle || p.typezone || '');
       });
+      var recus = fc.features.length;
       /* ⚠️ Le repli par géométrie interroge la BBOX, pas la commune : il
          ramène le zonage de Cléry, Mareau et Dry. Draper le PLU du voisin
          sur Mézières, c'est la même faute que l'INSEE 45203 — on découpe. */
@@ -207,7 +209,8 @@ function _c3dChargerZones(){
         if (dedans.length) fc = { type:'FeatureCollection', features:dedans };
       }
       _c3dZones = fc; _c3dDiag = '';
-      _c3dNoter('Géoportail de l\'Urbanisme', true, _c3dCommune || ('INSEE ' + C3D_INSEE), fc.features.length);
+      _c3dNoter('Géoportail de l\'Urbanisme', true, _c3dCommune || ('INSEE ' + C3D_INSEE),
+                recus, fc.features.length);
       return true;
     })
     .catch(function(e){
@@ -259,6 +262,8 @@ function _c3dBatiIGN(){
     });
   });
   return chaine.then(function(fc){
+    /* Le journal a noté le nombre reçu ; on lui ajoutera le nombre retenu
+       une fois le marquage communal fait. */
     fc.features.forEach(function(f){
       var p = f.properties || {};
       var h = parseFloat(p.hauteur);
@@ -280,11 +285,13 @@ function _c3dBatiIGN(){
    quand l'emprise couvre quatre communes est faux. */
 function _c3dMarquerCommune(fc){
   fc.mat_nCommune = 0;
+  var derniere = _c3dJournal.length ? _c3dJournal[_c3dJournal.length - 1] : null;
   fc.features.forEach(function(f){
     var dedans = _c3dContour ? _c3dDansGeom(_c3dCentroide(f.geometry), _c3dContour) : true;
     f.properties.mat_dans = dedans ? 1 : 0;
     if (dedans) fc.mat_nCommune++;
   });
+  if (derniere && derniere.ok) derniere.retenu = fc.mat_nCommune;
   return fc;
 }
 function _c3dBatiOSM(){
@@ -526,11 +533,16 @@ function _c3dOuvrirDiag(){
   document.getElementById('c3d-fiche-sous').textContent = 'Ce que chaque service a répondu';
   var out = '<div class="c3d-rows">';
   if (!_c3dJournal.length) out += '<div class="c3d-row"><span class="c">Aucune source interrogée</span></div>';
+  /* ⚠️ Ces nombres sont ceux RENVOYÉS par le service, sur une emprise de
+     7 km sur 6,7 km qui déborde sur les communes voisines. Ils étaient lus
+     comme des totaux communaux — d'où la distinction explicite. */
   _c3dJournal.forEach(function(e){
+    var retenu = e.retenu != null && e.retenu !== e.n
+      ? '<br><span class="d">' + e.retenu + ' retenus dans la commune</span>' : '';
     out += '<div class="c3d-row"><span class="c">' + _c3dEsc(e.nom)
-        +  '<br><span class="d">' + _c3dEsc(e.detail) + '</span></span>'
+        +  '<br><span class="d">' + _c3dEsc(e.detail) + '</span>' + retenu + '</span>'
         +  '<span class="a ' + (e.ok ? 'ok' : 'pc') + '">'
-        +  (e.ok ? e.n + ' éléments' : 'échec') + '</span></div>';
+        +  (e.ok ? e.n + ' reçus' : 'échec') + '</span></div>';
   });
   out += '</div>';
   out += '<div class="c3d-note">Données : orthophoto et BD TOPO de l\'IGN, zonage du Géoportail '

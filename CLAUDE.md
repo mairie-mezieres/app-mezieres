@@ -88,6 +88,21 @@ Cas typiques :
 - Toujours bumper `CACHE` dans `service-worker.js` quand `index.html`, un `.js` ou un `.css` chargé par l'app est modifié.
 - Format : `mat-vX.Y.Z` — incrémenter uniquement le patch (Z) pour les ajustements mineurs, le mineur (Y) pour les fonctionnalités.
 
+### ⛔ Modifier `js/xxx.js`, c'est incrémenter son `?v=` — aux TROIS endroits
+
+`index.html`, `js/mat-boot.js` et `service-worker.js`. Le service worker sert en
+**stale-while-revalidate** : tant que l'URL ne change pas, l'habitant reçoit la copie
+en cache. Un fichier modifié sans nouveau `?v=` **n'arrive jamais chez lui**.
+
+`js/mat-boot.js` est resté en `?v=4.4.1` pendant trois modifications (v4.64 → v4.66) :
+les habitants recevaient l'ancien boot, qui demandait l'ancien `mat-carte3d.js`. Le
+bouton « Où suis-je » s'affichait — `index.html` n'est pas versionné — mais ne
+répondait pas. Tout était vert : tests, CI, déploiement. Voir **ADR-0019**.
+
+⚠️ **Les tests ne peuvent pas voir ce bug** : Playwright part d'un profil vierge et le
+service worker y est bloqué (ADR-0006). Le contrôle est donc fait par
+`node scripts/check-cache-bust.js`, lancé par la CI.
+
 ## ⛔ Édition de fichiers — règles non négociables
 
 **Incident du 1ᵉʳ août 2026 : `docs/guide-technique.md` est passé de 41 Ko à 85 Mo

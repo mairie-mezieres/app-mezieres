@@ -5,6 +5,33 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.67] — 10 août 2026
+
+### Corrigé
+- **Les correctifs des v4.64 à v4.66 n'arrivaient pas chez les habitants.** `js/mat-boot.js`
+  a été modifié trois fois en restant servi sous `?v=4.4.1`. Le service worker sert en
+  stale-while-revalidate : tant que l'URL ne change pas, c'est la copie en cache qui part.
+  Le navigateur recevait donc l'ancien boot, qui demandait l'ancien `mat-carte3d.js` — d'où
+  un bouton « Où suis-je » **affiché mais inerte** (`index.html`, lui, n'est pas versionné)
+  et un zonage toujours non découpé sur la commune. `mat-boot.js` et `mat-mel.js` sont
+  repassés en `?v=4.5.0` et `?v=4.4.0`. Voir **ADR-0019**.
+
+### Ajouté
+- **`scripts/check-cache-bust.js`, branché sur la CI.** Il vérifie que chaque ressource
+  porte le même `?v=` dans `index.html`, `js/mat-boot.js` et `service-worker.js`, et
+  surtout qu'un fichier de `js/` ou `css/` modifié voit son `?v=` modifié **dans le même
+  lot**. `actions/checkout` passe en `fetch-depth: 0` — sans historique, le contrôle
+  s'ignorerait en silence, ce qui reproduirait la faute qu'il corrige.
+- Le panneau « 🔎 Détail des sources » distingue désormais ce que le service a **renvoyé**
+  de ce qui est **retenu pour la commune** : « 185 reçus · 12 dans la commune ». Les deux
+  chiffres avaient la même apparence, et le premier était lu comme le second.
+
+### Documentation
+- `docs/adr/0019-cache-busting-un-fichier-modifie-sans-nouveau-v-n-arrive-jamais.md`
+- `CLAUDE.md` — règle du `?v=` aux trois endroits, avec la raison
+
+---
+
 ## [4.66] — 10 août 2026
 
 ### Corrigé
