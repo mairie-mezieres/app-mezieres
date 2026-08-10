@@ -14,6 +14,17 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   avaient été incrémentés, pas le numéro visible. Le porteur, qui cherchait le nouveau
   numéro sur son téléphone, ne pouvait conclure qu'une chose : « ça ne se charge pas ».
 
+- **La recherche de carte communale n'était jamais lancée.** Un tableau **vide est truthy**
+  en JavaScript : l'interrogation par emprise ramène le zonage des communes voisines, le
+  découpage sur le contour les élimine toutes, et le résultat `[]` arrêtait la chaîne juste
+  avant l'étape « carte communale ». Le journal restait donc vide, et le panneau de
+  diagnostic n'affichait aucune ligne — ce qui a fait croire, à juste titre, que le code
+  n'était pas déployé. La chaîne teste maintenant la **longueur**, pas la vérité du tableau.
+- **Cliquer sur une commune sans zonage ne répondait rien.** Le clic n'interrogeait que la
+  couche du zonage ; une commune sans PLU n'a aucun polygone à toucher, donc l'écran restait
+  muet — précisément sur les communes dont on se demande pourquoi elles sont vides. Le clic
+  retombe désormais sur le **contour communal**, et nomme la commune en expliquant son état.
+
 ### Ajouté
 - **`scripts/check-cache-bust.js` refuse désormais un cache qui change en silence.** Si
   `CACHE` bouge dans `service-worker.js`, le numéro affiché dans `index.html` — bandeau

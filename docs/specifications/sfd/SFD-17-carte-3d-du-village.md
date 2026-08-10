@@ -130,6 +130,17 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 - **RG-17.21 — aucune règle de construction hors de Mézières.** `data/plu-data.json`
   décrit le PLU de Mézières et lui seul. En vue territoire, un clic nomme la commune et la
   famille de zone ; il **n'ouvre pas** la fiche des règles.
+  ⚠️ **Toute commune répond au clic, zonage ou pas.** Le clic n'interrogeait que la couche
+  du zonage : une commune sans PLU n'ayant aucun polygone à toucher, l'écran restait muet —
+  précisément sur les communes dont on se demande pourquoi elles sont vides. Le repli se
+  fait sur le **contour communal**, testé en JavaScript (`_c3dDansGeom`) : les contours sont
+  dessinés par des couches `line`, qu'un doigt ne touche presque jamais.
+- **RG-17.28 — un tableau vide est truthy.** La chaîne de recherche du zonage teste la
+  **longueur** du résultat, jamais sa seule vérité. L'interrogation par emprise ramène le
+  zonage des communes voisines et le découpage sur le contour les élimine toutes : le `[]`
+  qui en résulte arrêtait la chaîne juste avant l'étape « carte communale », qui n'était
+  donc jamais lancée. Le journal restait vide, le diagnostic n'affichait rien, et le porteur
+  en a conclu — à juste titre — que le code n'était pas déployé.
 - **RG-17.22 — à cette échelle, on ne colore que par famille normalisée.** Les codes de
   zones diffèrent d'un PLU à l'autre (« Ua » ici, « UB » là) : seules les quatre familles
   du Géoportail (U, AU, A, N) sont comparables. ⚠️ Les zones à urbaniser s'écrivent

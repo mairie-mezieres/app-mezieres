@@ -486,6 +486,97 @@ test.describe('Carte 3D', () => {
     expect(r.sansDoc, 'et la commune reste annoncée sans PLU, pas en panne').toBe(true);
   });
 
+  test('territoire : un découpage qui vide tout ne stoppe pas la recherche', async ({ page }) => {
+    /*
+     * ⚠️ Un tableau VIDE est truthy en JavaScript.
+     *
+     * L'interrogation par emprise rectangulaire ramène le zonage des communes
+     * VOISINES ; le découpage sur le contour les élimine toutes lorsque la
+     * commune n'a pas de PLU. Le résultat est alors `[]` — truthy — et un
+     * simple `r || suite()` arrêtait la chaîne là. La recherche de carte
+     * communale n'était jamais lancée, son journal restait vide, et le panneau
+     * de diagnostic n'affichait aucune ligne : sur le terrain, cela a fait
+     * croire que le code n'était pas déployé.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTerrZonesDe === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(async () => {
+      // Contour minuscule ; les zones renvoyées sont TRÈS loin, donc toutes
+      // écartées par le découpage — exactement le cas du terrain.
+      const carre = { type: 'Polygon', coordinates: [[[1.80, 47.82], [1.801, 47.82],
+                                                      [1.801, 47.821], [1.80, 47.821], [1.80, 47.82]]] };
+      const loin = { type: 'Polygon', coordinates: [[[1.60, 47.60], [1.61, 47.60],
+                                                     [1.61, 47.61], [1.60, 47.61], [1.60, 47.60]]] };
+      const vus = [];
+      const vrai = window.fetch;
+      window.fetch = function (url) {
+        const u = String(url);
+        vus.push(u);
+        if (u.indexOf('zone-urba') > -1)   // des zones, mais celles des voisines
+          return Promise.resolve(new Response(JSON.stringify({ type: 'FeatureCollection',
+            features: [{ type: 'Feature', properties: { typezone: 'A' }, geometry: loin }] }),
+            { status: 200 }));
+        return Promise.resolve(new Response(JSON.stringify(
+          { type: 'FeatureCollection', features: [] }), { status: 200 }));
+      };
+      const c = { insee: '45020', nom: 'Le Bardon', partition: '', rnu: false,
+                  geom: carre, nZones: 0, err: '' };
+      const zones = await window._c3dTerrZonesDe(c);
+      window.fetch = vrai;
+      return { zones: zones.length, journal: c.ccJournal || [], sansDoc: !!c.sansDoc,
+               aChercheCc: vus.some(u => /secteur-cc/.test(u)) };
+    });
+
+    expect(r.zones, 'le zonage des voisines est bien écarté').toBe(0);
+    expect(r.aChercheCc, 'la carte communale doit être cherchée malgré le découpage').toBe(true);
+    expect(r.journal.length, 'et la tentative doit laisser une trace').toBeGreaterThan(0);
+    expect(r.sansDoc, 'la commune reste annoncée sans PLU, pas en panne').toBe(true);
+  });
+
+  test('territoire : une commune sans zonage répond quand même au clic', async ({ page }) => {
+    /*
+     * ⚠️ Le clic n'interrogeait que la couche du ZONAGE. Une commune sans PLU
+     * n'a aucun polygone de zonage : le doigt ne rencontrait rien et l'écran
+     * restait muet — précisément sur les communes dont on se demande pourquoi
+     * elles sont vides. Dix des vingt-cinq étaient dans ce cas.
+     *
+     * Le repli se fait sur le CONTOUR communal, testé en JavaScript : les
+     * contours sont dessinés par des couches `line`, qu'un doigt ne touche
+     * presque jamais.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dClicTerritoire === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      const carre = (cx, cy, r) => ({ type: 'Polygon', coordinates: [[
+        [cx - r, cy - r], [cx + r, cy - r], [cx + r, cy + r], [cx - r, cy + r], [cx - r, cy - r]]] });
+      window._c3dTerr = [
+        { nom: 'Le Bardon', insee: '45020', geom: carre(1.70, 47.85, 0.02),
+          nZones: 0, sansDoc: true, err: '' },
+        { nom: 'Baule', insee: '45025', geom: carre(1.76, 47.85, 0.02),
+          nZones: 37, err: '' }
+      ];
+      const lu = () => document.getElementById('c3d-statut').innerHTML;
+      const dedans = window._c3dClicTerritoire([1.70, 47.85], { x: 0, y: 0 });
+      const msgSansPlu = lu();
+      window._c3dClicTerritoire([1.76, 47.85], { x: 0, y: 0 });
+      const msgAvecPlu = lu();
+      const dehors = window._c3dClicTerritoire([1.20, 47.20], { x: 0, y: 0 });
+      return { dedans, dehors, msgSansPlu, msgAvecPlu };
+    });
+
+    expect(r.dedans, 'un clic dans une commune doit être reconnu').toBe(true);
+    expect(r.msgSansPlu, 'la commune doit être nommée').toContain('Le Bardon');
+    expect(r.msgSansPlu, 'et son état expliqué').toContain('pas de PLU');
+    expect(r.msgSansPlu, 'sans laisser croire à une panne').toContain('pas une panne');
+    expect(r.msgAvecPlu, 'une commune avec zonage est nommée aussi').toContain('Baule');
+    expect(r.msgAvecPlu).toContain('37 secteurs');
+    expect(r.dehors, 'hors de tout contour, rien n’est inventé').toBe(false);
+  });
+
   test('territoire : sources coupées, aucune commune n’est inventée', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
