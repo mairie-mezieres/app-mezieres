@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.63 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.64 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -467,7 +467,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.63</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.64</button>
 </div>
 </div>
 </div>
@@ -1426,6 +1426,17 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <div id="plui-timeline"></div>
 </section>
 
+<!-- BLOC 2bis — Voir le zonage en 3D -->
+<section style="margin-bottom:22px">
+<h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">🏘️ Voir le zonage actuel en 3D</h3>
+<button onclick="matOuvrirCarte3D()" style="width:100%;display:flex;align-items:center;gap:14px;padding:16px;background:var(--mist);border:1.5px solid var(--sage);border-radius:14px;text-align:left;font-family:inherit;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent">
+<div style="font-size:1.8rem;flex-shrink:0" aria-hidden="true">🗺️</div>
+<div style="flex:1;min-width:0"><div style="font-weight:900;font-size:0.92rem;color:var(--forest)">Le village en relief</div><div style="font-size:0.8rem;color:var(--sage-ink);margin-top:3px;line-height:1.4">Survolez la commune, touchez un bâtiment&nbsp;: sa zone et ce qu’on a le droit d’y construire.</div></div>
+<div style="font-size:1.2rem;flex-shrink:0;opacity:0.8" aria-hidden="true">→</div>
+</button>
+<p style="font-size:0.76rem;color:var(--muted);margin:8px 2px 0;line-height:1.45">Zonage du PLU actuel, publié au Géoportail de l’Urbanisme. Le PLUi-H-D, lui, est encore en préparation.</p>
+</section>
+
 <!-- BLOC 3 — Donnez votre avis -->
 <section style="margin-bottom:22px">
 <h3 style="font-size:1.05rem;font-weight:900;color:var(--forest);margin:0 0 12px">🗣️ Donnez votre avis</h3>
@@ -1457,6 +1468,39 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 <div id="plui-docs"></div>
 </section>
 
+</div>
+</div>
+</template>
+</div>
+<div class="ov" id="ov-carte3d" onclick="ovClick('carte3d',event)" aria-label="Le village en 3D">
+<template data-lazy-ov>
+<div class="panel c3d-panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:rgba(255,255,255,0.15)">🏘️</div>
+<div class="panel-title">Le village en 3D</div>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('carte3d')">✕</button>
+</div>
+<div class="c3d-wrap">
+<div id="c3d-map" role="application" aria-label="Vue en trois dimensions de Mézières-lez-Cléry avec le zonage du plan local d’urbanisme"></div>
+<p id="c3d-statut" class="c3d-statut" aria-live="polite">Chargement…</p>
+<div class="c3d-outils">
+<button class="c3d-btn" id="c3d-btn-zones" aria-pressed="true">🗺️ <span>Zonage du PLU</span></button>
+<button class="c3d-btn" id="c3d-btn-bati" aria-pressed="true">🏠 <span>Bâtiments</span></button>
+<button class="c3d-btn" id="c3d-btn-fond" aria-pressed="true">🛰️ <span>Vue aérienne</span></button>
+<button class="c3d-btn" id="c3d-btn-diag" hidden>🔎 <span>Détail des sources</span></button>
+</div>
+<details class="c3d-legende" id="c3d-legende" hidden>
+<summary>Zones du PLU</summary>
+<ul id="c3d-legende-liste"></ul>
+</details>
+<section class="c3d-fiche" id="c3d-fiche" aria-live="polite">
+<div class="c3d-fiche-hdr">
+<span class="c3d-fiche-zone" id="c3d-fiche-zone">—</span>
+<div class="c3d-fiche-t"><span id="c3d-fiche-titre">—</span><small id="c3d-fiche-sous"></small></div>
+<button class="c3d-fiche-x" id="c3d-fiche-fermer" aria-label="Fermer la fiche">✕</button>
+</div>
+<div class="c3d-fiche-bd" id="c3d-fiche-corps"></div>
+</section>
 </div>
 </div>
 </template>
@@ -1671,6 +1715,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.64</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le village en 3D.</strong> Depuis la page PLUi-H-D, vous pouvez d&eacute;sormais survoler M&eacute;zi&egrave;res en relief, avec le zonage du plan local d&rsquo;urbanisme color&eacute; au sol. On voit d&rsquo;un coup d&rsquo;&oelig;il o&ugrave; s&rsquo;arr&ecirc;te le constructible et o&ugrave; commencent les zones agricoles et naturelles</li>
+<li><strong>Touchez un b&acirc;timent, vous obtenez ses r&egrave;gles.</strong> Sa zone, l&rsquo;emprise au sol, la hauteur maximale, le recul sur voie, les cl&ocirc;tures &mdash; puis abri de jardin, piscine, extension et panneaux solaires, avec &agrave; chaque fois &laquo;&nbsp;rien &agrave; faire&nbsp;&raquo;, &laquo;&nbsp;d&eacute;claration&nbsp;&raquo; ou &laquo;&nbsp;permis&nbsp;&raquo;</li>
+<li><strong>MEL vous y emm&egrave;ne.</strong> Apr&egrave;s avoir trouv&eacute; votre zone dans &laquo;&nbsp;Urbanisme &amp; Construction&nbsp;&raquo;, un bouton ouvre la carte centr&eacute;e sur votre adresse</li>
+<li>Les images de la carte sont celles de l&rsquo;IGN et le zonage vient du G&eacute;oportail de l&rsquo;Urbanisme. La carte a besoin d&rsquo;une connexion&nbsp;: le reste de l&rsquo;application continue de fonctionner hors ligne</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 ao&ucirc;t 2026 — v4.63</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Tout le texte de l&rsquo;accueil est plus grand.</strong> Sept lignes sur dix &eacute;taient affich&eacute;es sous 12&nbsp;pixels &mdash; les sous-titres des cartes, le jour de collecte des d&eacute;chets, l&rsquo;heure d&rsquo;ouverture de la mairie, le prochain bus. C&rsquo;&eacute;tait particuli&egrave;rement p&eacute;nible &agrave; lire sur t&eacute;l&eacute;phone. Plus aucun texte de la page d&rsquo;accueil n&rsquo;est d&eacute;sormais sous cette taille</li>

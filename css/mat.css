@@ -1431,3 +1431,86 @@ html.theme-sombre .content [role="button"]:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Carte 3D du village (overlay ov-carte3d) — v4.62
+   Le panneau occupe tout l'écran : une carte 3D dans une boîte de
+   400 px ne montre rien. Les commandes flottent au-dessus du canvas.
+   ══════════════════════════════════════════════════════════════ */
+.c3d-panel{max-width:none;width:100%;height:100%;display:flex;flex-direction:column;border-radius:0}
+.c3d-wrap{position:relative;flex:1;min-height:0;overflow:hidden}
+#c3d-map{position:absolute;inset:0}
+#c3d-map canvas{outline:none}
+
+.c3d-statut{position:absolute;z-index:3;left:50%;transform:translateX(-50%);top:10px;
+  background:rgba(28,43,31,0.93);color:#fff;font-size:0.75rem;font-weight:700;
+  padding:8px 14px;border-radius:999px;max-width:90%;text-align:center;line-height:1.35;
+  box-shadow:var(--shadow-lg);margin:0}
+.c3d-statut[hidden]{display:none}
+.c3d-statut b{color:var(--gold)}
+
+.c3d-outils{position:absolute;z-index:3;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+.c3d-btn{appearance:none;border:1px solid var(--border);background:rgba(255,255,255,0.94);
+  color:var(--text);font-family:inherit;font-size:0.75rem;font-weight:800;padding:8px 12px;
+  border-radius:999px;box-shadow:var(--shadow-lg);cursor:pointer;display:flex;align-items:center;gap:7px}
+.c3d-btn[aria-pressed="true"]{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+/* `display:flex` ci-dessus l'emporte sur le display:none du navigateur pour
+   [hidden] — sans cette règle, un bouton masqué reste visible. */
+.c3d-btn[hidden]{display:none}
+.c3d-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.c3d-legende{position:absolute;z-index:3;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  background:rgba(255,255,255,0.94);border-radius:14px;box-shadow:var(--shadow-lg);
+  max-width:min(46vw,230px);overflow:hidden}
+.c3d-legende[hidden]{display:none}
+.c3d-legende summary{list-style:none;cursor:pointer;padding:9px 12px;font-size:0.75rem;
+  font-weight:900;text-transform:uppercase;letter-spacing:0.07em;color:var(--leaf);
+  display:flex;align-items:center;gap:6px}
+.c3d-legende summary::-webkit-details-marker{display:none}
+.c3d-legende summary::after{content:'▾';margin-left:auto}
+.c3d-legende summary:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.c3d-legende ul{list-style:none;display:grid;gap:4px;padding:0 12px 11px;margin:0}
+.c3d-legende li{display:flex;align-items:center;gap:7px;font-size:0.75rem;font-weight:800;line-height:1.2}
+.c3d-legende i{width:12px;height:12px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(0,0,0,0.15)}
+.c3d-legende li span span{color:var(--muted);font-weight:600}
+
+.c3d-pin{width:18px;height:18px;border-radius:50%;background:var(--gold);
+  border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35)}
+
+.c3d-fiche{position:absolute;z-index:4;left:0;right:0;bottom:0;background:var(--card);
+  border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(26,61,43,0.22);
+  transform:translateY(102%);transition:transform 0.28s ease;max-height:78%;
+  display:flex;flex-direction:column}
+.c3d-fiche.on{transform:translateY(0)}
+.c3d-fiche-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:10px}
+.c3d-fiche-zone{background:var(--mist);color:var(--leaf);font-weight:900;font-size:0.78rem;
+  padding:5px 11px;border-radius:999px;flex:0 0 auto}
+.c3d-fiche-t{font-size:0.86rem;font-weight:900;line-height:1.3}
+.c3d-fiche-t small{display:block;font-size:0.75rem;font-weight:700;color:var(--muted);margin-top:2px}
+.c3d-fiche-x{margin-left:auto;appearance:none;border:0;background:var(--warm);width:32px;height:32px;
+  border-radius:50%;font-size:1rem;cursor:pointer;flex:0 0 auto;color:var(--text)}
+.c3d-fiche-bd{padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 18px);overflow-y:auto}
+
+.c3d-kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:0.76rem;margin:0 0 14px}
+.c3d-kv dt{color:var(--muted);font-weight:700}
+.c3d-kv dd{font-weight:800;text-align:right;margin:0;text-wrap:pretty}
+.c3d-sec{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--leaf);
+  font-weight:900;margin:14px 0 7px}
+.c3d-rows{display:flex;flex-direction:column;gap:5px}
+.c3d-row{display:flex;align-items:center;gap:9px;background:var(--warm);border-radius:10px;
+  padding:8px 10px;font-size:0.75rem}
+.c3d-row .c{flex:1;font-weight:700;line-height:1.3}
+.c3d-row .d{font-weight:600;color:var(--muted)}
+.c3d-row .a{font-weight:900;font-size:0.75rem;padding:3px 8px;border-radius:999px;
+  white-space:nowrap;flex:0 0 auto}
+.c3d-row .a.ok{background:#d8f3dc;color:#1b5e3f}
+.c3d-row .a.dp{background:#fdf0d5;color:#8a6a12}
+.c3d-row .a.pc{background:#fde2e1;color:#a02c26}
+.c3d-note{background:#fdf0d5;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  padding:8px 11px;font-size:0.75rem;font-weight:700;line-height:1.45;margin-top:10px}
+
+@media (prefers-reduced-motion:reduce){
+  .c3d-fiche{transition:none}
+}

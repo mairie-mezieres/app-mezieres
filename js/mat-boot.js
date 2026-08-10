@@ -172,3 +172,13 @@
   s.src = 'js/mat-guide-arrivee.js?v=1.0.5';
   document.head.appendChild(s);
 })();
+
+// Carte 3D — le module est léger (~29 Ko) et se contente de définir
+// matOuvrirCarte3D. La bibliothèque MapLibre (~1 Mo) n'est PAS chargée ici :
+// le module va la chercher à la première ouverture de la carte seulement.
+// Voir ADR-0018 — c'est la condition pour ne pas dégrader l'éco-index.
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-carte3d.js?v=1.0.0';
+  document.head.appendChild(s);
+})();
