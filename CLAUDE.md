@@ -103,6 +103,12 @@ répondait pas. Tout était vert : tests, CI, déploiement. Voir **ADR-0019**.
 service worker y est bloqué (ADR-0006). Le contrôle est donc fait par
 `node scripts/check-cache-bust.js`, lancé par la CI.
 
+**Effet de cascade** : les modules différés (`mat-carte3d.js`, `mat-saviez-vous.js`,
+`mat-plui.js`…) voient leur URL écrite **dans `js/mat-boot.js`**. Bumper l'un d'eux modifie
+donc `mat-boot.js`, **qui doit être bumpé à son tour** — sinon l'habitant reçoit l'ancien
+boot, qui réclame l'ancienne version du module, et le correctif n'arrive pas. Le contrôle
+de CI attrape ce cas ; il l'a fait dès la première occasion.
+
 ## ⛔ Édition de fichiers — règles non négociables
 
 **Incident du 1ᵉʳ août 2026 : `docs/guide-technique.md` est passé de 41 Ko à 85 Mo
