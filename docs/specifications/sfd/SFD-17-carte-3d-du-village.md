@@ -77,6 +77,29 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 - **RG-17.13 — « Où suis-je » ne transmet rien.** La position sert uniquement à centrer la
   carte et à lire la zone dans le zonage déjà chargé : aucune requête réseau n'est émise.
   Hors commune, l'écran l'indique explicitement.
+- **RG-17.14 — le bâti est différencié, mais jamais deviné.** Un bâtiment est classé
+  (habitat, agricole, industriel, cultuel, remarquable, annexe) à partir des seuls
+  attributs `nature` / `usage_1` / `legere` **déjà renvoyés** par la BD TOPO. Chaque
+  catégorie porte une teinte de murs, une teinte de toit et une hauteur de toit propres.
+  Le classement **ne complète rien** : une valeur non reconnue retombe sur `habitat`, la
+  catégorie la plus banale, et est **listée dans le panneau « 🔎 Détail des sources »**
+  pour être affinée sur pièce. Le repli OpenStreetMap, qui n'a pas ces champs, utilise le
+  tag `building` quand il est renseigné, sinon `habitat`.
+  ⚠️ La valeur `nature` de la BD TOPO est souvent le fourre-tout « Industriel, agricole ou
+  commercial », qui contient les trois mots à la fois : c'est `usage_1` qui doit être lu
+  **en premier**, sans quoi une usine devient un hangar agricole.
+- **RG-17.15 — les toits sont une lecture, pas une mesure.** La BD TOPO ne dit rien de la
+  forme ni de la pente des toitures. La casquette colorée posée au sommet de chaque volume
+  (couche `bati-toit`, entre `mat_h` et `mat_h + mat_toit`) est un **procédé de lisibilité**,
+  pas une restitution du bâti réel — au même titre que la couleur des zones du PLU. Elle ne
+  doit jamais être présentée comme une information sur la toiture d'un bâtiment donné.
+- **RG-17.16 — la texture de façade est dessinée localement.** La trame de fenêtres des
+  bâtiments d'habitation est générée en mémoire par l'application (`map.addImage`) : aucune
+  image n'est téléchargée, le poids de la page est inchangé.
+  ⚠️ `fill-extrusion-pattern` **remplace** `fill-extrusion-color`. Façade texturée et teinte
+  par catégorie ne peuvent donc pas cohabiter sur une même couche : les deux couches
+  `bati` et `bati-tex` portent des **filtres disjoints**, faute de quoi les volumes se
+  superposent et scintillent.
 
 ## 5. Parcours
 
@@ -117,3 +140,10 @@ information est accessible en texte, par l'assistante et par l'arbre de décisio
 `tests/e2e/carte3d.spec.js` — MapLibre absent au démarrage, entrée depuis la page
 PLUi-H-D, ouverture et fermeture par Échap, absence de bâti inventé hors connexion,
 bouton de diagnostic vérifié sur le **style calculé**, audit axe.
+
+Le test « la couche des bâtiments est acceptée par MapLibre » pose un jeu d'essai
+comportant une maison, une église, un hangar et un bâtiment hors commune, puis vérifie que
+les **quatre** couches (`bati`, `bati-tex`, `bati-toit`, `bati-contour`) existent, que la
+texture de façade est enregistrée, et qu'aucune erreur de validation n'est remontée. Il ne
+demande aucun réseau — seulement la bibliothèque servie en local — et c'est précisément
+pour cela qu'il est capable de voir ce qu'aucun autre test ne voyait (v4.68).
