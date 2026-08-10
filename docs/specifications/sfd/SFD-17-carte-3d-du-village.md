@@ -77,6 +77,11 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 - **RG-17.13 — « Où suis-je » ne transmet rien.** La position sert uniquement à centrer la
   carte et à lire la zone dans le zonage déjà chargé : aucune requête réseau n'est émise.
   Hors commune, l'écran l'indique explicitement.
+  Le bouton **clignote trois fois à l'ouverture, puis se tait** — et immédiatement dès qu'on
+  le touche. Il ne se distinguait pas de ses cinq voisins alors que sa fonction, situer *sa*
+  maison dans le zonage, est la moins devinable de la carte. L'animation est neutralisée par
+  la règle globale « Réduire les animations ». Verrouillé par un test qui assert le **style
+  calculé**, pas la seule présence de la classe.
 - **RG-17.14 — le bâti est différencié, mais jamais deviné.** Un bâtiment est classé
   (habitat, agricole, industriel, cultuel, remarquable, annexe) à partir des seuls
   attributs `nature` / `usage_1` / `legere` **déjà renvoyés** par la BD TOPO. Chaque
@@ -133,8 +138,12 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   agricole. Verrouillé par test.
 - **RG-17.23 — le cadrage est déduit des contours reçus.** Un zoom écrit à la main
   couperait des communes ou les noierait ; `fitBounds` sur ce qui est réellement arrivé ne
-  peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle, et le fond bascule sur
-  le **plan IGN** : à 30 km, la photo aérienne n'est qu'un tapis de parcelles.
+  peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle.
+  ⚠️ Le **fond de carte n'est pas imposé**. La v4.72 basculait d'office sur le plan IGN ; à
+  l'usage c'est la photo aérienne qu'on préfère — elle donne le paysage que le plan aplatit.
+  Le double tracé des limites (RG-17.25) rend le zonage lisible sur les deux, donc rien
+  n'oblige à choisir à la place de l'habitant : le bouton « Vue aérienne / Plan » reste le
+  seul maître du fond.
 - **RG-17.24 — trois chemins pour le zonage, jamais d'abandon silencieux.**
   `municipality?geom=` renvoie le nom, le code INSEE et le contour, mais **ni `partition` ni
   `is_rnu`** : seul `municipality?insee=` fait autorité. La chaîne est donc — partition

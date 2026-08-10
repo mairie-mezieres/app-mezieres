@@ -1122,26 +1122,18 @@ function _c3dVoirTerritoire(on){
   vis(C3D_COUCHES_VILLAGE, !on);
   vis(C3D_COUCHES_TERR, on);
 
-  /* Le fond suit la vue. À 30 km de distance, la photo aérienne n'est qu'un
-     tapis de parcelles : le plan IGN laisse lire les couleurs du zonage et les
-     limites communales. Le bouton « Vue aérienne » reste maître ensuite —
-     on ne fait que choisir le fond le plus lisible à l'arrivée. */
-  function fond(plan){
-    if (!_c3dMap.getLayer('l-plan')) return;
-    _c3dMap.setLayoutProperty('l-plan',  'visibility', plan ? 'visible' : 'none');
-    _c3dMap.setLayoutProperty('l-ortho', 'visibility', plan ? 'none' : 'visible');
-    var b = document.getElementById('c3d-btn-fond');
-    if (b) b.setAttribute('aria-pressed', String(!plan));
-    var t = document.querySelector('#c3d-btn-fond span');
-    if (t) t.textContent = plan ? 'Plan' : 'Vue aérienne';
-  }
+  /* ⚠️ Le fond n'est PAS imposé. La v4.72 basculait d'office sur le plan IGN,
+     au motif qu'à 30 km la photo aérienne n'est qu'un tapis de parcelles. À
+     l'usage, c'est la vue aérienne qu'on préfère : elle donne le paysage — la
+     Loire, la forêt, les bourgs — que le plan aplatit. Le double tracé des
+     limites (liseré sombre + trait clair) rend le zonage lisible sur les deux,
+     donc rien n'oblige à choisir à la place de l'habitant.
+     Le bouton « Vue aérienne / Plan » reste le seul maître du fond. */
 
   if (!on){
-    fond(false);
     _c3dMap.easeTo({ center:C3D_CENTRE, zoom:14.4, pitch:55, duration:1400 });
     return Promise.resolve();
   }
-  fond(true);
   /* À plat : à cette échelle, l'inclinaison ne montre rien et gêne la lecture.
      Ce recul n'est qu'un premier pas — `_c3dCadrerTerritoire` reprend la main
      dès que les contours sont là. */
@@ -1370,6 +1362,23 @@ function _c3dBrancher(){
   if (x) x.onclick = _c3dFermerFiche;
 }
 
+/* Trois clignotements à l'ouverture, puis plus rien. Le bouton ne se
+   distinguait pas de ses voisins, et sa fonction — situer SA maison dans le
+   zonage — est la moins devinable de la carte.
+   Il se tait dès qu'on le touche : insister après un clic serait du bruit. */
+function _c3dAttirerIci(){
+  setTimeout(function(){
+    var b = document.getElementById('c3d-btn-ici');
+    if (!b) return;
+    b.classList.remove('c3d-attire');
+    void b.offsetWidth;              // force le redémarrage à chaque ouverture
+    b.classList.add('c3d-attire');
+    var taire = function(){ b.classList.remove('c3d-attire'); };
+    b.addEventListener('animationend', taire, { once:true });
+    b.addEventListener('click', taire, { once:true });
+  }, 700);
+}
+
 /* « Où suis-je » — la position ne sort pas du navigateur : elle sert
    uniquement à centrer la carte et à lire la zone dans le zonage déjà
    chargé. Aucune requête réseau, rien n'est transmis à la commune. */
@@ -1483,11 +1492,13 @@ window.matOuvrirCarte3D = function(opts){
         _c3dAmbiance();
         _c3dBrancher();
         _c3dCharger().then(function(){ if (cible) _c3dViser(cible, opts.zone); });
+        _c3dAttirerIci();
       });
     } else {
       /* L'overlay était masqué : MapLibre a mesuré une taille nulle. */
       _c3dMap.resize();
       if (cible) _c3dViser(cible, opts.zone);
+      _c3dAttirerIci();
     }
   }).catch(function(e){
     _c3dStatut('⚠️ ' + _c3dEsc(e.message) + ' — réessayez avec une connexion.');

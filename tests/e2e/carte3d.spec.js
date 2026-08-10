@@ -453,6 +453,58 @@ test.describe('Carte 3D', () => {
     await expect(page.locator('#c3d-btn-ici')).toBeVisible();
   });
 
+  test('« Où suis-je » clignote à l’ouverture, puis se tait', async ({ page }) => {
+    /*
+     * Le bouton ne se distinguait pas de ses cinq voisins, et sa fonction —
+     * situer SA maison dans le zonage — est la moins devinable de la carte.
+     *
+     * ⚠️ On assert le STYLE CALCULÉ, pas seulement la classe : c'est le CSS qui
+     * produit l'effet, et une classe posée sans règle correspondante ne
+     * clignoterait pas (leçon des étoiles invisibles, ADR-0015).
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await expect(page.locator('#c3d-btn-ici')).toBeVisible();
+
+    await expect.poll(async () => page.evaluate(() => {
+      const b = document.getElementById('c3d-btn-ici');
+      return b ? getComputedStyle(b).animationName : 'absent';
+    }), { timeout: 6000, message: 'l’animation d’appel doit démarrer' }).toBe('c3dAttire');
+
+    const tours = await page.evaluate(() =>
+      getComputedStyle(document.getElementById('c3d-btn-ici')).animationIterationCount);
+    expect(tours, 'trois clignotements, pas un de plus').toBe('3');
+
+    // …puis il se tait : la classe est retirée à la fin de l'animation.
+    await expect.poll(async () => page.evaluate(() =>
+      document.getElementById('c3d-btn-ici').classList.contains('c3d-attire')),
+      { timeout: 10000, message: 'l’appel doit cesser de lui-même' }).toBe(false);
+  });
+
+  test('territoire : le fond de carte reste celui choisi par l’habitant', async ({ page }) => {
+    /*
+     * La v4.72 basculait d'office sur le plan IGN en vue territoire. À l'usage
+     * c'est la vue aérienne qu'on préfère — elle donne le paysage. Le bouton
+     * « Vue aérienne / Plan » doit rester le seul maître du fond.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const lire = () => page.evaluate(() => ({
+      ortho: window._c3dMap.getLayoutProperty('l-ortho', 'visibility') || 'visible',
+      presse: document.getElementById('c3d-btn-fond').getAttribute('aria-pressed')
+    }));
+    const avant = await lire();
+    await page.locator('#c3d-btn-terr').click();
+    await page.waitForTimeout(1500);
+    const apres = await lire();
+
+    expect(avant.ortho, 'la vue aérienne est le fond par défaut').toBe('visible');
+    expect(apres.ortho, 'passer au territoire ne doit pas changer le fond').toBe(avant.ortho);
+    expect(apres.presse, 'ni l’état du bouton de fond').toBe(avant.presse);
+  });
+
   test('aucune carte d’accueil ne partage son icône avec une autre', async ({ page, viewport }) => {
     test.skip(!viewport || viewport.width >= 1024, 'mise en page téléphone uniquement');
     // « Communauté » et « Mon village en 3D » portaient toutes deux 🏘️ :

@@ -28,6 +28,17 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 - Le bandeau ne compte plus les communes au RNU parmi les « sans zonage ». Il annonçait
   « 13 sans zonage » là où plusieurs étaient parfaitement en règle.
 
+### Modifié
+- **« Où suis-je » clignote trois fois à l'ouverture de la carte, puis se tait.** Le bouton
+  ne se distinguait pas de ses cinq voisins, et sa fonction — situer *sa* maison dans le
+  zonage — est la moins devinable de la carte. Il cesse immédiatement dès qu'on le touche,
+  et l'animation est neutralisée par le réglage « Réduire les animations ».
+- **La vue territoire garde la vue aérienne.** La v4.72 basculait d'office sur le plan IGN ;
+  à l'usage, c'est la photo qui parle — elle donne le paysage, la Loire, les bourgs, que le
+  plan aplatit. Le double tracé des limites rend le zonage lisible sur les deux fonds, donc
+  rien n'oblige à choisir à la place de l'habitant : le bouton « Vue aérienne / Plan » reste
+  le seul maître.
+
 ### Confirmé
 - **Les 25 communes de la liste de la mairie sont toutes reconnues** par le Géoportail —
   y compris Beauce-la-Romaine, Binas, Villermain et Saint-Laurent-des-Bois, sur lesquelles
