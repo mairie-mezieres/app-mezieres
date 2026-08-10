@@ -947,30 +947,88 @@ function _c3dTerrZonesDe(c){
      celles qui restaient vides sont les plus petites (Baccon, Binas,
      Charsonville, Coulmiers, Villermain…).
 
-     ⚠️ Le nom de cet endpoint est déduit de la documentation d'apicarto : il
-     n'est PAS vérifiable depuis l'environnement de développement. S'il n'existe
-     pas, l'appel échoue proprement, la commune est simplement annoncée sans
-     PLU, et le motif exact apparaît dans « 🔎 Détail des sources ». */
+     Confirmé par la mairie : Le Bardon relève d'une carte communale approuvée
+     en 2011, modifiée en 2022. L'hypothèse est donc juste — restait à trouver
+     la bonne porte.
+
+     ⚠️ Les noms d'endpoints au-delà de `municipality` et `zone-urba` sont
+     déduits de la documentation d'apicarto et NON vérifiables depuis
+     l'environnement de développement. D'où deux chemins, et surtout un
+     JOURNAL : chaque tentative inscrit son issue dans `c.ccJournal`, affiché
+     dans « 🔎 Détail des sources ».
+
+     ⚠️ La version précédente écrivait le motif d'échec dans `c.errCc`… que
+     RIEN ne lisait. Exactement la faute que ce panneau existe pour empêcher :
+     l'écran annonçait « pas de PLU » sans pouvoir dire si l'endpoint avait
+     répondu vide, renvoyé une erreur, ou n'existait pas. */
   function parCarteCommunale(){
     var bbox = _c3dBBoxGeom(c.geom);
-    if (!bbox) return null;
-    return jsonRessaye(C3D_GPU + 'secteur-cc?geom=' + encodeURIComponent(JSON.stringify(bbox)))
-      .then(function(fc){
-        var out = (fc && fc.features) || [];
-        if (!out.length) return null;
-        c.cc = true;
-        var res = habiller(out, 'carte communale', true);
-        /* Une carte communale n'a que deux secteurs. Les ranger dans les
-           familles d'un PLU (U/AU/A/N) laisserait croire à un zonage qui
-           n'existe pas : elles ont leurs propres couleurs. */
-        res.forEach(function(f){
-          var t = _c3dSansAccent(f.properties.libelle || f.properties.typesect
-                              || f.properties.typezone || '');
-          f.properties.mat_tz = (/non/.test(t) || /^nc/.test(t) || /^n/.test(t)) ? 'CN' : 'CU';
+    c.ccJournal = c.ccJournal || [];
+
+    /* Une carte communale n'a que deux secteurs. Les ranger dans les familles
+       d'un PLU (U/AU/A/N) laisserait croire à un zonage qui n'existe pas :
+       elles ont leurs propres couleurs. */
+    function retenir(out, via){
+      c.cc = true;
+      var res = habiller(out, via, true);
+      res.forEach(function(f){
+        var t = _c3dSansAccent(f.properties.libelle || f.properties.typesect
+                            || f.properties.typezone || f.properties.type || '');
+        f.properties.mat_tz = (/non/.test(t) || /^nc/.test(t) || /^n/.test(t)) ? 'CN' : 'CU';
+      });
+      return res;
+    }
+
+    function essai(url, via){
+      return jsonRessaye(url)
+        .then(function(fc){
+          var out = (fc && fc.features) || [];
+          c.ccJournal.push(via + ' : ' + out.length + ' secteur(s)');
+          return out.length ? retenir(out, via) : null;
+        })
+        .catch(function(e){
+          c.ccJournal.push(via + ' : ' + ((e && e.message) || 'échec'));
+          return null;
         });
-        return res;
+    }
+
+    /* Second chemin : demander au Géoportail QUELS documents couvrent la
+       commune. C'est lui qui donne la partition d'une carte communale, dont la
+       forme n'a aucune raison d'être celle d'un PLU. */
+    function parDocument(){
+      if (!c.insee) return null;
+      return jsonRessaye(C3D_GPU + 'document?insee=' + encodeURIComponent(c.insee))
+        .then(function(fc){
+          var fs = (fc && fc.features) || [];
+          var parts = [];
+          fs.forEach(function(f){
+            var p = (f && f.properties) || {};
+            if (p.partition) parts.push(p.partition);
+            if (p.du || p.type) c.docType = String(p.du || p.type);
+          });
+          c.ccJournal.push('document : ' + fs.length + ' document(s)'
+                         + (c.docType ? ' — ' + c.docType : ''));
+          if (!parts.length) return null;
+          /* On tente chaque partition annoncée, l'une après l'autre. */
+          return parts.reduce(function(chaine, p){
+            return chaine.then(function(r){
+              return r || essai(C3D_GPU + 'secteur-cc?partition=' + encodeURIComponent(p),
+                                'carte communale (' + p + ')');
+            });
+          }, Promise.resolve(null));
+        })
+        .catch(function(e){
+          c.ccJournal.push('document : ' + ((e && e.message) || 'échec'));
+          return null;
+        });
+    }
+
+    return Promise.resolve()
+      .then(function(){
+        return bbox ? essai(C3D_GPU + 'secteur-cc?geom=' + encodeURIComponent(JSON.stringify(bbox)),
+                            'carte communale (emprise)') : null;
       })
-      .catch(function(e){ c.errCc = (e && e.message) || 'échec'; return null; });
+      .then(function(r){ return r || parDocument(); });
   }
 
   /* Enchaînement : chaque étape renvoie un tableau si elle conclut, `null` si
@@ -1330,8 +1388,13 @@ function _c3dOuvrirDiag(){
      7 km sur 6,7 km qui déborde sur les communes voisines. Ils étaient lus
      comme des totaux communaux — d'où la distinction explicite. */
   _c3dJournal.forEach(function(e){
+    /* ⚠️ « retenus dans la commune » est faux pour les lignes du TERRITOIRE :
+       on n'y découpe pas sur Mézières, on apparie 25 communes parmi celles que
+       l'emprise a ramenées. Le chiffre était juste, la phrase non. */
     var retenu = e.retenu != null && e.retenu !== e.n
-      ? '<br><span class="d">' + e.retenu + ' retenus dans la commune</span>' : '';
+      ? '<br><span class="d">' + e.retenu
+        + (/territoire/i.test(e.nom) ? ' retenues sur ' + e.n
+                                     : ' retenus dans la commune') + '</span>' : '';
     out += '<div class="c3d-row"><span class="c">' + _c3dEsc(e.nom)
         +  '<br><span class="d">' + _c3dEsc(e.detail) + '</span>' + retenu + '</span>'
         +  '<span class="a ' + (e.ok ? 'ok' : 'pc') + '">'
@@ -1374,6 +1437,22 @@ function _c3dOuvrirDiag(){
       out += '<div class="c3d-row"><span class="c">' + _c3dEsc(c.nom)
           +  '<br><span class="d">' + _c3dEsc(c.err) + '</span></span>'
           +  '<span class="a pc">échec</span></div>';
+    });
+    out += '</div>';
+  }
+
+  /* Communes sans PLU : ce que chaque tentative de carte communale a répondu.
+     Sans ce détail, l'écran annonce « pas de PLU » sans pouvoir dire si le
+     service a répondu vide, renvoyé une erreur, ou n'existe pas sous ce nom —
+     et c'est justement la question qui reste ouverte. */
+  var sans = (_c3dTerr || []).filter(function(c){ return c.sansDoc && c.ccJournal; });
+  if (sans.length){
+    out += '<div class="c3d-sec">Communes sans PLU — recherche d\'une carte communale</div>'
+        +  '<div class="c3d-rows">';
+    sans.slice(0, 8).forEach(function(c){
+      out += '<div class="c3d-row"><span class="c">' + _c3dEsc(c.nom)
+          +  '<br><span class="d">' + _c3dEsc(c.ccJournal.join(' · ')) + '</span></span>'
+          +  '<span class="a dp">sans PLU</span></div>';
     });
     out += '</div>';
   }

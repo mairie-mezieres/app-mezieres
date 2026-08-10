@@ -174,7 +174,14 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   PLU laisserait croire à un zonage qui n'existe pas. La légende ne montre que les familles
   **réellement présentes**.
   Le relevé de terrain a rendu le motif évident : les communes qui répondaient étaient les
-  plus peuplées, celles qui restaient vides les plus petites.
+  plus peuplées, celles qui restaient vides les plus petites. La mairie l'a confirmé — Le
+  Bardon relève d'une carte communale approuvée en 2011.
+  ⚠️ **Toute tentative laisse une trace exploitable.** Deux chemins sont essayés (emprise,
+  puis les partitions annoncées par le Géoportail pour cette commune), et chacun inscrit son
+  issue dans un journal affiché au diagnostic. La v4.74 écrivait ce motif dans une variable
+  que **rien ne lisait** : l'écran disait « pas de PLU » sans pouvoir distinguer une réponse
+  vide d'une erreur ou d'un endpoint inexistant. Un motif d'échec écrit et jamais lu ne vaut
+  pas mieux que pas de motif du tout — verrouillé par test.
 - **RG-17.26 — jamais une géométrie complète dans une URL.** Un contour communal du
   Géoportail compte des milliers de sommets ; sérialisé et encodé dans une chaîne de
   requête, il produit une URL de plusieurs dizaines de milliers de caractères que la pile
