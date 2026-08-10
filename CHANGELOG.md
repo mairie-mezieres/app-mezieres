@@ -5,6 +5,40 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.71] — 10 août 2026
+
+### Ajouté
+- **« Le territoire » — les 25 communes des Terres du Val de Loire.** Un bouton de la carte
+  3D prend du recul et affiche le zonage des **25 PLU communaux en vigueur**, coloré par
+  les quatre familles normalisées du Géoportail (U, AU, A, N). Mézières est cerclée de
+  blanc. Un panneau liste les 25 communes avec, pour chacune, son nombre de secteurs, son
+  statut RNU, ou l'échec de son zonage.
+- **Le PLUi-H-D est annoncé comme en cours d'élaboration**, pas comme le document en
+  vigueur : ce sont bien 25 PLU distincts qui sont montrés (RG-17.19).
+
+### Note technique
+- **Aucun code INSEE n'est écrit dans le code.** Seuls les 25 **noms**, fournis par la
+  mairie, le sont ; codes, contours, partitions et statut RNU viennent de
+  `municipality?geom=`. Une commune que le Géoportail ne place pas dans l'emprise est
+  **signalée** dans le bandeau et dans « 🔎 Détail des sources » — jamais remplacée par une
+  supposition. Écrire 25 codes de mémoire referait la faute 45203/45204, à 25 exemplaires
+  et invisible à cette échelle. La fenêtre de recherche est volontairement large : trop
+  petite, des communes manquent et sont signalées ; trop grande, des voisines reviennent et
+  le filtrage par nom les écarte. L'erreur est rattrapable dans les deux sens.
+- **Aucune règle de construction hors de Mézières** : `data/plu-data.json` ne décrit que le
+  PLU communal. En vue territoire, un clic nomme la commune et la famille de zone, sans
+  ouvrir la fiche des règles (RG-17.21).
+- ⚠️ **Le piège « 1AU ».** Les zones à urbaniser s'écrivent presque toujours avec le
+  chiffre de phasage en tête, et « AU » commence par un « A ». Le test écrit avant la
+  correction a attrapé les deux : sans précaution, toutes les zones à urbaniser du
+  territoire retombaient en gris — y compris celles de Mézières.
+- Le cadrage est **déduit des contours reçus** (`fitBounds`), pas d'un zoom écrit à la
+  main. Aucun bâtiment n'est chargé à cette échelle.
+- Chargement par **vagues de quatre** requêtes : 25 appels lancés d'un coup étranglent un
+  téléphone. La carte se remplit au fur et à mesure.
+
+---
+
 ## [4.70] — 10 août 2026
 
 ### Ajouté

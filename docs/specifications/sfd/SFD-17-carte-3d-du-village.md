@@ -112,6 +112,29 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   (`bati-toit` en pente, `bati-toit-plat` pour l'industriel et le hors-commune) portent des
   filtres **exactement complémentaires**, faute de quoi les volumes se superposent.
 
+- **RG-17.19 — le territoire montre 25 PLU, pas un PLUi.** La vue « Le territoire »
+  affiche les **25 PLU communaux en vigueur** des Terres du Val de Loire, chacun avec sa
+  propre nomenclature. Le PLUi-H-D est en cours d'élaboration et n'existe pas au
+  Géoportail : l'écran doit le dire, et ne jamais laisser croire à un document unique.
+- **RG-17.20 — aucun code INSEE n'est écrit dans le code.** Seuls les 25 **noms** fournis
+  par la mairie le sont. Codes, contours, partitions et statut RNU viennent du Géoportail.
+  Une commune que le service ne place pas dans l'emprise est **signalée** — bandeau d'état
+  et panneau « 🔎 Détail des sources » — jamais remplacée par une supposition. Écrire des
+  codes de mémoire referait la faute 45203/45204, en 25 exemplaires et invisible à cette
+  échelle.
+- **RG-17.21 — aucune règle de construction hors de Mézières.** `data/plu-data.json`
+  décrit le PLU de Mézières et lui seul. En vue territoire, un clic nomme la commune et la
+  famille de zone ; il **n'ouvre pas** la fiche des règles.
+- **RG-17.22 — à cette échelle, on ne colore que par famille normalisée.** Les codes de
+  zones diffèrent d'un PLU à l'autre (« Ua » ici, « UB » là) : seules les quatre familles
+  du Géoportail (U, AU, A, N) sont comparables. ⚠️ Les zones à urbaniser s'écrivent
+  presque toujours **« 1AU », « 2AU »** — chiffre de phasage en tête — et « AU » commence
+  par un « A » : sans précaution, la forme la plus courante retombe en gris ou, pire, en
+  agricole. Verrouillé par test.
+- **RG-17.23 — le cadrage est déduit des contours reçus.** Un zoom écrit à la main
+  couperait des communes ou les noierait ; `fitBounds` sur ce qui est réellement arrivé ne
+  peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle.
+
 ## 5. Parcours
 
 1. **Depuis l'écran d'accueil** → rubrique « Démarches et Services », tuile
@@ -134,6 +157,8 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 | Zonage du PLU | Géoportail de l'Urbanisme via apicarto (`municipality` puis `zone-urba`) |
 | Règles d'urbanisme | `data/plu-data.json` (embarqué) |
 | Coordonnées d'adresse | Réutilisées de MEL — Base Adresse Nationale |
+| Communes du territoire | apicarto `municipality?geom=` — codes INSEE, contours, partitions, statut RNU (⚠️ **jamais écrits en dur**) |
+| Zonage des 25 communes | apicarto `zone-urba?partition=`, une requête par commune, par vagues de quatre |
 
 **Aucune route backend, aucune clé Redis.** La carte n'ajoute rien au serveur.
 
@@ -160,6 +185,19 @@ qu'aucune erreur de validation n'est remontée, et que la pile de tranches de la
 
 Le test « un toit ne déborde jamais de son bâtiment » pose une maison en L et vérifie que
 tous les sommets des tranches restent dans l'emprise (RG-17.16).
+
+Trois tests couvrent le territoire, tous **sans réseau** — ce qui compte, puisque apicarto
+est inaccessible depuis l'environnement de développement :
+
+- « les communes viennent du Géoportail, jamais d'une supposition » exerce `_c3dApparier`
+  sur une réponse simulée : appariement malgré casse et accents, rejet d'une commune hors
+  CCTVL, dédoublonnage, RNU conservé comme information, **aucun code INSEE fabriqué**, et
+  les 22 communes absentes signalées (RG-17.20).
+- « "AU" n'est pas rangé en agricole » verrouille `_c3dTypeZone`, y compris `1AU` / `2AU`
+  (RG-17.22). Ce test a trouvé le défaut à l'écriture : le chiffre de tête faisait
+  retomber toutes les zones à urbaniser en gris.
+- « sources coupées, aucune commune n'est inventée » vérifie qu'en l'absence de réponse la
+  vue le dit et ne pose aucune couche.
 
 Ces tests ne demandent aucun réseau — seulement la bibliothèque servie en local — et c'est
 précisément pour cela qu'ils voient ce qu'aucun autre test ne voyait (v4.68). Chacun a été

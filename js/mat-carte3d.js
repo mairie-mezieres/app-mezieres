@@ -705,6 +705,306 @@ function _c3dPoserBati(fc){
     paint:{ 'line-color':'#6b5a45', 'line-width':0.6, 'line-opacity':0.35 } });
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   LE TERRITOIRE — les 25 communes de la CCTVL
+
+   Le maire de Mézières porte le PLUi-H-D comme vice-président de la
+   communauté de communes des Terres du Val de Loire. Cette vue montre aux
+   Macériens le territoire dans lequel s'inscrit leur propre PLU.
+
+   ⚠️ Ce qui est montré, ce sont les **25 PLU communaux d'aujourd'hui**,
+   chacun avec ses propres règles et sa propre nomenclature de zones. Le
+   PLUi-H-D n'existe pas encore au Géoportail de l'Urbanisme : la carte ne
+   doit donc jamais laisser croire qu'elle affiche un document unique.
+
+   ⚠️ **Aucune règle de construction hors de Mézières.** `data/plu-data.json`
+   décrit le PLU de Mézières et lui seul — jusqu'au « Clos de Manthelon » et
+   au recul de l'A71. Appliquer ces règles à Baule ou à Tavers serait faux.
+
+   ⚠️ **Aucun code INSEE n'est écrit ici.** Les 25 NOMS viennent de la mairie ;
+   les codes, contours et partitions sont ceux que renvoie le Géoportail.
+   Écrire une liste de codes de mémoire, ce serait refaire la faute
+   45203/45204 — mais à 25 exemplaires, et invisible à cette échelle. Un nom
+   que le Géoportail ne place pas dans l'emprise est **signalé**, jamais
+   deviné : voir `_c3dTerrManquantes` et le panneau « 🔎 Détail des sources ».
+   ══════════════════════════════════════════════════════════════════ */
+
+var C3D_CCTVL = [
+  'Baccon', 'Baule', 'Beauce-la-Romaine', 'Beaugency', 'Binas', 'Chaingy',
+  'Charsonville', 'Cléry-Saint-André', 'Coulmiers', 'Cravant', 'Dry',
+  'Épieds-en-Beauce', 'Huisseau-sur-Mauves', 'Lailly-en-Val', 'Le Bardon',
+  'Mareau-aux-Prés', 'Messas', 'Meung-sur-Loire', 'Mézières-lez-Cléry',
+  'Rozières-en-Beauce', 'Saint-Ay', 'Saint-Laurent-des-Bois', 'Tavers',
+  'Villermain', 'Villorceau'
+];
+
+/* Fenêtre de recherche, volontairement large. Ce n'est PAS une affirmation
+   sur l'étendue de la CCTVL : trop petite, des communes manquent — et elles
+   sont alors signalées ; trop grande, des voisines reviennent — et le
+   filtrage par nom les écarte. L'erreur est donc rattrapable dans les deux
+   sens, ce qu'une liste de codes écrite à la main n'aurait pas été. */
+var C3D_TERR_BBOX = { w: 1.30, s: 47.63, e: 1.99, n: 48.06 };
+
+/* Les codes de zones diffèrent d'un PLU à l'autre (« Ua » ici, « UB » là) :
+   à l'échelle du territoire on ne peut colorer que par le TYPE normalisé du
+   Géoportail — les quatre familles communes à tous les PLU de France. */
+var C3D_TYPEZONE = {
+  U:  { c:'#c0563f', lib:'Zone urbanisée' },
+  AU: { c:'#e2703a', lib:'À urbaniser' },
+  A:  { c:'#e8c547', lib:'Agricole' },
+  N:  { c:'#2f9e5f', lib:'Naturelle et forestière' }
+};
+
+var _c3dTerr = null;              // [{insee, nom, partition, rnu, geom, nZones, err}]
+var _c3dTerrManquantes = [];      // noms fournis par la mairie, non placés
+var _c3dTerrZones = null;         // FeatureCollection des zonages des 25
+var _c3dTerrEtat = 'vierge';      // vierge | charge | pret | echec
+var _c3dTerrActif = false;
+
+/* Clé de comparaison des noms : sans accent, sans casse, sans tiret ni
+   espace. « Épieds-en-Beauce » et « EPIEDS EN BEAUCE » doivent s'apparier. */
+function _c3dNomCle(s){
+  return _c3dSansAccent(s).replace(/[^a-z0-9]+/g, '');
+}
+
+/* ⚠️ Deux pièges, tous deux attrapés par `carte3d.spec.js` :
+   1. « AU » commence par un « A » — une zone à urbaniser rangée en agricole
+      raconterait l'inverse de la réalité. D'où l'ordre des tests.
+   2. Les zones à urbaniser s'écrivent presque toujours « 1AU », « 2AU » : le
+      chiffre de phasage est en TÊTE. Sans le retirer, la forme la plus
+      courante — celle du PLU de Mézières lui-même — retombait en gris. */
+function _c3dTypeZone(p){
+  var t = _c3dSansAccent((p && (p.typezone || p.type_zone || p.libelle)) || '')
+            .trim().replace(/^[0-9]+/, '');
+  if (!t) return '';
+  if (t.indexOf('au') === 0 || /a urbaniser/.test(t)) return 'AU';
+  if (t.indexOf('u') === 0  || /urbanis/.test(t))     return 'U';
+  if (t.indexOf('a') === 0  || /agricole/.test(t))    return 'A';
+  if (t.indexOf('n') === 0  || /naturel|forest/.test(t)) return 'N';
+  return '';
+}
+
+/* Apparie ce que renvoie le Géoportail avec les 25 noms de la mairie.
+   Fonction PURE : testable sans réseau, et c'est elle qui porte la garantie
+   « aucun code inventé ». */
+function _c3dApparier(features){
+  var attendues = {}, trouvees = [], vus = {}, manquantes = [];
+  C3D_CCTVL.forEach(function(n){ attendues[_c3dNomCle(n)] = n; });
+  (features || []).forEach(function(f){
+    var p = (f && f.properties) || {};
+    var nom = p.name || p.nom || p.commune || p.libelle || '';
+    var cle = _c3dNomCle(nom);
+    if (!attendues[cle] || vus[cle]) return;   // hors CCTVL, ou déjà vue
+    vus[cle] = 1;
+    trouvees.push({
+      insee: p.insee || p.code_insee || p.insee_com || '',
+      nom: nom,
+      partition: p.partition || '',
+      rnu: (p.is_rnu === true || p.is_rnu === 'true'),
+      geom: f.geometry, nZones: 0, err: ''
+    });
+  });
+  C3D_CCTVL.forEach(function(n){ if (!vus[_c3dNomCle(n)]) manquantes.push(n); });
+  trouvees.sort(function(a, b){ return a.nom.localeCompare(b.nom, 'fr'); });
+  return { trouvees: trouvees, manquantes: manquantes };
+}
+
+function _c3dTerrCommunes(){
+  var b = C3D_TERR_BBOX;
+  var geom = { type:'Polygon', coordinates:[[
+    [b.w, b.s], [b.e, b.s], [b.e, b.n], [b.w, b.n], [b.w, b.s]
+  ]]};
+  return _c3dJson(C3D_GPU + 'municipality?geom=' + encodeURIComponent(JSON.stringify(geom)))
+    .then(function(fc){ return (fc && fc.features) || []; });
+}
+
+/* Le zonage d'UNE commune. Une commune au RNU n'a pas de document : ce n'est
+   pas une erreur, c'est une information — elle est affichée comme telle. */
+function _c3dTerrZonesDe(c){
+  if (c.rnu || !c.partition) return Promise.resolve([]);
+  return _c3dJson(C3D_GPU + 'zone-urba?partition=' + encodeURIComponent(c.partition))
+    .then(function(fc){
+      var out = (fc && fc.features) || [];
+      out.forEach(function(f){
+        f.properties = f.properties || {};
+        f.properties.mat_tz  = _c3dTypeZone(f.properties);
+        f.properties.mat_com = c.nom;
+        f.properties.mat_moi = (c.insee && c.insee === C3D_INSEE) ? 1 : 0;
+      });
+      c.nZones = out.length;
+      return out;
+    })
+    .catch(function(e){ c.err = (e && e.message) || 'échec'; return []; });
+}
+
+/* Chargement par vagues de quatre : 25 requêtes lancées d'un coup, c'est
+   un téléphone qui s'étrangle. La carte se remplit au fur et à mesure. */
+function _c3dTerrCharger(){
+  if (_c3dTerrEtat === 'pret' || _c3dTerrEtat === 'charge') return Promise.resolve();
+  _c3dTerrEtat = 'charge';
+  _c3dStatut('Chargement du territoire — 25 communes…');
+
+  return _c3dTerrCommunes()
+    .then(function(features){
+      var r = _c3dApparier(features);
+      _c3dTerr = r.trouvees;
+      _c3dTerrManquantes = r.manquantes;
+      _c3dNoter('Géoportail — communes du territoire', !!r.trouvees.length,
+        r.manquantes.length ? ('non placées : ' + r.manquantes.join(', ')) : 'les 25 communes',
+        (features || []).length, r.trouvees.length);
+      if (!r.trouvees.length) throw new Error('aucune commune du territoire trouvée');
+
+      _c3dTerrZones = { type:'FeatureCollection', features:[] };
+      _c3dPoserTerritoire();
+      _c3dCadrerTerritoire();
+
+      var i = 0;
+      function vague(){
+        var lot = _c3dTerr.slice(i, i + 4);
+        if (!lot.length) return Promise.resolve();
+        i += 4;
+        return Promise.all(lot.map(_c3dTerrZonesDe)).then(function(res){
+          res.forEach(function(zs){ _c3dTerrZones.features.push.apply(_c3dTerrZones.features, zs); });
+          var s = _c3dMap && _c3dMap.getSource('terr-zones');
+          if (s) s.setData(_c3dTerrZones);
+          _c3dTerrPanneau();
+          _c3dStatut('Territoire — ' + Math.min(i, _c3dTerr.length) + '/' + _c3dTerr.length
+                   + ' communes chargées…');
+          return vague();
+        });
+      }
+      return vague();
+    })
+    .then(function(){
+      _c3dTerrEtat = 'pret';
+      var rnu = _c3dTerr.filter(function(c){ return c.rnu; }).length;
+      var ko  = _c3dTerr.filter(function(c){ return c.err; }).length;
+      var msg = '<b>Les Terres du Val de Loire</b> · ' + _c3dTerr.length + ' communes sur '
+              + C3D_CCTVL.length;
+      if (rnu) msg += ' · ' + rnu + ' au RNU';
+      if (ko)  msg += ' · ' + ko + ' zonage(s) indisponible(s)';
+      if (_c3dTerrManquantes.length)
+        msg += '<br>⚠️ non placées : ' + _c3dEsc(_c3dTerrManquantes.join(', '));
+      _c3dStatut(msg);
+      _c3dTerrPanneau();
+    })
+    .catch(function(e){
+      _c3dTerrEtat = 'echec';
+      _c3dNoter('Géoportail — communes du territoire', false, (e && e.message) || 'raison inconnue');
+      _c3dStatut('⚠️ Territoire indisponible : ' + _c3dEsc(e && e.message)
+               + '<br>Touchez « 🔎 Détail des sources ».');
+    });
+}
+
+function _c3dPoserTerritoire(){
+  if (!_c3dMap || _c3dMap.getSource('terr-zones')) return;
+
+  _c3dMap.addSource('terr-communes', { type:'geojson', data:{ type:'FeatureCollection',
+    features: _c3dTerr.map(function(c){
+      return { type:'Feature', geometry:c.geom,
+               properties:{ mat_com:c.nom, mat_rnu:c.rnu ? 1 : 0,
+                            mat_moi:(c.insee && c.insee === C3D_INSEE) ? 1 : 0 } };
+    }) }});
+  _c3dMap.addSource('terr-zones', { type:'geojson', data:_c3dTerrZones });
+
+  var couleur = ['match', ['get','mat_tz'],
+    'U',  C3D_TYPEZONE.U.c,  'AU', C3D_TYPEZONE.AU.c,
+    'A',  C3D_TYPEZONE.A.c,  'N',  C3D_TYPEZONE.N.c,  C3D_DEFAUT];
+
+  _c3dMap.addLayer({ id:'terr-fill', type:'fill', source:'terr-zones',
+    paint:{ 'fill-color':couleur, 'fill-opacity':0.55 } });
+  _c3dMap.addLayer({ id:'terr-line', type:'line', source:'terr-communes',
+    paint:{ 'line-color':'#3d4a44', 'line-width':1.1, 'line-opacity':0.75 } });
+  /* Mézières doit se retrouver d'un coup d'œil : c'est de là qu'on regarde. */
+  _c3dMap.addLayer({ id:'terr-moi', type:'line', source:'terr-communes',
+    filter:['==', ['get','mat_moi'], 1],
+    paint:{ 'line-color':'#ffffff', 'line-width':3.4, 'line-opacity':0.95 } });
+}
+
+/* Le cadrage est DÉDUIT des contours reçus, jamais fixé à un zoom écrit à la
+   main : je ne connais pas l'étendue exacte de la CCTVL, et un zoom deviné
+   couperait des communes ou les noierait. `fitBounds` sur ce qui est
+   réellement arrivé ne peut pas se tromper. */
+function _c3dCadrerTerritoire(){
+  if (!_c3dMap || !_c3dTerr || !_c3dTerr.length) return;
+  var w = 180, s = 90, e = -180, n = -90, vus = 0;
+  _c3dTerr.forEach(function(c){
+    var g = c.geom;
+    if (!g) return;
+    var polys = g.type === 'Polygon' ? [g.coordinates]
+              : g.type === 'MultiPolygon' ? g.coordinates : [];
+    polys.forEach(function(anneaux){
+      (anneaux[0] || []).forEach(function(pt){
+        if (pt[0] < w) w = pt[0]; if (pt[0] > e) e = pt[0];
+        if (pt[1] < s) s = pt[1]; if (pt[1] > n) n = pt[1];
+        vus++;
+      });
+    });
+  });
+  if (!vus) return;
+  _c3dMap.fitBounds([[w, s], [e, n]], { padding:34, duration:1400, pitch:0, bearing:0 });
+}
+
+/* Liste des communes : le seul endroit qui dise, commune par commune, ce que
+   la carte sait et ce qu'elle ignore. */
+function _c3dTerrPanneau(){
+  var ul = document.getElementById('c3d-terr-liste');
+  if (!ul) return;
+  var lignes = (_c3dTerr || []).map(function(c){
+    var etat = c.rnu ? '<em>au RNU — pas de PLU</em>'
+             : c.err ? '<em>zonage indisponible</em>'
+             : c.nZones ? (c.nZones + ' secteurs') : '<em>en cours…</em>';
+    return '<li' + (c.insee === C3D_INSEE ? ' class="c3d-terr-moi"' : '') + '>'
+         + '<span>' + _c3dEsc(c.nom) + '</span> <small>' + etat + '</small></li>';
+  });
+  _c3dTerrManquantes.forEach(function(n){
+    lignes.push('<li><span>' + _c3dEsc(n) + '</span> <small><em>non trouvée au Géoportail</em></small></li>');
+  });
+  ul.innerHTML = lignes.join('');
+  var lg = document.getElementById('c3d-terr-legende');
+  if (lg) lg.innerHTML = Object.keys(C3D_TYPEZONE).map(function(k){
+    return '<li><i style="background:' + C3D_TYPEZONE[k].c + '"></i><span>' + k
+         + ' <span>' + C3D_TYPEZONE[k].lib + '</span></span></li>';
+  }).join('');
+}
+
+/* Bascule village ↔ territoire. Les bâtiments n'ont aucun sens à 30 km de
+   distance : ils sont masqués, pas seulement invisibles — c'est autant de
+   géométrie que la carte ne dessine plus. */
+var C3D_COUCHES_VILLAGE = ['bati','bati-toit','bati-toit-plat','bati-contour',
+                           'zones-fill','zones-line','contour-ligne'];
+var C3D_COUCHES_TERR = ['terr-fill','terr-line','terr-moi'];
+
+function _c3dVoirTerritoire(on){
+  _c3dTerrActif = !!on;
+  var det = document.getElementById('c3d-terr');
+  if (det) det.hidden = !on;
+  var lg = document.getElementById('c3d-legende');
+  if (lg) lg.hidden = on || !_c3dZones;
+
+  function vis(ids, montrer){
+    ids.forEach(function(l){
+      if (_c3dMap && _c3dMap.getLayer(l))
+        _c3dMap.setLayoutProperty(l, 'visibility', montrer ? 'visible' : 'none');
+    });
+  }
+  vis(C3D_COUCHES_VILLAGE, !on);
+  vis(C3D_COUCHES_TERR, on);
+
+  if (!on){
+    _c3dMap.easeTo({ center:C3D_CENTRE, zoom:14.4, pitch:55, duration:1400 });
+    return Promise.resolve();
+  }
+  /* À plat : à cette échelle, l'inclinaison ne montre rien et gêne la lecture.
+     Ce recul n'est qu'un premier pas — `_c3dCadrerTerritoire` reprend la main
+     dès que les contours sont là. */
+  _c3dMap.easeTo({ center:C3D_CENTRE, zoom:9.6, pitch:0, bearing:0, duration:1600 });
+  return _c3dTerrCharger().then(function(){
+    vis(C3D_COUCHES_TERR, true);
+    _c3dCadrerTerritoire();
+  });
+}
+
 function _c3dPoserLegende(){
   var ul = document.getElementById('c3d-legende-liste');
   if (!ul) return;
@@ -820,6 +1120,32 @@ function _c3dOuvrirDiag(){
     out += '</div>';
   }
 
+  /* Territoire : la liste des noms fournis par la mairie que le Géoportail
+     n'a pas placés dans l'emprise. Sans elle, la carte afficherait 23
+     communes en laissant croire qu'elle en montre 25. */
+  if (_c3dTerrManquantes.length){
+    out += '<div class="c3d-sec">Communes annoncées, non trouvées au Géoportail</div>'
+        +  '<div class="c3d-rows">';
+    _c3dTerrManquantes.forEach(function(n){
+      out += '<div class="c3d-row"><span class="c">' + _c3dEsc(n)
+          +  '<br><span class="d">nom absent de l\'emprise interrogée</span></span>'
+          +  '<span class="a pc">absente</span></div>';
+    });
+    out += '</div><div class="c3d-note">Un nom non trouvé n\'est jamais remplacé par une '
+        +  'supposition : ni code INSEE, ni commune approchante. Soit le Géoportail ne la '
+        +  'connaît pas sous ce nom, soit elle est hors de l\'emprise interrogée.</div>';
+  }
+  var ko = (_c3dTerr || []).filter(function(c){ return c.err; });
+  if (ko.length){
+    out += '<div class="c3d-sec">Zonages du territoire indisponibles</div><div class="c3d-rows">';
+    ko.forEach(function(c){
+      out += '<div class="c3d-row"><span class="c">' + _c3dEsc(c.nom)
+          +  '<br><span class="d">' + _c3dEsc(c.err) + '</span></span>'
+          +  '<span class="a pc">échec</span></div>';
+    });
+    out += '</div>';
+  }
+
   out += '<div class="c3d-note">Données : orthophoto et BD TOPO de l\'IGN, zonage du Géoportail '
       +  'de l\'Urbanisme, règles du PLU communal. Rien n\'est envoyé : votre position n\'est '
       +  'transmise à personne.</div>';
@@ -830,6 +1156,22 @@ function _c3dOuvrirDiag(){
 /* ── Interactions ──────────────────────────────────────────────── */
 function _c3dBrancher(){
   _c3dMap.on('click', function(e){
+    /* En vue territoire, un clic nomme la commune et la famille de zone —
+       et RIEN de plus. Ouvrir la fiche des règles reviendrait à appliquer le
+       PLU de Mézières à Baule ou à Tavers : `data/plu-data.json` ne décrit
+       que Mézières. Voir RG-17.21. */
+    if (_c3dTerrActif){
+      if (!_c3dMap.getLayer('terr-fill')) return;
+      var t = _c3dMap.queryRenderedFeatures(e.point, { layers:['terr-fill'] })[0];
+      if (!t) return;
+      var tz = t.properties.mat_tz;
+      var lib = C3D_TYPEZONE[tz] ? C3D_TYPEZONE[tz].lib : 'type non renseigné';
+      _c3dStatut('<b>' + _c3dEsc(t.properties.mat_com) + '</b> — ' + _c3dEsc(lib)
+        + (Number(t.properties.mat_moi) === 1
+            ? '<br>Revenez au village pour les règles qui s\'y appliquent.'
+            : '<br>Les règles de construction de cette commune ne sont pas dans l\'application.'));
+      return;
+    }
     if (!_c3dMap.getLayer('bati')) return;
     var f = _c3dMap.queryRenderedFeatures(e.point, { layers:['bati'] })[0];
     if (!f) return;
@@ -859,6 +1201,13 @@ function _c3dBrancher(){
     ['bati','bati-toit','bati-toit-plat','bati-contour'].forEach(function(l){
       if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
     });
+  });
+  /* Le territoire est FERMÉ par défaut (aria-pressed="false") : c'est une vue
+     supplémentaire, et son chargement coûte 26 requêtes. On ne l'impose pas. */
+  bascule('c3d-btn-terr', function(on){
+    var t = document.querySelector('#c3d-btn-terr span');
+    if (t) t.textContent = on ? 'Revenir au village' : 'Le territoire';
+    _c3dVoirTerritoire(on);
   });
   bascule('c3d-btn-fond', function(on){
     _c3dMap.setLayoutProperty('l-ortho', 'visibility', on ? 'visible' : 'none');
