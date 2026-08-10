@@ -62,6 +62,21 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   l'entrée se fait depuis MEL, les coordonnées restent dans le navigateur.
 - **RG-17.9** — Le travelling d'arrivée est supprimé si « Réduire les animations » est
   actif, et interrompu au premier geste.
+- **RG-17.10 — un seul nom.** La fonctionnalité s'appelle « Mon village en 3D » partout :
+  tuile d'accueil, titre d'écran, `aria-label`, section de la page PLUi-H-D. Le bouton de
+  MEL (« Voir ma zone en 3D ») nomme une **action**, pas la fonctionnalité. Verrouillé par test.
+- **RG-17.11 — les chiffres annoncés portent sur la commune, pas sur l'emprise interrogée.**
+  Celle-ci fait 7 km sur 6,7 km et déborde sur Cléry-Saint-André, Mareau-aux-Prés et Dry.
+  Le bandeau compte les **bâtiments dont le centre est dans le contour communal** (renvoyé
+  par l'appel `municipality`) et le nombre de **zones distinctes**, non de polygones : le
+  Géoportail renvoie un polygone par secteur, et « 185 zones » laissait croire à 185 règles.
+- **RG-17.12 — le zonage est découpé sur le contour de la commune.** Le repli par géométrie
+  ramène le PLU de tout le secteur ; l'afficher tel quel reviendrait à draper le plan du
+  voisin sur Mézières. Les bâtiments hors commune restent visibles mais **estompés**, et la
+  **limite communale est tracée**.
+- **RG-17.13 — « Où suis-je » ne transmet rien.** La position sert uniquement à centrer la
+  carte et à lire la zone dans le zonage déjà chargé : aucune requête réseau n'est émise.
+  Hors commune, l'écran l'indique explicitement.
 
 ## 5. Parcours
 
@@ -75,10 +90,6 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 4. **Sur ordinateur** → colonne « 🤝 Vous aider » et menu du haut. La grille de cartes
    étant propre au téléphone, sans ces deux entrées la carte serait invisible au-delà de
    1024 px.
-
-**RG-17.10 — un seul nom.** La fonctionnalité s'appelle « Mon village en 3D » partout :
-tuile d'accueil, titre d'écran, `aria-label`, section de la page PLUi-H-D. Le bouton de MEL
-(« Voir ma zone en 3D ») nomme une **action**, pas la fonctionnalité. Verrouillé par un test.
 
 ## 6. Données et interfaces
 

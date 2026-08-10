@@ -1,7 +1,14 @@
 /* MAT — Eau v3.12.0 — Niveau nappe + restrictions VigiEau (double requête coordonnées + commune, niveau le plus grave) */
 var _EAU_BSS   = '03983X0267/PZ3';
 var _EAU_LABEL = 'St-Cyr-en-Val';
-var _EAU_INSEE = '45203';
+// ⚠️ 45204 = Mézières-lez-Cléry. 45203 est MEUNG-SUR-LOIRE : jusqu'au
+// 10 août 2026, la requête VigiEau « par commune » interrogeait donc les
+// restrictions sécheresse du voisin. Comme le module retient le niveau le
+// plus sévère entre la requête par coordonnées (correcte) et celle par
+// commune, la commune a pu afficher une restriction qui n'était pas la sienne
+// — sur une information officielle. Voir aussi `VIGIEAU_COMMUNE_INSEE` côté
+// backend, corrigé en même temps.
+var _EAU_INSEE = '45204';
 // Coordonnées du bourg (même point que la météo) pour la requête VigiEau par
 // géométrie — le chemin utilisé par vigieau.gouv.fr quand on saisit une adresse.
 var _EAU_LAT   = 47.822;

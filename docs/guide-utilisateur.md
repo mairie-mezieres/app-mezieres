@@ -453,8 +453,15 @@ agricole, naturelle…), l'emprise au sol autorisée, la hauteur maximale, le re
 jardin, piscine, extension, panneaux solaires), s'il faut **ne rien faire**, une
 **déclaration préalable** ou un **permis de construire**.
 
-Trois interrupteurs en bas à gauche permettent d'éteindre le zonage, les bâtiments, ou de
-passer de la photo aérienne au plan.
+Des interrupteurs en bas à gauche permettent d'éteindre le zonage, les bâtiments, ou de
+passer de la photo aérienne au plan. Le bouton **« 📍 Où suis-je »** centre la carte sur
+votre position et affiche la zone où vous vous trouvez — votre position **ne quitte pas
+votre téléphone**, elle n'est transmise ni à la mairie ni à personne.
+
+**La limite de la commune est tracée** en pointillés, et les maisons des communes voisines
+sont volontairement estompées : on voit du premier coup d'œil où s'arrête Mézières. Les
+chiffres annoncés en haut de l'écran (nombre de bâtiments, nombre de zones) ne comptent que
+ce qui est **dans la commune**.
 
 **Depuis MEL.** Dans « Urbanisme & Construction », une fois votre adresse saisie et votre
 zone trouvée, un bouton **« 🏘️ Voir ma zone sur la carte 3D »** ouvre la carte centrée sur
