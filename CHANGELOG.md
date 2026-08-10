@@ -5,6 +5,47 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.73] — 10 août 2026
+
+### Corrigé
+- **Le zonage du territoire n'arrivait que pour 12 communes sur 25.** Le panneau de
+  diagnostic, mis en place en v4.72, a livré les deux causes exactes — c'était sa raison
+  d'être.
+- **« Failed to fetch » sur quatre communes : l'URL faisait 94 000 caractères.** Le zonage
+  était demandé en passant le **contour communal entier** dans la chaîne de requête. Un
+  contour du Géoportail compte des milliers de sommets ; sérialisé et encodé, il produit une
+  URL que la pile réseau refuse — sans même rendre d'erreur HTTP. La requête porte désormais
+  sur le **rectangle englobant (5 points)**, et l'exactitude est rétablie par le découpage
+  sur le vrai contour. Mesuré : 94 032 caractères avant, moins de 400 après.
+- **Neuf communes annoncées « sans zonage » alors que plusieurs sont simplement au RNU.**
+  `municipality?geom=` renvoie le nom, le code INSEE et le contour, mais **ni `partition` ni
+  `is_rnu`** — seul `municipality?insee=` fait autorité. Ce second appel est maintenant fait
+  pour toute commune restée muette : il donne la partition, et surtout distingue une commune
+  **sans PLU** (information) d'une commune **en panne** (erreur).
+- **Un échec réseau passager n'élimine plus une commune** : un seul second essai, sur les
+  seules erreurs de type « Failed to fetch ». Sur un téléphone, quatre requêtes simultanées
+  en perdent une de temps en temps.
+- Le bandeau ne compte plus les communes au RNU parmi les « sans zonage ». Il annonçait
+  « 13 sans zonage » là où plusieurs étaient parfaitement en règle.
+
+### Modifié
+- **« Où suis-je » clignote trois fois à l'ouverture de la carte, puis se tait.** Le bouton
+  ne se distinguait pas de ses cinq voisins, et sa fonction — situer *sa* maison dans le
+  zonage — est la moins devinable de la carte. Il cesse immédiatement dès qu'on le touche,
+  et l'animation est neutralisée par le réglage « Réduire les animations ».
+- **La vue territoire garde la vue aérienne.** La v4.72 basculait d'office sur le plan IGN ;
+  à l'usage, c'est la photo qui parle — elle donne le paysage, la Loire, les bourgs, que le
+  plan aplatit. Le double tracé des limites rend le zonage lisible sur les deux fonds, donc
+  rien n'oblige à choisir à la place de l'habitant : le bouton « Vue aérienne / Plan » reste
+  le seul maître.
+
+### Confirmé
+- **Les 25 communes de la liste de la mairie sont toutes reconnues** par le Géoportail —
+  y compris Beauce-la-Romaine, Binas, Villermain et Saint-Laurent-des-Bois, sur lesquelles
+  un doute avait été exprimé. C'est l'application qui l'a établi, pas une supposition.
+
+---
+
 ## [4.72] — 10 août 2026
 
 ### Corrigé

@@ -1460,6 +1460,18 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .c3d-btn[hidden]{display:none}
 .c3d-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 
+/* « Où suis-je » se perdait parmi six boutons de même allure : personne ne
+   devinait qu'il situait la maison de l'habitant dans le zonage. Il attire
+   l'œil trois fois à l'ouverture, puis se tait définitivement.
+   L'animation est neutralisée par la règle globale « Réduire les animations »
+   (l.1426) — aucune exception à prévoir ici. */
+@keyframes c3dAttire{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.07);box-shadow:0 0 0 7px rgba(240,180,41,0.45),var(--shadow-lg)}
+}
+.c3d-btn.c3d-attire{animation:c3dAttire 0.85s ease-in-out 3;
+  border-color:var(--gold);will-change:transform}
+
 .c3d-legende{position:absolute;z-index:3;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   background:rgba(255,255,255,0.94);border-radius:14px;box-shadow:var(--shadow-lg);
   max-width:min(46vw,230px);overflow:hidden}
