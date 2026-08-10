@@ -752,7 +752,11 @@ var C3D_TYPEZONE = {
   U:  { c:'#c0563f', lib:'Zone urbanisée' },
   AU: { c:'#e2703a', lib:'À urbaniser' },
   A:  { c:'#e8c547', lib:'Agricole' },
-  N:  { c:'#2f9e5f', lib:'Naturelle et forestière' }
+  N:  { c:'#2f9e5f', lib:'Naturelle et forestière' },
+  /* Carte communale : deux secteurs seulement — constructible ou non. Ce n'est
+     pas un PLU et la carte ne doit pas le faire croire. */
+  CU: { c:'#a2708f', lib:'Constructible (carte communale)' },
+  CN: { c:'#7f9c86', lib:'Non constructible (carte communale)' }
 };
 
 var _c3dTerr = null;              // [{insee, nom, partition, rnu, geom, nZones, err}]
@@ -923,10 +927,50 @@ function _c3dTerrZonesDe(c){
 
   function parEmprise(){
     var bbox = _c3dBBoxGeom(c.geom);
-    if (!bbox){ c.err = c.err || 'ni partition ni contour'; return []; }
+    if (!bbox){ c.err = c.err || 'ni partition ni contour'; return null; }
     return jsonRessaye(C3D_GPU + 'zone-urba?geom=' + encodeURIComponent(JSON.stringify(bbox)))
-      .then(function(fc){ return habiller((fc && fc.features) || [], 'emprise', true); })
-      .catch(function(e){ c.err = (e && e.message) || 'échec'; return []; });
+      .then(function(fc){
+        var out = (fc && fc.features) || [];
+        return out.length ? habiller(out, 'emprise', true) : null;
+      })
+      .catch(function(e){ c.err = (e && e.message) || 'échec'; return null; });
+  }
+
+  /* ⚠️ `zone-urba` ne sert QUE les PLU et les POS. Une petite commune rurale
+     est très souvent sous CARTE COMMUNALE — un document plus simple, à deux
+     secteurs : constructible ou non. Sa réponse `zone-urba` est légitimement
+     vide, et l'afficher comme « aucune zone renvoyée » laisse croire à une
+     panne alors que la commune est parfaitement en règle.
+
+     Le relevé de terrain le montre sans ambiguïté : les communes qui
+     répondaient sont les plus peuplées (Beaugency, Meung, Cléry, Lailly…),
+     celles qui restaient vides sont les plus petites (Baccon, Binas,
+     Charsonville, Coulmiers, Villermain…).
+
+     ⚠️ Le nom de cet endpoint est déduit de la documentation d'apicarto : il
+     n'est PAS vérifiable depuis l'environnement de développement. S'il n'existe
+     pas, l'appel échoue proprement, la commune est simplement annoncée sans
+     PLU, et le motif exact apparaît dans « 🔎 Détail des sources ». */
+  function parCarteCommunale(){
+    var bbox = _c3dBBoxGeom(c.geom);
+    if (!bbox) return null;
+    return jsonRessaye(C3D_GPU + 'secteur-cc?geom=' + encodeURIComponent(JSON.stringify(bbox)))
+      .then(function(fc){
+        var out = (fc && fc.features) || [];
+        if (!out.length) return null;
+        c.cc = true;
+        var res = habiller(out, 'carte communale', true);
+        /* Une carte communale n'a que deux secteurs. Les ranger dans les
+           familles d'un PLU (U/AU/A/N) laisserait croire à un zonage qui
+           n'existe pas : elles ont leurs propres couleurs. */
+        res.forEach(function(f){
+          var t = _c3dSansAccent(f.properties.libelle || f.properties.typesect
+                              || f.properties.typezone || '');
+          f.properties.mat_tz = (/non/.test(t) || /^nc/.test(t) || /^n/.test(t)) ? 'CN' : 'CU';
+        });
+        return res;
+      })
+      .catch(function(e){ c.errCc = (e && e.message) || 'échec'; return null; });
   }
 
   /* Enchaînement : chaque étape renvoie un tableau si elle conclut, `null` si
@@ -935,9 +979,13 @@ function _c3dTerrZonesDe(c){
     .then(function(){ return c.partition ? parPartition(c.partition, 'partition') : null; })
     .then(function(r){ return r || parInsee(); })
     .then(function(r){ return r || parEmprise(); })
+    .then(function(r){ return r || parCarteCommunale(); })
     .then(function(r){
       var out = r || [];
-      if (!out.length && !c.rnu && !c.err) c.err = 'aucune zone renvoyée';
+      /* Sans PLU ET sans carte communale, on ne conclut PAS à une panne : on
+         dit ce qu'on sait — le Géoportail n'a pas de document de zonage pour
+         cette commune. C'est une information, pas une erreur. */
+      if (!out.length && !c.rnu && !c.err) c.sansDoc = true;
       return out;
     });
 }
@@ -983,13 +1031,16 @@ function _c3dTerrCharger(){
     .then(function(){
       _c3dTerrEtat = 'pret';
       var rnu = _c3dTerr.filter(function(c){ return c.rnu; }).length;
-      /* Une commune au RNU n'est PAS en échec : elle n'a simplement pas de PLU.
-         Les compter ensemble annonçait « 13 sans zonage » là où plusieurs
-         étaient parfaitement en règle. */
-      var ko  = _c3dTerr.filter(function(c){ return c.err && !c.rnu; }).length;
+      /* ⚠️ Ne comptent comme ÉCHECS que les vraies pannes. Une commune au RNU
+         ou sans document au Géoportail est en règle : elle n'a pas de PLU.
+         Les mélanger annonçait « 13 sans zonage » — un chiffre qui donnait
+         l'impression d'une carte à moitié cassée. */
+      var sansPlu = _c3dTerr.filter(function(c){ return c.rnu || c.sansDoc; }).length;
+      var ko  = _c3dTerr.filter(function(c){ return c.err && !c.rnu && !c.sansDoc; }).length;
       var nz  = _c3dTerrZones.features.length;
       _c3dNoter('Géoportail — zonages du territoire', nz > 0,
-        (_c3dTerr.length - rnu - ko) + ' commune(s) avec zonage', nz, nz);
+        (_c3dTerr.length - sansPlu - ko) + ' commune(s) avec zonage · '
+        + sansPlu + ' sans PLU (RNU ou hors Géoportail)', nz, nz);
 
       /* Contours sans zonage : le cas où l'écran paraît vide alors que tout a
          « marché ». Il doit se dénoncer lui-même, et dire OÙ regarder. */
@@ -1000,10 +1051,14 @@ function _c3dTerrCharger(){
         _c3dTerrPanneau();
         return;
       }
-      var msg = '<b>Les Terres du Val de Loire</b> · ' + _c3dTerr.length + ' communes sur '
+      /* On annonce d'abord ce qui EST là. Le reste se dit en clair : « sans
+         PLU » n'est pas un défaut de la carte, c'est la situation de ces
+         communes. Seul `ko` désigne une vraie panne. */
+      var avecPlu = _c3dTerr.length - sansPlu - ko;
+      var msg = '<b>Les Terres du Val de Loire</b> · ' + avecPlu + ' communes avec zonage sur '
               + C3D_CCTVL.length;
-      if (rnu) msg += ' · ' + rnu + ' au RNU';
-      if (ko)  msg += ' · ' + ko + ' sans zonage';
+      if (sansPlu) msg += ' · ' + sansPlu + ' sans PLU';
+      if (ko)      msg += ' · ' + ko + ' indisponible' + (ko > 1 ? 's' : '');
       if (_c3dTerrManquantes.length)
         msg += '<br>⚠️ non placées : ' + _c3dEsc(_c3dTerrManquantes.join(', '));
       _c3dStatut(msg);
@@ -1028,9 +1083,11 @@ function _c3dPoserTerritoire(){
     }) }});
   _c3dMap.addSource('terr-zones', { type:'geojson', data:_c3dTerrZones });
 
-  var couleur = ['match', ['get','mat_tz'],
-    'U',  C3D_TYPEZONE.U.c,  'AU', C3D_TYPEZONE.AU.c,
-    'A',  C3D_TYPEZONE.A.c,  'N',  C3D_TYPEZONE.N.c,  C3D_DEFAUT];
+  /* Construite depuis `C3D_TYPEZONE` : ajouter une famille au tableau suffit,
+     sans risque d'oublier la couche. */
+  var couleur = ['match', ['get','mat_tz']];
+  Object.keys(C3D_TYPEZONE).forEach(function(k){ couleur.push(k, C3D_TYPEZONE[k].c); });
+  couleur.push(C3D_DEFAUT);
 
   _c3dMap.addLayer({ id:'terr-fill', type:'fill', source:'terr-zones',
     paint:{ 'fill-color':couleur, 'fill-opacity':0.55 } });
@@ -1073,17 +1130,36 @@ function _c3dCadrerTerritoire(){
   _c3dMap.fitBounds([[w, s], [e, n]], { padding:34, duration:1400, pitch:0, bearing:0 });
 }
 
+/* ⚠️ Déplié, le panneau des 25 communes recouvrait la colonne de boutons.
+   Replié il tenait — d'où un contrôle de collision qui passait au vert. Aucune
+   valeur écrite en CSS ne peut convenir : la hauteur dépend du nombre de
+   boutons visibles, de la barre système et du réglage de taille du texte.
+   On MESURE donc l'espace réellement libre au-dessus des boutons, à chaque
+   ouverture du panneau. */
+function _c3dTerrHauteurPanneau(){
+  var det = document.getElementById('c3d-terr');
+  var outils = document.querySelector('.c3d-outils');
+  if (!det || !outils || !det.open){ if (det) det.style.maxHeight = ''; return; }
+  var haut = det.getBoundingClientRect().top;
+  var bas  = outils.getBoundingClientRect().top;
+  var libre = bas - haut - 12;
+  det.style.maxHeight = Math.max(120, libre) + 'px';
+}
+
 /* Liste des communes : le seul endroit qui dise, commune par commune, ce que
    la carte sait et ce qu'elle ignore. */
 function _c3dTerrPanneau(){
   var ul = document.getElementById('c3d-terr-liste');
   if (!ul) return;
+  /* ⚠️ L'ordre départage panne et situation normale. Une commune au RNU ou
+     sans document au Géoportail n'est PAS en échec : elle est en règle, elle
+     n'a simplement pas de PLU. « aucune zone renvoyée » se lisait comme un
+     bug — dix communes sur onze étaient dans ce cas. */
   var lignes = (_c3dTerr || []).map(function(c){
-    /* Le RNU passe AVANT l'erreur : une commune sans PLU n'est pas en panne,
-       et l'afficher comme un échec est faux. */
-    var etat = c.rnu ? '<em>au RNU — pas de PLU</em>'
-             : c.nZones ? (c.nZones + ' secteurs')
-             : c.err ? '<em>' + _c3dEsc(c.err) + '</em>'
+    var etat = c.rnu     ? '<em>au RNU — pas de PLU</em>'
+             : c.nZones  ? (c.nZones + ' secteurs' + (c.cc ? ' <em>(carte communale)</em>' : ''))
+             : c.sansDoc ? '<em>pas de PLU au Géoportail</em>'
+             : c.err     ? '<em>' + _c3dEsc(c.err) + '</em>'
              : '<em>en cours…</em>';
     return '<li' + (c.insee === C3D_INSEE ? ' class="c3d-terr-moi"' : '') + '>'
          + '<span>' + _c3dEsc(c.nom) + '</span> <small>' + etat + '</small></li>';
@@ -1092,8 +1168,18 @@ function _c3dTerrPanneau(){
     lignes.push('<li><span>' + _c3dEsc(n) + '</span> <small><em>non trouvée au Géoportail</em></small></li>');
   });
   ul.innerHTML = lignes.join('');
+
+  /* La légende ne montre que les familles RÉELLEMENT présentes : afficher les
+     couleurs de la carte communale là où il n'y en a aucune ferait chercher
+     sur la carte quelque chose qui n'y est pas. */
+  var vues = {};
+  ((_c3dTerrZones && _c3dTerrZones.features) || []).forEach(function(f){
+    if (f.properties.mat_tz) vues[f.properties.mat_tz] = 1;
+  });
+  var cles = Object.keys(C3D_TYPEZONE).filter(function(k){ return vues[k]; });
+  if (!cles.length) cles = ['U', 'AU', 'A', 'N'];
   var lg = document.getElementById('c3d-terr-legende');
-  if (lg) lg.innerHTML = Object.keys(C3D_TYPEZONE).map(function(k){
+  if (lg) lg.innerHTML = cles.map(function(k){
     return '<li><i style="background:' + C3D_TYPEZONE[k].c + '"></i><span>' + k
          + ' <span>' + C3D_TYPEZONE[k].lib + '</span></span></li>';
   }).join('');
@@ -1109,7 +1195,14 @@ var C3D_COUCHES_TERR = ['terr-fill','terr-line-fond','terr-line','terr-moi'];
 function _c3dVoirTerritoire(on){
   _c3dTerrActif = !!on;
   var det = document.getElementById('c3d-terr');
-  if (det) det.hidden = !on;
+  if (det){
+    det.hidden = !on;
+    if (!det._c3dMesure){
+      det._c3dMesure = true;
+      det.addEventListener('toggle', _c3dTerrHauteurPanneau);
+      window.addEventListener('resize', _c3dTerrHauteurPanneau);
+    }
+  }
   var lg = document.getElementById('c3d-legende');
   if (lg) lg.hidden = on || !_c3dZones;
 

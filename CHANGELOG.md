@@ -5,6 +5,34 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.74] — 10 août 2026
+
+### Corrigé
+- **« Aucune zone renvoyée » sur dix communes : ce n'était pas une panne.** Le relevé de
+  terrain montre le motif sans ambiguïté — les communes qui affichaient leur zonage sont les
+  plus peuplées (Beaugency, Meung-sur-Loire, Cléry, Lailly-en-Val, Mézières…), celles qui
+  restaient vides sont les plus petites (Baccon, Binas, Charsonville, Coulmiers, Villermain,
+  Villorceau…). **Une petite commune rurale n'a souvent pas de PLU** mais une **carte
+  communale**, un document plus simple que la requête « zone-urba » ne sert pas.
+  L'application interroge désormais aussi les **secteurs de carte communale**, avec leurs
+  propres couleurs — constructible / non constructible — pour ne pas laisser croire à un
+  zonage de PLU qui n'existe pas.
+- **Une commune sans PLU n'est plus présentée comme en échec.** Le bandeau annonce d'abord
+  ce qui *est* là — « N communes avec zonage » — puis « X sans PLU », et ne réserve
+  « indisponible » qu'aux vraies pannes. La liste dit « pas de PLU au Géoportail » plutôt
+  qu'un motif d'erreur.
+- **Le panneau des 25 communes recouvrait trois boutons une fois déplié** — « Zonage du
+  PLU », « Bâtiments », « Revenir au village ». Replié il tenait, d'où un contrôle qui
+  passait au vert. Aucune hauteur écrite en CSS ne peut convenir : elle dépend du nombre de
+  boutons, de la barre système et du réglage de taille du texte. La hauteur est désormais
+  **mesurée** à chaque ouverture du panneau, et le test s'exécute sur un écran court — sur
+  un grand téléphone il passerait sans rien prouver.
+- La légende ne montre plus que les familles de zones **réellement présentes** : afficher
+  les couleurs de la carte communale là où il n'y en a aucune ferait chercher sur la carte
+  quelque chose qui n'y est pas.
+
+---
+
 ## [4.73] — 10 août 2026
 
 ### Corrigé

@@ -336,13 +336,19 @@ test.describe('Carte 3D', () => {
                   geom: carre, nZones: 0, err: '' };
       const zones = await window._c3dTerrZonesDe(c);
       window.fetch = vrai;
-      return { zones: zones.length, err: c.err, via: c.via,
+      return { zones: zones.length, err: c.err, sansDoc: !!c.sansDoc, via: c.via,
                aTenteContour: appels.some(u => /zone-urba\?geom=/.test(u)) };
     });
 
     expect(r.aTenteContour, 'sans partition, le zonage doit être demandé par contour').toBe(true);
     expect(r.zones).toBe(0);
-    expect(r.err, 'une commune muette doit porter un motif, jamais rester vide').toBeTruthy();
+    /* La garantie tient toujours — une commune muette ne reste JAMAIS sans état
+       explicite — mais l'état juste n'est pas « erreur » : une commune sans PLU
+       est en règle. C'est `sansDoc` qui la décrit, et le panneau l'affiche
+       « pas de PLU au Géoportail » au lieu d'un motif d'échec. */
+    expect(r.err || r.sansDoc,
+      'une commune muette doit porter un état, jamais rester vide').toBeTruthy();
+    expect(r.err, 'et cet état ne doit pas être présenté comme une panne').toBe('');
   });
 
   test('territoire : jamais un contour entier dans une URL', async ({ page }) => {
@@ -479,6 +485,45 @@ test.describe('Carte 3D', () => {
     await expect.poll(async () => page.evaluate(() =>
       document.getElementById('c3d-btn-ici').classList.contains('c3d-attire')),
       { timeout: 10000, message: 'l’appel doit cesser de lui-même' }).toBe(false);
+  });
+
+  test('territoire : le panneau déplié ne recouvre aucun bouton', async ({ page, viewport }) => {
+    /*
+     * ⚠️ Le contrôle précédent mesurait le panneau REPLIÉ, et passait au vert.
+     * Déplié, il recouvrait « Zonage du PLU », « Bâtiments » et « Revenir au
+     * village ». Aucune hauteur écrite en CSS ne peut convenir : elle dépend du
+     * nombre de boutons, de la barre système et du réglage de taille du texte.
+     * La hauteur est donc mesurée en JS — et c'est cette mesure qu'on vérifie.
+     */
+    test.skip(!viewport || viewport.width >= 1024, 'mise en page téléphone uniquement');
+    /* ⚠️ Hauteur volontairement CONTRAINTE. Sur un grand téléphone, le plafond
+       CSS suffit et le test passerait même sans la mesure — il ne prouverait
+       rien. C'est sur un écran court, ou avec la barre d'adresse du navigateur
+       visible, que le panneau mordait sur les boutons : le cas du terrain. */
+    await page.setViewportSize({ width: 360, height: 620 });
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.locator('#c3d-btn-terr').click();
+    await expect(page.locator('#c3d-terr')).toBeVisible();
+
+    // On déplie, comme le ferait l'habitant.
+    await page.locator('#c3d-terr summary').click();
+    await expect(page.locator('#c3d-terr')).toHaveJSProperty('open', true);
+    await page.waitForTimeout(400);
+
+    const collisions = await page.evaluate(() => {
+      const pan = document.getElementById('c3d-terr').getBoundingClientRect();
+      const heurte = [];
+      document.querySelectorAll('.c3d-btn').forEach((b) => {
+        if (b.hidden) return;
+        const r = b.getBoundingClientRect();
+        if (!(r.right < pan.left || r.left > pan.right ||
+              r.bottom < pan.top || r.top > pan.bottom))
+          heurte.push((b.textContent || '').trim());
+      });
+      return heurte;
+    });
+    expect(collisions, 'boutons recouverts : ' + collisions.join(' / ')).toEqual([]);
   });
 
   test('territoire : le fond de carte reste celui choisi par l’habitant', async ({ page }) => {

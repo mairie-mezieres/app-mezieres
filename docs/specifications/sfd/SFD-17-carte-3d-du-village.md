@@ -144,6 +144,13 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   Le double tracé des limites (RG-17.25) rend le zonage lisible sur les deux, donc rien
   n'oblige à choisir à la place de l'habitant : le bouton « Vue aérienne / Plan » reste le
   seul maître du fond.
+- **RG-17.27 — aucun panneau ne recouvre les commandes, DÉPLIÉ compris.** Le panneau des 25
+  communes tenait replié — d'où un contrôle de collision au vert — et recouvrait trois
+  boutons une fois ouvert. Aucune hauteur écrite en CSS ne peut convenir : elle dépend du
+  nombre de boutons visibles, de la barre système et du réglage de taille du texte. La
+  hauteur disponible est donc **mesurée** à chaque ouverture. Le test correspondant s'exécute
+  sur un **écran court** : sur un grand téléphone, le plafond CSS suffirait et le test
+  passerait sans rien prouver.
 - **RG-17.24 — trois chemins pour le zonage, jamais d'abandon silencieux.**
   `municipality?geom=` renvoie le nom, le code INSEE et le contour, mais **ni `partition` ni
   `is_rnu`** : seul `municipality?insee=` fait autorité. La chaîne est donc — partition
@@ -155,9 +162,19 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   « 🔎 Détail des sources ». Un écran vide qui ne se dénonce pas est la faute la plus
   coûteuse : elle a coûté une version — et c'est ce panneau qui a livré les deux causes
   réelles à la version suivante.
-- **RG-17.24 bis — une commune au RNU n'est pas en panne.** Elle n'a pas de PLU, ce qui est
-  une information et non une erreur : elle ne compte ni dans les échecs du bandeau, ni comme
-  « sans zonage » dans la liste.
+- **RG-17.24 bis — une commune sans PLU n'est pas en panne.** Qu'elle relève du RNU ou que
+  le Géoportail n'ait aucun document pour elle, c'est une **information**, pas une erreur :
+  elle ne compte pas dans les échecs, et la liste affiche « pas de PLU au Géoportail » et
+  non un motif d'échec. Le bandeau annonce d'abord ce qui **est** là — « N communes avec
+  zonage » — puis « X sans PLU », et réserve « indisponible » aux vraies pannes.
+- **RG-17.24 ter — la carte communale est un document à part.** `zone-urba` ne sert que les
+  PLU et les POS ; une petite commune rurale est souvent sous **carte communale**, à deux
+  secteurs seulement (constructible / non constructible). Ces secteurs sont interrogés en
+  dernier recours et portent leurs **propres couleurs** — les ranger dans les familles d'un
+  PLU laisserait croire à un zonage qui n'existe pas. La légende ne montre que les familles
+  **réellement présentes**.
+  Le relevé de terrain a rendu le motif évident : les communes qui répondaient étaient les
+  plus peuplées, celles qui restaient vides les plus petites.
 - **RG-17.26 — jamais une géométrie complète dans une URL.** Un contour communal du
   Géoportail compte des milliers de sommets ; sérialisé et encodé dans une chaîne de
   requête, il produit une URL de plusieurs dizaines de milliers de caractères que la pile

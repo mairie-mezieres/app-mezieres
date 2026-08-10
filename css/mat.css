@@ -1494,6 +1494,8 @@ html.theme-sombre .content [role="button"]:focus-visible {
    « 🔎 Détail des sources », précisément celui qu'il faut atteindre quand la
    vue ne montre rien. Sur un téléphone de 360 px, 74vw n'en laissait que 80.
    Il passe donc en haut à droite, sous le bandeau d'état. */
+/* La hauteur est MESURÉE en JS à l'ouverture (`_c3dTerrHauteurPanneau`) :
+   celle écrite ici n'est qu'un plafond de sécurité avant la mesure. */
 .c3d-terr{top:calc(env(safe-area-inset-top,0px) + 116px);bottom:auto;
   max-width:min(64vw,300px);max-height:min(50vh,360px);overflow-y:auto}
 .c3d-terr-avert{margin:0;padding:0 12px 9px;font-size:0.75rem;line-height:1.45;color:var(--muted)}
