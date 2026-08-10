@@ -5,6 +5,39 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.69] — 10 août 2026
+
+### Ajouté
+- **Des toits sur les bâtiments de la carte 3D.** Une seconde couche d'extrusion posée sur
+  la **même source**, entre `fill-extrusion-base = mat_h` et
+  `fill-extrusion-height = mat_h + mat_toit` : tuile sur l'habitat, ardoise sur l'église et
+  les bâtiments remarquables, bac acier sur l'agricole et l'industriel. MapLibre ne sait
+  faire que des prismes — ce n'est donc pas une pente, mais une casquette colorée en haut
+  de chaque volume, qui se lit comme un toit dès qu'on prend du recul (RG-17.15).
+- **Six catégories de bâtiments au lieu d'une.** La requête BD TOPO ramenait déjà `nature`,
+  `usage_1` et `legere` : ces attributs étaient **jetés**. Ils servent désormais à
+  distinguer habitat, agricole, industriel, cultuel, remarquable et annexe, par la couleur
+  des murs, celle du toit et la hauteur de la casquette. C'est la variété qui fait qu'un
+  village paraît vrai, plus que la finesse de chaque volume.
+  ⚠️ `nature` vaut très souvent le fourre-tout « Industriel, agricole ou commercial », qui
+  contient les trois mots : `usage_1` est lu **en premier**, sinon une usine est classée
+  agricole. Les valeurs non reconnues retombent sur `habitat` et sont **listées dans le
+  panneau « 🔎 Détail des sources »** — de quoi affiner sur pièce plutôt qu'à l'aveugle,
+  l'IGN étant inaccessible depuis l'environnement de développement.
+- **Une trame de fenêtres sur les façades d'habitation**, dessinée en mémoire par
+  l'application (`map.addImage`) : **aucune image téléchargée**, poids de page inchangé.
+- **Le test de pose des couches est étendu** à quatre bâtiments d'essai (maison, église,
+  hangar, hors commune) et vérifie les quatre couches plus l'enregistrement de la texture.
+
+### Note technique
+- `fill-extrusion-pattern` **remplace** `fill-extrusion-color` : une façade texturée ne peut
+  pas être en même temps teintée par catégorie sur la même couche. D'où deux couches à
+  **filtres disjoints** — `bati-tex` pour l'habitat de la commune, `bati` pour tout le
+  reste. Sans la disjonction, les volumes se superposent et scintillent, et la trame de
+  fenêtres se retrouve sur les hangars et sur l'église.
+
+---
+
 ## [4.68] — 10 août 2026
 
 ### Corrigé

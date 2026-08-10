@@ -111,23 +111,33 @@ test.describe('Carte 3D', () => {
     page.on('console', m => { if (m.type() === 'error') erreurs.push(m.text()); });
 
     const pose = await page.evaluate(() => {
+      const carre = (lon, lat) => ({ type: 'Polygon', coordinates: [[
+        [lon, lat], [lon + 0.0002, lat], [lon + 0.0002, lat + 0.0002], [lon, lat + 0.0002], [lon, lat]
+      ]] });
+      // Une maison, une église, un hangar, et un bâtiment hors commune :
+      // les quatre chemins des expressions de couleur sont exercés.
       const fc = { type: 'FeatureCollection', features: [
-        { type: 'Feature', properties: { mat_h: 8, mat_dans: 1 },
-          geometry: { type: 'Polygon', coordinates: [[
-            [1.8079, 47.8219], [1.8081, 47.8219], [1.8081, 47.8221], [1.8079, 47.8221], [1.8079, 47.8219]
-          ]] } },
-        { type: 'Feature', properties: { mat_h: 6, mat_dans: 0 },
-          geometry: { type: 'Polygon', coordinates: [[
-            [1.7700, 47.7950], [1.7702, 47.7950], [1.7702, 47.7952], [1.7700, 47.7952], [1.7700, 47.7950]
-          ]] } }
+        { type: 'Feature', properties: { mat_h: 8,  mat_dans: 1, mat_type: 'habitat',   mat_toit: 1.3 },
+          geometry: carre(1.8079, 47.8219) },
+        { type: 'Feature', properties: { mat_h: 14, mat_dans: 1, mat_type: 'culte',     mat_toit: 3.2 },
+          geometry: carre(1.8083, 47.8219) },
+        { type: 'Feature', properties: { mat_h: 7,  mat_dans: 1, mat_type: 'agricole',  mat_toit: 0.9 },
+          geometry: carre(1.8087, 47.8219) },
+        { type: 'Feature', properties: { mat_h: 6,  mat_dans: 0, mat_type: 'habitat',   mat_toit: 1.3 },
+          geometry: carre(1.7700, 47.7950) }
       ]};
       window._c3dPoserBati(fc);
-      return { bati: !!window._c3dMap.getLayer('bati'),
-               contour: !!window._c3dMap.getLayer('bati-contour') };
+      const m = window._c3dMap;
+      return { bati: !!m.getLayer('bati'), tex: !!m.getLayer('bati-tex'),
+               toit: !!m.getLayer('bati-toit'), contour: !!m.getLayer('bati-contour'),
+               image: m.hasImage ? m.hasImage('c3d-facade') : null };
     });
 
     expect(pose.bati, 'la couche « bati » doit exister').toBe(true);
+    expect(pose.tex, 'la couche texturée « bati-tex » doit exister').toBe(true);
+    expect(pose.toit, 'la couche des toits « bati-toit » doit exister').toBe(true);
     expect(pose.contour, 'la couche « bati-contour » doit exister').toBe(true);
+    expect(pose.image, 'la texture de façade doit être enregistrée').toBe(true);
     const refus = erreurs.filter(e => /paint|layers\.bati|not supported|unknown property/i.test(e));
     expect(refus, refus.join(' | ')).toEqual([]);
   });

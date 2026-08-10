@@ -234,6 +234,64 @@ function _c3dNormZone(lib){
   return v;
 }
 
+/* ── Types de bâtiments ──────────────────────────────────────────
+   La BD TOPO porte `nature` et `usage_1`, que la première version jetait.
+   C'est la VARIÉTÉ qui fait qu'un village paraît vrai — bien plus que la
+   finesse de chaque volume. Sans elle, l'église, un hangar et une maison
+   sont trois prismes identiques.
+
+   ⚠️ Les libellés exacts de la BD TOPO ne sont pas vérifiables depuis
+   l'environnement de développement (data.geopf.fr y est bloqué). On
+   classe donc par FRAGMENTS, en minuscules et sans accents, avec repli sur
+   `habitat` — et toute valeur non reconnue est relevée dans `_c3dInconnus`
+   puis affichée dans le panneau de diagnostic, pour affiner sur pièce. */
+var _c3dInconnus = {};
+
+function _c3dSansAccent(s){
+  return String(s || '').toLowerCase()
+    .normalize ? String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+               : String(s || '').toLowerCase();
+}
+
+/* Hauteur de la « casquette » de toit, en mètres. MapLibre ne sait pas
+   faire de pente : une bande colorée au sommet du volume se lit malgré
+   tout comme un toit dès qu'on prend du recul. */
+var C3D_TOITS = { culte:3.2, remarquable:2.6, habitat:1.3, agricole:0.9, industriel:0.8, annexe:0.4 };
+
+function _c3dTypeBati(p){
+  var n = _c3dSansAccent(p.nature);
+  var u = _c3dSansAccent(p.usage_1 || p.usage);
+
+  /* 1. La nature architecturale l'emporte toujours : une église reste une
+     église quel que soit son « usage » déclaré. */
+  if (/eglise|chapelle|cathedrale|cultuel/.test(n))                  return 'culte';
+  if (/chateau|tour|donjon|monument|moulin|arc de triomphe/.test(n)) return 'remarquable';
+  if (/serre|silo|etable|hangar/.test(n))                            return 'agricole';
+
+  /* 2. ⚠️ `nature` vaut très souvent « Industriel, agricole ou commercial » :
+     un fourre-tout qui contient les TROIS mots à la fois. S'y fier ferait
+     passer une usine pour une ferme. On lit donc `usage_1`, plus précis, et
+     on ne retombe sur `nature` que s'il est muet. */
+  var fourreTout = /industriel.*agricole.*commercial/.test(n);
+  var t = u || (fourreTout ? '' : n);
+
+  if (/religieux/.test(t))                       return 'culte';
+  if (/agricole/.test(t))                        return 'agricole';
+  if (/industriel|commercial|sportif/.test(t))   return 'industriel';
+  if (/annexe|legere|abri/.test(t) || p.legere === true || p.legere === 'true') return 'annexe';
+  if (/residentiel|habitation|indifferenci/.test(t)) return 'habitat';
+
+  /* 3. Fourre-tout sans usage : ce n'est pas de l'habitat, mais on ne sait pas
+     quoi. Dans une commune rurale, l'hypothèse la plus probable est agricole —
+     et le rendu (murs nus, toit bac acier) reste sobre si l'on se trompe. */
+  if (!t.trim()) return fourreTout ? 'agricole' : 'habitat';
+
+  /* 4. Valeur présente mais non reconnue : relevée pour le diagnostic. */
+  var brut = (p.usage_1 || p.nature || '').toString().trim();
+  if (brut) _c3dInconnus[brut] = (_c3dInconnus[brut] || 0) + 1;
+  return 'habitat';
+}
+
 /* ── Bâti : BD TOPO IGN (hauteurs réelles), repli OpenStreetMap ───
    Trois formulations de la requête, de la plus sûre à la plus ancienne.
    CRS:84 impose l'ordre longitude,latitude sans ambiguïté ; WFS 2.0 avec
@@ -273,6 +331,9 @@ function _c3dBatiIGN(){
       }
       f.properties.mat_h = Math.max(2.5, Math.min(h, 40));
       f.properties.mat_src = 'IGN';
+      var type = _c3dTypeBati(p);
+      f.properties.mat_type = type;
+      f.properties.mat_toit = C3D_TOITS[type] || 1.2;
     });
     return _c3dMarquerCommune(fc);
   });
@@ -311,8 +372,18 @@ function _c3dBatiOSM(){
           var n = parseFloat(t['building:levels']);
           h = isFinite(n) && n > 0 ? (n * 2.8 + 1.2) : 6;
         }
+        /* OpenStreetMap n'a ni `nature` ni `usage_1`, mais son tag
+           `building` porte la même information sous d'autres mots. */
+        var b = _c3dSansAccent(t.building);
+        var type = /church|chapel|cathedral|mosque|synagogue/.test(b) ? 'culte'
+                 : /castle|tower|monument|windmill/.test(b)           ? 'remarquable'
+                 : /barn|farm|greenhouse|silo|stable|cowshed/.test(b) ? 'agricole'
+                 : /industrial|warehouse|commercial|retail|sports/.test(b) ? 'industriel'
+                 : /garage|shed|carport|hut|roof/.test(b)             ? 'annexe'
+                 : 'habitat';
         return { type:'Feature',
-          properties:{ mat_h: Math.max(2.5, Math.min(h, 40)), mat_src:'OSM' },
+          properties:{ mat_h: Math.max(2.5, Math.min(h, 40)), mat_src:'OSM',
+                       mat_type: type, mat_toit: C3D_TOITS[type] || 1.2 },
           geometry:{ type:'Polygon', coordinates:[ e.geometry.map(function(g){ return [g.lon, g.lat]; }) ] } };
       });
     if (!feats.length) throw new Error('réponse vide');
@@ -421,33 +492,95 @@ function _c3dPoserZones(){
     paint:{ 'line-color':couleur, 'line-width':1.6, 'line-opacity':0.9 } }, sous);
 }
 
+/* Texture de façade — deux rangées de fenêtres, générée en mémoire.
+   Aucune image n'est téléchargée : 16 × 16 pixels calculés à la volée, donc
+   zéro octet ajouté au poids de l'application. */
+function _c3dImageFacade(){
+  if (_c3dMap.hasImage && _c3dMap.hasImage('c3d-facade')) return;
+  var w = 16, h = 16, data = new Uint8Array(w * h * 4);
+  for (var y = 0; y < h; y++){
+    for (var x = 0; x < w; x++){
+      var i = (y * w + x) * 4;
+      var fenetre = (x % 8 >= 2 && x % 8 <= 5) && (y % 8 >= 3 && y % 8 <= 6);
+      var c = fenetre ? [96, 112, 128] : [245, 238, 225];
+      data[i] = c[0]; data[i + 1] = c[1]; data[i + 2] = c[2]; data[i + 3] = 255;
+    }
+  }
+  try { _c3dMap.addImage('c3d-facade', { width:w, height:h, data:data }); } catch(_){}
+}
+
 function _c3dPoserBati(fc){
   if (_c3dMap.getSource('bati')) return;
   _c3dMap.addSource('bati', { type:'geojson', data:fc });
+  _c3dImageFacade();
+
+  var commun = {
+    'fill-extrusion-height':['get','mat_h'],
+    'fill-extrusion-base':0,
+    'fill-extrusion-opacity':1,
+    'fill-extrusion-vertical-gradient':true
+  };
+
+  /* ⚠️ `fill-extrusion-pattern` REMPLACE `fill-extrusion-color` : une façade
+     texturée ne peut pas être aussi teintée selon le type. D'où deux couches
+     aux filtres DISJOINTS — aucun bâtiment n'est peint deux fois, donc aucun
+     conflit d'affichage entre volumes superposés.
+     Les fenêtres sont réservées à l'habitat : un hangar ou une église à
+     rangées de fenêtres serait faux. */
+  var estHabitat = ['all', ['==', ['get','mat_type'], 'habitat'], ['==', ['get','mat_dans'], 1]];
+
+  /* Murs teintés — tout sauf l'habitat de la commune.
+     ⚠️ La distinction passe par la COULEUR, jamais par l'opacité :
+     `fill-extrusion-opacity` n'accepte aucune expression basée sur les
+     données (« data expressions not supported ») et MapLibre refuse alors la
+     couche ENTIÈRE — plus aucun bâtiment. C'est ce qui est arrivé en v4.66.
+     Même piège que `fill-extrusion-ambient-occlusion-*`, propriété de Mapbox
+     absente de MapLibre. Vérifié par test (`carte3d.spec.js`). */
   _c3dMap.addLayer({
     id:'bati', type:'fill-extrusion', source:'bati',
-    paint:{
-      /* Parti pris : la maquette d'architecte. Un bâti crème qui se détache
-         du zonage coloré au sol au lieu de rivaliser avec lui. */
-      /* Les bâtiments des communes voisines sont d'un gris sourd : ils
-         situent Mézières dans son territoire sans se faire passer pour elle.
-
-         ⚠️ La distinction passe par la COULEUR, pas par l'opacité.
-         `fill-extrusion-opacity` n'accepte aucune expression basée sur les
-         données (« data expressions not supported ») : MapLibre refuse alors
-         la couche ENTIÈRE, et plus aucun bâtiment ne s'affiche. C'est ce qui
-         est arrivé en v4.66. Même piège que
-         `fill-extrusion-ambient-occlusion-*`, propriété de Mapbox absente de
-         MapLibre. Vérifié par test (`carte3d.spec.js`). */
+    filter:['!', estHabitat],
+    paint: Object.assign({
       'fill-extrusion-color':['case', ['==', ['get','mat_dans'], 0], '#cfd6cd',
-        ['interpolate',['linear'],['get','mat_h'],
-          3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8']],
-      'fill-extrusion-height':['get','mat_h'],
-      'fill-extrusion-base':0,
+        ['match', ['get','mat_type'],
+          'culte',       '#efe7d6',
+          'remarquable', '#eae0cd',
+          'agricole',    '#dcd8cc',
+          'industriel',  '#d3d6d6',
+          'annexe',      '#f0eade',
+          ['interpolate',['linear'],['get','mat_h'],
+            3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8']]]
+    }, commun)
+  });
+
+  /* Murs texturés — l'habitat de la commune uniquement. */
+  _c3dMap.addLayer({
+    id:'bati-tex', type:'fill-extrusion', source:'bati',
+    filter: estHabitat,
+    paint: Object.assign({ 'fill-extrusion-pattern':'c3d-facade' }, commun)
+  });
+
+  /* Les toits : une seconde extrusion qui démarre au sommet des murs.
+     MapLibre ne sait pas faire de pente, mais une casquette colorée se lit
+     comme un toit dès qu'on prend du recul — tuile sur l'habitat, ardoise
+     sur l'église, bac acier sur les hangars. */
+  _c3dMap.addLayer({
+    id:'bati-toit', type:'fill-extrusion', source:'bati',
+    paint:{
+      'fill-extrusion-color':['case', ['==', ['get','mat_dans'], 0], '#b9bfb8',
+        ['match', ['get','mat_type'],
+          'culte',       '#5b6570',
+          'remarquable', '#5b6570',
+          'agricole',    '#8f9490',
+          'industriel',  '#9aa0a0',
+          'annexe',      '#9c6b52',
+          '#a8533f']],
+      'fill-extrusion-base':['get','mat_h'],
+      'fill-extrusion-height':['+', ['get','mat_h'], ['get','mat_toit']],
       'fill-extrusion-opacity':1,
       'fill-extrusion-vertical-gradient':true
     }
   });
+
   /* Liseré au sol : sans lui, les maisons mitoyennes fondent en un bloc. */
   _c3dMap.addLayer({ id:'bati-contour', type:'line', source:'bati',
     paint:{ 'line-color':'#6b5a45', 'line-width':0.6, 'line-opacity':0.35 } });
@@ -554,6 +687,20 @@ function _c3dOuvrirDiag(){
         +  (e.ok ? e.n + ' reçus' : 'échec') + '</span></div>';
   });
   out += '</div>';
+  /* Natures de bâtiments non reconnues : de quoi affiner le classement sur
+     pièce plutôt qu'à l'aveugle — les libellés exacts de la BD TOPO ne sont
+     pas vérifiables depuis l'environnement de développement. */
+  var inconnus = Object.keys(_c3dInconnus);
+  if (inconnus.length){
+    out += '<div class="c3d-sec">Natures de bâtiments non classées</div><div class="c3d-rows">';
+    inconnus.sort(function(a,b){ return _c3dInconnus[b] - _c3dInconnus[a]; })
+      .slice(0, 12).forEach(function(k){
+        out += '<div class="c3d-row"><span class="c">' + _c3dEsc(k) + '</span>'
+            +  '<span class="a dp">' + _c3dInconnus[k] + '</span></div>';
+      });
+    out += '</div>';
+  }
+
   out += '<div class="c3d-note">Données : orthophoto et BD TOPO de l\'IGN, zonage du Géoportail '
       +  'de l\'Urbanisme, règles du PLU communal. Rien n\'est envoyé : votre position n\'est '
       +  'transmise à personne.</div>';
@@ -590,7 +737,7 @@ function _c3dBrancher(){
     if (lg) lg.hidden = !(on && _c3dZones);
   });
   bascule('c3d-btn-bati', function(on){
-    ['bati','bati-contour'].forEach(function(l){
+    ['bati','bati-tex','bati-toit','bati-contour'].forEach(function(l){
       if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
     });
   });
