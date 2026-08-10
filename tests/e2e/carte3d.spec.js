@@ -307,6 +307,44 @@ test.describe('Carte 3D', () => {
     expect(cas.vide, 'sans information, aucune famille n’est devinée').toBe('');
   });
 
+  test('territoire : des contours sans zonage se dénoncent', async ({ page }) => {
+    /*
+     * Le défaut vu sur le téléphone du porteur : les 25 contours arrivaient,
+     * aucun zonage ne suivait, et RIEN ne le disait. `municipality?geom=` ne
+     * renvoie pas toujours `partition`, et le code abandonnait alors en
+     * silence — l'écran paraissait simplement vide.
+     *
+     * On simule ici une réponse SANS partition : la commune doit basculer sur
+     * l'interrogation par contour, et si celle-ci ne donne rien, le dire.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTerrZonesDe === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(async () => {
+      const carre = { type: 'Polygon', coordinates: [[[1.80, 47.82], [1.81, 47.82],
+                                                      [1.81, 47.83], [1.80, 47.83], [1.80, 47.82]]] };
+      const appels = [];
+      const vrai = window.fetch;
+      window.fetch = function (url) {
+        appels.push(String(url));
+        return Promise.resolve(new Response(JSON.stringify(
+          { type: 'FeatureCollection', features: [] }), { status: 200 }));
+      };
+      // Commune SANS partition — exactement le cas qui échouait en silence.
+      const c = { insee: '45204', nom: 'Mézières-lez-Cléry', partition: '', rnu: false,
+                  geom: carre, nZones: 0, err: '' };
+      const zones = await window._c3dTerrZonesDe(c);
+      window.fetch = vrai;
+      return { zones: zones.length, err: c.err, via: c.via,
+               aTenteContour: appels.some(u => /zone-urba\?geom=/.test(u)) };
+    });
+
+    expect(r.aTenteContour, 'sans partition, le zonage doit être demandé par contour').toBe(true);
+    expect(r.zones).toBe(0);
+    expect(r.err, 'une commune muette doit porter un motif, jamais rester vide').toBeTruthy();
+  });
+
   test('territoire : sources coupées, aucune commune n’est inventée', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());

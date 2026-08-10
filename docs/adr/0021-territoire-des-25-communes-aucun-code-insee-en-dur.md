@@ -77,6 +77,35 @@ le maire, cela aurait montré des terrains à urbaniser comme des terres agricol
 Le test a été écrit avant la correction et a échoué comme prévu. Le PLU de Mézières
 lui-même contient `1AU` et `2AU` : le défaut était sous nos yeux.
 
+## Ce que la première mise en ligne a appris (v4.72)
+
+La vue est partie en production, et le porteur a vu **25 contours et aucun zonage** — un
+écran qu'il a décrit comme vide. Trois fautes s'additionnaient, et la troisième est la
+plus instructive.
+
+1. **`municipality?geom=` ne renvoie pas `partition`.** Le code testait
+   `if (!c.partition) return []` et **abandonnait en silence**. Corrigé par un second
+   chemin : interrogation par **contour de commune**, puis découpage sur ce contour. La
+   leçon vaut au-delà : un service qui répond « 200 » ne répond pas forcément la même chose
+   selon la façon dont on l'interroge.
+
+2. **Un trait gris foncé de 1,1 px sur une photo aérienne est invisible.** Les contours
+   *étaient* tracés. Le rendu de vérification, fait sur un fond uni clair, ne pouvait pas le
+   montrer — le fond réel était le seul juge. C'est la parenté avec ADR-0015 (les étoiles
+   invisibles) : ce qui est produit n'est pas ce qui est vu.
+
+3. **Rien ne le disait.** Zéro zone était traité comme un succès ; le panneau affichait
+   « en cours… » indéfiniment ; et le bandeau d'état avait de toute façon été effacé par le
+   minuteur de six secondes de la vue village. Le seul endroit qui aurait pu parler — le
+   panneau « 🔎 Détail des sources » — était **recouvert par le panneau des 25 communes**.
+
+Cette troisième faute est la vraie. Les deux premières sont des bugs ordinaires ; celle-là
+a rendu le diagnostic impossible pour la personne devant l'écran, alors que le mécanisme
+existait. **Un dispositif de signalement qu'on masque ne vaut rien.** Trois règles en
+découlent, écrites dans SFD-17 : zéro donnée n'est jamais un succès (RG-17.24), ce qui doit
+être vu doit être lisible sur le fond réel (RG-17.25), et aucun panneau ne recouvre le
+bouton de diagnostic.
+
 ## Alternatives écartées
 
 - **Coder les 25 codes INSEE en dur.** Plus simple, plus rapide, invérifiable. Voir
