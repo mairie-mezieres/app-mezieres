@@ -5,6 +5,27 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.75] — 10 août 2026
+
+### Corrigé
+- **Une version déployée avec succès paraissait n'être jamais arrivée.** La v4.74.1 a été
+  fusionnée, la CI est passée, GitHub Pages l'a publiée — et l'application a continué
+  d'afficher **v4.74**, parce que seuls le cache du service worker et les `?v=` des modules
+  avaient été incrémentés, pas le numéro visible. Le porteur, qui cherchait le nouveau
+  numéro sur son téléphone, ne pouvait conclure qu'une chose : « ça ne se charge pas ».
+
+### Ajouté
+- **`scripts/check-cache-bust.js` refuse désormais un cache qui change en silence.** Si
+  `CACHE` bouge dans `service-worker.js`, le numéro affiché dans `index.html` — bandeau
+  mobile **et** bouton « 🆕 » du bureau — doit bouger aussi. Le contrôle échoue en CI sinon,
+  avec le geste exact à faire.
+  Le numéro affiché est le **seul** moyen qu'a un habitant de savoir ce qu'il a en main :
+  `index.html` n'est pas versionné, le cache est invisible, et « fermer puis rouvrir l'app »
+  ne dit rien de ce qu'on a reçu. Un déploiement muet est indistinguable d'un déploiement
+  raté — pour le porteur comme pour moi.
+
+---
+
 ## [4.74.1] — 10 août 2026
 
 ### Corrigé

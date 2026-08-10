@@ -79,7 +79,19 @@ function git(args) {
   return execFileSync('git', args, { cwd: RACINE, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 }
 
+/* Numéro de version AFFICHÉ dans l'application (bandeau mobile + bouton
+   « 🆕 » du bureau) et version du cache du service worker. */
+function versionAffichee(contenu) {
+  const m = contenu.match(/>\s*(v4\.\d+(?:\.\d+)?)\s*·/) || contenu.match(/🆕\s*(v4\.\d+(?:\.\d+)?)/);
+  return m ? m[1] : null;
+}
+function versionCache(contenu) {
+  const m = contenu.match(/const\s+CACHE\s*=\s*'([^']+)'/);
+  return m ? m[1] : null;
+}
+
 let oublies = [];
+let versionMuette = null;
 let baseUtilisee = null;
 try {
   const base = process.env.BASE_REF || 'origin/main';
@@ -87,6 +99,26 @@ try {
   const fusion = git(['merge-base', 'HEAD', base]);
   const modifies = git(['diff', '--name-only', fusion, 'HEAD']).split('\n').filter(Boolean);
   baseUtilisee = base;
+
+  /* ── Contrôle 3 : le numéro affiché suit le cache ────────────────────
+     Le 10 août 2026, la v4.74.1 a été fusionnée et déployée avec succès… en
+     continuant d'afficher « v4.74 ». Le porteur, qui cherchait le nouveau
+     numéro sur son téléphone, a conclu que rien n'était arrivé — et il ne
+     pouvait pas conclure autrement : RIEN à l'écran ne distinguait les deux
+     versions.
+
+     Le numéro affiché est le SEUL moyen qu'a un habitant de savoir ce qu'il
+     a en main. Si le cache du service worker change, le contenu change ; donc
+     le numéro doit changer aussi. */
+  const cacheAvant = versionCache(git(['show', `${fusion}:service-worker.js`]));
+  const cacheApres = versionCache(lire('service-worker.js'));
+  if (cacheAvant && cacheApres && cacheAvant !== cacheApres) {
+    const vuAvant = versionAffichee(git(['show', `${fusion}:index.html`]));
+    const vuApres = versionAffichee(lire('index.html'));
+    if (vuAvant && vuApres && vuAvant === vuApres) {
+      versionMuette = { cacheAvant, cacheApres, affichee: vuApres };
+    }
+  }
 
   const actifs = modifies.filter(f => /^(js|css)\/[^/]+\.(js|css)$/.test(f));
   if (actifs.length) {
@@ -126,6 +158,17 @@ if (oublies.length) {
   console.error('  Le service worker sert la copie en cache tant que l\'URL est identique :');
   console.error('  vos modifications n\'atteindront pas les habitants déjà équipés.');
   console.error('  Incrémentez le ?v= dans index.html, js/mat-boot.js ET service-worker.js.\n');
+}
+
+if (versionMuette) {
+  erreur = true;
+  console.error('✗ Le cache change, mais le numéro affiché reste le même :\n');
+  console.error(`  service-worker.js : ${versionMuette.cacheAvant} → ${versionMuette.cacheApres}`);
+  console.error(`  index.html        : ${versionMuette.affichee} (inchangé)\n`);
+  console.error('  Le numéro affiché est le SEUL moyen qu\'a un habitant de savoir ce qu\'il a');
+  console.error('  en main. Sans lui, une version déployée avec succès paraît n\'être jamais');
+  console.error('  arrivée. Mettez à jour le bandeau mobile ET le bouton « 🆕 » du bureau,');
+  console.error('  et ajoutez l\'entrée correspondante au changelog.\n');
 }
 
 if (erreur) process.exit(1);
