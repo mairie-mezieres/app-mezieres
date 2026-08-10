@@ -92,6 +92,46 @@ test.describe('Carte 3D', () => {
     await expect(page.locator('.d-nav-links button', { hasText: 'Mon village en 3D' })).toBeVisible();
   });
 
+  test('la couche des bâtiments est acceptée par MapLibre', async ({ page }) => {
+    /*
+     * En v4.66, `fill-extrusion-opacity` recevait une expression basée sur les
+     * données pour estomper les communes voisines. MapLibre ne le permet pas
+     * (« data expressions not supported ») et refuse alors la couche ENTIÈRE :
+     * plus aucun bâtiment sur la carte. Aucun test ne l'a vu, parce que sans
+     * réseau il n'y a pas de bâti à poser — la couche n'était jamais créée.
+     *
+     * Ce test pose la couche avec un bâtiment fictif : il n'a besoin d'aucune
+     * donnée distante, seulement de la bibliothèque, servie en local.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const erreurs = [];
+    page.on('console', m => { if (m.type() === 'error') erreurs.push(m.text()); });
+
+    const pose = await page.evaluate(() => {
+      const fc = { type: 'FeatureCollection', features: [
+        { type: 'Feature', properties: { mat_h: 8, mat_dans: 1 },
+          geometry: { type: 'Polygon', coordinates: [[
+            [1.8079, 47.8219], [1.8081, 47.8219], [1.8081, 47.8221], [1.8079, 47.8221], [1.8079, 47.8219]
+          ]] } },
+        { type: 'Feature', properties: { mat_h: 6, mat_dans: 0 },
+          geometry: { type: 'Polygon', coordinates: [[
+            [1.7700, 47.7950], [1.7702, 47.7950], [1.7702, 47.7952], [1.7700, 47.7952], [1.7700, 47.7950]
+          ]] } }
+      ]};
+      window._c3dPoserBati(fc);
+      return { bati: !!window._c3dMap.getLayer('bati'),
+               contour: !!window._c3dMap.getLayer('bati-contour') };
+    });
+
+    expect(pose.bati, 'la couche « bati » doit exister').toBe(true);
+    expect(pose.contour, 'la couche « bati-contour » doit exister').toBe(true);
+    const refus = erreurs.filter(e => /paint|layers\.bati|not supported|unknown property/i.test(e));
+    expect(refus, refus.join(' | ')).toEqual([]);
+  });
+
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());

@@ -429,13 +429,22 @@ function _c3dPoserBati(fc){
     paint:{
       /* Parti pris : la maquette d'architecte. Un bâti crème qui se détache
          du zonage coloré au sol au lieu de rivaliser avec lui. */
-      'fill-extrusion-color':['interpolate',['linear'],['get','mat_h'],
-        3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8'],
+      /* Les bâtiments des communes voisines sont d'un gris sourd : ils
+         situent Mézières dans son territoire sans se faire passer pour elle.
+
+         ⚠️ La distinction passe par la COULEUR, pas par l'opacité.
+         `fill-extrusion-opacity` n'accepte aucune expression basée sur les
+         données (« data expressions not supported ») : MapLibre refuse alors
+         la couche ENTIÈRE, et plus aucun bâtiment ne s'affiche. C'est ce qui
+         est arrivé en v4.66. Même piège que
+         `fill-extrusion-ambient-occlusion-*`, propriété de Mapbox absente de
+         MapLibre. Vérifié par test (`carte3d.spec.js`). */
+      'fill-extrusion-color':['case', ['==', ['get','mat_dans'], 0], '#cfd6cd',
+        ['interpolate',['linear'],['get','mat_h'],
+          3,'#fbf7f0', 8,'#f2e9db', 14,'#e6d8c4', 25,'#d6c3a8']],
       'fill-extrusion-height':['get','mat_h'],
       'fill-extrusion-base':0,
-      /* Les bâtiments des communes voisines sont estompés : ils situent
-         Mézières dans son territoire sans se faire passer pour elle. */
-      'fill-extrusion-opacity':['case', ['==', ['get','mat_dans'], 0], 0.45, 1],
+      'fill-extrusion-opacity':1,
       'fill-extrusion-vertical-gradient':true
     }
   });

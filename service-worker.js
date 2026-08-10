@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.67.0';
+const CACHE = 'mat-v4.68.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -62,7 +62,7 @@ const PRECACHE_URLS = [
   // poids d'installation de l'application pour une page que la plupart des
   // habitants n'ouvriront jamais. Conséquence assumée : la carte 3D ne
   // fonctionne pas hors connexion, et elle le dit. Voir ADR-0018.
-  './js/mat-carte3d.js?v=1.2.0',
+  './js/mat-carte3d.js?v=1.2.1',
   './js/mat-guide-arrivee.js?v=1.0.5',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.3.0',

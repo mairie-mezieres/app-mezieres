@@ -179,6 +179,6 @@
 // Voir ADR-0018 — c'est la condition pour ne pas dégrader l'éco-index.
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-carte3d.js?v=1.2.0';
+  s.src = 'js/mat-carte3d.js?v=1.2.1';
   document.head.appendChild(s);
 })();

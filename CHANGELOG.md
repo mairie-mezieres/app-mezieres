@@ -5,6 +5,26 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.68] — 10 août 2026
+
+### Corrigé
+- **Plus aucun bâtiment ne s'affichait sur la carte 3D.** Pour estomper les constructions
+  des communes voisines, la v4.66 passait une expression basée sur les données à
+  `fill-extrusion-opacity`. MapLibre ne le permet pas (« data expressions not supported »)
+  et **refuse alors la couche entière** : au lieu d'un estompage, la disparition totale du
+  bâti. La distinction passe désormais par la **couleur** — `fill-extrusion-color` accepte,
+  lui, les expressions de données. Les bâtiments hors commune sont d'un gris sourd.
+  Même piège que `fill-extrusion-ambient-occlusion-*`, propriété de Mapbox absente de
+  MapLibre : une propriété peut exister sans accepter ce qu'on lui demande.
+
+### Ajouté
+- **Un test pose la couche des bâtiments avec un bâti fictif** et vérifie qu'elle est bien
+  acceptée, sans aucune erreur de validation. Aucun test ne pouvait voir la régression :
+  sans réseau il n'y a pas de bâti à poser, donc la couche n'était jamais créée. Le test a
+  été vérifié en le faisant échouer sur le code fautif avant d'être conservé.
+
+---
+
 ## [4.67] — 10 août 2026
 
 ### Corrigé
