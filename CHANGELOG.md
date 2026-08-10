@@ -5,6 +5,36 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.72] — 10 août 2026
+
+### Corrigé
+- **La vue territoire montrait 25 contours et aucun zonage — sans rien dire.** Signalé sur
+  téléphone dès la mise en ligne : la carte semblait vide. `municipality?geom=` ne renvoie
+  pas le champ `partition` (contrairement à `municipality?insee=`), et le code **abandonnait
+  en silence**. Le zonage est désormais demandé **par contour de commune** quand la
+  partition manque, puis découpé sur ce contour pour ne pas draper le PLU du voisin.
+- **Une commune sans zonage porte maintenant un motif**, affiché dans le panneau. Elle se
+  confondait à l'écran avec une commune encore en cours de chargement.
+- **Zéro zone n'est plus traité comme un succès** : le bandeau annonce en clair
+  « X communes tracées, aucun zonage reçu » et **désigne le bouton** « 🔎 Détail des
+  sources ». Un échec muet est le pire des échecs.
+- **Les limites communales étaient invisibles.** Un trait gris foncé de 1,1 px sur une photo
+  aérienne ne se voit pas : les 25 contours étaient bien tracés et l'écran paraissait n'en
+  montrer aucun. Ils portent désormais un liseré sombre large sous un trait clair fin, qui
+  tient sur n'importe quel fond. Mézières passe en **or** — le blanc se confondait avec eux.
+- **Le panneau des 25 communes recouvrait les boutons**, dont « 🔎 Détail des sources » —
+  précisément celui qu'il faut atteindre quand la vue ne montre rien. Sur un téléphone de
+  360 px, il n'en laissait que 80. Il passe en haut à droite.
+- **Le bandeau d'état disparaissait au bout de six secondes.** Le minuteur qui masque le
+  message du village effaçait aussi ceux du territoire : ni progression, ni échec.
+
+### Modifié
+- **Le fond bascule sur le plan IGN en vue territoire.** À 30 km de distance, la photo
+  aérienne n'est qu'un tapis de parcelles ; le plan laisse lire les couleurs et les limites.
+  Le bouton « Vue aérienne » reste maître ensuite.
+
+---
+
 ## [4.71] — 10 août 2026
 
 ### Ajouté

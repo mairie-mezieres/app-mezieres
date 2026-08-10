@@ -1478,7 +1478,12 @@ html.theme-sombre .content [role="button"]:focus-visible {
 /* Panneau du territoire : 25 communes, donc plus large que la légende du PLU
    et défilable. ⚠️ Plancher typographique de 12 px (0.75rem) — ADR-0017 :
    ne RIEN descendre en dessous, même pour faire tenir la liste. */
-.c3d-terr{max-width:min(74vw,320px);max-height:min(58vh,420px);overflow-y:auto}
+/* ⚠️ En bas à droite, ce panneau RECOUVRAIT la colonne de boutons — dont
+   « 🔎 Détail des sources », précisément celui qu'il faut atteindre quand la
+   vue ne montre rien. Sur un téléphone de 360 px, 74vw n'en laissait que 80.
+   Il passe donc en haut à droite, sous le bandeau d'état. */
+.c3d-terr{top:calc(env(safe-area-inset-top,0px) + 116px);bottom:auto;
+  max-width:min(64vw,300px);max-height:min(50vh,360px);overflow-y:auto}
 .c3d-terr-avert{margin:0;padding:0 12px 9px;font-size:0.75rem;line-height:1.45;color:var(--muted)}
 .c3d-terr-avert b{color:var(--text)}
 .c3d-terr-liste{border-top:1px solid var(--border);padding-top:9px!important;margin-top:2px!important}

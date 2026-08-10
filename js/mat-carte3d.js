@@ -819,22 +819,59 @@ function _c3dTerrCommunes(){
 }
 
 /* Le zonage d'UNE commune. Une commune au RNU n'a pas de document : ce n'est
-   pas une erreur, c'est une information — elle est affichée comme telle. */
+   pas une erreur, c'est une information — elle est affichée comme telle.
+
+   ⚠️ Deux chemins, parce qu'un seul ne suffit pas. `municipality?geom=` ne
+   renvoie pas forcément le champ `partition` (contrairement à
+   `municipality?insee=`). La première version abandonnait alors EN SILENCE :
+   les 25 contours s'affichaient, aucun zonage n'arrivait, et le panneau
+   annonçait « en cours… » indéfiniment. Un échec muet est le pire des échecs
+   — c'est la leçon d'ADR-0018, et elle s'applique ici aussi.
+
+   À défaut de partition, on interroge donc par GÉOMÉTRIE, puis on découpe sur
+   le contour de la commune : la requête par emprise ramène aussi le zonage des
+   voisines, et draper le PLU du voisin serait la faute du 45203/45204. */
 function _c3dTerrZonesDe(c){
-  if (c.rnu || !c.partition) return Promise.resolve([]);
+  if (c.rnu) { c.via = 'RNU'; return Promise.resolve([]); }
+
+  function habiller(out, via, decouper){
+    if (decouper && c.geom){
+      out = out.filter(function(f){
+        return _c3dDansGeom(_c3dCentroide(f.geometry), c.geom);
+      });
+    }
+    out.forEach(function(f){
+      f.properties = f.properties || {};
+      f.properties.mat_tz  = _c3dTypeZone(f.properties);
+      f.properties.mat_com = c.nom;
+      f.properties.mat_moi = (c.insee && c.insee === C3D_INSEE) ? 1 : 0;
+    });
+    c.nZones = out.length;
+    c.via = via;
+    /* Zéro zone n'est PAS un succès : sans cela, une commune muette se
+       confondait à l'écran avec une commune encore en cours de chargement.
+       À l'inverse, un repli qui réussit efface l'échec du premier chemin. */
+    if (out.length) c.err = '';
+    else if (!c.err) c.err = 'aucune zone renvoyée';
+    return out;
+  }
+
+  function parGeometrie(){
+    if (!c.geom) { c.err = c.err || 'ni partition ni contour'; return []; }
+    return _c3dJson(C3D_GPU + 'zone-urba?geom=' + encodeURIComponent(JSON.stringify(c.geom)))
+      .then(function(fc){ return habiller((fc && fc.features) || [], 'contour', true); })
+      .catch(function(e){ c.err = (e && e.message) || 'échec'; return []; });
+  }
+
+  if (!c.partition) return Promise.resolve().then(parGeometrie);
+
   return _c3dJson(C3D_GPU + 'zone-urba?partition=' + encodeURIComponent(c.partition))
     .then(function(fc){
       var out = (fc && fc.features) || [];
-      out.forEach(function(f){
-        f.properties = f.properties || {};
-        f.properties.mat_tz  = _c3dTypeZone(f.properties);
-        f.properties.mat_com = c.nom;
-        f.properties.mat_moi = (c.insee && c.insee === C3D_INSEE) ? 1 : 0;
-      });
-      c.nZones = out.length;
-      return out;
+      if (!out.length) return parGeometrie();      // partition connue mais muette
+      return habiller(out, 'partition', false);
     })
-    .catch(function(e){ c.err = (e && e.message) || 'échec'; return []; });
+    .catch(function(e){ c.err = (e && e.message) || 'échec'; return parGeometrie(); });
 }
 
 /* Chargement par vagues de quatre : 25 requêtes lancées d'un coup, c'est
@@ -879,10 +916,23 @@ function _c3dTerrCharger(){
       _c3dTerrEtat = 'pret';
       var rnu = _c3dTerr.filter(function(c){ return c.rnu; }).length;
       var ko  = _c3dTerr.filter(function(c){ return c.err; }).length;
+      var nz  = _c3dTerrZones.features.length;
+      _c3dNoter('Géoportail — zonages du territoire', nz > 0,
+        (_c3dTerr.length - rnu - ko) + ' commune(s) avec zonage', nz, nz);
+
+      /* Contours sans zonage : le cas où l'écran paraît vide alors que tout a
+         « marché ». Il doit se dénoncer lui-même, et dire OÙ regarder. */
+      if (!nz){
+        _c3dStatut('<b>' + _c3dTerr.length + ' communes tracées, aucun zonage reçu.</b><br>'
+                 + 'Le Géoportail n\'a renvoyé aucune zone. Touchez le bouton '
+                 + '« 🔎 Détail des sources », en bas, pour voir sa réponse exacte.');
+        _c3dTerrPanneau();
+        return;
+      }
       var msg = '<b>Les Terres du Val de Loire</b> · ' + _c3dTerr.length + ' communes sur '
               + C3D_CCTVL.length;
       if (rnu) msg += ' · ' + rnu + ' au RNU';
-      if (ko)  msg += ' · ' + ko + ' zonage(s) indisponible(s)';
+      if (ko)  msg += ' · ' + ko + ' sans zonage';
       if (_c3dTerrManquantes.length)
         msg += '<br>⚠️ non placées : ' + _c3dEsc(_c3dTerrManquantes.join(', '));
       _c3dStatut(msg);
@@ -913,12 +963,19 @@ function _c3dPoserTerritoire(){
 
   _c3dMap.addLayer({ id:'terr-fill', type:'fill', source:'terr-zones',
     paint:{ 'fill-color':couleur, 'fill-opacity':0.55 } });
+  /* ⚠️ Un trait gris foncé de 1,1 px sur une photo aérienne est INVISIBLE.
+     La première version en était là : les 25 contours étaient bien tracés, et
+     l'écran semblait n'en montrer aucun. D'où le doublon — un liseré sombre
+     large dessous, un trait clair fin dessus — qui tient sur n'importe quel
+     fond, sombre comme clair. */
+  _c3dMap.addLayer({ id:'terr-line-fond', type:'line', source:'terr-communes',
+    paint:{ 'line-color':'#12261c', 'line-width':3.2, 'line-opacity':0.55 } });
   _c3dMap.addLayer({ id:'terr-line', type:'line', source:'terr-communes',
-    paint:{ 'line-color':'#3d4a44', 'line-width':1.1, 'line-opacity':0.75 } });
+    paint:{ 'line-color':'#f4f7f2', 'line-width':1.2, 'line-opacity':0.95 } });
   /* Mézières doit se retrouver d'un coup d'œil : c'est de là qu'on regarde. */
   _c3dMap.addLayer({ id:'terr-moi', type:'line', source:'terr-communes',
     filter:['==', ['get','mat_moi'], 1],
-    paint:{ 'line-color':'#ffffff', 'line-width':3.4, 'line-opacity':0.95 } });
+    paint:{ 'line-color':'#ffcf3f', 'line-width':4, 'line-opacity':1 } });
 }
 
 /* Le cadrage est DÉDUIT des contours reçus, jamais fixé à un zoom écrit à la
@@ -952,7 +1009,7 @@ function _c3dTerrPanneau(){
   if (!ul) return;
   var lignes = (_c3dTerr || []).map(function(c){
     var etat = c.rnu ? '<em>au RNU — pas de PLU</em>'
-             : c.err ? '<em>zonage indisponible</em>'
+             : c.err ? '<em>' + _c3dEsc(c.err) + '</em>'
              : c.nZones ? (c.nZones + ' secteurs') : '<em>en cours…</em>';
     return '<li' + (c.insee === C3D_INSEE ? ' class="c3d-terr-moi"' : '') + '>'
          + '<span>' + _c3dEsc(c.nom) + '</span> <small>' + etat + '</small></li>';
@@ -973,7 +1030,7 @@ function _c3dTerrPanneau(){
    géométrie que la carte ne dessine plus. */
 var C3D_COUCHES_VILLAGE = ['bati','bati-toit','bati-toit-plat','bati-contour',
                            'zones-fill','zones-line','contour-ligne'];
-var C3D_COUCHES_TERR = ['terr-fill','terr-line','terr-moi'];
+var C3D_COUCHES_TERR = ['terr-fill','terr-line-fond','terr-line','terr-moi'];
 
 function _c3dVoirTerritoire(on){
   _c3dTerrActif = !!on;
@@ -991,10 +1048,26 @@ function _c3dVoirTerritoire(on){
   vis(C3D_COUCHES_VILLAGE, !on);
   vis(C3D_COUCHES_TERR, on);
 
+  /* Le fond suit la vue. À 30 km de distance, la photo aérienne n'est qu'un
+     tapis de parcelles : le plan IGN laisse lire les couleurs du zonage et les
+     limites communales. Le bouton « Vue aérienne » reste maître ensuite —
+     on ne fait que choisir le fond le plus lisible à l'arrivée. */
+  function fond(plan){
+    if (!_c3dMap.getLayer('l-plan')) return;
+    _c3dMap.setLayoutProperty('l-plan',  'visibility', plan ? 'visible' : 'none');
+    _c3dMap.setLayoutProperty('l-ortho', 'visibility', plan ? 'none' : 'visible');
+    var b = document.getElementById('c3d-btn-fond');
+    if (b) b.setAttribute('aria-pressed', String(!plan));
+    var t = document.querySelector('#c3d-btn-fond span');
+    if (t) t.textContent = plan ? 'Plan' : 'Vue aérienne';
+  }
+
   if (!on){
+    fond(false);
     _c3dMap.easeTo({ center:C3D_CENTRE, zoom:14.4, pitch:55, duration:1400 });
     return Promise.resolve();
   }
+  fond(true);
   /* À plat : à cette échelle, l'inclinaison ne montre rien et gêne la lecture.
      Ce recul n'est qu'un premier pas — `_c3dCadrerTerritoire` reprend la main
      dès que les contours sont là. */
@@ -1302,7 +1375,10 @@ function _c3dCharger(){
             _c3dStatut('<b>' + _c3dEsc(_c3dCommune || 'la commune') + '</b> · '
               + nBati + ' bâtiments · ' + nZones + (nZones > 1 ? ' zones' : ' zone')
               + ' du PLU');
-            setTimeout(function(){ _c3dStatut('', true); }, 6000);
+            /* ⚠️ Ce minuteur a effacé les messages du TERRITOIRE : basculer
+               dans les six secondes suivant l'arrivée du village, et l'écran
+               n'annonçait plus rien — ni progression, ni échec. */
+            setTimeout(function(){ if (!_c3dTerrActif) _c3dStatut('', true); }, 6000);
           } else {
             _c3dStatut(fc.features.length + ' bâtiments — <b>zonage du PLU indisponible</b><br>'
               + _c3dEsc(_c3dDiag));

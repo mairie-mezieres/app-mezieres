@@ -133,7 +133,21 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   agricole. Verrouillé par test.
 - **RG-17.23 — le cadrage est déduit des contours reçus.** Un zoom écrit à la main
   couperait des communes ou les noierait ; `fitBounds` sur ce qui est réellement arrivé ne
-  peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle.
+  peut pas se tromper. Aucun bâtiment n'est chargé à cette échelle, et le fond bascule sur
+  le **plan IGN** : à 30 km, la photo aérienne n'est qu'un tapis de parcelles.
+- **RG-17.24 — deux chemins pour le zonage, jamais d'abandon silencieux.**
+  `municipality?geom=` ne renvoie pas forcément `partition` : à défaut, le zonage est
+  demandé **par contour de commune**, puis découpé sur ce contour (la requête par emprise
+  ramène aussi le zonage des voisines). **Zéro zone n'est pas un succès** : la commune porte
+  un motif affiché dans le panneau, et si le territoire entier est muet le bandeau l'annonce
+  et **désigne le bouton** « 🔎 Détail des sources ». Un écran vide qui ne se dénonce pas est
+  la faute la plus coûteuse : elle a coûté une version.
+- **RG-17.25 — ce qui doit être vu doit être lisible sur le fond réel.** Un trait gris foncé
+  de 1,1 px sur une photo aérienne est invisible : les 25 contours étaient tracés et l'écran
+  paraissait n'en montrer aucun. Les limites portent donc un liseré sombre large sous un
+  trait clair fin, et Mézières est en **or**. De même, aucun panneau ne doit recouvrir la
+  colonne de boutons — surtout pas « 🔎 Détail des sources », celui qu'on cherche quand rien
+  ne s'affiche.
 
 ## 5. Parcours
 

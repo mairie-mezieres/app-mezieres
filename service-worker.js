@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.71.0';
+const CACHE = 'mat-v4.72.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -22,7 +22,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.0',
+  './css/mat.css?v=4.14.1',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.6',
   './js/mat-core.js?v=4.3.5'
@@ -33,7 +33,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.0',
+  './css/mat.css?v=4.14.1',
   './css/mat-desktop.css?v=4.5.0',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
@@ -48,7 +48,7 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.4.9',
   './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.4.0',
-  './js/mat-boot.js?v=4.8.0',
+  './js/mat-boot.js?v=4.8.1',
   './js/mat-pwa-notif.js?v=4.2.8',
   './js/mat-dechets-notif.js?v=4.2.9',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -62,7 +62,7 @@ const PRECACHE_URLS = [
   // poids d'installation de l'application pour une page que la plupart des
   // habitants n'ouvriront jamais. Conséquence assumée : la carte 3D ne
   // fonctionne pas hors connexion, et elle le dit. Voir ADR-0018.
-  './js/mat-carte3d.js?v=1.5.0',
+  './js/mat-carte3d.js?v=1.5.1',
   './js/mat-guide-arrivee.js?v=1.0.5',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.3.0',
