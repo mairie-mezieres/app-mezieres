@@ -495,6 +495,18 @@ personne » et « inventer un historique de consultation » ; une visite l'étei
 (`display:none` par défaut). Le test `tests/e2e/documents-officiels.spec.js` asserte donc
 le **style calculé**, pas l'état interne — règle 7 du `CLAUDE.md`.
 
+⚠️ **Deux pastilles, une par mise en page**, commandées ensemble par `refreshDocsBadge()` :
+`#docs-badge` (carte de l'accueil) et `#docs-badge-desktop` (menu du haut). Sur ordinateur,
+`.content` — l'accueil mobile — est en `display:none` : la carte n'a donc **aucune boîte**,
+et seule la pastille du menu est peinte. Deux conséquences pour qui écrit un test :
+
+- asserter `toBeVisible()` sur `#docs-badge` échoue en `desktop-chromium` sans qu'aucun
+  défaut n'existe — il faut viser la pastille de la mise en page courante ;
+- **ne pas figer une valeur exacte de `display`** : `refreshDocsBadge()` pose `inline-flex`,
+  que le navigateur *blockifie* en `flex` quand le parent est un conteneur flex. La même
+  pastille est donc calculée `inline-flex` sur mobile et `flex` sur ordinateur. La question
+  utile est « allumée ou éteinte », d'où un `not.toHaveCSS('display', 'none')`.
+
 ### « Le saviez-vous ? » — aucune IA à l'exécution
 
 `js/mat-saviez-vous.js` affiche un fait par jour sur la commune. **Le contenu ne provient

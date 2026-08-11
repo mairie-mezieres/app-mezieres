@@ -41,18 +41,36 @@ test.beforeEach(async ({ page }) => {
     route.fulfill({ contentType: 'application/json', body: JSON.stringify({ doc: DOC_FEATURED }) }));
 });
 
-test('la pastille s’allume sur l’accueil sans ouvrir l’écran', async ({ page }) => {
+// Deux pastilles, une par mise en page : la carte de l'accueil (`#docs-badge`)
+// et l'entrée du menu du haut (`#docs-badge-desktop`). Sur ordinateur, l'accueil
+// mobile — le conteneur `.content` — est masqué par `display:none` ; c'est donc
+// la pastille du menu qui porte le signal, et elle seule qui a une boîte.
+// Asserter la visibilité de la carte d'accueil sur les deux projets ferait
+// échouer le test sur desktop pour une raison qui n'a rien d'un défaut.
+async function pastilleDeLaMiseEnPage(page) {
+  const accueilMasque = await page.locator('.content')
+    .evaluate((el) => getComputedStyle(el).display === 'none');
+  return page.locator(accueilMasque ? '#docs-badge-desktop' : '#docs-badge');
+}
+
+// ⚠️ Ne pas asserter une valeur EXACTE de `display` : la pastille est posée en
+// `inline-flex` par refreshDocsBadge(), et le navigateur la « blockifie » en
+// `flex` lorsque son parent est un conteneur flex — ce qui dépend de la mise en
+// page. La question utile n'est pas « quelle valeur » mais « allumée ou éteinte ».
+test('la pastille s’allume sans ouvrir l’écran', async ({ page }) => {
   await page.goto('/');
-  const badge = page.locator('#docs-badge');
   // Le rafraîchissement est différé de 2,5 s au démarrage : c'est justement ce
   // qui permet à la pastille d'être allumée AVANT la première ouverture.
-  await expect(badge).toHaveCSS('display', 'flex', { timeout: 10000 });
-  await expect(badge).toBeVisible();
+  // Les deux pastilles sont commandées ensemble par refreshDocsBadge().
+  await expect(page.locator('#docs-badge')).not.toHaveCSS('display', 'none', { timeout: 10000 });
+  await expect(page.locator('#docs-badge-desktop')).not.toHaveCSS('display', 'none');
+  // …et celle que la mise en page affiche vraiment est effectivement peinte.
+  await expect(await pastilleDeLaMiseEnPage(page)).toBeVisible();
 });
 
 test('chaque document non consulté porte sa pastille « Nouveau »', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#docs-badge')).toHaveCSS('display', 'flex', { timeout: 10000 });
+  await expect(page.locator('#docs-badge')).not.toHaveCSS('display', 'none', { timeout: 10000 });
 
   await page.evaluate(() => window.openDocs());
 
@@ -65,7 +83,7 @@ test('chaque document non consulté porte sa pastille « Nouveau »', async ({ p
 
 test('la pastille s’éteint après consultation et le reste au rechargement', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#docs-badge')).toHaveCSS('display', 'flex', { timeout: 10000 });
+  await expect(page.locator('#docs-badge')).not.toHaveCSS('display', 'none', { timeout: 10000 });
 
   await page.evaluate(() => window.openDocs());
   await expect(page.locator('#ov-docs').getByText(DOC_TEMP.title)).toBeVisible();
@@ -92,5 +110,5 @@ test('un document publié après la visite rallume la pastille', async ({ page }
     }));
 
   await page.reload();
-  await expect(page.locator('#docs-badge')).toHaveCSS('display', 'flex', { timeout: 10000 });
+  await expect(page.locator('#docs-badge')).not.toHaveCSS('display', 'none', { timeout: 10000 });
 });
