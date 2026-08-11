@@ -5,6 +5,35 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.76] — 11 août 2026
+
+### Ajouté
+- **Pastille « Nouveau » sur les documents officiels.** Publier un document temporaire ou
+  un document à la une depuis le tableau de bord ne produisait **aucun signal** côté
+  habitant : ni sur la carte 📁 « Documents officiels » de l'accueil, ni dans la liste une
+  fois l'écran ouvert. Seuls les documents du **PLUi** disposaient du mécanisme
+  ([ADR-0014](docs/adr/0014-documents-plui-administrables-page-embarquee.md)) ; il est
+  désormais appliqué aux deux routes `/docs/featured` et `/docs/temp` :
+  - une pastille rouge sur la carte d'accueil **et** sur l'entrée du menu bureau, allumée
+    par un rafraîchissement d'arrière-plan **au démarrage de l'application** — donc avant
+    que l'écran soit ouvert, sans quoi la pastille arriverait toujours trop tard ;
+  - une pastille « Nouveau » et un contour coloré **sur chaque document non consulté**, de
+    sorte qu'on voie lequel vient d'arriver quand plusieurs sont publiés ensemble ;
+  - le marquage « vu » après le rafraîchissement **et** après le rendu : un document publié
+    pendant la visite n'est pas compté comme lu, et les pastilles ne s'éteignent qu'à la
+    visite suivante.
+  Les identifiants déjà vus sont conservés dans `mat_docs_seen`. Le document à la une n'a
+  pas d'`id` côté backend : sa date de publication en tient lieu.
+- **Les documents officiels sont consultables hors connexion.** La dernière liste reçue est
+  conservée dans `mat_docs_cache` : l'écran s'ouvre sur son contenu réel au lieu d'un
+  « Chargement… », et reste lisible sans réseau.
+- **`tests/e2e/documents-officiels.spec.js`** — quatre cas verrouillent le comportement
+  (allumage sans ouverture, pastille par document, extinction persistante après
+  consultation, rallumage à la publication suivante). Le test asserte le **style calculé**
+  de la pastille, pas l'état interne du JS : règle 7 du `CLAUDE.md`.
+
+---
+
 ## [4.75] — 10 août 2026
 
 ### Corrigé
