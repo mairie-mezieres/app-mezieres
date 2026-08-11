@@ -451,6 +451,62 @@ est versionné dans le dépôt et listé dans `PRECACHE_URLS` :
 paramètre `?v=`**, sinon il ne sera pas disponible hors ligne et échappera à
 l'invalidation de cache.
 
+### Documents officiels — pastille « Nouveau » et cache local
+
+L'écran 📁 **Documents officiels** (`ov-docs`, code dans `js/mat-core.js`) agrège deux
+routes du backend : `GET /docs/featured` (le document mis en avant) et `GET /docs/temp`
+(les documents temporaires). Les documents *permanents* sont, eux, des liens Drive écrits
+en dur dans `index.html` — ils ne bougent pas et n'entrent pas dans le mécanisme.
+
+Le repérage des nouveautés reprend **exactement** le patron des documents du PLUi
+([ADR-0014](adr/0014-documents-plui-administrables-page-embarquee.md)) :
+
+| Clé `localStorage` | Contenu |
+|---|---|
+| `mat_docs_seen` | Tableau des identifiants **déjà vus** |
+| `mat_docs_cache` | Dernière réponse reçue — `{ temp: [], featured: {} }` |
+
+Trois points à connaître avant de toucher à ce code :
+
+1. **On mémorise des identifiants, pas une date de dernière visite.** Une date dit
+   seulement « quelque chose a changé » ; un ensemble d'identifiants dit **lequel** est
+   neuf, ce qui permet de poser une pastille sur le document concerné dans la liste.
+   Les identifiants sont préfixés (`temp:<id>`, `featured:<publishedAt>`) : les deux
+   routes vivent dans le même ensemble sans risque de collision.
+2. **Le document mis en avant n'a pas d'`id` côté backend** (`routes/docs.js` :
+   `POST /admin/docs/featured` écrit un objet unique, sans identifiant). Sa **date de
+   publication** en tient lieu. Republier remplace `publishedAt`, produit donc un
+   identifiant neuf, et rallume la pastille — ce qui est le comportement voulu.
+3. **La liste est rafraîchie au démarrage de l'application** (`setTimeout` de 2,5 s dans
+   `mat-core.js`), **pas** à l'ouverture de l'écran. Charger à l'ouverture rendrait la
+   pastille structurellement inutile : elle ne s'allumerait qu'une fois l'écran déjà vu.
+   Le délai évite de concurrencer les widgets d'accueil au premier rendu.
+
+Le marquage « vu » (`_markDocsSeen()`) intervient **après** le rafraîchissement déclenché
+par `openDocs()`, et **après** le rendu : un document arrivé pendant la consultation n'est
+donc pas compté comme lu, et les pastilles restent visibles pendant toute la visite.
+
+Conséquence assumée : au tout premier chargement après le déploiement, `mat_docs_seen` est
+vide, donc **tous** les documents en ligne sont « nouveaux » et la pastille s'allume une
+fois. C'est le prix à payer pour ne pas avoir à choisir entre « ne rien signaler à
+personne » et « inventer un historique de consultation » ; une visite l'éteint.
+
+⚠️ La pastille est produite par du JS mais habillée par du CSS en ligne
+(`display:none` par défaut). Le test `tests/e2e/documents-officiels.spec.js` asserte donc
+le **style calculé**, pas l'état interne — règle 7 du `CLAUDE.md`.
+
+⚠️ **Deux pastilles, une par mise en page**, commandées ensemble par `refreshDocsBadge()` :
+`#docs-badge` (carte de l'accueil) et `#docs-badge-desktop` (menu du haut). Sur ordinateur,
+`.content` — l'accueil mobile — est en `display:none` : la carte n'a donc **aucune boîte**,
+et seule la pastille du menu est peinte. Deux conséquences pour qui écrit un test :
+
+- asserter `toBeVisible()` sur `#docs-badge` échoue en `desktop-chromium` sans qu'aucun
+  défaut n'existe — il faut viser la pastille de la mise en page courante ;
+- **ne pas figer une valeur exacte de `display`** : `refreshDocsBadge()` pose `inline-flex`,
+  que le navigateur *blockifie* en `flex` quand le parent est un conteneur flex. La même
+  pastille est donc calculée `inline-flex` sur mobile et `flex` sur ordinateur. La question
+  utile est « allumée ou éteinte », d'où un `not.toHaveCSS('display', 'none')`.
+
 ### « Le saviez-vous ? » — aucune IA à l'exécution
 
 `js/mat-saviez-vous.js` affiche un fait par jour sur la commune. **Le contenu ne provient

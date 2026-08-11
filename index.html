@@ -48,7 +48,7 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
-<script defer src="js/mat-core.js?v=4.3.5"></script>
+<script defer src="js/mat-core.js?v=4.3.6"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
 <script defer src="js/mat-widgets.js?v=4.4.8"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.75 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.76 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -241,7 +241,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openGuideArrivee()">📦 Nouveaux habitants</button>
 <button onclick="openAssociations()">🤝 Associations</button>
 <button onclick="openEntreprises()">🛠️ Entreprises</button>
-<button onclick="openDocs()">📄 Documents officiels</button>
+<button onclick="openDocs()" style="position:relative">📄 Documents officiels<span id="docs-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
 <button onclick="openPlui()" style="position:relative">🗺️ PLUi-H-D<span id="plui-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
@@ -282,7 +282,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="ct"><div class="ct-label">Mon village en 3D</div><div class="ct-sub">Zonage du PLU</div></div>
 </button>
 <button class="card" onclick="openDocs()">
-<div class="ico" style="background:#e8f5e9">📁</div>
+<div class="ico" style="background:#e8f5e9;position:relative">📁<span id="docs-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box" aria-hidden="true">!</span></div>
 <div class="ct"><div class="ct-label">Documents officiels</div><div class="ct-sub">Bulletins, CR…</div></div>
 </button>
 </div>
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.75</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.76</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 11 ao&ucirc;t 2026 — v4.76</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Une pastille rouge signale les nouveaux documents officiels.</strong> Elle s&rsquo;allume sur la carte &laquo;&nbsp;Documents officiels&nbsp;&raquo; de l&rsquo;accueil d&egrave;s que la mairie publie un document, sans attendre que vous ouvriez l&rsquo;&eacute;cran, et s&rsquo;&eacute;teint une fois que vous l&rsquo;avez consult&eacute;</li>
+<li><strong>Chaque document non encore consult&eacute; porte sa pastille &laquo;&nbsp;Nouveau&nbsp;&raquo;</strong> dans la liste, avec un contour color&eacute;&nbsp;— document &agrave; la une comme documents temporaires. Quand plusieurs documents sont publi&eacute;s, vous voyez imm&eacute;diatement lequel vient d&rsquo;arriver</li>
+<li><strong>Les documents d&eacute;j&agrave; re&ccedil;us restent visibles hors connexion</strong>, et l&rsquo;&eacute;cran s&rsquo;ouvre directement sur leur liste au lieu d&rsquo;afficher &laquo;&nbsp;Chargement…&nbsp;&raquo;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 10 ao&ucirc;t 2026 — v4.75</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le num&eacute;ro de version affich&eacute; change d&eacute;sormais &agrave; chaque mise &agrave; jour.</strong> Une correction avait &eacute;t&eacute; d&eacute;ploy&eacute;e sans que le num&eacute;ro bouge&nbsp;: impossible de savoir si on l&rsquo;avait re&ccedil;ue. C&rsquo;est ce num&eacute;ro, en haut de l&rsquo;&eacute;cran, qui vous dit ce que vous avez en main</li>

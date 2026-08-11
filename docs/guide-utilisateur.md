@@ -10,6 +10,7 @@
 2. [Installer l'application sur votre téléphone](#2-installer-lapplication-sur-votre-téléphone)
 3. [L'écran d'accueil](#3-lécran-daccueil)
 4. [Les actualités](#4-les-actualités)
+4 bis. [Les documents officiels](#4-bis-les-documents-officiels)
 5. [L'agenda communal](#5-lagenda-communal)
 6. [MEL — l'assistante virtuelle](#6-mel--lassistante-virtuelle)
 7. [Signaler un problème](#7-signaler-un-problème)
@@ -137,6 +138,41 @@ La rubrique **Actualités** affiche les dernières nouvelles publiées par la ma
 - Les 30 dernières actualités sont conservées.
 
 **Notifications** : vous pouvez recevoir une notification sur votre téléphone dès qu'une nouvelle actualité est publiée — voir la section [9. Les notifications push](#9-les-notifications-push).
+
+---
+
+## 4 bis. Les documents officiels
+
+La carte **📁 Documents officiels** de l'accueil (et l'entrée du même nom dans le menu du
+haut sur ordinateur) réunit trois choses :
+
+1. **Le dernier document publié** — mis en avant tout en haut, sur un bandeau vert.
+2. **Les documents permanents** — bulletins municipaux, comptes rendus du conseil,
+   urbanisme, publicité des actes. Ce sont des dossiers d'archives, ils ne bougent pas.
+3. **Les documents temporaires** — publiés par la mairie au fil de l'eau depuis son
+   tableau de bord : enquête publique, arrêté de circulation, appel à candidatures…
+   Ils sont retirés quand ils n'ont plus lieu d'être.
+
+**Dès que la mairie publie un document**, une pastille rouge s'allume sur la carte
+« Documents officiels » de l'accueil — **sans que vous ayez besoin d'ouvrir l'écran**.
+Elle s'éteint une fois que vous l'avez consulté.
+
+Dans la liste, **chaque document que vous n'avez pas encore ouvert porte sa propre
+pastille « Nouveau »** et un contour coloré — le document mis en avant comme les
+documents temporaires. Quand plusieurs documents sont publiés en même temps, vous voyez
+d'un coup d'œil lequel vient d'arriver. Les pastilles restent visibles pendant toute
+votre visite : elles ne disparaissent qu'à la suivante, pour vous laisser le temps de
+repérer ce qui est neuf.
+
+> La toute première fois, la pastille peut s'allumer pour des documents déjà en ligne :
+> l'application ne sait pas ce que vous aviez consulté avant qu'elle ne sache le retenir.
+> Une visite suffit à la remettre à zéro.
+
+Les documents déjà reçus **restent visibles sans connexion**, et l'écran s'ouvre
+directement sur leur liste au lieu d'afficher « Chargement… ».
+
+> Les documents du **PLUi-H-D** ne sont pas ici : ils ont leur propre écran et leur propre
+> pastille — voir [16. Grand dossier PLUi-H-D](#16-grand-dossier-plui-h-d).
 
 ---
 

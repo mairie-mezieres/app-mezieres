@@ -299,33 +299,148 @@ function openSondages(){
   if (typeof refreshSondagesBadge === 'function') refreshSondagesBadge();
 }
 
+// ── Documents officiels : état, pastille « Nouveau » ──────
+// Même mécanique que les documents du PLUi (mat-plui.js, ADR-0014) : on mémorise
+// les identifiants DÉJÀ VUS, et non une simple date de dernière visite. Une date
+// dit seulement « quelque chose a changé » ; un ensemble d'identifiants dit AUSSI
+// lequel est neuf, ce qui permet de le signaler dans la liste elle-même.
+//
+// La liste est rafraîchie au DÉMARRAGE de l'application, pas à l'ouverture de
+// l'écran : une pastille qui ne s'allumerait qu'après la première ouverture ne
+// servirait à rien — elle arriverait toujours trop tard.
+var DOCS_SEEN_KEY  = 'mat_docs_seen';
+var DOCS_CACHE_KEY = 'mat_docs_cache';
+
+var _docsFeatured = null;   // document « à la une » (/docs/featured)
+var _docsTemp     = [];     // documents temporaires (/docs/temp)
+
+// Le document à la une n'a pas d'identifiant côté backend : sa date de
+// publication en tient lieu. Republier remplace `publishedAt`, donc produit un
+// identifiant neuf — et rallume la pastille, ce qui est le comportement attendu.
+function _featuredId(doc){ return doc ? 'featured:' + (doc.publishedAt || doc.url || '') : ''; }
+function _tempId(doc){ return 'temp:' + (doc && doc.id); }
+
+function _docsSeenIds(){
+  try {
+    var arr = JSON.parse(localStorage.getItem(DOCS_SEEN_KEY) || '[]');
+    return Array.isArray(arr) ? arr.map(String) : [];
+  } catch(_) { return []; }
+}
+
+function _isNewDoc(id, seen){ return !!id && seen.indexOf(String(id)) === -1; }
+
+function _allDocIds(){
+  var ids = _docsTemp.map(_tempId);
+  if (_docsFeatured) ids.push(_featuredId(_docsFeatured));
+  return ids;
+}
+
+function _markDocsSeen(){
+  try { localStorage.setItem(DOCS_SEEN_KEY, JSON.stringify(_allDocIds())); } catch(_){}
+}
+
+// Copie locale de la dernière liste reçue : l'écran s'ouvre alors instantanément
+// sur son contenu réel plutôt que sur « Chargement… », et reste consultable
+// quand le réseau manque.
+function _readDocsCache(){
+  try {
+    var d = JSON.parse(localStorage.getItem(DOCS_CACHE_KEY) || 'null');
+    if (!d || typeof d !== 'object') return;
+    _docsTemp     = Array.isArray(d.temp) ? d.temp : [];
+    _docsFeatured = d.featured || null;
+  } catch(_){}
+}
+
+function _writeDocsCache(){
+  try {
+    localStorage.setItem(DOCS_CACHE_KEY, JSON.stringify({ temp: _docsTemp, featured: _docsFeatured }));
+  } catch(_){}
+}
+
+_readDocsCache();
+
+// Rafraîchit les deux listes. Silencieux en cas d'échec : le cache prend le
+// relais. Les deux drapeaux distinguent trois situations qui ne se disent pas de
+// la même façon à l'habitant : pas encore chargé, chargé et vide, échec.
+var _docsLoadOk     = false;
+var _docsLoadFailed = false;
+function _fetchDocs(){
+  var api = (typeof window !== 'undefined' && window.MAT_API) || '';
+  if (!api) return Promise.resolve();
+  return Promise.all([
+    fetch(api + '/docs/temp', {cache:'no-store'}).then(function(r){ return r.json(); }),
+    fetch(api + '/docs/featured', {cache:'no-store'}).then(function(r){ return r.json(); })
+  ]).then(function(res){
+    _docsTemp       = Array.isArray(res[0] && res[0].docs) ? res[0].docs : [];
+    _docsFeatured   = (res[1] && res[1].doc) || null;
+    _docsLoadOk     = true;
+    _docsLoadFailed = false;
+    _writeDocsCache();
+  }).catch(function(){ _docsLoadFailed = true; /* cache conservé */ });
+}
+
+function hasNewDoc(){
+  var seen = _docsSeenIds();
+  return _allDocIds().some(function(id){ return _isNewDoc(id, seen); });
+}
+
+// Affiche/masque les pastilles « Nouveau » (carte d'accueil + menu bureau).
+function refreshDocsBadge(){
+  var on = hasNewDoc();
+  ['docs-badge','docs-badge-desktop'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.display = on ? 'inline-flex' : 'none';
+  });
+}
+window.refreshDocsBadge = refreshDocsBadge;
+
+// Pastille rouge posée sur un document de la liste.
+function _docNewPill(){
+  return '<div style="display:inline-block;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;'
+    + 'text-transform:uppercase;letter-spacing:0.05em;padding:2px 8px;border-radius:999px;margin-bottom:5px">Nouveau</div>';
+}
+
 // ── Featured doc (Documents officiels) ────────────────────
-async function loadFeaturedDoc() {
+function loadFeaturedDoc() {
   var el = document.getElementById('docs-featured-container');
   if (!el) return;
-  try {
-    var r = await fetch(window.MAT_API+'/docs/featured', {cache:'no-store'});
-    var d = await r.json();
-    if (!d.doc) { el.style.display = 'none'; return; }
-    var doc = d.doc;
-    el.style.display = '';
-    el.innerHTML = '<div style="margin-bottom:16px">'
-      + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
-      + '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
-      + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="font-weight:900;font-size:0.9rem;line-height:1.3">' + esc(doc.title) + '</div>'
-      + (doc.description ? '<div style="font-size:0.72rem;opacity:0.85;margin-top:3px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
-      + '<div style="font-size:0.66rem;opacity:0.7;margin-top:5px">📅 ' + new Date(doc.publishedAt).toLocaleDateString('fr-FR') + '</div>'
-      + '</div>'
-      + '<div style="font-size:1.4rem;flex-shrink:0;opacity:0.9">⬇</div>'
-      + '</a></div>';
-  } catch(e) { el.style.display = 'none'; }
+  var doc = _docsFeatured;
+  if (!doc) { el.style.display = 'none'; return; }
+  var neuf = _isNewDoc(_featuredId(doc), _docsSeenIds());
+  el.style.display = '';
+  el.innerHTML = '<div style="margin-bottom:16px">'
+    + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
+    + '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:2px solid ' + (neuf ? '#ef4444' : 'transparent') + ';border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
+    + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
+    + '<div style="flex:1;min-width:0">'
+    + (neuf ? _docNewPill() : '')
+    + '<div style="font-weight:900;font-size:0.9rem;line-height:1.3">' + esc(doc.title) + '</div>'
+    + (doc.description ? '<div style="font-size:0.72rem;opacity:0.85;margin-top:3px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
+    + '<div style="font-size:0.66rem;opacity:0.7;margin-top:5px">📅 ' + new Date(doc.publishedAt).toLocaleDateString('fr-FR') + '</div>'
+    + '</div>'
+    + '<div style="font-size:1.4rem;flex-shrink:0;opacity:0.9">⬇</div>'
+    + '</a></div>';
 }
 
 function openCarburant(){ openOv('carburant'); loadCarburantPanel(); }
 function openEventsLocaux(){ openOv('events-locaux'); loadEventsLocaux(); }
-function openDocs(){openOv('docs'); loadFeaturedDoc(); loadTempDocs();}
+function openDocs(){
+  openOv('docs');
+  // On affiche d'abord ce qu'on a (cache), puis on rafraîchit : l'écran ne
+  // reste jamais bloqué sur « Chargement… » si le réseau est absent.
+  loadFeaturedDoc();
+  loadTempDocs();
+  _fetchDocs().then(function(){
+    loadFeaturedDoc();
+    loadTempDocs();
+    // Le marquage « vu » se fait APRÈS le rafraîchissement, sinon un document
+    // arrivé pendant la consultation serait considéré comme déjà lu. Le rendu
+    // ci-dessus l'a précédé : les pastilles restent donc visibles pendant toute
+    // la visite, et ne disparaissent qu'à la suivante.
+    _markDocsSeen();
+    refreshDocsBadge();
+  });
+}
 function openNums(){ openOv('nums'); }
 function openBug(){ openOv('bug'); restoreBugFormState(); }
 
@@ -344,32 +459,42 @@ function openAgendaFromTopEvent(){
 
 
 // ── Documents officiels — chargement dynamique ────────────
-async function loadTempDocs() {
+function loadTempDocs() {
   var el = document.getElementById('docs-temp-list');
   if (!el) return;
-  el.innerHTML = '<div class="actu-empty">Chargement…</div>';
-  try {
-    var r = await fetch(window.MAT_API+'/docs/temp', {cache:'no-store'});
-    var d = await r.json();
-    var docs = d.docs || [];
-    if (!docs.length) {
-      el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:18px 0">Aucun document temporaire pour le moment.</div>';
-      return;
-    }
-    el.innerHTML = docs.map(function(doc) {
-      return '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:1px solid var(--border);margin-bottom:10px;-webkit-tap-highlight-color:transparent">'
-        + '<div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📄</div>'
-        + '<div style="flex:1;min-width:0">'
-        + '<div style="font-weight:900;font-size:0.86rem">' + esc(doc.title) + '</div>'
-        + (doc.description ? '<div style="font-size:0.73rem;color:var(--muted);margin-top:2px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
-        + '</div>'
-        + '<div style="color:var(--sage);font-size:1rem;flex-shrink:0">→</div>'
-        + '</a>';
-    }).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="actu-empty">Impossible de charger les documents.</div>';
+  var docs = _docsTemp;
+  if (!docs.length) {
+    if (_docsLoadOk)          el.innerHTML = '<div class="actu-empty" style="text-align:center;padding:18px 0">Aucun document temporaire pour le moment.</div>';
+    else if (_docsLoadFailed) el.innerHTML = '<div class="actu-empty">Impossible de charger les documents.</div>';
+    else                      el.innerHTML = '<div class="actu-empty">Chargement…</div>';
+    return;
   }
+  var seen = _docsSeenIds();
+  el.innerHTML = docs.map(function(doc) {
+    var neuf = _isNewDoc(_tempId(doc), seen);
+    return '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border-radius:14px;text-decoration:none;color:var(--text);box-shadow:0 1px 6px rgba(26,61,43,0.08);border:' + (neuf ? '1.5px solid var(--leaf)' : '1px solid var(--border)') + ';margin-bottom:10px;-webkit-tap-highlight-color:transparent">'
+      + '<div style="font-size:1.4rem;flex-shrink:0;width:36px;text-align:center">📄</div>'
+      + '<div style="flex:1;min-width:0">'
+      + (neuf ? _docNewPill() : '')
+      + '<div style="font-weight:900;font-size:0.86rem">' + esc(doc.title) + '</div>'
+      + (doc.description ? '<div style="font-size:0.73rem;color:var(--muted);margin-top:2px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
+      + '</div>'
+      + '<div style="color:var(--sage);font-size:1rem;flex-shrink:0">→</div>'
+      + '</a>';
+  }).join('');
 }
+
+// Rafraîchissement d'arrière-plan au démarrage de l'application. Sans lui, la
+// pastille ne pourrait s'allumer qu'après une première ouverture de l'écran —
+// c'est-à-dire jamais au bon moment. Différé pour ne pas concurrencer les
+// widgets d'accueil au premier rendu (même délai que mat-plui.js).
+setTimeout(function(){
+  _fetchDocs().then(function(){
+    refreshDocsBadge();
+    // Si l'écran est déjà ouvert quand la réponse arrive, on le met à jour.
+    if (document.getElementById('docs-temp-list')) { loadFeaturedDoc(); loadTempDocs(); }
+  });
+}, 2500);
 
 // Mapping tracking sur ouvertures
 // ⚠️ Le tracking ne doit JAMAIS empêcher l'ouverture d'un écran : si
