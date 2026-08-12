@@ -691,6 +691,35 @@ Les **gestes de protection** ne sont pas dans cette carte : ils vivent dans le b
 alimente maintenant (vent violent, orages, neige-verglas… n'y déclenchaient auparavant
 aucun conseil, faute de seuil de température atteint).
 
+### Fenêtre météo — carte « Maintenant » et hors-ligne (v4.78)
+
+`meteoBuildNowCard` affiche les mesures du moment : température, **ressenti**, humidité,
+pression, rafales maximales du jour, avec les tendances sur trois heures (`meteoTrend`).
+Ces sept valeurs étaient déjà calculées par `loadMeteoDetail` et **jamais rendues** — sept
+variables mortes et une douzaine de règles CSS orphelines. Si `temperature_2m` manque, la
+carte entière n'est pas rendue. Rafales et pression ont quitté le bloc **🌿 Air**, où elles
+n'avaient rien à faire.
+
+Trois règles à ne pas défaire, détaillées dans **ADR-0022** :
+
+- **Pas d'écart aux normales** tant qu'aucune source ne le porte. Les tableaux
+  `NORM_MAX`/`NORM_MIN` codés en dur ont été supprimés : sans station ni période citée,
+  « +6° au-dessus des normales » est une donnée inventée (ADR-0018).
+- **Aucun `|| 0` sur une mesure.** Un `weather_code` absent devenait le code 0, soit ☀️
+  « Ciel dégagé », et une température absente devenait 0 °C. Une donnée qu'on n'a pas
+  s'écrit « – ». L'UV porte une pastille d'échelle OMS (`meteoUvLevel`), dont le palier 8
+  est celui des prochains risques et des conseils du jour.
+- **Cache hors-ligne daté.** `mat_meteo_cache` garde le dernier bulletin avec son
+  horodatage ; `loadMeteo` s'y replie en cas d'échec réseau et `meteoPaintHeader` le dit
+  (« 📡 Hors ligne · relevé de 15h58 »). Au-delà de **6 h** le cache n'est plus servi, et
+  une **vigilance expirée est retirée** avant réaffichage — sinon on servirait une alerte
+  terminée comme si elle courait encore.
+
+Côté accessibilité, les deux carrousels (`.meteo-hourly-track`, `.meteo-days-scroll`)
+portent `tabindex="0"` + `role="group"` + nom accessible : sans `tabindex`, un conteneur
+défilant est hors d'atteinte au clavier sous Chrome (ADR-0016). Les titres de section sont
+de vrais `<h3>`.
+
 ### Effets visuels — ambiance météo, View Transitions, confettis
 
 Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**

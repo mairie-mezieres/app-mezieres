@@ -5,6 +5,51 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.78] — 12 août 2026
+
+### Ajouté
+- **Carte « Maintenant » dans la fenêtre météo** (`meteoBuildNowCard`) : température,
+  **ressenti**, humidité, pression, rafales maximales du jour, avec les tendances sur trois
+  heures. Ces sept mesures étaient calculées par `loadMeteoDetail` depuis l'origine et
+  **aucune n'était affichée** — sept variables mortes et une douzaine de règles CSS
+  orphelines (`.meteo-current-*`, `.meteo-stat-*`, `.meteo-grid-*`). Sur un écran de
+  vigilance canicule, le ressenti est justement le chiffre que l'on cherche. Si
+  `temperature_2m` manque, la carte n'est pas rendue du tout.
+- **La météo survit au hors-ligne.** `mat_meteo_cache` conserve le dernier bulletin reçu
+  avec son horodatage ; `loadMeteo` s'y replie en cas d'échec réseau. Le bandeau d'accueil
+  affiche « 📡 Hors ligne · relevé de 15h58 » et la fenêtre météo s'ouvre sur un bandeau
+  daté. Au-delà de 6 h le cache n'est plus servi, et une **vigilance expirée est retirée**
+  avant réaffichage — une alerte terminée réaffichée serait une fausse information.
+- **Source et fraîcheur** en pied de fenêtre : « Prévisions Open-Meteo (CC BY 4.0) ·
+  vigilance Météo-France — mis à jour à … ». Open-Meteo est diffusé sous CC BY 4.0.
+- **Pastille d'échelle sur l'indice UV** (`meteoUvLevel`, échelle OMS/Météo-France), au
+  même palier 8 que les prochains risques et les conseils du jour.
+- `tests/e2e/meteo-overlay.spec.js` — neuf cas : ressenti affiché, bloc Air allégé, « – »
+  sur donnée absente, couleurs UV mesurées sur le style calculé, carrousels focusables,
+  ligne de source, hors-ligne daté, purge d'une vigilance expirée, et passage axe de la
+  fenêtre entière.
+
+### Modifié
+- **Rafales et pression quittent le bloc 🌿 Air** pour la carte « Maintenant » : ce sont des
+  paramètres de vent et de pression, pas de qualité de l'air. La flèche de tendance des
+  rafales disparaît — la valeur affichée est un maximum quotidien, et une tendance sur un
+  maximum ne veut rien dire.
+- **Plus d'écart aux normales** : les tableaux `NORM_MAX`/`NORM_MIN` codés en dur, sans
+  station ni période citée, sont supprimés. Voir ADR-0022 — à reprendre le jour où le
+  backend servira des normales sourcées.
+- **Accessibilité** : les carrousels `.meteo-hourly-track` et `.meteo-days-scroll`
+  reçoivent `tabindex="0"`, `role="group"` et un nom accessible (sous Chrome, un conteneur
+  défilant sans `tabindex` est hors d'atteinte au clavier — ADR-0016), et les titres de
+  section deviennent de vrais `<h3>`.
+
+### Corrigé
+- **Une donnée absente n'est plus affichée comme une prévision.** `weather_code || 0`
+  transformait un code manquant en code 0, soit ☀️ « Ciel dégagé », et
+  `temperature_2m_max || 0` affichait 0 °C. Désormais « – » et « Indisponible » (ADR-0018).
+- Mode sombre : les titres 🌿 Air et 💡 Conseils du jour s'affichaient en texte sombre sur
+  fond sombre, et les lignes de détail des cartes « Prochains jours » étaient à 1,9:1 de
+  contraste.
+
 ## [4.77] — 12 août 2026
 
 ### Modifié
