@@ -399,6 +399,21 @@ Les deux dates ne sont écrites **qu'une fois**. L'ancien dépliant « Touchez p
 a disparu : il répétait les mêmes horaires et la même phrase. Le texte du bulletin ne
 s'affiche désormais que lorsque Météo-France en publie réellement un.
 
+### 🌡️ Maintenant
+
+Sous l'alerte, une carte donne les conditions du moment : température, **ressenti**,
+humidité, pression et rafales maximales de la journée. Une petite flèche indique si
+l'humidité et la pression montent ou baissent depuis trois heures.
+
+Quand une mesure n'est pas disponible, l'application écrit « – » : elle n'invente ni
+température ni prévision. Dans « Prochains jours », l'indice UV porte une pastille de
+couleur (vert = faible, jaune = modéré, orange = fort, rouge = très fort, violet =
+extrême), selon l'échelle officielle.
+
+En bas de la fenêtre, une ligne indique la **source** des données et l'**heure du dernier
+relevé**. Sans connexion, l'application affiche le dernier bulletin reçu, avec un bandeau
+qui le date — et jamais une alerte déjà terminée.
+
 ### ⚡ Prochains risques
 
 Juste en dessous, jusqu'à trois **jauges** résument les 18 prochaines heures : pluie (risque

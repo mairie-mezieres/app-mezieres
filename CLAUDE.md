@@ -23,6 +23,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **Rendu du bâti 3D** — toits en pente par tranches, pourquoi pas de texture de façade, pourquoi les murs tiennent en **une seule** couche (le clic) | `docs/adr/0020-toits-en-pente-par-tranches-et-abandon-de-la-texture-de-facade.md` puis `SFD-17` §RG-17.14 à RG-17.18 |
 | **Vue « territoire » — les 25 communes de la CCTVL** : ⚠️ **aucun code INSEE en dur** (seuls les 25 noms), aucune règle hors Mézières, piège « 1AU » | `docs/adr/0021-territoire-des-25-communes-aucun-code-insee-en-dur.md` puis `SFD-17` §RG-17.19 à RG-17.23 |
 | **Alerte météo & « Prochains risques »** — frise de l'alerte, seuils anti-bruit (UV ≥ 8, pas de répétition du phénomène en vigilance), ⚠️ `daily[0]` est **HIER** | `docs/guide-technique.md` §« Carte d'alerte météo » puis `tests/e2e/meteo-alerte.spec.js` |
+| **Fenêtre météo** — carte « Maintenant », cache hors-ligne daté (`mat_meteo_cache`), ⚠️ **pas d'écart aux normales sans source**, aucune donnée absente affichée comme un 0, échelle UV | `docs/adr/0022-fenetre-meteo-afficher-ce-qui-est-mesure-et-rien-d-autre.md` puis `tests/e2e/meteo-overlay.spec.js` |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |

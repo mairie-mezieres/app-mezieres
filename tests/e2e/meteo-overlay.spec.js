@@ -1,0 +1,209 @@
+const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+
+// Fenêtre météo — carte « Maintenant », hors-ligne, honnêteté des données,
+// accessibilité (v4.78).
+//
+// Ce lot verrouille des comportements qui avaient tous déjà existé « en
+// silence » : des mesures calculées et jamais affichées, un cache absent, des
+// zéros présentés comme des relevés, des carrousels hors d'atteinte au clavier.
+//
+// ⚠️ Fuseau forcé à Europe/Paris (heures Open-Meteo locales sans fuseau).
+
+test.use({ timezoneId: 'Europe/Paris' });
+
+const EXTERNAL_HOSTS = [
+  'chatbot-mairie-mezieres.onrender.com', 'open-meteo.com', 'tile.openstreetmap',
+  'data.education.gouv.fr', 'ingest.de.sentry.io', 'sentry.io',
+];
+
+const HIER = '2026-07-28';
+const AUJ = '2026-07-29';
+const DEMAIN = '2026-07-30';
+const APRES = '2026-07-31';
+const PARIS = '+02:00';
+const MAINTENANT = `${AUJ}T10:00:00${PARIS}`;
+
+// `daily[0]` = HIER (past_days=1, ADR-0007). Le 4ᵉ jour est volontairement
+// **vide** : c'est le cas qui produisait « 0 °C » et un grand soleil.
+function payload() {
+  const heures = [], temp = [], hum = [], pres = [], gust = [], prob = [], pluie = [], codes = [];
+  for (let h = 7; h <= 23; h++) {
+    heures.push(`${AUJ}T${String(h).padStart(2, '0')}:00`);
+    temp.push(30 + (h % 3));
+    hum.push(h < 10 ? 55 : 38);      // 55 % il y a trois heures → tendance à la baisse
+    pres.push(h < 10 ? 1018 : 1013);
+    gust.push(25);
+    prob.push(h === 14 ? 70 : 5);
+    pluie.push(h === 14 ? 2.0 : 0);
+    codes.push(0);
+  }
+  return {
+    forecast: {
+      current: {
+        temperature_2m: 36.6, apparent_temperature: 41.2, relative_humidity_2m: 38,
+        pressure_msl: 1013, weather_code: 0, wind_speed_10m: 14, wind_direction_10m: 220,
+      },
+      daily: {
+        time: [HIER, AUJ, DEMAIN, APRES],
+        weather_code: [0, 0, 3, null],
+        temperature_2m_max: [35, 37, 29, null],
+        temperature_2m_min: [19, 21, 17, null],
+        precipitation_sum: [0, 0, 1.2, null],
+        uv_index_max: [7, 9.2, 3.1, null],
+        wind_gusts_10m_max: [46, 52, 38, null],
+        wind_direction_10m_dominant: [220, 230, 250, null],
+        sunrise: [`${HIER}T06:30`, `${AUJ}T06:32`, `${DEMAIN}T06:34`, `${APRES}T06:36`],
+        sunset: [`${HIER}T21:38`, `${AUJ}T21:36`, `${DEMAIN}T21:34`, `${APRES}T21:32`],
+      },
+      hourly: {
+        time: heures, temperature_2m: temp, relative_humidity_2m: hum,
+        surface_pressure: pres, wind_gusts_10m: gust, weather_code: codes,
+        precipitation_probability: prob, precipitation: pluie,
+      },
+    },
+    vigilance: null,
+  };
+}
+
+async function ouvrirMeteo(page, opts) {
+  const o = opts || {};
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
+    return route.continue();
+  });
+  await page.addInitScript(() => {
+    try { localStorage.setItem('mat_onboarded_v3', '1'); } catch (_) {}
+  });
+  await page.clock.setFixedTime(new Date(MAINTENANT));
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.loadMeteoDetail === 'function');
+  await page.evaluate(async (arg) => {
+    window._meteoData = arg.d;
+    window._meteoDataAt = arg.at;
+    window._meteoDataStale = arg.stale;
+    openMeteo();
+    await window.loadMeteoDetail();
+  }, { d: payload(), at: new Date(MAINTENANT).getTime() - 7 * 60000, stale: !!o.stale });
+  await page.waitForSelector('#meteo-detail .meteo-premium');
+}
+
+test('la carte « Maintenant » affiche le ressenti et l’humidité', async ({ page }) => {
+  await ouvrirMeteo(page);
+
+  const r = await page.evaluate(() => {
+    const c = document.querySelector('.meteo-now-card');
+    return { txt: c ? c.innerText.replace(/\s+/g, ' ') : null };
+  });
+
+  // Ces mesures étaient calculées puis jetées : sept variables mortes.
+  expect(r.txt).toContain('37°');
+  expect(r.txt).toMatch(/ressenti/i); // le libellé est mis en capitales par le CSS
+  expect(r.txt).toContain('41°');
+  expect(r.txt).toContain('38 %');
+  expect(r.txt).toContain('1013 hPa');
+  expect(r.txt).toContain('52 km/h');
+
+  // Humidité 55 % il y a trois heures → 38 % : une flèche de tendance.
+  await expect(page.locator('.meteo-now-stat .meteo-trend-inline').first()).toBeVisible();
+});
+
+test('rafales et pression ont quitté le bloc « Air »', async ({ page }) => {
+  await ouvrirMeteo(page);
+  const air = await page.evaluate(() => {
+    const h = [...document.querySelectorAll('#meteo-detail h3')].find((e) => /Air/.test(e.textContent));
+    return h ? h.parentElement.innerText : '';
+  });
+  expect(air).toContain('Qualité de l’air'.replace('’', "'")); // libellé rendu avec apostrophe droite
+  expect(air).not.toContain('Rafales');
+  expect(air).not.toContain('Pression');
+});
+
+test('une donnée absente s’écrit « – », jamais 0 °C ni grand soleil', async ({ page }) => {
+  await ouvrirMeteo(page);
+
+  const dernier = await page.evaluate(() => {
+    const cartes = document.querySelectorAll('.meteo-day-card');
+    const c = cartes[cartes.length - 1];
+    return { txt: c.innerText.replace(/\s+/g, ' '), ico: c.querySelector('.meteo-day-icon').textContent };
+  });
+
+  expect(dernier.txt).toContain('–');
+  expect(dernier.txt).not.toContain('0°');
+  expect(dernier.txt).not.toContain('Ciel dégagé');
+  expect(dernier.ico).not.toBe('☀️');
+});
+
+test('l’indice UV porte sa couleur d’échelle', async ({ page }) => {
+  await ouvrirMeteo(page);
+
+  // Style CALCULÉ : la pastille est posée en JS et peinte par le CSS.
+  const r = await page.evaluate(() => {
+    const chips = [...document.querySelectorAll('.meteo-uv-chip')];
+    return chips.slice(0, 3).map((c) => ({
+      txt: c.textContent, cls: c.className, bg: getComputedStyle(c).backgroundColor,
+    }));
+  });
+
+  expect(r[0].txt).toBe('UV 9.2');
+  expect(r[0].cls).toContain('uv-4');           // 8-10 : très fort
+  expect(r[1].cls).toContain('uv-2');           // 3-5 : modéré
+  expect(r[2].cls).toContain('uv-0');           // valeur absente
+  expect(new Set(r.map((c) => c.bg)).size).toBe(3); // trois couleurs distinctes
+});
+
+test('les carrousels sont atteignables au clavier et nommés', async ({ page }) => {
+  await ouvrirMeteo(page);
+  for (const sel of ['.meteo-hourly-track', '.meteo-days-scroll']) {
+    const el = page.locator(sel);
+    await expect(el).toHaveAttribute('tabindex', '0');
+    await expect(el).toHaveAttribute('aria-label', /.+/);
+    await el.focus();
+    await expect(el).toBeFocused();
+  }
+});
+
+test('la source et l’heure du relevé sont indiquées', async ({ page }) => {
+  await ouvrirMeteo(page);
+  const src = await page.locator('.meteo-source').innerText();
+  expect(src).toContain('Open-Meteo');
+  expect(src).toContain('Météo-France');
+  expect(src).toMatch(/\d{1,2}h\d{2}/);
+});
+
+test('hors ligne : le bulletin en cache est affiché, et daté', async ({ page }) => {
+  await ouvrirMeteo(page, { stale: true });
+  const banner = page.locator('.meteo-stale-banner');
+  await expect(banner).toHaveCount(1);
+  await expect(banner).toContainText('Hors ligne');
+  await expect(banner).toContainText(/\d{1,2}h\d{2}/);
+  // Les prévisions restent lisibles : c'est tout l'intérêt du cache.
+  await expect(page.locator('.meteo-day-card').first()).toBeVisible();
+});
+
+test('une alerte expirée n’est pas réaffichée depuis le cache', async ({ page }) => {
+  await ouvrirMeteo(page);
+  const v = await page.evaluate((maintenant) => {
+    localStorage.setItem('mat_meteo_cache', JSON.stringify({
+      t: new Date(maintenant).getTime() - 30 * 60000,
+      d: { forecast: {}, vigilance: { level: 3, end: new Date(maintenant).getTime() - 3600000 } },
+    }));
+    // La vigilance stockée s'est terminée il y a une heure.
+    const c = window.meteoReadCache(new Date(maintenant).getTime());
+    return c ? c.d.vigilance : 'pas-de-cache';
+  }, MAINTENANT);
+  expect(v).toBe(null);
+});
+
+test('fenêtre météo : aucune violation axe sérieuse ou critique', async ({ page }) => {
+  await ouvrirMeteo(page);
+  const results = await new AxeBuilder({ page }).include('#ov-meteo')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  if (blocking.length) {
+    console.log('Violations fenêtre météo:', JSON.stringify(
+      blocking.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })), null, 2));
+  }
+  expect(blocking, 'axe fenêtre météo').toEqual([]);
+});

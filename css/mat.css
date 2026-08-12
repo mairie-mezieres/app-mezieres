@@ -845,15 +845,31 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-badge-alert.level-4{background:rgba(239,68,68,.22);color:#fee2e2;border:1px solid rgba(239,68,68,.36);}
 .meteo-premium{display:flex;flex-direction:column;gap:12px;}
 .meteo-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px 14px;box-shadow:0 4px 18px rgba(26,61,43,.06);}
-.meteo-card-kicker{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;}
+.meteo-card-kicker{font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 6px;}
 .meteo-card-foot{font-size:.62rem;color:var(--muted);margin-top:8px;line-height:1.4;}
-.meteo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.meteo-grid-mixed > .meteo-card{height:100%;}
-.meteo-grid-secondary .meteo-card{min-width:0;}
-.meteo-grid-secondary .meteo-stat-card{height:100%;}
-.meteo-inline-soft{font-size:.66rem;color:#334155;font-weight:800;white-space:nowrap;}
 .meteo-mini-label{font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
-.meteo-source{font-size:.62rem;color:var(--muted);text-align:center;}
+.meteo-source{font-size:.62rem;color:var(--muted);text-align:center;line-height:1.5;}
+/* Bulletin relu du cache : daté, jamais présenté comme un relevé de l'instant. */
+.meteo-stale-banner{background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1px solid #fcd34d;border-radius:12px;padding:9px 12px;font-size:.72rem;font-weight:800;color:#92400e;line-height:1.45;}
+.meteo-stale-note{display:inline-block;margin-top:2px;font-size:.6rem;font-weight:800;color:#fff7d6;opacity:.96;}
+/* Conditions du moment */
+.meteo-now-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.meteo-now-ico{font-size:2rem;line-height:1;}
+.meteo-now-temp{font-size:2rem;font-weight:900;color:var(--text);line-height:1;}
+.meteo-now-temp span{font-size:1.1rem;font-weight:800;color:var(--muted);}
+.meteo-now-feels{display:flex;flex-direction:column;gap:2px;margin-left:auto;text-align:right;}
+.meteo-now-feels strong{font-size:1.15rem;font-weight:900;color:var(--text);line-height:1.1;}
+.meteo-now-desc{margin-top:6px;font-size:.76rem;color:#4b5563;line-height:1.45;}
+.meteo-now-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
+.meteo-now-stat{background:linear-gradient(135deg,#f8fafc,#fff);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0;}
+.meteo-now-stat strong{font-size:.86rem;font-weight:900;color:var(--text);line-height:1.15;white-space:nowrap;}
+/* Indice UV — échelle OMS/Météo-France, même palier 8 que les alertes */
+.meteo-uv-chip{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:900;font-size:.58rem;background:#e2e8f0;color:#334155;}
+.meteo-uv-chip.uv-1{background:#dcfce7;color:#166534;}
+.meteo-uv-chip.uv-2{background:#fef9c3;color:#854d0e;}
+.meteo-uv-chip.uv-3{background:#ffedd5;color:#9a3412;}
+.meteo-uv-chip.uv-4{background:#fee2e2;color:#991b1b;}
+.meteo-uv-chip.uv-5{background:#ede9fe;color:#5b21b6;}
 
 .meteo-alert-card{padding:0;overflow:hidden;}
 .meteo-alert-card.level-2{background:linear-gradient(135deg,#fff8cc,#fffdf0);border-color:#facc15;}
@@ -893,20 +909,7 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-hour-mm{font-size:.54rem;color:#475569;margin-top:2px;white-space:nowrap;}
 .meteo-hour-wind{font-size:.6rem;color:#334155;margin-top:4px;font-weight:900;}
 
-.meteo-stat-card{display:flex;flex-direction:column;justify-content:center;min-height:92px;}
-.meteo-stat-compact{min-height:72px;padding:9px 10px;}
-.meteo-stat-line{display:block;margin-top:4px;min-width:0;}
-.meteo-stat-value{font-size:1rem;font-weight:900;color:var(--text);line-height:1.15;min-width:0;}
 .meteo-trend-inline{display:inline;font-size:1rem;line-height:1;font-weight:900;vertical-align:baseline;}
-
-.meteo-current-card{padding:11px 13px;}
-.meteo-current-main{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;}
-.meteo-current-value{font-size:1.08rem;font-weight:900;color:var(--text);line-height:1.1;white-space:nowrap;min-width:0;}
-.meteo-current-value span{font-size:.76rem;color:var(--muted);font-weight:800;white-space:nowrap;}
-.meteo-current-sub{display:none;}
-.meteo-current-norms-inline{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;background:linear-gradient(135deg,#f8fafc,#fff);border:1px solid rgba(0,0,0,.06);border-radius:11px;padding:6px 8px;justify-self:end;}
-.meteo-current-norms-inline span{font-size:.56rem;font-weight:800;color:var(--muted);letter-spacing:.02em;white-space:nowrap;}
-.meteo-current-norms-inline strong{font-size:.76rem;font-weight:900;color:var(--text);white-space:nowrap;}
 
 .meteo-sun-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
 .meteo-moon-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:linear-gradient(135deg,#eef2ff,#fff);border:1px solid rgba(99,102,241,.14);font-size:.68rem;font-weight:800;color:#4338ca;}
@@ -940,21 +943,15 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-day-temp{display:flex;justify-content:center;gap:8px;font-size:.8rem;font-weight:900;color:var(--text);margin-top:2px;}
 .meteo-day-temp span:first-child{color:#2563eb;}
 .meteo-day-temp span:last-child{color:#dc2626;}
-.meteo-day-desc,.meteo-day-meta,.meteo-day-norm{font-size:.58rem;line-height:1.35;}
+.meteo-day-desc,.meteo-day-meta{font-size:.58rem;line-height:1.35;}
 .meteo-day-desc{color:var(--muted);min-height:30px;}
 .meteo-day-meta{color:#475569;}
+/* Un conteneur défilant atteignable au clavier doit montrer son focus. */
+.meteo-days-scroll:focus-visible,.meteo-hourly-track:focus-visible{outline:2px solid var(--leaf);outline-offset:2px;border-radius:12px;}
 
 @media (max-width:420px){
-  .meteo-grid-2{grid-template-columns:1fr;}
-  .meteo-grid-secondary{grid-template-columns:1fr 1fr;}
-  .meteo-alert-periods{grid-template-columns:1fr;}
-  .meteo-current-main{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;}
-  .meteo-current-norms-inline{padding:5px 7px;gap:5px;}
-  .meteo-current-norms-inline span{font-size:.5rem;}
-  .meteo-current-norms-inline strong{font-size:.7rem;}
-  .meteo-stat-value{font-size:.9rem;}
-  .meteo-stat-compact .meteo-card-kicker{font-size:.56rem;}
-  .meteo-stat-line{gap:6px;}
+  .meteo-now-temp{font-size:1.7rem;}
+  .meteo-now-stat strong{font-size:.78rem;}
 }
 
 /* Overlay météo */
@@ -1009,8 +1006,18 @@ html.theme-sombre .meteo-alert-timeline{background:rgba(255,255,255,.06) !import
 html.theme-sombre .meteo-alert-countdown{color:#f1f5f9 !important;}
 html.theme-sombre .meteo-alert-bounds{color:#94a3b8 !important;}
 html.theme-sombre .meteo-alert-bar{background:rgba(226,232,240,.16) !important;}
-/* Météo — chips et barre soleil */
-html.theme-sombre .meteo-current-norms-inline { background:#2d3748 !important;border-color:#374151 !important; }
+/* Météo — carte « Maintenant », bandeau hors ligne, chips et barre soleil */
+html.theme-sombre .meteo-now-stat { background:#2d3748 !important;border-color:#374151 !important; }
+html.theme-sombre .meteo-now-stat strong,html.theme-sombre .meteo-now-temp { color:#f1f5f9 !important; }
+html.theme-sombre .meteo-now-feels strong { color:#f1f5f9 !important; }
+html.theme-sombre .meteo-now-desc { color:#cbd5e1 !important; }
+html.theme-sombre .meteo-stale-banner { background:#3d3518 !important;border-color:#a16207 !important;color:#fde68a !important; }
+/* Titres de section de l'overlay (🌿 Air, 💡 Conseils du jour) : leur couleur
+   inline var(--forest) tombe sur du texte sombre sur fond sombre. */
+html.theme-sombre #meteo-detail h3:not(.meteo-card-kicker) { color:#6ee7b7 !important; }
+/* Lignes de détail des cartes « Prochains jours » : #475569 sur #2d3748 est
+   illisible (contraste 1,9:1). */
+html.theme-sombre .meteo-day-meta { color:#cbd5e1 !important; }
 html.theme-sombre .meteo-moon-chip { background:#2d3748 !important;border-color:#374151 !important;color:#a5b4fc !important; }
 html.theme-sombre .meteo-sun-progress { background:#374151 !important;border-color:#4b5563 !important; }
 /* Déchets — tri sélectif et rappels */
