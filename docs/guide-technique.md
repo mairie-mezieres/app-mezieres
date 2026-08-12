@@ -663,6 +663,34 @@ plusieurs versions (phase « nuit » 24 h/24, soleil et crépuscule jamais décl
 Voir **ADR-0007** — et les tests de régression `tests/e2e/ambiance.spec.js`, dont le
 jeu de données reproduit volontairement la vraie forme de la réponse.
 
+La même erreur a été retrouvée deux fois en v4.77 dans `loadMeteoDetail` :
+« Prochains risques » lisait `daily.uv_index_max[1]` en l'annonçant **« Demain »**
+(c'était l'UV du jour même), et **💡 Conseils du jour** lisait `[0]`, c'est-à-dire les
+températures et l'UV **de la veille** — un conseil canicule pouvait donc manquer le
+jour où il servait. Les deux passent désormais par `meteoTodayIndex`.
+
+### Carte d'alerte météo et « Prochains risques » (v4.77)
+
+`meteoBuildAlertRiskCard` (`js/mat-widgets.js`) rend une seule carte, en deux blocs :
+
+- **L'alerte** — pastille de niveau, zone, phénomène, puis une **frise** (`meteoAlertProgress`)
+  qui situe l'instant présent entre `start` et `end` et affiche le temps restant. Le dépliant
+  `<details>` « Touchez pour le détail » a été supprimé : il ne faisait que redire les deux
+  dates et le résumé déjà visibles. Le texte du bulletin n'est affiché que si Météo-France l'a
+  réellement fourni (`vigilance.main_text`) — le repli de `meteoAlertSummary` (« Vigilance
+  orange en cours sur le Loiret. ») est mot pour mot ce que dit déjà la pastille.
+- **Les risques** — `meteoBuildRiskItems` renvoie des objets `{icon,label,when,value,pct,tone}`
+  rendus en jauges. Trois règles anti-bruit : le risque déjà porté par la vigilance en cours
+  n'est pas répété (`phenomenon_id` 1/3 → rafales, 2/3/4 → pluie), l'UV ne remonte qu'à partir
+  de **8** (seuil « très fort », le même que les conseils du jour ; à 6 l'item s'affichait tous
+  les jours de l'été), et sous une vigilance le bloc entier disparaît s'il n'a rien à dire —
+  sinon il annonçait « aucun risque notable » juste sous une alerte orange.
+
+Les **gestes de protection** ne sont pas dans cette carte : ils vivent dans le bloc
+**💡 Conseils du jour** du même overlay, qui existait déjà et qu'une vigilance en cours
+alimente maintenant (vent violent, orages, neige-verglas… n'y déclenchaient auparavant
+aucun conseil, faute de seuil de température atteint).
+
 ### Effets visuels — ambiance météo, View Transitions, confettis
 
 Trois effets « vitrine » introduits en v4.44, tous en **amélioration progressive**

@@ -5,6 +5,42 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.77] — 12 août 2026
+
+### Modifié
+- **La carte d'alerte météo ne se répète plus.** Le dépliant « Touchez pour le détail »
+  affichait, une fois ouvert, les deux mêmes horaires et la même phrase que le résumé
+  juste au-dessus — trois occurrences de « Vigilance orange en cours sur le Loiret. » sur
+  un même écran. Il est remplacé par une **frise** (`meteoAlertProgress`) qui situe
+  l'instant présent entre le début et la fin de l'alerte et annonce le temps restant
+  (« ⏳ Se termine dans 8 h », « ⏳ Débute dans 3 h »). Le texte du bulletin n'est affiché
+  que si Météo-France en a réellement publié un (`vigilance.main_text`) : le repli
+  automatique redisait mot pour mot la pastille de niveau.
+- **« Prochains risques » passe en jauges.** Pluie, rafales et UV sont rendus par
+  `meteoBuildRiskItems` sous forme d'items `{icon,label,when,value,pct,tone}` : une barre
+  qui se remplit et change de couleur selon l'intensité, au lieu d'une phrase.
+- **… et se tait quand il n'a rien à dire.** Trois règles anti-bruit : l'indice UV ne
+  remonte qu'à partir de **8** (« très fort ») au lieu de 6 — à 6, l'item s'affichait tous
+  les jours de l'été ; le risque déjà porté par la vigilance en cours n'est plus répété
+  (pas de ligne « rafales » sous une alerte vent violent) ; et sous une vigilance, le bloc
+  entier disparaît s'il est vide, au lieu d'annoncer « aucun risque météo notable » juste
+  sous une alerte orange.
+- **Les 💡 Conseils du jour sont alimentés par la vigilance en cours** (vent violent,
+  orages, pluie-inondation, crues, neige-verglas, canicule, grand froid). Une alerte vent
+  ou orage ne déclenchait auparavant **aucun** conseil, faute de seuil de température
+  atteint. Les gestes restent regroupés dans ce bloc unique : la carte d'alerte n'en
+  ouvre pas un second.
+
+### Corrigé
+- **Bug d'un jour dans l'overlay météo — `daily[0]` est HIER** (`past_days=1`, ADR-0007).
+  « Prochains risques » lisait `daily.uv_index_max[1]` en l'annonçant **« Demain »** : il
+  affichait l'UV du jour même. Et les **💡 Conseils du jour** lisaient `[0]`, soit les
+  températures et l'UV **de la veille** — le conseil canicule pouvait donc manquer le jour
+  où il servait. Les deux passent désormais par `meteoTodayIndex`.
+- Mode sombre : les textes de la carte d'alerte (bulletin, bornes de la frise, zone)
+  restaient en gris clair sur fond sombre, le dégradé de niveau étant écrasé par le fond
+  de `.meteo-card`.
+
 ## [4.76] — 11 août 2026
 
 ### Ajouté
