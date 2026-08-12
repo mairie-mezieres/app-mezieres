@@ -48,6 +48,43 @@ function meteoPhenomenonIcon(vigilance) {
   return METEO_ALERT_ICONS[Number((vigilance || {}).level || 1)] || '⚠️';
 }
 
+// Durée lisible (« 45 min », « 8 h 30 », « 2 j 4 h ») — pour le compte à rebours
+// d'une vigilance. C'est la seule information que l'habitant ne peut pas lire
+// lui-même sur les deux dates affichées.
+function meteoHumanDelay(ms) {
+  var mins = Math.max(0, Math.round(ms / 60000));
+  if (mins < 60) return mins + ' min';
+  var h = Math.floor(mins / 60);
+  var m = mins % 60;
+  if (h < 24) return h + ' h' + (m ? ' ' + String(m).padStart(2, '0') : '');
+  var d = Math.floor(h / 24);
+  var rh = h % 24;
+  return d + ' j' + (rh ? ' ' + rh + ' h' : '');
+}
+
+// Avancement d'une vigilance : { label, progress }.
+// `progress` vaut null quand les dates ne permettent pas de situer l'instant
+// présent — la frise est alors omise plutôt que dessinée au hasard.
+function meteoAlertProgress(vigilance, nowDate) {
+  var v = vigilance || {};
+  var now = (nowDate || new Date()).getTime();
+  var startMs = v.start ? new Date(v.start).getTime() : NaN;
+  var endMs = v.end ? new Date(v.end).getTime() : NaN;
+  if (isNaN(startMs) && isNaN(endMs)) return { label: '', progress: null };
+
+  if (!isNaN(startMs) && now < startMs) {
+    return { label: '⏳ Débute dans ' + meteoHumanDelay(startMs - now), progress: 0 };
+  }
+  if (!isNaN(endMs) && now < endMs) {
+    var pct = (!isNaN(startMs) && endMs > startMs)
+      ? Math.max(0, Math.min(100, ((now - startMs) / (endMs - startMs)) * 100))
+      : null;
+    return { label: '⏳ Se termine dans ' + meteoHumanDelay(endMs - now), progress: pct };
+  }
+  // Fin dépassée : Météo-France n'a pas encore levé la vigilance côté API.
+  return { label: '⏳ Fin annoncée passée — en attente de mise à jour', progress: 100 };
+}
+
 function meteoFindClosestHourlyIndex(times, targetDate) {
   if (!times || !times.length || !targetDate) return -1;
   var targetMs = targetDate.getTime();
@@ -267,16 +304,26 @@ function meteoBuildSunBlock(days, nowDate) {
     + '</div>';
 }
 
-function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
+// Risques prévisionnels des 18 prochaines heures, sous forme d'items visuels
+// { icon, label, when, value, pct, tone }.
+//
+// Deux garde-fous contre le bruit — c'est ce que les habitants reprochaient à
+// la section « Prochains risques » :
+//   1. une vigilance en cours dit déjà son risque : on ne le répète pas ici ;
+//   2. l'indice UV ne remonte qu'à partir de 8 (« très fort », seuil des
+//      conseils du jour). À 6, l'item s'affichait tous les jours de l'été sans
+//      rien apprendre à personne.
+function meteoBuildRiskItems(forecast, vigilance, nowDate) {
   var hourly = forecast.hourly || {};
   var daily = forecast.daily || {};
   var times = hourly.time || [];
   var start = meteoFindFirstFutureIndex(times, nowDate);
   var hasAlert = meteoHasAlert(vigilance);
-  var level = hasAlert ? Number(vigilance.level || 2) : 1;
+  var phenom = Number((vigilance || {}).phenomenon_id || 0);
+  var skipRain = hasAlert && (phenom === 2 || phenom === 3 || phenom === 4);
+  var skipWind = hasAlert && (phenom === 1 || phenom === 3);
 
-  // Risques prévisionnels — la vigilance n'est PAS répétée ici (affichée dans la section alerte)
-  var riskItems = [];
+  var items = [];
   var bestRain = null, bestGust = null;
   for (var i = start; i !== -1 && i < Math.min(start + 18, times.length); i++) {
     var prob = Math.round((hourly.precipitation_probability || [])[i] || 0);
@@ -291,63 +338,136 @@ function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
       if (!bestGust || gust > bestGust.gust) bestGust = { idx: i, gust: gust };
     }
   }
-  if (bestRain) {
-    var rainDt = new Date(times[bestRain.idx]);
-    riskItems.push('Précipitations vers ' + rainDt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h') + ' : ' + bestRain.prob + '% · ' + bestRain.mm.toFixed(1) + ' mm.');
+
+  function heure(idx) {
+    return new Date(times[idx]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
   }
-  if (bestGust) {
-    var gustDt = new Date(times[bestGust.idx]);
-    riskItems.push('Vent plus soutenu vers ' + gustDt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h') + ' : rafales ' + bestGust.gust + ' km/h.');
+
+  if (bestRain && !skipRain) {
+    items.push({
+      icon: bestRain.prob >= 70 ? '🌧️' : '🌦️',
+      label: 'Pluie',
+      when: 'vers ' + heure(bestRain.idx),
+      value: bestRain.prob + ' % de risque · ' + bestRain.mm.toFixed(1) + ' mm',
+      pct: Math.max(6, Math.min(100, bestRain.prob)),
+      tone: (bestRain.prob >= 80 || bestRain.mm >= 3) ? 'high' : (bestRain.prob >= 60 || bestRain.mm >= 1) ? 'mid' : 'low'
+    });
   }
-  if ((daily.uv_index_max || [])[1] != null && Number((daily.uv_index_max || [])[1]) >= 6) {
-    riskItems.push('Demain : UV ' + Number((daily.uv_index_max || [])[1]).toFixed(1) + '.');
+  if (bestGust && !skipWind) {
+    items.push({
+      icon: '💨',
+      label: 'Rafales',
+      when: 'vers ' + heure(bestGust.idx),
+      value: bestGust.gust + ' km/h',
+      // Jauge graduée sur 100 km/h : au-delà, le vent est déjà une vigilance.
+      pct: Math.max(6, Math.min(100, bestGust.gust)),
+      tone: bestGust.gust >= 80 ? 'high' : bestGust.gust >= 60 ? 'mid' : 'low'
+    });
   }
+
+  // ⚠️ daily[0] = HIER (past_days=1) — indexer par meteoTodayIndex, jamais en
+  // dur. L'ancien code lisait daily[1] en l'annonçant « Demain » : il affichait
+  // en fait l'UV du jour même.
+  var dayIdx = meteoTodayIndex(daily, nowDate);
+  if (dayIdx >= 0) {
+    var uvs = daily.uv_index_max || [];
+    var uvToday = Number(uvs[dayIdx]);
+    var uvTomorrow = Number(uvs[dayIdx + 1]);
+    // Avant 14 h, le pic UV du jour est encore devant l'habitant ; après, seul
+    // le lendemain a du sens.
+    var pick = (meteoParisNowMinutes(nowDate) < 14 * 60 && isFinite(uvToday) && uvToday >= 8)
+      ? { uv: uvToday, when: "aujourd'hui" }
+      : (isFinite(uvTomorrow) && uvTomorrow >= 8 ? { uv: uvTomorrow, when: 'demain' } : null);
+    if (pick) {
+      items.push({
+        icon: '🧴',
+        label: 'UV très fort',
+        when: pick.when,
+        value: 'Indice ' + pick.uv.toFixed(1) + ' — crème et ombre aux heures chaudes',
+        pct: Math.max(6, Math.min(100, Math.round((pick.uv / 11) * 100))),
+        tone: pick.uv >= 11 ? 'high' : 'mid'
+      });
+    }
+  }
+
+  return items;
+}
+
+function meteoRiskItemHtml(r) {
+  return '<div class="meteo-risk-item tone-' + r.tone + '" role="group" aria-label="' + esc(r.label + ' ' + r.when + ' : ' + r.value) + '">'
+    + '<span class="meteo-risk-ico" aria-hidden="true">' + r.icon + '</span>'
+    + '<span class="meteo-risk-body">'
+    + '<span class="meteo-risk-line"><span class="meteo-risk-label">' + esc(r.label) + '</span><span class="meteo-risk-when">' + esc(r.when) + '</span></span>'
+    + '<span class="meteo-risk-gauge" aria-hidden="true"><span class="meteo-risk-gauge-fill" style="width:' + r.pct + '%"></span></span>'
+    + '<span class="meteo-risk-value">' + esc(r.value) + '</span>'
+    + '</span>'
+    + '</div>';
+}
+
+function meteoBuildAlertRiskCard(forecast, vigilance, nowDate) {
+  var hasAlert = meteoHasAlert(vigilance);
+  var level = hasAlert ? Number(vigilance.level || 2) : 1;
+  var riskItems = meteoBuildRiskItems(forecast, vigilance, nowDate);
 
   var alertHtml;
   if (!hasAlert) {
     alertHtml = '<div class="meteo-alert-topline"><span class="meteo-alert-chip">✅ Pas de vigilance météo</span></div>'
       + '<div class="meteo-alert-text" style="margin-top:4px">' + esc(meteoAlertSummary(vigilance)) + '</div>';
   } else {
+    // Le repli automatique de meteoAlertSummary (« Vigilance orange en cours
+    // sur le Loiret. ») redit mot pour mot la pastille de niveau : on n'affiche
+    // le texte que si Météo-France a réellement fourni un bulletin.
+    var bulletin = (vigilance.main_text || '').trim();
+    var progression = meteoAlertProgress(vigilance, nowDate);
     var startTxt = meteoFormatAlertDate(vigilance.start, false);
     var endTxt = meteoFormatAlertDate(vigilance.end, false);
-    alertHtml = '<details open>'
-      + '<summary class="meteo-alert-summary">'
-      + '<div class="meteo-alert-topline">'
+    var pct = progression.progress;
+
+    alertHtml = '<div class="meteo-alert-topline">'
       + '<span class="meteo-alert-chip">' + (METEO_ALERT_ICONS[level] || '⚠️') + ' Vigilance ' + esc(vigilance.color_label || METEO_ALERT_COLORS[level] || '') + (vigilance.upcoming ? ' · À venir' : '') + '</span>'
-      + '<span class="meteo-alert-action">Touchez pour le détail</span>'
+      + '<span class="meteo-alert-zone">📍 Loiret (45)</span>'
       + '</div>'
       + '<div class="meteo-alert-head">'
-      + '<div class="meteo-alert-icon">' + meteoPhenomenonIcon(vigilance) + '</div>'
+      + '<div class="meteo-alert-icon" aria-hidden="true">' + meteoPhenomenonIcon(vigilance) + '</div>'
       + '<div class="meteo-alert-copy">'
       + '<div class="meteo-alert-title">' + esc(vigilance.phenomenon_label || 'Alerte météo') + '</div>'
-      + '<div class="meteo-alert-text">' + esc(meteoAlertSummary(vigilance)) + '</div>'
+      + (bulletin ? '<div class="meteo-alert-text">' + esc(bulletin).replace(/\n/g, '<br>') + '</div>' : '')
       + '</div>'
       + '</div>'
-      + '<div class="meteo-alert-periods">'
-      + '<div class="meteo-alert-period"><span>Début</span><strong>' + esc(startTxt) + '</strong></div>'
-      + '<div class="meteo-alert-period"><span>Fin</span><strong>' + esc(endTxt) + '</strong></div>'
-      + '</div>'
-      + '</summary>'
-      + '<div class="meteo-alert-detail">'
-      + '<div class="meteo-alert-detail-line"><strong>Début :</strong> ' + esc(startTxt) + '</div>'
-      + '<div class="meteo-alert-detail-line"><strong>Fin :</strong> ' + esc(endTxt) + '</div>'
-      + '<div class="meteo-alert-detail-line"><strong>Zone :</strong> Loiret (45)</div>'
-      + '<div class="meteo-alert-detail-text">' + esc(meteoAlertSummary(vigilance)).replace(/\n/g, '<br>') + '</div>'
-      + '</div>'
-      + '</details>';
+      + '<div class="meteo-alert-timeline">'
+      + (progression.label ? '<div class="meteo-alert-countdown">' + esc(progression.label) + '</div>' : '')
+      + (pct != null
+          ? '<div class="meteo-alert-bar" role="img" aria-label="' + esc('Alerte du ' + startTxt + ' au ' + endTxt) + '">'
+            + '<div class="meteo-alert-bar-fill" style="width:' + pct + '%"></div>'
+            // Pastille bornée : à 0 % comme à 100 %, elle reste dans la barre.
+            + '<div class="meteo-alert-bar-dot" style="left:min(calc(100% - 14px), max(0px, calc(' + pct + '% - 7px)))"></div>'
+            + '</div>'
+          : '')
+      + '<div class="meteo-alert-bounds"><span>' + esc(startTxt) + '</span><span>' + esc(endTxt) + '</span></div>'
+      + '</div>';
   }
 
-  var riskHtml = '<div style="border-top:1px solid rgba(0,0,0,0.09);margin-top:10px;padding-top:8px">'
-    + '<div class="meteo-card-kicker" style="padding:0 0 6px">⚡ Prochains risques</div>'
-    + '<div class="meteo-risk-list">'
-    + (riskItems.length
-        ? riskItems.slice(0, 3).map(function(txt){ return '<div class="meteo-risk-item">' + txt + '</div>'; }).join('')
-        : '<div class="meteo-risk-item">Aucun risque météo notable dans les prochaines heures.</div>')
-    + '</div>'
-    + '</div>';
+  // Sous une vigilance, une section « Prochains risques » vide dirait
+  // « aucun risque notable » juste sous une alerte orange : on l'omet.
+  var riskHtml = '';
+  if (riskItems.length || !hasAlert) {
+    riskHtml = '<div class="meteo-risk-block">'
+      + '<div class="meteo-card-kicker">⚡ Prochains risques</div>'
+      + '<div class="meteo-risk-list">'
+      + (riskItems.length
+          ? riskItems.slice(0, 3).map(meteoRiskItemHtml).join('')
+          : '<div class="meteo-risk-item meteo-risk-calm">'
+            + '<span class="meteo-risk-ico" aria-hidden="true">✅</span>'
+            + '<span class="meteo-risk-body">'
+            + '<span class="meteo-risk-label">Rien à signaler</span>'
+            + '<span class="meteo-risk-value">Aucun risque notable dans les 18 prochaines heures.</span>'
+            + '</span></div>')
+      + '</div>'
+      + '</div>';
+  }
 
   return '<div class="meteo-card meteo-alert-card level-' + level + '">'
-    + alertHtml
+    + '<div class="meteo-alert-block">' + alertHtml + '</div>'
     + riskHtml
     + '</div>';
 }
@@ -582,10 +702,13 @@ async function loadMeteoDetail() {
   // ── Conseils du jour (par seuil) — n’apparaît QUE si un paramètre le justifie.
   //    Déterministe (pas d’IA), gestes de bon sens de santé publique, source citée.
   //    Chaque règle est auto-limitante par sa saison (froid l’hiver, UV l’été…).
+  //    ⚠️ daily[0] = HIER (past_days=1) : ces trois seuils lisaient la journée
+  //    de la veille. Indexer par meteoTodayIndex, jamais en dur.
   var _cons = [];
-  var _txT = (days.temperature_2m_max || [])[0];
-  var _tnT = (days.temperature_2m_min || [])[0];
-  var _uvT = (days.uv_index_max || [])[0];
+  var _dj = dayIdx >= 0 ? dayIdx : 1;
+  var _txT = (days.temperature_2m_max || [])[_dj];
+  var _tnT = (days.temperature_2m_min || [])[_dj];
+  var _uvT = (days.uv_index_max || [])[_dj];
   var _aqV = (env && env.aqi) ? env.aqi.valeur : null;
   var _plV = (env && env.pollen) ? env.pollen.niveau : null;
   var _dom = (env && env.aqi && env.aqi.dominant) ? env.aqi.dominant.label : null;
@@ -596,6 +719,28 @@ async function loadMeteoDetail() {
   else if (_aqV != null && _aqV >= 60) _cons.push(['🏭', 'Air pollué' + (_dom ? ' (' + _dom + ')' : '') + ' : personnes sensibles (asthme, enfants, seniors), évitez les efforts intenses dehors.']);
   if (_plV != null && _plV >= 50) _cons.push(['🌸', 'Pollens élevés : aérez tôt le matin, fenêtres fermées en journée ; pour les allergiques, évitez de tondre et rincez-vous les cheveux le soir.']);
   if (_uvT != null && +_uvT >= 8) _cons.push(['🧴', 'UV très fort : chapeau, lunettes et crème solaire ; évitez le soleil entre 12 h et 16 h.']);
+  //    Une vigilance en cours mérite ses propres gestes : sans cela, une alerte
+  //    « vent violent » ou « orages » n’était accompagnée d’aucun conseil — aucun
+  //    seuil de température ne se déclenchant. Les gestes vivent ICI, dans le bloc
+  //    qui existe déjà : pas de second encart de consignes dans la carte d’alerte.
+  var _phen = meteoHasAlert(vigilance) ? Number(vigilance.phenomenon_id || 0) : 0;
+  var _VIG_CONSEILS = {
+    1: ['💨', 'Vent violent : limitez vos déplacements, rangez ou arrimez ce qui peut s’envoler, et ne touchez jamais un fil électrique tombé.'],
+    2: ['🌧️', 'Pluie-inondation : ne vous engagez ni à pied ni en voiture sur une route inondée, et éloignez-vous des cours d’eau.'],
+    3: ['⛈️', 'Orages : abritez-vous dans un bâtiment en dur, évitez les arbres isolés et reportez les activités de plein air.'],
+    4: ['🌊', 'Crues : ne traversez jamais une zone inondée, mettez vos biens en hauteur et suivez la situation sur Vigicrues.'],
+    5: ['❄️', 'Neige-verglas : ne prenez la route qu’en cas de nécessité et avec des équipements adaptés ; dégagez le trottoir devant chez vous.'],
+    6: ['🥵', 'Canicule : buvez régulièrement sans attendre la soif, fermez volets et fenêtres le jour, aérez la nuit, et prenez des nouvelles des personnes isolées.'],
+    7: ['🥶', 'Grand froid : couvrez-vous, surveillez le chauffage (risque de monoxyde de carbone) et prenez des nouvelles des personnes isolées.']
+  };
+  if (_VIG_CONSEILS[_phen]) {
+    var _dejaDit = _cons.some(function(c){ return c[0] === _VIG_CONSEILS[_phen][0]; });
+    // La canicule recoupe les seuils 32/36 °C ci-dessus : on ne dit pas deux fois
+    // de boire de l’eau.
+    if (!_dejaDit && !(_phen === 6 && _cons.some(function(c){ return c[0] === '☀️'; }))) {
+      _cons.unshift(_VIG_CONSEILS[_phen]);
+    }
+  }
   if (_cons.length) {
     html += '<div style="margin-top:10px;border-radius:14px;border:1px solid var(--border);background:var(--card)">'
       + '<div style="padding:9px 14px;font-size:0.82rem;font-weight:900;color:var(--forest);border-bottom:1px solid var(--border)">💡 Conseils du jour</div>'

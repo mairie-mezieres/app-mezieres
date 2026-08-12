@@ -388,6 +388,35 @@ Dans l'application, appuyez sur la **météo** (en-tête de l'écran d'accueil) 
 détail. Tout en bas, la section **💧 Eau** récapitule la pluie, l'humidité, le niveau de la
 Loire, le niveau de la nappe et l'état des **restrictions sécheresse** de la commune.
 
+### La carte d'alerte météo
+
+Quand Météo-France place le Loiret en vigilance, une **carte colorée** ouvre la fenêtre météo :
+le phénomène (canicule, orages, vent violent…), la couleur du niveau, et une **frise** qui
+montre où l'on en est entre le début et la fin, avec le temps restant — « ⏳ Se termine dans
+8 h », ou « ⏳ Débute dans 3 h » pour une alerte à venir.
+
+Les deux dates ne sont écrites **qu'une fois**. L'ancien dépliant « Touchez pour le détail »
+a disparu : il répétait les mêmes horaires et la même phrase. Le texte du bulletin ne
+s'affiche désormais que lorsque Météo-France en publie réellement un.
+
+### ⚡ Prochains risques
+
+Juste en dessous, jusqu'à trois **jauges** résument les 18 prochaines heures : pluie (risque
+et cumul attendu), rafales, indice UV. Chaque jauge se remplit et change de couleur selon
+l'intensité — un coup d'œil suffit.
+
+Cette section ne parle que quand elle a quelque chose à dire :
+
+- le risque **déjà annoncé par la vigilance** n'est pas répété (pas de ligne « rafales » sous
+  une alerte vent violent) ;
+- l'**indice UV** n'apparaît qu'à partir de **8** (« très fort »), et non plus tous les jours
+  d'été ;
+- sous une vigilance, si rien d'autre n'est à signaler, la section **disparaît** au lieu
+  d'afficher « aucun risque notable » sous une alerte orange.
+
+Les gestes à adopter, eux, restent regroupés dans le bloc **💡 Conseils du jour**, plus bas
+dans la même fenêtre.
+
 ### Comprendre les niveaux de restriction (source officielle VigiEau)
 
 | Niveau | Ce que ça veut dire |
@@ -430,7 +459,8 @@ Dans la fenêtre météo, la section **🌿 Air** indique l'indice de qualité d
 quand l'air est dégradé, le **polluant dominant** du moment (ozone, particules fines…).
 
 Un bloc **💡 Conseils du jour** apparaît **uniquement lorsqu'un paramètre le justifie** — pic
-de pollution, forte chaleur, grand froid, pollens élevés ou UV très fort. Il propose alors des
+de pollution, forte chaleur, grand froid, pollens élevés, UV très fort, ou **vigilance météo
+en cours** (vent violent, orages, neige-verglas, canicule…). Il propose alors des
 gestes simples pour se protéger (s'hydrater, aérer au bon moment, limiter l'effort dehors…).
 Ce sont des recommandations générales de santé publique ; en cas de doute, demandez conseil à
 votre médecin. Quand les conditions sont bonnes, ce bloc **ne s'affiche pas**.
