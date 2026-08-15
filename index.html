@@ -43,14 +43,14 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.5">
+<link rel="stylesheet" href="css/mat.css?v=4.14.6">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.6"></script>
 <script defer src="js/mat-core.js?v=4.3.6"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
-<script defer src="js/mat-widgets.js?v=4.5.0"></script>
+<script defer src="js/mat-widgets.js?v=4.5.1"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.4"></script>
 <script defer src="js/mat-forms.js?v=4.6.5"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.78 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.79 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.78</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.79</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 15 ao&ucirc;t 2026 — v4.79</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>&laquo;&nbsp;Fait-il plus chaud que d&rsquo;habitude&nbsp;?&nbsp;&raquo; La fen&ecirc;tre m&eacute;t&eacute;o r&eacute;pond.</strong> Sous la temp&eacute;rature, la carte &laquo;&nbsp;Maintenant&nbsp;&raquo; compare la <strong>maximale du jour &agrave; la normale du mois</strong>&nbsp;: &laquo;&nbsp;31&nbsp;&deg;C, +5,4&nbsp;&deg;C&nbsp;&raquo;. L&rsquo;&eacute;cart n&rsquo;est mis en couleur qu&rsquo;&agrave; partir de 3&nbsp;&deg;C&nbsp;— en dessous, ce n&rsquo;est pas un &eacute;v&eacute;nement</li>
+<li><strong>Et la normale affiche d&rsquo;o&ugrave; elle vient.</strong> &laquo;&nbsp;Normale de juillet&nbsp;: 25,6&nbsp;&deg;C&nbsp;— r&eacute;analyse ERA5, 1991-2020&nbsp;&raquo;. Ces normales avaient &eacute;t&eacute; <strong>retir&eacute;es</strong> de l&rsquo;application faute de source&nbsp;; elles reviennent avec la leur, calcul&eacute;e sur trente ans aux coordonn&eacute;es de la commune. Ce n&rsquo;est pas une station m&eacute;t&eacute;o locale, et l&rsquo;application le dit</li>
+<li>Si la normale n&rsquo;est pas disponible, <strong>rien ne s&rsquo;affiche</strong>&nbsp;: pas d&rsquo;&eacute;cart approximatif</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 12 ao&ucirc;t 2026 — v4.78</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>La fen&ecirc;tre m&eacute;t&eacute;o affiche enfin le ressenti.</strong> Une carte &laquo;&nbsp;Maintenant&nbsp;&raquo; donne la temp&eacute;rature, le <strong>ressenti</strong>, l&rsquo;humidit&eacute;, la pression et les rafales du jour&nbsp;— avec une fl&egrave;che de tendance. Ces mesures &eacute;taient re&ccedil;ues depuis des mois sans jamais &ecirc;tre montr&eacute;es</li>

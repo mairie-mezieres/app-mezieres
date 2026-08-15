@@ -405,6 +405,27 @@ Sous l'alerte, une carte donne les conditions du moment : température, **ressen
 humidité, pression et rafales maximales de la journée. Une petite flèche indique si
 l'humidité et la pression montent ou baissent depuis trois heures.
 
+**« Fait-il plus chaud que d'habitude ? »** Juste en dessous, l'application compare la
+**maximale prévue aujourd'hui** à la **normale du mois** :
+
+> Maximale prévue aujourd'hui **31 °C** — **+5,4 °C**
+> Normale de juillet : 25,6 °C — réanalyse ERA5, 1991-2020
+
+Trois choses à savoir sur ce chiffre :
+
+- Il compare la **maximale du jour** à la moyenne des maximales de ce mois entre 1991 et
+  2020. Ce n'est pas la température qu'il fait à l'instant où vous regardez : comparer
+  celle de 8 h du matin à une moyenne de maximales n'aurait aucun sens.
+- La couleur n'apparaît qu'à partir de **3 °C** d'écart. En dessous, le chiffre s'affiche
+  sans être mis en avant : ce n'est pas un événement.
+- **« Réanalyse ERA5 » n'est pas une station météo de la commune.** C'est un modèle
+  climatique européen, calculé sur une maille de quelques kilomètres autour de
+  Mézières-lez-Cléry. L'application l'écrit plutôt que de vous laisser croire à un relevé
+  pris dans le bourg. Ces normales avaient d'ailleurs été **retirées** de l'application
+  en août 2026, précisément parce qu'elles n'avaient aucune source affichable.
+
+Si la normale n'est pas disponible, **rien ne s'affiche** : pas d'écart approximatif.
+
 Quand une mesure n'est pas disponible, l'application écrit « – » : elle n'invente ni
 température ni prévision. Dans « Prochains jours », l'indice UV porte une pastille de
 couleur (vert = faible, jaune = modéré, orange = fort, rouge = très fort, violet =

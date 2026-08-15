@@ -8,6 +8,8 @@
 const METEO_ICONS = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',99:'⛈️'};
 const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard givrant',51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',71:'Neige légère',73:'Neige modérée',75:'Neige forte',80:'Averses légères',81:'Averses modérées',82:'Averses violentes',95:'Orage',99:'Orage fort'};
 const METEO_ALERT_COLORS = {1:'vert',2:'jaune',3:'orange',4:'rouge'};
+// Mois en toutes lettres, pour nommer la normale affichée (« Normale de juillet »).
+const METEO_MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const METEO_ALERT_ICONS = {1:'✅',2:'🟡',3:'🟠',4:'🔴'};
 
 function meteoHasAlert(vigilance) {
@@ -439,7 +441,74 @@ function meteoRiskItemHtml(r) {
 // codées en dur dans `loadMeteoDetail`, sans source vérifiable. Afficher
 // « +6° au-dessus des normales » sur cette base serait une donnée inventée
 // (ADR-0018). À reprendre le jour où le backend servira des normales sourcées.
-function meteoBuildNowCard(forecast, nowDate) {
+/* Écart à la normale du mois — rendu seulement si TOUT est là et sourcé.
+   ────────────────────────────────────────────────────────────────────────
+   ⚠️ La comparaison porte sur la MAXIMALE DU JOUR face à la normale des
+   maximales. Comparer la température de l'instant à une moyenne mensuelle de
+   maximales afficherait « bien en dessous des normales » tous les matins, et
+   « au-dessus » tous les après-midis d'été : deux affirmations fausses tirées
+   de chiffres justes. C'est l'ancienne version qui faisait cela (ADR-0022).
+
+   Le mois est lu sur le JOUR comparé (`daily.time[dayIdx]`) et non sur l'heure
+   du navigateur : le 1er du mois, les deux ne disent pas la même chose.
+
+   Les normales viennent du backend avec leur provenance (`lib/normales.js`) ;
+   sans elles, cette ligne n'existe pas — l'app n'invente aucune normale. */
+function meteoBuildNormLine(daily, normales, nowDate) {
+  if (!normales || !Array.isArray(normales.mois) || !normales.mois.length) return '';
+  if (!daily || !daily.temperature_2m_max) return '';
+
+  var dayIdx = meteoTodayIndex(daily, nowDate);   // daily[0] = HIER (ADR-0007)
+  if (dayIdx < 0) return '';
+
+  var brut = daily.temperature_2m_max[dayIdx];
+  if (brut == null) return '';                    // « – » ailleurs, rien ici : c'est un complément
+  var tmaxJour = Number(brut);
+  if (!isFinite(tmaxJour)) return '';
+
+  var jour = String((daily.time && daily.time[dayIdx]) || '');
+  var m = /^\d{4}-(\d{2})-\d{2}/.exec(jour);
+  if (!m) return '';
+  var moisNum = Number(m[1]);
+
+  var norme = null;
+  for (var i = 0; i < normales.mois.length; i++) {
+    if (Number(normales.mois[i].mois) === moisNum) { norme = normales.mois[i]; break; }
+  }
+  if (!norme || norme.tmax == null || !isFinite(Number(norme.tmax))) return '';
+
+  var ecart = Math.round((tmaxJour - Number(norme.tmax)) * 10) / 10;
+  var abs = Math.abs(ecart);
+  // Seuil d'emphase : sous 3 °C, l'écart est affiché mais reste neutre. Une
+  // pastille rouge à +1,2 °C banaliserait la couleur, comme l'UV à 6 le faisait
+  // dans « Prochains risques » avant la v4.77.
+  var ton = abs < 3 ? 'tone-neutre' : (ecart > 0 ? 'tone-chaud' : 'tone-froid');
+  var libelleEcart = abs < 0.05
+    ? 'conforme à la normale'
+    : (ecart > 0 ? '+' : '−') + String(abs).replace('.', ',') + ' °C';
+
+  var periode = (normales.periode && normales.periode.debut && normales.periode.fin)
+    ? normales.periode.debut + '-' + normales.periode.fin : '';
+  var jeu = normales.jeu ? String(normales.jeu) : '';
+  // Provenance écrite sous la valeur : « réanalyse » et non « station », parce
+  // qu'ERA5 est une maille de modèle. Le backend le dit (`reanalyse: true`), on
+  // le répète à l'habitant plutôt que de le laisser supposer un relevé local.
+  var provenance = 'Normale de ' + METEO_MOIS[moisNum - 1] + ' : '
+    + String(Math.round(Number(norme.tmax) * 10) / 10).replace('.', ',') + ' °C'
+    + (jeu ? ' — ' + (normales.reanalyse ? 'réanalyse ' : '') + jeu : '')
+    + (periode ? ', ' + periode : '');
+
+  return '<div class="meteo-now-norm ' + ton + '">'
+    + '<div class="meteo-now-norm-main">'
+    + '<span class="meteo-mini-label">Maximale prévue aujourd\'hui</span>'
+    + '<strong>' + Math.round(tmaxJour) + ' °C</strong>'
+    + '<span class="meteo-norm-ecart">' + esc(libelleEcart) + '</span>'
+    + '</div>'
+    + '<div class="meteo-now-norm-src">' + esc(provenance) + '</div>'
+    + '</div>';
+}
+
+function meteoBuildNowCard(forecast, nowDate, normales) {
   var cur = (forecast || {}).current || {};
   var hourly = (forecast || {}).hourly || {};
   var daily = (forecast || {}).daily || {};
@@ -488,6 +557,7 @@ function meteoBuildNowCard(forecast, nowDate) {
         : '')
     + '</div>'
     + (sousTitre ? '<div class="meteo-now-desc">' + esc(sousTitre) + '</div>' : '')
+    + meteoBuildNormLine(daily, normales, nowDate)
     + '<div class="meteo-now-grid">'
     + stat('Humidité', hum != null ? hum + ' %' : null, meteoTrendBadge(tHum))
     + stat('Pression', pres != null ? pres + ' hPa' : null, meteoTrendBadge(tPres))
@@ -700,7 +770,7 @@ async function loadMeteoDetail() {
       + esc(meteoClockLabel(window._meteoDataAt)) + '. Les prévisions peuvent avoir changé.</div>';
   }
   html += meteoBuildAlertRiskCard(forecast, vigilance, now);
-  html += meteoBuildNowCard(forecast, now);
+  html += meteoBuildNowCard(forecast, now, d.normales);
   html += meteoBuildHourlyTimeline(hourly, now);
 
   html += '<div class="meteo-days-block">'
@@ -876,8 +946,11 @@ async function loadMeteoDetail() {
   }
 
   // Attribution et fraîcheur : Open-Meteo est diffusé sous licence CC BY 4.0,
-  // et l'habitant doit pouvoir savoir de quand date ce qu'il lit.
-  html += '<div class="meteo-source">Prévisions Open-Meteo (CC BY 4.0) · vigilance Météo-France'
+  // et l'habitant doit pouvoir savoir de quand date ce qu'il lit. Les normales
+  // viennent du même fournisseur (archive ERA5) : l'attribution les couvre, et
+  // ne les mentionne que si elles ont réellement été servies.
+  html += '<div class="meteo-source">Prévisions'
+    + (d.normales ? ' et normales' : '') + ' Open-Meteo (CC BY 4.0) · vigilance Météo-France'
     + (window._meteoDataAt ? ' — ' + (window._meteoDataStale ? 'dernier bulletin reçu à ' : 'mis à jour à ') + esc(meteoClockLabel(window._meteoDataAt)) : '')
     + '</div>';
 

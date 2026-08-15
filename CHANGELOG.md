@@ -5,6 +5,41 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.79] — 15 août 2026
+
+### Ajouté
+- **L'écart à la normale du mois revient dans la carte « Maintenant »** — avec sa source.
+  `meteoBuildNormLine` compare la **maximale du jour** à la **normale des maximales** du
+  mois : « Maximale prévue aujourd'hui 31 °C · +5,4 °C », suivi de « Normale de juillet :
+  25,6 °C — réanalyse ERA5, 1991-2020 ». La v4.78 avait supprimé cet écart faute de
+  source (ADR-0022) ; il ne revient qu'accompagné de la sienne.
+- **La comparaison porte sur la maximale du jour, pas sur la température de l'instant.**
+  Confronter le thermomètre de 8 h à une moyenne mensuelle de maximales afficherait « bien
+  en dessous des normales » tous les matins, et « au-dessus » tous les après-midis d'été :
+  deux affirmations fausses tirées de chiffres justes. Le mois est lu sur le **jour
+  comparé** (`daily.time[dayIdx]`), pas sur l'horloge du navigateur — le 1er du mois, les
+  deux divergent.
+- **Seuil d'emphase à 3 °C** : en deçà, l'écart s'affiche mais reste neutre. Une pastille
+  rouge à +1,2 °C banaliserait la couleur, comme l'UV à 6 le faisait avant la v4.77. Le
+  sens est porté par le **signe** (+ / −), jamais par la seule couleur.
+- **Backend** (`lib/normales.js`, dépôt `chatbot-mairie-mezieres`) : normales 1991-2020
+  calculées sur la réanalyse **ERA5** (archive Open-Meteo, jeu épinglé `models=era5`) aux
+  coordonnées de la commune, en cache Redis six mois. Servies dans `/meteo/commune` —
+  l'app n'a **aucun appel supplémentaire** à faire, et elles suivent le cache hors-ligne
+  `mat_meteo_cache` sans code supplémentaire. Check 📊 dans le diagnostic Services.
+
+### Modifié
+- La ligne de source du bas de fenêtre devient « Prévisions **et normales** Open-Meteo
+  (CC BY 4.0) » — uniquement quand des normales ont réellement été servies.
+
+### Notes
+- **ERA5 est une réanalyse, pas une station.** L'ADR-0022 demandait « station et période
+  citées » ; l'ADR-0024 amende ce point plutôt que de le contourner : l'étiquette affichée
+  dit « réanalyse ERA5, 1991-2020 », et le payload porte `reanalyse: true`, `station: null`.
+  Le token Météo-France du backend est abonné à la vigilance, pas à la climatologie.
+- **Rien n'est affiché si quoi que ce soit manque** : pas de normales, pas de maximale du
+  jour, ou un seul mois trop lacunaire côté backend → aucune ligne, aucun écart approché.
+
 ## [4.78] — 12 août 2026
 
 ### Ajouté
