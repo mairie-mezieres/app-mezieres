@@ -704,7 +704,8 @@ Trois règles à ne pas défaire, détaillées dans **ADR-0022** :
 
 - **Pas d'écart aux normales** tant qu'aucune source ne le porte. Les tableaux
   `NORM_MAX`/`NORM_MIN` codés en dur ont été supprimés : sans station ni période citée,
-  « +6° au-dessus des normales » est une donnée inventée (ADR-0018).
+  « +6° au-dessus des normales » est une donnée inventée (ADR-0018). Depuis la **v4.79**,
+  la condition est remplie — voir la sous-section suivante.
 - **Aucun `|| 0` sur une mesure.** Un `weather_code` absent devenait le code 0, soit ☀️
   « Ciel dégagé », et une température absente devenait 0 °C. Une donnée qu'on n'a pas
   s'écrit « – ». L'UV porte une pastille d'échelle OMS (`meteoUvLevel`), dont le palier 8
@@ -719,6 +720,41 @@ Côté accessibilité, les deux carrousels (`.meteo-hourly-track`, `.meteo-days-
 portent `tabindex="0"` + `role="group"` + nom accessible : sans `tabindex`, un conteneur
 défilant est hors d'atteinte au clavier sous Chrome (ADR-0016). Les titres de section sont
 de vrais `<h3>`.
+
+### Écart à la normale du mois (v4.79)
+
+`meteoBuildNormLine(daily, normales, nowDate)` ajoute une ligne à la carte « Maintenant » :
+
+```
+Maximale prévue aujourd'hui   31 °C          [ +5,4 °C ]
+Normale de juillet : 25,6 °C — réanalyse ERA5, 1991-2020
+```
+
+Les normales viennent du **backend** dans le champ `normales` de `/meteo/commune`
+(`chatbot-mairie-mezieres/lib/normales.js`, `GUIDE-ADMIN.md` §6quinquies). Aucun appel
+supplémentaire côté app — et comme elles voyagent dans la même réponse, elles suivent le
+cache `mat_meteo_cache` **sans une ligne de code de plus**.
+
+Cinq points à ne pas défaire (**ADR-0024**) :
+
+- **ERA5 est une réanalyse, PAS une station.** La ligne affichée le dit (« réanalyse
+  ERA5 »), le payload aussi (`reanalyse: true`, `station: null`), et un test vérifie que le
+  mot « station » n'apparaît pas. Annoncer une maille de modèle comme un relevé local
+  serait la faute de l'ADR-0022 sous une autre forme.
+- **On compare la maximale du JOUR à la normale des MAXIMALES.** Comparer la température
+  de l'instant à une moyenne mensuelle de maximales dirait « bien en dessous des normales »
+  tous les matins : faux, à partir de chiffres justes. Et l'indice du jour vient de
+  `meteoTodayIndex` — `daily[0]` est **hier** (ADR-0007).
+- **Le mois est lu sur `daily.time[dayIdx]`**, pas sur l'horloge du navigateur : le 1er du
+  mois, les deux ne disent pas la même chose.
+- **Emphase à partir de 3 °C** seulement, et le signe (+ / −) porte le sens autant que la
+  couleur (lisible en niveaux de gris, et pour un daltonien).
+- **Tout ou rien** : pas de normales, pas de maximale du jour, mois introuvable → aucune
+  ligne. C'est un complément, pas une mesure attendue : il ne s'écrit pas « – ».
+
+> Le mode sombre a ses propres règles (`html.theme-sombre .meteo-now-norm…`) : sans elles,
+> le bloc garderait son dégradé clair et son texte `#4b5563` — gris foncé sur gris foncé,
+> le défaut corrigé en v4.78 sur les titres 🌿 Air.
 
 ### Effets visuels — ambiance météo, View Transitions, confettis
 

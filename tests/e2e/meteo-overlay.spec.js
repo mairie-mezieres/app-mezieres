@@ -66,6 +66,26 @@ function payload() {
   };
 }
 
+// Normales servies par le backend (`lib/normales.js`). `tmaxJuillet` est le seul
+// paramètre qui compte ici : la maximale d'aujourd'hui vaut 37 °C dans le payload.
+function normales(tmaxJuillet) {
+  return {
+    periode: { debut: 1991, fin: 2020 },
+    jeu: 'ERA5',
+    fournisseur: 'Open-Meteo',
+    licence: 'CC BY 4.0',
+    reanalyse: true,
+    station: null,
+    etiquette: 'Normales 1991-2020 — réanalyse ERA5 (Open-Meteo)',
+    mois: Array.from({ length: 12 }, (_, i) => ({
+      mois: i + 1,
+      tmax: i + 1 === 7 ? tmaxJuillet : 15,
+      tmin: 8,
+      jours: 930,
+    })),
+  };
+}
+
 async function ouvrirMeteo(page, opts) {
   const o = opts || {};
   await page.route('**/*', (route) => {
@@ -85,7 +105,11 @@ async function ouvrirMeteo(page, opts) {
     window._meteoDataStale = arg.stale;
     openMeteo();
     await window.loadMeteoDetail();
-  }, { d: payload(), at: new Date(MAINTENANT).getTime() - 7 * 60000, stale: !!o.stale });
+  }, {
+    d: Object.assign(payload(), o.normales ? { normales: o.normales } : {}),
+    at: new Date(MAINTENANT).getTime() - 7 * 60000,
+    stale: !!o.stale,
+  });
   await page.waitForSelector('#meteo-detail .meteo-premium');
 }
 
@@ -196,8 +220,95 @@ test('une alerte expirée n’est pas réaffichée depuis le cache', async ({ pa
   expect(v).toBe(null);
 });
 
+/* ── Écart à la normale du mois (v4.79, ADR-0024) ─────────────────────────── */
+
+test('l’écart à la normale s’affiche avec sa provenance', async ({ page }) => {
+  await ouvrirMeteo(page, { normales: normales(26) });
+
+  const txt = await page.evaluate(() => {
+    const el = document.querySelector('.meteo-now-norm');
+    return el ? el.innerText.replace(/\s+/g, ' ') : null;
+  });
+
+  expect(txt).toContain('37 °C');            // maximale d'aujourd'hui
+  expect(txt).toContain('+11 °C');           // 37 − 26
+  expect(txt).toContain('Normale de juillet');
+  expect(txt).toContain('26 °C');
+  // La provenance n'est pas facultative : ces normales avaient été retirées
+  // faute de source (ADR-0022). Et ERA5 est une réanalyse, pas une station.
+  expect(txt).toContain('réanalyse ERA5');
+  expect(txt).toContain('1991-2020');
+  expect(txt).not.toMatch(/station/i);
+});
+
+test('l’écart est calculé sur AUJOURD’HUI, jamais sur daily[0] qui est hier', async ({ page }) => {
+  // daily[0] = 35 °C (hier), daily[1] = 37 °C (aujourd'hui). Face à une normale
+  // de 26 °C, l'écart juste est +11. Un décalage d'un jour donnerait +9 — le
+  // bug ADR-0007, qui a déjà frappé cette fenêtre.
+  await ouvrirMeteo(page, { normales: normales(26) });
+  const txt = await page.evaluate(() => document.querySelector('.meteo-now-norm').innerText);
+  expect(txt).toContain('+11');
+  expect(txt).not.toContain('+9');
+});
+
+test('sans normales servies, aucune ligne d’écart — et rien d’approximatif', async ({ page }) => {
+  await ouvrirMeteo(page);                    // payload sans champ `normales`
+  await expect(page.locator('.meteo-now-norm')).toHaveCount(0);
+  // La carte « Maintenant », elle, reste entière.
+  await expect(page.locator('.meteo-now-card')).toBeVisible();
+  const source = await page.locator('.meteo-source').innerText();
+  expect(source).not.toContain('normales');
+});
+
+test('sous 3 °C d’écart, la pastille reste neutre — mesuré sur le style calculé', async ({ page }) => {
+  // Règle 7 du CLAUDE.md : un effet habillé par le CSS se vérifie sur le rendu,
+  // pas sur une classe. Normale à 35 °C → écart +2, sous le seuil d'emphase.
+  await ouvrirMeteo(page, { normales: normales(35) });
+  const neutre = await page.evaluate(() => {
+    const el = document.querySelector('.meteo-norm-ecart');
+    return { fond: getComputedStyle(el).backgroundColor, txt: el.textContent };
+  });
+  expect(neutre.txt).toContain('+2');
+
+  await ouvrirMeteo(page, { normales: normales(26) });   // écart +11 → emphase
+  const chaud = await page.evaluate(() => {
+    const el = document.querySelector('.meteo-norm-ecart');
+    return { fond: getComputedStyle(el).backgroundColor, txt: el.textContent };
+  });
+  expect(chaud.fond).not.toBe(neutre.fond);
+
+  // Le sens ne doit jamais tenir à la seule couleur : le signe le porte aussi.
+  expect(chaud.txt).toContain('+');
+});
+
+test('une maximale du jour absente ne produit aucun écart', async ({ page }) => {
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
+    return route.continue();
+  });
+  await page.addInitScript(() => { try { localStorage.setItem('mat_onboarded_v3', '1'); } catch (_) {} });
+  await page.clock.setFixedTime(new Date(MAINTENANT));
+  await page.goto('/');
+  await page.waitForFunction(() => typeof window.loadMeteoDetail === 'function');
+  await page.evaluate(async (arg) => {
+    const d = arg.d;
+    d.forecast.daily.temperature_2m_max[1] = null;   // aujourd'hui sans maximale
+    d.normales = arg.n;
+    window._meteoData = d;
+    window._meteoDataAt = arg.at;
+    window._meteoDataStale = false;
+    openMeteo();
+    await window.loadMeteoDetail();
+  }, { d: payload(), n: normales(26), at: new Date(MAINTENANT).getTime() });
+  await page.waitForSelector('#meteo-detail .meteo-premium');
+  await expect(page.locator('.meteo-now-norm')).toHaveCount(0);
+});
+
 test('fenêtre météo : aucune violation axe sérieuse ou critique', async ({ page }) => {
-  await ouvrirMeteo(page);
+  // Avec les normales : la pastille d'écart porte du texte sur fond coloré,
+  // c'est un contraste de plus à vérifier, pas un détail décoratif.
+  await ouvrirMeteo(page, { normales: normales(26) });
   const results = await new AxeBuilder({ page }).include('#ov-meteo')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');

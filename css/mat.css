@@ -860,6 +860,16 @@ html.theme-sombre .panel-body p { color:#94a3b8; }
 .meteo-now-feels{display:flex;flex-direction:column;gap:2px;margin-left:auto;text-align:right;}
 .meteo-now-feels strong{font-size:1.15rem;font-weight:900;color:var(--text);line-height:1.1;}
 .meteo-now-desc{margin-top:6px;font-size:.76rem;color:#4b5563;line-height:1.45;}
+/* Écart à la normale du mois. Le sens est porté par le signe (+ / −), jamais par
+   la seule couleur : la pastille reste lisible en niveaux de gris et pour un
+   daltonien. Taille plancher 0.75rem = 12 px (ADR-0017). */
+.meteo-now-norm{margin-top:10px;padding:9px 11px;border:1px solid rgba(0,0,0,.06);border-radius:12px;background:linear-gradient(135deg,#f8fafc,#fff);}
+.meteo-now-norm-main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.meteo-now-norm-main strong{font-size:1rem;font-weight:900;color:var(--text);line-height:1.15;}
+.meteo-norm-ecart{margin-left:auto;font-size:.78rem;font-weight:900;padding:2px 9px;border-radius:999px;white-space:nowrap;background:#eef2f7;color:#334155;}
+.meteo-now-norm.tone-chaud .meteo-norm-ecart{background:#fee2e2;color:#991b1b;}
+.meteo-now-norm.tone-froid .meteo-norm-ecart{background:#dbeafe;color:#1e40af;}
+.meteo-now-norm-src{margin-top:5px;font-size:.75rem;color:#4b5563;line-height:1.45;}
 .meteo-now-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;}
 .meteo-now-stat{background:linear-gradient(135deg,#f8fafc,#fff);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0;}
 .meteo-now-stat strong{font-size:.86rem;font-weight:900;color:var(--text);line-height:1.15;white-space:nowrap;}
@@ -990,6 +1000,14 @@ html.theme-sombre .meteo-hour-col{background:linear-gradient(180deg,rgba(37,99,2
 html.theme-sombre .meteo-hour-mm{color:#94a3b8 !important;}
 html.theme-sombre .meteo-hour-wind{color:#cbd5e1 !important;}
 html.theme-sombre .meteo-hour-time{color:#94a3b8 !important;}
+/* Météo — écart à la normale en mode sombre. Sans ces règles, le bloc garderait
+   son dégradé clair et son texte #4b5563 : gris foncé sur blanc devenu gris
+   foncé sur gris foncé, le défaut corrigé en v4.78 sur les titres 🌿 Air. */
+html.theme-sombre .meteo-now-norm{background:#2d3748 !important;border-color:#374151 !important;}
+html.theme-sombre .meteo-now-norm-src{color:#cbd5e1 !important;}
+html.theme-sombre .meteo-norm-ecart{background:#374151 !important;color:#e2e8f0 !important;}
+html.theme-sombre .meteo-now-norm.tone-chaud .meteo-norm-ecart{background:#7f1d1d !important;color:#fecaca !important;}
+html.theme-sombre .meteo-now-norm.tone-froid .meteo-norm-ecart{background:#1e3a5f !important;color:#bfdbfe !important;}
 /* Météo — items "Prochains risques" en mode sombre */
 html.theme-sombre .meteo-risk-item{background:#2d3748 !important;border-color:#374151 !important;color:#e2e8f0 !important;}
 html.theme-sombre .meteo-risk-calm{background:#1c3526 !important;border-color:#2d5a3d !important;}
