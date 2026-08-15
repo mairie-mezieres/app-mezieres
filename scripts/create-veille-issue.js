@@ -26,7 +26,11 @@
  * Node 20+ requis (fetch global). Aucune dépendance externe.
  */
 
-const fs = require('fs');
+// Lecture, normalisation et filtrage : `scripts/lib/veille-actions.js` est la
+// source unique de ces règles, partagée avec l'étage 2 (PR draft). Deux
+// filtrages divergents publieraient une action dans l'issue sans jamais la
+// reprendre en PR, ou l'inverse, sans que rien ne le signale.
+const { CATEGORIES, PRIORITES, lireActions } = require('./lib/veille-actions');
 
 // --- Sortie best-effort : jamais d'échec du job ---------------------------
 function bail(message) {
@@ -34,60 +38,11 @@ function bail(message) {
   process.exit(0);
 }
 
-const CATEGORIES = {
-  dependance: { label: '📦 Dépendances', order: 1 },
-  securite: { label: '🔒 Sécurité', order: 0 },
-  accessibilite: { label: '♿ Accessibilité / séniors', order: 2 },
-};
-const PRIORITES = {
-  haute: { pastille: '🔴 haute', order: 0 },
-  moyenne: { pastille: '🟠 moyenne', order: 1 },
-  basse: { pastille: '🟡 basse', order: 2 },
-};
-
 const ACTIONS_PATH = (process.env.ACTIONS_PATH || 'veille/actions-pwa.json').trim();
 
-if (!fs.existsSync(ACTIONS_PATH)) {
-  bail(`Aucun fichier ${ACTIONS_PATH} : pas d'action PWA cette semaine, aucune issue créée.`);
-}
-
-let raw;
-try {
-  raw = fs.readFileSync(ACTIONS_PATH, 'utf8');
-} catch (err) {
-  bail(`Lecture de ${ACTIONS_PATH} impossible (${err.message}) — aucune issue créée.`);
-}
-
-let parsed;
-try {
-  parsed = JSON.parse(raw);
-} catch (err) {
-  bail(`${ACTIONS_PATH} n'est pas un JSON valide (${err.message}) — aucune issue créée.`);
-}
-
-if (!Array.isArray(parsed)) {
-  bail(`${ACTIONS_PATH} ne contient pas un tableau JSON — aucune issue créée.`);
-}
-
-// --- Normalisation / filtrage défensif (le JSON vient d'un LLM) ------------
-const clip = (value, max) => String(value == null ? '' : value).trim().slice(0, max);
-
-const actions = parsed
-  .map((item) => {
-    if (!item || typeof item !== 'object') return null;
-    const categorie = clip(item.categorie, 40).toLowerCase();
-    const titre = clip(item.titre, 200);
-    if (!titre || !CATEGORIES[categorie]) return null; // titre + catégorie valides obligatoires
-    const source = clip(item.source, 500);
-    if (!/^https?:\/\//i.test(source)) return null; // source http(s) OBLIGATOIRE (anti-injection)
-    let priorite = clip(item.priorite, 20).toLowerCase();
-    if (!PRIORITES[priorite]) priorite = 'moyenne';
-    return { categorie, titre, priorite, source, resume: clip(item.resume, 600) };
-  })
-  .filter(Boolean);
-
-if (actions.length === 0) {
-  bail(`${ACTIONS_PATH} ne contient aucune action valide — aucune issue créée.`);
+const { actions, raison } = lireActions(ACTIONS_PATH);
+if (raison) {
+  bail(`${raison} Aucune issue créée.`);
 }
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;

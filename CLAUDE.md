@@ -24,6 +24,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | **Vue « territoire » — les 25 communes de la CCTVL** : ⚠️ **aucun code INSEE en dur** (seuls les 25 noms), aucune règle hors Mézières, piège « 1AU » | `docs/adr/0021-territoire-des-25-communes-aucun-code-insee-en-dur.md` puis `SFD-17` §RG-17.19 à RG-17.23 |
 | **Alerte météo & « Prochains risques »** — frise de l'alerte, seuils anti-bruit (UV ≥ 8, pas de répétition du phénomène en vigilance), ⚠️ `daily[0]` est **HIER** | `docs/guide-technique.md` §« Carte d'alerte météo » puis `tests/e2e/meteo-alerte.spec.js` |
 | **Fenêtre météo** — carte « Maintenant », cache hors-ligne daté (`mat_meteo_cache`), ⚠️ **pas d'écart aux normales sans source**, aucune donnée absente affichée comme un 0, échelle UV | `docs/adr/0022-fenetre-meteo-afficher-ce-qui-est-mesure-et-rien-d-autre.md` puis `tests/e2e/meteo-overlay.spec.js` |
+| **Veille technologique — canal actionnable** : issue « Actions PWA », puis **PR draft automatiques** (garde-fou de périmètre, dédoublonnage par URL, ⚠️ ces PR n'ont pas de coche verte) | `docs/adr/0005-veille-canal-actionnable-issue-pwa.md` puis `docs/adr/0023-veille-pr-draft-sous-barriere-pas-sous-consigne.md` et `docs/guide-technique.md` §10 |
 | Déployer pour une nouvelle commune (de zéro) | `docs/DEPLOIEMENT.md` |
 | Répliquer / adapter l'app à une autre collectivité | `docs/REPLICATION.md` |
 | Sécurité, signalement de vulnérabilité, périmètre | `SECURITY.md` |

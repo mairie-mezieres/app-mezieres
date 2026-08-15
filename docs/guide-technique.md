@@ -1017,9 +1017,46 @@ produit un **canal actionnable** qui alimente le backlog technique de la PWA :
 > n'est pas committé ; l'issue est l'artefact durable. Permission requise :
 > `issues: write`.
 >
-> Étape suivante prévue (non encore livrée) : un agent ouvrant automatiquement une
-> **PR en draft** par action éligible. La `veille-bulletin.yml` (éditoriale) n'a pas
-> ce canal : ses idées d'articles ne sont pas des actions techniques.
+> La `veille-bulletin.yml` (éditoriale) n'a pas ce canal : ses idées d'articles ne sont
+> pas des actions techniques.
+
+### Étage 2 : une PR **en draft** par action (ADR-0023)
+
+Le job `pr-draft` de `veille-techno.yml` prend la suite. Il est **séparé** du job de
+veille (`needs: veille`) : quand il démarre, le rapport est envoyé, l'issue est publiée
+et la mémoire est committée — son échec ne coûte rien de ce qui compte.
+
+| Étape | Script | Ce qu'elle garantit |
+|---|---|---|
+| Sélection | `scripts/select-veille-actions.js` | Écarte toute action **déjà traitée**, plafonne à 3 PR, publie une matrice. N'écrit aucun code. |
+| Correctif | `anthropics/claude-code-action` | `--allowedTools "Read,Grep,Glob,Edit,Write"` : **ni terminal, ni réseau**. |
+| Garde-fou | `scripts/check-veille-diff.js` | Liste blanche de fichiers + plafonds (8 fichiers, 400 lignes). |
+| Contrôles | `check-css.js`, `check-cache-bust.js`, `node --check` | Les mêmes que `ci.yml`, joués **avant** l'ouverture de la PR. |
+| Ouverture | `scripts/create-veille-pr.js` | PR **draft**, jamais fusionnée automatiquement. |
+
+Quatre points à connaître avant d'y toucher :
+
+- **Ne rien faire est le résultat normal.** La plupart des actions ne concernent pas ce
+  dépôt (paquets npm et Node.js → dépôt backend ; versions d'actions GitHub → interdit
+  ici ; failles de produits que MAT n'utilise pas). Le prompt demande alors de **ne rien
+  écrire** ; le workflow le détecte et n'ouvre pas de PR. L'action reste dans l'issue.
+- **L'identité d'une action est `categorie + source`, pas son titre** : le LLM reformule,
+  l'URL non. La branche `claude/veille-<slug>-<id>` ne contient pas de date, de sorte
+  qu'une action déjà traitée (branche existante, ou PR même fermée) soit écartée pour
+  toujours. Si l'API ne répond pas, le script ne sélectionne **rien** — un doublon coûte
+  plus cher qu'une semaine de retard.
+- **`.github/**` et `scripts/**` sont refusés par le garde-fou**, y compris les scripts de
+  contrôle eux-mêmes. Un correctif issu du web ne doit pas pouvoir réécrire la CI qui le
+  contrôle. Idem `data/saviez-vous.json` (ADR-0012).
+- **Ces PR n'ont pas de coche verte** : GitHub ne déclenche aucun workflow pour les
+  événements produits par le `GITHUB_TOKEN`. C'est pour cela que les contrôles tournent
+  dans le job, et le corps de la PR l'explique au relecteur. Pour relancer la CI, pousser
+  un commit sur la branche.
+
+> Le filtrage des actions est porté par `scripts/lib/veille-actions.js`, **commun aux deux
+> étages** : deux filtrages divergents publieraient une action dans l'issue sans jamais la
+> reprendre en PR, sans que rien ne le signale. Permissions du job : `contents: write` et
+> `pull-requests: write`.
 
 ### Tests Playwright
 
