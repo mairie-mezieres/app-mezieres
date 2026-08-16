@@ -5,6 +5,25 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.80] — 17 août 2026
+
+### Modifié
+- **Deux lignes gagnées sur la carte « Maintenant ».** En réglage « grand texte »
+  (`html.font-large`, et a fortiori `font-xl`), la ligne de provenance de la normale et le
+  libellé « Rafales · 24 h » passaient chacun **sur deux lignes** : la carte mesurait 332 px
+  au lieu de 297. Mesuré au rendu, avant et après.
+  - La **période 1991-2020** quitte la carte pour la ligne de sources en pied de fenêtre
+    (« Prévisions et normales 1991-2020 Open-Meteo (CC BY 4.0) »), où vivent déjà le
+    fournisseur et la licence. Le mot **« réanalyse » reste dans la carte** — c'est lui qui
+    porte la décision de l'ADR-0024, pas la période. Chaque fait reste affiché une fois.
+  - Le libellé devient **« Rafales 24 h »** : la puce médiane offrait un point de coupure
+    de plus dans une tuile large d'un tiers d'écran.
+
+### Corrigé
+- **« Normale de août » → « Normale d'août ».** L'élision manquait devant une voyelle : la
+  faute s'affichait trois mois par an (avril, août, octobre). Nouveau helper
+  `meteoMoisPrefixe()`, verrouillé par un test sur les cinq cas.
+
 ## [4.79] — 15 août 2026
 
 ### Ajouté

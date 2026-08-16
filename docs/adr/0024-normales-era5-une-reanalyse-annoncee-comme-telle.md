@@ -43,9 +43,17 @@ un relevé de terrain : nous amendons ce point plutôt que de le contourner par 
 formulation floue.
 
 - Le payload porte `reanalyse: true` et `station: null`.
-- La ligne affichée dit, sous la valeur : « Normale de juillet : 25,6 °C — **réanalyse
-  ERA5**, 1991-2020 ».
+- La ligne affichée dit, sous la valeur : « Normale de juillet : 25,6 °C · **réanalyse
+  ERA5** ».
 - Un test vérifie que le mot « station » n'apparaît **pas** dans cette ligne.
+
+> **Amendement du 17 août 2026 (v4.80).** La ligne occupait **deux lignes** dès le réglage
+> « grand texte » de l'application, et la carte y perdait 35 px. La **période
+> (1991-2020)** a donc été déplacée dans la ligne de sources en pied de fenêtre
+> (« Prévisions et normales 1991-2020 Open-Meteo (CC BY 4.0) »), où vivent déjà le
+> fournisseur et la licence. Le mot **« réanalyse » reste dans la carte** : c'est lui qui
+> porte la décision ci-dessus, pas la période. Les deux faits demeurent affichés, chacun
+> une seule fois, et un test mesure le nombre de lignes rendues plutôt que la chaîne.
 
 Une normale de maille annoncée comme une normale de station serait exactement la faute que
 l'ADR-0022 a corrigée — sous une autre forme, avec une source en plus.

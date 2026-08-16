@@ -237,8 +237,40 @@ test('l’écart à la normale s’affiche avec sa provenance', async ({ page })
   // La provenance n'est pas facultative : ces normales avaient été retirées
   // faute de source (ADR-0022). Et ERA5 est une réanalyse, pas une station.
   expect(txt).toContain('réanalyse ERA5');
-  expect(txt).toContain('1991-2020');
   expect(txt).not.toMatch(/station/i);
+
+  // La période a rejoint la ligne de sources (v4.80) pour tenir sur une ligne
+  // en « grand texte » — elle reste visible, ailleurs, une seule fois.
+  expect(txt).not.toContain('1991-2020');
+  const source = await page.locator('.meteo-source').innerText();
+  expect(source).toContain('normales 1991-2020');
+});
+
+test('le mois s’élide : « d’août », jamais « de août »', async ({ page }) => {
+  await ouvrirMeteo(page, { normales: normales(26) });
+  const r = await page.evaluate(() => [1, 4, 7, 8, 10].map((m) => window.meteoMoisPrefixe(m)));
+  expect(r).toEqual(['de janvier', "d'avril", 'de juillet', "d'août", "d'octobre"]);
+});
+
+// Régression de mise en page : ces deux libellés passaient à la ligne dès le
+// réglage « grand texte », et la carte gagnait 35 px pour rien. On mesure le
+// RENDU (hauteur / interligne), pas la chaîne — règle 7 du CLAUDE.md.
+test('en grand texte, la provenance et « Rafales 24 h » tiennent sur une ligne', async ({ page }) => {
+  await ouvrirMeteo(page, { normales: normales(26) });
+  await page.evaluate(() => document.documentElement.classList.add('font-large'));
+  await page.waitForTimeout(200);
+
+  const r = await page.evaluate(() => {
+    const lignes = (el) => Math.round(el.offsetHeight / parseFloat(getComputedStyle(el).lineHeight));
+    const src = document.querySelector('.meteo-now-norm-src');
+    const labels = [...document.querySelectorAll('.meteo-now-stat .meteo-mini-label')];
+    const rafales = labels.find((e) => /Rafales/.test(e.textContent));
+    return { provenance: lignes(src), rafales: rafales ? lignes(rafales) : null, txt: rafales && rafales.textContent };
+  });
+
+  expect(r.txt).toBe('Rafales 24 h');   // la puce médiane offrait un point de coupure
+  expect(r.provenance).toBe(1);
+  expect(r.rafales).toBe(1);
 });
 
 test('l’écart est calculé sur AUJOURD’HUI, jamais sur daily[0] qui est hier', async ({ page }) => {

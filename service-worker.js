@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.79.0';
+const CACHE = 'mat-v4.80.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -40,7 +40,7 @@ const PRECACHE_URLS = [
   './js/mat-utils.js?v=4.3.6',
   './js/mat-core.js?v=4.3.6',
   './js/mat-accessibility.js?v=4.3.8',
-  './js/mat-widgets.js?v=4.5.1',
+  './js/mat-widgets.js?v=4.5.2',
   './js/mat-ambiance.js?v=1.8.0',
   './js/mat-agenda.js?v=4.3.4',
   './js/mat-forms.js?v=4.6.5',
