@@ -10,6 +10,15 @@ const METEO_DESC  = {0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellem
 const METEO_ALERT_COLORS = {1:'vert',2:'jaune',3:'orange',4:'rouge'};
 // Mois en toutes lettres, pour nommer la normale affichée (« Normale de juillet »).
 const METEO_MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+// « de juillet », mais « d'avril », « d'août », « d'octobre » : l'élision est
+// obligatoire devant une voyelle. Un simple 'de ' + mois écrivait « Normale de
+// août » trois mois par an.
+function meteoMoisPrefixe(moisNum) {
+  var nom = METEO_MOIS[Number(moisNum) - 1] || '';
+  if (!nom) return '';
+  return (/^[aeiouyâàéèêîôû]/i.test(nom) ? 'd\'' : 'de ') + nom;
+}
 const METEO_ALERT_ICONS = {1:'✅',2:'🟡',3:'🟠',4:'🔴'};
 
 function meteoHasAlert(vigilance) {
@@ -487,16 +496,18 @@ function meteoBuildNormLine(daily, normales, nowDate) {
     ? 'conforme à la normale'
     : (ecart > 0 ? '+' : '−') + String(abs).replace('.', ',') + ' °C';
 
-  var periode = (normales.periode && normales.periode.debut && normales.periode.fin)
-    ? normales.periode.debut + '-' + normales.periode.fin : '';
   var jeu = normales.jeu ? String(normales.jeu) : '';
   // Provenance écrite sous la valeur : « réanalyse » et non « station », parce
   // qu'ERA5 est une maille de modèle. Le backend le dit (`reanalyse: true`), on
   // le répète à l'habitant plutôt que de le laisser supposer un relevé local.
-  var provenance = 'Normale de ' + METEO_MOIS[moisNum - 1] + ' : '
+  //
+  // ⚠️ Cette ligne doit tenir sur UNE ligne, y compris en « très grand texte »
+  // (`html.font-xl`) : à deux lignes elle poussait la carte de 90 px. La période
+  // (1991-2020) a donc rejoint la ligne de sources en pied de fenêtre, où vivent
+  // déjà le fournisseur et la licence — chaque fait reste visible, une fois.
+  var provenance = 'Normale ' + meteoMoisPrefixe(moisNum) + ' : '
     + String(Math.round(Number(norme.tmax) * 10) / 10).replace('.', ',') + ' °C'
-    + (jeu ? ' — ' + (normales.reanalyse ? 'réanalyse ' : '') + jeu : '')
-    + (periode ? ', ' + periode : '');
+    + (jeu ? ' · ' + (normales.reanalyse ? 'réanalyse ' : '') + jeu : '');
 
   return '<div class="meteo-now-norm ' + ton + '">'
     + '<div class="meteo-now-norm-main">'
@@ -561,7 +572,9 @@ function meteoBuildNowCard(forecast, nowDate, normales) {
     + '<div class="meteo-now-grid">'
     + stat('Humidité', hum != null ? hum + ' %' : null, meteoTrendBadge(tHum))
     + stat('Pression', pres != null ? pres + ' hPa' : null, meteoTrendBadge(tPres))
-    + stat('Rafales · 24 h', gust24 != null ? Math.round(gust24) + ' km/h' : null, '')
+    // « Rafales · 24 h » passait à la ligne dans sa tuile dès le réglage
+    // « grand texte » : la puce médiane offrait un point de coupure de plus.
+    + stat('Rafales 24 h', gust24 != null ? Math.round(gust24) + ' km/h' : null, '')
     + '</div>'
     + '</div>';
 }
@@ -949,8 +962,12 @@ async function loadMeteoDetail() {
   // et l'habitant doit pouvoir savoir de quand date ce qu'il lit. Les normales
   // viennent du même fournisseur (archive ERA5) : l'attribution les couvre, et
   // ne les mentionne que si elles ont réellement été servies.
+  // La période des normales (1991-2020) est écrite ICI et plus dans la carte :
+  // là-haut elle faisait passer la provenance sur deux lignes en « grand texte ».
+  var _periodeNorm = (d.normales && d.normales.periode && d.normales.periode.debut && d.normales.periode.fin)
+    ? ' ' + d.normales.periode.debut + '-' + d.normales.periode.fin : '';
   html += '<div class="meteo-source">Prévisions'
-    + (d.normales ? ' et normales' : '') + ' Open-Meteo (CC BY 4.0) · vigilance Météo-France'
+    + (d.normales ? ' et normales' + _periodeNorm : '') + ' Open-Meteo (CC BY 4.0) · vigilance Météo-France'
     + (window._meteoDataAt ? ' — ' + (window._meteoDataStale ? 'dernier bulletin reçu à ' : 'mis à jour à ') + esc(meteoClockLabel(window._meteoDataAt)) : '')
     + '</div>';
 

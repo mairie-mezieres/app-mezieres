@@ -409,7 +409,10 @@ l'humidité et la pression montent ou baissent depuis trois heures.
 **maximale prévue aujourd'hui** à la **normale du mois** :
 
 > Maximale prévue aujourd'hui **31 °C** — **+5,4 °C**
-> Normale de juillet : 25,6 °C — réanalyse ERA5, 1991-2020
+> Normale de juillet : 25,6 °C · réanalyse ERA5
+
+La période de référence (1991-2020) est rappelée en bas de la fenêtre, avec les autres
+sources.
 
 Trois choses à savoir sur ce chiffre :
 

@@ -727,8 +727,22 @@ de vrais `<h3>`.
 
 ```
 Maximale prévue aujourd'hui   31 °C          [ +5,4 °C ]
-Normale de juillet : 25,6 °C — réanalyse ERA5, 1991-2020
+Normale de juillet : 25,6 °C · réanalyse ERA5
 ```
+
+⚠️ **Cette ligne doit tenir sur une seule ligne, y compris en `html.font-xl`.** Elle en
+occupait deux dès le réglage « grand texte », et la carte gagnait 35 px pour rien (v4.80).
+Deux conséquences à ne pas défaire :
+
+- la **période** (1991-2020) est écrite dans la ligne de sources en pied de fenêtre
+  (« Prévisions et normales 1991-2020 Open-Meteo »), plus dans la carte — chaque fait reste
+  visible, une seule fois ;
+- le mois passe par `meteoMoisPrefixe()`, qui élide devant une voyelle : `'de ' + mois`
+  écrivait « Normale de août » trois mois par an (avril, août, octobre).
+
+Le libellé de la tuile voisine est « Rafales 24 h » et non « Rafales · 24 h » : la puce
+médiane offrait un point de coupure de plus, et la tuile passait à deux lignes. Les deux
+comportements sont mesurés sur le rendu dans `tests/e2e/meteo-overlay.spec.js`.
 
 Les normales viennent du **backend** dans le champ `normales` de `/meteo/commune`
 (`chatbot-mairie-mezieres/lib/normales.js`, `GUIDE-ADMIN.md` §6quinquies). Aucun appel
