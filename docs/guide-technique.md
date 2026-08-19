@@ -1046,6 +1046,14 @@ rédaction. ⚠️ Ce fichier est de la **connaissance**, pas de la mise en form
 compétence déléguée oubliée fait remonter chaque mois des aides que la commune ne
 peut pas solliciter. Il se tient à jour à la main.
 
+Le profil sert **aussi de plan de recherche** : l'agent doit consacrer au moins une
+recherche à chacune des compétences listées, et pas seulement à celles qui remontent
+d'elles-mêmes. L'urbanisme, la voirie et les subventions d'investissement se signalent
+tout seuls ; **l'école, l'action sociale et les aînés passent à la trappe si on ne les
+cherche pas nommément**. Le rapport se termine donc par une ligne « 🔍 Compétences
+balayées ce mois-ci », qui nomme aussi celles restées sans résultat — sans elle, un
+silence sur un domaine se lit comme un oubli.
+
 **2. Deux garde-fous anti-répétition, pas un.**
 
 - la **mémoire** `veille/historique-municipale.md` (12 dernières éditions, une ligne
@@ -1054,6 +1062,19 @@ peut pas solliciter. Il se tient à jour à la main.
 - la **fenêtre de publication** : seuls entrent les dispositifs publiés, ouverts ou
   modifiés entre `J-35` et `J`, chacun daté. Un dispositif permanent qui n'a pas
   bougé n'entre pas ; une date limite déjà passée écarte l'item.
+
+⚠️ **La mémoire est écrite par du code, pas par l'agent** (ADR-0026). L'agent produit
+`veille/items-municipale.json` (`{niveau, titre, url}`, éphémère et non committé, sur
+le modèle de `veille/actions-pwa.json`) ; `scripts/update-veille-memoire.js` en écrit
+la section datée. Le script écrit **toujours** une section — avec les items, ou avec
+`- (mémoire non renseignée par l'agent…)` et un `::warning` si le JSON manque — et
+sort toujours en 0 : un souci de mémoire ne doit pas coûter l'email.
+
+> Pourquoi : au **premier run réel** (19 août 2026), tout était vert, l'email est
+> parti, et l'étape de commit a répondu « Historique inchangé — rien à committer ».
+> L'agent avait sauté l'ÉTAPE 6, dernière consigne d'un prompt de 180 lignes. Rien
+> n'avait échoué ; la panne ne serait devenue visible que le mois suivant, sous la
+> forme d'items re-proposés. Ne pas remettre l'écriture de la mémoire dans le prompt.
 
 La période est écrite dans l'objet de l'email et sous le titre, et le rapport
 s'ouvre sur une introduction qui rappelle l'objectif et que **l'outil oriente mais
