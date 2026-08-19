@@ -1,0 +1,89 @@
+# ════════════════════════════════════════════════════════════════════
+# Profil de la commune — filtre de pertinence de la veille municipale
+# ════════════════════════════════════════════════════════════════════
+# Lu par `.github/workflows/veille-municipale.yml` : l'agent s'en sert pour
+# décider ce qui nous concerne VRAIMENT (seuils de population, périmètre
+# géographique, compétences réellement exercées) avant même de rédiger.
+#
+# ⚠️ Ce fichier est de la CONNAISSANCE, pas de la mise en forme. Une donnée
+# fausse ici (population, compétence déléguée, EPCI) produit un mois entier de
+# signalements hors sujet. Le tenir à jour à la main, jamais par un agent.
+#
+# ⚠️ `veille/**` fait partie des chemins interdits au correcteur automatique
+# de la veille technologique (ADR-0023, scripts/check-veille-diff.js) : aucune
+# IA ne peut réécrire ce profil au fil de l'eau.
+
+nom: Mézières-lez-Cléry
+code_insee: "45204"          # ⚠️ 45203 = Meung-sur-Loire (voir ADR-0018)
+departement: "45"            # Loiret
+region: "Centre-Val de Loire"
+
+# Recensement 2023 : 883 habitants (population municipale légale). Estimation
+# courante ~904. Sous 1 000 habitants — donc éligible aux dispositifs « petites
+# communes » et exclu de tout ce qui vise les communes de plus de 3 500 hab.
+population: 883
+strate: "moins de 1 000 habitants"
+
+epci: "Communauté de communes des Terres du Val de Loire (CCTVL)"
+epci_communes: 25
+# Le maire est 3ᵉ vice-président de la CCTVL : une aide fléchée EPCI n'est pas
+# hors sujet pour autant — elle est simplement à relayer, pas à porter.
+
+syndicats_et_representations:
+  - "C3M — syndicat intercommunal des eaux Cléry / Mareau / Mézières (eau potable)"
+  - "Crèche des Marmousets"
+  - "EPFLI 45 — établissement public foncier local"
+  - "GIP RECIA — numérique en Centre-Val de Loire"
+  - "Pays Beauce Val de Loire"
+  - "APPROLYS — centrale d'achat"
+  - "CNAS — action sociale du personnel"
+
+# Compétences RÉELLEMENT exercées par la commune. Ce que la commune n'exerce
+# pas est listé en `competences_deleguees` : une aide sur ces sujets ne se
+# candidate pas depuis la mairie.
+competences:
+  - "urbanisme — instruction et projets communaux, dans le cadre du PLUi-H-D intercommunal"
+  - "voirie communale"
+  - "école La Forêt, périscolaire et restaurant scolaire"
+  - "cimetière"
+  - "bâtiments communaux (dont rénovation énergétique)"
+  - "état civil, élections, listes électorales"
+  - "sécurité civile et prévention (référent sécurité civile désigné)"
+  - "action sociale et pôle aînés"
+  - "vie associative, fêtes et cérémonies"
+  - "communication et numérique (application MAT)"
+
+competences_deleguees:
+  - "eau potable → syndicat C3M"
+  - "assainissement collectif → CCTVL"
+  - "collecte et traitement des déchets → CCTVL"
+  - "document d'urbanisme → PLUi-H-D porté par la CCTVL"
+  - "petite enfance → crèche intercommunale des Marmousets"
+  - "inclusion numérique → service mobile de la CCTVL"
+
+projets_en_cours:
+  - "communication et numérique — application citoyenne MAT, accessibilité séniors"
+  - "voirie communale"
+  - "rénovation énergétique des bâtiments communaux"
+  - "cimetière"
+  - "sécurité routière et cadre de vie"
+
+# Un item qui tombe dans l'un de ces cas est écarté AVANT tout travail de
+# rédaction — c'est le « filtre grossier » du pipeline.
+seuils_exclusion:
+  - "aide réservée aux communes de plus de 3 500 habitants"
+  - "aide réservée aux communes de plus de 2 000 habitants"
+  - "aide réservée aux EPCI, départements ou régions à l'exclusion des communes"
+  - "aide réservée à une autre région ou à un autre département que le Loiret"
+  - "aide réservée aux communes littorales, de montagne, ou en quartier prioritaire"
+  - "dispositif dont la date limite de dépôt est déjà passée"
+  - "compétence non exercée par la commune (voir competences_deleguees)"
+
+# Interlocuteurs habituels — utiles pour situer une source.
+interlocuteurs:
+  - "Préfecture du Loiret (DETR / DSIL, recueil des actes administratifs)"
+  - "Conseil départemental du Loiret"
+  - "Région Centre-Val de Loire"
+  - "Association des Maires du Loiret, AMRF"
+  - "Banque des Territoires"
+  - "ADEME, Agence de l'eau Loire-Bretagne"
