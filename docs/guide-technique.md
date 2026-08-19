@@ -118,7 +118,8 @@ app-mezieres/
     ├── liens-morts.yml     Détection de liens morts (hebdomadaire)
     ├── sauvegarde-upstash.yml  Sauvegarde Redis Upstash (hebdomadaire)
     ├── veille-techno.yml   Veille technologique par IA (hebdomadaire)
-    └── veille-bulletin.yml Veille éditoriale bulletin municipal (mensuelle)
+    ├── veille-bulletin.yml Veille éditoriale bulletin municipal (mensuelle)
+    └── veille-municipale.yml  Veille élus : subventions et obligations (mensuelle)
 ```
 
 ### Backend — `chatbot-mairie-mezieres`
@@ -1008,6 +1009,7 @@ Les workflows dans `.github/workflows/` :
 | `sauvegarde-upstash.yml` | hebdomadaire (cron, lundi) | Sauvegarde de la base Redis Upstash |
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
+| `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
 
@@ -1028,14 +1030,58 @@ pour ne pas re-signaler d'une semaine sur l'autre une information déjà rapport
 Pour re-signaler volontairement une info, supprimer sa ligne de l'historique.
 Voir aussi `veille/README.md`.
 
+### Veille municipale — profil, mémoire et fenêtre de publication (ADR-0025)
+
+`veille-municipale.yml` s'adresse aux **élus** : subventions ouvertes, obligations
+réglementaires nouvelles, bonnes pratiques applicables. Même patron que les deux
+autres veilles (agent + recherche web + `scripts/send-veille-email.js`), avec trois
+spécificités.
+
+**1. Un profil de commune comme filtre.** `veille/commune.yml` porte la population
+(883 hab., strate « moins de 1 000 »), l'EPCI (CCTVL), les compétences réellement
+exercées, les compétences **déléguées** (eau au C3M, déchets et PLUi à la CCTVL,
+petite enfance à la crèche intercommunale) et les seuils d'exclusion. L'agent le lit
+à chaque exécution ; un dispositif qui ne passe pas ce filtre est écarté avant
+rédaction. ⚠️ Ce fichier est de la **connaissance**, pas de la mise en forme : une
+compétence déléguée oubliée fait remonter chaque mois des aides que la commune ne
+peut pas solliciter. Il se tient à jour à la main.
+
+**2. Deux garde-fous anti-répétition, pas un.**
+
+- la **mémoire** `veille/historique-municipale.md` (12 dernières éditions, une ligne
+  `- [action|surveiller] Titre — URL` par item), lue avant les recherches et
+  committée après l'envoi réussi, comme pour la veille techno ;
+- la **fenêtre de publication** : seuls entrent les dispositifs publiés, ouverts ou
+  modifiés entre `J-35` et `J`, chacun daté. Un dispositif permanent qui n'a pas
+  bougé n'entre pas ; une date limite déjà passée écarte l'item.
+
+La période est écrite dans l'objet de l'email et sous le titre, et le rapport
+s'ouvre sur une introduction qui rappelle l'objectif et que **l'outil oriente mais
+ne décide pas**. Le tri est plafonné : au plus 4 « action requise », 6 « à
+surveiller », les écartés réduits à un nombre et à leurs motifs.
+
+**3. Destinataires — un secret, pas un commit.**
+
+| Exécution | Destinataire |
+|---|---|
+| planifiée (1er lundi) | `VEILLE_MUNICIPALE_EMAIL_TO`, **ou** `VEILLE_EMAIL_TO` si ce secret n'existe pas |
+| manuelle, entrée `destinataire: test` (défaut) | `VEILLE_EMAIL_TO` |
+| manuelle, entrée `destinataire: conseil` | `VEILLE_MUNICIPALE_EMAIL_TO` |
+
+Tant que `VEILLE_MUNICIPALE_EMAIL_TO` n'est pas créé, tout part à l'adresse de test.
+⚠️ **Écrire à tout le conseil suppose d'abord un domaine vérifié chez Resend** :
+l'expéditeur est le sender de test `onboarding@resend.dev`, qui n'autorise l'envoi
+que vers l'adresse du compte Resend. Renseigner quinze adresses sans avoir vérifié
+`mezieres-lez-clery.fr` et renseigné `RESEND_FROM` produit un 403, pas un envoi.
+
 ### Robustesse des veilles IA (retry + diagnostic)
 
-L'étape Claude Code des deux veilles peut se terminer « avec succès » **sans avoir
+L'étape Claude Code des trois veilles peut se terminer « avec succès » **sans avoir
 écrit le rapport HTML** (abandon prématuré de l'agent, recherches en échec…). Les
 workflows traitent donc le livrable comme vérifiable (ADR-0004) :
 
 - le prompt est construit une fois dans une variable d'env (`VEILLE_PROMPT` /
-  `BULLETIN_PROMPT`) partagée par les deux invocations ;
+  `BULLETIN_PROMPT` / `MUNICIPALE_PROMPT`) partagée par les deux invocations ;
 - 1re tentative en `continue-on-error`, puis vérification `[ -s rapport-*.html ]` ;
   si le fichier manque, **2e tentative** avec le même prompt, puis vérification
   finale bloquante ;
@@ -1067,8 +1113,9 @@ produit un **canal actionnable** qui alimente le backlog technique de la PWA :
 > n'est pas committé ; l'issue est l'artefact durable. Permission requise :
 > `issues: write`.
 >
-> La `veille-bulletin.yml` (éditoriale) n'a pas ce canal : ses idées d'articles ne sont
-> pas des actions techniques.
+> Ni `veille-bulletin.yml` (éditoriale) ni `veille-municipale.yml` (élus) n'ont ce
+> canal : des idées d'articles et des dossiers de subvention ne sont pas des actions
+> techniques, et rien n'y est traduisible en une modification de ce dépôt.
 
 ### Étage 2 : une PR **en draft** par action (ADR-0023)
 
