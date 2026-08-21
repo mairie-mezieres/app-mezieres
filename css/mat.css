@@ -1578,6 +1578,24 @@ html.theme-sombre .content [role="button"]:focus-visible {
   text-shadow:0 1px 3px rgba(0,0,0,0.8)}
 .c3d-lab-moi{color:#ffcf3f;background:rgba(15,32,23,0.86);border-color:#ffcf3f}
 
+/* Lieu-dit : le nom, un trait, un point au sol. Le marqueur est ancré par le
+   BAS, donc le point du sol est sous la pastille du trait — texte et trait
+   dans le même élément, ils ne peuvent pas se désolidariser. La hauteur du
+   trait est écrite en JS (`_c3dTigePx`) : elle vaut 13 m réels, donc elle
+   grandit quand on approche. Ce n'est PAS une mesure du bâti — voir ADR-0026. */
+.c3d-lieu{display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;user-select:none}
+.c3d-lieu-nom{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;
+  line-height:1.15;color:#fff8e6;white-space:nowrap;padding:2px 7px;border-radius:8px;
+  background:rgba(15,32,23,0.6);border:1px solid rgba(255,255,255,0.22);
+  text-shadow:0 1px 3px rgba(0,0,0,0.8)}
+.c3d-lieu-tige{position:relative;width:2px;flex:0 0 auto;
+  background:linear-gradient(to bottom,rgba(255,248,230,0.85),rgba(255,248,230,0.35));
+  box-shadow:0 0 2px rgba(0,0,0,0.5)}
+.c3d-lieu-tige::after{content:'';position:absolute;bottom:-3px;left:50%;
+  transform:translateX(-50%);width:7px;height:7px;border-radius:50%;
+  background:#fff8e6;box-shadow:0 0 3px rgba(0,0,0,0.6)}
+
 .c3d-fiche{position:absolute;z-index:4;left:0;right:0;bottom:0;background:var(--card);
   border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(26,61,43,0.22);
   transform:translateY(102%);transition:transform 0.28s ease;max-height:78%;

@@ -5,6 +5,42 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.82] — 21 août 2026
+
+### Ajouté
+- **Les lieux-dits et hameaux nommés sur la carte 3D du village.** Manthelon, Rolland, le
+  Bréau… La couche `BDTOPO_V3:toponymie` de l'IGN les porte avec leur point exact. Chaque
+  nom est posé **au bout d'un mât terminé par un point au sol** : sans lui, un nom au ras du
+  sol à côté d'une maison de 6 m semblerait nommer la maison — et un marqueur HTML n'étant
+  jamais occulté par le bâti, un nom lointain flotterait sur les maisons du premier plan.
+  - **Le mât vaut 13 m réels**, convertis en pixels par `(h / mpp) × sin(pitch)` : il
+    rétrécit avec la distance comme le bâti, à l'inverse d'un décalage écrit en pixels
+    (RG-17.17). `sin` et non `cos` — à la verticale, une hauteur ne se projette pas. Ce
+    n'est **pas une mesure** : même statut que les toits en pente (RG-17.15).
+  - Voir **ADR-0026** (complété) et **RG-17.30**.
+
+### Ce que la source a appris
+- ⚠️ **La couche de toponymie ne contient pas que des lieux-dits** : 219 objets sur
+  l'emprise de la commune — croix, ponts, sources. Seule la classe « Zone d'habitation » est
+  affichée ; **tout le reste est compté par classe** dans « 🔎 Détail des sources », pour
+  qu'un hameau rangé un jour ailleurs se voie au lieu de manquer en silence.
+- ⚠️ **Il existe deux « manthelon » en France** — le nôtre et un autre à 120 km, en
+  Eure-et-Loir, sortis de la même requête avec la même graphie et la même classe. C'est très
+  exactement le risque qu'ADR-0021 avait invoqué pour refuser de résoudre les communes par
+  leur nom, et cette fois la preuve était dans la réponse du service. Le découpage sur le
+  contour communal est verrouillé par un test qui échoue si on le retire.
+- ⚠️ **La graphie arrive en minuscules.** `_c3dCapitales` remet les majuscules, particules
+  exceptées — et seulement si la graphie n'en porte aucune, pour ne jamais retoucher un
+  « Saint-Laurent-des-Bois » déjà bien écrit.
+
+### Modifié
+- **La chaîne de requête WFS est partagée** entre le bâti et la toponymie (`_c3dWfs`) : deux
+  couches de la même base, servies par le même service, avec les mêmes trois formulations de
+  repli. Les libellés du journal gagnent un préfixe (« BD TOPO bâti », « BD TOPO
+  toponymie ») — sans quoi le panneau de diagnostic afficherait deux lignes identiques.
+- **L'anticollision des étiquettes est mutualisée** (`_c3dRangerEtiquettes`) entre les noms
+  de communes et ceux des lieux-dits.
+
 ## [4.81] — 21 août 2026
 
 ### Ajouté
