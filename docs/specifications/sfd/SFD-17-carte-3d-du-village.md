@@ -223,6 +223,27 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   ⚠️ Une étiquette porte `pointer-events:none`, faute de quoi elle avale le clic qui doit
   nommer la commune (RG-17.21). Verrouillé par un test sur le **style calculé**.
   Voir ADR-0026.
+- **RG-17.30 — un lieu-dit est nommé au bout d'un mât, et seulement s'il est habité et dans
+  la commune.** Les hameaux viennent de `BDTOPO_V3:toponymie`.
+  ⚠️ **Cette couche ne contient pas que des lieux-dits** : sur l'emprise de la commune elle
+  renvoie 219 objets — croix, ponts, sources, détails hydrographiques. Seule la classe
+  **« Zone d'habitation »** est affichée ; tout le reste est **compté par classe** dans
+  « 🔎 Détail des sources », de sorte qu'un hameau rangé un jour dans une autre classe se
+  voie au lieu de manquer en silence.
+  ⚠️ **Il existe deux « manthelon » en France** — le nôtre et un autre à 120 km, sortis de la
+  même requête avec la même graphie et la même classe. Le découpage sur le contour communal
+  n'est donc pas une précaution mais la condition pour ne pas afficher le hameau d'un autre
+  département. Verrouillé par un test qui échoue si l'on retire le découpage.
+  ⚠️ **La graphie arrive en minuscules** (« manthelon »). Les capitales sont remises, les
+  particules exceptées — et **uniquement si la graphie n'en porte aucune**, pour ne jamais
+  retoucher un nom que le service a déjà bien écrit. C'est la seule transformation du libellé.
+  **Le mât n'est pas une mesure.** Il vaut 13 m réels convertis en pixels
+  (`(h / mpp) × sin(pitch)` — `sin`, car à la verticale une hauteur ne se projette pas), il
+  rétrécit donc avec la distance comme le bâti, à l'inverse d'un décalage en pixels
+  (RG-17.17). Il ne dit la hauteur de rien : il dit **à quel point du sol le nom appartient**,
+  même statut que les toits en pente de RG-17.15. Sans lui, un nom posé au ras du sol à côté
+  d'une maison semblerait nommer la maison — et un marqueur HTML n'étant jamais occulté par
+  le bâti, un nom lointain flotterait sur les maisons du premier plan.
 
 ## 5. Parcours
 
@@ -242,7 +263,8 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 | Élément | Source |
 |---|---|
 | Fond aérien, plan | Orthophoto et Plan IGN — Géoplateforme (couches ouvertes) |
-| Bâti et hauteurs | BD TOPO de l'IGN via WFS ; repli OpenStreetMap |
+| Bâti et hauteurs | BD TOPO de l'IGN via WFS (`BDTOPO_V3:batiment`) ; repli OpenStreetMap |
+| Lieux-dits et hameaux | BD TOPO de l'IGN via WFS (`BDTOPO_V3:toponymie`) — ⚠️ classe **« Zone d'habitation »** uniquement, découpée sur le contour communal |
 | Zonage du PLU | Géoportail de l'Urbanisme via apicarto (`municipality` puis `zone-urba`) |
 | Règles d'urbanisme | `data/plu-data.json` (embarqué) |
 | Coordonnées d'adresse | Réutilisées de MEL — Base Adresse Nationale |
@@ -306,6 +328,22 @@ pose directement.
   commune est la plus petite des deux.
 - « le nom ne prend ni le clic ni la place du village » vérifie `pointer-events:none` sur le
   style calculé, puis qu'un retour au village ne laisse aucun nom affiché.
+
+Quatre tests couvrent les **lieux-dits** (RG-17.30), sur un jeu d'essai **relevé dans la
+vraie réponse du service** — trois croix, un pont, une source, et les deux « manthelon » de
+France :
+
+- « seul l'habitat est étiqueté, et seulement dans la commune » — un seul Manthelon retenu,
+  celui d'Eure-et-Loir écarté par le contour, et les cinq autres toponymes **comptés** par
+  classe. Vérifié en le faisant échouer : sans le découpage, deux Manthelon passent.
+- « la BD TOPO écrit en minuscules, la carte remet les capitales » — « manthelon » →
+  « Manthelon », « clos de manthelon » → « Clos de Manthelon », et
+  « Saint-Laurent-des-Bois » **laissé intact**.
+- « le mât mesure des mètres, et disparaît à la verticale » — zéro à pitch nul, plus grand
+  de près que de loin. Vérifié en le faisant échouer : avec `cos` au lieu de `sin`, le mât
+  vaut 32,4 px là où il devrait valoir 0.
+- « le nom est ancré au sol, et s'efface en vue territoire » — hauteur de trait réelle et
+  `pointer-events:none` sur le **style calculé**, puis disparition à la bascule.
 
 Ces tests ne demandent aucun réseau — seulement la bibliothèque servie en local — et c'est
 précisément pour cela qu'ils voient ce qu'aucun autre test ne voyait (v4.68). Chacun a été

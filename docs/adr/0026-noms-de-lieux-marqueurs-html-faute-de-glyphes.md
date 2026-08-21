@@ -84,23 +84,42 @@ laissé à dormir. C'est la leçon de RG-17.24 ter appliquée à l'envers : là-
 d'échec était écrit et jamais lu ; ici une branche était écrite et jamais prise. Dans les
 deux cas, du code qui rassure sans rien garantir.
 
-## Ce qui n'est PAS fait, et pourquoi
+## Les lieux-dits (v4.82) — ce que la source a livré
 
-**Les lieux-dits du village n'ont pas d'étiquette.** L'étape suivante demande une source, et
-aucune ne peut être branchée de mémoire :
+La couche est **`BDTOPO_V3:toponymie`**, relevée sur le `GetCapabilities` du service par le
+porteur : je ne pouvais pas la lire d'ici, `data.geopf.fr` étant injoignable depuis
+l'environnement de développement, comme apicarto (ADR-0021). Écrire un `TYPENAMES` de
+mémoire aurait refait le 45203/45204.
 
-- **BD TOPO** (`data.geopf.fr`) est la bonne source, et le pipeline existe déjà tel quel
-  dans `_c3dBatiIGN` — trois formulations, journal `_c3dNoter`, panneau de diagnostic. Mais
-  les noms de couches doivent être **confirmés sur `GetCapabilities` depuis une machine
-  connectée** : `data.geopf.fr` est injoignable depuis l'environnement de développement,
-  comme apicarto (ADR-0021). Écrire un `TYPENAMES` de mémoire referait le 45203/45204.
-- **Le cadastre** donne des noms de *sections*, souvent archaïques et rarement ceux que les
-  habitants emploient, sans point où les poser — seulement des polygones.
-- **OpenStreetMap** couvre inégalement une commune de 850 habitants.
+Un échantillon réel de la réponse a ensuite décidé de tout le reste. **Trois faits, aucun
+devinable :**
 
-**Les « quartiers », eux, ne peuvent venir que de la mairie.** Il n'existe aucun découpage
-officiel à cette échelle : l'IRIS de l'INSEE ne descend pas sous 10 000 habitants, et
-Mézières est non irisée — un IRIS pour toute la commune.
+1. **La couche ne contient pas que des lieux-dits.** Sur l'emprise de la commune, elle
+   renvoie **219 objets** : des croix, des ponts, des sources, des détails hydrographiques.
+   Le tri se fait sur `classe_de_l_objet` — on ne garde que **« Zone d'habitation »**, la
+   classe qui répond à la question posée. Le reste est **compté par classe** dans
+   « 🔎 Détail des sources » : le jour où l'IGN rangera un hameau ailleurs, l'écran le dira
+   au lieu de l'avaler. C'est le procédé de `_c3dInconnus` pour les usages de bâtiments.
+2. **La graphie arrive en minuscules** — « manthelon », « croix glaneuse ». Posée telle
+   quelle, elle ressemble à un défaut d'affichage. `_c3dCapitales` remet les majuscules,
+   particules exceptées — et **seulement si la graphie n'en porte aucune**, pour ne pas
+   abîmer un « Saint-Laurent-des-Bois » que le service aurait déjà bien écrit. C'est la
+   seule transformation appliquée au libellé.
+3. ⚠️ **Il existe deux « manthelon » en France** — le nôtre et un autre à 120 km, dans
+   l'Eure-et-Loir. Ils sont sortis ensemble de la même requête, avec la même graphie et la
+   même classe. L'emprise interrogée déborde de toute façon sur Cléry, Mareau et Dry : le
+   découpage sur `_c3dContour` n'est pas une précaution, c'est ce qui empêche d'afficher le
+   hameau d'un autre département. **ADR-0021 avait écarté la résolution par nom pour cette
+   raison exacte** — cette fois la preuve était dans la réponse du service, et elle est
+   devenue un test.
+
+**Les sources écartées**, pour mémoire : le **cadastre** donne des noms de *sections*,
+souvent archaïques et rarement ceux que les habitants emploient, sans point où les poser —
+seulement des polygones. **OpenStreetMap** couvre inégalement une commune de 850 habitants.
+
+**Les « quartiers » restent hors de portée**, et ne peuvent venir que de la mairie : il
+n'existe aucun découpage officiel à cette échelle — l'IRIS de l'INSEE ne descend pas sous
+10 000 habitants, et Mézières est non irisée, un IRIS pour toute la commune.
 
 ⚠️ Et une liste validée par la mairie **existe déjà dans le dépôt**, sans coordonnées : le
 champ `hameau` du trombinoscope (`js/mat-trombi.js` — Le Bourg, Manthelon, Rolland, Le
@@ -121,18 +140,36 @@ loin derrière flotte par-dessus les maisons du premier plan et **paraît les no
 n'est pas une donnée fausse, c'est un **rattachement** faux, et ADR-0018 ne fait pas la
 différence : un affichage faux n'est pas acceptable.
 
-La surélévation avec un trait reste donc la bonne réponse, mais pour l'autre raison : le
-trait dit **à quel point du sol le nom appartient**. Surélever sans trait serait pire que ne
-rien faire.
+La surélévation avec un trait est donc la bonne réponse, mais pour l'autre raison : le trait
+dit **à quel point du sol le nom appartient**. Surélever sans trait serait pire que ne rien
+faire.
 
-La mécanique, quand l'étape village viendra : cette version de MapLibre n'expose pas
-d'altitude sur un `Marker`, il faut donc convertir des mètres en pixels —
-`mpp = 40075016,686 × cos(lat) / (512 × 2^zoom)`, puis
-`décalage = (h / mpp) × sin(pitch)`, recalculé sur `move`. `sin` et non `cos` : à pitch nul,
-vue à la verticale, une hauteur ne se projette pas. Douze à quatorze mètres suffisent — le
-bâti de village tourne autour de 6 m de murs et 2,6 m de toit (`C3D_TOITS`). Et comme le
-toit en pente d'ADR-0020, **ce mât est un procédé de lisibilité, jamais une mesure** : il ne
-doit à aucun moment être présenté comme la hauteur de quoi que ce soit.
+**La mécanique retenue.** Cette version de MapLibre n'expose pas d'altitude sur un
+`Marker` : on convertit des mètres en pixels.
+
+```
+mpp     = 40075016,686 × cos(lat) / (512 × 2^zoom)   — mètres par pixel
+hauteur = (h / mpp) × sin(pitch)                     — pixels à l'écran
+```
+
+`sin` et non `cos` : à pitch nul — vue à la verticale — une hauteur ne se projette pas du
+tout, et le mât doit disparaître. Un test le vérifie, et il échoue bien avec `cos`
+(32,4 px au lieu de 0).
+
+`C3D_LIEU_H = 13 m` : au-dessus des toits du village, qui tournent autour de 6 m de murs et
+2,6 m de toit (`C3D_TOITS`), et loin sous le clocher. Mesuré : ≈ 38 px au zoom 17,4 et
+≈ 7 px au zoom 15. **Le mât rétrécit avec la distance, comme le bâti** — c'est ce qui le
+distingue d'un décalage écrit en pixels, qui serait juste à un seul zoom (RG-17.17).
+
+Le texte et le trait sont **dans le même élément**, ancré par le bas (`anchor:'bottom'`) :
+il n'y a aucun offset à recalculer, seulement la hauteur du trait, et les deux ne peuvent
+pas se désolidariser. La hauteur est mise à jour à chaque image du geste — c'est une
+écriture de style, sans lecture de mise en page ; l'anticollision, elle, mesure des
+rectangles et attend `moveend`.
+
+Enfin, comme le toit en pente d'ADR-0020, **ce mât est un procédé de lisibilité, jamais une
+mesure** : c'est une approximation qui ignore la division perspective, et il ne doit à aucun
+moment être présenté comme la hauteur de quoi que ce soit.
 
 ## Alternatives écartées
 
@@ -149,13 +186,23 @@ doit à aucun moment être présenté comme la hauteur de quoi que ce soit.
 
 ## Conséquences
 
-**Positives** : la vue territoire se lit sans déplier de panneau ; aucun octet ajouté au
-chargement ; la mécanique d'étiquette est en place et testée pour l'étape des lieux-dits.
+**Positives** : la vue territoire se lit sans déplier de panneau ; les hameaux sont nommés
+là où l'habitant regarde ; aucun octet ajouté au chargement de l'application ; la même
+mécanique d'étiquette sert les deux échelles (`_c3dRangerEtiquettes`), et la même chaîne WFS
+sert le bâti et la toponymie (`_c3dWfs`).
 
 **Négatives** : trois comportements que `symbol` offrirait gratuitement sont désormais du
 code à maintenir. L'anticollision est recalculée à `moveend`, donc les noms se réorganisent
-à la fin du geste et non pendant.
+à la fin du geste et non pendant. Une requête WFS de plus à l'ouverture de la vue village —
+elle ne bloque rien, et son échec n'empêche ni le bâti ni le zonage.
 
-**À surveiller** : si un jour la carte porte beaucoup plus de libellés — les lieux-dits en
-vue village, par exemple — l'anticollision en O(n²) et les mesures de rectangles deviendront
-le point de bascule vers les glyphes vendorisés. Le seuil n'est pas atteint à 25.
+**À surveiller** :
+
+- Si la carte devait porter beaucoup plus de libellés, l'anticollision en O(n²) et les
+  mesures de rectangles deviendraient le point de bascule vers les glyphes vendorisés. À
+  25 communes et une quinzaine de lieux-dits, le seuil est loin.
+- **Le panneau « Toponymes non affichés »** est le canari : si un habitant signale un hameau
+  manquant, c'est là qu'on verra sous quelle classe l'IGN l'a rangé — plutôt que de conclure
+  à une panne. C'est ce même dispositif qui a livré les deux causes réelles en v4.73.
+- Le mât est calé sur `C3D_LIEU_H = 13 m`. Si un jour la carte servait une commune au bâti
+  plus haut, c'est ce nombre qu'on ajuste — pas un décalage en pixels.

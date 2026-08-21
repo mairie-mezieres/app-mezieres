@@ -296,17 +296,21 @@ function _c3dTypeBati(p){
    Trois formulations de la requête, de la plus sûre à la plus ancienne.
    CRS:84 impose l'ordre longitude,latitude sans ambiguïté ; WFS 2.0 avec
    EPSG:4326 impose l'ordre inverse — d'où la bascule du BBOX. */
-function _c3dBatiIGN(){
+/* ⚠️ Partagé par le bâti et la toponymie : deux couches de la même base,
+   servies par le même WFS. Le préfixe du journal les distingue, sans quoi le
+   panneau de diagnostic afficherait deux lignes « BD TOPO (CRS:84) » sans
+   moyen de savoir laquelle a échoué. */
+function _c3dWfs(prefixe, couche, nb){
   var base = 'https://data.geopf.fr/wfs/ows?SERVICE=WFS&REQUEST=GetFeature&outputFormat=application/json';
   var essais = [
-    ['BD TOPO (CRS:84)',
-      base + '&VERSION=2.0.0&TYPENAMES=BDTOPO_V3:batiment&SRSNAME=CRS:84&count=6000'
+    [prefixe + ' (CRS:84)',
+      base + '&VERSION=2.0.0&TYPENAMES=' + couche + '&SRSNAME=CRS:84&count=' + nb
            + '&BBOX=' + [C3D_BBOX.w, C3D_BBOX.s, C3D_BBOX.e, C3D_BBOX.n].join(',') + ',CRS:84'],
-    ['BD TOPO (EPSG:4326)',
-      base + '&VERSION=2.0.0&TYPENAMES=BDTOPO_V3:batiment&SRSNAME=EPSG:4326&count=6000'
+    [prefixe + ' (EPSG:4326)',
+      base + '&VERSION=2.0.0&TYPENAMES=' + couche + '&SRSNAME=EPSG:4326&count=' + nb
            + '&BBOX=' + [C3D_BBOX.s, C3D_BBOX.w, C3D_BBOX.n, C3D_BBOX.e].join(',') + ',EPSG:4326'],
-    ['BD TOPO (WFS 1.1)',
-      base + '&VERSION=1.1.0&TYPENAME=BDTOPO_V3:batiment&SRSNAME=EPSG:4326&maxFeatures=6000'
+    [prefixe + ' (WFS 1.1)',
+      base + '&VERSION=1.1.0&TYPENAME=' + couche + '&SRSNAME=EPSG:4326&maxFeatures=' + nb
            + '&BBOX=' + [C3D_BBOX.s, C3D_BBOX.w, C3D_BBOX.n, C3D_BBOX.e].join(',')]
   ];
   var chaine = Promise.reject(new Error('init'));
@@ -319,7 +323,11 @@ function _c3dBatiIGN(){
       }).catch(function(err){ _c3dNoter(e[0], false, err.message); throw err; });
     });
   });
-  return chaine.then(function(fc){
+  return chaine;
+}
+
+function _c3dBatiIGN(){
+  return _c3dWfs('BD TOPO bâti', 'BDTOPO_V3:batiment', 6000).then(function(fc){
     /* Le journal a noté le nombre reçu ; on lui ajoutera le nombre retenu
        une fois le marquage communal fait. */
     fc.features.forEach(function(f){
@@ -391,6 +399,100 @@ function _c3dBatiOSM(){
     return _c3dMarquerCommune({ type:'FeatureCollection', features:feats });
   })
   .catch(function(e){ _c3dNoter('OpenStreetMap', false, e.message); throw e; });
+}
+
+/* ── Lieux-dits : la toponymie de la BD TOPO ─────────────────────
+   Manthelon, Rolland, le Bréau… La couche `BDTOPO_V3:toponymie` les porte,
+   chacun avec son point exact. Trois choses la gouvernent, et chacune a été
+   LUE dans la réponse réelle du service, aucune supposée :
+
+   1. Elle ne contient pas que des lieux-dits. Sur l'emprise de la commune,
+      elle renvoie 219 objets — des croix, des ponts, des sources, des détails
+      hydrographiques. On ne retient que la classe « Zone d'habitation », celle
+      qui répond à la question posée : quel est ce hameau ? Tout le reste est
+      compté par classe dans « 🔎 Détail des sources ». Si l'IGN range un jour
+      un hameau dans une autre classe, l'écran le dira au lieu de l'avaler —
+      c'est le procédé de `_c3dInconnus` pour les usages de bâtiments.
+
+   2. La graphie arrive en MINUSCULES : « manthelon », « croix glaneuse ».
+      Posée telle quelle sur la carte, elle ressemble à un défaut d'affichage.
+
+   3. ⚠️ Il existe DEUX « manthelon » en France — le nôtre et un autre à
+      120 km, dans l'Eure-et-Loir. L'emprise interrogée déborde largement sur
+      Cléry, Mareau et Dry : un nom ne prouve rien, le contour si. D'où le
+      découpage sur `_c3dContour`, comme pour le zonage. C'est très exactement
+      la raison pour laquelle ADR-0021 a refusé de résoudre les communes par
+      leur nom — et cette fois, la preuve était dans la réponse du service. */
+
+/* Comparaison faite sur la chaîne dé-accentuée et en minuscules. Le `.{0,2}`
+   couvre l'apostrophe droite, la courbe et l'espace : la valeur observée est
+   « Zone d'habitation », mais le séparateur n'est garanti par rien. */
+var C3D_TOPO_CLASSE = /zone d.{0,2}habitation/;
+var C3D_LIEU_H = 13;              // mètres — le mât, voir _c3dTigePx
+var C3D_LIEUX_ZOOM = 13.6;        // en deçà, les noms encombrent sans servir
+
+var _c3dLieux = [];               // étiquettes posées
+var _c3dToposEcartes = {};        // classe écartée → nombre, pour le diagnostic
+
+/* Les particules restent en minuscules : « le Clos de Manthelon », et non
+   « Le Clos De Manthelon ». */
+var C3D_PARTICULES = /^(de|du|des|d|la|le|les|l|en|sur|sous|les|et|au|aux|a)$/;
+
+/* ⚠️ La BD TOPO renvoie « manthelon », pas « Manthelon ». On remet les
+   capitales — mais SEULEMENT si la graphie n'en porte aucune, pour ne pas
+   abîmer un « Saint-Laurent-des-Bois » que le service aurait déjà bien écrit.
+   C'est la seule transformation appliquée au libellé : le nom affiché reste
+   celui du service, à la casse près. */
+function _c3dCapitales(s){
+  var t = String(s == null ? '' : s).trim();
+  if (!t || /[A-ZÀ-Þ]/.test(t)) return t;
+  return t.replace(/[^\s\-']+/g, function(mot, pos){
+    if (pos > 0 && C3D_PARTICULES.test(_c3dSansAccent(mot))) return mot;
+    return mot.charAt(0).toUpperCase() + mot.slice(1);
+  });
+}
+
+/* Le tri est une fonction PURE : c'est la seule façon de l'éprouver ici, où
+   data.geopf.fr est inaccessible. Elle remplit `_c3dToposEcartes` au passage —
+   ce qui n'est pas affiché doit être comptable. */
+function _c3dTrierToponymes(features){
+  _c3dToposEcartes = {};
+  var gardes = [], hors = 0;
+  (features || []).forEach(function(f){
+    var p = (f && f.properties) || {}, g = f && f.geometry;
+    if (!g || g.type !== 'Point' || !g.coordinates) return;
+    var classe = String(p.classe_de_l_objet || '').trim();
+    if (!C3D_TOPO_CLASSE.test(_c3dSansAccent(classe))){
+      var k = classe || '(classe absente)';
+      _c3dToposEcartes[k] = (_c3dToposEcartes[k] || 0) + 1;
+      return;
+    }
+    if (_c3dContour && !_c3dDansGeom(g.coordinates, _c3dContour)){ hors++; return; }
+    var nom = _c3dCapitales(p.graphie_du_toponyme);
+    if (!nom) return;
+    gardes.push({ nom:nom, pt:g.coordinates, nature:String(p.nature_de_l_objet || '').trim() });
+  });
+  return { gardes:gardes, hors:hors };
+}
+
+function _c3dLieuxIGN(){
+  _c3dToposEcartes = {};
+  return _c3dWfs('BD TOPO toponymie', 'BDTOPO_V3:toponymie', 2000)
+    .then(function(fc){
+      var recus = (fc.features || []).length;
+      var r = _c3dTrierToponymes(fc.features);
+      /* Zéro retenu n'est pas un succès : le motif part au journal, comme
+         partout ailleurs dans cette carte. */
+      _c3dNoter('Lieux-dits de la commune', !!r.gardes.length,
+        r.gardes.length ? (r.hors + ' écartés hors contour')
+                        : 'aucun toponyme habité dans le contour communal',
+        recus, r.gardes.length);
+      return r.gardes;
+    })
+    .catch(function(e){
+      _c3dNoter('Lieux-dits de la commune', false, (e && e.message) || 'raison inconnue');
+      return [];
+    });
 }
 
 /* Contrôle de position : le bourg est à lon ≈ 1,81 / lat ≈ 47,82. Hors de
@@ -1279,7 +1381,7 @@ function _c3dTerrPoserEtiquettes(){
        flottantes de plus ne feraient qu'un doublon à la synthèse vocale. */
     el.setAttribute('aria-hidden', 'true');
     _c3dTerrEtiq.push({
-      el:el, aire:p.aire, moi:moi,
+      el:el, rang:moi ? 1 : 0, poids:p.aire,
       marqueur: new maplibregl.Marker({ element:el }).setLngLat(p.c).addTo(_c3dMap)
     });
   });
@@ -1288,26 +1390,32 @@ function _c3dTerrPoserEtiquettes(){
   _c3dTerrRangerEtiquettes();
 }
 
-/* Anticollision. MapLibre ne décale et ne masque QUE les couches `symbol` : des
-   marqueurs HTML se recouvrent sans rien dire, et sur un territoire large de
-   30 km les vingt-cinq noms se marchent dessus. On garde donc — Mézières
-   d'abord, puis les communes les plus étendues, celles où le nom a le plus de
-   place — celles dont le rectangle n'en touche aucun déjà retenu. Les autres
-   sont masquées : mieux vaut un nom manquant qu'une bouillie de noms.
+function _c3dTerrRangerEtiquettes(){
+  _c3dRangerEtiquettes(_c3dTerrEtiq, _c3dTerrActif);
+}
+
+/* Anticollision, partagée par les noms de communes et ceux des lieux-dits.
+   MapLibre ne décale et ne masque QUE les couches `symbol` : des marqueurs
+   HTML se recouvrent sans rien dire, et sur un territoire large de 30 km les
+   vingt-cinq noms se marchent dessus. On garde donc — par `rang` décroissant
+   (Mézières d'abord), puis par `poids` (les communes les plus étendues, celles
+   où le nom a le plus de place) — ceux dont le rectangle n'en touche aucun
+   déjà retenu. Les autres sont masqués : mieux vaut un nom manquant qu'une
+   bouillie de noms.
 
    Recalculé à `moveend` et non à chaque image : les marqueurs se repositionnent
    seuls, seule leur VISIBILITÉ dépend de la mise en page. Et `visibility`,
    jamais `display` : un élément en `display:none` n'a plus de rectangle à
    mesurer, donc plus rien à départager. */
-function _c3dTerrRangerEtiquettes(){
-  if (!_c3dTerrEtiq.length || !_c3dMap) return;
-  if (!_c3dTerrActif){
-    _c3dTerrEtiq.forEach(function(l){ l.el.style.visibility = 'hidden'; });
+function _c3dRangerEtiquettes(liste, visible){
+  if (!liste || !liste.length || !_c3dMap) return;
+  if (!visible){
+    liste.forEach(function(l){ l.el.style.visibility = 'hidden'; });
     return;
   }
   var vue = _c3dMap.getCanvas().getBoundingClientRect();
-  var ordre = _c3dTerrEtiq.slice().sort(function(a, b){
-    return (b.moi ? 1 : 0) - (a.moi ? 1 : 0) || b.aire - a.aire;
+  var ordre = liste.slice().sort(function(a, b){
+    return (b.rang || 0) - (a.rang || 0) || (b.poids || 0) - (a.poids || 0);
   });
   ordre.forEach(function(l){ l.el.style.visibility = 'visible'; });
   var gardes = [];
@@ -1321,6 +1429,84 @@ function _c3dTerrRangerEtiquettes(){
     });
     if (libre) gardes.push(r); else l.el.style.visibility = 'hidden';
   });
+}
+
+/* ── Le mât des lieux-dits ───────────────────────────────────────
+   Un nom posé au ras du sol, à côté d'une maison de 6 m, semble nommer la
+   maison. Le mât et son trait disent à quel POINT DU SOL le nom appartient.
+
+   ⚠️ Et le risque n'est pas celui qu'on croit : un marqueur HTML vit dans un
+   conteneur AU-DESSUS du canvas WebGL, sans test de profondeur contre les
+   `fill-extrusion`. Un libellé n'est donc JAMAIS masqué par un bâtiment ; ce
+   qui menace, c'est l'inverse — un nom lointain qui flotte par-dessus les
+   maisons du premier plan et paraît les nommer. Pas une donnée fausse : un
+   rattachement faux, ce qu'ADR-0018 refuse tout autant.
+
+   Cette version de MapLibre n'expose pas d'altitude sur un `Marker` : on
+   convertit donc des mètres en pixels à la main.
+     mpp    = 40075016,686 × cos(lat) / (512 × 2^zoom)   — mètres par pixel
+     hauteur = (h / mpp) × sin(pitch)                    — pixels à l'écran
+   `sin` et non `cos` : à pitch nul — vue à la verticale — une hauteur ne se
+   projette pas du tout, et le mât doit disparaître.
+
+   C'est une APPROXIMATION : elle ignore la division perspective, donc un
+   libellé en haut d'écran dérive de quelques pixels par rapport à un volume
+   réel de 13 m. Elle est acceptable parce que ce mât n'est pas une mesure —
+   il ne dit la hauteur de rien, exactement comme les toits en pente de
+   RG-17.15. Il faut le lire ainsi et jamais autrement.
+
+   Le trait et le texte sont dans le MÊME élément, ancré par le bas : ils ne
+   peuvent donc pas se désolidariser, et il n'y a pas d'offset à recalculer —
+   seulement la hauteur du trait. */
+function _c3dTigePx(lat){
+  if (!_c3dMap) return 0;
+  var mpp = 40075016.686 * Math.cos(lat * Math.PI / 180)
+          / (512 * Math.pow(2, _c3dMap.getZoom()));
+  if (!isFinite(mpp) || mpp <= 0) return 0;
+  return Math.max(0, (C3D_LIEU_H / mpp) * Math.sin(_c3dMap.getPitch() * Math.PI / 180));
+}
+
+function _c3dPoserLieux(lieux){
+  if (!_c3dMap || !lieux || !lieux.length || _c3dLieux.length) return;
+  lieux.forEach(function(l){
+    var el = document.createElement('div');
+    el.className = 'c3d-lieu';
+    /* Les lieux-dits ne sont listés nulle part ailleurs en texte — mais la
+       carte est un contenu visuel, et MEL répond à la même question en mots
+       (RG-17.8 bis du parcours). On ne double pas la synthèse vocale de
+       quinze noms flottants sur un `role="application"`. */
+    el.setAttribute('aria-hidden', 'true');
+    var nom = document.createElement('span');
+    nom.className = 'c3d-lieu-nom';
+    nom.textContent = l.nom;
+    var tige = document.createElement('span');
+    tige.className = 'c3d-lieu-tige';
+    el.appendChild(nom);
+    el.appendChild(tige);
+    _c3dLieux.push({
+      el:el, tige:tige, lat:l.pt[1], rang:0, poids:0,
+      marqueur: new maplibregl.Marker({ element:el, anchor:'bottom' })
+                  .setLngLat(l.pt).addTo(_c3dMap)
+    });
+  });
+  /* La hauteur du mât suit le zoom et l'inclinaison, donc à chaque image du
+     geste — c'est une écriture de style, sans lecture de mise en page. Le
+     rangement, lui, mesure des rectangles : il attend la fin du geste. */
+  _c3dMap.on('move', _c3dMajTiges);
+  _c3dMap.on('moveend', _c3dRangerLieux);
+  _c3dMajTiges();
+  _c3dRangerLieux();
+}
+
+function _c3dMajTiges(){
+  _c3dLieux.forEach(function(l){ l.tige.style.height = _c3dTigePx(l.lat).toFixed(1) + 'px'; });
+}
+
+/* Les noms de lieux-dits n'ont pas de sens en vue territoire — à 30 km, ils
+   couvriraient le zonage —, ni de trop loin en vue village. */
+function _c3dRangerLieux(){
+  _c3dRangerEtiquettes(_c3dLieux,
+    !_c3dTerrActif && !!_c3dMap && _c3dMap.getZoom() >= C3D_LIEUX_ZOOM);
 }
 
 /* ⚠️ Déplié, le panneau des 25 communes recouvrait la colonne de boutons.
@@ -1408,9 +1594,11 @@ function _c3dVoirTerritoire(on){
   vis(C3D_COUCHES_VILLAGE, !on);
   vis(C3D_COUCHES_TERR, on);
   /* Les étiquettes sont des éléments HTML, pas une couche : `setLayoutProperty`
-     ne les atteint pas. Sans cette ligne, les noms des 25 communes resteraient
-     affichés par-dessus le village au retour. */
+     ne les atteint pas. Sans ces deux lignes, les noms des 25 communes
+     resteraient affichés par-dessus le village au retour — et les lieux-dits
+     par-dessus le territoire. */
   _c3dTerrRangerEtiquettes();
+  _c3dRangerLieux();
 
   /* ⚠️ Le fond n'est PAS imposé. La v4.72 basculait d'office sur le plan IGN,
      au motif qu'à 30 km la photo aérienne n'est qu'un tapis de parcelles. À
@@ -1550,6 +1738,22 @@ function _c3dOuvrirDiag(){
       .slice(0, 12).forEach(function(k){
         out += '<div class="c3d-row"><span class="c">' + _c3dEsc(k) + '</span>'
             +  '<span class="a dp">' + _c3dInconnus[k] + '</span></div>';
+      });
+    out += '</div>';
+  }
+
+  /* ⚠️ La couche de toponymie ne contient pas que des lieux-dits : croix,
+     ponts, sources. Seule la classe « Zone d'habitation » est affichée, et ce
+     qui est écarté est compté ICI. Si un jour un hameau manque à la carte,
+     c'est dans cette liste qu'on verra sous quelle classe l'IGN l'a rangé —
+     plutôt que de conclure à une panne. */
+  var ecartes = Object.keys(_c3dToposEcartes);
+  if (ecartes.length){
+    out += '<div class="c3d-sec">Toponymes non affichés (hors habitat)</div><div class="c3d-rows">';
+    ecartes.sort(function(a,b){ return _c3dToposEcartes[b] - _c3dToposEcartes[a]; })
+      .slice(0, 12).forEach(function(k){
+        out += '<div class="c3d-row"><span class="c">' + _c3dEsc(k) + '</span>'
+            +  '<span class="a dp">' + _c3dToposEcartes[k] + '</span></div>';
       });
     out += '</div>';
   }
@@ -1778,6 +1982,10 @@ function _c3dCharger(){
           _c3dPoserZones();
           _c3dPoserContour();
           _c3dPoserLegende();
+          /* Les lieux-dits arrivent quand ils arrivent : ils ne retardent ni
+             le bandeau d'état ni l'affichage du bâti. Un échec ici ne casse
+             rien d'autre — il est seulement inscrit au journal. */
+          _c3dLieuxIGN().then(_c3dPoserLieux);
           var btnDiag = document.getElementById('c3d-btn-diag');
           if (btnDiag) btnDiag.hidden = false;
           if (!fc){

@@ -732,6 +732,128 @@ test.describe('Carte 3D', () => {
     expect(restants, 'de retour au village, plus aucun nom de commune').toBe(0);
   });
 
+  /*
+   * ── Les lieux-dits ──────────────────────────────────────────────────────
+   * Jeu d'essai RÉEL, relevé sur `BDTOPO_V3:toponymie` pour l'emprise de la
+   * commune : trois croix, un pont, une source, et les DEUX « manthelon » de
+   * France — le nôtre et celui de l'Eure-et-Loir, à 120 km. C'est ce dernier
+   * qui rend le test intéressant : un nom ne prouve rien, seul le contour
+   * tranche. Exactement ce qu'ADR-0021 avait anticipé pour les communes.
+   */
+  const TOPONYMES = [
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix glaneuse', pt: [1.80179786, 47.82295509] },
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix des morts', pt: [1.80845209, 47.81593453] },
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix de bailly', pt: [1.82122217, 47.79893985] },
+    { classe: 'Construction linéaire',   nature: 'Pont',  nom: 'pont des dames',  pt: [1.79807795, 47.80398847] },
+    { classe: 'Détail hydrographique',   nature: 'Source', nom: 'fosse de lézeau', pt: [1.82607885, 47.8106586] },
+    { classe: "Zone d'habitation", nature: 'Lieu-dit habité', nom: 'manthelon', pt: [1.7930418, 47.82132338] },
+    // Le Manthelon d'Eure-et-Loir : même graphie, même classe, autre commune.
+    { classe: "Zone d'habitation", nature: 'Lieu-dit habité', nom: 'manthelon', pt: [1.0477489, 48.91099394] }
+  ].map((t) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: t.pt },
+    properties: { classe_de_l_objet: t.classe, nature_de_l_objet: t.nature,
+                  graphie_du_toponyme: t.nom, statut_du_toponyme: 'Validé' }
+  }));
+
+  test('lieux-dits : seul l’habitat est étiqueté, et seulement dans la commune', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTrierToponymes === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate((features) => {
+      // Contour approximatif de Mézières : il exclut l'Eure-et-Loir.
+      window._c3dContour = { type: 'Polygon', coordinates: [[
+        [1.762, 47.792], [1.856, 47.792], [1.856, 47.852], [1.762, 47.852], [1.762, 47.792]]] };
+      const res = window._c3dTrierToponymes(features);
+      return { noms: res.gardes.map(g => g.nom), hors: res.hors,
+               ecartes: window._c3dToposEcartes };
+    }, TOPONYMES);
+
+    expect(r.noms, 'un seul Manthelon retenu, et avec sa capitale').toEqual(['Manthelon']);
+    expect(r.hors, 'le Manthelon d’Eure-et-Loir est écarté par le contour').toBe(1);
+    // Ce qui n'est pas affiché doit rester comptable : c'est ce panneau qui
+    // dira, le jour venu, sous quelle classe un hameau manquant a été rangé.
+    expect(r.ecartes['Construction ponctuelle'], 'les trois croix sont comptées').toBe(3);
+    expect(r.ecartes['Construction linéaire']).toBe(1);
+    expect(r.ecartes['Détail hydrographique']).toBe(1);
+  });
+
+  test('lieux-dits : la BD TOPO écrit en minuscules, la carte remet les capitales', async ({ page }) => {
+    /*
+     * ⚠️ Le service renvoie « manthelon », pas « Manthelon ». Mais on ne
+     * retouche JAMAIS une graphie que l'IGN a déjà capitalisée : la seule
+     * transformation admise est de remettre des majuscules là où il n'y en a
+     * aucune. Les particules restent en bas de casse.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dCapitales === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => ['manthelon', 'le bréau', 'clos de manthelon',
+      "l'étang du bois", 'Saint-Laurent-des-Bois', 'la grange'].map(window._c3dCapitales));
+
+    expect(r).toEqual(['Manthelon', 'Le Bréau', 'Clos de Manthelon',
+      "L'Étang du Bois", 'Saint-Laurent-des-Bois', 'La Grange']);
+  });
+
+  test('lieux-dits : le mât mesure des mètres, et disparaît à la verticale', async ({ page }) => {
+    /*
+     * `sin(pitch)` et non `cos` : à pitch nul, vue à la verticale, une hauteur
+     * ne se projette pas — le mât doit valoir zéro. Et il grandit quand on
+     * approche, puisqu'il vaut 13 m réels. C'est ce qui distingue ce trait
+     * d'un décalage écrit en pixels, qui mentirait à tous les zooms sauf un.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      const lire = (zoom, pitch) => {
+        window._c3dMap.jumpTo({ center: [1.808, 47.822], zoom, pitch });
+        return window._c3dTigePx(47.822);
+      };
+      return { plat: lire(17, 0), proche: lire(17.4, 62), loin: lire(15, 62) };
+    });
+
+    expect(r.plat, 'à la verticale, une hauteur ne se projette pas').toBe(0);
+    expect(r.proche, 'de près, le mât dépasse les toits').toBeGreaterThan(25);
+    expect(r.loin, 'de loin il rétrécit, comme le bâti').toBeLessThan(r.proche);
+    expect(r.loin, 'mais il ne disparaît pas').toBeGreaterThan(0);
+  });
+
+  test('lieux-dits : le nom est ancré au sol, et s’efface en vue territoire', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const pose = await page.evaluate(() => {
+      window._c3dMap.jumpTo({ center: [1.808, 47.822], zoom: 17, pitch: 62 });
+      window._c3dPoserLieux([{ nom: 'Manthelon', pt: [1.808, 47.822], nature: 'Lieu-dit habité' }]);
+      const el = document.querySelector('.c3d-lieu');
+      const tige = document.querySelector('.c3d-lieu-tige');
+      return {
+        nom: el.textContent,
+        clic: getComputedStyle(el).pointerEvents,
+        // Le trait doit avoir une hauteur RÉELLE : c'est lui qui rattache le
+        // nom à son point au sol. Zéro, et le nom flotte sans rien dire.
+        tige: parseFloat(getComputedStyle(tige).height),
+        visible: getComputedStyle(el).visibility
+      };
+    });
+
+    expect(pose.nom).toContain('Manthelon');
+    expect(pose.clic, 'un nom ne doit jamais avaler le clic d’un bâtiment').toBe('none');
+    expect(pose.tige, 'le trait doit relier le nom au sol').toBeGreaterThan(10);
+    expect(pose.visible).toBe('visible');
+
+    // En vue territoire, à 30 km, les lieux-dits couvriraient le zonage.
+    await page.evaluate(() => window._c3dVoirTerritoire(true));
+    const apres = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.c3d-lieu')).visibility);
+    expect(apres, 'aucun lieu-dit par-dessus la vue territoire').toBe('hidden');
+  });
+
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
