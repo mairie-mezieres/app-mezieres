@@ -593,6 +593,145 @@ test.describe('Carte 3D', () => {
     expect(dessine.source, 'aucune couche de territoire posée sans données').toBe(false);
   });
 
+  /*
+   * ── Le nom des 25 communes ──────────────────────────────────────────────
+   * Les contours étaient anonymes. Ces quatre tests tiennent les quatre
+   * promesses des étiquettes : le nom vient du service et de nulle part
+   * ailleurs, il est posé dans le plus grand polygone, deux noms ne se
+   * recouvrent jamais, et le nom ne prend ni le clic ni la place du village.
+   *
+   * ⚠️ apicarto est coupé ici : on ne charge donc PAS le territoire, on injecte
+   * ce que le service aurait renvoyé et on appelle la pose directement. C'est
+   * la même stratégie que pour `_c3dApparier`.
+   */
+  async function poserEtiquettes(page, communes) {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+    await page.evaluate((liste) => {
+      window._c3dTerr = liste;
+      window._c3dTerrActif = true;
+      window._c3dTerrPoserEtiquettes();
+    }, communes);
+  }
+
+  // Carré de 0,004° de côté centré sur (lon, lat) — l'ordre des sommets est
+  // celui du Géoportail : anneau extérieur fermé.
+  const carre = (lon, lat, cote = 0.004) => ({
+    type: 'Polygon',
+    coordinates: [[[lon - cote, lat - cote], [lon + cote, lat - cote],
+                   [lon + cote, lat + cote], [lon - cote, lat + cote],
+                   [lon - cote, lat - cote]]]
+  });
+
+  test('territoire : chaque étiquette porte le nom renvoyé par le service', async ({ page }) => {
+    /*
+     * Le pendant visuel de RG-17.20 : ce qui est ÉCRIT sur la carte est ce que
+     * le Géoportail a renvoyé. Une commune sans géométrie n'a pas d'étiquette
+     * — elle est signalée dans le panneau, jamais posée au jugé.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.808, 47.822) },
+      { nom: 'Cléry-Saint-André',  insee: '45098', geom: carre(1.760, 47.822) },
+      { nom: 'Dry',                insee: '45130', geom: carre(1.856, 47.822) },
+      // Non appariée par le Géoportail : aucune géométrie, donc aucun nom posé.
+      { nom: 'Villermain',         insee: '',      geom: null }
+    ]);
+
+    const r = await page.evaluate(() => ({
+      textes: [...document.querySelectorAll('.c3d-lab')].map(e => e.textContent),
+      moi: [...document.querySelectorAll('.c3d-lab-moi')].map(e => e.textContent),
+      // Les noms sont déjà dans le panneau, en texte : la synthèse vocale ne
+      // doit pas les lire deux fois.
+      masques: [...document.querySelectorAll('.c3d-lab')]
+        .every(e => e.getAttribute('aria-hidden') === 'true')
+    }));
+
+    expect(r.textes.sort(), 'un nom par commune réellement renvoyée')
+      .toEqual(['Cléry-Saint-André', 'Dry', 'Mézières-lez-Cléry']);
+    expect(r.textes.includes('Villermain'), 'une commune non placée n’a pas d’étiquette').toBe(false);
+    expect(r.moi, 'Mézières doit se distinguer, comme son contour').toEqual(['Mézières-lez-Cléry']);
+    expect(r.masques, 'les étiquettes doublonnent le panneau : aria-hidden').toBe(true);
+  });
+
+  test('territoire : le nom se pose dans le plus grand polygone', async ({ page }) => {
+    /*
+     * `_c3dCentroide` moyenne les sommets du PREMIER anneau : elle suffit à
+     * dire « cet objet est dans la commune », mais poserait le nom sur un écart
+     * de territoire dès qu'une commune en compte plusieurs. Fonction pure,
+     * donc testable sans réseau.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dCentreEtiquette === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      // Un grand polygone autour de (1.80 ; 47.82), et un minuscule écart à
+      // 0,5° de là. Le nom doit aller sur le grand.
+      const grand = [[1.78, 47.80], [1.82, 47.80], [1.82, 47.84], [1.78, 47.84], [1.78, 47.80]];
+      const ecart = [[2.30, 47.80], [2.301, 47.80], [2.301, 47.801], [2.30, 47.801], [2.30, 47.80]];
+      const p = window._c3dCentreEtiquette({ type: 'MultiPolygon', coordinates: [[ecart], [grand]] });
+      // Contour aplati (aire nulle) : aucun endroit défendable où poser le nom.
+      // On attend `null` — pas un point calculé sur une division par zéro.
+      const plat = window._c3dCentreEtiquette({ type: 'Polygon',
+        coordinates: [[[1.8, 47.8], [1.9, 47.8], [1.85, 47.8], [1.8, 47.8]]] });
+      return { c: p && p.c, aire: p && p.aire, plat: plat };
+    });
+
+    expect(r.c[0], 'le nom doit tomber dans le grand polygone, pas sur l’écart').toBeGreaterThan(1.78);
+    expect(r.c[0]).toBeLessThan(1.82);
+    expect(r.c[1]).toBeGreaterThan(47.80);
+    expect(r.c[1]).toBeLessThan(47.84);
+    expect(r.aire, 'l’aire retenue est celle du plus grand polygone').toBeGreaterThan(0.001);
+    expect(r.plat, 'un contour sans surface ne reçoit pas de nom posé au jugé').toBe(null);
+  });
+
+  test('territoire : deux noms ne se recouvrent jamais, et Mézières l’emporte', async ({ page }) => {
+    /*
+     * ⚠️ MapLibre ne décale et ne masque que les couches `symbol`. Des marqueurs
+     * HTML se superposent sans rien dire — deux noms l'un sur l'autre ne se
+     * lisent ni l'un ni l'autre. Mézières est prioritaire même si sa commune est
+     * la plus PETITE des deux : c'est le point de vue de la carte.
+     *
+     * Leçon des étoiles invisibles (ADR-0015) : on assert le style CALCULÉ.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Grande-Voisine',     insee: '45999', geom: carre(1.8081, 47.8220, 0.02) },
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.8080, 47.8220, 0.001) }
+    ]);
+
+    const vus = await page.evaluate(() =>
+      [...document.querySelectorAll('.c3d-lab')]
+        .filter(e => getComputedStyle(e).visibility === 'visible')
+        .map(e => e.textContent));
+
+    expect(vus, 'un seul des deux noms superposés doit rester lisible').toEqual(['Mézières-lez-Cléry']);
+  });
+
+  test('territoire : le nom ne prend ni le clic ni la place du village', async ({ page }) => {
+    /*
+     * Deux régressions possibles d'un coup :
+     *  • une étiquette qui capte le clic empêcherait de nommer la commune —
+     *    or « toute commune répond au clic » est une règle acquise (RG-17.21) ;
+     *  • les étiquettes sont des éléments HTML, que `setLayoutProperty` n'atteint
+     *    pas : sans traitement explicite, les 25 noms resteraient affichés
+     *    par-dessus le village au retour.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.808, 47.822) }
+    ]);
+
+    const clic = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.c3d-lab')).pointerEvents);
+    expect(clic, 'une étiquette ne doit jamais avaler le clic de la carte').toBe('none');
+
+    await page.evaluate(() => window._c3dVoirTerritoire(false));
+    const restants = await page.evaluate(() =>
+      [...document.querySelectorAll('.c3d-lab')]
+        .filter(e => getComputedStyle(e).visibility === 'visible').length);
+    expect(restants, 'de retour au village, plus aucun nom de commune').toBe(0);
+  });
+
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
