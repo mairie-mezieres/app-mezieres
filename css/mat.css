@@ -1566,6 +1566,18 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .c3d-pin{width:18px;height:18px;border-radius:50%;background:var(--gold);
   border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.35)}
 
+/* Nom d'une commune en vue territoire. Le fond de carte est au choix de
+   l'habitant — photo aérienne OU plan IGN — donc le libellé doit tenir sur les
+   deux (RG-17.25) : pastille sombre translucide et texte blanc gras, jamais du
+   texte nu. `pointer-events:none` est vital, sinon l'étiquette avale le clic
+   qui doit nommer la commune (RG-17.21). */
+.c3d-lab{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;
+  line-height:1.15;color:#fff;white-space:nowrap;pointer-events:none;
+  user-select:none;padding:2px 7px;border-radius:8px;
+  background:rgba(15,32,23,0.62);border:1px solid rgba(255,255,255,0.26);
+  text-shadow:0 1px 3px rgba(0,0,0,0.8)}
+.c3d-lab-moi{color:#ffcf3f;background:rgba(15,32,23,0.86);border-color:#ffcf3f}
+
 .c3d-fiche{position:absolute;z-index:4;left:0;right:0;bottom:0;background:var(--card);
   border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(26,61,43,0.22);
   transform:translateY(102%);transition:transform 0.28s ease;max-height:78%;

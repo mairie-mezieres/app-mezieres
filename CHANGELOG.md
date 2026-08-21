@@ -5,6 +5,34 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.81] — 21 août 2026
+
+### Ajouté
+- **Le nom des 25 communes en vue « Le territoire ».** La vue du PLUi-H-D affichait
+  vingt-cinq contours anonymes : le seul endroit qui les nommait était un panneau dépliant,
+  c'est-à-dire pas là où se pose le regard. Chaque contour porte désormais son nom, posé au
+  centroïde d'aire de son **plus grand** polygone (`_c3dCentreEtiquette`), Mézières en or
+  comme sa limite.
+  - **Des marqueurs HTML, pas une couche `symbol`** : le style de la carte n'a pas d'URL
+    `glyphs`, et sans glyphes un `text-field` ne rend *rien*, sans erreur ni trace. Les
+    vendoriser coûterait quelques centaines de kilo-octets à une page déjà lourde
+    (ADR-0018). Coût assumé, et tenu par trois tests : anticollision écrite à la main,
+    masquage explicite au retour au village (`setLayoutProperty` n'atteint pas un élément
+    HTML), et `pointer-events:none` pour ne pas avaler le clic qui nomme la commune.
+  - **Le nom écrit est celui que le Géoportail a renvoyé**, jamais la liste de la mairie :
+    une commune non appariée reste sans nom sur la carte, et signalée dans le panneau
+    (prolongement de RG-17.20). Un contour sans surface n'en reçoit pas non plus.
+  - Voir **ADR-0026** et **RG-17.29**. L'ADR consigne aussi ce qui n'est pas fait — les
+    lieux-dits du village — et pourquoi : les noms de couches BD TOPO doivent être confirmés
+    depuis une machine connectée, et les « quartiers » ne peuvent venir que de la mairie
+    (l'IRIS de l'INSEE ne descend pas sous 10 000 habitants).
+
+### Supprimé
+- **Un repli inatteignable dans `_c3dCentreEtiquette`.** Le test écrit pour l'exercer a
+  échoué : un anneau d'aire nulle n'est jamais retenu par la boucle qui cherche le plus
+  grand polygone, donc la branche « moyenne des sommets » ne pouvait pas être prise. Le
+  contrat est rendu explicite — pas de surface, pas de nom — plutôt que gardé endormi.
+
 ## [4.80] — 17 août 2026
 
 ### Modifié

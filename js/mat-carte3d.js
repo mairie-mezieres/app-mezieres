@@ -1175,6 +1175,10 @@ function _c3dPoserTerritoire(){
   _c3dMap.addLayer({ id:'terr-moi', type:'line', source:'terr-communes',
     filter:['==', ['get','mat_moi'], 1],
     paint:{ 'line-color':'#ffcf3f', 'line-width':4, 'line-opacity':1 } });
+
+  /* Les noms partent avec les contours : un contour sans nom ne dit rien à qui
+     ne connaît pas la carte du canton par cœur. */
+  _c3dTerrPoserEtiquettes();
 }
 
 /* Le cadrage est DÉDUIT des contours reçus, jamais fixé à un zoom écrit à la
@@ -1199,6 +1203,124 @@ function _c3dCadrerTerritoire(){
   });
   if (!vus) return;
   _c3dMap.fitBounds([[w, s], [e, n]], { padding:34, duration:1400, pitch:0, bearing:0 });
+}
+
+/* ── Le nom des 25 communes, posé sur la carte ───────────────────
+   Les contours étaient anonymes : la vue que porte le maire montrait vingt-cinq
+   polygones sans nom, et le seul endroit qui les nommait était un panneau
+   dépliant. Le nom manquait là où se pose le regard.
+
+   ⚠️ Pourquoi des éléments HTML et non une couche `symbol` : le style de la
+   carte n'a pas d'URL `glyphs` (voir `_c3dCreerCarte`). Sans glyphes, un
+   `text-field` ne rend RIEN — pas d'erreur, pas de console, du vide : la
+   famille de panne d'ADR-0015. Les vendoriser coûterait quelques centaines de
+   kilo-octets à une bibliothèque qui pèse déjà 1 Mo (ADR-0018). Un marqueur
+   HTML ne pèse rien et hérite de la typographie de l'application, donc du
+   plancher de 12 px (ADR-0017) — le `c3d-pin` de « Où suis-je » fait déjà cela.
+
+   ⚠️ Les noms écrits ici sont ceux que le GÉOPORTAIL a renvoyés, retenus par
+   `_c3dApparier` — jamais la liste de la mairie. Une commune non appariée n'a
+   pas d'étiquette : elle est signalée dans le panneau, jamais posée au jugé
+   (RG-17.20). */
+var _c3dTerrEtiq = [];
+
+/* Où poser le nom d'une commune. `_c3dCentroide` ne convient pas ici : elle
+   moyenne les sommets du PREMIER anneau — assez pour dire « cet objet est dans
+   la commune », mais le nom atterrirait sur un écart de territoire dès qu'une
+   commune en compte plusieurs, et serait tiré vers les portions de contour les
+   plus finement découpées. On retient donc le plus GRAND polygone et son
+   centroïde d'aire. L'aire repart avec : elle départage les étiquettes qui se
+   recouvrent. */
+function _c3dCentreEtiquette(geom){
+  var polys = !geom ? []
+            : geom.type === 'Polygon' ? [geom.coordinates]
+            : geom.type === 'MultiPolygon' ? geom.coordinates : [];
+  var meilleur = null, aireMax = 0;
+  polys.forEach(function(anneaux){
+    var a = anneaux && anneaux[0];
+    if (!a || a.length < 3) return;
+    var s = 0;
+    for (var i = 0, j = a.length - 1; i < a.length; j = i++)
+      s += a[j][0] * a[i][1] - a[i][0] * a[j][1];
+    var aire = Math.abs(s) / 2;
+    if (aire > aireMax){ aireMax = aire; meilleur = a; }
+  });
+  /* Aucune surface, donc aucun endroit défendable où poser le nom : on ne pose
+     rien. Un contour aplati ou vide ne peut venir que d'une réponse abîmée, et
+     le nom irait se coller n'importe où sur la carte — exactement ce que la
+     règle « rien au jugé » interdit. Le panneau, lui, continue de lister la
+     commune. Ce `null` n'est pas défensif : un test l'exerce.
+     ⚠️ Le repli « moyenne des sommets » d'une première version était du code
+     MORT : une aire nulle n'est jamais retenue plus haut, donc `som` ne peut
+     pas y valoir zéro. */
+  if (!meilleur) return null;
+
+  var cx = 0, cy = 0, som = 0;
+  for (var i = 0, j = meilleur.length - 1; i < meilleur.length; j = i++){
+    var f = meilleur[j][0] * meilleur[i][1] - meilleur[i][0] * meilleur[j][1];
+    som += f;
+    cx += (meilleur[j][0] + meilleur[i][0]) * f;
+    cy += (meilleur[j][1] + meilleur[i][1]) * f;
+  }
+  return { c:[cx / (3 * som), cy / (3 * som)], aire:aireMax };
+}
+
+function _c3dTerrPoserEtiquettes(){
+  if (!_c3dMap || !_c3dTerr || _c3dTerrEtiq.length) return;
+  _c3dTerr.forEach(function(c){
+    var p = _c3dCentreEtiquette(c.geom);
+    if (!p || !c.nom) return;
+    var moi = c.insee === C3D_INSEE;
+    var el = document.createElement('div');
+    el.className = 'c3d-lab' + (moi ? ' c3d-lab-moi' : '');
+    el.textContent = c.nom;
+    /* Le panneau « Les 25 communes » liste les mêmes noms en texte, avec l'état
+       de chacune : c'est lui, le chemin accessible. Vingt-cinq étiquettes
+       flottantes de plus ne feraient qu'un doublon à la synthèse vocale. */
+    el.setAttribute('aria-hidden', 'true');
+    _c3dTerrEtiq.push({
+      el:el, aire:p.aire, moi:moi,
+      marqueur: new maplibregl.Marker({ element:el }).setLngLat(p.c).addTo(_c3dMap)
+    });
+  });
+  if (!_c3dTerrEtiq.length) return;
+  _c3dMap.on('moveend', _c3dTerrRangerEtiquettes);
+  _c3dTerrRangerEtiquettes();
+}
+
+/* Anticollision. MapLibre ne décale et ne masque QUE les couches `symbol` : des
+   marqueurs HTML se recouvrent sans rien dire, et sur un territoire large de
+   30 km les vingt-cinq noms se marchent dessus. On garde donc — Mézières
+   d'abord, puis les communes les plus étendues, celles où le nom a le plus de
+   place — celles dont le rectangle n'en touche aucun déjà retenu. Les autres
+   sont masquées : mieux vaut un nom manquant qu'une bouillie de noms.
+
+   Recalculé à `moveend` et non à chaque image : les marqueurs se repositionnent
+   seuls, seule leur VISIBILITÉ dépend de la mise en page. Et `visibility`,
+   jamais `display` : un élément en `display:none` n'a plus de rectangle à
+   mesurer, donc plus rien à départager. */
+function _c3dTerrRangerEtiquettes(){
+  if (!_c3dTerrEtiq.length || !_c3dMap) return;
+  if (!_c3dTerrActif){
+    _c3dTerrEtiq.forEach(function(l){ l.el.style.visibility = 'hidden'; });
+    return;
+  }
+  var vue = _c3dMap.getCanvas().getBoundingClientRect();
+  var ordre = _c3dTerrEtiq.slice().sort(function(a, b){
+    return (b.moi ? 1 : 0) - (a.moi ? 1 : 0) || b.aire - a.aire;
+  });
+  ordre.forEach(function(l){ l.el.style.visibility = 'visible'; });
+  var gardes = [];
+  ordre.forEach(function(l){
+    var r = l.el.getBoundingClientRect();
+    var dedans = r.right > vue.left && r.left < vue.right
+              && r.bottom > vue.top && r.top < vue.bottom;
+    var libre = dedans && gardes.every(function(g){
+      return r.right + 5 < g.left || r.left - 5 > g.right
+          || r.bottom + 3 < g.top || r.top - 3 > g.bottom;
+    });
+    if (libre) gardes.push(r); else l.el.style.visibility = 'hidden';
+  });
 }
 
 /* ⚠️ Déplié, le panneau des 25 communes recouvrait la colonne de boutons.
@@ -1285,6 +1407,10 @@ function _c3dVoirTerritoire(on){
   }
   vis(C3D_COUCHES_VILLAGE, !on);
   vis(C3D_COUCHES_TERR, on);
+  /* Les étiquettes sont des éléments HTML, pas une couche : `setLayoutProperty`
+     ne les atteint pas. Sans cette ligne, les noms des 25 communes resteraient
+     affichés par-dessus le village au retour. */
+  _c3dTerrRangerEtiquettes();
 
   /* ⚠️ Le fond n'est PAS imposé. La v4.72 basculait d'office sur le plan IGN,
      au motif qu'à 30 km la photo aérienne n'est qu'un tapis de parcelles. À
