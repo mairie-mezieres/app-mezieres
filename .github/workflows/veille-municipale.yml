@@ -109,20 +109,31 @@ jobs:
           subventions ouvertes, les obligations réglementaires nouvelles et les bonnes
           pratiques RÉELLEMENT APPLICABLES à notre commune — et rien d'autre.
 
-          ⚠️ LIVRABLE OBLIGATOIRE : quoi qu'il arrive (recherches infructueuses, sources
-          inaccessibles, mois calme), tu DOIS créer le fichier `rapport-veille-municipale.html`
-          avant de terminer — au pire en disant explicitement qu'il n'y a rien ce mois-ci.
-          Une exécution qui se termine sans ce fichier est un échec du workflow.
+          ⚠️ DEUX LIVRABLES OBLIGATOIRES : quoi qu'il arrive (recherches infructueuses,
+          sources inaccessibles, mois calme), tu DOIS créer AVANT DE TERMINER
+          — au pire en disant explicitement qu'il n'y a rien ce mois-ci :
+            1. `rapport-veille-municipale.html` — l'email envoyé aux élus (ÉTAPE 5) ;
+            2. `veille/items-municipale.json` — la liste structurée des items retenus,
+               qui alimente la mémoire anti-répétition (ÉTAPE 6). Elle peut être vide
+               (`[]`), mais le fichier doit exister.
+          Une exécution qui se termine sans le rapport est un échec du workflow. Une
+          exécution sans le JSON envoie l'email puis oublie ce qu'elle a envoyé : le
+          mois suivant re-proposera les mêmes items. C'est arrivé dès la première
+          exécution réelle — ne saute pas l'ÉTAPE 6.
 
           ═══════════════════════════════════════════════════════════════════
           ÉTAPE 1 — LIRE AVANT DE CHERCHER (deux fichiers, obligatoire)
           ═══════════════════════════════════════════════════════════════════
 
-          1. `veille/commune.yml` — le profil de la commune. C'est TON FILTRE DE
-             PERTINENCE : population, EPCI, compétences réellement exercées,
-             compétences déléguées à un syndicat ou à la communauté de communes,
-             projets en cours, seuils d'exclusion. Un dispositif qui ne passe pas ce
-             filtre n'entre pas dans le rapport, même s'il est intéressant en soi.
+          1. `veille/commune.yml` — le profil de la commune. Il joue DEUX rôles, et
+             les deux comptent :
+             - **ton plan de recherche** : la liste `competences` énumère ce que la
+               commune exerce réellement. Chacune de ces compétences doit être
+               cherchée, pas seulement les plus évidentes (voir ÉTAPE 3).
+             - **ton filtre de pertinence** : population, EPCI, compétences
+               déléguées à un syndicat ou à la communauté de communes, projets en
+               cours, seuils d'exclusion. Un dispositif qui ne passe pas ce filtre
+               n'entre pas dans le rapport, même s'il est intéressant en soi.
 
           2. `veille/historique-municipale.md` — la MÉMOIRE des éditions précédentes
              (une ligne par item déjà signalé : niveau, titre, URL).
@@ -171,6 +182,39 @@ jobs:
              dispositifs d'aide aux communes rurales.
           5. **Compléments** : Association des Maires du Loiret, AMRF, Banque des
              Territoires, ADEME, Agence de l'eau Loire-Bretagne.
+
+          ⚠️ **BALAYAGE PAR COMPÉTENCE — obligatoire, et pas seulement les sujets
+          les plus visibles.** L'urbanisme, la voirie et les subventions
+          d'investissement remontent d'eux-mêmes ; l'école, le social et les aînés
+          passent à la trappe si on ne les cherche pas explicitement. Consacre au
+          moins une recherche à CHACUNE des compétences listées dans
+          `veille/commune.yml`, en t'aidant de ces angles :
+
+          - **école, périscolaire, cantine** — fonds de soutien et dotations pour le
+            bâti scolaire, restauration scolaire et cantine à tarif social, fournitures
+            et numérique éducatif, obligations de la rentrée, PEDT, taux d'encadrement ;
+          - **action sociale et aînés** — CCAS, plan canicule et registre des personnes
+            vulnérables, lutte contre l'isolement, aide à domicile, conférence des
+            financeurs, France Services, portage de repas ;
+          - **voirie communale et chemins ruraux** — sécurité routière, amendes de
+            police, entretien, mobilités douces, éclairage public ;
+          - **bâtiments communaux et énergie** — rénovation énergétique, décret
+            tertiaire, confort d'été, certificats d'économie d'énergie ;
+          - **cimetière et funéraire** — reprise de concessions, règlement, ossuaire ;
+          - **état civil, élections, listes électorales** — obligations nouvelles et
+            échéances de calendrier ;
+          - **sécurité civile et prévention** — plan communal de sauvegarde, DICRIM,
+            risques naturels, réserve communale ;
+          - **vie associative, fêtes et culture** — soutien aux associations, FDVA,
+            sécurité des manifestations, patrimoine ;
+          - **communication et numérique** — inclusion numérique, accessibilité RGAA
+            des sites publics, cybersécurité des petites communes, données publiques ;
+          - **urbanisme** — dans le cadre du PLUi-H-D porté par la CCTVL.
+
+          Une compétence sans rien de nouveau ce mois-ci est un résultat NORMAL, et
+          même le cas le plus fréquent. Ne remplis jamais une compétence avec un item
+          faible pour « ne pas la laisser vide » — mais garde la trace de ce que tu as
+          balayé : le rapport doit pouvoir le dire (voir ÉTAPE 5, pied de page).
 
           Si une source est inaccessible ou muette, DIS-LE dans le rapport. N'invente
           jamais un dispositif, un montant ou une échéance pour combler un vide.
@@ -251,7 +295,16 @@ jobs:
           5. **📋 Écartés ce mois-ci : n items** — le nombre et deux ou trois motifs
              typiques, en une phrase.
 
-          6. **PIED DE PAGE** discret : la citation d'Aides-territoires avec son lien et
+          6. **🔍 Compétences balayées ce mois-ci** — une ligne discrète, en petits
+             caractères, listant les compétences que tu as effectivement cherchées, et
+             signalant celles qui n'ont rien donné. Exemple de forme : « Balayé :
+             urbanisme, voirie, école et périscolaire, action sociale et aînés,
+             bâtiments et énergie, cimetière, élections, sécurité civile, vie
+             associative, numérique. Sans résultat ce mois-ci : cimetière, élections,
+             vie associative. » C'est ce qui permet à un élu de voir que son domaine
+             a bien été regardé — un silence sans cette ligne se lit comme un oubli.
+
+          7. **PIED DE PAGE** discret : la citation d'Aides-territoires avec son lien et
              la date de consultation (obligation de licence), puis « Veille générée
              automatiquement (GitHub Actions + Claude Code avec recherche web). À
              vérifier sur les fiches sources avant toute démarche. »
@@ -260,25 +313,33 @@ jobs:
           en couleur foncée et soulignée, ouvrant la source d'origine.
 
           ═══════════════════════════════════════════════════════════════════
-          ÉTAPE 6 — METTRE À JOUR LA MÉMOIRE
+          ÉTAPE 6 — ALIMENTER LA MÉMOIRE (second livrable obligatoire)
           ═══════════════════════════════════════════════════════════════════
 
-          Après avoir écrit le rapport, mets à jour `veille/historique-municipale.md` :
-          - Ajoute EN TÊTE des sections datées (juste après le commentaire HTML
-            d'amorce, sans toucher à l'en-tête explicatif du fichier) une section
-            `## ${{ steps.now.outputs.iso }}` listant une ligne par item retenu :
-            `- [action] Titre court — URL` ou `- [surveiller] Titre court — URL`.
-          - Si une section `## ${{ steps.now.outputs.iso }}` existe déjà (tentative
-            précédente du même jour), REMPLACE-la au lieu d'en ajouter une deuxième.
-          - Si rien n'a été retenu : `- (rien de notable)`.
-          - Conserve les sections précédentes mais LIMITE le fichier aux 12 sections
-            les plus récentes — supprime les plus anciennes.
-          - C'est une mémoire compacte, pas un rapport : pas de HTML, pas de commentaire,
-            juste les lignes datées ci-dessus.
+          Tu n'édites PAS `veille/historique-municipale.md` toi-même : un script du
+          workflow l'écrit à partir de la liste structurée que tu produis ici. C'est
+          cette liste qui empêchera le mois prochain de te re-proposer les mêmes
+          dispositifs — sans elle, la veille se répète.
 
-          N'utilise Write que pour ces DEUX fichiers (`rapport-veille-municipale.html` et
-          `veille/historique-municipale.md`). Ne modifie aucun autre fichier du dépôt, ne
-          crée aucune issue, ne fais aucun commit : le workflow s'en charge après l'envoi.
+          Écris `veille/items-municipale.json` : un tableau JSON VALIDE, et rien
+          d'autre dans le fichier (pas de commentaire, pas de texte autour, pas de
+          balise Markdown de code). Un élément par item que tu as RETENU dans le
+          rapport — les deux niveaux, pas seulement les actions requises :
+
+            [{"niveau": "action" | "surveiller",
+              "titre": "titre court, celui du rapport",
+              "url": "https://…"}]
+
+          - `url` doit être l'adresse réelle de la source, en http(s) : c'est la clé
+            du dédoublonnage du mois suivant. Un item sans URL valide est ignoré.
+          - Un tableau vide (`[]`) est la bonne réponse pour un mois sans rien à
+            retenir. N'invente pas d'item pour ne pas le laisser vide.
+          - Les items ÉCARTÉS n'y figurent pas : la mémoire ne retient que ce qui a
+            été signalé aux élus.
+
+          N'utilise Write que pour ces DEUX fichiers (`rapport-veille-municipale.html`
+          et `veille/items-municipale.json`). Ne modifie aucun autre fichier du dépôt,
+          ne crée aucune issue, ne fais aucun commit : le workflow s'en charge.
           PROMPT_TXT
           echo 'MUNICIPALE_PROMPT_EOF'
           } >> "$GITHUB_ENV"
@@ -335,6 +396,7 @@ jobs:
           path: |
             ${{ runner.temp }}/claude-execution-output.json
             ${{ runner.temp }}/claude-execution-output-tentative1.json
+            veille/items-municipale.json
           if-no-files-found: ignore
           retention-days: 30
 
@@ -346,6 +408,19 @@ jobs:
             exit 1
           fi
 
+      # La mémoire est écrite par du CODE, pas par la discipline de l'agent
+      # (ADR-0026). L'exécution du 19 août 2026 s'est terminée « avec succès »,
+      # email parti, et l'étape de commit a répondu « Historique inchangé » :
+      # l'agent avait sauté la dernière consigne d'un prompt de 180 lignes, et
+      # la veille suivante aurait re-proposé les mêmes items. Le script écrit
+      # toujours une section datée — avec les items du JSON, ou avec la mention
+      # de l'anomalie et un ::warning si le JSON manque.
+      - name: Écrire la mémoire de veille
+        if: steps.gate.outputs.run == 'true'
+        env:
+          VEILLE_DATE: ${{ steps.now.outputs.iso }}
+        run: node scripts/update-veille-memoire.js
+
       # ⚠️ Tant que le domaine mezieres-lez-clery.fr n'est pas vérifié sur Resend,
       # l'expéditeur reste le sender de test (onboarding@resend.dev), qui n'autorise
       # l'envoi QUE vers l'adresse du compte Resend. Écrire à tout le conseil suppose
@@ -356,6 +431,10 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # Sans cette ligne, le secret peut exister sans rien changer : le script
+          # retombe sur son défaut (onboarding@resend.dev) et l'envoi au conseil
+          # échoue en 403 sans que le message dise pourquoi.
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
           EMAIL_TEST: ${{ secrets.VEILLE_EMAIL_TO }}
           EMAIL_CONSEIL: ${{ secrets.VEILLE_MUNICIPALE_EMAIL_TO }}
           CIBLE: ${{ steps.cible.outputs.mode }}
@@ -365,6 +444,12 @@ jobs:
             (période du ${{ steps.now.outputs.debut_fr }} au ${{ steps.now.outputs.jour_fr }})
         run: |
           if [ "$CIBLE" = "conseil" ] && [ -n "$EMAIL_CONSEIL" ]; then
+            # Contrôle avant vol : avec l'expéditeur de test, Resend refusera en
+            # 403 avec un message obscur. Autant le dire ici, en clair.
+            if [ -z "$RESEND_FROM" ]; then
+              echo "::error title=Veille municipale::Envoi au conseil demandé, mais le secret RESEND_FROM est vide. L'expéditeur serait onboarding@resend.dev, qui n'autorise l'envoi QU'À l'adresse du compte Resend : Resend rejetterait l'envoi (403). Vérifier d'abord le domaine chez Resend (un sous-domaine d'envoi, ex. send.mezieres-lez-clery.fr, pour ne pas toucher aux enregistrements qui servent la PWA ni au courrier de la mairie), puis renseigner RESEND_FROM — ex. « MAT Veille <veille@send.mezieres-lez-clery.fr> »."
+              exit 1
+            fi
             echo "Envoi au conseil municipal (VEILLE_MUNICIPALE_EMAIL_TO)."
             export EMAIL_TO="$EMAIL_CONSEIL"
           else
