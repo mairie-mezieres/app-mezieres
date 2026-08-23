@@ -1090,10 +1090,19 @@ surveiller », les écartés réduits à un nombre et à leurs motifs.
 | manuelle, entrée `destinataire: conseil` | `VEILLE_MUNICIPALE_EMAIL_TO` |
 
 Tant que `VEILLE_MUNICIPALE_EMAIL_TO` n'est pas créé, tout part à l'adresse de test.
-⚠️ **Écrire à tout le conseil suppose d'abord un domaine vérifié chez Resend** :
-l'expéditeur est le sender de test `onboarding@resend.dev`, qui n'autorise l'envoi
-que vers l'adresse du compte Resend. Renseigner quinze adresses sans avoir vérifié
-`mezieres-lez-clery.fr` et renseigné `RESEND_FROM` produit un 403, pas un envoi.
+
+⚠️ **Écrire à tout le conseil suppose d'abord un domaine vérifié chez Resend.**
+L'expéditeur par défaut est le sender de test `onboarding@resend.dev`, qui n'autorise
+l'envoi **que vers l'adresse du compte Resend**. L'ordre est donc : vérifier un
+**sous-domaine d'envoi** chez Resend (`send.mezieres-lez-clery.fr` — surtout pas le
+domaine racine, qui sert la PWA via GitHub Pages et porte le courrier de la mairie),
+renseigner le secret `RESEND_FROM`, **puis** `VEILLE_MUNICIPALE_EMAIL_TO`.
+
+Le workflow refuse d'envoyer au conseil si `RESEND_FROM` est vide, avec un `::error`
+explicite : Resend répondrait 403 avec un message obscur, et l'échec serait attribué
+au mauvais endroit. Le secret doit être **passé dans l'`env` de l'étape d'envoi** —
+sans cette ligne il peut exister sans rien changer, le script retombant sur son
+défaut.
 
 ### Robustesse des veilles IA (retry + diagnostic)
 

@@ -431,6 +431,10 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # Sans cette ligne, le secret peut exister sans rien changer : le script
+          # retombe sur son défaut (onboarding@resend.dev) et l'envoi au conseil
+          # échoue en 403 sans que le message dise pourquoi.
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
           EMAIL_TEST: ${{ secrets.VEILLE_EMAIL_TO }}
           EMAIL_CONSEIL: ${{ secrets.VEILLE_MUNICIPALE_EMAIL_TO }}
           CIBLE: ${{ steps.cible.outputs.mode }}
@@ -440,6 +444,12 @@ jobs:
             (période du ${{ steps.now.outputs.debut_fr }} au ${{ steps.now.outputs.jour_fr }})
         run: |
           if [ "$CIBLE" = "conseil" ] && [ -n "$EMAIL_CONSEIL" ]; then
+            # Contrôle avant vol : avec l'expéditeur de test, Resend refusera en
+            # 403 avec un message obscur. Autant le dire ici, en clair.
+            if [ -z "$RESEND_FROM" ]; then
+              echo "::error title=Veille municipale::Envoi au conseil demandé, mais le secret RESEND_FROM est vide. L'expéditeur serait onboarding@resend.dev, qui n'autorise l'envoi QU'À l'adresse du compte Resend : Resend rejetterait l'envoi (403). Vérifier d'abord le domaine chez Resend (un sous-domaine d'envoi, ex. send.mezieres-lez-clery.fr, pour ne pas toucher aux enregistrements qui servent la PWA ni au courrier de la mairie), puis renseigner RESEND_FROM — ex. « MAT Veille <veille@send.mezieres-lez-clery.fr> »."
+              exit 1
+            fi
             echo "Envoi au conseil municipal (VEILLE_MUNICIPALE_EMAIL_TO)."
             export EMAIL_TO="$EMAIL_CONSEIL"
           else
