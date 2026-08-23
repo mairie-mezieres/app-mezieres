@@ -219,6 +219,20 @@ En dehors de ces plages, ils sont interdits. Ces horaires ne valent que pour ces
 la règle générale, elle, s'applique de jour comme de nuit — aucun bruit ne doit, par sa
 durée, sa répétition ou son intensité, porter atteinte à la tranquillité du voisinage.
 
+#### Salle communale et location de matériel
+
+La **salle communale** (ou salle des fêtes) **n'est plus proposée à la location** : ni
+pour une fête de famille, ni pour un événement privé. Il n'existe donc ni grille tarifaire
+ni calendrier de réservation, à aucune date. MEL le dit désormais explicitement, au lieu
+d'improviser.
+
+La commune met en revanche du matériel à disposition des Macériens pour leurs
+manifestations : **tables, chaises et barnums** (deux tailles), avec un chèque de caution
+restitué en fin de location si aucune dégradation n'est constatée. Les tarifs et les
+modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la rubrique
+« Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
+recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
+
 ### Ce que MEL ne sait pas faire
 
 - MEL ne peut pas accéder à votre dossier personnel ni effectuer de démarches à votre place.

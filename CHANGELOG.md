@@ -26,6 +26,24 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   - `chatbot-mairie-mezieres/test/bruit.test.js` verrouille les deux faces : les plages
     exactes sont présentes, **et** les plages hallucinées sont absentes.
   - Voir **ADR-0013 du backend** (« Une règle absente ne se tait pas, elle hallucine »).
+- **MEL improvisait sur la location de la salle communale.** « Je souhaite louer la salle
+  des fêtes, quel est le tarif pour le 1er week-end d'octobre 2026 ? » partait dans la
+  catégorie « autre ». Or **la salle n'est plus proposée à la location**. Le fait existait
+  pourtant dans le dépôt — mais enterré en 9ᵉ ligne d'un paragraphe de 200 mots de la
+  rubrique « Location de matériel » (`data/mel-tree.json`), **absent** de l'autre copie de
+  l'arbre (`js/mat-mel.js`), et inconnu du backend.
+  - Nouvelle `DIRECT_RULE` `location_salle_materiel` + bloc `SALLE COMMUNALE ET LOCATION
+    DE MATÉRIEL` dans le `SYSTEM_PROMPT`, côté backend.
+  - `js/mat-mel.js` et `data/mel-tree.json` : la rubrique « Location de matériel communal »
+    l'annonce désormais **en première phrase**, dans les deux copies de l'arbre.
+  - **Aucun tarif n'est recopié dans le code** : les prix vivent dans l'arbre de décision,
+    que la mairie édite depuis l'admin. Les dupliquer créerait une double source vouée à
+    diverger — un test le vérifie (`test/location-salle.test.js`).
+
+### Supprimé
+- Lien mort **« 🌐 Page location matériel »** (`mezieres-lez-clery.fr/2018/10/24/…`) dans
+  `data/mel-tree.json` : l'ancien site WordPress n'existe plus, le domaine sert
+  l'application. Dernière URL de ce type dans `data/` et `js/`.
 
 ---
 
