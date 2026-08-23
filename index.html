@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.82 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.83 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.82</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.83</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 23 ao&ucirc;t 2026 — v4.83</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>MEL conna&icirc;t enfin les horaires de bruit.</strong> &laquo;&nbsp;&Agrave; quelle heure ai-je le droit de tondre&nbsp;?&nbsp;&raquo; re&ccedil;oit d&eacute;sormais une r&eacute;ponse imm&eacute;diate&nbsp;: outils bruyants autoris&eacute;s du <strong>lundi au vendredi 8h30-12h et 14h30-19h30</strong>, le <strong>samedi 9h-12h et 15h-19h</strong>, le <strong>dimanche et les jours f&eacute;ri&eacute;s 10h-12h</strong>. Ce sont les horaires de l&rsquo;arr&ecirc;t&eacute; pr&eacute;fectoral du Loiret du 1er mars 1999&nbsp;&mdash; la commune n&rsquo;a pas d&rsquo;arr&ecirc;t&eacute; propre sur le bruit</li>
+<li>Ces horaires ne valent que pour les outils bruyants. Le reste du temps, la r&egrave;gle g&eacute;n&eacute;rale s&rsquo;applique de jour comme de nuit&nbsp;: aucun bruit ne doit, par sa dur&eacute;e, sa r&eacute;p&eacute;tition ou son intensit&eacute;, troubler la tranquillit&eacute; du voisinage</li>
+<li>Correction&nbsp;: MEL r&eacute;pondait jusqu&rsquo;ici soit qu&rsquo;elle ne savait pas, soit &mdash; selon la formulation &mdash; en <strong>inventant</strong> des horaires (&laquo;&nbsp;22h-7h&nbsp;&raquo;, &laquo;&nbsp;interdit tout le dimanche&nbsp;&raquo;) attribu&eacute;s &agrave; un arr&ecirc;t&eacute; municipal inexistant</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 21 ao&ucirc;t 2026 — v4.82</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les hameaux et lieux-dits sont nomm&eacute;s sur la carte 3D.</strong> Manthelon, Rolland, le Br&eacute;au, le Buisson, la Grange&hellip; chaque nom est port&eacute; par un petit m&acirc;t termin&eacute; par un point&nbsp;: le point marque l&rsquo;endroit exact, pour qu&rsquo;un nom ne semble jamais d&eacute;signer la maison qui se trouve devant</li>

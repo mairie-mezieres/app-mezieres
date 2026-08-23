@@ -201,6 +201,24 @@ L'**Agenda** liste les événements à venir dans la commune et ses alentours pr
 - Orienter vers les bons interlocuteurs.
 - Donner des informations pratiques disponibles en ligne.
 
+#### Horaires de bruit — ce que MEL répond
+
+Depuis la v4.83, la question « à quelle heure ai-je le droit de tondre / bricoler ? »
+reçoit une réponse immédiate, tirée de l'**arrêté préfectoral du Loiret du 1er mars 1999**
+relatif à la lutte contre les bruits de voisinage (la commune n'a pas d'arrêté propre sur
+le bruit). Les outils bruyants — tondeuse, taille-haie, tronçonneuse, perceuse, nettoyeur
+haute pression… — sont autorisés :
+
+| Jour | Plages autorisées |
+|---|---|
+| Lundi au vendredi | 8h30 – 12h et 14h30 – 19h30 |
+| Samedi | 9h – 12h et 15h – 19h |
+| Dimanche et jours fériés | 10h – 12h |
+
+En dehors de ces plages, ils sont interdits. Ces horaires ne valent que pour ces outils :
+la règle générale, elle, s'applique de jour comme de nuit — aucun bruit ne doit, par sa
+durée, sa répétition ou son intensité, porter atteinte à la tranquillité du voisinage.
+
 ### Ce que MEL ne sait pas faire
 
 - MEL ne peut pas accéder à votre dossier personnel ni effectuer de démarches à votre place.

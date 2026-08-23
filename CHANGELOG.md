@@ -5,6 +5,30 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.83] — 23 août 2026
+
+### Ajouté
+- **MEL connaît les horaires de bruit.** Nouvelle `DIRECT_RULE` `bruit_travaux_horaires`
+  (backend `lib/mel.js`) : réponse instantanée, sans appel IA, tirée de l'**arrêté
+  préfectoral du Loiret du 1er mars 1999**. Outils bruyants autorisés du lundi au vendredi
+  8h30-12h et 14h30-19h30, le samedi 9h-12h et 15h-19h, le dimanche et les jours fériés
+  10h-12h. Un bloc **BRUITS DE VOISINAGE** est ajouté au `SYSTEM_PROMPT` pour les
+  formulations qui passeraient à travers la regex.
+
+### Corrigé
+- **MEL inventait les horaires de bruit.** Le changelog de la **v4.15** annonçait déjà une
+  « règle MEL directe pour les horaires de bruit et de bricolage » — elle **n'a jamais
+  existé dans le code**. Conséquence en production : « quelles sont les horaires de bruit »
+  → « je n'ai pas cette information », et la même question reformulée → des horaires
+  **inventés** (« interdit de 22h à 7h », « dimanche toute la journée ») attribués à un
+  **arrêté municipal inexistant**. Une règle absente ne se manifeste pas par un silence,
+  mais par une hallucination plausible.
+  - `chatbot-mairie-mezieres/test/bruit.test.js` verrouille les deux faces : les plages
+    exactes sont présentes, **et** les plages hallucinées sont absentes.
+  - Voir **ADR-0013 du backend** (« Une règle absente ne se tait pas, elle hallucine »).
+
+---
+
 ## [4.82] — 21 août 2026
 
 ### Ajouté
