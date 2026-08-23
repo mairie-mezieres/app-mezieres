@@ -559,7 +559,7 @@ const _MEL_TREE_FALLBACK = {
           links:[{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"},{label:"✉️ assainissement@ccterresduvaldeloire.fr",url:"mailto:assainissement@ccterresduvaldeloire.fr"},{label:"🌐 Portail usagers CCTVL",url:"https://portail-usagers.ccterresduvaldeloire.fr"}]}
       },
       {id:"location",ico:"🪑",label:"Location de matériel communal",
-        directAnswer:{text:"La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+        directAnswer:{text:"⚠️ La salle communale (salle des fêtes) n'est plus proposée à la location : ni pour une fête de famille, ni pour un événement privé. En revanche, la commune met du matériel à disposition des Macériens (tables, chaises, barnums…), avec un chèque de caution restitué en fin de location si aucune dégradation n'est constatée. Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
           links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
       },
     ]
@@ -631,7 +631,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.4';
+  const V = '3.7.5';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,

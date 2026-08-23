@@ -201,6 +201,38 @@ L'**Agenda** liste les événements à venir dans la commune et ses alentours pr
 - Orienter vers les bons interlocuteurs.
 - Donner des informations pratiques disponibles en ligne.
 
+#### Horaires de bruit — ce que MEL répond
+
+Depuis la v4.83, la question « à quelle heure ai-je le droit de tondre / bricoler ? »
+reçoit une réponse immédiate, tirée de l'**arrêté préfectoral du Loiret du 1er mars 1999**
+relatif à la lutte contre les bruits de voisinage (la commune n'a pas d'arrêté propre sur
+le bruit). Les outils bruyants — tondeuse, taille-haie, tronçonneuse, perceuse, nettoyeur
+haute pression… — sont autorisés :
+
+| Jour | Plages autorisées |
+|---|---|
+| Lundi au vendredi | 8h30 – 12h et 14h30 – 19h30 |
+| Samedi | 9h – 12h et 15h – 19h |
+| Dimanche et jours fériés | 10h – 12h |
+
+En dehors de ces plages, ils sont interdits. Ces horaires ne valent que pour ces outils :
+la règle générale, elle, s'applique de jour comme de nuit — aucun bruit ne doit, par sa
+durée, sa répétition ou son intensité, porter atteinte à la tranquillité du voisinage.
+
+#### Salle communale et location de matériel
+
+La **salle communale** (ou salle des fêtes) **n'est plus proposée à la location** : ni
+pour une fête de famille, ni pour un événement privé. Il n'existe donc ni grille tarifaire
+ni calendrier de réservation, à aucune date. MEL le dit désormais explicitement, au lieu
+d'improviser.
+
+La commune met en revanche du matériel à disposition des Macériens pour leurs
+manifestations : **tables, chaises et barnums** (deux tailles), avec un chèque de caution
+restitué en fin de location si aucune dégradation n'est constatée. Les tarifs et les
+modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la rubrique
+« Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
+recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
+
 ### Ce que MEL ne sait pas faire
 
 - MEL ne peut pas accéder à votre dossier personnel ni effectuer de démarches à votre place.
