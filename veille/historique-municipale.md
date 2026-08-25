@@ -17,6 +17,11 @@ une ligne que l'on souhaite voir re-signaler le mois suivant.
 
 <!-- Les sections datées sont ajoutées ci-dessous, la plus récente en tête. -->
 
+## 2026-08-25
+
+- [surveiller] Décret n° 2026-687 du 28 juillet 2026 — protection de la communauté éducative — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054541484
+- [surveiller] Décret n° 2026-770 du 13 août 2026 — information des consommateurs sur les prestations funéraires — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054678115
+
 ## 2026-08-19
 
 - [action] Décret n° 2026-674 du 27 juillet 2026, simplification de l'action publique locale (urbanisme, CGCT) — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054499268
