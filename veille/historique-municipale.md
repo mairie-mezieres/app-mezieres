@@ -16,3 +16,7 @@ Limité aux **12 dernières éditions**. Ne pas éditer à la main, sauf pour re
 une ligne que l'on souhaite voir re-signaler le mois suivant.
 
 <!-- Les sections datées sont ajoutées ci-dessous, la plus récente en tête. -->
+
+## 2026-08-25
+
+- (rien de notable)
