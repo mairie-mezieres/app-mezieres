@@ -266,6 +266,18 @@ jobs:
 
           Structure imposée :
 
+          0. **PRÉEN-TÊTE MASQUÉ** — le tout premier élément de `<body>`, avant l'en-tête.
+             C'est le texte que Gmail affiche en aperçu dans la liste des messages, sous
+             l'objet. Sans lui, cet aperçu recopie le titre et ne dit rien de plus ; il
+             doit donc porter le RÉSUMÉ CHIFFRÉ de l'édition, par exemple :
+             « 2 actions requises · 1 à surveiller · période du 15/07 au 19/08 ».
+             Adapte les nombres à ton tri réel ; s'il n'y a aucune action requise,
+             dis-le (« Aucune action requise · 3 à surveiller · … »).
+             Forme exacte — un `<div>` invisible à l'ouverture du message :
+             `<div style="display:none;font-size:1px;color:#f4f1ea;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">TON RÉSUMÉ ICI&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;</div>`
+             Garde la suite de `&#8199;&#65279;` : elle empêche le client d'aller
+             compléter l'aperçu avec les premiers mots du corps.
+
           1. **TITRE HORODATÉ EXPLICITE** en `<h1>` :
              « Veille municipale — Mézières-lez-Cléry — édition du ${{ steps.now.outputs.jour_fr }} »
              suivi, en plus petit juste dessous, de :
@@ -409,7 +421,7 @@ jobs:
           fi
 
       # La mémoire est écrite par du CODE, pas par la discipline de l'agent
-      # (ADR-0026). L'exécution du 19 août 2026 s'est terminée « avec succès »,
+      # (ADR-0027). L'exécution du 19 août 2026 s'est terminée « avec succès »,
       # email parti, et l'étape de commit a répondu « Historique inchangé » :
       # l'agent avait sauté la dernière consigne d'un prompt de 180 lignes, et
       # la veille suivante aurait re-proposé les mêmes items. Le script écrit

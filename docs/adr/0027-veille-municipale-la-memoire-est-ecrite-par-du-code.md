@@ -1,7 +1,11 @@
-# ADR-0026 — La mémoire de la veille municipale est écrite par du code, pas par l'agent
+# ADR-0027 — La mémoire de la veille municipale est écrite par du code, pas par l'agent
 
 - **Date** : 19 août 2026
 - **Statut** : Accepté
+- **Note de numérotation** : publié d'abord sous le numéro 0026, renuméroté en 0027
+  le 25 août 2026 — l'ADR « noms de lieux » avait pris le même numéro en parallèle.
+  C'est celui-ci qui bouge : l'autre est cité dans `CHANGELOG.md`, et on ne réécrit
+  pas un historique publié.
 - **Complète** : ADR-0025 (veille municipale — mémoire et fenêtre de publication)
 - **Même leçon que** : ADR-0004 (un livrable confié à un agent doit être vérifiable)
 

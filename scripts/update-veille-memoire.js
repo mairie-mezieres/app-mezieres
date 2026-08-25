@@ -3,7 +3,7 @@
  * (`veille/historique-municipale.md`) à partir du fichier structuré
  * `veille/items-municipale.json` produit par l'agent.
  *
- * POURQUOI CE SCRIPT EXISTE (ADR-0026) : la première exécution réelle du
+ * POURQUOI CE SCRIPT EXISTE (ADR-0027) : la première exécution réelle du
  * 19 août 2026 s'est terminée « avec succès », email envoyé — et l'étape de
  * commit a répondu « Historique inchangé — rien à committer ». L'agent avait
  * écrit son rapport puis n'avait pas touché la mémoire, dernière consigne d'un

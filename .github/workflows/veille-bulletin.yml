@@ -207,11 +207,14 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          # Expéditeur volontairement figé sur le sender de test Resend
-          # (onboarding@resend.dev, défaut du script). Tant que le domaine
-          # mezieres-lez-clery.fr n'est pas vérifié sur Resend, c'est le seul
-          # « from » utilisable ; il n'autorise l'envoi que vers l'adresse du
-          # compte Resend (cf. secret VEILLE_EMAIL_TO).
+          # Le domaine mezieres-lez-clery.fr est vérifié chez Resend depuis le
+          # 25 août 2026 : l'expéditeur est donc une vraie adresse de la mairie,
+          # via le secret RESEND_FROM. Sans cette ligne le secret peut exister
+          # sans rien changer — le script retombe sur son défaut
+          # (onboarding@resend.dev), qui n'autorise l'envoi que vers l'adresse
+          # du compte Resend. ⚠️ Ne jamais mettre une adresse Gmail dans
+          # RESEND_FROM : domaine non vérifiable, Resend rejette en 403.
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
           EMAIL_TO: ${{ secrets.VEILLE_EMAIL_TO }}
           REPORT_PATH: rapport-bulletin.html
           EMAIL_SUBJECT: Veille bulletin municipal MAT - ${{ steps.now.outputs.iso }}
