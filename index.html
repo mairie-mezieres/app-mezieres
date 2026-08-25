@@ -57,9 +57,9 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.4.1"></script>
+<script defer src="js/mat-mel.js?v=4.5.0"></script>
 <script defer src="js/mat-perf.js?v=1.0.8"></script>
-<script defer src="js/mat-boot.js?v=4.12.0"></script>
+<script defer src="js/mat-boot.js?v=4.12.1"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.83 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.84 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.83</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.84</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 25 ao&ucirc;t 2026 — v4.84</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Un nouveau service pour les tout-petits&nbsp;: le LAEP.</strong> La Communaut&eacute; de Communes ouvre le <strong>7&nbsp;septembre 2026</strong> un Lieu d&rsquo;Accueil Enfants-Parents itin&eacute;rant&nbsp;: <strong>gratuit, confidentiel et sans inscription</strong>, pour les enfants de <strong>moins de 6&nbsp;ans</strong> accompagn&eacute;s d&rsquo;un parent, d&rsquo;un grand-parent ou d&rsquo;un adulte r&eacute;f&eacute;rent&nbsp;&mdash; et pour les futurs parents. Un lieu d&rsquo;&eacute;coute, d&rsquo;&eacute;changes, de jeux et de rencontres</li>
+<li>Ce n&rsquo;est <strong>pas un mode de garde</strong>&nbsp;: l&rsquo;adulte qui accompagne l&rsquo;enfant reste avec lui pendant toute la dur&eacute;e de l&rsquo;accueil. Au moins deux professionnels, les &laquo;&nbsp;accueillants&nbsp;&raquo;, sont pr&eacute;sents et tenus au secret professionnel</li>
+<li>Le LAEP est <strong>itin&eacute;rant</strong> et ne passe pas par M&eacute;zi&egrave;res&nbsp;: il se d&eacute;place sur Beauce la Romaine, Beaugency, <strong>Cl&eacute;ry-Saint-Andr&eacute;</strong> et Meung-sur-Loire. Le <strong>planning des cr&eacute;neaux n&rsquo;est pas encore publi&eacute;</strong>&nbsp;: renseignements au <strong>06&nbsp;62&nbsp;65&nbsp;59&nbsp;04</strong> ou &agrave; laep@ccterresduvaldeloire.fr. MEL sait r&eacute;pondre &agrave; la question, et sa rubrique Enfance y renvoie</li>
+<li><strong>Correction&nbsp;: la cr&egrave;che Les Marmousets n&rsquo;est pas &agrave; M&eacute;zi&egrave;res.</strong> La fiche &laquo;&nbsp;Je viens d&rsquo;emm&eacute;nager&nbsp;&raquo; laissait entendre que la commune en disposait. Elle est &agrave; Cl&eacute;ry-Saint-Andr&eacute;&nbsp;: M&eacute;zi&egrave;res en &eacute;tant commune partenaire, les familles mac&eacute;riennes peuvent y pr&eacute;tendre &agrave; ce titre</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 23 ao&ucirc;t 2026 — v4.83</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>MEL conna&icirc;t enfin les horaires de bruit.</strong> &laquo;&nbsp;&Agrave; quelle heure ai-je le droit de tondre&nbsp;?&nbsp;&raquo; re&ccedil;oit d&eacute;sormais une r&eacute;ponse imm&eacute;diate&nbsp;: outils bruyants autoris&eacute;s du <strong>lundi au vendredi 8h30-12h et 14h30-19h30</strong>, le <strong>samedi 9h-12h et 15h-19h</strong>, le <strong>dimanche et les jours f&eacute;ri&eacute;s 10h-12h</strong>. Ce sont les horaires de l&rsquo;arr&ecirc;t&eacute; pr&eacute;fectoral du Loiret du 1er mars 1999&nbsp;&mdash; la commune n&rsquo;a pas d&rsquo;arr&ecirc;t&eacute; propre sur le bruit</li>
