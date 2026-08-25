@@ -1087,6 +1087,31 @@ période du … ». C'est la ligne d'aperçu affichée par Gmail sous l'objet, l
 sur mobile : sans elle, l'aperçu ne fait que recopier le titre du rapport, ce qui
 donne l'illusion d'un doublon dans la liste des messages.
 
+⚠️ **Les plafonds vont avec un plancher** (calibrage du 25 août 2026, voir le retour
+d'expérience en fin d'ADR-0025). Trois exécutions le même jour ont produit 2, 0 puis
+1 items sur la même fenêtre, en manquant les deux dispositifs les plus utiles de la
+période. Le prompt n'avait que des consignes poussant à écarter. Trois règles ont été
+posées, à ne pas défaire :
+
+- **la fenêtre de publication n'est pas l'anti-répétition** — c'est la mémoire qui
+  joue ce rôle. Un dispositif permanent absent de l'historique n'a jamais été signalé
+  aux élus, donc il est neuf pour eux. Une **échéance à venir dans les 3 mois** suffit
+  à inclure un item, même ouvert avant la période (c'est ce qui récupère la DETR et le
+  Fonds vert, mécaniquement écartés jusque-là) ;
+- **une liste de vérification de quatre sources** — Aides-territoires, JORF de la
+  période, Fonds vert, préfecture du Loiret — doit être cochée avant de pouvoir
+  conclure. Le balayage par compétence lui est subordonné : s'il faut écourter, c'est
+  lui qu'on écourte ;
+- **la sévérité porte sur le tri, pas sur la recherche.** Un rapport vide n'est pas le
+  résultat prudent par défaut : annoncer « rien ce mois-ci » alors qu'une aide était
+  ouverte fait manquer l'échéance, soit l'exact contraire de la raison d'être de
+  l'outil.
+
+Le rapport se termine donc par un encadré **« 🔍 Ce qui a été consulté ce mois-ci »** :
+les quatre sources avec ✓ ou ✗, puis les compétences balayées et celles restées sans
+résultat. C'est ce qui rend une édition maigre vérifiable au lieu d'être prise sur
+parole.
+
 **3. Destinataires — un secret, pas un commit.**
 
 | Exécution | Destinataire |

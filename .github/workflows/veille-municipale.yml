@@ -151,18 +151,52 @@ jobs:
           Nous sommes le ${{ steps.now.outputs.iso }}. La période couverte par cette
           édition va du ${{ steps.now.outputs.debut }} au ${{ steps.now.outputs.iso }}.
 
-          - Ne retiens QUE des dispositifs, textes ou appels à projets PUBLIÉS, OUVERTS
-            ou MODIFIÉS pendant cette période. Pas de rétrospective, pas de « rappel »
-            d'un dispositif permanent qui n'a pas bougé.
+          Deux motifs d'inclusion, et un seul suffit :
+
+          1. **Publié, ouvert ou modifié pendant la période.** C'est le cas courant.
+          2. **Échéance à venir dans les 3 mois**, même pour un dispositif permanent
+             ou ouvert avant la période. Une campagne DETR/DSIL qui s'ouvre, une
+             enveloppe dont le dépôt se clôt en novembre, un texte dont l'entrée en
+             vigueur approche : c'est utile aux élus MAINTENANT, et le fait que le
+             dispositif existe depuis des mois n'y change rien.
+
+          ⚠️ Ne te sers PAS de la fenêtre pour éviter les répétitions : c'est le rôle
+          de la mémoire (ÉTAPE 1), et elle le fait déjà. Un dispositif permanent absent
+          de l'historique n'a jamais été signalé aux élus — il est donc neuf POUR EUX.
+          Écarter un item au motif qu'il « existe depuis longtemps » est une erreur.
+
           - Formule tes requêtes web avec l'année ${{ steps.now.outputs.year }} et
             privilégie explicitement les actualités du mois en cours.
-          - Pour CHAQUE item, indique sa date de publication ou d'ouverture. Si tu ne
-            peux pas la dater, ou qu'elle est antérieure à la période, ne l'inclus pas.
+          - Indique pour chaque item sa date de publication, d'ouverture ou d'échéance.
+            Si tu ne peux pas la dater précisément mais que le dispositif est
+            manifestement en cours, garde-le en « à surveiller » avec la mention
+            « date à vérifier sur la fiche source » — ne le supprime pas pour autant.
+          - N'écarte que ce qui est clairement HORS période ET sans échéance à venir.
           - Un dispositif dont la date limite de dépôt est DÉJÀ PASSÉE est écarté.
 
           ═══════════════════════════════════════════════════════════════════
-          ÉTAPE 3 — SOURCES À INTERROGER (par ordre de valeur)
+          ÉTAPE 3 — SOURCES : QUATRE OBLIGATOIRES, PUIS LE BALAYAGE
           ═══════════════════════════════════════════════════════════════════
+
+          ⛔ **LISTE DE VÉRIFICATION — tu ne peux pas conclure avant d'avoir consulté
+          ces quatre sources.** Ce ne sont pas des suggestions : ce sont celles qui
+          produisent presque tout le rendement de cette veille. Un mois à zéro action
+          requise doit être un FAIT CONSTATÉ sur ces quatre-là, jamais le résultat de
+          recherches trop dispersées.
+
+            ☐ 1. Aides-territoires — aides ouvertes aux COMMUNES, périmètre Loiret /
+                 Centre-Val de Loire / national
+            ☐ 2. Légifrance / JORF de la période — textes intéressant les communes
+                 (CGCT, maire, conseil municipal, urbanisme, voirie, funéraire,
+                 école, élections, DETR, DGF)
+            ☐ 3. Fonds vert — édition en cours, mesures ouvertes, révisions récentes
+            ☐ 4. Préfecture du Loiret — DETR/DSIL (calendrier et ouverture de la
+                 campagne), appels à projets, recueil des actes administratifs
+
+          Si l'une d'elles est inaccessible, dis-le explicitement dans le rapport
+          plutôt que de la passer sous silence.
+
+          Le détail de ces sources, et les autres :
 
           1. **Aides-territoires** (https://aides-territoires.beta.gouv.fr ) — le guichet
              unique de l'État recensant les aides aux collectivités. C'est le cœur de la
@@ -183,12 +217,14 @@ jobs:
           5. **Compléments** : Association des Maires du Loiret, AMRF, Banque des
              Territoires, ADEME, Agence de l'eau Loire-Bretagne.
 
-          ⚠️ **BALAYAGE PAR COMPÉTENCE — obligatoire, et pas seulement les sujets
-          les plus visibles.** L'urbanisme, la voirie et les subventions
+          ⚠️ **BALAYAGE PAR COMPÉTENCE — le second temps, une fois les quatre
+          sources obligatoires faites.** L'urbanisme, la voirie et les subventions
           d'investissement remontent d'eux-mêmes ; l'école, le social et les aînés
-          passent à la trappe si on ne les cherche pas explicitement. Consacre au
-          moins une recherche à CHACUNE des compétences listées dans
-          `veille/commune.yml`, en t'aidant de ces angles :
+          passent à la trappe si on ne les cherche pas explicitement. Une recherche
+          ciblée par compétence, en commençant par celles liées aux `projets_en_cours`
+          du profil — mais **jamais au détriment des quatre sources ci-dessus** : si
+          le temps manque, c'est ce balayage qu'on écourte, pas la liste de
+          vérification. Les angles utiles :
 
           - **école, périscolaire, cantine** — fonds de soutien et dotations pour le
             bâti scolaire, restauration scolaire et cantine à tarif social, fournitures
@@ -239,6 +275,16 @@ jobs:
           personne n'ouvre. Si aucun item ne mérite « action requise » ce mois-ci,
           ÉCRIS-LE explicitement — ne gonfle jamais la liste pour remplir l'email.
           La crédibilité de l'outil tient entièrement à cela.
+
+          ⚠️ **Mais la sévérité porte sur le TRI, pas sur la RECHERCHE.** Ces deux
+          erreurs coûtent autant l'une que l'autre :
+          - inonder les élus d'items faibles → ils cessent d'ouvrir l'email ;
+          - leur annoncer « rien ce mois-ci » alors qu'une aide était ouverte →
+            l'échéance passe, et l'outil a fait exactement le contraire de sa raison
+            d'être.
+          Un rapport vide n'est donc PAS le résultat prudent par défaut : c'est une
+          affirmation forte, qui engage. Ne l'écris qu'après avoir réellement coché
+          les quatre sources obligatoires de l'ÉTAPE 3.
 
           ⚠️ **Les dates limites sont l'information critique.** Extrais-les et
           vérifie-les systématiquement. En cas d'ambiguïté, écris « date limite à
@@ -307,14 +353,18 @@ jobs:
           5. **📋 Écartés ce mois-ci : n items** — le nombre et deux ou trois motifs
              typiques, en une phrase.
 
-          6. **🔍 Compétences balayées ce mois-ci** — une ligne discrète, en petits
-             caractères, listant les compétences que tu as effectivement cherchées, et
-             signalant celles qui n'ont rien donné. Exemple de forme : « Balayé :
-             urbanisme, voirie, école et périscolaire, action sociale et aînés,
-             bâtiments et énergie, cimetière, élections, sécurité civile, vie
-             associative, numérique. Sans résultat ce mois-ci : cimetière, élections,
-             vie associative. » C'est ce qui permet à un élu de voir que son domaine
-             a bien été regardé — un silence sans cette ligne se lit comme un oubli.
+          6. **🔍 Ce qui a été consulté ce mois-ci** — un encadré discret, en petits
+             caractères, en DEUX lignes :
+             - « Sources : Aides-territoires ✓ · JORF ✓ · Fonds vert ✓ · Préfecture
+               du Loiret ✓ » — une par source obligatoire de l'ÉTAPE 3, avec ✓ si tu
+               l'as consultée et ✗ si elle était inaccessible (dis alors pourquoi).
+             - « Compétences balayées : urbanisme, voirie, école et périscolaire,
+               action sociale et aînés, bâtiments et énergie, cimetière, élections,
+               sécurité civile, vie associative, numérique. Sans résultat ce mois-ci :
+               cimetière, élections, vie associative. »
+             C'est ce qui permet à un élu de voir que son domaine a bien été regardé —
+             un silence sans cette ligne se lit comme un oubli. Et c'est ce qui rend
+             une édition maigre vérifiable au lieu d'être prise sur parole.
 
           7. **PIED DE PAGE** discret : la citation d'Aides-territoires avec son lien et
              la date de consultation (obligation de licence), puis « Veille générée
