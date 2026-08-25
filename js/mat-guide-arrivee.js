@@ -113,9 +113,19 @@ var GUIDE_ETAPES = [
         ]
       },
       {
-        id:'periscolaire', ico:'🧒', titre:'Pensez au périscolaire, à la cantine et à la crèche',
-        texte:'La commune dispose d’une garderie matin et soir, d’un restaurant scolaire, d’un centre de loisirs et de la crèche familiale Les Marmousets. Inscriptions et tarifs auprès de la mairie.',
-        liens:[ { label:'02 38 45 61 76', tel:'0238456176' } ]
+        // ⚠️ La crèche Les Marmousets n'est PAS sur la commune : elle est à
+        // Cléry-Saint-André, Mézières en est commune partenaire. Cette fiche a
+        // affirmé le contraire jusqu'au 25 août 2026, alors même que MEL portait
+        // déjà le garde-fou « ne dis jamais que la commune dispose d'une crèche »
+        // (chatbot-mairie-mezieres/lib/mel.js). Ne pas réintroduire.
+        id:'periscolaire', ico:'🧒', titre:'Pensez au périscolaire, à la cantine et à la petite enfance',
+        texte:'La commune dispose d’une garderie matin et soir, d’un restaurant scolaire et d’un centre de loisirs ; inscriptions et tarifs auprès de la mairie. La crèche familiale Les Marmousets est à Cléry-Saint-André : Mézières en étant commune partenaire, les familles macériennes peuvent y prétendre. La Communauté de Communes ouvre par ailleurs, le 7 septembre 2026, un LAEP itinérant — gratuit et sans inscription, pour les moins de 6 ans accompagnés d’un adulte, et pour les futurs parents. Ce n’est pas un mode de garde et il ne passe pas par Mézières : la commune d’accueil la plus proche est Cléry-Saint-André. Le planning des créneaux n’est pas encore publié.',
+        liens:[
+          { label:'02 38 45 61 76', tel:'0238456176' },
+          { label:'Crèche Les Marmousets : 02 38 45 76 56', tel:'0238457656' },
+          { label:'LAEP : 06 62 65 59 04', tel:'0662655904' },
+          { label:'Le LAEP (CCTVL)', url:'https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/' }
+        ]
       },
       {
         id:'medecin', ico:'🏥', titre:'Déclarez un médecin traitant',

@@ -524,6 +524,13 @@ const _MEL_TREE_FALLBACK = {
         directAnswer:{text:"La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
           links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"}]}
       },
+      // ⚠️ Doublon volontaire avec data/mel-tree.json (l'arbre éditable depuis
+      // l'admin) : les deux copies doivent rester en phase. Le LAEP n'est PAS
+      // un mode de garde et ne passe PAS par Mézières — ne pas « simplifier ».
+      {id:"laep",ico:"🤱",label:"LAEP — Lieu d'Accueil Enfants-Parents",
+        directAnswer:{text:"Un lieu convivial d'écoute, d'échanges, de jeux et de rencontres, ouvert par la Communauté de Communes à compter du 7 septembre 2026. Gratuit, confidentiel, sans inscription. Pour les enfants de moins de 6 ans accompagnés d'un parent, d'un grand-parent ou d'un adulte référent, et pour les futurs parents. Ce n'est pas un mode de garde : l'adulte reste avec l'enfant pendant toute la durée de l'accueil. Au moins deux professionnels, les « accueillants », sont présents et tenus au secret professionnel. Le LAEP est itinérant : il se déplace sur Beauce la Romaine, Beaugency, Cléry-Saint-André et Meung-sur-Loire — pas à Mézières, Cléry-Saint-André étant la commune d'accueil la plus proche. Le planning des créneaux n'est pas encore publié : renseignements auprès de la Communauté de Communes.",
+          links:[{label:"📞 LAEP : 06 62 65 59 04",tel:"0662655904"},{label:"✉️ laep@ccterresduvaldeloire.fr",url:"mailto:laep@ccterresduvaldeloire.fr"},{label:"🌐 Le LAEP sur le site de la CCTVL",url:"https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/"}]}
+      },
       {id:"loisirs",ico:"🎨",label:"Centre de loisirs",
         directAnswer:{text:"Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
           links:[{label:"✉️ accueilloisirs.ardoux@ccterresduvaldeloire.fr",url:"mailto:accueilloisirs.ardoux@ccterresduvaldeloire.fr"},{label:"🌐 Site CCTVL",url:"https://www.ccterresduvaldeloire.fr/listes/enfance-jeunesse/"}]}

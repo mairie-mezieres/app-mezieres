@@ -233,6 +233,34 @@ modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la ru
 « Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
 recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
 
+#### LAEP — Lieu d'Accueil Enfants-Parents
+
+Depuis la v4.84, MEL répond aux questions sur le **LAEP** ouvert par la Communauté de
+Communes des Terres du Val de Loire **à compter du 7 septembre 2026**. C'est un lieu
+convivial d'écoute, d'échanges, de jeux et de rencontres, **gratuit, confidentiel et sans
+inscription**, pour les enfants de **moins de 6 ans** accompagnés d'un parent, d'un
+grand-parent ou d'un adulte référent — et pour les **futurs parents**. Il est aussi
+accessible depuis la rubrique **Enfance** du parcours guidé de MEL.
+
+Deux points que MEL énonce systématiquement, parce qu'ils prêtent à confusion :
+
+- **Ce n'est pas un mode de garde.** L'adulte qui accompagne l'enfant reste avec lui
+  pendant toute la durée de l'accueil. Au moins deux professionnels, les « accueillants »,
+  sont présents ; ils sont tenus au secret professionnel et à l'obligation de réserve.
+- **Le LAEP est itinérant et ne passe pas par Mézières.** Les communes d'accueil sont
+  Beauce la Romaine, Beaugency, **Cléry-Saint-André** (la plus proche) et Meung-sur-Loire.
+
+Le **planning des créneaux n'est pas encore publié** (état au 25 août 2026). MEL n'annonce
+donc aucun jour ni aucun horaire et renvoie vers les renseignements du service —
+**06 62 65 59 04**, `laep@ccterresduvaldeloire.fr`,
+`https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/` — ou vers la
+mairie (02 38 45 61 76).
+
+Ce silence est volontaire et le restera après la publication du planning : ces créneaux
+changeront sans que l'application en soit avertie, et un horaire faux vaut moins que pas
+d'horaire du tout. `test/laep.test.js` (dépôt backend) refuse toute mention d'un horaire ou
+d'un jour de la semaine dans la réponse de MEL.
+
 ### Ce que MEL ne sait pas faire
 
 - MEL ne peut pas accéder à votre dossier personnel ni effectuer de démarches à votre place.
@@ -642,7 +670,7 @@ liste à cocher**.
 | Étape | Ce qu'on y trouve |
 |---|---|
 | **📦 Dès votre arrivée** | Se présenter en mairie, changement d'adresse, carte grise, ouverture des compteurs d'eau/électricité/gaz, demande des bacs gris et jaune, inscription à la déchetterie, raccordement à la fibre (réseau public Lysséo — et déclaration de l'adresse auprès de XpFibre / Loiret THD si le logement est une construction neuve) |
-| **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine/crèche, médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
+| **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine et petite enfance (crèche familiale Les Marmousets — à Cléry-Saint-André, Mézières en étant commune partenaire — et LAEP itinérant de la Communauté de Communes), médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
 | **🌳 Bien vivre à Mézières** | Associations, entreprises et artisans, bus Rémi ligne 8, conseil municipal, règles avant travaux, aides à la rénovation (OPAH) |
 | **🔔 Rester informé** | Notifications, agenda, signalements, boîte à idées |
 
