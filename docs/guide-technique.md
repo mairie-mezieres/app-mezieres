@@ -1063,7 +1063,7 @@ silence sur un domaine se lit comme un oubli.
   modifiés entre `J-35` et `J`, chacun daté. Un dispositif permanent qui n'a pas
   bougé n'entre pas ; une date limite déjà passée écarte l'item.
 
-⚠️ **La mémoire est écrite par du code, pas par l'agent** (ADR-0026). L'agent produit
+⚠️ **La mémoire est écrite par du code, pas par l'agent** (ADR-0027). L'agent produit
 `veille/items-municipale.json` (`{niveau, titre, url}`, éphémère et non committé, sur
 le modèle de `veille/actions-pwa.json`) ; `scripts/update-veille-memoire.js` en écrit
 la section datée. Le script écrit **toujours** une section — avec les items, ou avec
@@ -1081,6 +1081,12 @@ s'ouvre sur une introduction qui rappelle l'objectif et que **l'outil oriente ma
 ne décide pas**. Le tri est plafonné : au plus 4 « action requise », 6 « à
 surveiller », les écartés réduits à un nombre et à leurs motifs.
 
+Le rapport commence par un **préen-tête masqué** (`<div>` invisible, premier enfant
+de `<body>`) portant le résumé chiffré — « 2 actions requises · 1 à surveiller ·
+période du … ». C'est la ligne d'aperçu affichée par Gmail sous l'objet, la plus lue
+sur mobile : sans elle, l'aperçu ne fait que recopier le titre du rapport, ce qui
+donne l'illusion d'un doublon dans la liste des messages.
+
 **3. Destinataires — un secret, pas un commit.**
 
 | Exécution | Destinataire |
@@ -1091,18 +1097,45 @@ surveiller », les écartés réduits à un nombre et à leurs motifs.
 
 Tant que `VEILLE_MUNICIPALE_EMAIL_TO` n'est pas créé, tout part à l'adresse de test.
 
-⚠️ **Écrire à tout le conseil suppose d'abord un domaine vérifié chez Resend.**
-L'expéditeur par défaut est le sender de test `onboarding@resend.dev`, qui n'autorise
-l'envoi **que vers l'adresse du compte Resend**. L'ordre est donc : vérifier un
-**sous-domaine d'envoi** chez Resend (`send.mezieres-lez-clery.fr` — surtout pas le
-domaine racine, qui sert la PWA via GitHub Pages et porte le courrier de la mairie),
-renseigner le secret `RESEND_FROM`, **puis** `VEILLE_MUNICIPALE_EMAIL_TO`.
+### Expéditeur : `mezieres-lez-clery.fr` vérifié chez Resend (25 août 2026)
 
-Le workflow refuse d'envoyer au conseil si `RESEND_FROM` est vide, avec un `::error`
-explicite : Resend répondrait 403 avec un message obscur, et l'échec serait attribué
-au mauvais endroit. Le secret doit être **passé dans l'`env` de l'étape d'envoi** —
-sans cette ligne il peut exister sans rien changer, le script retombant sur son
-défaut.
+Le domaine **racine** `mezieres-lez-clery.fr` est vérifié dans le compte Resend
+(DNS chez OVH, gérés par le prestataire ADEFI ; région d'envoi `eu-west-1`). Les
+trois veilles et le mail de stats partent donc d'une vraie adresse de la mairie,
+`numerique@mezieres-lez-clery.fr`, via le secret **`RESEND_FROM`** :
+
+| Où | Valeur |
+|---|---|
+| Secret GitHub `RESEND_FROM` (les 3 veilles) | `MAT Veille <numerique@mezieres-lez-clery.fr>` |
+| Variable Render `RESEND_FROM` (mail de stats) | `MAT Stats <numerique@mezieres-lez-clery.fr>` |
+
+**Pourquoi le domaine racine et non un sous-domaine d'envoi.** Resend n'autorise un
+`From` que sur un domaine **vérifié dans le compte**. Vérifier
+`send.mezieres-lez-clery.fr` aurait imposé d'écrire depuis `…@send.mezieres-lez-clery.fr`
+— une adresse qui n'existe pas et où personne ne lit les réponses. Un élu qui répond à
+la veille doit tomber dans une boîte réelle.
+
+**Pourquoi c'était sans risque pour la messagerie existante.** Dans la configuration
+que Resend génère pour le domaine racine, le `MX` et le `TXT v=spf1` se posent sur
+`send.mezieres-lez-clery.fr`, pas à la racine : le SPF existant de la mairie n'est pas
+modifié et le courrier entrant n'est pas concerné. Le sélecteur DKIM
+(`resend._domainkey`) est unique et ne peut pas entrer en collision. **Seul le `_dmarc`
+est à la racine** — un domaine ne pouvant en porter qu'un, ne jamais écraser celui qui
+existe.
+
+⚠️ **Le secret doit être passé dans l'`env` de l'étape d'envoi.** Sans cette ligne il
+peut exister sans rien changer, le script retombant sur son défaut
+(`onboarding@resend.dev`), qui n'autorise l'envoi que vers l'adresse du compte Resend.
+Le cas s'est produit : le commentaire du workflow réclamait `RESEND_FROM` que l'étape
+ne lisait pas. Les trois veilles le passent désormais.
+
+⚠️ **Ne jamais mettre une adresse Gmail dans `RESEND_FROM`** : le domaine `gmail.com`
+n'est pas vérifiable par la commune (il faudrait écrire dans le DNS de Google), et
+Resend rejette en 403.
+
+`veille-municipale.yml` refuse d'envoyer au conseil si `RESEND_FROM` est vide, avec un
+`::error` explicite : Resend répondrait 403 avec un message obscur, et l'échec serait
+attribué au mauvais endroit.
 
 ### Robustesse des veilles IA (retry + diagnostic)
 
