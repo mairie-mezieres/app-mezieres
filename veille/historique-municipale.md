@@ -19,4 +19,4 @@ une ligne que l'on souhaite voir re-signaler le mois suivant.
 
 ## 2026-08-25
 
-- (rien de notable)
+- [surveiller] Décret n° 2026-800 du 17 août 2026 — statut de l'élu local (autorisations d'absence) — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054708683
