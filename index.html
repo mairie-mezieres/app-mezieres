@@ -148,13 +148,17 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button class="ib-btn" onclick="installApp();event.stopPropagation()">Installer</button>
 <button class="ib-x" onclick="hideBanner(event)" aria-label="Fermer">✕</button>
 </div>
-<div class="header">
+<!-- RGAA 9.2 / 12.6 — repères de page. On pose le RÔLE plutôt que de changer
+     la balise : <div> → <header> aurait le même effet sémantique, mais imposerait
+     de retrouver la bonne balise fermante dans 560 lignes de gabarit. Le rôle
+     obtient le même résultat sans toucher à la structure. -->
+<div class="header" role="banner">
 <div class="mat-hero">
 <div class="mat-text">
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.88 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.89 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +486,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.88</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.89</button>
 </div>
 </div>
 </div>
@@ -662,10 +666,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div style="padding:0 14px 14px;font-size:0.8rem;color:var(--text);line-height:1.65">
 <p style="margin:6px 0">La Mairie de Mézières-lez-Cléry s'engage à rendre son application accessible, conformément à l'article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005.</p>
 <p style="margin:10px 0 4px"><strong>État de conformité</strong></p>
-<p style="margin:0 0 6px">L'application MAT est <strong>partiellement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 73,8&nbsp;%</strong> — 48&nbsp;critères conformes sur les 65 qui s'appliquent à elle.</p>
+<p style="margin:0 0 6px">L'application MAT est <strong>partiellement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 78,5&nbsp;%</strong> — 51&nbsp;critères conformes sur les 65 qui s'appliquent à elle.</p>
 <p style="margin:0 0 6px">Ce taux est un <strong>plancher</strong>&nbsp;: six critères n'ont pas encore pu être tranchés, et ils sont comptés comme non conformes. Le taux réel est donc au moins celui-là, et il montera à mesure que le plan d'action avance.</p>
 <p style="margin:0 0 6px">Un <strong>audit interne des 106&nbsp;critères a été mené le 27&nbsp;août 2026</strong>. Il a corrigé quinze défauts, dont l'absence de nom annoncé sur les douze interrupteurs de cet écran, sur six champs de formulaire et sur les trente fenêtres de l'application&nbsp;; un contraste insuffisant sur le bouton d'appel des pompiers&nbsp;; et des bordures de champs de saisie à peine visibles (1,17 pour un minimum de 3).</p>
-<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>48 conformes</strong>, 11 non conformes, 6 non tranchés. Le plan d'action ci-dessous traite les uns et les autres.</p>
+<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>51 conformes</strong>, 8 non conformes, 6 non tranchés. Le plan d'action ci-dessous traite les uns et les autres.</p>
 <p style="margin:10px 0 4px"><strong>Mesures d'accessibilité déjà mises en œuvre</strong></p>
 <ul style="margin:0;padding-left:18px;line-height:1.7">
 <li>Tailles de texte ajustables (normal / agrandi / très agrandi)</li>
@@ -712,7 +716,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <button class="tts-bar-btn" onclick="ttsPause()" id="tts-pause-btn" title="Pause" aria-label="Pause">⏸</button>
 <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter" aria-label="Arrêter la lecture">⏹</button>
 </div>
-<div class="footer">
+<div class="footer" role="contentinfo">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left">
 <span>MAT · Mézières-lez-Cléry</span>
 <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
@@ -1765,6 +1769,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.89</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Les rep&egrave;res de page sont pos&eacute;s.</strong> Un lecteur d&rsquo;&eacute;cran peut d&eacute;sormais sauter directement &agrave; l&rsquo;en-t&ecirc;te, au contenu principal ou au pied de page, au lieu de tout parcourir. Les pages &laquo;&nbsp;hors-ligne&nbsp;&raquo; et &laquo;&nbsp;architecture&nbsp;&raquo; n&rsquo;en avaient aucun</li>
+<li>Taux de conformit&eacute; RGAA&nbsp;: <strong>73,8&nbsp;% &rarr; 78,5&nbsp;%</strong></li>
+<li>Rien ne se voit&nbsp;: l&rsquo;apparence est <strong>inchang&eacute;e</strong></li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.88</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Quand un envoi &eacute;choue, l&rsquo;application le dit maintenant &agrave; voix haute.</strong> Les r&eacute;ponses de MEL, le suivi de vos signalements et la galerie photos &eacute;taient mis &agrave; jour en silence&nbsp;: une personne aveugle ne savait pas qu&rsquo;il s&rsquo;&eacute;tait pass&eacute; quelque chose</li>

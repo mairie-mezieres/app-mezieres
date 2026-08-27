@@ -5,6 +5,34 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.89] — 27 août 2026
+
+### Corrigé
+- **RGAA 9.2 / 12.6 — aucun repère de page.** Un lecteur d'écran devait parcourir
+  toute la page de haut en bas, sans pouvoir sauter à l'en-tête, au contenu principal
+  ou au pied. `offline.html` et `architecture.html` n'en avaient aucun.
+  `role="banner"`, `role="main"` et `role="contentinfo"` posés — **le rôle plutôt que
+  la balise** : `<div>` → `<header>` aurait le même effet sémantique, mais imposerait
+  de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié après
+  coup : un seul repère de chaque type par page.
+
+### Audit — une erreur corrigée
+- **10.8 était un faux positif.** La deuxième passe avait relevé « un conteneur
+  `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne
+  vérifiait pas si le conteneur était affiché. Mesuré : `display:none`, boîte du
+  bouton à 0 px, hors ordre de tabulation — et le script bascule bien `aria-hidden`
+  à `false` à l'ouverture. **Conforme, sans correctif.**
+- **10.5 reste non conforme, délibérément.** 45 déclarations inline posent le fond
+  **ou** la couleur du texte, dont **6 seulement** sur des éléments visibles, et l'une
+  est le fond de `<html>`. Corriger les 45 à l'aveugle ferait courir un risque visuel
+  réel pour un bénéfice théorique : à traiter cas par cas.
+
+### Modifié
+- **Taux de conformité RGAA : 73,8 % → 78,5 %** (51 conformes sur 65 applicables).
+- **Aucun changement visible.**
+
+---
+
 ## [4.88] — 27 août 2026
 
 ### Corrigé

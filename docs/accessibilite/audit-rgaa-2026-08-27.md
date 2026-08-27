@@ -155,6 +155,20 @@ formulaire de contact accepte **un e-mail ou un téléphone** : aucun jeton
 champ en deux — un changement visible, hors du périmètre de cette passe. Le champ
 « nom » a reçu `autocomplete="name"`.
 
+### Quatrième passe — repères de page, et une erreur de mon audit
+
+| Critères | Constat | Suite |
+|---|---|---|
+| **9.2 / 12.6** | **Aucun repère de page.** Un lecteur d'écran devait tout parcourir de haut en bas, sans pouvoir sauter à l'en-tête, au contenu ou au pied. Les pages hors-ligne et architecture n'en avaient aucun. | `role="banner"`, `role="main"`, `role="contentinfo"` posés — **le rôle plutôt que la balise** : `<div>` → `<header>` aurait le même effet, mais imposerait de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié : un seul repère de chaque type par page. |
+| **10.8** | **Faux positif de la deuxième passe.** J'avais relevé « un conteneur `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne vérifiait pas si le conteneur était affiché. | Mesuré : le conteneur est en `display:none`, son bouton a une boîte de 0 px et n'est pas dans l'ordre de tabulation. Et le script bascule bien `aria-hidden` à `false` quand la fenêtre s'ouvre. **Conforme, sans correctif.** |
+
+**10.5 reste non conforme, et je n'y touche pas.** 45 déclarations inline posent le
+fond **ou** la couleur du texte, mais pas les deux — dont **6 seulement** sur des
+éléments visibles, et l'une d'elles est le fond de `<html>`, qui est légitime. Les
+autres héritent du fond d'un conteneur qui, lui, le déclare. Corriger les 45 à
+l'aveugle ferait courir un risque visuel réel pour un bénéfice théorique. Le
+chantier reste au plan, à traiter en regardant chaque cas.
+
 ---
 
 ## 5. Les 106 critères
@@ -171,18 +185,18 @@ champ en deux — un changement visible, hors du périmètre de cette passe. Le 
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
 | **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 demande le validateur du W3C. |
-| **9. Structuration** (4) | 9.1 `NC` · 9.2 `NC` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil ; repères de page absents. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | |
+| **9. Structuration** (4) | 9.1 `NC` · 9.2 `C` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte, dont 6 seulement sur des éléments visibles. |
 | **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `NC` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
-| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `NC` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
+| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
 | **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **48** |
-| Non conformes | **11** |
+| Conformes | **51** |
+| Non conformes | **8** |
 | Non applicables | **41** |
 | Non tranchés | **6** |
 | Total | **106** |
@@ -192,27 +206,26 @@ champ en deux — un changement visible, hors du périmètre de cette passe. Le 
 Critères applicables : 106 − 41 = **65**. Les 6 non tranchés restent comptés comme
 non conformes — le taux publié est un **plancher**.
 
-> ## Taux de conformité : **73,8 %** (48 sur 65)
+> ## Taux de conformité : **78,5 %** (51 sur 65)
 > ### Mention RGAA : **partiellement conforme**
 
 | Étape | Conformes | Taux |
 |---|---|---|
 | Avant l'audit | *non mesuré* | — |
 | Première et deuxième passe | 37 | 56,9 % |
-| **Troisième passe** | **48** | **73,8 %** |
-| Si les 6 non tranchés passent | 54 | 83,1 % |
+| Troisième passe | 48 | 73,8 % |
+| **Quatrième passe** | **51** | **78,5 %** |
+| Si les 6 non tranchés passent | 57 | 87,7 % |
 | Si tout le plan est traité | 65 | 100 % |
 
-### Les 11 non-conformités restantes
+### Les 8 non-conformités restantes
 
 | Critères | Chantier | Visible à l'écran ? |
 |---|---|---|
 | 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
-| 9.2, 12.6 | Poser les repères de page, rendre les regroupements contournables | non |
 | 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
 | 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
 | 10.5 | 45 déclarations inline ne posent que le fond **ou** que le texte | non |
-| 10.8 | Un conteneur `aria-hidden` contient un élément focusable | non |
 | 11.13 | Scinder le champ « e-mail ou téléphone » | **oui** |
 
 ### Les 6 critères non tranchés

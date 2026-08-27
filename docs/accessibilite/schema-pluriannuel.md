@@ -74,10 +74,16 @@ bouge : régions live pour les messages dynamiques, erreurs de saisie rattachée
 champ fautif, groupement des champs de même nature, balisage du tableau des
 horaires, mention des liens ouvrant une nouvelle fenêtre.
 
-**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
-Parmi eux, **48 conformes**, **11 non conformes**, **6 non tranchés**.
+**La quatrième a posé les repères de page** — un lecteur d'écran peut enfin sauter
+à l'en-tête, au contenu ou au pied — et a corrigé **une erreur de l'audit
+lui-même** : le critère 10.8 avait été déclaré non conforme sur la foi d'un
+comptage qui ne vérifiait pas si le conteneur incriminé était affiché. Il ne
+l'était pas.
 
-> **Taux de conformité : 73,8 %** — mention **partiellement conforme**.
+**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
+Parmi eux, **51 conformes**, **8 non conformes**, **6 non tranchés**.
+
+> **Taux de conformité : 78,5 %** — mention **partiellement conforme**.
 >
 > Les 6 critères non tranchés restent comptés comme non conformes : le taux publié
 > est un **plancher**, qui ne peut que monter.
@@ -93,18 +99,17 @@ Chacun fait monter le taux sans qu'aucune ligne de code ne change.
 | 1 | **Relecture par la mairie** : pertinence des alternatives d'images, information donnée par la seule couleur, accessibilité des PDF du PLUi, gestes complexes sur la carte 3D. | 1.3, 3.1, 13.3, 13.4, 13.10 | la mairie |
 | 2 | **Brancher le validateur du W3C** en intégration continue. | 8.2 | technique |
 
-Ces deux points portent le taux à **83,1 %**.
+Ces deux points portent le taux à **87,7 %**.
 
-### Ensuite — les 11 non-conformités restantes
+### Ensuite — les 8 non-conformités restantes
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
 | 3 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste : la navigation par titres est impossible. | 9.1, 9.3 | **oui** | T1 2027 |
-| 4 | **Poser les repères de page** et rendre les regroupements contournables. | 9.2, 12.6 | non | T1 2027 |
 | 5 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | **oui** | T1 2027 |
 | 6 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo, à juger à l'œil. | 3.2 | selon | T1 2027 |
 | 7 | **Scinder le champ « e-mail ou téléphone »** du formulaire de contact : aucun jeton `autocomplete` ne couvre les deux à la fois. | 11.13 | **oui** | 2027 |
-| 8 | **Déclarations CSS de couleur** (45 cas ne posent que le fond ou que le texte) et conteneur `aria-hidden` contenant un focusable. | 10.5, 10.8 | non | T2 2027 |
+| 8 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond **ou** que le texte, dont 6 sur des éléments visibles. À traiter cas par cas — une correction en masse ferait courir un risque visuel pour un bénéfice théorique. | 10.5 | non | T2 2027 |
 
 Traiter l'ensemble porte le taux à **100 %**.
 
