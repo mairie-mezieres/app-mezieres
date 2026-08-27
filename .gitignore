@@ -43,3 +43,9 @@ tests/e2e/playwright/.cache/
 rapport-veille.html
 rapport-bulletin.html
 veille/actions-pwa.json
+
+# Validateur du W3C (RGAA 8.2) — sorties du workflow validite-html.yml, générées
+# en CI et aussi en local quand on reproduit le contrôle à la main. Jamais suivies.
+rapport-html.md
+vnu.json
+vnu-brut.txt

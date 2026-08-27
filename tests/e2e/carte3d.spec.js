@@ -975,7 +975,19 @@ test.describe('Carte 3D', () => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
     await expect(page.locator('#ov-carte3d .panel-title')).toHaveText('Mon village en 3D');
-    await expect(page.locator('#ov-carte3d')).toHaveAttribute('aria-label', 'Mon village en 3D');
+    // Ce qui compte est le nom ANNONCÉ, pas l'attribut qui le porte. Il venait
+    // d'un `aria-label` écrit en dur sur le <div class="ov"> — invalide selon le
+    // validateur du W3C (RGAA 8.2 : `aria-label` n'est pas admis sur un <div>
+    // sans rôle propre) et redondant depuis que openOv() pose `aria-labelledby`
+    // vers le titre du panneau. Asserter l'attribut aurait interdit la
+    // correction ; asserter le nom calculé verrouille la même chose en mieux :
+    // le nom annoncé et le titre affiché ne peuvent plus diverger.
+    const nomAnnonce = await page.locator('#ov-carte3d').evaluate(el => {
+      const id = el.getAttribute('aria-labelledby');
+      const cible = id && document.getElementById(id);
+      return (cible ? cible.textContent : el.getAttribute('aria-label')) || '';
+    });
+    expect(nomAnnonce.trim()).toBe('Mon village en 3D');
   });
 
   test('l’overlay s’ouvre, se ferme avec Échap, et n’invente aucun bâtiment', async ({ page }) => {

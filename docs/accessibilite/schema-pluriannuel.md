@@ -1,7 +1,7 @@
 # Schéma pluriannuel de mise en accessibilité numérique — 2026-2029
 
 **Commune de Mézières-lez-Cléry**
-Adopté le : *(à compléter — date de validation par la mairie)*
+Adopté le : **27 août 2026**
 Période couverte : **2026 – 2029**
 
 > Document rendu obligatoire par l'article 47 de la loi n° 2005-102 du 11 février
@@ -37,7 +37,8 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
 
 ## 3. Organisation et moyens
 
-- **Responsable de l'accessibilité** : *(à désigner — élu ou agent référent)*
+- **Référent accessibilité** : **Fabrice Auffret**, joignable par la mairie —
+  02 38 45 61 76, 36 rue du Bourg, 45370 Mézières-lez-Cléry.
 - **Contact des usagers** : Mairie de Mézières-lez-Cléry, 36 rue du Bourg,
   45370 — 02 38 45 61 76. Toute demande d'alternative reçoit une réponse.
 - **Voie de recours** : Défenseur des droits.
@@ -46,15 +47,20 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
   - `axe-core` s'exécute sur chaque écran à chaque proposition de modification ;
   - la navigation clavier est verrouillée par des tests dédiés (ADR-0016) ;
   - la taille de texte réellement peinte est mesurée sur le rendu (ADR-0017) ;
+  - le **validateur officiel du W3C** contrôle la validité du code à chaque
+    modification d'une page et chaque lundi (critère 8.2) ;
   - une régression sur un critère outillable **bloque** la mise en ligne.
-- **Compétences** : la commune ne dispose pas d'expert RGAA en interne. Les
-  critères relevant du jugement humain (pertinence des alternatives, cohérence
-  des libellés) feront l'objet d'une relecture dédiée, au besoin accompagnée.
+- **Compétences** : la commune ne dispose pas d'expert RGAA en interne. Les critères
+  relevant du jugement humain (pertinence des alternatives, information portée par la
+  seule couleur, provenance des documents publiés, gestes complexes) ne sont pas
+  outillables : ils ont été soumis au référent le 27 août 2026 et **se re-vérifient à
+  chaque évolution** — nouveau document publié, nouveau geste sur la carte.
 
 ## 4. État des lieux au 27 août 2026
 
 Un audit interne outillé des **106 critères** a été mené le 27 août 2026
-(`audit-rgaa-2026-08-27.md`), en trois passes.
+(`audit-rgaa-2026-08-27.md`), en cinq passes. **Il est complet : aucun critère n'est
+laissé sans verdict.**
 
 **La première a montré que l'instrument de mesure était faussé.** Les contrôles
 automatiques mesuraient les écrans pendant leur transition d'ouverture, alors
@@ -80,36 +86,38 @@ lui-même** : le critère 10.8 avait été déclaré non conforme sur la foi d'u
 comptage qui ne vérifiait pas si le conteneur incriminé était affiché. Il ne
 l'était pas.
 
-**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
-Parmi eux, **51 conformes**, **8 non conformes**, **6 non tranchés**.
+**La cinquième a tranché les six derniers critères.** Cinq relevaient du jugement
+humain — aucun outil ne dit si une alternative d'image est *pertinente*, ni si un PDF
+sort d'un scanner : le **référent accessibilité** y a répondu, et les cinq sont
+conformes. Le sixième, la validité du code, n'était pas une question mais une mesure :
+le validateur officiel du W3C a relevé **39 erreurs**. Quatre ont été corrigées ;
+**33 subsistent**, toutes structurelles. Ce critère est donc **non conforme**, et le
+validateur tourne désormais à chaque modification.
 
-> **Taux de conformité : 78,5 %** — mention **partiellement conforme**.
+**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
+Parmi eux, **56 conformes** et **9 non conformes**.
+
+> **Taux de conformité : 86,2 %** — mention **partiellement conforme**.
 >
-> Les 6 critères non tranchés restent comptés comme non conformes : le taux publié
-> est un **plancher**, qui ne peut que monter.
+> Ce taux n'est plus un plancher prudent : chaque critère applicable a été instruit
+> jusqu'à un verdict.
 
 ## 5. Plan d'action annuel 2026-2027
 
-### D'abord — les 6 critères encore ouverts (T4 2026)
+Les six critères ouverts au moment de la quatrième passe ont été traités : cinq sont
+conformes, un — la validité du code — a échoué à la mesure et rejoint le plan
+ci-dessous.
 
-Chacun fait monter le taux sans qu'aucune ligne de code ne change.
-
-| # | Action | Critères | Qui |
-|---|---|---|---|
-| 1 | **Relecture par la mairie** : pertinence des alternatives d'images, information donnée par la seule couleur, accessibilité des PDF du PLUi, gestes complexes sur la carte 3D. | 1.3, 3.1, 13.3, 13.4, 13.10 | la mairie |
-| 2 | **Brancher le validateur du W3C** en intégration continue. | 8.2 | technique |
-
-Ces deux points portent le taux à **87,7 %**.
-
-### Ensuite — les 8 non-conformités restantes
+### Les 9 non-conformités restantes
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
-| 3 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste : la navigation par titres est impossible. | 9.1, 9.3 | **oui** | T1 2027 |
-| 5 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | **oui** | T1 2027 |
-| 6 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo, à juger à l'œil. | 3.2 | selon | T1 2027 |
-| 7 | **Scinder le champ « e-mail ou téléphone »** du formulaire de contact : aucun jeton `autocomplete` ne couvre les deux à la fois. | 11.13 | **oui** | 2027 |
-| 8 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond **ou** que le texte, dont 6 sur des éléments visibles. À traiter cas par cas — une correction en masse ferait courir un risque visuel pour un bénéfice théorique. | 10.5 | non | T2 2027 |
+| 1 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste : la navigation par titres est impossible. | 9.1, 9.3 | **oui** | T1 2027 |
+| 2 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | **oui** | T1 2027 |
+| 3 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo, à juger à l'œil. | 3.2 | selon | T1 2027 |
+| 4 | **Les 33 erreurs de validité HTML.** Trois familles : 28 tuiles de l'accueil portent un `<div>` dans un `<button>`, 4 cartes à cocher un `<div>` dans un `<label>`, et une feuille de style est déclarée dans le corps de la page. La conversion en `<span>` impose de rendre à ces éléments le `display:block` qu'ils tenaient de la balise : à faire écran par écran, avec vérification visuelle. | 8.2 | non — **si** le `display` suit | T1 2027 |
+| 5 | **Scinder le champ « e-mail ou téléphone »** du formulaire de contact : aucun jeton `autocomplete` ne couvre les deux à la fois. | 11.13 | **oui** | 2027 |
+| 6 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond **ou** que le texte, dont 6 sur des éléments visibles. À traiter cas par cas — une correction en masse ferait courir un risque visuel pour un bénéfice théorique. | 10.5 | non | T2 2027 |
 
 Traiter l'ensemble porte le taux à **100 %**.
 
