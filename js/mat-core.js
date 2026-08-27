@@ -176,6 +176,27 @@ function _ovVisual(mutate){
   }catch(_){}
   mutate();
 }
+/* RGAA 13.2 — un lien qui ouvre une nouvelle fenêtre doit le dire AVANT d'être
+   activé. Sept liens de l'accueil, quatre des Documents et dix du guide
+   d'arrivée ne le faisaient pas : la fenêtre s'ouvrait, et un habitant au
+   lecteur d'écran ne comprenait pas pourquoi le bouton « précédent » ne le
+   ramenait plus.
+
+   La mention est ajoutée en texte réservé aux lecteurs d'écran : rien ne change
+   à l'écran. Appelé au chargement puis à l'ouverture de chaque overlay — ce qui
+   couvre aussi les contenus injectés après coup, sans imposer d'observateur de
+   mutations permanent à une application qui se veut sobre. */
+function marquerLiensNouvelleFenetre(racine){
+  const cible = racine || document;
+  cible.querySelectorAll('a[target="_blank"]:not([data-nf])').forEach(function(a){
+    a.setAttribute('data-nf', '1');
+    const s = document.createElement('span');
+    s.className = 'sr-only';
+    s.textContent = ' (nouvelle fenêtre)';
+    a.appendChild(s);
+  });
+}
+
 function openOv(id){
   const el = document.getElementById('ov-'+id);
   if(!el) return;
@@ -194,6 +215,18 @@ function openOv(id){
   // Sémantique pour les lecteurs d'écran : fenêtre modale annoncée comme telle.
   el.setAttribute('role','dialog');
   el.setAttribute('aria-modal','true');
+  // RGAA 12.9 — une fenêtre modale doit porter un NOM. Sans lui, un lecteur
+  // d'écran annonce « dialogue », sans dire lequel : les 30 overlays étaient
+  // indiscernables (relevé de l'audit du 27 août 2026). Le titre visible du
+  // panneau fait le nom ; il est hydraté juste au-dessus, donc disponible ici.
+  if(!el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')){
+    const t = el.querySelector('.panel-title');
+    if(t){
+      if(!t.id) t.id = 'ov-titre-' + id;
+      el.setAttribute('aria-labelledby', t.id);
+    }
+  }
+  marquerLiensNouvelleFenetre(el);
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
   _ovVisual(function(){
@@ -409,7 +442,7 @@ function loadFeaturedDoc() {
   var neuf = _isNewDoc(_featuredId(doc), _docsSeenIds());
   el.style.display = '';
   el.innerHTML = '<div style="margin-bottom:16px">'
-    + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
+    + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage-ink);margin-bottom:8px">📌 Dernier document publié</div>'
     + '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:2px solid ' + (neuf ? '#ef4444' : 'transparent') + ';border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
     + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
     + '<div style="flex:1;min-width:0">'
@@ -628,7 +661,7 @@ function hideSplash(forceDelay){
   const wait=Math.max(forceDelay||0, 1000-elapsed);
   setTimeout(function(){ document.body.classList.remove('preload'); document.body.classList.add('app-ready'); splash.classList.add('hide'); }, wait);
 }
-window.addEventListener('load', function(){ hideSplash(0); });
+window.addEventListener('load', function(){ hideSplash(0); marquerLiensNouvelleFenetre(); });
 
 // ── Vider cache ──────────────────────────────────────────────
 async function clearCacheAndReload() {

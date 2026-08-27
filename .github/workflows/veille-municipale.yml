@@ -109,20 +109,31 @@ jobs:
           subventions ouvertes, les obligations réglementaires nouvelles et les bonnes
           pratiques RÉELLEMENT APPLICABLES à notre commune — et rien d'autre.
 
-          ⚠️ LIVRABLE OBLIGATOIRE : quoi qu'il arrive (recherches infructueuses, sources
-          inaccessibles, mois calme), tu DOIS créer le fichier `rapport-veille-municipale.html`
-          avant de terminer — au pire en disant explicitement qu'il n'y a rien ce mois-ci.
-          Une exécution qui se termine sans ce fichier est un échec du workflow.
+          ⚠️ DEUX LIVRABLES OBLIGATOIRES : quoi qu'il arrive (recherches infructueuses,
+          sources inaccessibles, mois calme), tu DOIS créer AVANT DE TERMINER
+          — au pire en disant explicitement qu'il n'y a rien ce mois-ci :
+            1. `rapport-veille-municipale.html` — l'email envoyé aux élus (ÉTAPE 5) ;
+            2. `veille/items-municipale.json` — la liste structurée des items retenus,
+               qui alimente la mémoire anti-répétition (ÉTAPE 6). Elle peut être vide
+               (`[]`), mais le fichier doit exister.
+          Une exécution qui se termine sans le rapport est un échec du workflow. Une
+          exécution sans le JSON envoie l'email puis oublie ce qu'elle a envoyé : le
+          mois suivant re-proposera les mêmes items. C'est arrivé dès la première
+          exécution réelle — ne saute pas l'ÉTAPE 6.
 
           ═══════════════════════════════════════════════════════════════════
           ÉTAPE 1 — LIRE AVANT DE CHERCHER (deux fichiers, obligatoire)
           ═══════════════════════════════════════════════════════════════════
 
-          1. `veille/commune.yml` — le profil de la commune. C'est TON FILTRE DE
-             PERTINENCE : population, EPCI, compétences réellement exercées,
-             compétences déléguées à un syndicat ou à la communauté de communes,
-             projets en cours, seuils d'exclusion. Un dispositif qui ne passe pas ce
-             filtre n'entre pas dans le rapport, même s'il est intéressant en soi.
+          1. `veille/commune.yml` — le profil de la commune. Il joue DEUX rôles, et
+             les deux comptent :
+             - **ton plan de recherche** : la liste `competences` énumère ce que la
+               commune exerce réellement. Chacune de ces compétences doit être
+               cherchée, pas seulement les plus évidentes (voir ÉTAPE 3).
+             - **ton filtre de pertinence** : population, EPCI, compétences
+               déléguées à un syndicat ou à la communauté de communes, projets en
+               cours, seuils d'exclusion. Un dispositif qui ne passe pas ce filtre
+               n'entre pas dans le rapport, même s'il est intéressant en soi.
 
           2. `veille/historique-municipale.md` — la MÉMOIRE des éditions précédentes
              (une ligne par item déjà signalé : niveau, titre, URL).
@@ -140,18 +151,52 @@ jobs:
           Nous sommes le ${{ steps.now.outputs.iso }}. La période couverte par cette
           édition va du ${{ steps.now.outputs.debut }} au ${{ steps.now.outputs.iso }}.
 
-          - Ne retiens QUE des dispositifs, textes ou appels à projets PUBLIÉS, OUVERTS
-            ou MODIFIÉS pendant cette période. Pas de rétrospective, pas de « rappel »
-            d'un dispositif permanent qui n'a pas bougé.
+          Deux motifs d'inclusion, et un seul suffit :
+
+          1. **Publié, ouvert ou modifié pendant la période.** C'est le cas courant.
+          2. **Échéance à venir dans les 3 mois**, même pour un dispositif permanent
+             ou ouvert avant la période. Une campagne DETR/DSIL qui s'ouvre, une
+             enveloppe dont le dépôt se clôt en novembre, un texte dont l'entrée en
+             vigueur approche : c'est utile aux élus MAINTENANT, et le fait que le
+             dispositif existe depuis des mois n'y change rien.
+
+          ⚠️ Ne te sers PAS de la fenêtre pour éviter les répétitions : c'est le rôle
+          de la mémoire (ÉTAPE 1), et elle le fait déjà. Un dispositif permanent absent
+          de l'historique n'a jamais été signalé aux élus — il est donc neuf POUR EUX.
+          Écarter un item au motif qu'il « existe depuis longtemps » est une erreur.
+
           - Formule tes requêtes web avec l'année ${{ steps.now.outputs.year }} et
             privilégie explicitement les actualités du mois en cours.
-          - Pour CHAQUE item, indique sa date de publication ou d'ouverture. Si tu ne
-            peux pas la dater, ou qu'elle est antérieure à la période, ne l'inclus pas.
+          - Indique pour chaque item sa date de publication, d'ouverture ou d'échéance.
+            Si tu ne peux pas la dater précisément mais que le dispositif est
+            manifestement en cours, garde-le en « à surveiller » avec la mention
+            « date à vérifier sur la fiche source » — ne le supprime pas pour autant.
+          - N'écarte que ce qui est clairement HORS période ET sans échéance à venir.
           - Un dispositif dont la date limite de dépôt est DÉJÀ PASSÉE est écarté.
 
           ═══════════════════════════════════════════════════════════════════
-          ÉTAPE 3 — SOURCES À INTERROGER (par ordre de valeur)
+          ÉTAPE 3 — SOURCES : QUATRE OBLIGATOIRES, PUIS LE BALAYAGE
           ═══════════════════════════════════════════════════════════════════
+
+          ⛔ **LISTE DE VÉRIFICATION — tu ne peux pas conclure avant d'avoir consulté
+          ces quatre sources.** Ce ne sont pas des suggestions : ce sont celles qui
+          produisent presque tout le rendement de cette veille. Un mois à zéro action
+          requise doit être un FAIT CONSTATÉ sur ces quatre-là, jamais le résultat de
+          recherches trop dispersées.
+
+            ☐ 1. Aides-territoires — aides ouvertes aux COMMUNES, périmètre Loiret /
+                 Centre-Val de Loire / national
+            ☐ 2. Légifrance / JORF de la période — textes intéressant les communes
+                 (CGCT, maire, conseil municipal, urbanisme, voirie, funéraire,
+                 école, élections, DETR, DGF)
+            ☐ 3. Fonds vert — édition en cours, mesures ouvertes, révisions récentes
+            ☐ 4. Préfecture du Loiret — DETR/DSIL (calendrier et ouverture de la
+                 campagne), appels à projets, recueil des actes administratifs
+
+          Si l'une d'elles est inaccessible, dis-le explicitement dans le rapport
+          plutôt que de la passer sous silence.
+
+          Le détail de ces sources, et les autres :
 
           1. **Aides-territoires** (https://aides-territoires.beta.gouv.fr ) — le guichet
              unique de l'État recensant les aides aux collectivités. C'est le cœur de la
@@ -171,6 +216,41 @@ jobs:
              dispositifs d'aide aux communes rurales.
           5. **Compléments** : Association des Maires du Loiret, AMRF, Banque des
              Territoires, ADEME, Agence de l'eau Loire-Bretagne.
+
+          ⚠️ **BALAYAGE PAR COMPÉTENCE — le second temps, une fois les quatre
+          sources obligatoires faites.** L'urbanisme, la voirie et les subventions
+          d'investissement remontent d'eux-mêmes ; l'école, le social et les aînés
+          passent à la trappe si on ne les cherche pas explicitement. Une recherche
+          ciblée par compétence, en commençant par celles liées aux `projets_en_cours`
+          du profil — mais **jamais au détriment des quatre sources ci-dessus** : si
+          le temps manque, c'est ce balayage qu'on écourte, pas la liste de
+          vérification. Les angles utiles :
+
+          - **école, périscolaire, cantine** — fonds de soutien et dotations pour le
+            bâti scolaire, restauration scolaire et cantine à tarif social, fournitures
+            et numérique éducatif, obligations de la rentrée, PEDT, taux d'encadrement ;
+          - **action sociale et aînés** — CCAS, plan canicule et registre des personnes
+            vulnérables, lutte contre l'isolement, aide à domicile, conférence des
+            financeurs, France Services, portage de repas ;
+          - **voirie communale et chemins ruraux** — sécurité routière, amendes de
+            police, entretien, mobilités douces, éclairage public ;
+          - **bâtiments communaux et énergie** — rénovation énergétique, décret
+            tertiaire, confort d'été, certificats d'économie d'énergie ;
+          - **cimetière et funéraire** — reprise de concessions, règlement, ossuaire ;
+          - **état civil, élections, listes électorales** — obligations nouvelles et
+            échéances de calendrier ;
+          - **sécurité civile et prévention** — plan communal de sauvegarde, DICRIM,
+            risques naturels, réserve communale ;
+          - **vie associative, fêtes et culture** — soutien aux associations, FDVA,
+            sécurité des manifestations, patrimoine ;
+          - **communication et numérique** — inclusion numérique, accessibilité RGAA
+            des sites publics, cybersécurité des petites communes, données publiques ;
+          - **urbanisme** — dans le cadre du PLUi-H-D porté par la CCTVL.
+
+          Une compétence sans rien de nouveau ce mois-ci est un résultat NORMAL, et
+          même le cas le plus fréquent. Ne remplis jamais une compétence avec un item
+          faible pour « ne pas la laisser vide » — mais garde la trace de ce que tu as
+          balayé : le rapport doit pouvoir le dire (voir ÉTAPE 5, pied de page).
 
           Si une source est inaccessible ou muette, DIS-LE dans le rapport. N'invente
           jamais un dispositif, un montant ou une échéance pour combler un vide.
@@ -195,6 +275,16 @@ jobs:
           personne n'ouvre. Si aucun item ne mérite « action requise » ce mois-ci,
           ÉCRIS-LE explicitement — ne gonfle jamais la liste pour remplir l'email.
           La crédibilité de l'outil tient entièrement à cela.
+
+          ⚠️ **Mais la sévérité porte sur le TRI, pas sur la RECHERCHE.** Ces deux
+          erreurs coûtent autant l'une que l'autre :
+          - inonder les élus d'items faibles → ils cessent d'ouvrir l'email ;
+          - leur annoncer « rien ce mois-ci » alors qu'une aide était ouverte →
+            l'échéance passe, et l'outil a fait exactement le contraire de sa raison
+            d'être.
+          Un rapport vide n'est donc PAS le résultat prudent par défaut : c'est une
+          affirmation forte, qui engage. Ne l'écris qu'après avoir réellement coché
+          les quatre sources obligatoires de l'ÉTAPE 3.
 
           ⚠️ **Les dates limites sont l'information critique.** Extrais-les et
           vérifie-les systématiquement. En cas d'ambiguïté, écris « date limite à
@@ -221,6 +311,18 @@ jobs:
             foncée distincte. Une page à l'écran, lisible en deux minutes sur mobile.
 
           Structure imposée :
+
+          0. **PRÉEN-TÊTE MASQUÉ** — le tout premier élément de `<body>`, avant l'en-tête.
+             C'est le texte que Gmail affiche en aperçu dans la liste des messages, sous
+             l'objet. Sans lui, cet aperçu recopie le titre et ne dit rien de plus ; il
+             doit donc porter le RÉSUMÉ CHIFFRÉ de l'édition, par exemple :
+             « 2 actions requises · 1 à surveiller · période du 15/07 au 19/08 ».
+             Adapte les nombres à ton tri réel ; s'il n'y a aucune action requise,
+             dis-le (« Aucune action requise · 3 à surveiller · … »).
+             Forme exacte — un `<div>` invisible à l'ouverture du message :
+             `<div style="display:none;font-size:1px;color:#f4f1ea;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">TON RÉSUMÉ ICI&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;&#8199;&#65279;</div>`
+             Garde la suite de `&#8199;&#65279;` : elle empêche le client d'aller
+             compléter l'aperçu avec les premiers mots du corps.
 
           1. **TITRE HORODATÉ EXPLICITE** en `<h1>` :
              « Veille municipale — Mézières-lez-Cléry — édition du ${{ steps.now.outputs.jour_fr }} »
@@ -251,7 +353,20 @@ jobs:
           5. **📋 Écartés ce mois-ci : n items** — le nombre et deux ou trois motifs
              typiques, en une phrase.
 
-          6. **PIED DE PAGE** discret : la citation d'Aides-territoires avec son lien et
+          6. **🔍 Ce qui a été consulté ce mois-ci** — un encadré discret, en petits
+             caractères, en DEUX lignes :
+             - « Sources : Aides-territoires ✓ · JORF ✓ · Fonds vert ✓ · Préfecture
+               du Loiret ✓ » — une par source obligatoire de l'ÉTAPE 3, avec ✓ si tu
+               l'as consultée et ✗ si elle était inaccessible (dis alors pourquoi).
+             - « Compétences balayées : urbanisme, voirie, école et périscolaire,
+               action sociale et aînés, bâtiments et énergie, cimetière, élections,
+               sécurité civile, vie associative, numérique. Sans résultat ce mois-ci :
+               cimetière, élections, vie associative. »
+             C'est ce qui permet à un élu de voir que son domaine a bien été regardé —
+             un silence sans cette ligne se lit comme un oubli. Et c'est ce qui rend
+             une édition maigre vérifiable au lieu d'être prise sur parole.
+
+          7. **PIED DE PAGE** discret : la citation d'Aides-territoires avec son lien et
              la date de consultation (obligation de licence), puis « Veille générée
              automatiquement (GitHub Actions + Claude Code avec recherche web). À
              vérifier sur les fiches sources avant toute démarche. »
@@ -260,25 +375,33 @@ jobs:
           en couleur foncée et soulignée, ouvrant la source d'origine.
 
           ═══════════════════════════════════════════════════════════════════
-          ÉTAPE 6 — METTRE À JOUR LA MÉMOIRE
+          ÉTAPE 6 — ALIMENTER LA MÉMOIRE (second livrable obligatoire)
           ═══════════════════════════════════════════════════════════════════
 
-          Après avoir écrit le rapport, mets à jour `veille/historique-municipale.md` :
-          - Ajoute EN TÊTE des sections datées (juste après le commentaire HTML
-            d'amorce, sans toucher à l'en-tête explicatif du fichier) une section
-            `## ${{ steps.now.outputs.iso }}` listant une ligne par item retenu :
-            `- [action] Titre court — URL` ou `- [surveiller] Titre court — URL`.
-          - Si une section `## ${{ steps.now.outputs.iso }}` existe déjà (tentative
-            précédente du même jour), REMPLACE-la au lieu d'en ajouter une deuxième.
-          - Si rien n'a été retenu : `- (rien de notable)`.
-          - Conserve les sections précédentes mais LIMITE le fichier aux 12 sections
-            les plus récentes — supprime les plus anciennes.
-          - C'est une mémoire compacte, pas un rapport : pas de HTML, pas de commentaire,
-            juste les lignes datées ci-dessus.
+          Tu n'édites PAS `veille/historique-municipale.md` toi-même : un script du
+          workflow l'écrit à partir de la liste structurée que tu produis ici. C'est
+          cette liste qui empêchera le mois prochain de te re-proposer les mêmes
+          dispositifs — sans elle, la veille se répète.
 
-          N'utilise Write que pour ces DEUX fichiers (`rapport-veille-municipale.html` et
-          `veille/historique-municipale.md`). Ne modifie aucun autre fichier du dépôt, ne
-          crée aucune issue, ne fais aucun commit : le workflow s'en charge après l'envoi.
+          Écris `veille/items-municipale.json` : un tableau JSON VALIDE, et rien
+          d'autre dans le fichier (pas de commentaire, pas de texte autour, pas de
+          balise Markdown de code). Un élément par item que tu as RETENU dans le
+          rapport — les deux niveaux, pas seulement les actions requises :
+
+            [{"niveau": "action" | "surveiller",
+              "titre": "titre court, celui du rapport",
+              "url": "https://…"}]
+
+          - `url` doit être l'adresse réelle de la source, en http(s) : c'est la clé
+            du dédoublonnage du mois suivant. Un item sans URL valide est ignoré.
+          - Un tableau vide (`[]`) est la bonne réponse pour un mois sans rien à
+            retenir. N'invente pas d'item pour ne pas le laisser vide.
+          - Les items ÉCARTÉS n'y figurent pas : la mémoire ne retient que ce qui a
+            été signalé aux élus.
+
+          N'utilise Write que pour ces DEUX fichiers (`rapport-veille-municipale.html`
+          et `veille/items-municipale.json`). Ne modifie aucun autre fichier du dépôt,
+          ne crée aucune issue, ne fais aucun commit : le workflow s'en charge.
           PROMPT_TXT
           echo 'MUNICIPALE_PROMPT_EOF'
           } >> "$GITHUB_ENV"
@@ -335,6 +458,7 @@ jobs:
           path: |
             ${{ runner.temp }}/claude-execution-output.json
             ${{ runner.temp }}/claude-execution-output-tentative1.json
+            veille/items-municipale.json
           if-no-files-found: ignore
           retention-days: 30
 
@@ -346,6 +470,19 @@ jobs:
             exit 1
           fi
 
+      # La mémoire est écrite par du CODE, pas par la discipline de l'agent
+      # (ADR-0027). L'exécution du 19 août 2026 s'est terminée « avec succès »,
+      # email parti, et l'étape de commit a répondu « Historique inchangé » :
+      # l'agent avait sauté la dernière consigne d'un prompt de 180 lignes, et
+      # la veille suivante aurait re-proposé les mêmes items. Le script écrit
+      # toujours une section datée — avec les items du JSON, ou avec la mention
+      # de l'anomalie et un ::warning si le JSON manque.
+      - name: Écrire la mémoire de veille
+        if: steps.gate.outputs.run == 'true'
+        env:
+          VEILLE_DATE: ${{ steps.now.outputs.iso }}
+        run: node scripts/update-veille-memoire.js
+
       # ⚠️ Tant que le domaine mezieres-lez-clery.fr n'est pas vérifié sur Resend,
       # l'expéditeur reste le sender de test (onboarding@resend.dev), qui n'autorise
       # l'envoi QUE vers l'adresse du compte Resend. Écrire à tout le conseil suppose
@@ -356,6 +493,10 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # Sans cette ligne, le secret peut exister sans rien changer : le script
+          # retombe sur son défaut (onboarding@resend.dev) et l'envoi au conseil
+          # échoue en 403 sans que le message dise pourquoi.
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
           EMAIL_TEST: ${{ secrets.VEILLE_EMAIL_TO }}
           EMAIL_CONSEIL: ${{ secrets.VEILLE_MUNICIPALE_EMAIL_TO }}
           CIBLE: ${{ steps.cible.outputs.mode }}
@@ -365,6 +506,12 @@ jobs:
             (période du ${{ steps.now.outputs.debut_fr }} au ${{ steps.now.outputs.jour_fr }})
         run: |
           if [ "$CIBLE" = "conseil" ] && [ -n "$EMAIL_CONSEIL" ]; then
+            # Contrôle avant vol : avec l'expéditeur de test, Resend refusera en
+            # 403 avec un message obscur. Autant le dire ici, en clair.
+            if [ -z "$RESEND_FROM" ]; then
+              echo "::error title=Veille municipale::Envoi au conseil demandé, mais le secret RESEND_FROM est vide. L'expéditeur serait onboarding@resend.dev, qui n'autorise l'envoi QU'À l'adresse du compte Resend : Resend rejetterait l'envoi (403). Vérifier d'abord le domaine chez Resend (un sous-domaine d'envoi, ex. send.mezieres-lez-clery.fr, pour ne pas toucher aux enregistrements qui servent la PWA ni au courrier de la mairie), puis renseigner RESEND_FROM — ex. « MAT Veille <veille@send.mezieres-lez-clery.fr> »."
+              exit 1
+            fi
             echo "Envoi au conseil municipal (VEILLE_MUNICIPALE_EMAIL_TO)."
             export EMAIL_TO="$EMAIL_CONSEIL"
           else

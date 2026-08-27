@@ -201,6 +201,96 @@ L'**Agenda** liste les événements à venir dans la commune et ses alentours pr
 - Orienter vers les bons interlocuteurs.
 - Donner des informations pratiques disponibles en ligne.
 
+#### Horaires de bruit — ce que MEL répond
+
+Depuis la v4.83, la question « à quelle heure ai-je le droit de tondre / bricoler ? »
+reçoit une réponse immédiate, tirée de l'**arrêté préfectoral du Loiret du 1er mars 1999**
+relatif à la lutte contre les bruits de voisinage (la commune n'a pas d'arrêté propre sur
+le bruit). Les outils bruyants — tondeuse, taille-haie, tronçonneuse, perceuse, nettoyeur
+haute pression… — sont autorisés :
+
+| Jour | Plages autorisées |
+|---|---|
+| Lundi au vendredi | 8h30 – 12h et 14h30 – 19h30 |
+| Samedi | 9h – 12h et 15h – 19h |
+| Dimanche et jours fériés | 10h – 12h |
+
+En dehors de ces plages, ils sont interdits. Ces horaires ne valent que pour ces outils :
+la règle générale, elle, s'applique de jour comme de nuit — aucun bruit ne doit, par sa
+durée, sa répétition ou son intensité, porter atteinte à la tranquillité du voisinage.
+
+#### Salle communale et location de matériel
+
+La **salle communale** (ou salle des fêtes) **n'est plus proposée à la location** : ni
+pour une fête de famille, ni pour un événement privé. Il n'existe donc ni grille tarifaire
+ni calendrier de réservation, à aucune date. MEL le dit désormais explicitement, au lieu
+d'improviser.
+
+La commune met en revanche du matériel à disposition des Macériens pour leurs
+manifestations : **tables, chaises et barnums** (deux tailles), avec un chèque de caution
+restitué en fin de location si aucune dégradation n'est constatée. Les tarifs et les
+modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la rubrique
+« Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
+recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
+
+#### Crèche familiale « Les Marmousets »
+
+Depuis la v4.85, MEL répond directement aux questions sur la crèche, à partir du
+**règlement de fonctionnement « parents » 2026-2027** du SIVU. La question tombait
+jusque-là sur la réponse générale « périscolaire et centre de loisirs ».
+
+La crèche est **familiale** : les **16** assistantes maternelles salariées accueillent les
+enfants **à leur domicile**, avec des temps collectifs chaque semaine dans les locaux de la
+crèche ou en salle communale. Elle prend les enfants **de 10 semaines jusqu'à leur entrée à
+l'école maternelle** ; les enfants déjà scolarisés peuvent y venir le mercredi et pendant
+les vacances, selon les places. Ouverture **du lundi au vendredi, 7h30-18h30**, au 92 rue du
+Maréchal Foch à Cléry-Saint-André.
+
+Elle est gérée par un **SIVU** réunissant Cléry-Saint-André, Mareau-aux-Prés et
+Mézières-lez-Cléry — les familles macériennes y ont donc droit, mais la crèche **n'est pas
+sur la commune**. L'inscription se fait en liste d'attente, puis une commission
+d'attribution statue sur les places ; **aucune condition d'activité professionnelle** des
+parents n'est exigée.
+
+> ⚠️ **Deux chiffres étaient faux jusqu'à la v4.85** : « 17 assistantes maternelles » (elles
+> sont 16) et « les enfants de moins de 6 ans ». Ce second chiffre figure bien dans le
+> règlement — mais au paragraphe des places garanties de l'article D.214-7, réservées aux
+> parents engagés dans un parcours d'insertion. Un chiffre lu dans la bonne source, au
+> mauvais paragraphe, reste un chiffre faux. Les deux s'étaient propagés dans le corpus
+> « Le saviez-vous ? », qui puise dans l'arbre de décision de MEL.
+
+**Aucun tarif n'est annoncé** : la participation suit le barème national de la CNAF et
+dépend des revenus et du nombre d'enfants à charge de chaque famille. Renseignements au
+02 38 45 76 56 ou à `crechemarmousets@orange.fr`.
+
+#### LAEP — Lieu d'Accueil Enfants-Parents
+
+Depuis la v4.84, MEL répond aux questions sur le **LAEP** ouvert par la Communauté de
+Communes des Terres du Val de Loire **à compter du 7 septembre 2026**. C'est un lieu
+convivial d'écoute, d'échanges, de jeux et de rencontres, **gratuit, confidentiel et sans
+inscription**, pour les enfants de **moins de 6 ans** accompagnés d'un parent, d'un
+grand-parent ou d'un adulte référent — et pour les **futurs parents**. Il est aussi
+accessible depuis la rubrique **Enfance** du parcours guidé de MEL.
+
+Deux points que MEL énonce systématiquement, parce qu'ils prêtent à confusion :
+
+- **Ce n'est pas un mode de garde.** L'adulte qui accompagne l'enfant reste avec lui
+  pendant toute la durée de l'accueil. Au moins deux professionnels, les « accueillants »,
+  sont présents ; ils sont tenus au secret professionnel et à l'obligation de réserve.
+- **Le LAEP est itinérant et ne passe pas par Mézières.** Les communes d'accueil sont
+  Beauce la Romaine, Beaugency, **Cléry-Saint-André** (la plus proche) et Meung-sur-Loire.
+
+Le **planning des créneaux n'est pas encore publié** (état au 25 août 2026). MEL n'annonce
+donc aucun jour ni aucun horaire et renvoie vers les renseignements du service —
+**06 62 65 59 04**, `laep@ccterresduvaldeloire.fr`,
+`https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/` — ou vers la
+mairie (02 38 45 61 76).
+
+Ce silence est volontaire et le restera après la publication du planning : ces créneaux
+changeront sans que l'application en soit avertie, et un horaire faux vaut moins que pas
+d'horaire du tout. `test/laep.test.js` (dépôt backend) refuse toute mention d'un horaire ou
+d'un jour de la semaine dans la réponse de MEL.
+
 ### Ce que MEL ne sait pas faire
 
 - MEL ne peut pas accéder à votre dossier personnel ni effectuer de démarches à votre place.
@@ -610,7 +700,7 @@ liste à cocher**.
 | Étape | Ce qu'on y trouve |
 |---|---|
 | **📦 Dès votre arrivée** | Se présenter en mairie, changement d'adresse, carte grise, ouverture des compteurs d'eau/électricité/gaz, demande des bacs gris et jaune, inscription à la déchetterie, raccordement à la fibre (réseau public Lysséo — et déclaration de l'adresse auprès de XpFibre / Loiret THD si le logement est une construction neuve) |
-| **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine/crèche, médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
+| **🗓️ Dans le premier mois** | Listes électorales, inscription scolaire, périscolaire/cantine et petite enfance (crèche familiale Les Marmousets — à Cléry-Saint-André, Mézières en étant commune partenaire — et LAEP itinérant de la Communauté de Communes), médecin traitant, assainissement (SPANC), recensement citoyen des jeunes de 16 ans |
 | **🌳 Bien vivre à Mézières** | Associations, entreprises et artisans, bus Rémi ligne 8, conseil municipal, règles avant travaux, aides à la rénovation (OPAH) |
 | **🔔 Rester informé** | Notifications, agenda, signalements, boîte à idées |
 

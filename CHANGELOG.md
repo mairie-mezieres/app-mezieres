@@ -5,6 +5,387 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.90] — 27 août 2026
+
+### Ajouté
+- **Le validateur du W3C est branché en intégration continue** —
+  `.github/workflows/validite-html.yml` (RGAA 8.2). Chaque lundi et à chaque
+  modification d'un `.html`, `vnu` — le moteur même de `validator.w3.org`, exécuté
+  en local pour ne dépendre d'aucun service tiers — valide les six pages de
+  l'échantillon. Même modèle que `liens-morts.yml` : **une seule issue vivante**,
+  mise à jour à chaque passage, refermée d'elle-même à zéro erreur.
+  ⚠️ **Il ne fait pas échouer le build** : faire rougir chaque PR sur un passif
+  connu de 33 erreurs apprendrait surtout à ignorer le rouge.
+  ⚠️ **Le contrôle a failli naître aveugle.** Sa première version cherchait le début
+  du JSON à `{"messages"` — or `vnu` émet `{"version":…,"messages":[…]}`. Le repère
+  était introuvable, le script lisait donc **zéro message, donc zéro erreur**, et
+  aurait annoncé le critère 8.2 satisfait à chaque passage, pour toujours. Pris au
+  moment de le lancer contre les pages réelles, qui en comptaient 33. Même panne que
+  les tests axe lancés sur un écran encore invisible (ADR-0030) : **un contrôle qui
+  ne mesure rien ne rougit pas, il verdit.** Le script échoue désormais bruyamment
+  quand la sortie du validateur est illisible, plutôt que de conclure au vert.
+
+### Corrigé
+- **RGAA 8.2 — quatre erreurs de validité, dont une qui pouvait recharger la page.**
+  Le validateur en a relevé 39 ; ces quatre-là étaient sans risque :
+  - espaces non encodées dans un `src` — `img/MAT et MEL.webp` (4 occurrences dans
+    `index.html`) et `img/Fabrice AUFFRET ….jpg` dans `partager.html` → `%20` ;
+  - `src=""` sur `#trombi-big-img` : invalide, et **interprété par certains
+    navigateurs comme une requête vers la page courante** — donc un rechargement
+    parasite. Remplacé par un pixel transparent en `data:` ; la vraie photo est
+    posée par le script à l'ouverture du trombinoscope ;
+  - `aria-label` sur le `<div class="ov" id="ov-carte3d">`, sans rôle propre :
+    invalide, et inutile depuis que `openOv()` pose `aria-labelledby` vers le titre
+    du panneau.
+
+### Audit — l'audit RGAA est terminé
+- **Les 106 critères ont tous un verdict.** Aucun `?` ne subsiste. Cinquième et
+  dernière passe.
+- **Cinq critères de jugement humain tranchés par le référent accessibilité**
+  (27 août 2026) — aucun outil ne dit si une alternative d'image est *pertinente*,
+  ni si un PDF sort d'un scanner :
+  - **1.3** les quatre alternatives d'images conviennent → `C` ;
+  - **3.1** partout un mot ou un symbole double la couleur (vigilance météo,
+    sécheresse, statut des signalements, zonage du PLU) → `C` ;
+  - **13.3 / 13.4** les documents du PLUi sont des **exports numériques**, non des
+    scans : ils portent une couche de texte → `C` ;
+  - **13.10** zoom, rotation et remise à plat de la carte 3D se font aux boutons,
+    à un doigt → `C`.
+  Ce sont des **déclarations, pas des mesures** : le RGAA les admet, mais elles se
+  re-vérifient à chaque nouveau document publié ou changement de gestes.
+- **8.2 était une mesure, et il tombe.** 39 erreurs relevées, 4 corrigées ci-dessus,
+  **33 restantes** en trois familles seulement : 28 `<div>` dans un `<button>` (les
+  tuiles de l'accueil), 4 `<div>` dans un `<label>` (`partager.html`), 1 `<style>`
+  dans le `<body>` (`index.html` ligne 80, la feuille du lien d'évitement — la
+  déplacer dans le `<head>` change l'ordre de la cascade). Passe de `?` à **`NC`**.
+  ⚠️ Vérifié avant de renoncer : `.ct-label` et `.ct-sub` ne déclarent **aucun**
+  `display`. Convertir ces `<div>` en `<span>` casserait la mise en page des 28
+  tuiles tant qu'un `display:block` ne leur est pas rendu — le chantier rejoint le
+  plan d'action, il n'est pas un remplacement mécanique.
+- **La quatrième passe pronostiquait 87,7 %, la mesure dit 86,2 %.** Le saut n'est
+  pas de 6 critères mais de 5 : c'est la différence entre un pronostic et un audit.
+
+### Modifié
+- **Taux de conformité RGAA : 78,5 % → 86,2 %** (56 conformes sur 65 applicables,
+  41 non applicables). Mention inchangée : **partiellement conforme**.
+- Déclaration d'accessibilité publiée dans l'app, `docs/accessibilite/audit-rgaa-2026-08-27.md`
+  et `docs/accessibilite/schema-pluriannuel.md` mis en phase. Le plan d'action publié
+  passe de « six critères ouverts + huit chantiers » à **neuf non-conformités datées** ;
+  « poser les repères de page », traité en v4.89, en disparaît.
+
+---
+
+## [4.89] — 27 août 2026
+
+### Corrigé
+- **RGAA 9.2 / 12.6 — aucun repère de page.** Un lecteur d'écran devait parcourir
+  toute la page de haut en bas, sans pouvoir sauter à l'en-tête, au contenu principal
+  ou au pied. `offline.html` et `architecture.html` n'en avaient aucun.
+  `role="banner"`, `role="main"` et `role="contentinfo"` posés — **le rôle plutôt que
+  la balise** : `<div>` → `<header>` aurait le même effet sémantique, mais imposerait
+  de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié après
+  coup : un seul repère de chaque type par page.
+
+### Audit — une erreur corrigée
+- **10.8 était un faux positif.** La deuxième passe avait relevé « un conteneur
+  `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne
+  vérifiait pas si le conteneur était affiché. Mesuré : `display:none`, boîte du
+  bouton à 0 px, hors ordre de tabulation — et le script bascule bien `aria-hidden`
+  à `false` à l'ouverture. **Conforme, sans correctif.**
+- **10.5 reste non conforme, délibérément.** 45 déclarations inline posent le fond
+  **ou** la couleur du texte, dont **6 seulement** sur des éléments visibles, et l'une
+  est le fond de `<html>`. Corriger les 45 à l'aveugle ferait courir un risque visuel
+  réel pour un bénéfice théorique : à traiter cas par cas.
+
+### Modifié
+- **Taux de conformité RGAA : 73,8 % → 78,5 %** (51 conformes sur 65 applicables).
+- **Aucun changement visible.**
+
+---
+
+## [4.88] — 27 août 2026
+
+### Corrigé
+- **RGAA 7.5 — aucune région live.** Les réponses de MEL, le suivi des signalements
+  et la galerie photos étaient mis à jour en silence : un lecteur d'écran n'annonçait
+  rien. Un habitant aveugle dont l'envoi échouait croyait que c'était parti.
+  `role="status"` + `aria-live="polite"` sur `#msgs`, `#suivi-body` et `#photos-list` ;
+  la modale de validation devient un `alertdialog` et prend le focus.
+- **RGAA 11.10 / 11.11 — l'erreur de saisie ne désignait pas le champ fautif.** Elle
+  s'affichait dans une fenêtre, et après fermeture le focus repartait au début du
+  document. Désormais : `aria-invalid` sur le champ, focus rendu au champ, marqueur
+  effacé dès la première frappe. Le focus est aussi rendu à son point de départ à la
+  fermeture de toute modale (12.9).
+- **RGAA 11.5 à 11.7 — champs de même nature non groupés.** Les vingt cases de
+  `partager.html` n'avaient aucun groupement, et le libellé « Votre niveau en
+  informatique » **ne portait aucun `for`** : affiché, rattaché à rien. `role="group"`
+  + `aria-labelledby`, et le libellé orphelin devient la légende du groupe.
+- **RGAA 5.4 à 5.7 — les horaires de la mairie** étaient lus d'une traite, sans lien
+  entre le jour et l'heure. `caption` réservé aux lecteurs d'écran, jour passé en
+  `th scope="row"`. **Rendu vérifié identique** — les règles CSS rendent au `th`
+  l'apparence exacte de l'ancien `td`. Idem pour les deux tableaux RGPD.
+- **RGAA 13.2 — 7 liens** ouvraient une nouvelle fenêtre sans le dire. Mention
+  ajoutée en texte réservé aux lecteurs d'écran, posée au chargement puis à
+  l'ouverture de chaque écran — ce qui couvre les contenus injectés après coup sans
+  imposer d'observateur de mutations permanent.
+
+### Modifié
+- **Taux de conformité RGAA : 56,9 % → 73,8 %** (48 conformes sur 65 applicables).
+  Mention inchangée : **partiellement conforme**.
+- **Aucun changement visible.** L'apparence de l'application est identique.
+
+### Connu
+- **RGAA 11.13 reste non conforme, délibérément.** Le champ « Coordonnée de réponse »
+  accepte un e-mail **ou** un téléphone : aucun jeton `autocomplete` ne couvre les
+  deux. Le corriger demande de scinder le champ — un changement visible, planifié
+  pour 2027.
+
+---
+
+## [4.87] — 27 août 2026
+
+### Modifié
+- **L'application n'est plus déclarée « non conforme ».** L'audit des 106 critères
+  du RGAA est achevé : **41 non applicables**, donc **65 applicables** — **37
+  conformes**, 22 non conformes, 6 non tranchés. **Taux : 56,9 %**, mention
+  **partiellement conforme**. Les 6 non tranchés sont comptés comme non conformes :
+  le taux publié est un **plancher**, qui ne peut que monter.
+- Plan d'action réordonné : d'abord les 6 critères ouverts (ils font monter le taux
+  sans qu'une ligne de code change), puis les non-conformités. Les traiter porterait
+  le taux au-delà de **90 %**.
+
+### Corrigé
+- **RGAA 3.3 — les bordures des champs de saisie étaient presque invisibles.**
+  `rgba(0,0,0,0.07)` = **1,17:1**, pour un minimum de 3:1. Nouveau jeton
+  `--border-champ` à **3,88:1**, décliné pour le contraste élevé (10,37:1) et le
+  thème sombre (4,79:1). `--border` reste inchangé : il sert aussi à des séparateurs
+  décoratifs, qui n'ont aucun minimum à respecter.
+- **RGAA 3.3 — les interrupteurs du panneau Accessibilité** : piste `#ccc` sur blanc
+  = **1,61:1**, état allumé **2,47:1**. Bordure ajoutée (**3,95:1**), état allumé
+  passé à `--sage-ink` (**6,39:1**), distinction éteint/allumé à **3,98:1**.
+- **RGAA 10.9 / 10.10 — l'état sélectionné n'était donné que par la couleur** sur les
+  boutons de taille de texte, de thème et les onglets de l'agenda. `aria-pressed`
+  ajouté sur les six.
+- **RGAA 8.9 — 15 séquences de `<br><br>`** servaient à espacer des paragraphes
+  (présentation du majordome, contact RGPD, écran d'accueil). Remplacées par de vrais
+  paragraphes, l'espacement rendu au CSS.
+
+### Audit — critères tranchés dans cette version
+- **8.9**, **13.11** (aucun gestionnaire `mousedown`/`touchstart`/`pointerdown` :
+  tout passe par `click` et `change`, annulables), **3.3**, **10.9**, **10.10** →
+  conformes. **10.13**, **10.14**, **12.11** → non applicables : aucun contenu
+  additionnel révélé au survol par CSS ou JavaScript.
+- Restent 6 critères, dont 5 relèvent du jugement de la mairie et 1 du validateur
+  du W3C.
+
+---
+
+## [4.86] — 27 août 2026
+
+### Corrigé
+- **Les douze interrupteurs du panneau Accessibilité n'avaient aucun nom accessible**
+  (RGAA 11.1, axe `label`, niveau *critical*). Contraste élevé, mode daltonien,
+  lecture vocale, espacement des lignes… : au lecteur d'écran, tous s'annonçaient
+  « case à cocher », sans distinction. Le libellé visible existait, dans un `<div>`
+  frère non associé. Rattaché par `aria-labelledby`.
+- **Six champs de formulaire sans étiquette associée** (RGAA 11.1) — signalement,
+  contact (×3), bug, boîte à idées. Le `<label class="form-label">` existait mais
+  **sans `for`** : seul le `placeholder` portait l'information, et un `placeholder`
+  n'est pas une étiquette — il disparaît à la saisie. `for` posé sur les cinq
+  libellés existants, `aria-label` sur la boîte à idées qui n'en avait aucun.
+- **Les trente fenêtres modales n'avaient pas de nom** (RGAA 12.9). Elles portaient
+  bien `role="dialog"` et `aria-modal`, mais un lecteur d'écran annonçait
+  « dialogue » sans dire lequel. `openOv()` pose désormais un `aria-labelledby`
+  vers le titre visible du panneau.
+- **Contrastes insuffisants** relevés et corrigés :
+  - bouton d'appel **Pompiers 18** — blanc sur `#ea580c` = **3,55:1** → `#c2410c` = 5,18:1 ;
+  - intitulés de rubrique `--sage` `#52b788` sur blanc = **2,47:1** → jeton `--sage-ink`
+    `#2d6a4f` = 6,39:1 (numéros utiles, dernier document, widgets, liens MEL) ;
+  - `offline.html` — texte à 2,47:1 et 2,32:1 ;
+  - `architecture.html` — 26 nœuds sur fond sombre, jusqu'à **1,22:1** ;
+  - messages d'erreur `#dc2626` sur crème `#f4f0ea` = **4,25:1** → `#b91c1c`.
+- **`partager.html` n'avait aucun `<h1>`** (RGAA 9.1). Le titre visuel en devient un,
+  rendu inchangé.
+- **Lien d'attribution de la carte** (RGAA 10.6) : 2,55:1 avec le texte voisin et
+  aucune distinction non colorimétrique. Souligné — avec la spécificité nécessaire
+  pour battre `leaflet.css`, injecté dans le `<head>` après `mat.css`.
+
+### Modifié
+- **La déclaration d'accessibilité explique enfin ce que « non conforme » signifie** :
+  non pas inaccessible, mais **non mesurée** sur les 106 critères. Le RGAA ne connaît
+  que trois états et n'autorise les deux autres que sur la foi d'un audit.
+- **Schéma pluriannuel 2026-2029 et plan d'action 2026-2027 publiés dans l'app**,
+  écran Accessibilité — neuf chantiers datés, obligation du décret n° 2019-768.
+- Le badge « ♿ RGAA · WCAG AA » de l'écran RGPD, affiché sous le titre
+  « Certifications & engagements », **contredisait la déclaration à deux écrans
+  d'écart**. Devenu « ♿ Accessibilité renforcée ».
+
+### Tests
+- **Cinq contrôles axe ne pouvaient pas échouer.** Ils mesuraient l'écran pendant sa
+  transition d'ouverture, alors qu'il était encore `visibility:hidden` — et axe ignore
+  ce qui est masqué. 0 violation à t=0, 9 à t=400 ms, mêmes nœuds. Ils attendent
+  désormais le **style calculé**. Ils ont aussitôt révélé deux défauts réels.
+
+### Audit des 106 critères
+- Sur 106 critères, **38 non applicables** (ni média temporel, ni cadre, ni CAPTCHA),
+  donc **68 applicables** : **32 conformes**, 22 non conformes, **14 non tranchés**.
+- Le seuil de « partiellement conforme » est à **34 sur 68**. **Il suffit que deux
+  des quatorze critères non tranchés soient conformes** pour que la mention change.
+  Le travail restant n'est pas de rendre l'application accessible : c'est de finir
+  de la mesurer.
+- Des quatorze, **huit** sont résolubles par des mesures complémentaires, **un**
+  demande le validateur du W3C, et **cinq** relèvent du jugement humain (pertinence
+  des alternatives, information par la seule couleur, accessibilité des PDF du PLUi,
+  gestes sur la carte 3D).
+
+### Documentation
+- `docs/accessibilite/audit-rgaa-2026-08-27.md` — méthode, échantillon, preuves,
+  tableau des 106 critères, et les 14 questions restantes.
+- `docs/accessibilite/schema-pluriannuel.md` — schéma 2026-2029.
+- **ADR-0030** — « Un contrôle d'accessibilité lancé trop tôt mesure un écran vide ».
+
+---
+
+## [4.85.1] — 27 août 2026
+
+### Corrigé
+- **Les cerfa d'urbanisme cités par l'application étaient abrogés.** Au **1er janvier
+  2025**, les cerfa **13703** (DP maison individuelle), **13702** (DP lotissement) et
+  **13404** (DP constructions et travaux) ont été remplacés par le **16702**
+  (constructions et travaux) et le **16703** (aménagements) ; le permis de construire
+  reste le **13406**. Un dossier déposé sur l'ancien formulaire est refusé.
+  - `js/mat-mel.js` — le lien « 📄 Cerfa DP » du zonage PLU pointait `…/vosdroits/R11646`,
+    **supprimée** du site Service-Public (404 signalé par le scan hebdomadaire, issue
+    #400). Il pointe désormais `…/vosdroits/R2028`.
+  - `data/saviez-vous.json` — l'entrée `gnau-cerfa-cloture` enseignait que le 16702 était
+    « propre aux clôtures » et renvoyait au 13703 pour le reste : **verdict inversé**
+    (`false` → `true`, l'identifiant est conservé pour les compteurs de réactions), texte
+    réécrit et sourcé. L'entrée `cloture-dp` perd son millésime « \*02 ».
+  - Backend `lib/mel.js` — la règle `plu_permis_construire_depot` et le bloc AUTORISATIONS
+    du `SYSTEM_PROMPT` conseillaient le 13703. Corrigés, et le prompt interdit désormais
+    explicitement les trois numéros abrogés. Verrouillé par `test/urbanisme-cerfa.test.js`.
+- **« Où trouver le cerfa pour ma clôture ? » ne tombait sur aucune règle directe** — les
+  règles clôture exigent toutes un second terme (rue, voisin, hauteur) — et partait donc
+  au modèle, à l'endroit précis où le numéro périmé risquait le plus d'être repris.
+- **`data/saviez-vous.json` était précaché sous une URL que personne ne demandait.** Le
+  service worker précachait `?v=1.3.1` quand `js/mat-saviez-vous.js` réclamait `?v=1.3.0` :
+  l'entrée de précache ne servait jamais. Les deux passent à `?v=1.4.0`.
+- **Scan de liens morts : trois faux positifs par étranglement.** lychee lançait jusqu'à
+  128 requêtes en parallèle avec 20 s de patience ; `service-public.gouv.fr` laissait
+  expirer une partie de la rafale (issue #201 du dépôt backend, sur des pages vivantes).
+  Les deux workflows passent à `--max-concurrency 8 --timeout 30`.
+
+### Documentation
+- **ADR-0029** — « Un numéro de formulaire mort ne se voit pas comme un lien mort ».
+
+---
+
+## [4.83] — 23 août 2026
+
+### Ajouté
+- **MEL connaît les horaires de bruit.** Nouvelle `DIRECT_RULE` `bruit_travaux_horaires`
+  (backend `lib/mel.js`) : réponse instantanée, sans appel IA, tirée de l'**arrêté
+  préfectoral du Loiret du 1er mars 1999**. Outils bruyants autorisés du lundi au vendredi
+  8h30-12h et 14h30-19h30, le samedi 9h-12h et 15h-19h, le dimanche et les jours fériés
+  10h-12h. Un bloc **BRUITS DE VOISINAGE** est ajouté au `SYSTEM_PROMPT` pour les
+  formulations qui passeraient à travers la regex.
+
+### Corrigé
+- **MEL inventait les horaires de bruit.** Le changelog de la **v4.15** annonçait déjà une
+  « règle MEL directe pour les horaires de bruit et de bricolage » — elle **n'a jamais
+  existé dans le code**. Conséquence en production : « quelles sont les horaires de bruit »
+  → « je n'ai pas cette information », et la même question reformulée → des horaires
+  **inventés** (« interdit de 22h à 7h », « dimanche toute la journée ») attribués à un
+  **arrêté municipal inexistant**. Une règle absente ne se manifeste pas par un silence,
+  mais par une hallucination plausible.
+  - `chatbot-mairie-mezieres/test/bruit.test.js` verrouille les deux faces : les plages
+    exactes sont présentes, **et** les plages hallucinées sont absentes.
+  - Voir **ADR-0013 du backend** (« Une règle absente ne se tait pas, elle hallucine »).
+- **MEL improvisait sur la location de la salle communale.** « Je souhaite louer la salle
+  des fêtes, quel est le tarif pour le 1er week-end d'octobre 2026 ? » partait dans la
+  catégorie « autre ». Or **la salle n'est plus proposée à la location**. Le fait existait
+  pourtant dans le dépôt — mais enterré en 9ᵉ ligne d'un paragraphe de 200 mots de la
+  rubrique « Location de matériel » (`data/mel-tree.json`), **absent** de l'autre copie de
+  l'arbre (`js/mat-mel.js`), et inconnu du backend.
+  - Nouvelle `DIRECT_RULE` `location_salle_materiel` + bloc `SALLE COMMUNALE ET LOCATION
+    DE MATÉRIEL` dans le `SYSTEM_PROMPT`, côté backend.
+  - `js/mat-mel.js` et `data/mel-tree.json` : la rubrique « Location de matériel communal »
+    l'annonce désormais **en première phrase**, dans les deux copies de l'arbre.
+  - **Aucun tarif n'est recopié dans le code** : les prix vivent dans l'arbre de décision,
+    que la mairie édite depuis l'admin. Les dupliquer créerait une double source vouée à
+    diverger — un test le vérifie (`test/location-salle.test.js`).
+
+### Supprimé
+- Lien mort **« 🌐 Page location matériel »** (`mezieres-lez-clery.fr/2018/10/24/…`) dans
+  `data/mel-tree.json` : l'ancien site WordPress n'existe plus, le domaine sert
+  l'application. Dernière URL de ce type dans `data/` et `js/`.
+
+---
+
+## [4.82] — 21 août 2026
+
+### Ajouté
+- **Les lieux-dits et hameaux nommés sur la carte 3D du village.** Manthelon, Rolland, le
+  Bréau… La couche `BDTOPO_V3:toponymie` de l'IGN les porte avec leur point exact. Chaque
+  nom est posé **au bout d'un mât terminé par un point au sol** : sans lui, un nom au ras du
+  sol à côté d'une maison de 6 m semblerait nommer la maison — et un marqueur HTML n'étant
+  jamais occulté par le bâti, un nom lointain flotterait sur les maisons du premier plan.
+  - **Le mât vaut 13 m réels**, convertis en pixels par `(h / mpp) × sin(pitch)` : il
+    rétrécit avec la distance comme le bâti, à l'inverse d'un décalage écrit en pixels
+    (RG-17.17). `sin` et non `cos` — à la verticale, une hauteur ne se projette pas. Ce
+    n'est **pas une mesure** : même statut que les toits en pente (RG-17.15).
+  - Voir **ADR-0026** (complété) et **RG-17.30**.
+
+### Ce que la source a appris
+- ⚠️ **La couche de toponymie ne contient pas que des lieux-dits** : 219 objets sur
+  l'emprise de la commune — croix, ponts, sources. Seule la classe « Zone d'habitation » est
+  affichée ; **tout le reste est compté par classe** dans « 🔎 Détail des sources », pour
+  qu'un hameau rangé un jour ailleurs se voie au lieu de manquer en silence.
+- ⚠️ **Il existe deux « manthelon » en France** — le nôtre et un autre à 120 km, en
+  Eure-et-Loir, sortis de la même requête avec la même graphie et la même classe. C'est très
+  exactement le risque qu'ADR-0021 avait invoqué pour refuser de résoudre les communes par
+  leur nom, et cette fois la preuve était dans la réponse du service. Le découpage sur le
+  contour communal est verrouillé par un test qui échoue si on le retire.
+- ⚠️ **La graphie arrive en minuscules.** `_c3dCapitales` remet les majuscules, particules
+  exceptées — et seulement si la graphie n'en porte aucune, pour ne jamais retoucher un
+  « Saint-Laurent-des-Bois » déjà bien écrit.
+
+### Modifié
+- **La chaîne de requête WFS est partagée** entre le bâti et la toponymie (`_c3dWfs`) : deux
+  couches de la même base, servies par le même service, avec les mêmes trois formulations de
+  repli. Les libellés du journal gagnent un préfixe (« BD TOPO bâti », « BD TOPO
+  toponymie ») — sans quoi le panneau de diagnostic afficherait deux lignes identiques.
+- **L'anticollision des étiquettes est mutualisée** (`_c3dRangerEtiquettes`) entre les noms
+  de communes et ceux des lieux-dits.
+
+## [4.81] — 21 août 2026
+
+### Ajouté
+- **Le nom des 25 communes en vue « Le territoire ».** La vue du PLUi-H-D affichait
+  vingt-cinq contours anonymes : le seul endroit qui les nommait était un panneau dépliant,
+  c'est-à-dire pas là où se pose le regard. Chaque contour porte désormais son nom, posé au
+  centroïde d'aire de son **plus grand** polygone (`_c3dCentreEtiquette`), Mézières en or
+  comme sa limite.
+  - **Des marqueurs HTML, pas une couche `symbol`** : le style de la carte n'a pas d'URL
+    `glyphs`, et sans glyphes un `text-field` ne rend *rien*, sans erreur ni trace. Les
+    vendoriser coûterait quelques centaines de kilo-octets à une page déjà lourde
+    (ADR-0018). Coût assumé, et tenu par trois tests : anticollision écrite à la main,
+    masquage explicite au retour au village (`setLayoutProperty` n'atteint pas un élément
+    HTML), et `pointer-events:none` pour ne pas avaler le clic qui nomme la commune.
+  - **Le nom écrit est celui que le Géoportail a renvoyé**, jamais la liste de la mairie :
+    une commune non appariée reste sans nom sur la carte, et signalée dans le panneau
+    (prolongement de RG-17.20). Un contour sans surface n'en reçoit pas non plus.
+  - Voir **ADR-0026** et **RG-17.29**. L'ADR consigne aussi ce qui n'est pas fait — les
+    lieux-dits du village — et pourquoi : les noms de couches BD TOPO doivent être confirmés
+    depuis une machine connectée, et les « quartiers » ne peuvent venir que de la mairie
+    (l'IRIS de l'INSEE ne descend pas sous 10 000 habitants).
+
+### Supprimé
+- **Un repli inatteignable dans `_c3dCentreEtiquette`.** Le test écrit pour l'exercer a
+  échoué : un anneau d'aire nulle n'est jamais retenu par la boucle qui cherche le plus
+  grand polygone, donc la branche « moyenne des sommets » ne pouvait pas être prise. Le
+  contrat est rendu explicite — pas de surface, pas de nom — plutôt que gardé endormi.
+
 ## [4.80] — 17 août 2026
 
 ### Modifié

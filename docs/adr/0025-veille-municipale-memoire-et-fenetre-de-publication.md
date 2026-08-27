@@ -107,3 +107,50 @@ explicitement.
   Loire / national, bénéficiaire « commune »), sans rien changer au reste de la chaîne —
   ni à la mémoire, ni à la fenêtre, ni à l'envoi. L'obligation de citer Aides-territoires
   avec un lien et une date de mise à jour vaut dans les deux cas.
+
+---
+
+## Retour d'expérience — 25 août 2026 : la sévérité avait été mise au mauvais endroit
+
+Trois exécutions le même jour, même fenêtre `21/07 → 25/08`, ont produit **2, 0 et 1**
+items. Les deux dernières partaient d'une mémoire vide — donc avec plus de liberté que
+la première, qui avait cinq items à exclure. Aucune des trois n'a retrouvé le **décret
+n° 2026-674** (simplification de l'action publique locale, en vigueur depuis le
+29 juillet, volet urbanisme) ni la **révision de la mesure Fonds vert « bâtiments
+publics »** de juillet — les deux items les plus utiles de la période, trouvés à la main
+lors de la mise au point.
+
+Ce n'était donc pas un mois calme, mais une recherche qui passait à côté de l'existant.
+
+**Cause.** Le prompt empilait trois consignes qui poussent toutes à écarter — « le
+sur-signalement tue l'outil », la fenêtre de publication, « si tu ne peux pas dater,
+n'inclus pas » — et **aucune qui impose de vérifier les sources à fort rendement**. Des
+plafonds sans plancher. Le balayage par compétence ajouté entre-temps a probablement
+aggravé les choses en étalant l'effort sur dix domaines au lieu de creuser les quatre
+sources qui produisent presque tout.
+
+**Deux erreurs de conception, corrigées :**
+
+1. **La fenêtre servait d'anti-répétition.** « Pas de rappel d'un dispositif permanent
+   qui n'a pas bougé » écartait mécaniquement la DETR, le Fonds vert et tout dispositif
+   pluriannuel — alors que la mémoire, elle, joue déjà ce rôle, et bien mieux : un
+   dispositif absent de l'historique n'a jamais été signalé aux élus, il est donc neuf
+   **pour eux**. Une **échéance à venir dans les 3 mois** devient un motif d'inclusion à
+   part entière.
+2. **La sévérité portait sur la recherche, pas seulement sur le tri.** Un rapport vide
+   était devenu le résultat prudent par défaut. Or les deux erreurs coûtent autant :
+   inonder fait cesser de lire, mais annoncer « rien ce mois-ci » alors qu'une aide était
+   ouverte fait manquer l'échéance — l'exact contraire de la raison d'être de l'outil.
+
+**Ce qui a été mis en place :** une **liste de vérification de quatre sources**
+(Aides-territoires, JORF de la période, Fonds vert, préfecture du Loiret) qu'il faut
+avoir cochées avant de pouvoir conclure ; le balayage par compétence explicitement
+subordonné à ces quatre-là ; la règle de datation assouplie (non datable mais
+manifestement en cours → « à surveiller — date à vérifier » plutôt que suppression) ; et
+un encadré **« Ce qui a été consulté ce mois-ci »** dans le rapport, listant les sources
+cochées et les compétences balayées. C'est ce dernier point qui rend une édition maigre
+**vérifiable** au lieu d'être prise sur parole.
+
+**Point de vigilance.** Le prompt approche les 300 lignes. C'est la longueur qui avait
+fait sauter l'étape mémoire (ADR-0027). Toute consigne réellement critique doit être
+soit tôt dans le prompt, soit sortie du prompt et confiée à du code.

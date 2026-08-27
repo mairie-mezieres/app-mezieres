@@ -1046,6 +1046,14 @@ rédaction. ⚠️ Ce fichier est de la **connaissance**, pas de la mise en form
 compétence déléguée oubliée fait remonter chaque mois des aides que la commune ne
 peut pas solliciter. Il se tient à jour à la main.
 
+Le profil sert **aussi de plan de recherche** : l'agent doit consacrer au moins une
+recherche à chacune des compétences listées, et pas seulement à celles qui remontent
+d'elles-mêmes. L'urbanisme, la voirie et les subventions d'investissement se signalent
+tout seuls ; **l'école, l'action sociale et les aînés passent à la trappe si on ne les
+cherche pas nommément**. Le rapport se termine donc par une ligne « 🔍 Compétences
+balayées ce mois-ci », qui nomme aussi celles restées sans résultat — sans elle, un
+silence sur un domaine se lit comme un oubli.
+
 **2. Deux garde-fous anti-répétition, pas un.**
 
 - la **mémoire** `veille/historique-municipale.md` (12 dernières éditions, une ligne
@@ -1055,10 +1063,54 @@ peut pas solliciter. Il se tient à jour à la main.
   modifiés entre `J-35` et `J`, chacun daté. Un dispositif permanent qui n'a pas
   bougé n'entre pas ; une date limite déjà passée écarte l'item.
 
+⚠️ **La mémoire est écrite par du code, pas par l'agent** (ADR-0027). L'agent produit
+`veille/items-municipale.json` (`{niveau, titre, url}`, éphémère et non committé, sur
+le modèle de `veille/actions-pwa.json`) ; `scripts/update-veille-memoire.js` en écrit
+la section datée. Le script écrit **toujours** une section — avec les items, ou avec
+`- (mémoire non renseignée par l'agent…)` et un `::warning` si le JSON manque — et
+sort toujours en 0 : un souci de mémoire ne doit pas coûter l'email.
+
+> Pourquoi : au **premier run réel** (19 août 2026), tout était vert, l'email est
+> parti, et l'étape de commit a répondu « Historique inchangé — rien à committer ».
+> L'agent avait sauté l'ÉTAPE 6, dernière consigne d'un prompt de 180 lignes. Rien
+> n'avait échoué ; la panne ne serait devenue visible que le mois suivant, sous la
+> forme d'items re-proposés. Ne pas remettre l'écriture de la mémoire dans le prompt.
+
 La période est écrite dans l'objet de l'email et sous le titre, et le rapport
 s'ouvre sur une introduction qui rappelle l'objectif et que **l'outil oriente mais
 ne décide pas**. Le tri est plafonné : au plus 4 « action requise », 6 « à
 surveiller », les écartés réduits à un nombre et à leurs motifs.
+
+Le rapport commence par un **préen-tête masqué** (`<div>` invisible, premier enfant
+de `<body>`) portant le résumé chiffré — « 2 actions requises · 1 à surveiller ·
+période du … ». C'est la ligne d'aperçu affichée par Gmail sous l'objet, la plus lue
+sur mobile : sans elle, l'aperçu ne fait que recopier le titre du rapport, ce qui
+donne l'illusion d'un doublon dans la liste des messages.
+
+⚠️ **Les plafonds vont avec un plancher** (calibrage du 25 août 2026, voir le retour
+d'expérience en fin d'ADR-0025). Trois exécutions le même jour ont produit 2, 0 puis
+1 items sur la même fenêtre, en manquant les deux dispositifs les plus utiles de la
+période. Le prompt n'avait que des consignes poussant à écarter. Trois règles ont été
+posées, à ne pas défaire :
+
+- **la fenêtre de publication n'est pas l'anti-répétition** — c'est la mémoire qui
+  joue ce rôle. Un dispositif permanent absent de l'historique n'a jamais été signalé
+  aux élus, donc il est neuf pour eux. Une **échéance à venir dans les 3 mois** suffit
+  à inclure un item, même ouvert avant la période (c'est ce qui récupère la DETR et le
+  Fonds vert, mécaniquement écartés jusque-là) ;
+- **une liste de vérification de quatre sources** — Aides-territoires, JORF de la
+  période, Fonds vert, préfecture du Loiret — doit être cochée avant de pouvoir
+  conclure. Le balayage par compétence lui est subordonné : s'il faut écourter, c'est
+  lui qu'on écourte ;
+- **la sévérité porte sur le tri, pas sur la recherche.** Un rapport vide n'est pas le
+  résultat prudent par défaut : annoncer « rien ce mois-ci » alors qu'une aide était
+  ouverte fait manquer l'échéance, soit l'exact contraire de la raison d'être de
+  l'outil.
+
+Le rapport se termine donc par un encadré **« 🔍 Ce qui a été consulté ce mois-ci »** :
+les quatre sources avec ✓ ou ✗, puis les compétences balayées et celles restées sans
+résultat. C'est ce qui rend une édition maigre vérifiable au lieu d'être prise sur
+parole.
 
 **3. Destinataires — un secret, pas un commit.**
 
@@ -1069,10 +1121,46 @@ surveiller », les écartés réduits à un nombre et à leurs motifs.
 | manuelle, entrée `destinataire: conseil` | `VEILLE_MUNICIPALE_EMAIL_TO` |
 
 Tant que `VEILLE_MUNICIPALE_EMAIL_TO` n'est pas créé, tout part à l'adresse de test.
-⚠️ **Écrire à tout le conseil suppose d'abord un domaine vérifié chez Resend** :
-l'expéditeur est le sender de test `onboarding@resend.dev`, qui n'autorise l'envoi
-que vers l'adresse du compte Resend. Renseigner quinze adresses sans avoir vérifié
-`mezieres-lez-clery.fr` et renseigné `RESEND_FROM` produit un 403, pas un envoi.
+
+### Expéditeur : `mezieres-lez-clery.fr` vérifié chez Resend (25 août 2026)
+
+Le domaine **racine** `mezieres-lez-clery.fr` est vérifié dans le compte Resend
+(DNS chez OVH, gérés par le prestataire ADEFI ; région d'envoi `eu-west-1`). Les
+trois veilles et le mail de stats partent donc d'une vraie adresse de la mairie,
+`numerique@mezieres-lez-clery.fr`, via le secret **`RESEND_FROM`** :
+
+| Où | Valeur |
+|---|---|
+| Secret GitHub `RESEND_FROM` (les 3 veilles) | `MAT Veille <numerique@mezieres-lez-clery.fr>` |
+| Variable Render `RESEND_FROM` (mail de stats) | `MAT Stats <numerique@mezieres-lez-clery.fr>` |
+
+**Pourquoi le domaine racine et non un sous-domaine d'envoi.** Resend n'autorise un
+`From` que sur un domaine **vérifié dans le compte**. Vérifier
+`send.mezieres-lez-clery.fr` aurait imposé d'écrire depuis `…@send.mezieres-lez-clery.fr`
+— une adresse qui n'existe pas et où personne ne lit les réponses. Un élu qui répond à
+la veille doit tomber dans une boîte réelle.
+
+**Pourquoi c'était sans risque pour la messagerie existante.** Dans la configuration
+que Resend génère pour le domaine racine, le `MX` et le `TXT v=spf1` se posent sur
+`send.mezieres-lez-clery.fr`, pas à la racine : le SPF existant de la mairie n'est pas
+modifié et le courrier entrant n'est pas concerné. Le sélecteur DKIM
+(`resend._domainkey`) est unique et ne peut pas entrer en collision. **Seul le `_dmarc`
+est à la racine** — un domaine ne pouvant en porter qu'un, ne jamais écraser celui qui
+existe.
+
+⚠️ **Le secret doit être passé dans l'`env` de l'étape d'envoi.** Sans cette ligne il
+peut exister sans rien changer, le script retombant sur son défaut
+(`onboarding@resend.dev`), qui n'autorise l'envoi que vers l'adresse du compte Resend.
+Le cas s'est produit : le commentaire du workflow réclamait `RESEND_FROM` que l'étape
+ne lisait pas. Les trois veilles le passent désormais.
+
+⚠️ **Ne jamais mettre une adresse Gmail dans `RESEND_FROM`** : le domaine `gmail.com`
+n'est pas vérifiable par la commune (il faudrait écrire dans le DNS de Google), et
+Resend rejette en 403.
+
+`veille-municipale.yml` refuse d'envoyer au conseil si `RESEND_FROM` est vide, avec un
+`::error` explicite : Resend répondrait 403 avec un message obscur, et l'échec serait
+attribué au mauvais endroit.
 
 ### Robustesse des veilles IA (retry + diagnostic)
 

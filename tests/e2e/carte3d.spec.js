@@ -593,6 +593,267 @@ test.describe('Carte 3D', () => {
     expect(dessine.source, 'aucune couche de territoire posée sans données').toBe(false);
   });
 
+  /*
+   * ── Le nom des 25 communes ──────────────────────────────────────────────
+   * Les contours étaient anonymes. Ces quatre tests tiennent les quatre
+   * promesses des étiquettes : le nom vient du service et de nulle part
+   * ailleurs, il est posé dans le plus grand polygone, deux noms ne se
+   * recouvrent jamais, et le nom ne prend ni le clic ni la place du village.
+   *
+   * ⚠️ apicarto est coupé ici : on ne charge donc PAS le territoire, on injecte
+   * ce que le service aurait renvoyé et on appelle la pose directement. C'est
+   * la même stratégie que pour `_c3dApparier`.
+   */
+  async function poserEtiquettes(page, communes) {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+    await page.evaluate((liste) => {
+      window._c3dTerr = liste;
+      window._c3dTerrActif = true;
+      window._c3dTerrPoserEtiquettes();
+    }, communes);
+  }
+
+  // Carré de 0,004° de côté centré sur (lon, lat) — l'ordre des sommets est
+  // celui du Géoportail : anneau extérieur fermé.
+  const carre = (lon, lat, cote = 0.004) => ({
+    type: 'Polygon',
+    coordinates: [[[lon - cote, lat - cote], [lon + cote, lat - cote],
+                   [lon + cote, lat + cote], [lon - cote, lat + cote],
+                   [lon - cote, lat - cote]]]
+  });
+
+  test('territoire : chaque étiquette porte le nom renvoyé par le service', async ({ page }) => {
+    /*
+     * Le pendant visuel de RG-17.20 : ce qui est ÉCRIT sur la carte est ce que
+     * le Géoportail a renvoyé. Une commune sans géométrie n'a pas d'étiquette
+     * — elle est signalée dans le panneau, jamais posée au jugé.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.808, 47.822) },
+      { nom: 'Cléry-Saint-André',  insee: '45098', geom: carre(1.760, 47.822) },
+      { nom: 'Dry',                insee: '45130', geom: carre(1.856, 47.822) },
+      // Non appariée par le Géoportail : aucune géométrie, donc aucun nom posé.
+      { nom: 'Villermain',         insee: '',      geom: null }
+    ]);
+
+    const r = await page.evaluate(() => ({
+      textes: [...document.querySelectorAll('.c3d-lab')].map(e => e.textContent),
+      moi: [...document.querySelectorAll('.c3d-lab-moi')].map(e => e.textContent),
+      // Les noms sont déjà dans le panneau, en texte : la synthèse vocale ne
+      // doit pas les lire deux fois.
+      masques: [...document.querySelectorAll('.c3d-lab')]
+        .every(e => e.getAttribute('aria-hidden') === 'true')
+    }));
+
+    expect(r.textes.sort(), 'un nom par commune réellement renvoyée')
+      .toEqual(['Cléry-Saint-André', 'Dry', 'Mézières-lez-Cléry']);
+    expect(r.textes.includes('Villermain'), 'une commune non placée n’a pas d’étiquette').toBe(false);
+    expect(r.moi, 'Mézières doit se distinguer, comme son contour').toEqual(['Mézières-lez-Cléry']);
+    expect(r.masques, 'les étiquettes doublonnent le panneau : aria-hidden').toBe(true);
+  });
+
+  test('territoire : le nom se pose dans le plus grand polygone', async ({ page }) => {
+    /*
+     * `_c3dCentroide` moyenne les sommets du PREMIER anneau : elle suffit à
+     * dire « cet objet est dans la commune », mais poserait le nom sur un écart
+     * de territoire dès qu'une commune en compte plusieurs. Fonction pure,
+     * donc testable sans réseau.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dCentreEtiquette === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      // Un grand polygone autour de (1.80 ; 47.82), et un minuscule écart à
+      // 0,5° de là. Le nom doit aller sur le grand.
+      const grand = [[1.78, 47.80], [1.82, 47.80], [1.82, 47.84], [1.78, 47.84], [1.78, 47.80]];
+      const ecart = [[2.30, 47.80], [2.301, 47.80], [2.301, 47.801], [2.30, 47.801], [2.30, 47.80]];
+      const p = window._c3dCentreEtiquette({ type: 'MultiPolygon', coordinates: [[ecart], [grand]] });
+      // Contour aplati (aire nulle) : aucun endroit défendable où poser le nom.
+      // On attend `null` — pas un point calculé sur une division par zéro.
+      const plat = window._c3dCentreEtiquette({ type: 'Polygon',
+        coordinates: [[[1.8, 47.8], [1.9, 47.8], [1.85, 47.8], [1.8, 47.8]]] });
+      return { c: p && p.c, aire: p && p.aire, plat: plat };
+    });
+
+    expect(r.c[0], 'le nom doit tomber dans le grand polygone, pas sur l’écart').toBeGreaterThan(1.78);
+    expect(r.c[0]).toBeLessThan(1.82);
+    expect(r.c[1]).toBeGreaterThan(47.80);
+    expect(r.c[1]).toBeLessThan(47.84);
+    expect(r.aire, 'l’aire retenue est celle du plus grand polygone').toBeGreaterThan(0.001);
+    expect(r.plat, 'un contour sans surface ne reçoit pas de nom posé au jugé').toBe(null);
+  });
+
+  test('territoire : deux noms ne se recouvrent jamais, et Mézières l’emporte', async ({ page }) => {
+    /*
+     * ⚠️ MapLibre ne décale et ne masque que les couches `symbol`. Des marqueurs
+     * HTML se superposent sans rien dire — deux noms l'un sur l'autre ne se
+     * lisent ni l'un ni l'autre. Mézières est prioritaire même si sa commune est
+     * la plus PETITE des deux : c'est le point de vue de la carte.
+     *
+     * Leçon des étoiles invisibles (ADR-0015) : on assert le style CALCULÉ.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Grande-Voisine',     insee: '45999', geom: carre(1.8081, 47.8220, 0.02) },
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.8080, 47.8220, 0.001) }
+    ]);
+
+    const vus = await page.evaluate(() =>
+      [...document.querySelectorAll('.c3d-lab')]
+        .filter(e => getComputedStyle(e).visibility === 'visible')
+        .map(e => e.textContent));
+
+    expect(vus, 'un seul des deux noms superposés doit rester lisible').toEqual(['Mézières-lez-Cléry']);
+  });
+
+  test('territoire : le nom ne prend ni le clic ni la place du village', async ({ page }) => {
+    /*
+     * Deux régressions possibles d'un coup :
+     *  • une étiquette qui capte le clic empêcherait de nommer la commune —
+     *    or « toute commune répond au clic » est une règle acquise (RG-17.21) ;
+     *  • les étiquettes sont des éléments HTML, que `setLayoutProperty` n'atteint
+     *    pas : sans traitement explicite, les 25 noms resteraient affichés
+     *    par-dessus le village au retour.
+     */
+    await poserEtiquettes(page, [
+      { nom: 'Mézières-lez-Cléry', insee: '45204', geom: carre(1.808, 47.822) }
+    ]);
+
+    const clic = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.c3d-lab')).pointerEvents);
+    expect(clic, 'une étiquette ne doit jamais avaler le clic de la carte').toBe('none');
+
+    await page.evaluate(() => window._c3dVoirTerritoire(false));
+    const restants = await page.evaluate(() =>
+      [...document.querySelectorAll('.c3d-lab')]
+        .filter(e => getComputedStyle(e).visibility === 'visible').length);
+    expect(restants, 'de retour au village, plus aucun nom de commune').toBe(0);
+  });
+
+  /*
+   * ── Les lieux-dits ──────────────────────────────────────────────────────
+   * Jeu d'essai RÉEL, relevé sur `BDTOPO_V3:toponymie` pour l'emprise de la
+   * commune : trois croix, un pont, une source, et les DEUX « manthelon » de
+   * France — le nôtre et celui de l'Eure-et-Loir, à 120 km. C'est ce dernier
+   * qui rend le test intéressant : un nom ne prouve rien, seul le contour
+   * tranche. Exactement ce qu'ADR-0021 avait anticipé pour les communes.
+   */
+  const TOPONYMES = [
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix glaneuse', pt: [1.80179786, 47.82295509] },
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix des morts', pt: [1.80845209, 47.81593453] },
+    { classe: 'Construction ponctuelle', nature: 'Croix', nom: 'croix de bailly', pt: [1.82122217, 47.79893985] },
+    { classe: 'Construction linéaire',   nature: 'Pont',  nom: 'pont des dames',  pt: [1.79807795, 47.80398847] },
+    { classe: 'Détail hydrographique',   nature: 'Source', nom: 'fosse de lézeau', pt: [1.82607885, 47.8106586] },
+    { classe: "Zone d'habitation", nature: 'Lieu-dit habité', nom: 'manthelon', pt: [1.7930418, 47.82132338] },
+    // Le Manthelon d'Eure-et-Loir : même graphie, même classe, autre commune.
+    { classe: "Zone d'habitation", nature: 'Lieu-dit habité', nom: 'manthelon', pt: [1.0477489, 48.91099394] }
+  ].map((t) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: t.pt },
+    properties: { classe_de_l_objet: t.classe, nature_de_l_objet: t.nature,
+                  graphie_du_toponyme: t.nom, statut_du_toponyme: 'Validé' }
+  }));
+
+  test('lieux-dits : seul l’habitat est étiqueté, et seulement dans la commune', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dTrierToponymes === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate((features) => {
+      // Contour approximatif de Mézières : il exclut l'Eure-et-Loir.
+      window._c3dContour = { type: 'Polygon', coordinates: [[
+        [1.762, 47.792], [1.856, 47.792], [1.856, 47.852], [1.762, 47.852], [1.762, 47.792]]] };
+      const res = window._c3dTrierToponymes(features);
+      return { noms: res.gardes.map(g => g.nom), hors: res.hors,
+               ecartes: window._c3dToposEcartes };
+    }, TOPONYMES);
+
+    expect(r.noms, 'un seul Manthelon retenu, et avec sa capitale').toEqual(['Manthelon']);
+    expect(r.hors, 'le Manthelon d’Eure-et-Loir est écarté par le contour').toBe(1);
+    // Ce qui n'est pas affiché doit rester comptable : c'est ce panneau qui
+    // dira, le jour venu, sous quelle classe un hameau manquant a été rangé.
+    expect(r.ecartes['Construction ponctuelle'], 'les trois croix sont comptées').toBe(3);
+    expect(r.ecartes['Construction linéaire']).toBe(1);
+    expect(r.ecartes['Détail hydrographique']).toBe(1);
+  });
+
+  test('lieux-dits : la BD TOPO écrit en minuscules, la carte remet les capitales', async ({ page }) => {
+    /*
+     * ⚠️ Le service renvoie « manthelon », pas « Manthelon ». Mais on ne
+     * retouche JAMAIS une graphie que l'IGN a déjà capitalisée : la seule
+     * transformation admise est de remettre des majuscules là où il n'y en a
+     * aucune. Les particules restent en bas de casse.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => typeof window._c3dCapitales === 'function', null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => ['manthelon', 'le bréau', 'clos de manthelon',
+      "l'étang du bois", 'Saint-Laurent-des-Bois', 'la grange'].map(window._c3dCapitales));
+
+    expect(r).toEqual(['Manthelon', 'Le Bréau', 'Clos de Manthelon',
+      "L'Étang du Bois", 'Saint-Laurent-des-Bois', 'La Grange']);
+  });
+
+  test('lieux-dits : le mât mesure des mètres, et disparaît à la verticale', async ({ page }) => {
+    /*
+     * `sin(pitch)` et non `cos` : à pitch nul, vue à la verticale, une hauteur
+     * ne se projette pas — le mât doit valoir zéro. Et il grandit quand on
+     * approche, puisqu'il vaut 13 m réels. C'est ce qui distingue ce trait
+     * d'un décalage écrit en pixels, qui mentirait à tous les zooms sauf un.
+     */
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const r = await page.evaluate(() => {
+      const lire = (zoom, pitch) => {
+        window._c3dMap.jumpTo({ center: [1.808, 47.822], zoom, pitch });
+        return window._c3dTigePx(47.822);
+      };
+      return { plat: lire(17, 0), proche: lire(17.4, 62), loin: lire(15, 62) };
+    });
+
+    expect(r.plat, 'à la verticale, une hauteur ne se projette pas').toBe(0);
+    expect(r.proche, 'de près, le mât dépasse les toits').toBeGreaterThan(25);
+    expect(r.loin, 'de loin il rétrécit, comme le bâti').toBeLessThan(r.proche);
+    expect(r.loin, 'mais il ne disparaît pas').toBeGreaterThan(0);
+  });
+
+  test('lieux-dits : le nom est ancré au sol, et s’efface en vue territoire', async ({ page }) => {
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const pose = await page.evaluate(() => {
+      window._c3dMap.jumpTo({ center: [1.808, 47.822], zoom: 17, pitch: 62 });
+      window._c3dPoserLieux([{ nom: 'Manthelon', pt: [1.808, 47.822], nature: 'Lieu-dit habité' }]);
+      const el = document.querySelector('.c3d-lieu');
+      const tige = document.querySelector('.c3d-lieu-tige');
+      return {
+        nom: el.textContent,
+        clic: getComputedStyle(el).pointerEvents,
+        // Le trait doit avoir une hauteur RÉELLE : c'est lui qui rattache le
+        // nom à son point au sol. Zéro, et le nom flotte sans rien dire.
+        tige: parseFloat(getComputedStyle(tige).height),
+        visible: getComputedStyle(el).visibility
+      };
+    });
+
+    expect(pose.nom).toContain('Manthelon');
+    expect(pose.clic, 'un nom ne doit jamais avaler le clic d’un bâtiment').toBe('none');
+    expect(pose.tige, 'le trait doit relier le nom au sol').toBeGreaterThan(10);
+    expect(pose.visible).toBe('visible');
+
+    // En vue territoire, à 30 km, les lieux-dits couvriraient le zonage.
+    await page.evaluate(() => window._c3dVoirTerritoire(true));
+    const apres = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.c3d-lieu')).visibility);
+    expect(apres, 'aucun lieu-dit par-dessus la vue territoire').toBe('hidden');
+  });
+
   test('le bouton « Où suis-je » est proposé', async ({ page }) => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
@@ -714,7 +975,19 @@ test.describe('Carte 3D', () => {
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
     await expect(page.locator('#ov-carte3d .panel-title')).toHaveText('Mon village en 3D');
-    await expect(page.locator('#ov-carte3d')).toHaveAttribute('aria-label', 'Mon village en 3D');
+    // Ce qui compte est le nom ANNONCÉ, pas l'attribut qui le porte. Il venait
+    // d'un `aria-label` écrit en dur sur le <div class="ov"> — invalide selon le
+    // validateur du W3C (RGAA 8.2 : `aria-label` n'est pas admis sur un <div>
+    // sans rôle propre) et redondant depuis que openOv() pose `aria-labelledby`
+    // vers le titre du panneau. Asserter l'attribut aurait interdit la
+    // correction ; asserter le nom calculé verrouille la même chose en mieux :
+    // le nom annoncé et le titre affiché ne peuvent plus diverger.
+    const nomAnnonce = await page.locator('#ov-carte3d').evaluate(el => {
+      const id = el.getAttribute('aria-labelledby');
+      const cible = id && document.getElementById(id);
+      return (cible ? cible.textContent : el.getAttribute('aria-label')) || '';
+    });
+    expect(nomAnnonce.trim()).toBe('Mon village en 3D');
   });
 
   test('l’overlay s’ouvre, se ferme avec Échap, et n’invente aucun bâtiment', async ({ page }) => {

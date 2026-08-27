@@ -206,6 +206,44 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   trait clair fin, et Mézières est en **or**. De même, aucun panneau ne doit recouvrir la
   colonne de boutons — surtout pas « 🔎 Détail des sources », celui qu'on cherche quand rien
   ne s'affiche.
+- **RG-17.29 — un nom de commune est écrit tel que le service l'a renvoyé, et se retire
+  plutôt que de devenir illisible.** En vue territoire, chaque contour porte son nom. Ce nom
+  vient de `_c3dApparier`, donc du Géoportail : une commune que le service ne place pas
+  **n'a pas d'étiquette** — elle reste signalée dans le panneau, jamais posée au jugé
+  (prolongement de RG-17.20). Un contour sans surface n'en reçoit pas non plus : il n'existe
+  aucun endroit défendable où poser le nom.
+  Le nom est un **élément HTML**, pas une couche `symbol` : le style de la carte n'a pas
+  d'URL `glyphs`, et sans glyphes un `text-field` ne rend **rien**, sans erreur ni trace —
+  la panne silencieuse d'ADR-0015. Trois conséquences à tenir :
+  ⚠️ MapLibre ne décale et ne masque **que** les couches `symbol` : l'anticollision est donc
+  écrite à la main, et deux noms superposés se résolvent en **un seul affiché** — Mézières
+  d'abord, puis les communes les plus étendues. Un nom manquant vaut mieux qu'une bouillie.
+  ⚠️ `setLayoutProperty` **n'atteint pas** un élément HTML : le retour au village doit
+  masquer les étiquettes explicitement, sans quoi les 25 noms flottent au-dessus du bourg.
+  ⚠️ Une étiquette porte `pointer-events:none`, faute de quoi elle avale le clic qui doit
+  nommer la commune (RG-17.21). Verrouillé par un test sur le **style calculé**.
+  Voir ADR-0026.
+- **RG-17.30 — un lieu-dit est nommé au bout d'un mât, et seulement s'il est habité et dans
+  la commune.** Les hameaux viennent de `BDTOPO_V3:toponymie`.
+  ⚠️ **Cette couche ne contient pas que des lieux-dits** : sur l'emprise de la commune elle
+  renvoie 219 objets — croix, ponts, sources, détails hydrographiques. Seule la classe
+  **« Zone d'habitation »** est affichée ; tout le reste est **compté par classe** dans
+  « 🔎 Détail des sources », de sorte qu'un hameau rangé un jour dans une autre classe se
+  voie au lieu de manquer en silence.
+  ⚠️ **Il existe deux « manthelon » en France** — le nôtre et un autre à 120 km, sortis de la
+  même requête avec la même graphie et la même classe. Le découpage sur le contour communal
+  n'est donc pas une précaution mais la condition pour ne pas afficher le hameau d'un autre
+  département. Verrouillé par un test qui échoue si l'on retire le découpage.
+  ⚠️ **La graphie arrive en minuscules** (« manthelon »). Les capitales sont remises, les
+  particules exceptées — et **uniquement si la graphie n'en porte aucune**, pour ne jamais
+  retoucher un nom que le service a déjà bien écrit. C'est la seule transformation du libellé.
+  **Le mât n'est pas une mesure.** Il vaut 13 m réels convertis en pixels
+  (`(h / mpp) × sin(pitch)` — `sin`, car à la verticale une hauteur ne se projette pas), il
+  rétrécit donc avec la distance comme le bâti, à l'inverse d'un décalage en pixels
+  (RG-17.17). Il ne dit la hauteur de rien : il dit **à quel point du sol le nom appartient**,
+  même statut que les toits en pente de RG-17.15. Sans lui, un nom posé au ras du sol à côté
+  d'une maison semblerait nommer la maison — et un marqueur HTML n'étant jamais occulté par
+  le bâti, un nom lointain flotterait sur les maisons du premier plan.
 
 ## 5. Parcours
 
@@ -225,7 +263,8 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
 | Élément | Source |
 |---|---|
 | Fond aérien, plan | Orthophoto et Plan IGN — Géoplateforme (couches ouvertes) |
-| Bâti et hauteurs | BD TOPO de l'IGN via WFS ; repli OpenStreetMap |
+| Bâti et hauteurs | BD TOPO de l'IGN via WFS (`BDTOPO_V3:batiment`) ; repli OpenStreetMap |
+| Lieux-dits et hameaux | BD TOPO de l'IGN via WFS (`BDTOPO_V3:toponymie`) — ⚠️ classe **« Zone d'habitation »** uniquement, découpée sur le contour communal |
 | Zonage du PLU | Géoportail de l'Urbanisme via apicarto (`municipality` puis `zone-urba`) |
 | Règles d'urbanisme | `data/plu-data.json` (embarqué) |
 | Coordonnées d'adresse | Réutilisées de MEL — Base Adresse Nationale |
@@ -270,6 +309,41 @@ est inaccessible depuis l'environnement de développement :
   retomber toutes les zones à urbaniser en gris.
 - « sources coupées, aucune commune n'est inventée » vérifie qu'en l'absence de réponse la
   vue le dit et ne pose aucune couche.
+
+Quatre tests couvrent le **nom des communes** (RG-17.29), également sans réseau : le
+territoire n'est pas chargé, on injecte ce que le service aurait renvoyé et l'on appelle la
+pose directement.
+
+- « chaque étiquette porte le nom renvoyé par le service » — une commune sans géométrie
+  n'obtient pas d'étiquette, Mézières se distingue, et les libellés sont `aria-hidden`
+  puisque le panneau les liste déjà en texte.
+- « le nom se pose dans le plus grand polygone » exerce `_c3dCentreEtiquette` sur un
+  MultiPolygon : le nom va sur le grand polygone et non sur l'écart de territoire, et un
+  contour d'aire nulle renvoie `null` — pas un point calculé sur une division par zéro.
+  ⚠️ C'est ce test qui a révélé que le repli « moyenne des sommets » de la première version
+  était du **code mort** : une aire nulle n'est jamais retenue en amont. Il a été supprimé
+  plutôt que laissé à dormir.
+- « deux noms ne se recouvrent jamais, et Mézières l'emporte » superpose deux étiquettes et
+  vérifie sur le **style calculé** qu'une seule reste visible — Mézières, même quand sa
+  commune est la plus petite des deux.
+- « le nom ne prend ni le clic ni la place du village » vérifie `pointer-events:none` sur le
+  style calculé, puis qu'un retour au village ne laisse aucun nom affiché.
+
+Quatre tests couvrent les **lieux-dits** (RG-17.30), sur un jeu d'essai **relevé dans la
+vraie réponse du service** — trois croix, un pont, une source, et les deux « manthelon » de
+France :
+
+- « seul l'habitat est étiqueté, et seulement dans la commune » — un seul Manthelon retenu,
+  celui d'Eure-et-Loir écarté par le contour, et les cinq autres toponymes **comptés** par
+  classe. Vérifié en le faisant échouer : sans le découpage, deux Manthelon passent.
+- « la BD TOPO écrit en minuscules, la carte remet les capitales » — « manthelon » →
+  « Manthelon », « clos de manthelon » → « Clos de Manthelon », et
+  « Saint-Laurent-des-Bois » **laissé intact**.
+- « le mât mesure des mètres, et disparaît à la verticale » — zéro à pitch nul, plus grand
+  de près que de loin. Vérifié en le faisant échouer : avec `cos` au lieu de `sin`, le mât
+  vaut 32,4 px là où il devrait valoir 0.
+- « le nom est ancré au sol, et s'efface en vue territoire » — hauteur de trait réelle et
+  `pointer-events:none` sur le **style calculé**, puis disparition à la bascule.
 
 Ces tests ne demandent aucun réseau — seulement la bibliothèque servie en local — et c'est
 précisément pour cela qu'ils voient ce qu'aucun autre test ne voyait (v4.68). Chacun a été

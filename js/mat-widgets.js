@@ -1396,7 +1396,7 @@ function renderCarburantPanel(el, d) {
     var go  = info.gazole != null ? '<span style="font-size:.88rem;font-weight:900;color:var(--forest)">Diesel ' + parseFloat(info.gazole).toFixed(3) + ' €</span>' : '';
     var maj = info.maj ? '<div style="font-size:.64rem;color:var(--muted);margin-top:4px">Mis à jour le ' + info.maj + '</div>' : '';
     html += '<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
-          + '<div style="font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--sage);margin-bottom:8px">' + s.emoji + ' ' + (info.label || s.key) + '</div>'
+          + '<div style="font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--sage-ink);margin-bottom:8px">' + s.emoji + ' ' + (info.label || s.key) + '</div>'
           + '<div style="display:flex;gap:14px;flex-wrap:wrap">' + [sp, go].filter(Boolean).join('') + '</div>'
           + maj
           + '</div>';

@@ -301,6 +301,7 @@ function trackAppOpenOncePerDay(){
 
 // ── Modale MAT (remplace alert/confirm natifs) ──────────────
 let _matModalResolver = null;
+let _matModalRetour = null;   // élément à qui rendre le focus à la fermeture
 function openMatModal(opts){
   opts = opts || {};
   let modal = document.getElementById('mat-modal');
@@ -338,14 +339,29 @@ function openMatModal(opts){
   ok.textContent = opts.okText || 'OK';
   cancel.textContent = opts.cancelText || 'Annuler';
   cancel.style.display = opts.type === 'alert' ? 'none' : '';
+  // RGAA 7.5 / 11.10 — une alerte est un message de statut : « alertdialog »
+  // la fait annoncer immédiatement, là où « dialog » attend que le focus y
+  // entre. Et le focus doit y entrer : sans ça, un habitant au clavier reste
+  // sur le formulaire pendant qu'une erreur s'affiche ailleurs, sans rien
+  // savoir. On mémorise l'élément d'où l'on vient pour le lui rendre.
+  const carte = modal.querySelector('.mat-modal-card');
+  if (carte) carte.setAttribute('role', opts.type === 'alert' ? 'alertdialog' : 'dialog');
+  _matModalRetour = document.activeElement;
   modal.classList.add('open');
   document.body.style.overflow='hidden';
+  try { ok.focus({ preventScroll: true }); } catch (_) {}
   return new Promise(resolve => { _matModalResolver = resolve; });
 }
 function closeMatModal(value){
   const modal = document.getElementById('mat-modal');
   if(modal) modal.classList.remove('open');
   if(typeof _ovStack !== 'undefined' && _ovStack.length === 0) document.body.style.overflow='';
+  // RGAA 12.9 — rendre le focus à l'élément d'où l'on venait, sinon il repart
+  // au début du document et l'habitant doit tout re-parcourir.
+  if(_matModalRetour && document.contains(_matModalRetour)){
+    try { _matModalRetour.focus({ preventScroll: true }); } catch(_) {}
+  }
+  _matModalRetour = null;
   if(_matModalResolver){ const fn = _matModalResolver; _matModalResolver = null; fn(!!value); }
 }
 function matModalBackdrop(e){ if(e.target === document.getElementById('mat-modal')) closeMatModal(false); }
@@ -493,7 +509,7 @@ function formatPhone(num) {
   return num.replace(/[\s\.\-]/g,'');
 }
 function formatMelText(text) {
-  const linkStyle = 'color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);';
+  const linkStyle = 'color:var(--sage-ink);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage-ink);';
 
   // Échappement HTML PRÉALABLE : le texte vient de la réponse IA (MEL) ou de la
   // saisie utilisateur. On neutralise tout HTML brut (<img onerror>, <script>…)

@@ -1,3 +1,21 @@
+## 2026-08-24
+- Attaque supply-chain npm keyv/cacheable/flat-cache/file-entry-cache, ver auto-propagé (4 août 2026, relayé CERT-FR ACT-034 le 10 août, MàJ 17 août) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-034/
+- Chrome 151 : correctifs critiques d'évasion de bac à sable (18-20 août 2026) — https://www.techtimes.com/articles/324984/20260819/chrome-update-patches-two-sandbox-escape-flaws-codex-security-gets-first-browser-credit.htm
+- Playwright 1.62.1, correctif de régressions (30 juillet 2026) — https://github.com/microsoft/playwright/releases/tag/v1.62.1
+- Sentry Logs, mise à jour été 2026 (11 août 2026) — https://blog.sentry.io/sentry-logs-summer-2026-roundup/
+- Anthropic : retrait de Claude Opus 4.1 (5 août 2026) — https://platform.claude.com/docs/en/about-claude/model-deprecations
+- Anthropic : fermeture du Claude API Workbench historique (17 août 2026) — https://www.techtimes.com/articles/324669/20260817/anthropic-kills-claude-workbench-today-saved-prompts-gone-api-pipelines-broken.htm
+- Mistral AI : lancement de Shieldstral, modèle de modération open-weight (5 août 2026) — https://siliconangle.com/2026/08/05/mistral-introduces-shieldstral-provide-lightweight-policy-aware-moderation-ai-models/
+- Render.com : builds accélérés de ~40 % (changement du 7 août, annoncé le 21 août 2026) — https://render.com/changelog
+- Incident de service GitHub.com, Actions/API dégradés 7h47 (17 août 2026) — https://www.githubstatus.com/
+- Cyberattaque revendiquée contre la mairie de Rinxent par le groupe Krybit, non confirmée officiellement (2 août 2026) — https://www.cyberattaque.org/mairie-de-rinxent-160-go-de-donnees-revendiques-apres-une-cyberattaque/
+- Bulletins CERT-FR CERTFR-2026-ACT-032 à 035 (27 juillet au 17 août 2026) — https://www.cert.ssi.gouv.fr/actualite/
+- [reco] Auditer les dépendances npm keyv/cacheable/flat-cache/file-entry-cache du backend et faire tourner les secrets si présentes
+- [reco] Tester la PWA MAT sur Chrome 151
+- [reco] Mettre à jour Playwright vers 1.62.1
+- [reco] Vérifier l'absence de Claude Opus 4.1 dans le code du fallback IA
+- [reco] Renforcer la sensibilisation hameçonnage/sauvegardes suite à la revendication Rinxent
+
 ## 2026-07-27
 - Node.js security release 27 juillet 2026, sévérité HIGH (22.x/24.x/26.x) — https://nodejs.org/en/blog/vulnerability/july-2026-security-releases
 - Chrome correctif d'urgence 150.0.7871.181/182, 12 failles haute sévérité (22 juillet 2026) — https://www.malwarebytes.com/blog/bugs/2026/07/chrome-needs-another-whopper-update-to-fix-382-security-fixes

@@ -33,6 +33,15 @@ nouvelles, bonnes pratiques applicables. Voir ADR-0025.
   (`## AAAA-MM-JJ`), une ligne par item retenu
   (`- [action] Titre court — URL` / `- [surveiller] Titre court — URL`).
   Limité aux 12 dernières éditions.
+  ⚠️ **Écrit par `scripts/update-veille-memoire.js`, pas par l'agent** (ADR-0027) :
+  au premier run réel, l'agent avait sauté cette étape sans que rien n'échoue.
+
+- `items-municipale.json` — **éphémère, non committé** (comme `actions-pwa.json`).
+  La liste structurée des items retenus, produite par l'agent :
+  `[{"niveau": "action"|"surveiller", "titre": "…", "url": "https://…"}]`.
+  C'est la source de la section datée écrite dans la mémoire. Un tableau vide est
+  valide (mois calme) ; un fichier absent déclenche un `::warning` et une section
+  portant la mention de l'anomalie.
 
 ## Règle commune aux deux veilles
 

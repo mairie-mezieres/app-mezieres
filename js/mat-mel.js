@@ -257,9 +257,19 @@ function pluGetZone(zoneKey) {
 }
 
 function pluAuthLink(auth) {
-  // Retourne un lien cliquable si DP ou PC reconnu
+  // Retourne un lien cliquable si DP ou PC reconnu.
+  //
+  // ⚠️ Les cerfa d'urbanisme changent de NUMÉRO, pas seulement de millésime.
+  // Au 1er janvier 2025, les cerfa 13703 (DP maison individuelle), 13702
+  // (lotissement) et 13404 (DP constructions et travaux) ont été ABROGÉS et
+  // remplacés par le 16702 (constructions et travaux) et le 16703
+  // (aménagements). La fiche R11646, qui portait le 13703, n'a pas déménagé :
+  // elle a été supprimée, et répondait 404 (issue #400). La référence courante
+  // de la DP côté particuliers est R2028. Ne jamais figer un millésime
+  // (« *02 ») dans une URL ni dans un texte : seul le numéro à 5 chiffres est
+  // stable. Voir docs/adr/0029.
   if (/Déclaration Préalable|\bDP\b/.test(auth)) {
-    return auth + ' <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/R11646" target="_blank" class="plu-form-link">📄 Cerfa DP</a>';
+    return auth + ' <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/R2028" target="_blank" class="plu-form-link">📄 Cerfa DP</a>';
   }
   if (/Permis de Construire|\bPC\b/.test(auth)) {
     return auth + ' <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/R11637" target="_blank" class="plu-form-link">📄 Cerfa PC</a>';
@@ -521,8 +531,21 @@ const _MEL_TREE_FALLBACK = {
           links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
       },
       {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",
-        directAnswer:{text:"La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
-          links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"}]}
+        // ⚠️ Chiffres tirés du règlement de fonctionnement « parents » 2026-2027
+        // du SIVU (modifications au 1er septembre 2026). Deux erreurs y ont été
+        // corrigées : « 17 assistantes maternelles » (le règlement en compte 16)
+        // et « enfants de moins de 6 ans » — la crèche prend de 10 semaines à
+        // l'entrée en maternelle ; les « moins de six ans » du règlement ne
+        // visent que les places garanties de l'article D.214-7. Ne pas rétablir.
+        directAnswer:{text:"C'est une crèche « familiale » : 16 assistantes maternelles salariées accueillent les enfants à leur domicile, avec des temps collectifs chaque semaine dans les locaux de la crèche ou en salle communale. Elle accueille les enfants de 10 semaines jusqu'à leur entrée à l'école maternelle ; les enfants déjà scolarisés peuvent l'être le mercredi et pendant les vacances, selon les places disponibles. Ouverte du lundi au vendredi de 7h30 à 18h30, au 92 rue du Maréchal Foch à Cléry-Saint-André. Elle est gérée par un syndicat intercommunal (SIVU) qui regroupe Cléry-Saint-André, Mareau-aux-Prés et Mézières-lez-Cléry. L'inscription se fait en liste d'attente, puis une commission d'attribution statue sur les places ; aucune condition d'activité professionnelle des parents n'est exigée. Le tarif est calculé selon le barème national de la CNAF, d'après vos revenus et le nombre d'enfants à charge.",
+          links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"},{label:"✉️ crechemarmousets@orange.fr",url:"mailto:crechemarmousets@orange.fr"}]}
+      },
+      // ⚠️ Doublon volontaire avec data/mel-tree.json (l'arbre éditable depuis
+      // l'admin) : les deux copies doivent rester en phase. Le LAEP n'est PAS
+      // un mode de garde et ne passe PAS par Mézières — ne pas « simplifier ».
+      {id:"laep",ico:"🤱",label:"LAEP — Lieu d'Accueil Enfants-Parents",
+        directAnswer:{text:"Un lieu convivial d'écoute, d'échanges, de jeux et de rencontres, ouvert par la Communauté de Communes à compter du 7 septembre 2026. Gratuit, confidentiel, sans inscription. Pour les enfants de moins de 6 ans accompagnés d'un parent, d'un grand-parent ou d'un adulte référent, et pour les futurs parents. Ce n'est pas un mode de garde : l'adulte reste avec l'enfant pendant toute la durée de l'accueil. Au moins deux professionnels, les « accueillants », sont présents et tenus au secret professionnel. Le LAEP est itinérant : il se déplace sur Beauce la Romaine, Beaugency, Cléry-Saint-André et Meung-sur-Loire — pas à Mézières, Cléry-Saint-André étant la commune d'accueil la plus proche. Le planning des créneaux n'est pas encore publié : renseignements auprès de la Communauté de Communes.",
+          links:[{label:"📞 LAEP : 06 62 65 59 04",tel:"0662655904"},{label:"✉️ laep@ccterresduvaldeloire.fr",url:"mailto:laep@ccterresduvaldeloire.fr"},{label:"🌐 Le LAEP sur le site de la CCTVL",url:"https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/"}]}
       },
       {id:"loisirs",ico:"🎨",label:"Centre de loisirs",
         directAnswer:{text:"Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
@@ -552,14 +575,14 @@ const _MEL_TREE_FALLBACK = {
       },
       {id:"vote",ico:"🗳️",label:"Inscription sur les listes électorales",
         directAnswer:{text:"Pour voter, vous devez être inscrit sur les listes électorales. Inscription en mairie ou en ligne sur service-public.gouv.fr. Documents à prévoir : pièce d'identité et justificatif de domicile.",
-          links:[{label:"📄 Formulaire d'inscription (cerfa 12669)",url:"https://www.service-public.fr/particuliers/vosdroits/R16024"},{label:"🌐 Inscription en ligne",url:"https://www.service-public.gouv.fr"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
+          links:[{label:"📄 Formulaire d'inscription (cerfa 12669)",url:"https://www.service-public.gouv.fr/particuliers/vosdroits/R16024"},{label:"🌐 Inscription en ligne",url:"https://www.service-public.gouv.fr"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"assainissement",ico:"🚰",label:"Assainissement (fosse, raccordement, SPANC)",
         directAnswer:{text:"L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
           links:[{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"},{label:"✉️ assainissement@ccterresduvaldeloire.fr",url:"mailto:assainissement@ccterresduvaldeloire.fr"},{label:"🌐 Portail usagers CCTVL",url:"https://portail-usagers.ccterresduvaldeloire.fr"}]}
       },
       {id:"location",ico:"🪑",label:"Location de matériel communal",
-        directAnswer:{text:"La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+        directAnswer:{text:"⚠️ La salle communale (salle des fêtes) n'est plus proposée à la location : ni pour une fête de famille, ni pour un événement privé. En revanche, la commune met du matériel à disposition des Macériens (tables, chaises, barnums…), avec un chèque de caution restitué en fin de location si aucune dégradation n'est constatée. Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
           links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
       },
     ]
@@ -631,7 +654,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.4';
+  const V = '3.7.5';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,

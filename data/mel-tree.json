@@ -180,7 +180,7 @@
         "ico": "🪑",
         "label": "Location de matériel communal",
         "directAnswer": {
-          "text": "La commune met du matériel à disposition (tables, chaises, barnums…). Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
+          "text": "⚠️ La salle communale (salle des fêtes) n'est plus proposée à la location : ni pour une fête de famille, ni pour un événement privé. En revanche, la commune met du matériel à disposition des Macériens (tables, chaises, barnums…), avec un chèque de caution restitué en fin de location si aucune dégradation n'est constatée. Pour connaître le matériel disponible, les tarifs et les modalités de réservation, contactez la mairie.",
           "links": [
             {
               "label": "📞 Mairie : 02 38 45 61 76",
@@ -189,10 +189,6 @@
             {
               "label": "✉️ mairie@mezieres-lez-clery.fr",
               "url": "mailto:mairie@mezieres-lez-clery.fr"
-            },
-            {
-              "label": "🌐 Page location matériel",
-              "url": "https://mezieres-lez-clery.fr/2018/10/24/location-de-materiel/"
             }
           ]
         }
@@ -285,11 +281,37 @@
         "ico": "👶",
         "label": "Crèche familiale Les Marmousets",
         "directAnswer": {
-          "text": "La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
+          "text": "C'est une crèche « familiale » : 16 assistantes maternelles salariées accueillent les enfants à leur domicile, avec des temps collectifs chaque semaine dans les locaux de la crèche ou en salle communale. Elle accueille les enfants de 10 semaines jusqu'à leur entrée à l'école maternelle ; les enfants déjà scolarisés peuvent l'être le mercredi et pendant les vacances, selon les places disponibles. Ouverte du lundi au vendredi de 7h30 à 18h30, au 92 rue du Maréchal Foch à Cléry-Saint-André. Elle est gérée par un syndicat intercommunal (SIVU) qui regroupe Cléry-Saint-André, Mareau-aux-Prés et Mézières-lez-Cléry. L'inscription se fait en liste d'attente, puis une commission d'attribution statue sur les places ; aucune condition d'activité professionnelle des parents n'est exigée. Le tarif est calculé selon le barème national de la CNAF, d'après vos revenus et le nombre d'enfants à charge.",
           "links": [
             {
               "label": "📞 Crèche Les Marmousets : 02 38 45 76 56",
               "tel": "0238457656"
+            },
+            {
+              "label": "✉️ crechemarmousets@orange.fr",
+              "url": "mailto:crechemarmousets@orange.fr"
+            }
+          ]
+        }
+      },
+      {
+        "id": "laep",
+        "ico": "🤱",
+        "label": "LAEP — Lieu d'Accueil Enfants-Parents",
+        "directAnswer": {
+          "text": "Un lieu convivial d'écoute, d'échanges, de jeux et de rencontres, ouvert par la Communauté de Communes à compter du 7 septembre 2026. Gratuit, confidentiel, sans inscription. Pour les enfants de moins de 6 ans accompagnés d'un parent, d'un grand-parent ou d'un adulte référent, et pour les futurs parents. Ce n'est pas un mode de garde : l'adulte reste avec l'enfant pendant toute la durée de l'accueil. Au moins deux professionnels, les « accueillants », sont présents et tenus au secret professionnel. Le LAEP est itinérant : il se déplace sur Beauce la Romaine, Beaugency, Cléry-Saint-André et Meung-sur-Loire — pas à Mézières, Cléry-Saint-André étant la commune d'accueil la plus proche. Le planning des créneaux n'est pas encore publié : renseignements auprès de la Communauté de Communes.",
+          "links": [
+            {
+              "label": "📞 LAEP : 06 62 65 59 04",
+              "tel": "0662655904"
+            },
+            {
+              "label": "✉️ laep@ccterresduvaldeloire.fr",
+              "url": "mailto:laep@ccterresduvaldeloire.fr"
+            },
+            {
+              "label": "🌐 Le LAEP sur le site de la CCTVL",
+              "url": "https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/"
             }
           ]
         }

@@ -211,6 +211,11 @@
   .d-mairie-status.closed{color:#ef4444}
   .d-horaires{width:100%;border-collapse:collapse;font-size:.75rem;margin:0 0 10px}
   .d-horaires td{padding:5px 16px;color:#374151}
+  /* RGAA 5.6 — la cellule du jour est passée de <td> à <th scope="row"> pour
+     rattacher l'horaire à son jour. Ces règles lui rendent EXACTEMENT le rendu
+     qu'elle avait : sans elles, le navigateur la centrerait et la mettrait en
+     gras par défaut, et la ligne changerait d'allure sans raison visible. */
+  .d-horaires th{padding:5px 16px;color:#6b7280;font-weight:700;text-align:left}
   .d-horaires td:first-child{color:#6b7280;font-weight:700}
   .d-horaires tr:nth-child(even){background:#f9fafb}
   .d-mairie-actions{display:flex;gap:8px;padding:8px 16px 14px}
@@ -295,10 +300,12 @@ html.theme-sombre .d-agenda-info small{color:#94a3b8}
 html.theme-sombre .d-agenda-day{color:#f1f5f9}
 html.theme-sombre .d-agenda-item{border-bottom-color:rgba(255,255,255,.06)}
 html.theme-sombre .d-horaires td{color:#f1f5f9}
+html.theme-sombre .d-horaires th{color:#94a3b8}
 html.theme-sombre .d-horaires td:first-child{color:#94a3b8}
 html.theme-sombre .d-horaires tr:nth-child(even){background:rgba(255,255,255,.04)}
 html.theme-sombre .d-horaires tr.d-hor-today{background:#2d3748}
 html.theme-sombre .d-horaires tr.d-hor-today td{color:#f1f5f9}
+html.theme-sombre .d-horaires tr.d-hor-today th{color:#f1f5f9}
 html.theme-sombre .d-collecte-name{color:#f1f5f9}
 html.theme-sombre .d-collecte-date{color:#f1f5f9}
 html.theme-sombre .d-elu-name{color:#f1f5f9}

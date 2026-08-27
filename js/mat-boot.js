@@ -162,14 +162,14 @@
 // de conteneur .sv-bloc ou si le corpus est indisponible.
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-saviez-vous.js?v=1.3.0';
+  s.src = 'js/mat-saviez-vous.js?v=1.4.0';
   s.onload = function(){ try { if (typeof matSaviezVousInit === 'function') matSaviezVousInit(); } catch(e){} };
   document.head.appendChild(s);
 })();
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-guide-arrivee.js?v=1.0.5';
+  s.src = 'js/mat-guide-arrivee.js?v=1.0.7';
   document.head.appendChild(s);
 })();
 
@@ -179,6 +179,6 @@
 // Voir ADR-0018 — c'est la condition pour ne pas dégrader l'éco-index.
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-carte3d.js?v=1.7.0';
+  s.src = 'js/mat-carte3d.js?v=1.9.0';
   document.head.appendChild(s);
 })();

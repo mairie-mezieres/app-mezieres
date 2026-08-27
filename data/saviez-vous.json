@@ -1,6 +1,6 @@
 {
-  "version": "1.3.0",
-  "maj": "2026-08-02",
+  "version": "1.4.0",
+  "maj": "2026-08-27",
   "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
     {
@@ -25,7 +25,7 @@
       "id": "cloture-dp",
       "question": "Peut-on poser une clôture sur rue sans aucune formalité à Mézières ?",
       "reponse": false,
-      "explication": "Non. Une déclaration préalable est obligatoire depuis la délibération du 1er mars 2012, quelle que soit la hauteur. Formulaire Cerfa 16702*02.",
+      "explication": "Non. Une déclaration préalable est obligatoire depuis la délibération du 1er mars 2012, quelle que soit la hauteur. Formulaire Cerfa 16702.",
       "source": "Délibération du conseil municipal du 1er mars 2012",
       "url": "",
       "categorie": "urbanisme"
@@ -591,10 +591,10 @@
     {
       "id": "gnau-cerfa-cloture",
       "question": "Le formulaire d’une déclaration préalable pour une clôture est-il le même que pour un abri de jardin ?",
-      "reponse": false,
-      "explication": "Non : le Cerfa 16702*02 est propre aux clôtures. Pour les autres déclarations préalables, c’est le Cerfa 13703 ; pour un permis de construire, le 13406.",
-      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
-      "url": "",
+      "reponse": true,
+      "explication": "Oui, depuis le 1er janvier 2025 : le Cerfa 16702 couvre toutes les déclarations préalables de constructions et travaux — clôture, abri de jardin, extension, ravalement. Les anciens 13703, 13702 et 13404 sont abrogés. Le 16703, lui, vise les aménagements (lotissement, division de terrain) ; le permis de construire reste le 13406.",
+      "source": "Service-Public — formulaire 16702, « Déclaration préalable constructions et travaux non soumis à permis de construire » (les cerfa 13703, 13702 et 13404 sont abrogés depuis le 1er janvier 2025)",
+      "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R2028",
       "categorie": "urbanisme"
     },
     {
@@ -709,8 +709,8 @@
       "id": "marmousets-familiale",
       "question": "Les enfants de la crèche Les Marmousets passent-ils leurs journées dans un même bâtiment ?",
       "reponse": false,
-      "explication": "Non : c’est une crèche « familiale ». Dix-sept assistantes maternelles salariées accueillent les enfants chez elles, avec des temps collectifs hebdomadaires à la crèche.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "explication": "Non : c’est une crèche « familiale ». Seize assistantes maternelles salariées accueillent les enfants chez elles, et tout le monde se retrouve une fois par semaine dans les locaux de la crèche ou en salle communale.",
+      "source": "SIVU de la crèche familiale Les Marmousets — règlement de fonctionnement « parents » 2026-2027, §1.4 et §4.1",
       "url": "",
       "categorie": "vie-communale"
     },
@@ -718,8 +718,8 @@
       "id": "marmousets-communes",
       "question": "Faut-il habiter Cléry-Saint-André pour prétendre à la crèche Les Marmousets ?",
       "reponse": false,
-      "explication": "Non : il faut résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry — l’un ou l’autre suffit. La pré-inscription se fait sur place ou par téléphone, au 02 38 45 76 56.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "explication": "Non : la crèche est gérée par un syndicat intercommunal qui réunit trois communes — Cléry-Saint-André, Mareau-aux-Prés et Mézières-lez-Cléry. L’inscription se fait en liste d’attente, puis une commission d’attribution statue sur les places. Aucune condition d’activité professionnelle des parents n’est exigée. Renseignements au 02 38 45 76 56.",
+      "source": "SIVU de la crèche familiale Les Marmousets — règlement de fonctionnement « parents » 2026-2027, préambule et §1.1, §2.1",
       "url": "",
       "categorie": "vie-communale"
     },

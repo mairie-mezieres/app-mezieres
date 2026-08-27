@@ -57,9 +57,21 @@ jobs:
           # lychee. C'est arrivé le 2 août 2026 — trois lignes d'explication ont
           # rendu le scan muet (1 s d'exécution, rapport vide) sans rien casser
           # de visible. Les commentaires vont ici, au-dessus de la clé.
+          # ⚠️ Concurrence et délai : lychee lance par défaut jusqu'à 128 requêtes
+          # en parallèle, et abandonne au bout de 20 s. service-public.gouv.fr —
+          # de loin le domaine le plus cité par MEL et par le guide d'arrivée —
+          # étrangle cette rafale et laisse expirer une partie des requêtes. Le
+          # scan du 24 août 2026 côté backend a ainsi ouvert l'issue #201 sur
+          # trois « TIMEOUT » de pages parfaitement vivantes (R11193, R16396).
+          # Un faux positif coûte plus cher qu'un scan lent : il faut le
+          # ré-instruire à la main, et il apprend à se méfier du signal.
+          # 8 requêtes en parallèle et 30 s de patience suffisent — le scan
+          # tient largement dans les 10 minutes du job.
           args: >-
             --no-progress
             --max-retries 2
+            --max-concurrency 8
+            --timeout 30
             --exclude 'facebook\.com'
             --exclude 'instagram\.com'
             --exclude 'linkedin\.com'
