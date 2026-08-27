@@ -131,67 +131,101 @@ identifiants** tous uniques.
 
 ---
 
-## 4. Les 106 critères
+## 4. Troisième passe — onze non-conformités levées
+
+Les trois chantiers dont le code change sans que l'écran bouge.
+
+| Critères | Ce qui n'allait pas | Correctif |
+|---|---|---|
+| **7.5** | **Aucune région live.** Les réponses de MEL, le suivi des signalements et la galerie photos étaient mis à jour en silence : un lecteur d'écran n'annonçait rien. Un habitant aveugle dont l'envoi échouait croyait que c'était parti. | `role="status"` + `aria-live="polite"` sur `#msgs`, `#suivi-body`, `#photos-list`. La modale de validation devient un `alertdialog` et prend le focus. |
+| **11.10 / 11.11** | L'erreur de saisie était énoncée dans une fenêtre, **sans lien avec le champ fautif**. Après fermeture, le focus repartait au début et l'habitant devait retrouver le champ seul. | `aria-invalid` posé sur le champ, focus rendu au champ, marqueur effacé dès la première frappe. Les messages suggéraient déjà la correction. |
+| **11.5 / 11.6 / 11.7** | Vingt cases de même nature sans groupement, et un libellé « Votre niveau en informatique » qui **ne portait aucun `for`** — affiché, rattaché à rien. | `role="group"` + `aria-labelledby` vers le titre de l'étape ; le libellé orphelin devient la légende du groupe de boutons radio. |
+| **5.4 / 5.5 / 5.6 / 5.7** | Les horaires de la mairie étaient lus d'une traite : « Lundi 14h00 17h30 Mardi Fermée… », sans lien entre le jour et l'heure. | `caption` réservé aux lecteurs d'écran, jour passé en `th scope="row"`. **Rendu vérifié identique** : même alignement, même graisse, même couleur — les règles CSS lui rendent exactement l'apparence de l'ancien `td`. |
+| **13.2** | **7 liens** ouvraient une nouvelle fenêtre sans le dire. Le bouton « précédent » ne ramenait plus, sans explication. | mention « (nouvelle fenêtre) » en texte réservé aux lecteurs d'écran, posée au chargement puis à l'ouverture de chaque écran — ce qui couvre les contenus injectés après coup, sans observateur de mutations permanent. |
+
+Vérifié après coup, sur le rendu : **7 liens sur 7** avertis · 5 `th scope="row"` et
+1 `caption` sur le tableau des horaires, rendu inchangé · régions live présentes sur
+`#msgs` et `#suivi-body` · modale en `alertdialog` avec focus sur le bouton, puis
+`aria-invalid="true"` et focus rendu au champ à la fermeture, marqueur effacé à la
+saisie.
+
+**11.13 reste non conforme**, délibérément. Le champ « Coordonnée de réponse » du
+formulaire de contact accepte **un e-mail ou un téléphone** : aucun jeton
+`autocomplete` ne couvre les deux. Le corriger proprement demanderait de scinder le
+champ en deux — un changement visible, hors du périmètre de cette passe. Le champ
+« nom » a reçu `autocomplete="name"`.
+
+---
+
+## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable · `?` non tranché
 
 | Thème | Critères | Verdicts |
 |---|---|---|
-| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. Aucun CAPTCHA, aucune image-texte, aucun SVG. |
+| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. |
 | **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
-| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `C` | 3.2 : contrastes calculables corrigés, **136 nœuds restent indéterminés** (texte sur dégradé ou photo). |
+| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `C` | 3.2 : **136 nœuds indéterminés** (texte sur dégradé ou photo). |
 | **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
-| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `NC` · 5.5 `NC` · 5.6 `NC` · 5.7 `NC` · 5.8 `NA` | Horaires de la mairie : tableau de données sans `caption`, sans `th`, sans `scope`. |
-| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | Aucun lien sans intitulé ni libellé non explicite. |
-| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `NC` | 7.5 : aucune région live. |
+| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
+| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
+| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
 | **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 demande le validateur du W3C. |
 | **9. Structuration** (4) | 9.1 `NC` · 9.2 `NC` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil ; repères de page absents. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte. 10.8 : un conteneur `aria-hidden` contient un focusable. |
-| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `NC` · 11.6 `NC` · 11.7 `NC` · 11.8 `NA` · 11.9 `C` · 11.10 `NC` · 11.11 `NC` · 11.12 `NA` · 11.13 `NC` | Étiquetage corrigé ; restent le groupement, le contrôle de saisie et `autocomplete`. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | |
+| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `NC` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
 | **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `NC` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
-| **13. Consultation** (12) | 13.1 `NA` · 13.2 `NC` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | 13.2 : 7 liens ouvrent une nouvelle fenêtre sans le signaler. |
+| **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **37** |
-| Non conformes | **22** |
+| Conformes | **48** |
+| Non conformes | **11** |
 | Non applicables | **41** |
 | Non tranchés | **6** |
 | Total | **106** |
 
-## 5. Taux de conformité
+## 6. Taux de conformité
 
-Critères applicables : 106 − 41 = **65**.
+Critères applicables : 106 − 41 = **65**. Les 6 non tranchés restent comptés comme
+non conformes — le taux publié est un **plancher**.
 
-Les **6 critères non tranchés sont comptés comme non conformes** : c'est le choix
-conservateur, et il rend l'audit complet — chaque critère porte un verdict. Le taux
-publié est donc un **plancher**, qui ne peut que monter.
-
-> ## Taux de conformité : **56,9 %** (37 sur 65)
+> ## Taux de conformité : **73,8 %** (48 sur 65)
 > ### Mention RGAA : **partiellement conforme**
 
-| Hypothèse | Taux |
-|---|---|
-| Les 6 non tranchés comptés non conformes — **taux publié** | **56,9 %** |
-| Seuil de « partiellement conforme » | 50 % |
-| Les 6 tranchés conformes | 66,2 % |
+| Étape | Conformes | Taux |
+|---|---|---|
+| Avant l'audit | *non mesuré* | — |
+| Première et deuxième passe | 37 | 56,9 % |
+| **Troisième passe** | **48** | **73,8 %** |
+| Si les 6 non tranchés passent | 54 | 83,1 % |
+| Si tout le plan est traité | 65 | 100 % |
 
-L'application **franchit le seuil dans tous les cas de figure**. La déclaration
-passe donc de « non conforme » à « **partiellement conforme — 56,9 %** ».
+### Les 11 non-conformités restantes
 
-### Les 6 critères encore ouverts
+| Critères | Chantier | Visible à l'écran ? |
+|---|---|---|
+| 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
+| 9.2, 12.6 | Poser les repères de page, rendre les regroupements contournables | non |
+| 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
+| 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
+| 10.5 | 45 déclarations inline ne posent que le fond **ou** que le texte | non |
+| 10.8 | Un conteneur `aria-hidden` contient un élément focusable | non |
+| 11.13 | Scinder le champ « e-mail ou téléphone » | **oui** |
+
+### Les 6 critères non tranchés
 
 | Critère | Question | Qui tranche |
 |---|---|---|
-| 1.3 | Les alternatives des images sont-elles **pertinentes** ? Le blason est décrit « Mézières », l'avatar de l'assistante « MEL ». | la mairie |
-| 3.1 | Une information est-elle donnée **uniquement par la couleur** — pastilles de statut, zonage du PLU, niveaux de vigilance ? | la mairie |
-| 8.2 | Validité du code selon le validateur du W3C. | à brancher en CI |
-| 13.3 / 13.4 | Les **PDF du PLUi** publiés depuis l'administration sont-ils accessibles ? | la mairie |
-| 13.10 | La **carte 3D** impose-t-elle un geste complexe sans solution de remplacement ? | la mairie |
+| 1.3 | Les alternatives des images sont-elles **pertinentes** ? | la mairie |
+| 3.1 | Une information est-elle donnée **uniquement par la couleur** ? | la mairie |
+| 8.2 | Validité du code selon le validateur du W3C | à brancher en CI |
+| 13.3 / 13.4 | Les **PDF du PLUi** sont-ils accessibles ? | la mairie |
+| 13.10 | La **carte 3D** impose-t-elle un geste complexe sans alternative ? | la mairie |
 
-## 6. Reproduire cet audit
+## 7. Reproduire cet audit
 
 ```bash
 cd tests/e2e && npm ci

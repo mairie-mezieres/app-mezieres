@@ -385,6 +385,14 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .majordome-name{font-family:'Grape Nuts',cursive;font-size:2rem;color:var(--forest);margin-bottom:6px;}
 .majordome-tagline{font-size:0.78rem;font-weight:800;color:var(--sage-ink);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;}
 .majordome-text{font-size:0.84rem;color:var(--muted);line-height:1.7;text-align:left;background:white;border-radius:16px;padding:16px;border:1px solid var(--border);}
+/* Contenu réservé aux lecteurs d'écran : présent dans la restitution, absent de
+   l'écran. On ne peut PAS utiliser display:none ni visibility:hidden — les deux
+   retirent l'élément de l'arbre d'accessibilité, ce qui est exactement le
+   contraire du but. La technique du rognage à 1 px est la seule qui garde le
+   texte lisible par les technologies d'assistance. Sert aux titres de tableaux
+   (RGAA 5.4) déjà annoncés visuellement par le bloc qui les entoure. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
 /* RGAA 8.9 — ces paragraphes etaient separes par des <br><br>, un
    detournement de balise a des fins de presentation. Ce sont de vrais
    paragraphes ; l'espacement revient au CSS, qui est sa place. */

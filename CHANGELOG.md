@@ -5,6 +5,45 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.88] — 27 août 2026
+
+### Corrigé
+- **RGAA 7.5 — aucune région live.** Les réponses de MEL, le suivi des signalements
+  et la galerie photos étaient mis à jour en silence : un lecteur d'écran n'annonçait
+  rien. Un habitant aveugle dont l'envoi échouait croyait que c'était parti.
+  `role="status"` + `aria-live="polite"` sur `#msgs`, `#suivi-body` et `#photos-list` ;
+  la modale de validation devient un `alertdialog` et prend le focus.
+- **RGAA 11.10 / 11.11 — l'erreur de saisie ne désignait pas le champ fautif.** Elle
+  s'affichait dans une fenêtre, et après fermeture le focus repartait au début du
+  document. Désormais : `aria-invalid` sur le champ, focus rendu au champ, marqueur
+  effacé dès la première frappe. Le focus est aussi rendu à son point de départ à la
+  fermeture de toute modale (12.9).
+- **RGAA 11.5 à 11.7 — champs de même nature non groupés.** Les vingt cases de
+  `partager.html` n'avaient aucun groupement, et le libellé « Votre niveau en
+  informatique » **ne portait aucun `for`** : affiché, rattaché à rien. `role="group"`
+  + `aria-labelledby`, et le libellé orphelin devient la légende du groupe.
+- **RGAA 5.4 à 5.7 — les horaires de la mairie** étaient lus d'une traite, sans lien
+  entre le jour et l'heure. `caption` réservé aux lecteurs d'écran, jour passé en
+  `th scope="row"`. **Rendu vérifié identique** — les règles CSS rendent au `th`
+  l'apparence exacte de l'ancien `td`. Idem pour les deux tableaux RGPD.
+- **RGAA 13.2 — 7 liens** ouvraient une nouvelle fenêtre sans le dire. Mention
+  ajoutée en texte réservé aux lecteurs d'écran, posée au chargement puis à
+  l'ouverture de chaque écran — ce qui couvre les contenus injectés après coup sans
+  imposer d'observateur de mutations permanent.
+
+### Modifié
+- **Taux de conformité RGAA : 56,9 % → 73,8 %** (48 conformes sur 65 applicables).
+  Mention inchangée : **partiellement conforme**.
+- **Aucun changement visible.** L'apparence de l'application est identique.
+
+### Connu
+- **RGAA 11.13 reste non conforme, délibérément.** Le champ « Coordonnée de réponse »
+  accepte un e-mail **ou** un téléphone : aucun jeton `autocomplete` ne couvre les
+  deux. Le corriger demande de scinder le champ — un changement visible, planifié
+  pour 2027.
+
+---
+
 ## [4.87] — 27 août 2026
 
 ### Modifié

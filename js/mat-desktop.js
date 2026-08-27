@@ -281,11 +281,23 @@ function renderHoraires(){
   var now=new Date();
   var today=now.getDay();
   var dayIdx=[6,0,1,2,3,4,5];
-  var html='<table class="d-horaires"><tbody>';
+  /* RGAA 5.4 à 5.7 — c'est un tableau de DONNÉES : il lui faut un titre
+     (caption), des en-têtes (th) et le lien explicite entre chaque cellule et
+     son en-tête (scope). Sans ça, un lecteur d'écran énonce « Lundi 14h00
+     17h30 Mardi Fermée… » d'une traite, sans dire ce que chaque valeur
+     représente. Le caption est masqué visuellement — le titre est déjà donné
+     à l'écran par le bloc qui entoure le tableau — mais reste lu.
+
+     Pas de ligne d'en-tête de colonne : il n'y en a pas à l'écran, et le
+     référentiel demande de déclarer les en-têtes qui EXISTENT, pas d'en
+     inventer. Le jour suffit à porter la ligne. Le rendu ne bouge donc pas. */
+  var html='<table class="d-horaires">'+
+    '<caption class="sr-only">Horaires d’ouverture de la mairie</caption>'+
+    '<tbody>';
   rows.forEach(function(r,i){
     var isCurrent=(dayIdx[today]===i);
     html+='<tr'+(isCurrent?' class="d-hor-today"':'')+'>'+
-      '<td>'+r[0]+'</td>'+
+      '<th scope="row">'+r[0]+'</th>'+
       '<td>'+r[1]+'</td>'+
     '</tr>';
   });
