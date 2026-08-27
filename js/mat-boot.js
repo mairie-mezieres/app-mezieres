@@ -169,7 +169,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-guide-arrivee.js?v=1.0.6';
+  s.src = 'js/mat-guide-arrivee.js?v=1.0.7';
   document.head.appendChild(s);
 })();
 
