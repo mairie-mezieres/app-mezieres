@@ -38,6 +38,7 @@ Règle d'or : **vérifier qu'une fonctionnalité n'existe pas déjà (code + UI 
 | Présentation générale du frontend | `README.md` |
 | **Accessibilité clavier** — pourquoi `role="button"` et pas `<button>`, pourquoi axe ne voit pas un `<div onclick>`, quelles exceptions sont admises | `docs/adr/0016-clavier-axe-ne-voit-pas-un-div-onclick.md` puis `tests/e2e/accessibilite-clavier.spec.js` |
 | **Taille du texte** — plancher de 12 px, pourquoi pas 16 px, pourquoi `body{font-size:1rem}`, ce qui reste à traiter (desktop, overlays, admin) | `docs/adr/0017-plancher-typographique-12px-mesure-sur-le-rendu.md` puis `tests/e2e/typographie.spec.js` |
+| **Cerfa d'urbanisme** (lien « Cerfa DP » du zonage PLU, corpus « Le saviez-vous ? ») — ⚠️ les **13703, 13702 et 13404 sont abrogés** depuis le 1er janvier 2025 (→ **16702** et **16703** ; le PC reste le **13406**) ; ne jamais écrire de **millésime** (« 16702\*02 ») ; quatre endroits à garder en phase | `docs/adr/0029-un-numero-de-formulaire-mort-ne-se-voit-pas.md` puis `chatbot-mairie-mezieres/test/urbanisme-cerfa.test.js` |
 | **Décisions d'architecture** (pourquoi PWA, pourquoi ce versioning SW…) | `docs/adr/` — un fichier par décision |
 | **Côté backend** (Trello, MEL, admin, diagnostic Services, env Render) | repo `chatbot-mairie-mezieres` → son `CLAUDE.md` puis `GUIDE-ADMIN.md` |
 

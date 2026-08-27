@@ -57,9 +57,9 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.4"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.5.1"></script>
+<script defer src="js/mat-mel.js?v=4.5.2"></script>
 <script defer src="js/mat-perf.js?v=1.0.8"></script>
-<script defer src="js/mat-boot.js?v=4.12.2"></script>
+<script defer src="js/mat-boot.js?v=4.12.3"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.85 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.85.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.85</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.85.1</button>
 </div>
 </div>
 </div>
@@ -1738,6 +1738,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.85.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le formulaire de d&eacute;claration pr&eacute;alable a chang&eacute; de num&eacute;ro&nbsp;: l&rsquo;application le disait encore &agrave; l&rsquo;ancienne.</strong> Depuis le <strong>1<sup>er</sup> janvier 2025</strong>, les cerfa <strong>13703</strong>, 13702 et 13404 sont abrog&eacute;s&nbsp;: c&rsquo;est le <strong>16702</strong> pour toutes les d&eacute;clarations pr&eacute;alables de constructions et travaux (cl&ocirc;ture, abri de jardin, extension, ravalement) et le <strong>16703</strong> pour les am&eacute;nagements. D&eacute;pos&eacute; sur l&rsquo;ancien formulaire, un dossier est refus&eacute;</li>
+<li>Le lien &laquo;&nbsp;<strong>Cerfa DP</strong>&nbsp;&raquo; du zonage PLU ouvrait une page supprim&eacute;e du site Service-Public (erreur 404). Il pointe d&eacute;sormais la bonne fiche</li>
+<li>La question du &laquo;&nbsp;Le saviez-vous&nbsp;?&nbsp;&raquo; sur le formulaire des cl&ocirc;tures donnait la r&eacute;ponse inverse de la r&eacute;alit&eacute; d&rsquo;aujourd&rsquo;hui&nbsp;: c&rsquo;est bien <strong>le m&ecirc;me formulaire</strong> pour une cl&ocirc;ture et pour un abri de jardin. Corrig&eacute;e, et sourc&eacute;e</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.85</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>La cr&egrave;che Les Marmousets&nbsp;: deux chiffres faux corrig&eacute;s.</strong> Le r&egrave;glement de fonctionnement 2026-2027 nous a appris que l&rsquo;application annon&ccedil;ait <strong>17 assistantes maternelles</strong> quand il y en a <strong>16</strong>, et un accueil des <strong>&laquo;&nbsp;moins de 6 ans&nbsp;&raquo;</strong> alors que la cr&egrave;che prend les enfants <strong>de 10 semaines jusqu&rsquo;&agrave; leur entr&eacute;e en maternelle</strong> — les d&eacute;j&agrave; scolaris&eacute;s pouvant y venir le mercredi et pendant les vacances, selon les places</li>
