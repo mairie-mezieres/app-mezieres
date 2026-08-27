@@ -5,6 +5,76 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.90] — 27 août 2026
+
+### Ajouté
+- **Le validateur du W3C est branché en intégration continue** —
+  `.github/workflows/validite-html.yml` (RGAA 8.2). Chaque lundi et à chaque
+  modification d'un `.html`, `vnu` — le moteur même de `validator.w3.org`, exécuté
+  en local pour ne dépendre d'aucun service tiers — valide les six pages de
+  l'échantillon. Même modèle que `liens-morts.yml` : **une seule issue vivante**,
+  mise à jour à chaque passage, refermée d'elle-même à zéro erreur.
+  ⚠️ **Il ne fait pas échouer le build** : faire rougir chaque PR sur un passif
+  connu de 33 erreurs apprendrait surtout à ignorer le rouge.
+  ⚠️ **Le contrôle a failli naître aveugle.** Sa première version cherchait le début
+  du JSON à `{"messages"` — or `vnu` émet `{"version":…,"messages":[…]}`. Le repère
+  était introuvable, le script lisait donc **zéro message, donc zéro erreur**, et
+  aurait annoncé le critère 8.2 satisfait à chaque passage, pour toujours. Pris au
+  moment de le lancer contre les pages réelles, qui en comptaient 33. Même panne que
+  les tests axe lancés sur un écran encore invisible (ADR-0030) : **un contrôle qui
+  ne mesure rien ne rougit pas, il verdit.** Le script échoue désormais bruyamment
+  quand la sortie du validateur est illisible, plutôt que de conclure au vert.
+
+### Corrigé
+- **RGAA 8.2 — quatre erreurs de validité, dont une qui pouvait recharger la page.**
+  Le validateur en a relevé 39 ; ces quatre-là étaient sans risque :
+  - espaces non encodées dans un `src` — `img/MAT et MEL.webp` (4 occurrences dans
+    `index.html`) et `img/Fabrice AUFFRET ….jpg` dans `partager.html` → `%20` ;
+  - `src=""` sur `#trombi-big-img` : invalide, et **interprété par certains
+    navigateurs comme une requête vers la page courante** — donc un rechargement
+    parasite. Remplacé par un pixel transparent en `data:` ; la vraie photo est
+    posée par le script à l'ouverture du trombinoscope ;
+  - `aria-label` sur le `<div class="ov" id="ov-carte3d">`, sans rôle propre :
+    invalide, et inutile depuis que `openOv()` pose `aria-labelledby` vers le titre
+    du panneau.
+
+### Audit — l'audit RGAA est terminé
+- **Les 106 critères ont tous un verdict.** Aucun `?` ne subsiste. Cinquième et
+  dernière passe.
+- **Cinq critères de jugement humain tranchés par le référent accessibilité**
+  (27 août 2026) — aucun outil ne dit si une alternative d'image est *pertinente*,
+  ni si un PDF sort d'un scanner :
+  - **1.3** les quatre alternatives d'images conviennent → `C` ;
+  - **3.1** partout un mot ou un symbole double la couleur (vigilance météo,
+    sécheresse, statut des signalements, zonage du PLU) → `C` ;
+  - **13.3 / 13.4** les documents du PLUi sont des **exports numériques**, non des
+    scans : ils portent une couche de texte → `C` ;
+  - **13.10** zoom, rotation et remise à plat de la carte 3D se font aux boutons,
+    à un doigt → `C`.
+  Ce sont des **déclarations, pas des mesures** : le RGAA les admet, mais elles se
+  re-vérifient à chaque nouveau document publié ou changement de gestes.
+- **8.2 était une mesure, et il tombe.** 39 erreurs relevées, 4 corrigées ci-dessus,
+  **33 restantes** en trois familles seulement : 28 `<div>` dans un `<button>` (les
+  tuiles de l'accueil), 4 `<div>` dans un `<label>` (`partager.html`), 1 `<style>`
+  dans le `<body>` (`index.html` ligne 80, la feuille du lien d'évitement — la
+  déplacer dans le `<head>` change l'ordre de la cascade). Passe de `?` à **`NC`**.
+  ⚠️ Vérifié avant de renoncer : `.ct-label` et `.ct-sub` ne déclarent **aucun**
+  `display`. Convertir ces `<div>` en `<span>` casserait la mise en page des 28
+  tuiles tant qu'un `display:block` ne leur est pas rendu — le chantier rejoint le
+  plan d'action, il n'est pas un remplacement mécanique.
+- **La quatrième passe pronostiquait 87,7 %, la mesure dit 86,2 %.** Le saut n'est
+  pas de 6 critères mais de 5 : c'est la différence entre un pronostic et un audit.
+
+### Modifié
+- **Taux de conformité RGAA : 78,5 % → 86,2 %** (56 conformes sur 65 applicables,
+  41 non applicables). Mention inchangée : **partiellement conforme**.
+- Déclaration d'accessibilité publiée dans l'app, `docs/accessibilite/audit-rgaa-2026-08-27.md`
+  et `docs/accessibilite/schema-pluriannuel.md` mis en phase. Le plan d'action publié
+  passe de « six critères ouverts + huit chantiers » à **neuf non-conformités datées** ;
+  « poser les repères de page », traité en v4.89, en disparaît.
+
+---
+
 ## [4.89] — 27 août 2026
 
 ### Corrigé

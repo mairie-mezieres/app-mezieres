@@ -1,10 +1,12 @@
 # Audit RGAA 4.1 — Mézières Avec Toi (MAT)
 
 - **Date de l'audit** : 27 août 2026
-- **Version auditée** : v4.86 (`mat-v4.86.0`)
+- **Version auditée** : v4.86 → v4.90 (cinq passes ; le taux publié est celui de la v4.90)
 - **Référentiel** : RGAA version 4.1 — 106 critères, 13 thématiques
 - **Réalisé par** : audit interne outillé, commune de Mézières-lez-Cléry
-- **Statut** : ⚠️ **projet — à valider par la mairie avant publication du taux**
+- **Statut** : **complet** — les 106 critères ont un verdict, aucun n'est laissé
+  ouvert. Les cinq critères de jugement humain ont été tranchés le 27 août 2026 par
+  le référent accessibilité de la commune (cinquième passe).
 
 > Le RGAA n'impose **pas** de prestataire extérieur : l'audit peut être mené en
 > interne. Il impose en revanche que l'organisme réponde de la **fiabilité** de sa
@@ -169,44 +171,101 @@ autres héritent du fond d'un conteneur qui, lui, le déclare. Corriger les 45 �
 l'aveugle ferait courir un risque visuel réel pour un bénéfice théorique. Le
 chantier reste au plan, à traiter en regardant chaque cas.
 
+### Cinquième passe — les six derniers critères sont tranchés
+
+Cet audit ne comporte plus de `?`. Cinq critères relevaient du **jugement humain** :
+aucun outil ne peut dire si une alternative d'image est *pertinente*, ni si un PDF
+vient d'un scanner. Ils ont été soumis au **référent accessibilité** de la commune,
+qui a répondu le 27 août 2026.
+
+| Critère | Question posée | Réponse | Verdict |
+|---|---|---|---|
+| **1.3** | Les quatre alternatives d'images sont-elles compréhensibles à l'oreille ? | oui, telles quelles | `C` |
+| **3.1** | Une information passe-t-elle **uniquement** par la couleur (vigilance météo, sécheresse, statut des signalements, zonage du PLU) ? | non — **partout un mot ou un symbole double la couleur** | `C` |
+| **13.3 / 13.4** | Les documents du PLUi sont-ils des scans ? | non — ce sont des **exports numériques** (Word, LibreOffice, logiciel métier) : ils portent une couche de texte | `C` |
+| **13.10** | La carte 3D exige-t-elle un geste à deux doigts sans équivalent ? | non — zoom, rotation et remise à plat se font aux boutons | `C` |
+
+> ⚠️ **Ces quatre réponses sont des déclarations, pas des mesures.** Le RGAA les
+> admet — il demande que l'organisme réponde de la fiabilité de sa déclaration, non
+> qu'un outil ait tout vérifié. Elles se re-vérifient à l'œil, et devront l'être si
+> un nouveau document est publié ou si la carte 3D change de gestes.
+
+**Le sixième, 8.2, n'était pas une question mais une mesure — et il tombe.** Le
+validateur officiel du W3C (`vnu`, le même moteur que `validator.w3.org`, exécuté en
+local) a relevé **39 erreurs** sur les six pages de l'échantillon. Quatre étaient sans
+risque et sont corrigées ici :
+
+| Erreur | Où | Correction |
+|---|---|---|
+| Espaces non encodées dans un `src` | `img/MAT et MEL.webp` (4 fois), `img/Fabrice AUFFRET ….jpg` | `%20` |
+| `src=""` — invalide, et interprété par certains navigateurs comme **un rechargement de la page courante** | `#trombi-big-img` | un pixel transparent en `data:` ; la vraie photo est posée à l'ouverture |
+| `aria-label` sur un `<div>` sans rôle propre | `#ov-carte3d` | supprimé — `openOv()` pose déjà `aria-labelledby` vers le titre du panneau |
+
+Restent **33 erreurs**, toutes structurelles et de trois familles seulement :
+
+| Occurrences | Erreur | Où |
+|---|---|---|
+| 28 | `<div>` à l'intérieur d'un `<button>` | les tuiles de l'accueil (`index.html`) |
+| 4 | `<div>` à l'intérieur d'un `<label>` | les cartes à cocher de `partager.html` |
+| 1 | `<style>` dans le `<body>` | `index.html` ligne 80 — la feuille du lien d'évitement |
+
+Soit **29 erreurs dans `index.html` et 4 dans `partager.html`**. La dernière est la
+moins chère — déplacer le bloc `<style>` dans le `<head>` — mais elle **change l'ordre
+de la cascade** vis-à-vis des feuilles liées : à faire en regardant l'écran, pas à
+l'aveugle.
+
+**8.2 est donc `NC`, et non plus `?`.** Le chantier n'est pas anodin : `.ct-label` et
+`.ct-sub` ne déclarent **aucun** `display` — vérifié — donc passer ces `<div>` en
+`<span>` casserait la mise en page des 28 tuiles tant qu'un `display:block` ne leur
+est pas ajouté. Il rejoint les non-conformités à traiter, hors de cette passe.
+
+**Le validateur est branché** : `.github/workflows/validite-html.yml`, chaque lundi et
+à chaque modification d'un `.html`. Il suit le modèle de `liens-morts.yml` — une seule
+issue vivante, mise à jour à chaque passage, refermée d'elle-même quand le compte
+tombe à zéro. Il **ne fait pas échouer le build** : faire rougir chaque proposition de
+modification sur un passif connu de 33 erreurs apprendrait surtout à ignorer le rouge.
+
 ---
 
 ## 5. Les 106 critères
 
-`C` conforme · `NC` non conforme · `NA` non applicable · `?` non tranché
+`C` conforme · `NC` non conforme · `NA` non applicable
+
+> **Aucun `?` ne subsiste.** Les 106 critères ont tous un verdict : c'est ce qui fait
+> de ce document un audit et non un relevé partiel.
 
 | Thème | Critères | Verdicts |
 |---|---|---|
-| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. |
+| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `C` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. 1.3 tranché par le référent (cinquième passe). |
 | **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
-| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `C` | 3.2 : **136 nœuds indéterminés** (texte sur dégradé ou photo). |
+| **3. Couleurs** (3) | 3.1 `C` · 3.2 `NC` · 3.3 `C` | 3.1 : partout un mot ou un symbole double la couleur (référent). 3.2 : **136 nœuds indéterminés** (texte sur dégradé ou photo). |
 | **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
 | **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
-| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 demande le validateur du W3C. |
+| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `NC` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 mesuré au validateur du W3C : **33 erreurs** restantes (4 corrigées), trois familles structurelles. |
 | **9. Structuration** (4) | 9.1 `NC` · 9.2 `C` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
 | **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte, dont 6 seulement sur des éléments visibles. |
 | **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `NC` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
 | **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
-| **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | |
+| **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `C` · 13.4 `C` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `C` · 13.11 `C` · 13.12 `NA` | 13.3/13.4 : les documents du PLUi sont des exports numériques, non des scans. 13.10 : la carte 3D se pilote entièrement aux boutons (référent). |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **51** |
-| Non conformes | **8** |
+| Conformes | **56** |
+| Non conformes | **9** |
 | Non applicables | **41** |
-| Non tranchés | **6** |
+| Non tranchés | **0** |
 | Total | **106** |
 
 ## 6. Taux de conformité
 
-Critères applicables : 106 − 41 = **65**. Les 6 non tranchés restent comptés comme
-non conformes — le taux publié est un **plancher**.
+Critères applicables : 106 − 41 = **65**. **Aucun critère n'est laissé sans verdict** :
+le taux n'est plus un plancher prudent, c'est la mesure.
 
-> ## Taux de conformité : **78,5 %** (51 sur 65)
+> ## Taux de conformité : **86,2 %** (56 sur 65)
 > ### Mention RGAA : **partiellement conforme**
 
 | Étape | Conformes | Taux |
@@ -214,35 +273,41 @@ non conformes — le taux publié est un **plancher**.
 | Avant l'audit | *non mesuré* | — |
 | Première et deuxième passe | 37 | 56,9 % |
 | Troisième passe | 48 | 73,8 % |
-| **Quatrième passe** | **51** | **78,5 %** |
-| Si les 6 non tranchés passent | 57 | 87,7 % |
+| Quatrième passe | 51 | 78,5 % (6 critères encore ouverts) |
+| **Cinquième passe** | **56** | **86,2 %** |
 | Si tout le plan est traité | 65 | 100 % |
 
-### Les 8 non-conformités restantes
+> Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
+> de jugement ont reçu une réponse favorable, le sixième — 8.2 — a été **mesuré** et
+> il échoue. La quatrième passe l'espérait à 87,7 % ; la mesure dit 86,2 %. C'est la
+> différence entre un pronostic et un audit.
+
+### Les 9 non-conformités restantes
 
 | Critères | Chantier | Visible à l'écran ? |
 |---|---|---|
 | 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
 | 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
 | 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
+| 8.2 | 33 erreurs de validité HTML — 28 tuiles, 4 cartes à cocher, un `<style>` déplacé | non, **si** le `display` est repris avec |
 | 10.5 | 45 déclarations inline ne posent que le fond **ou** que le texte | non |
 | 11.13 | Scinder le champ « e-mail ou téléphone » | **oui** |
-
-### Les 6 critères non tranchés
-
-| Critère | Question | Qui tranche |
-|---|---|---|
-| 1.3 | Les alternatives des images sont-elles **pertinentes** ? | la mairie |
-| 3.1 | Une information est-elle donnée **uniquement par la couleur** ? | la mairie |
-| 8.2 | Validité du code selon le validateur du W3C | à brancher en CI |
-| 13.3 / 13.4 | Les **PDF du PLUi** sont-ils accessibles ? | la mairie |
-| 13.10 | La **carte 3D** impose-t-elle un geste complexe sans alternative ? | la mairie |
 
 ## 7. Reproduire cet audit
 
 ```bash
 cd tests/e2e && npm ci
 npx playwright test                 # 260 tests, dont les contrôles axe par écran
+```
+
+Et pour le critère 8.2, le validateur officiel — le même moteur que
+`validator.w3.org`, exécuté en local :
+
+```bash
+npm install --no-save vnu-jar
+java -jar "$(find node_modules/vnu-jar -name vnu.jar)" \
+  index.html offline.html notif.html partager.html \
+  architecture.html revue-saviez-vous.html
 ```
 
 Les tests d'accessibilité échouent désormais **vraiment** : ils attendent le style

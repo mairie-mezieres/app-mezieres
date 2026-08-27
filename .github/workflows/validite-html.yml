@@ -1,0 +1,134 @@
+name: Validité HTML (W3C)
+
+# RGAA critère 8.2 — « le code source généré est-il valide selon le type de
+# document spécifié ? ». Un document invalide n'est pas une coquetterie de
+# puriste : les technologies d'assistance s'appuient sur l'arbre que le
+# navigateur construit, et un balisage illégal le fait diverger d'un moteur à
+# l'autre. Ce que le lecteur d'écran restitue cesse alors d'être prévisible.
+#
+# Ce contrôle N'ÉCHOUE PAS le build. Au 27 août 2026 il reste 33 erreurs, toutes
+# structurelles (voir docs/accessibilite/audit-rgaa-2026-08-27.md) : faire rougir
+# chaque PR sur un passif connu apprendrait surtout à ignorer le rouge. Il suit
+# le même modèle que `liens-morts.yml` — une seule issue vivante, mise à jour à
+# chaque passage, refermée d'elle-même quand le compte tombe à zéro.
+
+on:
+  schedule:
+    # Lundi 08h00 UTC, après les deux scans de liens (07h00 et 07h30).
+    - cron: '0 8 * * 1'
+  workflow_dispatch: {}
+  pull_request:
+    paths:
+      - '**.html'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Java (requis par le validateur du W3C)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Installer vnu (le validateur officiel, en local)
+        # On l'exécute en local plutôt que d'appeler validator.w3.org : pas de
+        # dépendance à un service tiers, pas de limitation de débit, et le même
+        # verdict qu'en ligne — c'est le même moteur.
+        run: npm install --no-save --no-audit --no-fund vnu-jar
+
+      - name: Valider les pages
+        id: vnu
+        run: |
+          JAR=$(find node_modules/vnu-jar -name 'vnu.jar' | head -1)
+          echo "Validateur : $JAR"
+          set +e
+          java -jar "$JAR" --format json \
+            index.html offline.html notif.html partager.html \
+            architecture.html revue-saviez-vous.html \
+            > vnu-brut.txt 2> vnu.json
+          set -e
+          node -e '
+            const fs = require("fs");
+            const brut = fs.readFileSync("vnu.json", "utf8");
+            // ⚠️ ATTENTION — aucune apostrophe ASCII dans ce bloc : il est passé à
+            // node entre guillemets simples, une apostrophe droite fermerait la
+            // chaîne du shell. Les apostrophes typographiques (’) sont sans danger.
+            //
+            // Le JSON de vnu commence par {"version":…, PAS par {"messages":… — et la
+            // JVM peut le faire précéder de sa bannière JAVA_TOOL_OPTIONS. Un repère
+            // mal choisi ne lève aucune erreur : il renvoie zéro message, donc zéro
+            // erreur, donc un contrôle vert qui n’a rien mesuré. C’est la panne des
+            // tests axe lancés sur un écran encore invisible (ADR-0030), reproduite
+            // ici — elle a été prise à temps. D’où le repère souple ci-dessous, et
+            // l’échec bruyant plutôt que le silence quand la sortie est illisible.
+            const debut = brut.match(/\{"(?:version|messages)"/);
+            if (!debut) { console.error(brut.slice(0, 2000)); throw new Error("Sortie du validateur illisible — aucun JSON trouvé. Le contrôle NE PEUT PAS conclure."); }
+            const doc = JSON.parse(brut.slice(debut.index));
+            if (!Array.isArray(doc.messages)) throw new Error("JSON du validateur sans tableau \"messages\" — le contrôle NE PEUT PAS conclure.");
+            const err = doc.messages.filter(m => m.type === "error");
+            const parFichier = {};
+            const parType = {};
+            for (const m of err) {
+              const f = (m.url || "?").split("/").pop();
+              parFichier[f] = (parFichier[f] || 0) + 1;
+              const c = m.message.slice(0, 90);
+              parType[c] = (parType[c] || 0) + 1;
+            }
+            let md = "# Validité HTML — validateur du W3C\n\n";
+            md += `**${err.length} erreur(s)** sur 6 pages.\n\n`;
+            if (err.length) {
+              md += "## Par page\n\n| Page | Erreurs |\n|---|---|\n";
+              for (const [f, n] of Object.entries(parFichier).sort((a,b) => b[1]-a[1]))
+                md += `| \`${f}\` | ${n} |\n`;
+              md += "\n## Par famille\n\n| Occurrences | Message |\n|---|---|\n";
+              for (const [c, n] of Object.entries(parType).sort((a,b) => b[1]-a[1]))
+                md += `| ${n} | ${c} |\n`;
+              md += "\n## Premières occurrences\n\n";
+              for (const m of err.slice(0, 15))
+                md += `- \`${(m.url||"?").split("/").pop()}\` ligne ${m.lastLine} — ${m.message}\n`;
+              md += "\n_Le critère RGAA 8.2 exige zéro erreur._\n";
+            }
+            fs.writeFileSync("rapport-html.md", md);
+            fs.writeFileSync(process.env.GITHUB_OUTPUT, `erreurs=${err.length}\n`, { flag: "a" });
+            console.log(md);
+          '
+
+      - name: Chercher une issue « validite-html » déjà ouverte
+        if: github.event_name != 'pull_request'
+        id: issue_ouverte
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          numero=$(gh issue list --repo "$GITHUB_REPOSITORY" \
+                     --label validite-html --state open --limit 1 \
+                     --json number --jq '.[0].number // ""')
+          echo "numero=$numero" >> "$GITHUB_OUTPUT"
+          echo "Issue validite-html ouverte : ${numero:-aucune}"
+
+      - name: Créer ou mettre à jour l'issue
+        if: github.event_name != 'pull_request' && steps.vnu.outputs.erreurs != '0'
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: 🧾 Erreurs de validité HTML (RGAA 8.2)
+          content-filepath: ./rapport-html.md
+          labels: validite-html
+          issue-number: ${{ steps.issue_ouverte.outputs.numero }}
+
+      - name: Refermer l'issue si le code est valide
+        if: github.event_name != 'pull_request' && steps.vnu.outputs.erreurs == '0' && steps.issue_ouverte.outputs.numero != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMERO: ${{ steps.issue_ouverte.outputs.numero }}
+        run: |
+          gh issue comment "$NUMERO" --repo "$GITHUB_REPOSITORY" \
+            --body "✅ Scan du $(date -u '+%d/%m/%Y') : plus aucune erreur de validité. Le critère RGAA 8.2 est satisfait. Refermée automatiquement."
+          gh issue close "$NUMERO" --repo "$GITHUB_REPOSITORY" --reason completed
