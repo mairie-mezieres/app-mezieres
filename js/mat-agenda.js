@@ -83,7 +83,8 @@ function setAgendaView(view){
   _agendaTargetMonth=null;
   ['today','week','month'].forEach(function(v){
     var el=document.getElementById('agenda-tab-'+v);
-    if(el) el.classList.toggle('on',v===view);
+    // RGAA 10.9 — l'onglet actif n'est pas signalé que par sa couleur.
+    if(el) { el.classList.toggle('on',v===view); el.setAttribute('aria-pressed', String(v===view)); }
   });
   renderAgenda();
 }

@@ -5,6 +5,44 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.87] — 27 août 2026
+
+### Modifié
+- **L'application n'est plus déclarée « non conforme ».** L'audit des 106 critères
+  du RGAA est achevé : **41 non applicables**, donc **65 applicables** — **37
+  conformes**, 22 non conformes, 6 non tranchés. **Taux : 56,9 %**, mention
+  **partiellement conforme**. Les 6 non tranchés sont comptés comme non conformes :
+  le taux publié est un **plancher**, qui ne peut que monter.
+- Plan d'action réordonné : d'abord les 6 critères ouverts (ils font monter le taux
+  sans qu'une ligne de code change), puis les non-conformités. Les traiter porterait
+  le taux au-delà de **90 %**.
+
+### Corrigé
+- **RGAA 3.3 — les bordures des champs de saisie étaient presque invisibles.**
+  `rgba(0,0,0,0.07)` = **1,17:1**, pour un minimum de 3:1. Nouveau jeton
+  `--border-champ` à **3,88:1**, décliné pour le contraste élevé (10,37:1) et le
+  thème sombre (4,79:1). `--border` reste inchangé : il sert aussi à des séparateurs
+  décoratifs, qui n'ont aucun minimum à respecter.
+- **RGAA 3.3 — les interrupteurs du panneau Accessibilité** : piste `#ccc` sur blanc
+  = **1,61:1**, état allumé **2,47:1**. Bordure ajoutée (**3,95:1**), état allumé
+  passé à `--sage-ink` (**6,39:1**), distinction éteint/allumé à **3,98:1**.
+- **RGAA 10.9 / 10.10 — l'état sélectionné n'était donné que par la couleur** sur les
+  boutons de taille de texte, de thème et les onglets de l'agenda. `aria-pressed`
+  ajouté sur les six.
+- **RGAA 8.9 — 15 séquences de `<br><br>`** servaient à espacer des paragraphes
+  (présentation du majordome, contact RGPD, écran d'accueil). Remplacées par de vrais
+  paragraphes, l'espacement rendu au CSS.
+
+### Audit — critères tranchés dans cette version
+- **8.9**, **13.11** (aucun gestionnaire `mousedown`/`touchstart`/`pointerdown` :
+  tout passe par `click` et `change`, annulables), **3.3**, **10.9**, **10.10** →
+  conformes. **10.13**, **10.14**, **12.11** → non applicables : aucun contenu
+  additionnel révélé au survol par CSS ou JavaScript.
+- Restent 6 critères, dont 5 relèvent du jugement de la mairie et 1 du validateur
+  du W3C.
+
+---
+
 ## [4.86] — 27 août 2026
 
 ### Corrigé

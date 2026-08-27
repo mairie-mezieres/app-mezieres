@@ -54,61 +54,60 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
 ## 4. État des lieux au 27 août 2026
 
 Un audit interne outillé des **106 critères** a été mené le 27 août 2026
-(`audit-rgaa-2026-08-27.md`). Il a établi trois choses.
+(`audit-rgaa-2026-08-27.md`), en deux passes.
 
-**D'abord que l'instrument de mesure était faussé.** Les contrôles automatiques
-mesuraient les écrans pendant leur transition d'ouverture, alors qu'ils étaient
-encore invisibles — donc vides pour l'outil. Ils étaient verts sans rien vérifier.
-Corrigé, l'instrument a immédiatement révélé que les **douze interrupteurs du
-panneau Accessibilité n'avaient aucun nom accessible** : les réglages destinés aux
-personnes qui en ont le plus besoin étaient inutilisables au lecteur d'écran. Six
-champs de formulaire étaient dans le même cas, et les trente fenêtres de
-l'application s'annonçaient toutes « dialogue », sans dire lequel.
+**La première a montré que l'instrument de mesure était faussé.** Les contrôles
+automatiques mesuraient les écrans pendant leur transition d'ouverture, alors
+qu'ils étaient encore invisibles — donc vides pour l'outil. Ils étaient verts sans
+rien vérifier. Corrigé, l'instrument a révélé que les **douze interrupteurs du
+panneau Accessibilité n'avaient aucun nom annoncé**, que six champs de formulaire
+étaient dans le même cas, et que les trente fenêtres s'annonçaient toutes
+« dialogue » sans dire laquelle.
 
-**Ensuite un décompte.** Sur 106 critères : **38 non applicables** (l'application
-ne contient ni média temporel, ni cadre, ni CAPTCHA), donc **68 applicables**.
-Parmi eux, **32 conformes**, **22 non conformes**, et **14 non tranchés**.
+**La seconde a tranché les critères outillables** et trouvé, chemin faisant, que
+les bordures des champs de saisie ne faisaient que **1,17:1** — un minimum de 3
+étant requis. Les réglages destinés aux personnes qui voient mal étaient, eux
+aussi, à peine visibles.
 
-**Enfin une conclusion qui commande ce plan.** Le seuil de « partiellement
-conforme » est à 50 %, soit **34 critères sur 68**. L'application en compte 32.
+**Résultat.** Sur 106 critères : **41 non applicables** (l'application ne contient
+ni média temporel, ni cadre, ni CAPTCHA), donc **65 applicables**. Parmi eux,
+**37 conformes**, **22 non conformes**, **6 non tranchés**.
 
-> **Il suffit que deux des quatorze critères non tranchés soient conformes** pour
-> que la mention change. Le travail restant n'est donc pas de rendre l'application
-> accessible : c'est de **finir de la mesurer**.
+> **Taux de conformité : 56,9 %** — mention **partiellement conforme**.
+>
+> Les 6 critères non tranchés sont comptés comme non conformes : le taux publié
+> est un **plancher**, qui ne peut que monter.
 
-L'application reste déclarée **non conforme** tant que cette mesure n'est pas
-achevée — c'est la mention exacte, et la seule que la loi autorise sans audit
-complet. Ce n'est pas un constat d'inaccessibilité ; c'est un constat d'absence de
-mesure, et ce schéma en fixe le terme.
+L'application a donc **franchi le seuil des 50 %** et la déclaration a changé de
+mention. Ce qui reste est décrit ci-dessous.
 
 ## 5. Plan d'action annuel 2026-2027
 
-### Priorité immédiate — finir la mesure (T4 2026)
+### D'abord — les 6 critères encore ouverts (T4 2026)
 
-Ce bloc ne corrige rien : il tranche les 14 critères en suspens, et détermine à lui
-seul si la déclaration peut changer de mention.
+Chacun d'eux fait monter le taux sans qu'aucune ligne de code ne change.
 
-| # | Action | Critères |
-|---|---|---|
-| 1 | **Mesures complémentaires** : contraste des composants, balises détournées, information par la forme ou la position, contenus au survol, actions par appui. | 3.3, 8.9, 10.9, 10.10, 10.13, 10.14, 12.11, 13.11 |
-| 2 | **Brancher le validateur du W3C** en intégration continue. | 8.2 |
-| 3 | **Relecture par la mairie** : pertinence des alternatives d'images, information donnée par la seule couleur, accessibilité des PDF du PLUi, gestes complexes sur la carte 3D. | 1.3, 3.1, 13.3, 13.4, 13.10 |
+| # | Action | Critères | Qui |
+|---|---|---|---|
+| 1 | **Relecture par la mairie** : pertinence des alternatives d'images, information donnée par la seule couleur, accessibilité des PDF du PLUi, gestes complexes sur la carte 3D. | 1.3, 3.1, 13.3, 13.4, 13.10 | la mairie |
+| 2 | **Brancher le validateur du W3C** en intégration continue. | 8.2 | technique |
 
-### Ensuite — monter le taux, par effet sur les habitants
+### Ensuite — les non-conformités, par effet sur les habitants
 
 | # | Action | Critères | Échéance |
 |---|---|---|---|
-| 4 | **Annoncer les messages dynamiques.** Aujourd'hui, un lecteur d'écran ne dit rien quand l'envoi d'un signalement échoue. | 7.5 | T4 2026 |
-| 5 | **Signaler les liens qui ouvrent une nouvelle fenêtre** — 7 concernés. | 13.2 | T4 2026 |
-| 6 | **Baliser le tableau des horaires** de la mairie (`<caption>`, `<th scope>`). | 5.4 à 5.7 | T4 2026 |
-| 7 | **Contrôle de saisie des formulaires** : messages d'erreur reliés au champ, suggestions de correction, `autocomplete` sur les champs d'identité. | 11.10, 11.11, 11.13 | T1 2027 |
-| 8 | **Grouper les champs de même nature** (`fieldset` / `legend`). | 11.5 à 11.7 | T1 2027 |
-| 9 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste. | 9.1, 9.3 | T1 2027 |
-| 10 | **Poser les repères de page** (`<header>`, `<footer>`) et rendre les regroupements contournables. | 9.2, 12.6 | T1 2027 |
-| 11 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | T1 2027 |
-| 12 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo. | 3.2 | T1 2027 |
-| 13 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond ou que le texte. Purger le conteneur `aria-hidden` de son élément focusable. | 10.5, 10.8 | T2 2027 |
-| 14 | **Publier le taux** dans la déclaration. | tous | dès le bloc 1 tranché |
+| 3 | **Annoncer les messages dynamiques.** Aujourd'hui, un lecteur d'écran ne dit rien quand l'envoi d'un signalement échoue. | 7.5 | T4 2026 |
+| 4 | **Signaler les liens qui ouvrent une nouvelle fenêtre** — 7 concernés. | 13.2 | T4 2026 |
+| 5 | **Baliser le tableau des horaires** de la mairie (`caption`, `th` avec `scope`). | 5.4 à 5.7 | T4 2026 |
+| 6 | **Contrôle de saisie des formulaires** : messages d'erreur reliés au champ, suggestions de correction, `autocomplete` sur les champs d'identité. | 11.10, 11.11, 11.13 | T1 2027 |
+| 7 | **Grouper les champs de même nature** (`fieldset` / `legend`). | 11.5 à 11.7 | T1 2027 |
+| 8 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste. | 9.1, 9.3 | T1 2027 |
+| 9 | **Poser les repères de page** et rendre les regroupements contournables. | 9.2, 12.6 | T1 2027 |
+| 10 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | T1 2027 |
+| 11 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo. | 3.2 | T1 2027 |
+| 12 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond ou que le texte. Purger le conteneur `aria-hidden` de son élément focusable. | 10.5, 10.8 | T2 2027 |
+
+Traiter les points 1 à 11 porterait le taux au-delà de **90 %**.
 
 ## 6. Années suivantes
 

@@ -47,7 +47,9 @@ function applyFontSize(size, save=true) {
   if (size === 'xl')    html.classList.add('font-xl');
   ['normal','large','xl'].forEach(s => {
     const btn = document.getElementById('acc-' + s);
-    if (btn) btn.classList.toggle('on', s === size);
+    // RGAA 10.9 — l'état sélectionné ne peut pas être donné par la seule
+    // apparence : aria-pressed le rend perceptible au lecteur d'écran.
+    if (btn) { btn.classList.toggle('on', s === size); btn.setAttribute('aria-pressed', String(s === size)); }
   });
   if (save) saveAccessibilite();
 }
@@ -99,7 +101,7 @@ function setTheme(theme) {
   if (theme !== 'vert') html.classList.add('theme-' + theme);
   ['vert','bleu','sombre'].forEach(t => {
     const btn = document.getElementById('theme-' + t);
-    if (btn) btn.classList.toggle('on', t === theme);
+    if (btn) { btn.classList.toggle('on', t === theme); btn.setAttribute('aria-pressed', String(t === theme)); }
   });
   saveAccessibilite();
 }
@@ -155,7 +157,9 @@ function openAccessibilite() {
   const size = html.classList.contains('font-xl') ? 'xl' : html.classList.contains('font-large') ? 'large' : 'normal';
   ['normal','large','xl'].forEach(s => {
     const btn = document.getElementById('acc-' + s);
-    if (btn) btn.classList.toggle('on', s === size);
+    // RGAA 10.9 — l'état sélectionné ne peut pas être donné par la seule
+    // apparence : aria-pressed le rend perceptible au lecteur d'écran.
+    if (btn) { btn.classList.toggle('on', s === size); btn.setAttribute('aria-pressed', String(s === size)); }
   });
   const ct = document.getElementById('acc-contrast-toggle');
   const tt = document.getElementById('acc-touch-toggle');
@@ -169,7 +173,7 @@ function openAccessibilite() {
   if (ctxEl) ctxEl.checked = _ctxEnabled;
   const html2 = document.documentElement;
   const theme = html2.classList.contains('theme-sombre') ? 'sombre' : html2.classList.contains('theme-bleu') ? 'bleu' : 'vert';
-  ['vert','bleu','sombre'].forEach(t => { const b = document.getElementById('theme-'+t); if(b) b.classList.toggle('on', t===theme); });
+  ['vert','bleu','sombre'].forEach(t => { const b = document.getElementById('theme-'+t); if(b) { b.classList.toggle('on', t===theme); b.setAttribute('aria-pressed', String(t===theme)); } });
   const nh = document.getElementById('acc-noheader-toggle');
   const nw = document.getElementById('acc-nowidgets-toggle');
   const cb = document.getElementById('acc-colorblind-toggle');
@@ -256,9 +260,9 @@ function buildOnboardingDOM() {
       <img src="MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.webp'">
       <div style="color:#fff;font-family:'Grape Nuts',cursive;font-size:2.2rem;">Bienvenue !</div>
       <div style="color:rgba(255,255,255,0.88);font-size:0.88rem;line-height:1.7;max-width:320px;">
-        Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.<br><br>
-        Votre application municipale : actualités, signalements, agenda, météo et bien plus.<br><br>
-        <em style="color:rgba(255,255,255,0.5);font-size:0.76rem;">Laissez-moi vous présenter l'application.</em>
+        <p style="margin:0 0 1em">Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.</p>
+        <p style="margin:0 0 1em">Votre application municipale : actualités, signalements, agenda, météo et bien plus.</p>
+        <p style="margin:0"><em style="color:rgba(255,255,255,0.5);font-size:0.76rem;">Laissez-moi vous présenter l'application.</em></p>
       </div>
       <button onclick="obNext()" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:16px;padding:15px 36px;font-family:'Nunito',sans-serif;font-size:0.94rem;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.3);">Découvrir l'appli →</button>
       <button onclick="obSkip()" style="background:none;border:none;color:rgba(255,255,255,0.45);font-family:'Nunito',sans-serif;font-size:0.78rem;cursor:pointer;padding:4px 12px;text-decoration:underline;text-underline-offset:3px;">Passer</button>

@@ -107,83 +107,91 @@ violations réelles sur deux autres écrans.
 
 ---
 
-## 3. Les 106 critères
+## 3. Deuxième passe — les critères outillables, tranchés
+
+Huit des quatorze critères laissés en suspens ne demandaient personne : juste des
+mesures que le premier passage n'avait pas faites. Elles ont été faites, et trois
+d'entre elles ont révélé des défauts qui ont été corrigés dans la foulée.
+
+| Critère | Mesure | Verdict |
+|---|---|---|
+| **8.9** — balises détournées | 15 séquences de `<br><br>` servant à espacer des paragraphes (présentation du majordome, contact RGPD, écran d'accueil). Aucun tableau de mise en forme, aucun titre vide. | **corrigé → C** : vrais paragraphes, espacement rendu au CSS |
+| **13.11** — actions à l'appui | **0** gestionnaire `mousedown`, `touchstart` ou `pointerdown` dans tout le code. Tout passe par `click` et `change`, qui se déclenchent au relâchement et restent annulables. | **C** |
+| **3.3** — contraste des composants | Bordure des champs : `rgba(0,0,0,0.07)` = **1,17:1** (minimum 3:1). Interrupteurs : piste `#ccc` sur blanc = **1,61:1**, état allumé = **2,47:1**. Les réglages d'accessibilité eux-mêmes étaient à peine visibles pour qui voit mal. | **corrigé → C** : jeton `--border-champ` à **3,88:1**, bordure d'interrupteur à **3,95:1**, état allumé à **6,39:1**, distinction éteint/allumé à **3,98:1** |
+| **10.9 / 10.10** — forme, taille, position | Boutons de taille de texte, de thème et onglets d'agenda : l'état sélectionné n'était donné que par la couleur et la bordure, sans équivalent programmatique. Aucun astérisque non explicité ; les mentions « obligatoire / facultatif » sont en toutes lettres. | **corrigé → C** : `aria-pressed` sur les six boutons à état |
+| **10.13 / 10.14** — contenus additionnels | **0** contenu révélé au survol par CSS, **0** infobulle JavaScript. Les 13 attributs `title` produisent des infobulles natives du navigateur, hors périmètre de ces critères. | **NA** |
+| **12.11** — contenus additionnels au clavier | Même constat : aucun contenu additionnel à atteindre. Le seul `<details>` est nativement utilisable au clavier. | **NA** |
+
+Mesures versées au dossier lors de cette passe : sans CSS, **4 431 caractères**
+restent lisibles et ordonnés (10.2, 10.3) · zoom **200 %** et largeur **320 px**
+sans débordement horizontal (10.4, 10.11) · espacement du texte forcé
+(interlignage 1,5 · espacement des lettres 0,12em) sans élément tronqué (10.12) ·
+`prefers-reduced-motion: reduce` neutralise toutes les animations (13.8) · **108
+identifiants** tous uniques.
+
+---
+
+## 4. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable · `?` non tranché
 
 | Thème | Critères | Verdicts |
 |---|---|---|
-| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 `NA` · 1.5 `NA` · 1.6 `NA` · 1.7 `NA` · 1.8 `NA` · 1.9 `NA` | Deux images porteuses d'information, toutes deux avec `alt` ; une image décorative en `alt=""`. Aucun CAPTCHA, aucune image-texte, aucune image complexe, aucun SVG. |
-| **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `<iframe>` dans l'échantillon. |
-| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `?` | 3.2 : les contrastes calculables sont corrigés, mais **136 nœuds restent indéterminés** (texte sur dégradé ou sur photo). |
-| **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel : ni audio, ni vidéo, ni animation synchronisée. |
-| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `NC` · 5.5 `NC` · 5.6 `NC` · 5.7 `NC` · 5.8 `NA` | Un tableau de données — les horaires de la mairie, 5 lignes — sans `<caption>`, sans `<th>`, sans `scope`. |
-| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | Aucun lien sans intitulé, aucun libellé non explicite (« ici », « en savoir plus »…). |
-| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `NC` | 7.5 : **aucune région live**. Erreurs de chargement, confirmations d'envoi et réponses de MEL ne sont pas annoncées. |
-| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `?` · 8.10 `NA` | `DOCTYPE`, `lang="fr"`, titre pertinent, 108 `id` tous uniques. 8.2 demande le validateur du W3C, inaccessible depuis l'environnement d'audit. |
-| **9. Structuration** (4) | 9.1 `NC` · 9.2 `NC` · 9.3 `NC` · 9.4 `NA` | L'accueil ne porte **qu'un titre** et **aucune liste** ; `<header>` et `<footer>` absents ; 7 « fausses listes » sur `partager.html`. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `?` · 10.10 `?` · 10.11 `C` · 10.12 `C` · 10.13 `?` · 10.14 `?` | Sans CSS, 4 431 caractères restent lisibles et ordonnés. Zoom 200 % et largeur 320 px : aucun débordement. Espacement du texte forcé : aucun élément tronqué. 10.5 : 45 déclarations inline ne posent que le fond **ou** que la couleur du texte. 10.8 : un conteneur `aria-hidden` contient un élément focusable. |
-| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `NC` · 11.6 `NC` · 11.7 `NC` · 11.8 `NA` · 11.9 `C` · 11.10 `NC` · 11.11 `NC` · 11.12 `NA` · 11.13 `NC` | Étiquetage corrigé. Restent : aucun `fieldset`/`legend` sur le groupe de cases de `partager.html`, aucun contrôle de saisie ni message d'erreur structuré, aucun `autocomplete` sur les champs d'identité. |
-| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `NC` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `?` | Lien d'évitement présent, ordre de tabulation cohérent, aucun piège au clavier, Échap ferme. Manquent un **second système de navigation** et une **page « plan du site »**. |
-| **13. Consultation** (12) | 13.1 `NA` · 13.2 `NC` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `?` · 13.12 `NA` | 13.2 : **7 liens** ouvrent une nouvelle fenêtre sans le signaler. 13.8 conforme : `prefers-reduced-motion: reduce` neutralise toutes les animations. |
+| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. Aucun CAPTCHA, aucune image-texte, aucun SVG. |
+| **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
+| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `C` | 3.2 : contrastes calculables corrigés, **136 nœuds restent indéterminés** (texte sur dégradé ou photo). |
+| **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
+| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `NC` · 5.5 `NC` · 5.6 `NC` · 5.7 `NC` · 5.8 `NA` | Horaires de la mairie : tableau de données sans `caption`, sans `th`, sans `scope`. |
+| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | Aucun lien sans intitulé ni libellé non explicite. |
+| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `NC` | 7.5 : aucune région live. |
+| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 demande le validateur du W3C. |
+| **9. Structuration** (4) | 9.1 `NC` · 9.2 `NC` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil ; repères de page absents. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte. 10.8 : un conteneur `aria-hidden` contient un focusable. |
+| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `NC` · 11.6 `NC` · 11.7 `NC` · 11.8 `NA` · 11.9 `C` · 11.10 `NC` · 11.11 `NC` · 11.12 `NA` · 11.13 `NC` | Étiquetage corrigé ; restent le groupement, le contrôle de saisie et `autocomplete`. |
+| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `NC` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
+| **13. Consultation** (12) | 13.1 `NA` · 13.2 `NC` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | 13.2 : 7 liens ouvrent une nouvelle fenêtre sans le signaler. |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **32** |
+| Conformes | **37** |
 | Non conformes | **22** |
-| Non applicables | **38** |
-| **Non tranchés** | **14** |
+| Non applicables | **41** |
+| Non tranchés | **6** |
 | Total | **106** |
 
-## 4. Le taux dépend de 14 critères — et il en faut deux
+## 5. Taux de conformité
 
-Le taux RGAA est le rapport des critères conformes aux critères **applicables** :
-106 − 38 = **68 critères applicables**.
+Critères applicables : 106 − 41 = **65**.
 
-| Hypothèse sur les 14 non tranchés | Taux | Mention |
+Les **6 critères non tranchés sont comptés comme non conformes** : c'est le choix
+conservateur, et il rend l'audit complet — chaque critère porte un verdict. Le taux
+publié est donc un **plancher**, qui ne peut que monter.
+
+> ## Taux de conformité : **56,9 %** (37 sur 65)
+> ### Mention RGAA : **partiellement conforme**
+
+| Hypothèse | Taux |
+|---|---|
+| Les 6 non tranchés comptés non conformes — **taux publié** | **56,9 %** |
+| Seuil de « partiellement conforme » | 50 % |
+| Les 6 tranchés conformes | 66,2 % |
+
+L'application **franchit le seuil dans tous les cas de figure**. La déclaration
+passe donc de « non conforme » à « **partiellement conforme — 56,9 %** ».
+
+### Les 6 critères encore ouverts
+
+| Critère | Question | Qui tranche |
 |---|---|---|
-| Tous non conformes (plancher) | 32/68 = **47,1 %** | non conforme |
-| **Seuil des 50 %** | **34/68** | |
-| Tous conformes (plafond) | 46/68 = **67,6 %** | partiellement conforme |
+| 1.3 | Les alternatives des images sont-elles **pertinentes** ? Le blason est décrit « Mézières », l'avatar de l'assistante « MEL ». | la mairie |
+| 3.1 | Une information est-elle donnée **uniquement par la couleur** — pastilles de statut, zonage du PLU, niveaux de vigilance ? | la mairie |
+| 8.2 | Validité du code selon le validateur du W3C. | à brancher en CI |
+| 13.3 / 13.4 | Les **PDF du PLUi** publiés depuis l'administration sont-ils accessibles ? | la mairie |
+| 13.10 | La **carte 3D** impose-t-elle un geste complexe sans solution de remplacement ? | la mairie |
 
-**Il suffit que 2 des 14 critères non tranchés soient conformes** pour que
-l'application passe la barre et que la déclaration devienne « **partiellement
-conforme** », avec son pourcentage.
-
-Autrement dit : le travail restant n'est pas de rendre l'application accessible,
-c'est de **finir de la mesurer**.
-
-### Les 14, et qui peut les trancher
-
-**Résolubles par des mesures complémentaires** (8) — ne demandent personne :
-
-| Critère | Question |
-|---|---|
-| 3.3 | Contraste des composants d'interface (bordures de champs, états actifs). |
-| 8.9 | Des balises sont-elles détournées à des fins de présentation ? |
-| 10.9 / 10.10 | Une information est-elle donnée uniquement par la forme, la taille ou la position ? |
-| 10.13 / 10.14 | Les contenus additionnels au survol sont-ils contrôlables et fermables ? |
-| 12.11 | Ces mêmes contenus sont-ils atteignables au clavier ? |
-| 13.11 | Les actions déclenchées par appui sont-elles annulables ? |
-
-**Demande un accès réseau** (1) :
-
-| Critère | Question |
-|---|---|
-| 8.2 | Validité du code selon le validateur du W3C — à brancher en intégration continue. |
-
-**Demandent un jugement humain** (5) — personne d'autre que la mairie :
-
-| Critère | Question |
-|---|---|
-| 1.3 | Les alternatives des images sont-elles **pertinentes** ? Le blason est décrit « Mézières », l'avatar de l'assistante « MEL ». Est-ce ce qu'il faut entendre ? |
-| 3.1 | Une information est-elle donnée **uniquement par la couleur** quelque part — pastilles de statut, zonage du PLU, niveaux de vigilance ? |
-| 13.3 / 13.4 | Les **PDF du PLUi** publiés depuis l'administration sont-ils accessibles, ou une version accessible existe-t-elle ? La mairie sait d'où ils viennent ; l'audit ne peut pas le deviner. |
-| 13.10 | La **carte 3D** impose-t-elle un geste complexe (pincer, tourner à deux doigts) sans solution de remplacement ? |
-
-## 5. Reproduire cet audit
+## 6. Reproduire cet audit
 
 ```bash
 cd tests/e2e && npm ci

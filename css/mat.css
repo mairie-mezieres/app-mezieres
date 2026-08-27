@@ -6,7 +6,7 @@
 :root{
   --forest:#1a3d2b;--leaf:#2d6a4f;--sage:#52b788;--sage-ink:#2d6a4f;--mist:#d8f3dc;
   --gold:#d4a843;--amber:#f4a261;--cream:#faf7f2;--warm:#f4f0ea;
-  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.07);
+  --card:#fff;--text:#1c2b1f;--muted:#5a7065;--border:rgba(0,0,0,0.07);--border-champ:rgba(0,0,0,0.5);
   --shadow:0 2px 16px rgba(26,61,43,0.10);
   --shadow-lg:0 8px 32px rgba(26,61,43,0.16);
   --r:18px;
@@ -243,12 +243,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .form-group{margin-bottom:14px;}
 .form-label{font-size:0.78rem;font-weight:800;color:var(--text);margin-bottom:6px;display:block;}
 .form-cats{display:flex;flex-wrap:wrap;gap:7px;}
-.cat-btn{background:white;border:2px solid var(--border);border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;white-space:nowrap;}
+.cat-btn{background:white;border:2px solid var(--border-champ);border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-size:0.78rem;font-weight:700;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s;white-space:nowrap;}
 .cat-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
-.form-textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;resize:none;height:80px;}
+.form-textarea{width:100%;border:1.5px solid var(--border-champ);border-radius:12px;padding:10px 13px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;background:white;resize:none;height:80px;}
 .form-textarea:focus{border-color:var(--sage);}
 .photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.photo-btn{width:100%;background:white;border:2px dashed var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:700;color:var(--muted);transition:all 0.15s;}
+.photo-btn{width:100%;background:white;border:2px dashed var(--border-champ);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:700;color:var(--muted);transition:all 0.15s;}
 .photo-btn:hover{border-color:var(--sage);color:var(--leaf);}
 .photo-btn.secondary{background:var(--warm);border-style:solid;}
 .photo-preview{width:100%;height:170px;object-fit:cover;border-radius:12px;display:none;margin-top:10px;border:1px solid var(--border);box-shadow:var(--shadow);}
@@ -263,15 +263,15 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 /* ── Boîte à idées ── */
 .idea-form{background:white;border-radius:14px;padding:14px;margin-bottom:14px;border:1px solid var(--border);}
-.idea-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;resize:none;height:70px;}
+.idea-input{width:100%;border:1.5px solid var(--border-champ);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;resize:none;height:70px;}
 .idea-input:focus{border-color:var(--gold);}
 .idea-cats{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap;}
-.idea-cat{background:var(--warm);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.idea-cat{background:var(--warm);border:1.5px solid var(--border-champ);border-radius:10px;padding:5px 10px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;}
 .idea-cat.on{background:#fffbe8;border-color:var(--gold);color:#8a6200;}
 .idea-submit{background:linear-gradient(135deg,var(--gold),var(--amber));color:#3d2000;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:900;cursor:pointer;width:100%;margin-top:6px;}
 .ideas-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:-2px 0 10px;flex-wrap:wrap;}
 .ideas-sort-group{display:flex;gap:7px;flex-wrap:wrap;}
-.ideas-sort-btn{background:white;border:1.5px solid var(--border);border-radius:999px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s;}
+.ideas-sort-btn{background:white;border:1.5px solid var(--border-champ);border-radius:999px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s;}
 .ideas-sort-btn.on{background:var(--forest);border-color:var(--forest);color:#fff;}
 .idea-sort-note{font-size:0.68rem;color:var(--muted);font-weight:700;}
 .ideas-list{display:flex;flex-direction:column;gap:9px;}
@@ -385,6 +385,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .majordome-name{font-family:'Grape Nuts',cursive;font-size:2rem;color:var(--forest);margin-bottom:6px;}
 .majordome-tagline{font-size:0.78rem;font-weight:800;color:var(--sage-ink);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;}
 .majordome-text{font-size:0.84rem;color:var(--muted);line-height:1.7;text-align:left;background:white;border-radius:16px;padding:16px;border:1px solid var(--border);}
+/* RGAA 8.9 — ces paragraphes etaient separes par des <br><br>, un
+   detournement de balise a des fins de presentation. Ce sont de vrais
+   paragraphes ; l'espacement revient au CSS, qui est sa place. */
+.majordome-text p{margin:0 0 1em}
+.majordome-text p:last-child{margin-bottom:0}
+.rgpd-contact p{margin:0 0 1em}
 .majordome-btn{margin-top:18px;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:14px;padding:13px 28px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;width:100%;}
 
 /* ── Bus + Carburant split row ── */
@@ -640,6 +646,7 @@ html.high-contrast {
   --card:   #ffffff;
   --warm:   #f0f0f0;
   --border: rgba(0,0,0,0.25);
+  --border-champ: rgba(0,0,0,0.75);
   --forest: #003319;
   --leaf:   #004d26;
   --mist:   #b8f5cc;
@@ -740,13 +747,19 @@ html.colorblind-mode .top-mairie{background:linear-gradient(135deg,#7c2d12,#ea58
 .acc-option-label{font-size:0.84rem;font-weight:800;color:var(--text);}
 .acc-option-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
 .acc-toggle{display:flex;gap:6px;}
-.acc-size-btn{background:var(--warm);border:2px solid var(--border);border-radius:10px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.acc-size-btn{background:var(--warm);border:2px solid var(--border-champ);border-radius:10px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all 0.15s;}
 .acc-size-btn.on{background:var(--mist);border-color:var(--sage);color:var(--leaf);}
 .acc-switch{position:relative;width:48px;height:28px;cursor:pointer;}
 .acc-switch input{opacity:0;width:0;height:0;}
-.acc-slider{position:absolute;inset:0;background:#ccc;border-radius:999px;transition:0.3s;}
-.acc-slider:before{content:'';position:absolute;width:20px;height:20px;left:4px;top:4px;background:white;border-radius:50%;transition:0.3s;}
-.acc-switch input:checked + .acc-slider{background:var(--sage);}
+/* RGAA 3.3 — les composants d'interface doivent se distinguer de ce qui les
+   entoure à 3:1 au moins. Mesuré le 27 août 2026 : la piste #ccc sur fond blanc
+   ne faisait que 1,61:1, et l'état allumé --sage 2,47:1. L'interrupteur était
+   donc à peine visible pour qui voit mal — sur l'écran des réglages
+   d'accessibilité, précisément. Une bordure porte désormais la limite du
+   composant, et l'état allumé passe au jeton --sage-ink (6,39:1). */
+.acc-slider{position:absolute;inset:0;box-sizing:border-box;background:#ccc;border:1px solid var(--border-champ);border-radius:999px;transition:0.3s;}
+.acc-slider:before{content:'';position:absolute;box-sizing:border-box;width:20px;height:20px;left:4px;top:4px;background:white;border:1px solid var(--border-champ);border-radius:50%;transition:0.3s;}
+.acc-switch input:checked + .acc-slider{background:var(--sage-ink);}
 .acc-switch input:checked + .acc-slider:before{transform:translateX(20px);}
 .acc-preview{background:var(--mist);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:0.84rem;line-height:1.6;color:var(--forest);}
 
@@ -762,7 +775,7 @@ html.theme-bleu .majordome-panel .panel-hdr { background: linear-gradient(135deg
 html.theme-sombre {
   --forest:#111827;--leaf:#1f2937;--sage:#6b7280;--sage-ink:#6ee7b7;--mist:#374151;
   --gold:#d4a843;--amber:#f4a261;--warm:#0f172a;--card:#1e293b;
-  --text:#f1f5f9;--muted:#94a3b8;--border:rgba(255,255,255,0.08);
+  --text:#f1f5f9;--muted:#94a3b8;--border:rgba(255,255,255,0.08);--border-champ:rgba(255,255,255,0.5);
   --shadow:0 2px 16px rgba(0,0,0,0.4);
 }
 html.theme-sombre body { background: #0f172a; }
@@ -1156,7 +1169,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 #mel-tree-l2.active{display:flex;}
 .mel-tree-title{font-size:.82rem;font-weight:800;color:var(--forest);margin-bottom:12px;}
 .mel-cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.mel-cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:15px 10px;min-height:96px;border-radius:16px;border:2px solid var(--border);background:linear-gradient(180deg,#fff,rgba(255,255,255,.92));cursor:pointer;transition:all .15s;font-family:'Nunito',sans-serif;color:var(--text);font-size:.76rem;font-weight:800;text-align:center;line-height:1.2;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 14px rgba(26,61,43,.06);}
+.mel-cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:15px 10px;min-height:96px;border-radius:16px;border:2px solid var(--border-champ);background:linear-gradient(180deg,#fff,rgba(255,255,255,.92));cursor:pointer;transition:all .15s;font-family:'Nunito',sans-serif;color:var(--text);font-size:.76rem;font-weight:800;text-align:center;line-height:1.2;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 14px rgba(26,61,43,.06);}
 .mel-cat-btn:hover,.mel-cat-btn:active{background:var(--mist);border-color:var(--leaf);transform:translateY(-1px);}
 .mel-cat-btn .ico{font-size:1.5rem;}
 .mel-sub{display:flex;flex-direction:column;gap:7px;}
@@ -1167,7 +1180,7 @@ html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
 .mel-zone-block{background:var(--mist);border-radius:11px;padding:11px 12px;margin-bottom:4px;flex-shrink:0;}
 .mel-zone-block label{font-size:.72rem;font-weight:700;color:var(--leaf);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:7px;}
 .mel-zone-row{display:flex;gap:6px;}
-.mel-addr-input{flex:1;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border);font-size:16px !important;font-family:'Nunito',sans-serif;background:white;color:var(--text);min-width:0;}
+.mel-addr-input{flex:1;padding:9px 11px;border-radius:9px;border:1.5px solid var(--border-champ);font-size:16px !important;font-family:'Nunito',sans-serif;background:white;color:var(--text);min-width:0;}
 .mel-addr-input:focus{outline:none;border-color:var(--leaf);}
 .mel-gps-btn,.mel-addr-btn{padding:9px 11px;border-radius:9px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;transition:background .15s;white-space:nowrap;font-family:'Nunito',sans-serif;flex-shrink:0;}
 .mel-gps-btn{background:var(--leaf);color:white;}
