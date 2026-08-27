@@ -107,83 +107,138 @@ violations réelles sur deux autres écrans.
 
 ---
 
-## 3. Les 106 critères
+## 3. Deuxième passe — les critères outillables, tranchés
+
+Huit des quatorze critères laissés en suspens ne demandaient personne : juste des
+mesures que le premier passage n'avait pas faites. Elles ont été faites, et trois
+d'entre elles ont révélé des défauts qui ont été corrigés dans la foulée.
+
+| Critère | Mesure | Verdict |
+|---|---|---|
+| **8.9** — balises détournées | 15 séquences de `<br><br>` servant à espacer des paragraphes (présentation du majordome, contact RGPD, écran d'accueil). Aucun tableau de mise en forme, aucun titre vide. | **corrigé → C** : vrais paragraphes, espacement rendu au CSS |
+| **13.11** — actions à l'appui | **0** gestionnaire `mousedown`, `touchstart` ou `pointerdown` dans tout le code. Tout passe par `click` et `change`, qui se déclenchent au relâchement et restent annulables. | **C** |
+| **3.3** — contraste des composants | Bordure des champs : `rgba(0,0,0,0.07)` = **1,17:1** (minimum 3:1). Interrupteurs : piste `#ccc` sur blanc = **1,61:1**, état allumé = **2,47:1**. Les réglages d'accessibilité eux-mêmes étaient à peine visibles pour qui voit mal. | **corrigé → C** : jeton `--border-champ` à **3,88:1**, bordure d'interrupteur à **3,95:1**, état allumé à **6,39:1**, distinction éteint/allumé à **3,98:1** |
+| **10.9 / 10.10** — forme, taille, position | Boutons de taille de texte, de thème et onglets d'agenda : l'état sélectionné n'était donné que par la couleur et la bordure, sans équivalent programmatique. Aucun astérisque non explicité ; les mentions « obligatoire / facultatif » sont en toutes lettres. | **corrigé → C** : `aria-pressed` sur les six boutons à état |
+| **10.13 / 10.14** — contenus additionnels | **0** contenu révélé au survol par CSS, **0** infobulle JavaScript. Les 13 attributs `title` produisent des infobulles natives du navigateur, hors périmètre de ces critères. | **NA** |
+| **12.11** — contenus additionnels au clavier | Même constat : aucun contenu additionnel à atteindre. Le seul `<details>` est nativement utilisable au clavier. | **NA** |
+
+Mesures versées au dossier lors de cette passe : sans CSS, **4 431 caractères**
+restent lisibles et ordonnés (10.2, 10.3) · zoom **200 %** et largeur **320 px**
+sans débordement horizontal (10.4, 10.11) · espacement du texte forcé
+(interlignage 1,5 · espacement des lettres 0,12em) sans élément tronqué (10.12) ·
+`prefers-reduced-motion: reduce` neutralise toutes les animations (13.8) · **108
+identifiants** tous uniques.
+
+---
+
+## 4. Troisième passe — onze non-conformités levées
+
+Les trois chantiers dont le code change sans que l'écran bouge.
+
+| Critères | Ce qui n'allait pas | Correctif |
+|---|---|---|
+| **7.5** | **Aucune région live.** Les réponses de MEL, le suivi des signalements et la galerie photos étaient mis à jour en silence : un lecteur d'écran n'annonçait rien. Un habitant aveugle dont l'envoi échouait croyait que c'était parti. | `role="status"` + `aria-live="polite"` sur `#msgs`, `#suivi-body`, `#photos-list`. La modale de validation devient un `alertdialog` et prend le focus. |
+| **11.10 / 11.11** | L'erreur de saisie était énoncée dans une fenêtre, **sans lien avec le champ fautif**. Après fermeture, le focus repartait au début et l'habitant devait retrouver le champ seul. | `aria-invalid` posé sur le champ, focus rendu au champ, marqueur effacé dès la première frappe. Les messages suggéraient déjà la correction. |
+| **11.5 / 11.6 / 11.7** | Vingt cases de même nature sans groupement, et un libellé « Votre niveau en informatique » qui **ne portait aucun `for`** — affiché, rattaché à rien. | `role="group"` + `aria-labelledby` vers le titre de l'étape ; le libellé orphelin devient la légende du groupe de boutons radio. |
+| **5.4 / 5.5 / 5.6 / 5.7** | Les horaires de la mairie étaient lus d'une traite : « Lundi 14h00 17h30 Mardi Fermée… », sans lien entre le jour et l'heure. | `caption` réservé aux lecteurs d'écran, jour passé en `th scope="row"`. **Rendu vérifié identique** : même alignement, même graisse, même couleur — les règles CSS lui rendent exactement l'apparence de l'ancien `td`. |
+| **13.2** | **7 liens** ouvraient une nouvelle fenêtre sans le dire. Le bouton « précédent » ne ramenait plus, sans explication. | mention « (nouvelle fenêtre) » en texte réservé aux lecteurs d'écran, posée au chargement puis à l'ouverture de chaque écran — ce qui couvre les contenus injectés après coup, sans observateur de mutations permanent. |
+
+Vérifié après coup, sur le rendu : **7 liens sur 7** avertis · 5 `th scope="row"` et
+1 `caption` sur le tableau des horaires, rendu inchangé · régions live présentes sur
+`#msgs` et `#suivi-body` · modale en `alertdialog` avec focus sur le bouton, puis
+`aria-invalid="true"` et focus rendu au champ à la fermeture, marqueur effacé à la
+saisie.
+
+**11.13 reste non conforme**, délibérément. Le champ « Coordonnée de réponse » du
+formulaire de contact accepte **un e-mail ou un téléphone** : aucun jeton
+`autocomplete` ne couvre les deux. Le corriger proprement demanderait de scinder le
+champ en deux — un changement visible, hors du périmètre de cette passe. Le champ
+« nom » a reçu `autocomplete="name"`.
+
+### Quatrième passe — repères de page, et une erreur de mon audit
+
+| Critères | Constat | Suite |
+|---|---|---|
+| **9.2 / 12.6** | **Aucun repère de page.** Un lecteur d'écran devait tout parcourir de haut en bas, sans pouvoir sauter à l'en-tête, au contenu ou au pied. Les pages hors-ligne et architecture n'en avaient aucun. | `role="banner"`, `role="main"`, `role="contentinfo"` posés — **le rôle plutôt que la balise** : `<div>` → `<header>` aurait le même effet, mais imposerait de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié : un seul repère de chaque type par page. |
+| **10.8** | **Faux positif de la deuxième passe.** J'avais relevé « un conteneur `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne vérifiait pas si le conteneur était affiché. | Mesuré : le conteneur est en `display:none`, son bouton a une boîte de 0 px et n'est pas dans l'ordre de tabulation. Et le script bascule bien `aria-hidden` à `false` quand la fenêtre s'ouvre. **Conforme, sans correctif.** |
+
+**10.5 reste non conforme, et je n'y touche pas.** 45 déclarations inline posent le
+fond **ou** la couleur du texte, mais pas les deux — dont **6 seulement** sur des
+éléments visibles, et l'une d'elles est le fond de `<html>`, qui est légitime. Les
+autres héritent du fond d'un conteneur qui, lui, le déclare. Corriger les 45 à
+l'aveugle ferait courir un risque visuel réel pour un bénéfice théorique. Le
+chantier reste au plan, à traiter en regardant chaque cas.
+
+---
+
+## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable · `?` non tranché
 
 | Thème | Critères | Verdicts |
 |---|---|---|
-| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 `NA` · 1.5 `NA` · 1.6 `NA` · 1.7 `NA` · 1.8 `NA` · 1.9 `NA` | Deux images porteuses d'information, toutes deux avec `alt` ; une image décorative en `alt=""`. Aucun CAPTCHA, aucune image-texte, aucune image complexe, aucun SVG. |
-| **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `<iframe>` dans l'échantillon. |
-| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `?` | 3.2 : les contrastes calculables sont corrigés, mais **136 nœuds restent indéterminés** (texte sur dégradé ou sur photo). |
-| **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel : ni audio, ni vidéo, ni animation synchronisée. |
-| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `NC` · 5.5 `NC` · 5.6 `NC` · 5.7 `NC` · 5.8 `NA` | Un tableau de données — les horaires de la mairie, 5 lignes — sans `<caption>`, sans `<th>`, sans `scope`. |
-| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | Aucun lien sans intitulé, aucun libellé non explicite (« ici », « en savoir plus »…). |
-| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `NC` | 7.5 : **aucune région live**. Erreurs de chargement, confirmations d'envoi et réponses de MEL ne sont pas annoncées. |
-| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `?` · 8.10 `NA` | `DOCTYPE`, `lang="fr"`, titre pertinent, 108 `id` tous uniques. 8.2 demande le validateur du W3C, inaccessible depuis l'environnement d'audit. |
-| **9. Structuration** (4) | 9.1 `NC` · 9.2 `NC` · 9.3 `NC` · 9.4 `NA` | L'accueil ne porte **qu'un titre** et **aucune liste** ; `<header>` et `<footer>` absents ; 7 « fausses listes » sur `partager.html`. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `NC` · 10.9 `?` · 10.10 `?` · 10.11 `C` · 10.12 `C` · 10.13 `?` · 10.14 `?` | Sans CSS, 4 431 caractères restent lisibles et ordonnés. Zoom 200 % et largeur 320 px : aucun débordement. Espacement du texte forcé : aucun élément tronqué. 10.5 : 45 déclarations inline ne posent que le fond **ou** que la couleur du texte. 10.8 : un conteneur `aria-hidden` contient un élément focusable. |
-| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `NC` · 11.6 `NC` · 11.7 `NC` · 11.8 `NA` · 11.9 `C` · 11.10 `NC` · 11.11 `NC` · 11.12 `NA` · 11.13 `NC` | Étiquetage corrigé. Restent : aucun `fieldset`/`legend` sur le groupe de cases de `partager.html`, aucun contrôle de saisie ni message d'erreur structuré, aucun `autocomplete` sur les champs d'identité. |
-| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `NC` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `?` | Lien d'évitement présent, ordre de tabulation cohérent, aucun piège au clavier, Échap ferme. Manquent un **second système de navigation** et une **page « plan du site »**. |
-| **13. Consultation** (12) | 13.1 `NA` · 13.2 `NC` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `?` · 13.12 `NA` | 13.2 : **7 liens** ouvrent une nouvelle fenêtre sans le signaler. 13.8 conforme : `prefers-reduced-motion: reduce` neutralise toutes les animations. |
+| **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `?` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. |
+| **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
+| **3. Couleurs** (3) | 3.1 `?` · 3.2 `NC` · 3.3 `C` | 3.2 : **136 nœuds indéterminés** (texte sur dégradé ou photo). |
+| **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
+| **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
+| **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
+| **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
+| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `?` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 demande le validateur du W3C. |
+| **9. Structuration** (4) | 9.1 `NC` · 9.2 `C` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte, dont 6 seulement sur des éléments visibles. |
+| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `NC` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
+| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
+| **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `?` · 13.4 `?` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `?` · 13.11 `C` · 13.12 `NA` | |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **32** |
-| Non conformes | **22** |
-| Non applicables | **38** |
-| **Non tranchés** | **14** |
+| Conformes | **51** |
+| Non conformes | **8** |
+| Non applicables | **41** |
+| Non tranchés | **6** |
 | Total | **106** |
 
-## 4. Le taux dépend de 14 critères — et il en faut deux
+## 6. Taux de conformité
 
-Le taux RGAA est le rapport des critères conformes aux critères **applicables** :
-106 − 38 = **68 critères applicables**.
+Critères applicables : 106 − 41 = **65**. Les 6 non tranchés restent comptés comme
+non conformes — le taux publié est un **plancher**.
 
-| Hypothèse sur les 14 non tranchés | Taux | Mention |
+> ## Taux de conformité : **78,5 %** (51 sur 65)
+> ### Mention RGAA : **partiellement conforme**
+
+| Étape | Conformes | Taux |
 |---|---|---|
-| Tous non conformes (plancher) | 32/68 = **47,1 %** | non conforme |
-| **Seuil des 50 %** | **34/68** | |
-| Tous conformes (plafond) | 46/68 = **67,6 %** | partiellement conforme |
+| Avant l'audit | *non mesuré* | — |
+| Première et deuxième passe | 37 | 56,9 % |
+| Troisième passe | 48 | 73,8 % |
+| **Quatrième passe** | **51** | **78,5 %** |
+| Si les 6 non tranchés passent | 57 | 87,7 % |
+| Si tout le plan est traité | 65 | 100 % |
 
-**Il suffit que 2 des 14 critères non tranchés soient conformes** pour que
-l'application passe la barre et que la déclaration devienne « **partiellement
-conforme** », avec son pourcentage.
+### Les 8 non-conformités restantes
 
-Autrement dit : le travail restant n'est pas de rendre l'application accessible,
-c'est de **finir de la mesurer**.
+| Critères | Chantier | Visible à l'écran ? |
+|---|---|---|
+| 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
+| 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
+| 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
+| 10.5 | 45 déclarations inline ne posent que le fond **ou** que le texte | non |
+| 11.13 | Scinder le champ « e-mail ou téléphone » | **oui** |
 
-### Les 14, et qui peut les trancher
+### Les 6 critères non tranchés
 
-**Résolubles par des mesures complémentaires** (8) — ne demandent personne :
+| Critère | Question | Qui tranche |
+|---|---|---|
+| 1.3 | Les alternatives des images sont-elles **pertinentes** ? | la mairie |
+| 3.1 | Une information est-elle donnée **uniquement par la couleur** ? | la mairie |
+| 8.2 | Validité du code selon le validateur du W3C | à brancher en CI |
+| 13.3 / 13.4 | Les **PDF du PLUi** sont-ils accessibles ? | la mairie |
+| 13.10 | La **carte 3D** impose-t-elle un geste complexe sans alternative ? | la mairie |
 
-| Critère | Question |
-|---|---|
-| 3.3 | Contraste des composants d'interface (bordures de champs, états actifs). |
-| 8.9 | Des balises sont-elles détournées à des fins de présentation ? |
-| 10.9 / 10.10 | Une information est-elle donnée uniquement par la forme, la taille ou la position ? |
-| 10.13 / 10.14 | Les contenus additionnels au survol sont-ils contrôlables et fermables ? |
-| 12.11 | Ces mêmes contenus sont-ils atteignables au clavier ? |
-| 13.11 | Les actions déclenchées par appui sont-elles annulables ? |
-
-**Demande un accès réseau** (1) :
-
-| Critère | Question |
-|---|---|
-| 8.2 | Validité du code selon le validateur du W3C — à brancher en intégration continue. |
-
-**Demandent un jugement humain** (5) — personne d'autre que la mairie :
-
-| Critère | Question |
-|---|---|
-| 1.3 | Les alternatives des images sont-elles **pertinentes** ? Le blason est décrit « Mézières », l'avatar de l'assistante « MEL ». Est-ce ce qu'il faut entendre ? |
-| 3.1 | Une information est-elle donnée **uniquement par la couleur** quelque part — pastilles de statut, zonage du PLU, niveaux de vigilance ? |
-| 13.3 / 13.4 | Les **PDF du PLUi** publiés depuis l'administration sont-ils accessibles, ou une version accessible existe-t-elle ? La mairie sait d'où ils viennent ; l'audit ne peut pas le deviner. |
-| 13.10 | La **carte 3D** impose-t-elle un geste complexe (pincer, tourner à deux doigts) sans solution de remplacement ? |
-
-## 5. Reproduire cet audit
+## 7. Reproduire cet audit
 
 ```bash
 cd tests/e2e && npm ci

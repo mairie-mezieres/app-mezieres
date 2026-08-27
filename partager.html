@@ -136,8 +136,11 @@ button.btn:active{transform:translateY(1px)}
     </div>
 
     <div class="field">
-      <label>Votre niveau en informatique</label>
-      <div class="radio-row" role="radiogroup" aria-label="Niveau informatique">
+      <!-- RGAA 11.5 à 11.7 — ce libellé ne portait aucun « for » : il s'affichait
+           sans être rattaché à quoi que ce soit. Il sert désormais de légende au
+           groupe, ce que le référentiel admet au même titre qu'un fieldset. -->
+      <label id="lbl-niveau">Votre niveau en informatique</label>
+      <div class="radio-row" role="radiogroup" aria-labelledby="lbl-niveau">
         <label class="radio-card selected" data-level="debutant">
           <input type="radio" name="niveau" value="debutant" checked>
           <div class="rc-title">D&eacute;butant</div>
@@ -197,10 +200,12 @@ button.btn:active{transform:translateY(1px)}
 
   <!-- &Eacute;TAPE 2 -->
   <section class="card hidden" id="step-2">
-    <h2>2. Vos fonctionnalit&eacute;s</h2>
+    <h2 id="titre-fonctionnalites">2. Vos fonctionnalit&eacute;s</h2>
     <div class="sub">Cochez ce que vous voulez int&eacute;grer. Les essentielles sont pr&eacute;-coch&eacute;es. Le co&ucirc;t mensuel s&rsquo;affiche en fourchette min&ndash;max selon le trafic, avec d&eacute;tail et alertes sur les paliers gratuits.</div>
 
-    <div class="feat-list" id="feat-list"></div>
+    <!-- RGAA 11.5 à 11.7 — une vingtaine de cases de même nature : elles doivent
+         former un groupe portant une légende. Le titre de l'étape la fournit. -->
+    <div class="feat-list" id="feat-list" role="group" aria-labelledby="titre-fonctionnalites"></div>
 
     <div class="cost-bar" role="status" aria-live="polite" style="flex-direction:column;align-items:stretch;gap:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">

@@ -176,6 +176,27 @@ function _ovVisual(mutate){
   }catch(_){}
   mutate();
 }
+/* RGAA 13.2 — un lien qui ouvre une nouvelle fenêtre doit le dire AVANT d'être
+   activé. Sept liens de l'accueil, quatre des Documents et dix du guide
+   d'arrivée ne le faisaient pas : la fenêtre s'ouvrait, et un habitant au
+   lecteur d'écran ne comprenait pas pourquoi le bouton « précédent » ne le
+   ramenait plus.
+
+   La mention est ajoutée en texte réservé aux lecteurs d'écran : rien ne change
+   à l'écran. Appelé au chargement puis à l'ouverture de chaque overlay — ce qui
+   couvre aussi les contenus injectés après coup, sans imposer d'observateur de
+   mutations permanent à une application qui se veut sobre. */
+function marquerLiensNouvelleFenetre(racine){
+  const cible = racine || document;
+  cible.querySelectorAll('a[target="_blank"]:not([data-nf])').forEach(function(a){
+    a.setAttribute('data-nf', '1');
+    const s = document.createElement('span');
+    s.className = 'sr-only';
+    s.textContent = ' (nouvelle fenêtre)';
+    a.appendChild(s);
+  });
+}
+
 function openOv(id){
   const el = document.getElementById('ov-'+id);
   if(!el) return;
@@ -205,6 +226,7 @@ function openOv(id){
       el.setAttribute('aria-labelledby', t.id);
     }
   }
+  marquerLiensNouvelleFenetre(el);
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
   _ovVisual(function(){
@@ -639,7 +661,7 @@ function hideSplash(forceDelay){
   const wait=Math.max(forceDelay||0, 1000-elapsed);
   setTimeout(function(){ document.body.classList.remove('preload'); document.body.classList.add('app-ready'); splash.classList.add('hide'); }, wait);
 }
-window.addEventListener('load', function(){ hideSplash(0); });
+window.addEventListener('load', function(){ hideSplash(0); marquerLiensNouvelleFenetre(); });
 
 // ── Vider cache ──────────────────────────────────────────────
 async function clearCacheAndReload() {

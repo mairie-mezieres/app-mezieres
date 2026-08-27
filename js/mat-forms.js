@@ -143,9 +143,23 @@ function _saveMySig(id, cat, type){
   }catch(_){}
 }
 
+/* RGAA 11.10 — une erreur de saisie doit être identifiée sur LE CHAMP fautif,
+   pas seulement énoncée dans une fenêtre. Sans aria-invalid, un lecteur d'écran
+   qui repasse sur le formulaire ne signale rien ; sans le focus rendu au champ,
+   l'habitant doit le retrouver seul. Appelé APRÈS la fermeture de la modale,
+   qui rend d'abord le focus à son point de départ. */
+function _champInvalide(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.setAttribute('aria-invalid','true');
+  const nettoie = () => { el.removeAttribute('aria-invalid'); el.removeEventListener('input', nettoie); };
+  el.addEventListener('input', nettoie);
+  try { el.focus({ preventScroll:false }); } catch(_){}
+}
+
 async function submitSignal(){
   const desc=document.getElementById('signal-desc').value.trim();
-  if(!desc){await alertMAT('Veuillez décrire le problème à signaler.','Signalement','⚠️');return;}
+  if(!desc){await alertMAT('Veuillez décrire le problème à signaler.','Signalement','⚠️');_champInvalide('signal-desc');return;}
   const photoEl=document.getElementById('signal-photo-preview');
   const btn=document.querySelector('#signal-form .submit-btn');
   btn.textContent='Envoi en cours…'; btn.disabled=true;
@@ -309,8 +323,8 @@ function setIdeasSort(mode){
 
 async function submitIdee(){
   const txt=document.getElementById('idea-input').value.trim();
-  if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');return;}
-  if(txt.length<10){await alertMAT('Merci de détailler un peu votre idée (10 caractères minimum).','Vos idées','💡');return;}
+  if(!txt){await alertMAT('Veuillez écrire votre idée !','Vos idées','💡');_champInvalide('idea-input');return;}
+  if(txt.length<10){await alertMAT('Merci de détailler un peu votre idée (10 caractères minimum).','Vos idées','💡');_champInvalide('idea-input');return;}
   const idea={id:Date.now(),text:txt,cat:ideaCat||'💡 Autre',votes:0,date:new Date().toLocaleDateString('fr-FR'),createdAt:new Date().toISOString()};
   const notifyToken=(typeof crypto!=='undefined'&&crypto.randomUUID)?crypto.randomUUID():null;
   const pushSub=notifyToken?await _getPushSubForNotify():null;
@@ -399,9 +413,9 @@ async function submitContactForm(){
   const name=document.getElementById('contact-name').value.trim();
   const reply=document.getElementById('contact-reply').value.trim();
   const msg=document.getElementById('contact-msg').value.trim();
-  if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');return;}
+  if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');_champInvalide('contact-msg');return;}
   if(reply && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(reply) && !/^\d{10}$/.test(reply.replace(/[\s.\-]/g,''))){
-    await alertMAT('Votre adresse e-mail ou numéro de téléphone semble invalide — vérifiez-le ou laissez le champ vide.','Contacter la mairie','💬');return;
+    await alertMAT('Votre adresse e-mail ou numéro de téléphone semble invalide — vérifiez-le ou laissez le champ vide.','Contacter la mairie','💬');_champInvalide('contact-reply');return;
   }
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi…'; btn.disabled=true;
@@ -459,7 +473,7 @@ function removeBugPhoto(){
 
 async function submitBug(){
   const desc=document.getElementById('bug-desc').value.trim();
-  if(!desc){await alertMAT('Veuillez décrire le problème rencontré.','Rapport de bug','⚠️');return;}
+  if(!desc){await alertMAT('Veuillez décrire le problème rencontré.','Rapport de bug','⚠️');_champInvalide('bug-desc');return;}
   const btn=document.querySelector('#bug-form .submit-btn');
   const photoEl=document.getElementById('bug-photo-preview');
   btn.textContent='Envoi…'; btn.disabled=true;

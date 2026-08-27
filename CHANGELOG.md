@@ -5,6 +5,111 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.89] — 27 août 2026
+
+### Corrigé
+- **RGAA 9.2 / 12.6 — aucun repère de page.** Un lecteur d'écran devait parcourir
+  toute la page de haut en bas, sans pouvoir sauter à l'en-tête, au contenu principal
+  ou au pied. `offline.html` et `architecture.html` n'en avaient aucun.
+  `role="banner"`, `role="main"` et `role="contentinfo"` posés — **le rôle plutôt que
+  la balise** : `<div>` → `<header>` aurait le même effet sémantique, mais imposerait
+  de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié après
+  coup : un seul repère de chaque type par page.
+
+### Audit — une erreur corrigée
+- **10.8 était un faux positif.** La deuxième passe avait relevé « un conteneur
+  `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne
+  vérifiait pas si le conteneur était affiché. Mesuré : `display:none`, boîte du
+  bouton à 0 px, hors ordre de tabulation — et le script bascule bien `aria-hidden`
+  à `false` à l'ouverture. **Conforme, sans correctif.**
+- **10.5 reste non conforme, délibérément.** 45 déclarations inline posent le fond
+  **ou** la couleur du texte, dont **6 seulement** sur des éléments visibles, et l'une
+  est le fond de `<html>`. Corriger les 45 à l'aveugle ferait courir un risque visuel
+  réel pour un bénéfice théorique : à traiter cas par cas.
+
+### Modifié
+- **Taux de conformité RGAA : 73,8 % → 78,5 %** (51 conformes sur 65 applicables).
+- **Aucun changement visible.**
+
+---
+
+## [4.88] — 27 août 2026
+
+### Corrigé
+- **RGAA 7.5 — aucune région live.** Les réponses de MEL, le suivi des signalements
+  et la galerie photos étaient mis à jour en silence : un lecteur d'écran n'annonçait
+  rien. Un habitant aveugle dont l'envoi échouait croyait que c'était parti.
+  `role="status"` + `aria-live="polite"` sur `#msgs`, `#suivi-body` et `#photos-list` ;
+  la modale de validation devient un `alertdialog` et prend le focus.
+- **RGAA 11.10 / 11.11 — l'erreur de saisie ne désignait pas le champ fautif.** Elle
+  s'affichait dans une fenêtre, et après fermeture le focus repartait au début du
+  document. Désormais : `aria-invalid` sur le champ, focus rendu au champ, marqueur
+  effacé dès la première frappe. Le focus est aussi rendu à son point de départ à la
+  fermeture de toute modale (12.9).
+- **RGAA 11.5 à 11.7 — champs de même nature non groupés.** Les vingt cases de
+  `partager.html` n'avaient aucun groupement, et le libellé « Votre niveau en
+  informatique » **ne portait aucun `for`** : affiché, rattaché à rien. `role="group"`
+  + `aria-labelledby`, et le libellé orphelin devient la légende du groupe.
+- **RGAA 5.4 à 5.7 — les horaires de la mairie** étaient lus d'une traite, sans lien
+  entre le jour et l'heure. `caption` réservé aux lecteurs d'écran, jour passé en
+  `th scope="row"`. **Rendu vérifié identique** — les règles CSS rendent au `th`
+  l'apparence exacte de l'ancien `td`. Idem pour les deux tableaux RGPD.
+- **RGAA 13.2 — 7 liens** ouvraient une nouvelle fenêtre sans le dire. Mention
+  ajoutée en texte réservé aux lecteurs d'écran, posée au chargement puis à
+  l'ouverture de chaque écran — ce qui couvre les contenus injectés après coup sans
+  imposer d'observateur de mutations permanent.
+
+### Modifié
+- **Taux de conformité RGAA : 56,9 % → 73,8 %** (48 conformes sur 65 applicables).
+  Mention inchangée : **partiellement conforme**.
+- **Aucun changement visible.** L'apparence de l'application est identique.
+
+### Connu
+- **RGAA 11.13 reste non conforme, délibérément.** Le champ « Coordonnée de réponse »
+  accepte un e-mail **ou** un téléphone : aucun jeton `autocomplete` ne couvre les
+  deux. Le corriger demande de scinder le champ — un changement visible, planifié
+  pour 2027.
+
+---
+
+## [4.87] — 27 août 2026
+
+### Modifié
+- **L'application n'est plus déclarée « non conforme ».** L'audit des 106 critères
+  du RGAA est achevé : **41 non applicables**, donc **65 applicables** — **37
+  conformes**, 22 non conformes, 6 non tranchés. **Taux : 56,9 %**, mention
+  **partiellement conforme**. Les 6 non tranchés sont comptés comme non conformes :
+  le taux publié est un **plancher**, qui ne peut que monter.
+- Plan d'action réordonné : d'abord les 6 critères ouverts (ils font monter le taux
+  sans qu'une ligne de code change), puis les non-conformités. Les traiter porterait
+  le taux au-delà de **90 %**.
+
+### Corrigé
+- **RGAA 3.3 — les bordures des champs de saisie étaient presque invisibles.**
+  `rgba(0,0,0,0.07)` = **1,17:1**, pour un minimum de 3:1. Nouveau jeton
+  `--border-champ` à **3,88:1**, décliné pour le contraste élevé (10,37:1) et le
+  thème sombre (4,79:1). `--border` reste inchangé : il sert aussi à des séparateurs
+  décoratifs, qui n'ont aucun minimum à respecter.
+- **RGAA 3.3 — les interrupteurs du panneau Accessibilité** : piste `#ccc` sur blanc
+  = **1,61:1**, état allumé **2,47:1**. Bordure ajoutée (**3,95:1**), état allumé
+  passé à `--sage-ink` (**6,39:1**), distinction éteint/allumé à **3,98:1**.
+- **RGAA 10.9 / 10.10 — l'état sélectionné n'était donné que par la couleur** sur les
+  boutons de taille de texte, de thème et les onglets de l'agenda. `aria-pressed`
+  ajouté sur les six.
+- **RGAA 8.9 — 15 séquences de `<br><br>`** servaient à espacer des paragraphes
+  (présentation du majordome, contact RGPD, écran d'accueil). Remplacées par de vrais
+  paragraphes, l'espacement rendu au CSS.
+
+### Audit — critères tranchés dans cette version
+- **8.9**, **13.11** (aucun gestionnaire `mousedown`/`touchstart`/`pointerdown` :
+  tout passe par `click` et `change`, annulables), **3.3**, **10.9**, **10.10** →
+  conformes. **10.13**, **10.14**, **12.11** → non applicables : aucun contenu
+  additionnel révélé au survol par CSS ou JavaScript.
+- Restent 6 critères, dont 5 relèvent du jugement de la mairie et 1 du validateur
+  du W3C.
+
+---
+
 ## [4.86] — 27 août 2026
 
 ### Corrigé
