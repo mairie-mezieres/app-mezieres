@@ -13,6 +13,13 @@ l'historique git. Aucune donnée d'usage n'est accessible depuis le code
 > Note de lecture : ce document ne contient que des éléments vérifiables dans
 > les dépôts. Chaque incertitude est signalée explicitement.
 
+> ⚠️ **Une section a été mise à jour après le relevé : §3, conformité
+> réglementaire.** Le 21 août, l'application était déclarée *non conforme* faute
+> d'audit. L'**audit RGAA complet a été mené le 27 août 2026** : le taux est
+> désormais de **86,2 %**, mention *partiellement conforme*. La date du relevé
+> ci-dessus reste celle du reste du document — les chiffres de code, de tests et
+> de commits n'ont pas été recomptés.
+
 ---
 
 ## 1. Inventaire fonctionnel
@@ -147,7 +154,7 @@ notifications, Redis, services, signalements, sondages, réglages application.
 | Générateur de réplication (`partager.html`) | Voir §5. |
 | Page architecture | `architecture.html` : présentation publique du fonctionnement technique. |
 | Page RGPD | Explication des données collectées et des droits associés. |
-| Déclaration d'accessibilité RGAA | Voir §3. |
+| Déclaration d'accessibilité RGAA, schéma pluriannuel et plan d'action | Publiés dans l'application. Voir §3. |
 | Veille technologique automatique 🆕 | Un agent examine chaque semaine l'état de l'art et ouvre une fiche d'actions ; depuis peu, il peut aussi proposer des correctifs en brouillon. |
 | Veille pour le bulletin municipal 🆕 | Suggestions mensuelles de sujets pour le bulletin. |
 | Veille municipale (élus) 🆕 | Point mensuel sur les subventions et obligations qui concernent la commune. |
@@ -348,15 +355,44 @@ profil mobile) :
 
 ### Conformité réglementaire
 
-La déclaration d'accessibilité RGAA figure dans l'application. Elle a été
-**établie le 29 mai 2026 par auto-évaluation** et annonce l'application comme
-**non conforme**, faute d'audit RGAA v4 complet, tout en listant les mesures
-déjà en place. C'est une déclaration volontairement prudente : un score
-Lighthouse de 100 ne vaut pas conformité RGAA, et le document le dit.
+> ⚠️ **Mis à jour le 27 août 2026.** Ce paragraphe annonçait l'application comme
+> *non conforme, faute d'audit formel* — c'était exact au 21 août, ça ne l'est
+> plus. L'audit a été mené entre-temps.
 
-> Pour le dossier : annoncer « 100/100 Lighthouse accessibilité, déclaration
-> RGAA publiée, audit complet non encore réalisé » est exact. Annoncer
-> « conforme RGAA » ne le serait pas.
+**L'audit RGAA 4.1 des 106 critères a été réalisé le 27 août 2026**, en interne
+et outillé (`docs/accessibilite/audit-rgaa-2026-08-27.md`). Il est **complet** :
+chaque critère a un verdict, aucun n'est laissé ouvert.
+
+| | |
+|---|---|
+| Critères non applicables | 41 (ni vidéo, ni son, ni cadre, ni CAPTCHA) |
+| Critères applicables | **65** |
+| Conformes | **56** |
+| Non conformes | **9** |
+| **Taux de conformité** | **86,2 %** |
+| **Mention RGAA** | **partiellement conforme** |
+
+La déclaration publiée dans l'application porte ce taux. Le **schéma pluriannuel
+2026-2029** et le **plan d'action 2026-2027** exigés par le décret n° 2019-768
+sont publiés (`docs/accessibilite/schema-pluriannuel.md`), avec un référent
+accessibilité nommé, un contact usagers et la voie de recours auprès du
+Défenseur des droits. Les 9 chantiers restants sont datés.
+
+L'audit a conduit à corriger, entre le 27 août et la v4.90, une vingtaine de
+défauts réels : les douze interrupteurs de l'écran Accessibilité n'avaient aucun
+nom annoncé, six champs de formulaire non plus, les bordures de saisie ne
+faisaient que 1,17:1 de contraste (minimum requis : 3), et aucune page ne portait
+de repère permettant à un lecteur d'écran de sauter au contenu.
+
+> Pour le dossier : annoncer « **audit RGAA 4.1 complet des 106 critères,
+> partiellement conforme à 86,2 %, schéma pluriannuel et plan d'action publiés** »
+> est exact et vérifiable — le document d'audit expose la méthode et les preuves
+> critère par critère. Annoncer « conforme RGAA » ne le serait toujours pas :
+> cette mention suppose 100 %.
+
+Le score Lighthouse de 100/100 ci-dessus ne vaut toujours pas conformité RGAA —
+il mesure une quarantaine de points automatisables, là où le référentiel en
+compte 106, dont beaucoup ne se mesurent pas sans jugement humain.
 
 ---
 
@@ -530,9 +566,12 @@ Trois éléments à connaître avant de rédiger le pitch :
 1. **Le changelog a un trou de deux mois** (v4.16 à v4.53, juin-juillet 2026).
    Si le dossier s'appuie sur une chronologie, elle doit être reconstruite
    depuis l'historique git, pas depuis `CHANGELOG.md`.
-2. **La conformité RGAA n'est pas acquise** : la déclaration publiée annonce
-   l'application comme non conforme, faute d'audit formel. Le score Lighthouse
-   de 100/100 est un indicateur automatique, pas un audit.
+2. **La conformité RGAA est mesurée, pas totale** : l'audit complet des 106
+   critères a été mené le 27 août 2026 et donne **86,2 %** — mention
+   *partiellement conforme*, 9 non-conformités restantes, datées dans le plan
+   d'action. Ne pas écrire « conforme RGAA », qui suppose 100 % ; écrire le taux,
+   qui est vérifiable. Le score Lighthouse de 100/100 reste un indicateur
+   automatique, pas un audit.
 3. **L'Eco-index est à 46/100 (note D)** au dernier audit, pour une
    performance à 72/100. C'est le seul indicateur mesuré qui ne soit pas au
    maximum ; mieux vaut l'assumer que le laisser découvrir.
