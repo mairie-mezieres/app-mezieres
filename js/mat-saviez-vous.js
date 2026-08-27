@@ -24,7 +24,7 @@
 (function () {
   'use strict';
 
-  var SV_URL       = './data/saviez-vous.json?v=1.3.0';
+  var SV_URL       = './data/saviez-vous.json?v=1.4.0';
   var SV_ETAT_KEY  = 'mat_sv_v1';       // { jour, id, reponse }
   var SV_GRAINE    = 20260802;          // graine fixe : l'ordre ne doit jamais changer
   // Mise en service. La rotation compte les jours DEPUIS cette date, pour que

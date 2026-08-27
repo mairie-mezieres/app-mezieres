@@ -5,6 +5,40 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.85.1] — 27 août 2026
+
+### Corrigé
+- **Les cerfa d'urbanisme cités par l'application étaient abrogés.** Au **1er janvier
+  2025**, les cerfa **13703** (DP maison individuelle), **13702** (DP lotissement) et
+  **13404** (DP constructions et travaux) ont été remplacés par le **16702**
+  (constructions et travaux) et le **16703** (aménagements) ; le permis de construire
+  reste le **13406**. Un dossier déposé sur l'ancien formulaire est refusé.
+  - `js/mat-mel.js` — le lien « 📄 Cerfa DP » du zonage PLU pointait `…/vosdroits/R11646`,
+    **supprimée** du site Service-Public (404 signalé par le scan hebdomadaire, issue
+    #400). Il pointe désormais `…/vosdroits/R2028`.
+  - `data/saviez-vous.json` — l'entrée `gnau-cerfa-cloture` enseignait que le 16702 était
+    « propre aux clôtures » et renvoyait au 13703 pour le reste : **verdict inversé**
+    (`false` → `true`, l'identifiant est conservé pour les compteurs de réactions), texte
+    réécrit et sourcé. L'entrée `cloture-dp` perd son millésime « \*02 ».
+  - Backend `lib/mel.js` — la règle `plu_permis_construire_depot` et le bloc AUTORISATIONS
+    du `SYSTEM_PROMPT` conseillaient le 13703. Corrigés, et le prompt interdit désormais
+    explicitement les trois numéros abrogés. Verrouillé par `test/urbanisme-cerfa.test.js`.
+- **« Où trouver le cerfa pour ma clôture ? » ne tombait sur aucune règle directe** — les
+  règles clôture exigent toutes un second terme (rue, voisin, hauteur) — et partait donc
+  au modèle, à l'endroit précis où le numéro périmé risquait le plus d'être repris.
+- **`data/saviez-vous.json` était précaché sous une URL que personne ne demandait.** Le
+  service worker précachait `?v=1.3.1` quand `js/mat-saviez-vous.js` réclamait `?v=1.3.0` :
+  l'entrée de précache ne servait jamais. Les deux passent à `?v=1.4.0`.
+- **Scan de liens morts : trois faux positifs par étranglement.** lychee lançait jusqu'à
+  128 requêtes en parallèle avec 20 s de patience ; `service-public.gouv.fr` laissait
+  expirer une partie de la rafale (issue #201 du dépôt backend, sur des pages vivantes).
+  Les deux workflows passent à `--max-concurrency 8 --timeout 30`.
+
+### Documentation
+- **ADR-0029** — « Un numéro de formulaire mort ne se voit pas comme un lien mort ».
+
+---
+
 ## [4.83] — 23 août 2026
 
 ### Ajouté

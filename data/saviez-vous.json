@@ -1,6 +1,6 @@
 {
-  "version": "1.3.0",
-  "maj": "2026-08-02",
+  "version": "1.4.0",
+  "maj": "2026-08-27",
   "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
     {
@@ -25,7 +25,7 @@
       "id": "cloture-dp",
       "question": "Peut-on poser une clôture sur rue sans aucune formalité à Mézières ?",
       "reponse": false,
-      "explication": "Non. Une déclaration préalable est obligatoire depuis la délibération du 1er mars 2012, quelle que soit la hauteur. Formulaire Cerfa 16702*02.",
+      "explication": "Non. Une déclaration préalable est obligatoire depuis la délibération du 1er mars 2012, quelle que soit la hauteur. Formulaire Cerfa 16702.",
       "source": "Délibération du conseil municipal du 1er mars 2012",
       "url": "",
       "categorie": "urbanisme"
@@ -591,10 +591,10 @@
     {
       "id": "gnau-cerfa-cloture",
       "question": "Le formulaire d’une déclaration préalable pour une clôture est-il le même que pour un abri de jardin ?",
-      "reponse": false,
-      "explication": "Non : le Cerfa 16702*02 est propre aux clôtures. Pour les autres déclarations préalables, c’est le Cerfa 13703 ; pour un permis de construire, le 13406.",
-      "source": "Mairie de Mézières-lez-Cléry — service urbanisme",
-      "url": "",
+      "reponse": true,
+      "explication": "Oui, depuis le 1er janvier 2025 : le Cerfa 16702 couvre toutes les déclarations préalables de constructions et travaux — clôture, abri de jardin, extension, ravalement. Les anciens 13703, 13702 et 13404 sont abrogés. Le 16703, lui, vise les aménagements (lotissement, division de terrain) ; le permis de construire reste le 13406.",
+      "source": "Service-Public — formulaire 16702, « Déclaration préalable constructions et travaux non soumis à permis de construire » (les cerfa 13703, 13702 et 13404 sont abrogés depuis le 1er janvier 2025)",
+      "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R2028",
       "categorie": "urbanisme"
     },
     {
