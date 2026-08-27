@@ -835,6 +835,25 @@ html.theme-sombre .panel-body [style*="color:var(--muted)"] { color:#94a3b8 !imp
 html.theme-sombre .panel-body [style*="color:var(--leaf)"] { color:#6ee7b7 !important; }
 html.theme-sombre .panel-body [style*="color:var(--forest)"] { color:#6ee7b7 !important; }
 html.theme-sombre .panel-body [style*="color:var(--sage)"] { color:#6ee7b7 !important; }
+/* ⚠️ Le sélecteur ci-dessus est en `*=` mais « color:var(--sage-ink) » ne
+   contient PAS « color:var(--sage) » — la parenthèse fermante l'en empêche.
+   Sans cette ligne, les intitulés passés à --sage-ink pour le contraste
+   (audit RGAA du 27 août 2026) redeviendraient vert foncé sur fond sombre. */
+html.theme-sombre .panel-body [style*="color:var(--sage-ink)"] { color:#6ee7b7 !important; }
+
+/* RGAA 10.6 — le lien d'attribution de Leaflet est posé par la bibliothèque :
+   #0078a8 sur texte #333333 ne fait que 2,55:1 (minimum 3:1) et rien ne le
+   distingue du texte autour. On ne peut pas le recolorer sans casser son
+   contraste avec le fond blanc (4,94:1) : on le souligne, ce qui satisfait
+   le critère par un moyen non colorimétrique.
+
+   ⚠️ Le sélecteur doit être PLUS SPÉCIFIQUE que celui de la bibliothèque.
+   leaflet.css porte « .leaflet-control-attribution a { text-decoration:none } »
+   — même spécificité que la nôtre — et il est injecté dans le <head> À LA
+   DEMANDE par mat-forms.js, donc APRÈS mat.css : à égalité, c'est lui qui
+   gagne. Écrit sans le préfixe .leaflet-container, ce correctif est resté
+   sans effet (style calculé : text-decoration-line:none, mesuré). */
+.leaflet-container .leaflet-control-attribution a { text-decoration: underline; }
 html.theme-sombre .panel-body p { color:#94a3b8; }
 
 

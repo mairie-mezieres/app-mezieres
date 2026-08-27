@@ -194,6 +194,17 @@ function openOv(id){
   // Sémantique pour les lecteurs d'écran : fenêtre modale annoncée comme telle.
   el.setAttribute('role','dialog');
   el.setAttribute('aria-modal','true');
+  // RGAA 12.9 — une fenêtre modale doit porter un NOM. Sans lui, un lecteur
+  // d'écran annonce « dialogue », sans dire lequel : les 30 overlays étaient
+  // indiscernables (relevé de l'audit du 27 août 2026). Le titre visible du
+  // panneau fait le nom ; il est hydraté juste au-dessus, donc disponible ici.
+  if(!el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')){
+    const t = el.querySelector('.panel-title');
+    if(t){
+      if(!t.id) t.id = 'ov-titre-' + id;
+      el.setAttribute('aria-labelledby', t.id);
+    }
+  }
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
   _ovVisual(function(){
@@ -409,7 +420,7 @@ function loadFeaturedDoc() {
   var neuf = _isNewDoc(_featuredId(doc), _docsSeenIds());
   el.style.display = '';
   el.innerHTML = '<div style="margin-bottom:16px">'
-    + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:8px">📌 Dernier document publié</div>'
+    + '<div style="font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--sage-ink);margin-bottom:8px">📌 Dernier document publié</div>'
     + '<a href="' + safeHref(doc.url) + '" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;padding:16px;background:linear-gradient(135deg,var(--forest),var(--leaf));border:2px solid ' + (neuf ? '#ef4444' : 'transparent') + ';border-radius:14px;text-decoration:none;color:white;-webkit-tap-highlight-color:transparent">'
     + '<div style="font-size:2rem;flex-shrink:0">' + (doc.icon || '📄') + '</div>'
     + '<div style="flex:1;min-width:0">'

@@ -43,18 +43,18 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.8">
+<link rel="stylesheet" href="css/mat.css?v=4.14.9">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.0">
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
-<script defer src="js/mat-utils.js?v=4.3.6"></script>
-<script defer src="js/mat-core.js?v=4.3.6"></script>
+<script defer src="js/mat-utils.js?v=4.3.7"></script>
+<script defer src="js/mat-core.js?v=4.3.7"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.8"></script>
-<script defer src="js/mat-widgets.js?v=4.5.2"></script>
+<script defer src="js/mat-widgets.js?v=4.5.3"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.4"></script>
-<script defer src="js/mat-forms.js?v=4.6.5"></script>
-<script defer src="js/mat-photos.js?v=1.3.4"></script>
+<script defer src="js/mat-forms.js?v=4.6.6"></script>
+<script defer src="js/mat-photos.js?v=1.3.5"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
@@ -154,7 +154,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.85.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.86 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT et MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -482,7 +482,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.85.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.86</button>
 </div>
 </div>
 </div>
@@ -512,61 +512,61 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">🔆 Contraste élevé</div>
+<div class="acc-option-label" id="acc-contrast-lbl">🔆 Contraste élevé</div>
 <div class="acc-option-sub">Texte plus sombre, couleurs plus nettes</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-contrast-toggle" onchange="toggleContrast(this.checked)">
+<input type="checkbox" id="acc-contrast-toggle" aria-labelledby="acc-contrast-lbl" onchange="toggleContrast(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">🌈 Mode daltonien</div>
+<div class="acc-option-label" id="acc-colorblind-lbl">🌈 Mode daltonien</div>
 <div class="acc-option-sub">Palette plus différenciée, moins dépendante du rouge et du vert</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-colorblind-toggle" onchange="toggleColorblind(this.checked)">
+<input type="checkbox" id="acc-colorblind-toggle" aria-labelledby="acc-colorblind-lbl" onchange="toggleColorblind(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option d-mobile-only">
 <div>
-<div class="acc-option-label">👆 Boutons plus grands</div>
+<div class="acc-option-label" id="acc-touch-lbl">👆 Boutons plus grands</div>
 <div class="acc-option-sub">Zones tactiles agrandies, plus faciles à appuyer</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-touch-toggle" onchange="toggleTouch(this.checked)">
+<input type="checkbox" id="acc-touch-toggle" aria-labelledby="acc-touch-lbl" onchange="toggleTouch(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">↕️ Espacement des lignes</div>
+<div class="acc-option-label" id="acc-spacing-lbl">↕️ Espacement des lignes</div>
 <div class="acc-option-sub">Texte plus aéré, plus facile à lire</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-spacing-toggle" onchange="toggleSpacing(this.checked)">
+<input type="checkbox" id="acc-spacing-toggle" aria-labelledby="acc-spacing-lbl" onchange="toggleSpacing(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">🔊 Lecture vocale</div>
+<div class="acc-option-label" id="acc-tts-lbl">🔊 Lecture vocale</div>
 <div class="acc-option-sub">Lit les actualités et réponses MEL à voix haute</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-tts-toggle" onchange="toggleTTS(this.checked)">
+<input type="checkbox" id="acc-tts-toggle" aria-labelledby="acc-tts-lbl" onchange="toggleTTS(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">💡 Aide contextuelle</div>
+<div class="acc-option-label" id="acc-ctx-lbl">💡 Aide contextuelle</div>
 <div class="acc-option-sub">Conseils utiles dans MEL, signalement et contact</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-ctx-toggle" onchange="toggleContextHelp(this.checked)">
+<input type="checkbox" id="acc-ctx-toggle" aria-labelledby="acc-ctx-lbl" onchange="toggleContextHelp(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
@@ -584,52 +584,52 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 </div>
 <div class="acc-option d-mobile-only">
 <div>
-<div class="acc-option-label">📐 Masquer l'en-tête</div>
+<div class="acc-option-label" id="acc-noheader-lbl">📐 Masquer l'en-tête</div>
 <div class="acc-option-sub">Condense l'affichage, plus d'espace pour les boutons</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-noheader-toggle" onchange="toggleNoHeader(this.checked)">
+<input type="checkbox" id="acc-noheader-toggle" aria-labelledby="acc-noheader-lbl" onchange="toggleNoHeader(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option d-mobile-only">
 <div>
-<div class="acc-option-label">🗺️ Masquer la météo &amp; transports</div>
+<div class="acc-option-label" id="acc-nowidgets-lbl">🗺️ Masquer la météo &amp; transports</div>
 <div class="acc-option-sub">Retire les encarts du header</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-nowidgets-toggle" onchange="toggleNoWidgets(this.checked)">
+<input type="checkbox" id="acc-nowidgets-toggle" aria-labelledby="acc-nowidgets-lbl" onchange="toggleNoWidgets(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option" id="opt-badge-notif">
 <div>
-<div class="acc-option-label">🔢 Badge sur l'icône</div>
+<div class="acc-option-label" id="acc-badge-lbl">🔢 Badge sur l'icône</div>
 <div class="acc-option-sub">Compteur sur l'icône de l'app (si supporté par le téléphone)</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-badge-toggle" checked onchange="toggleBadgeNotif(this.checked)">
+<input type="checkbox" id="acc-badge-toggle" aria-labelledby="acc-badge-lbl" checked onchange="toggleBadgeNotif(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div style="font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:16px 0 8px">🔔 Notifications push</div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">📰 Actualités</div>
+<div class="acc-option-label" id="acc-actus-notif-lbl">📰 Actualités</div>
 <div class="acc-option-sub">Nouvelles publications de la mairie</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-actus-notif-toggle" onchange="toggleActusNotifFromAcc(this.checked)">
+<input type="checkbox" id="acc-actus-notif-toggle" aria-labelledby="acc-actus-notif-lbl" onchange="toggleActusNotifFromAcc(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">🌦️ Alertes météo</div>
+<div class="acc-option-label" id="acc-meteo-notif-lbl">🌦️ Alertes météo</div>
 <div class="acc-option-sub">Vigilances météo Loiret</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-meteo-notif-toggle" onchange="toggleMeteoNotif(this.checked)">
+<input type="checkbox" id="acc-meteo-notif-toggle" aria-labelledby="acc-meteo-notif-lbl" onchange="toggleMeteoNotif(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
@@ -643,11 +643,11 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 </div>
 <div class="acc-option">
 <div>
-<div class="acc-option-label">🗑️ Rappels collecte</div>
+<div class="acc-option-label" id="acc-dechets-notif-lbl">🗑️ Rappels collecte</div>
 <div class="acc-option-sub">Notification la veille de chaque collecte</div>
 </div>
 <label class="acc-switch">
-<input type="checkbox" id="acc-dechets-notif-toggle" onchange="toggleDechetsNotifFromAcc(this.checked)">
+<input type="checkbox" id="acc-dechets-notif-toggle" aria-labelledby="acc-dechets-notif-lbl" onchange="toggleDechetsNotifFromAcc(this.checked)">
 <span class="acc-slider"></span>
 </label>
 </div>
@@ -662,7 +662,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div style="padding:0 14px 14px;font-size:0.8rem;color:var(--text);line-height:1.65">
 <p style="margin:6px 0">La Mairie de Mézières-lez-Cléry s'engage à rendre son application accessible, conformément à l'article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005.</p>
 <p style="margin:10px 0 4px"><strong>État de conformité</strong></p>
-<p style="margin:0 0 6px">L'application MAT n'a pas encore fait l'objet d'un audit RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4) complet. En l'absence d'audit formel, elle est déclarée <strong>non conforme</strong>, bien que de nombreuses mesures d'accessibilité soient déjà en place.</p>
+<p style="margin:0 0 6px">L'application MAT est déclarée <strong>non conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1).</p>
+<p style="margin:0 0 6px">Cette mention ne signifie pas que l'application est inaccessible&nbsp;: elle signifie qu'<strong>aucun audit complet des 106&nbsp;critères n'établit encore de taux de conformité</strong>. Le RGAA ne connaît que trois états — totalement conforme, partiellement conforme, non conforme — et n'autorise les deux premiers que sur la foi d'un audit. Annoncer autre chose aujourd'hui serait une fausse déclaration.</p>
+<p style="margin:0 0 6px">Un <strong>audit interne des 106&nbsp;critères a été mené le 27&nbsp;août 2026</strong>. Il a corrigé dix défauts, dont l'absence de nom accessible sur les douze interrupteurs de cet écran, sur six champs de formulaire et sur les trente fenêtres de l'application, ainsi qu'un contraste insuffisant sur le bouton d'appel des pompiers.</p>
+<p style="margin:0 0 6px">Résultat&nbsp;: sur 106&nbsp;critères, <strong>38 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>68 restants</strong>&nbsp;: <strong>32 conformes</strong>, 22 non conformes, et <strong>14 encore à trancher</strong>. Le seuil de «&nbsp;partiellement conforme&nbsp;» est à 34. <strong>Il suffit donc que deux de ces quatorze soient conformes</strong> pour que la mention change&nbsp;: ce qui reste à faire, c'est finir de mesurer.</p>
 <p style="margin:10px 0 4px"><strong>Mesures d'accessibilité déjà mises en œuvre</strong></p>
 <ul style="margin:0;padding-left:18px;line-height:1.7">
 <li>Tailles de texte ajustables (normal / agrandi / très agrandi)</li>
@@ -675,9 +678,28 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <li>Navigation compl&egrave;te au clavier&nbsp;: toutes les tuiles et cartes de l&rsquo;accueil s&rsquo;ouvrent avec Entr&eacute;e ou Espace, et l&rsquo;&eacute;l&eacute;ment s&eacute;lectionn&eacute; est entour&eacute; d&rsquo;un cadre visible (y compris en contraste &eacute;lev&eacute; et th&egrave;me sombre)</li>
 </ul>
 <p style="margin:10px 0 4px"><strong>Établissement de cette déclaration</strong></p>
-<p style="margin:0 0 6px">Déclaration établie le 29&nbsp;mai&nbsp;2026 par auto-évaluation. Un audit RGAA complet est envisagé pour formaliser le niveau de conformité.</p>
+<p style="margin:0 0 6px">Déclaration établie le 29&nbsp;mai&nbsp;2026, mise à jour le <strong>27&nbsp;août 2026</strong> après un audit interne outillé (axe-core&nbsp;4.13 sur 6&nbsp;pages et 21&nbsp;écrans, relevé du code, calcul manuel des contrastes). Technologies&nbsp;: HTML, CSS, JavaScript. Environnement de test&nbsp;: Chromium, en 1280&nbsp;px et 320&nbsp;px de large.</p>
 <p style="margin:10px 0 4px"><strong>Retour d'information et contact</strong></p>
 <p style="margin:0 0 6px">Si vous rencontrez un défaut d'accessibilité vous empêchant d'accéder à un contenu, contactez la Mairie de Mézières-lez-Cléry — 36 rue du bourg, 45370 — 📞 02&nbsp;38&nbsp;45&nbsp;61&nbsp;76, afin qu'une alternative vous soit proposée.</p>
+<p style="margin:10px 0 4px"><strong>Schéma pluriannuel et plan d'action</strong></p>
+<p style="margin:0 0 6px">Schéma pluriannuel de mise en accessibilité <strong>2026-2029</strong>, plan d'action <strong>2026-2027</strong>.</p>
+<p style="margin:8px 0 4px"><em>D'abord finir la mesure — c'est ce qui décide de la mention (fin 2026)&nbsp;:</em></p>
+<ol style="margin:0;padding-left:18px;line-height:1.7">
+<li><strong>Mesures complémentaires</strong> sur les huit critères encore outillables</li>
+<li><strong>Validateur du W3C</strong> branché sur chaque modification</li>
+<li><strong>Relecture par la mairie</strong>&nbsp;: pertinence des descriptions d'images, information donnée par la seule couleur, accessibilité des PDF du PLUi, gestes sur la carte 3D</li>
+</ol>
+<p style="margin:8px 0 4px"><em>Ensuite, monter le niveau — par effet sur vous, pas par facilité&nbsp;:</em></p>
+<ol start="4" style="margin:0;padding-left:18px;line-height:1.7">
+<li><strong>Annoncer les messages</strong> — aujourd'hui, un lecteur d'écran ne dit rien quand l'envoi d'un signalement échoue <em>(fin 2026)</em></li>
+<li><strong>Signaler les liens qui ouvrent une nouvelle fenêtre</strong> — 7 concernés <em>(fin 2026)</em></li>
+<li><strong>Baliser le tableau des horaires</strong> de la mairie <em>(fin 2026)</em></li>
+<li><strong>Messages d'erreur des formulaires</strong> reliés au champ concerné <em>(début 2027)</em></li>
+<li><strong>Structurer le contenu par des titres et des listes</strong> <em>(début 2027)</em></li>
+<li><strong>Repères de page</strong> et <strong>plan du site</strong> <em>(début 2027)</em></li>
+<li><strong>Lever les 136 contrastes indéterminés</strong> — texte sur dégradé ou sur photo <em>(début 2027)</em></li>
+</ol>
+<p style="margin:6px 0 6px">Le plan est révisé chaque année. Vos signalements l'alimentent&nbsp;: c'est le contact ci-dessus.</p>
 <p style="margin:10px 0 4px"><strong>Voie de recours</strong></p>
 <p style="margin:0">Si vous constatez un défaut d'accessibilité et que la réponse de la mairie ne vous satisfait pas, vous pouvez saisir le Défenseur des droits (formulaire en ligne sur <span style="color:var(--leaf);font-weight:700">defenseurdesdroits.fr</span>, ou par courrier gratuit sans affranchissement&nbsp;: Défenseur des droits, Libre réponse 71120, 75342 Paris CEDEX 07).</p>
 </div>
@@ -787,7 +809,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 </div>
 </div>
 <div class="form-group">
-<label class="form-label">Description (facultatif)</label>
+<label class="form-label" for="signal-desc">Description (facultatif)</label>
 <textarea class="form-textarea" id="signal-desc" placeholder="Décrivez le problème en quelques mots…"></textarea>
 </div>
 <div class="form-group">
@@ -853,7 +875,7 @@ Et si quelque chose cloche dans la commune — un nid de poule, un lampadaire ca
 <button class="idea-cat" onclick="selIdeaCat(this,'📱 MAT')">📱 MAT</button>
 <button class="idea-cat" onclick="selIdeaCat(this,'💡 Autre')">💡 Autre</button>
 </div>
-<textarea class="idea-input" id="idea-input" placeholder="Proposez une idée pour améliorer la vie dans la commune…"></textarea>
+<textarea class="idea-input" id="idea-input" aria-label="Votre idée pour la commune" placeholder="Proposez une idée pour améliorer la vie dans la commune…"></textarea>
 <button class="idea-submit" onclick="submitIdee()">💡 Soumettre mon idée</button>
 </div>
 <div class="ideas-toolbar">
@@ -974,15 +996,15 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 </div>
 <div id="contact-form">
 <div class="form-group">
-<label class="form-label">Votre nom ou prénom</label>
+<label class="form-label" for="contact-name">Votre nom ou prénom</label>
 <input class="form-textarea" id="contact-name" style="height:auto" placeholder="Ex. Mme Martin">
 </div>
 <div class="form-group">
-<label class="form-label">Coordonnée de réponse</label>
+<label class="form-label" for="contact-reply">Coordonnée de réponse</label>
 <input class="form-textarea" id="contact-reply" style="height:auto" placeholder="Téléphone ou email">
 </div>
 <div class="form-group">
-<label class="form-label">Votre message</label>
+<label class="form-label" for="contact-msg">Votre message</label>
 <textarea class="form-textarea" id="contact-msg" placeholder="Décrivez votre demande…"></textarea>
 </div>
 <button class="submit-btn" onclick="submitContactForm()">📤 Envoyer ma demande</button>
@@ -1075,7 +1097,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 </div>
 </div>
 <div class="form-group">
-<label class="form-label">Description du problème</label>
+<label class="form-label" for="bug-desc">Description du problème</label>
 <textarea class="form-textarea" id="bug-desc" placeholder="Décrivez ce qui ne fonctionne pas…"></textarea>
 </div>
 <div class="form-group">
@@ -1118,7 +1140,7 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">🔒 0 CDN tiers</span>
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">🇫🇷 IA souveraine</span>
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">🌱 Écoconçu</span>
-<span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">♿ RGAA · WCAG&nbsp;AA</span>
+<span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">♿ Accessibilité renforcée</span>
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">📴 Hors-ligne (PWA)</span>
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">🛡️ Données en UE</span>
 <span style="font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:999px;background:white;color:var(--leaf);box-shadow:0 1px 3px rgba(0,0,0,0.08)">📖 Open source · MIT</span>
@@ -1245,12 +1267,12 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
 <a href="tel:15" style="background:#dc2626;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🚑 SAMU<br><span style="font-size:1rem">15</span></a>
 <a href="tel:17" style="background:#1d4ed8;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">👮 Police<br><span style="font-size:1rem">17</span></a>
-<a href="tel:18" style="background:#ea580c;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🔥 Pompiers<br><span style="font-size:1rem">18</span></a>
+<a href="tel:18" style="background:#c2410c;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🔥 Pompiers<br><span style="font-size:1rem">18</span></a>
 <a href="tel:112" style="background:#7c3aed;color:white;border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.82rem">🆘 Européen<br><span style="font-size:1rem">112</span></a>
 </div>
 </div>
 <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🏥 Santé — Médecins &amp; pharmacie</div>
+<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-ink);margin-bottom:8px">🏥 Santé — Médecins &amp; pharmacie</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
 <div style="display:flex;align-items:center;justify-content:space-between">
 <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">MSP Val d'Ardoux — Cléry</div><div style="font-size:0.68rem;color:var(--muted)">Médecins, kiné, infirmiers…</div></div>
@@ -1271,7 +1293,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </div>
 </div>
 <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🆘 Lignes d'aide spécialisées</div>
+<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-ink);margin-bottom:8px">🆘 Lignes d'aide spécialisées</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
 <a href="tel:3114" style="background:#7c3aed;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">🧠 Prévention suicide<br><span style="font-size:1rem">3114</span></a>
 <a href="tel:3919" style="background:#be185d;color:white;border-radius:12px;padding:9px 8px;text-align:center;text-decoration:none;font-weight:900;font-size:0.75rem;line-height:1.3">💜 Violences femmes<br><span style="font-size:1rem">3919</span></a>
@@ -1283,7 +1305,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 <div style="font-size:0.62rem;color:var(--muted);margin-top:8px;text-align:center">Tous ces numéros sont gratuits 24h/24</div>
 </div>
 <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:8px">🏫 École &amp; Périscolaire</div>
+<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-ink);margin-bottom:8px">🏫 École &amp; Périscolaire</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
 <div style="display:flex;align-items:center;justify-content:space-between">
 <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">École de la Forêt</div><div style="font-size:0.68rem;color:var(--muted)">Mézières-lez-Cléry</div></div>
@@ -1296,7 +1318,7 @@ Vous pouvez exercer vos droits d'accès, de rectification et de suppression en c
 </div>
 </div>
 <div style="background:white;border-radius:14px;padding:12px 14px;border:1px solid var(--border)">
-<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage);margin-bottom:6px">🏢 Services publics</div>
+<div style="font-size:0.6rem;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;color:var(--sage-ink);margin-bottom:6px">🏢 Services publics</div>
 <div style="display:flex;flex-direction:column;gap:8px;">
 <div style="display:flex;align-items:center;justify-content:space-between">
 <div><div style="font-size:0.82rem;font-weight:800;color:var(--text)">EDF — Pannes électriques</div></div>
@@ -1738,6 +1760,17 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.86</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Les r&eacute;glages d&rsquo;accessibilit&eacute; &eacute;taient inutilisables au lecteur d&rsquo;&eacute;cran.</strong> Les <strong>douze interrupteurs</strong> de l&rsquo;&eacute;cran &laquo;&nbsp;Accessibilit&eacute;&nbsp;&raquo; &mdash; contraste &eacute;lev&eacute;, mode daltonien, lecture vocale&hellip; &mdash; n&rsquo;avaient <strong>aucun nom&nbsp;annonc&eacute;</strong>. Une personne aveugle entendait &laquo;&nbsp;case &agrave; cocher&nbsp;&raquo;, sans savoir laquelle. Corrig&eacute;</li>
+<li><strong>Six champs de formulaire</strong> &eacute;taient dans le m&ecirc;me cas &mdash; signalement, contact, bug, bo&icirc;te &agrave; id&eacute;es. Le libell&eacute; s&rsquo;affichait &agrave; l&rsquo;&eacute;cran mais n&rsquo;&eacute;tait pas rattach&eacute; au champ&nbsp;: seul le texte gris&eacute; &agrave; l&rsquo;int&eacute;rieur portait l&rsquo;information, et il dispara&icirc;t d&egrave;s qu&rsquo;on &eacute;crit</li>
+<li><strong>Les trente fen&ecirc;tres de l&rsquo;application s&rsquo;annon&ccedil;aient toutes &laquo;&nbsp;dialogue&nbsp;&raquo;</strong>, sans dire laquelle. Chacune porte d&eacute;sormais son titre</li>
+<li><strong>Le bouton d&rsquo;appel des pompiers manquait de contraste</strong> (3,55 pour un minimum de 4,5). Assombri. Les intitul&eacute;s de rubrique des num&eacute;ros utiles aussi, ainsi que les messages d&rsquo;erreur et la page hors-ligne</li>
+<li><strong>Un plan d&rsquo;action publi&eacute;.</strong> L&rsquo;&eacute;cran Accessibilit&eacute; porte d&eacute;sormais le <strong>sch&eacute;ma pluriannuel 2026-2029</strong> et les neuf chantiers de l&rsquo;ann&eacute;e, dat&eacute;s. Ce que l&rsquo;application ne sait pas encore faire y est &eacute;crit noir sur blanc</li>
+<li>La d&eacute;claration explique maintenant ce que &laquo;&nbsp;non conforme&nbsp;&raquo; veut dire&nbsp;: non pas inaccessible, mais <strong>pas encore mesur&eacute;e</strong> sur les 106 crit&egrave;res</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 27 ao&ucirc;t 2026 — v4.85.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le formulaire de d&eacute;claration pr&eacute;alable a chang&eacute; de num&eacute;ro&nbsp;: l&rsquo;application le disait encore &agrave; l&rsquo;ancienne.</strong> Depuis le <strong>1<sup>er</sup> janvier 2025</strong>, les cerfa <strong>13703</strong>, 13702 et 13404 sont abrog&eacute;s&nbsp;: c&rsquo;est le <strong>16702</strong> pour toutes les d&eacute;clarations pr&eacute;alables de constructions et travaux (cl&ocirc;ture, abri de jardin, extension, ravalement) et le <strong>16703</strong> pour les am&eacute;nagements. D&eacute;pos&eacute; sur l&rsquo;ancien formulaire, un dossier est refus&eacute;</li>
