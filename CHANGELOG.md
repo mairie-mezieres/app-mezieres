@@ -13,6 +13,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   lecture vocale, espacement des lignes… : au lecteur d'écran, tous s'annonçaient
   « case à cocher », sans distinction. Le libellé visible existait, dans un `<div>`
   frère non associé. Rattaché par `aria-labelledby`.
+- **Six champs de formulaire sans étiquette associée** (RGAA 11.1) — signalement,
+  contact (×3), bug, boîte à idées. Le `<label class="form-label">` existait mais
+  **sans `for`** : seul le `placeholder` portait l'information, et un `placeholder`
+  n'est pas une étiquette — il disparaît à la saisie. `for` posé sur les cinq
+  libellés existants, `aria-label` sur la boîte à idées qui n'en avait aucun.
+- **Les trente fenêtres modales n'avaient pas de nom** (RGAA 12.9). Elles portaient
+  bien `role="dialog"` et `aria-modal`, mais un lecteur d'écran annonçait
+  « dialogue » sans dire lequel. `openOv()` pose désormais un `aria-labelledby`
+  vers le titre visible du panneau.
 - **Contrastes insuffisants** relevés et corrigés :
   - bouton d'appel **Pompiers 18** — blanc sur `#ea580c` = **3,55:1** → `#c2410c` = 5,18:1 ;
   - intitulés de rubrique `--sage` `#52b788` sur blanc = **2,47:1** → jeton `--sage-ink`
@@ -42,9 +51,21 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   ce qui est masqué. 0 violation à t=0, 9 à t=400 ms, mêmes nœuds. Ils attendent
   désormais le **style calculé**. Ils ont aussitôt révélé deux défauts réels.
 
+### Audit des 106 critères
+- Sur 106 critères, **38 non applicables** (ni média temporel, ni cadre, ni CAPTCHA),
+  donc **68 applicables** : **32 conformes**, 22 non conformes, **14 non tranchés**.
+- Le seuil de « partiellement conforme » est à **34 sur 68**. **Il suffit que deux
+  des quatorze critères non tranchés soient conformes** pour que la mention change.
+  Le travail restant n'est pas de rendre l'application accessible : c'est de finir
+  de la mesurer.
+- Des quatorze, **huit** sont résolubles par des mesures complémentaires, **un**
+  demande le validateur du W3C, et **cinq** relèvent du jugement humain (pertinence
+  des alternatives, information par la seule couleur, accessibilité des PDF du PLUi,
+  gestes sur la carte 3D).
+
 ### Documentation
 - `docs/accessibilite/audit-rgaa-2026-08-27.md` — méthode, échantillon, preuves,
-  non-conformités restantes.
+  tableau des 106 critères, et les 14 questions restantes.
 - `docs/accessibilite/schema-pluriannuel.md` — schéma 2026-2029.
 - **ADR-0030** — « Un contrôle d'accessibilité lancé trop tôt mesure un écran vide ».
 

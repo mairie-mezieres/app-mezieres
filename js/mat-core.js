@@ -194,6 +194,17 @@ function openOv(id){
   // Sémantique pour les lecteurs d'écran : fenêtre modale annoncée comme telle.
   el.setAttribute('role','dialog');
   el.setAttribute('aria-modal','true');
+  // RGAA 12.9 — une fenêtre modale doit porter un NOM. Sans lui, un lecteur
+  // d'écran annonce « dialogue », sans dire lequel : les 30 overlays étaient
+  // indiscernables (relevé de l'audit du 27 août 2026). Le titre visible du
+  // panneau fait le nom ; il est hydraté juste au-dessus, donc disponible ici.
+  if(!el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')){
+    const t = el.querySelector('.panel-title');
+    if(t){
+      if(!t.id) t.id = 'ov-titre-' + id;
+      el.setAttribute('aria-labelledby', t.id);
+    }
+  }
   // Porte le focus dans le dialogue (clavier + lecteurs d'écran y entrent).
   if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','-1');
   _ovVisual(function(){
