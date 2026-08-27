@@ -233,6 +233,36 @@ modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la ru
 « Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
 recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
 
+#### Crèche familiale « Les Marmousets »
+
+Depuis la v4.85, MEL répond directement aux questions sur la crèche, à partir du
+**règlement de fonctionnement « parents » 2026-2027** du SIVU. La question tombait
+jusque-là sur la réponse générale « périscolaire et centre de loisirs ».
+
+La crèche est **familiale** : les **16** assistantes maternelles salariées accueillent les
+enfants **à leur domicile**, avec des temps collectifs chaque semaine dans les locaux de la
+crèche ou en salle communale. Elle prend les enfants **de 10 semaines jusqu'à leur entrée à
+l'école maternelle** ; les enfants déjà scolarisés peuvent y venir le mercredi et pendant
+les vacances, selon les places. Ouverture **du lundi au vendredi, 7h30-18h30**, au 92 rue du
+Maréchal Foch à Cléry-Saint-André.
+
+Elle est gérée par un **SIVU** réunissant Cléry-Saint-André, Mareau-aux-Prés et
+Mézières-lez-Cléry — les familles macériennes y ont donc droit, mais la crèche **n'est pas
+sur la commune**. L'inscription se fait en liste d'attente, puis une commission
+d'attribution statue sur les places ; **aucune condition d'activité professionnelle** des
+parents n'est exigée.
+
+> ⚠️ **Deux chiffres étaient faux jusqu'à la v4.85** : « 17 assistantes maternelles » (elles
+> sont 16) et « les enfants de moins de 6 ans ». Ce second chiffre figure bien dans le
+> règlement — mais au paragraphe des places garanties de l'article D.214-7, réservées aux
+> parents engagés dans un parcours d'insertion. Un chiffre lu dans la bonne source, au
+> mauvais paragraphe, reste un chiffre faux. Les deux s'étaient propagés dans le corpus
+> « Le saviez-vous ? », qui puise dans l'arbre de décision de MEL.
+
+**Aucun tarif n'est annoncé** : la participation suit le barème national de la CNAF et
+dépend des revenus et du nombre d'enfants à charge de chaque famille. Renseignements au
+02 38 45 76 56 ou à `crechemarmousets@orange.fr`.
+
 #### LAEP — Lieu d'Accueil Enfants-Parents
 
 Depuis la v4.84, MEL répond aux questions sur le **LAEP** ouvert par la Communauté de

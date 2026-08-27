@@ -521,8 +521,14 @@ const _MEL_TREE_FALLBACK = {
           links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
       },
       {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",
-        directAnswer:{text:"La crèche Les Marmousets accueille les enfants de moins de 6 ans chez 17 assistantes maternelles salariées, avec des temps collectifs hebdomadaires à la crèche. Conditions : résider ou travailler à Cléry-Saint-André, Mareau-aux-Prés ou Mézières-lez-Cléry. Pré-inscription en présentiel ou par téléphone.",
-          links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"}]}
+        // ⚠️ Chiffres tirés du règlement de fonctionnement « parents » 2026-2027
+        // du SIVU (modifications au 1er septembre 2026). Deux erreurs y ont été
+        // corrigées : « 17 assistantes maternelles » (le règlement en compte 16)
+        // et « enfants de moins de 6 ans » — la crèche prend de 10 semaines à
+        // l'entrée en maternelle ; les « moins de six ans » du règlement ne
+        // visent que les places garanties de l'article D.214-7. Ne pas rétablir.
+        directAnswer:{text:"C'est une crèche « familiale » : 16 assistantes maternelles salariées accueillent les enfants à leur domicile, avec des temps collectifs chaque semaine dans les locaux de la crèche ou en salle communale. Elle accueille les enfants de 10 semaines jusqu'à leur entrée à l'école maternelle ; les enfants déjà scolarisés peuvent l'être le mercredi et pendant les vacances, selon les places disponibles. Ouverte du lundi au vendredi de 7h30 à 18h30, au 92 rue du Maréchal Foch à Cléry-Saint-André. Elle est gérée par un syndicat intercommunal (SIVU) qui regroupe Cléry-Saint-André, Mareau-aux-Prés et Mézières-lez-Cléry. L'inscription se fait en liste d'attente, puis une commission d'attribution statue sur les places ; aucune condition d'activité professionnelle des parents n'est exigée. Le tarif est calculé selon le barème national de la CNAF, d'après vos revenus et le nombre d'enfants à charge.",
+          links:[{label:"📞 Crèche Les Marmousets : 02 38 45 76 56",tel:"0238457656"},{label:"✉️ crechemarmousets@orange.fr",url:"mailto:crechemarmousets@orange.fr"}]}
       },
       // ⚠️ Doublon volontaire avec data/mel-tree.json (l'arbre éditable depuis
       // l'admin) : les deux copies doivent rester en phase. Le LAEP n'est PAS
