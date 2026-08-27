@@ -5,6 +5,51 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.86] — 27 août 2026
+
+### Corrigé
+- **Les douze interrupteurs du panneau Accessibilité n'avaient aucun nom accessible**
+  (RGAA 11.1, axe `label`, niveau *critical*). Contraste élevé, mode daltonien,
+  lecture vocale, espacement des lignes… : au lecteur d'écran, tous s'annonçaient
+  « case à cocher », sans distinction. Le libellé visible existait, dans un `<div>`
+  frère non associé. Rattaché par `aria-labelledby`.
+- **Contrastes insuffisants** relevés et corrigés :
+  - bouton d'appel **Pompiers 18** — blanc sur `#ea580c` = **3,55:1** → `#c2410c` = 5,18:1 ;
+  - intitulés de rubrique `--sage` `#52b788` sur blanc = **2,47:1** → jeton `--sage-ink`
+    `#2d6a4f` = 6,39:1 (numéros utiles, dernier document, widgets, liens MEL) ;
+  - `offline.html` — texte à 2,47:1 et 2,32:1 ;
+  - `architecture.html` — 26 nœuds sur fond sombre, jusqu'à **1,22:1** ;
+  - messages d'erreur `#dc2626` sur crème `#f4f0ea` = **4,25:1** → `#b91c1c`.
+- **`partager.html` n'avait aucun `<h1>`** (RGAA 9.1). Le titre visuel en devient un,
+  rendu inchangé.
+- **Lien d'attribution de la carte** (RGAA 10.6) : 2,55:1 avec le texte voisin et
+  aucune distinction non colorimétrique. Souligné — avec la spécificité nécessaire
+  pour battre `leaflet.css`, injecté dans le `<head>` après `mat.css`.
+
+### Modifié
+- **La déclaration d'accessibilité explique enfin ce que « non conforme » signifie** :
+  non pas inaccessible, mais **non mesurée** sur les 106 critères. Le RGAA ne connaît
+  que trois états et n'autorise les deux autres que sur la foi d'un audit.
+- **Schéma pluriannuel 2026-2029 et plan d'action 2026-2027 publiés dans l'app**,
+  écran Accessibilité — neuf chantiers datés, obligation du décret n° 2019-768.
+- Le badge « ♿ RGAA · WCAG AA » de l'écran RGPD, affiché sous le titre
+  « Certifications & engagements », **contredisait la déclaration à deux écrans
+  d'écart**. Devenu « ♿ Accessibilité renforcée ».
+
+### Tests
+- **Cinq contrôles axe ne pouvaient pas échouer.** Ils mesuraient l'écran pendant sa
+  transition d'ouverture, alors qu'il était encore `visibility:hidden` — et axe ignore
+  ce qui est masqué. 0 violation à t=0, 9 à t=400 ms, mêmes nœuds. Ils attendent
+  désormais le **style calculé**. Ils ont aussitôt révélé deux défauts réels.
+
+### Documentation
+- `docs/accessibilite/audit-rgaa-2026-08-27.md` — méthode, échantillon, preuves,
+  non-conformités restantes.
+- `docs/accessibilite/schema-pluriannuel.md` — schéma 2026-2029.
+- **ADR-0030** — « Un contrôle d'accessibilité lancé trop tôt mesure un écran vide ».
+
+---
+
 ## [4.85.1] — 27 août 2026
 
 ### Corrigé

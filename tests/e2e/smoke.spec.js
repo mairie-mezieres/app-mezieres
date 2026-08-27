@@ -25,6 +25,37 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+/* ⚠️ Ouvrir un overlay ne suffit PAS pour l'auditer avec axe.
+   La classe `open` est posée AVANT la fin de la transition CSS : pendant
+   ~300 ms l'overlay reste `visibility:hidden`, et axe IGNORE tout ce qui est
+   masqué. Un `analyze()` lancé à cet instant renvoie donc zéro violation,
+   quel que soit le contenu — le test passe à vide et ne peut pas échouer.
+
+   Mesuré le 27 août 2026 sur #ov-accessibilite : 0 violation à t=0,
+   9 violations `label` (critical) à t=400 ms, sur les mêmes nœuds. Les douze
+   interrupteurs du panneau Accessibilité n'avaient aucun nom accessible
+   depuis leur création, sous un test vert.
+
+   D'où cette attente sur le STYLE CALCULÉ, et pas sur la classe :
+   c'est la règle 7 du CLAUDE.md — un test qui n'interroge que le JS ne
+   prouve pas qu'un effet est visible. */
+async function ouvrirOverlayVisible(page, fn, sel) {
+  await page.waitForFunction((f) => typeof window[f] === 'function', fn);
+  await expect(async () => {
+    await page.evaluate((f) => window[f](), fn);
+    await expect(page.locator(sel)).toHaveClass(/open/, { timeout: 1000 });
+  }).toPass({ timeout: 8000 });
+  await page.waitForFunction(
+    (s) => getComputedStyle(document.querySelector(s)).visibility === 'visible',
+    sel,
+    { timeout: 5000 }
+  );
+  // Garde-fou : si l'overlay redevenait masqué, axe mesurerait du vide.
+  await expect
+    .poll(() => page.evaluate((s) => getComputedStyle(document.querySelector(s)).visibility, sel))
+    .toBe('visible');
+}
+
 test('le shell se charge (lang, titre, meta description)', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle(/Mézières Avec Toi/);
@@ -86,11 +117,7 @@ test('clavier : la touche Échap ferme l’overlay ouvert', async ({ page }) => 
 
 test('overlay Accessibilité : aucune violation axe sérieuse ou critique', async ({ page }) => {
   await page.goto('/');
-  await page.waitForFunction(() => typeof window.openAccessibilite === 'function');
-  await expect(async () => {
-    await page.evaluate(() => window.openAccessibilite());
-    await expect(page.locator('#ov-accessibilite')).toHaveClass(/open/, { timeout: 1000 });
-  }).toPass({ timeout: 8000 });
+  await ouvrirOverlayVisible(page, 'openAccessibilite', '#ov-accessibilite');
   const results = await new AxeBuilder({ page })
     .include('#ov-accessibilite')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
@@ -117,11 +144,7 @@ const A11Y_OVERLAYS = [
 for (const ov of A11Y_OVERLAYS) {
   test(`overlay ${ov.label} : aucune violation axe sérieuse ou critique`, async ({ page }) => {
     await page.goto('/');
-    await page.waitForFunction((fn) => typeof window[fn] === 'function', ov.fn);
-    await expect(async () => {
-      await page.evaluate((fn) => window[fn](), ov.fn);
-      await expect(page.locator(ov.sel)).toHaveClass(/open/, { timeout: 1000 });
-    }).toPass({ timeout: 8000 });
+    await ouvrirOverlayVisible(page, ov.fn, ov.sel);
     const results = await new AxeBuilder({ page })
       .include(ov.sel)
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

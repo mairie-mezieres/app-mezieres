@@ -493,7 +493,7 @@ function formatPhone(num) {
   return num.replace(/[\s\.\-]/g,'');
 }
 function formatMelText(text) {
-  const linkStyle = 'color:var(--sage);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage);';
+  const linkStyle = 'color:var(--sage-ink);font-weight:800;text-decoration:none;border-bottom:1px solid var(--sage-ink);';
 
   // Échappement HTML PRÉALABLE : le texte vient de la réponse IA (MEL) ou de la
   // saisie utilisateur. On neutralise tout HTML brut (<img onerror>, <script>…)

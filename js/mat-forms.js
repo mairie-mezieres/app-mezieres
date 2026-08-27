@@ -731,7 +731,7 @@ async function loadSuivi(type){
     body.innerHTML=`${_suiviToggleHtml()}<div id="suivi-filter-bar" style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">${mkBtn('all','📋','Tous',cnt.all)}${mkBtn('mine','👤','Mes signalements',myCount)}${mkBtn('pending','🟡','À traiter',cnt.pending)}${mkBtn('in_progress','🔵','En cours',cnt.in_progress)}${mkBtn('resolved','🟢','Résolu',cnt.resolved)}</div><div id="suivi-cards"></div><div id="suivi-map" style="display:none;height:340px;border-radius:12px;overflow:hidden;border:1px solid var(--border)"></div>`;
     setSuiviView('list');
   }catch(e){
-    body.innerHTML='<div style="text-align:center;padding:24px;color:#dc2626">Impossible de charger les données.</div>';
+    body.innerHTML='<div style="text-align:center;padding:24px;color:#b91c1c">Impossible de charger les données.</div>';
   }
 }
 
