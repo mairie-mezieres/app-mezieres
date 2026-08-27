@@ -1,7 +1,7 @@
 # Schéma pluriannuel de mise en accessibilité numérique — 2026-2029
 
 **Commune de Mézières-lez-Cléry**
-Adopté le : *(à compléter — date de validation par la mairie)*
+Adopté le : **27 août 2026**
 Période couverte : **2026 – 2029**
 
 > Document rendu obligatoire par l'article 47 de la loi n° 2005-102 du 11 février
@@ -37,7 +37,8 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
 
 ## 3. Organisation et moyens
 
-- **Responsable de l'accessibilité** : *(à désigner — élu ou agent référent)*
+- **Référent accessibilité** : **Fabrice Auffret**, joignable par la mairie —
+  02 38 45 61 76, 36 rue du Bourg, 45370 Mézières-lez-Cléry.
 - **Contact des usagers** : Mairie de Mézières-lez-Cléry, 36 rue du Bourg,
   45370 — 02 38 45 61 76. Toute demande d'alternative reçoit une réponse.
 - **Voie de recours** : Défenseur des droits.
