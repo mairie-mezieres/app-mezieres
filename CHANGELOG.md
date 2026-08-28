@@ -5,6 +5,52 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.94] — 28 août 2026
+
+### Corrigé
+- **Depuis le plan du site, la moitié des écrans s'ouvraient VIDES.** Signalé en
+  production par le porteur, captures à l'appui : « Conseil municipal » sans
+  aucun élu, « Je viens d'emménager » bloqué sur « Chargement… ».
+  **Cause :** `openOv(id)` ne pose que la coquille. C'est la fonction dédiée de
+  chaque écran qui va chercher le contenu — `openConseil()` fait `openOv('conseil')`
+  **puis** `buildTrombi()`. Le plan appelait `openOv` directement, donc la
+  seconde moitié n'arrivait jamais.
+  **Correctif :** `PLAN_OUVERTURE` déclare la fonction d'ouverture de chaque
+  écran, et `_ouvrirEcran()` l'appelle. Une déclaration peut porter des
+  arguments (`['openSuivi', 'signalements']`) : `openSuivi()` sans type reste
+  précisément bloqué sur « Chargement… ».
+  ⚠️ Ces fonctions sont **enveloppées pour les statistiques**
+  (`window.openMel = () => { _track('mel'); _origOpenMel(); }`). Il faut donc
+  résoudre `window[nom]` **au moment du clic** — une référence prise au
+  chargement court-circuiterait le comptage.
+
+### Ajouté
+- `tests/e2e/plan-du-site.spec.js` — deux contrôles de plus, et une leçon.
+  - **`_ouvrirEcran appelle bien la fonction dédiée`** : remplace chaque
+    fonction déclarée par un espion, appelle `_ouvrirEcran`, vérifie l'appel
+    **et ses arguments**. Vérifié par sabotage : il rougit en nommant
+    `mel → openMel` et `conseil → openConseil`.
+  - **`chaque lien ouvre un écran RENSEIGNÉ`** : ouvre les 27 écrans du plan et
+    refuse un écran resté sur « Chargement… ».
+  ⚠️ **Ce second test, écrit en premier, ne suffisait pas — et je l'ai su parce
+  que je l'ai saboté.** Avec le bug réintroduit, il restait VERT : un écran non
+  rempli garde son gabarit et franchit n'importe quel seuil de « nombre
+  d'éléments » (« Conseil municipal » vide affiche encore sa consigne
+  « Cliquez sur une photo »). Mesurer le résultat ne suffisait pas ; il fallait
+  vérifier **le contrat** — la fonction est-elle appelée. Un test de
+  non-régression qu'on n'a pas vu échouer ne prouve rien.
+  ⚠️ Sa première version cherchait le contenu dans `.panel-body` : MEL, la carte
+  3D et le majordome ont leur propre gabarit (`mel-panel`, `c3d-panel`,
+  `majordome-panel`) et n'en ont pas. Elle les déclarait vides à tort. Le
+  contrôle doit épouser l'application, pas l'inverse.
+
+### Non modifié
+- Taux de conformité RGAA : **96,9 %** inchangé. Le plan du site satisfaisait
+  déjà 12.1, 12.3 et 12.4 en tant que structure ; c'est son comportement qui
+  était fautif.
+
+---
+
 ## [4.93] — 28 août 2026
 
 ### Ajouté

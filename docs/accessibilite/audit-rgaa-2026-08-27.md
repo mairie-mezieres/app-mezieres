@@ -369,6 +369,19 @@ Oublier un écran devient impossible en silence.
 > au lieu de les relever (`actus` pour `notifs`, `bugs` pour `bug`, `associations`
 > pour `assoc`…). Écrit après coup, il n'aurait rien trouvé.
 
+> ⚠️ **Le plan a été livré cassé, et c'est le porteur qui l'a vu.** En v4.93,
+> les liens appelaient `openOv(id)` — qui ne pose que la coquille de l'écran.
+> « Conseil municipal » s'ouvrait sans aucun élu, « Je viens d'emménager »
+> restait sur « Chargement… ». Corrigé en v4.94.
+>
+> Mes deux premiers tests de non-régression ne l'attrapaient pas : l'un
+> vérifiait que l'écran **s'ouvre**, l'autre qu'il contient **assez
+> d'éléments** — or un écran vide garde son gabarit et son message d'accueil.
+> Je l'ai su en **remettant le bug exprès** : le test restait vert. Il a fallu
+> viser le contrat lui-même — la fonction dédiée est-elle appelée, avec ses
+> arguments — pour qu'il rougisse. **Un test de non-régression qu'on n'a pas vu
+> échouer ne prouve rien.**
+
 **Le plan est atteignable depuis le pied de page**, présent sur chaque écran — ce
 qu'exige 12.4. Une tuile d'accueil n'aurait pas suffi : elle disparaît dès qu'on
 ouvre autre chose.

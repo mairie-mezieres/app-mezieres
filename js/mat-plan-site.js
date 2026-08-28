@@ -29,6 +29,52 @@ const PLAN_RUBRIQUES = [
   ['L’application',              ['accessibilite', 'rgpd', 'changelog']]
 ];
 
+/* ⛔ OUVRIR UN ÉCRAN, CE N'EST PAS `openOv(id)`.
+   La v4.93 a livré ce plan en appelant `openOv` directement : les écrans
+   s'ouvraient VIDES. `openOv` ne pose que la coquille — c'est la fonction
+   dédiée de chaque écran qui va chercher le contenu. `openConseil()` fait
+   `openOv('conseil')` PUIS `buildTrombi()` ; sans le second, le trombinoscope
+   ne se construit jamais et l'habitant voit un panneau nu. Signalé en
+   production par le porteur, sur « Conseil municipal » et « Je viens
+   d'emménager ».
+   ⚠️ Ces fonctions sont en plus ENVELOPPÉES pour les statistiques
+   (`window.openMel = () => { _track('mel'); _origOpenMel(); }`) : il faut
+   appeler `window[nom]` au moment du clic, jamais garder une référence prise
+   au chargement, sinon on court-circuite le comptage.
+   Le nom est déclaré ici pour chaque écran. `tests/e2e/plan-du-site.spec.js`
+   ouvre CHAQUE lien et vérifie que l'écran se remplit vraiment — c'est ce
+   contrôle-là qui manquait. */
+const PLAN_OUVERTURE = {
+  'mel': 'openMel',                     'guide': 'openGuideArrivee',
+  'carte3d': 'matOuvrirCarte3D',        'docs': 'openDocs',
+  'plui': 'openPlui',                   'notifs': 'openNotifs',
+  'agenda': 'openAgenda',               'events-locaux': 'openEventsLocaux',
+  'meteo': 'openMeteo',                 'dechets': 'openDechets',
+  'remi': 'openRemi',                   'idees': 'openIdees',
+  'sondages': 'openSondages',           'photos': 'openPhotos',
+  'contact': 'openContact',             'signal': 'openSignal',
+  'bug': 'openBug',                     'nums': 'openNums',
+  'assoc': 'openAssociations',          'subvention': 'openSubvention',
+  'entreprises': 'openEntreprises',     'conseil': 'openConseil',
+  'majordome': 'openMajordome',         'accessibilite': 'openAccessibilite',
+  'rgpd': 'openRgpd',                   'changelog': 'openChangelog',
+  'carburant': 'openCarburant',
+  // Certaines fonctions attendent un argument : on le déclare avec elles.
+  // `openSuivi()` sans argument reste bloqué sur « Chargement… » — c'est
+  // exactement le genre de vide que ce plan a livré en v4.93.
+  'suivi': ['openSuivi', 'signalements']
+};
+
+/* Ouvre un écran comme le ferait une tuile de l'accueil. */
+function _ouvrirEcran(id) {
+  const decl = PLAN_OUVERTURE[id];
+  const nom = Array.isArray(decl) ? decl[0] : decl;
+  const args = Array.isArray(decl) ? decl.slice(1) : [];
+  const fn = nom && window[nom];
+  if (typeof fn === 'function') { fn.apply(null, args); return; }
+  openOv(id);
+}
+
 // Écrans volontairement absents du plan, avec leur raison. Le test exige que
 // tout écran soit ici ou dans une rubrique — jamais nulle part.
 const PLAN_ECARTES = {
@@ -90,7 +136,7 @@ function construirePlanSite() {
         closeOv('plansite');
         // Laisser la fermeture se jouer avant d'ouvrir : sinon les deux
         // transitions se chevauchent et l'écran cible s'ouvre invisible.
-        setTimeout(() => { try { openOv(e.id); } catch (_) {} }, 220);
+        setTimeout(() => { try { _ouvrirEcran(e.id); } catch (_) {} }, 220);
       });
       li.appendChild(b);
       ul.appendChild(li);
