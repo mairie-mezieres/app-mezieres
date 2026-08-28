@@ -50,8 +50,12 @@ input[type=text],input[type=number],select{width:100%;padding:10px 12px;border:1
 .radio-card:hover{border-color:var(--sage)}
 .radio-card.selected{border-color:var(--leaf);background:var(--mist)}
 .radio-card input{position:absolute;opacity:0;pointer-events:none}
-.radio-card .rc-title{font-weight:900;font-size:.92rem;color:var(--forest)}
-.radio-card .rc-desc{font-size:.74rem;color:var(--muted);margin-top:4px}
+/* ⚠️ RGAA 8.2 — `display:block` obligatoire : ces deux éléments étaient des
+   <div> dans un <label>, ce que le validateur du W3C refuse. Passés en <span>,
+   ils perdent le block que la balise leur donnait et se retrouveraient côte à
+   côte sur une seule ligne. */
+.radio-card .rc-title{display:block;font-weight:900;font-size:.92rem;color:var(--forest)}
+.radio-card .rc-desc{display:block;font-size:.74rem;color:var(--muted);margin-top:4px}
 
 .slider-row{display:flex;align-items:center;gap:12px}
 .slider-row input[type=range]{flex:1}
@@ -143,13 +147,13 @@ button.btn:active{transform:translateY(1px)}
       <div class="radio-row" role="radiogroup" aria-labelledby="lbl-niveau">
         <label class="radio-card selected" data-level="debutant">
           <input type="radio" name="niveau" value="debutant" checked>
-          <div class="rc-title">D&eacute;butant</div>
-          <div class="rc-desc">Je sais utiliser un navigateur et glisser-d&eacute;poser un fichier. Pas de code.</div>
+          <span class="rc-title">D&eacute;butant</span>
+          <span class="rc-desc">Je sais utiliser un navigateur et glisser-d&eacute;poser un fichier. Pas de code.</span>
         </label>
         <label class="radio-card" data-level="intermediaire">
           <input type="radio" name="niveau" value="intermediaire">
-          <div class="rc-title">Interm&eacute;diaire</div>
-          <div class="rc-desc">Je connais GitHub, j&rsquo;&eacute;dite du HTML, je peux configurer un h&eacute;bergement.</div>
+          <span class="rc-title">Interm&eacute;diaire</span>
+          <span class="rc-desc">Je connais GitHub, j&rsquo;&eacute;dite du HTML, je peux configurer un h&eacute;bergement.</span>
         </label>
       </div>
     </div>

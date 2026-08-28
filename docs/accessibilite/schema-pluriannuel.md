@@ -59,7 +59,7 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
 ## 4. État des lieux au 27 août 2026
 
 Un audit interne outillé des **106 critères** a été mené le 27 août 2026
-(`audit-rgaa-2026-08-27.md`), en cinq passes. **Il est complet : aucun critère n'est
+(`audit-rgaa-2026-08-27.md`), en six passes. **Il est complet : aucun critère n'est
 laissé sans verdict.**
 
 **La première a montré que l'instrument de mesure était faussé.** Les contrôles
@@ -94,10 +94,18 @@ le validateur officiel du W3C a relevé **39 erreurs**. Quatre ont été corrig�
 **33 subsistent**, toutes structurelles. Ce critère est donc **non conforme**, et le
 validateur tourne désormais à chaque modification.
 
-**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
-Parmi eux, **56 conformes** et **9 non conformes**.
+**La sixième a levé ces 33 erreurs, et le champ « e-mail ou téléphone ».** Le code
+de l'application est **valide à 100 %** selon le validateur du W3C ; le formulaire de
+contact demande désormais l'adresse et le numéro séparément, ce qui permet enfin au
+navigateur de les pré-remplir. Elle a aussi **corrigé une troisième erreur de mesure
+de l'audit** : le critère 10.5 était annoncé à « 45 déclarations », le vrai compte est
+d'environ **356 emplacements** — le relevé d'origine ne regardait ni les écrans non
+affichés, ni les feuilles de style.
 
-> **Taux de conformité : 86,2 %** — mention **partiellement conforme**.
+**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
+Parmi eux, **58 conformes** et **7 non conformes** (état v4.91, 28 août 2026).
+
+> **Taux de conformité : 89,2 %** — mention **partiellement conforme**.
 >
 > Ce taux n'est plus un plancher prudent : chaque critère applicable a été instruit
 > jusqu'à un verdict.
@@ -108,16 +116,14 @@ Les six critères ouverts au moment de la quatrième passe ont été traités : 
 conformes, un — la validité du code — a échoué à la mesure et rejoint le plan
 ci-dessous.
 
-### Les 9 non-conformités restantes
+### Les 7 non-conformités restantes
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
 | 1 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste : la navigation par titres est impossible. | 9.1, 9.3 | **oui** | T1 2027 |
 | 2 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | **oui** | T1 2027 |
 | 3 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo, à juger à l'œil. | 3.2 | selon | T1 2027 |
-| 4 | **Les 33 erreurs de validité HTML.** Trois familles : 28 tuiles de l'accueil portent un `<div>` dans un `<button>`, 4 cartes à cocher un `<div>` dans un `<label>`, et une feuille de style est déclarée dans le corps de la page. La conversion en `<span>` impose de rendre à ces éléments le `display:block` qu'ils tenaient de la balise : à faire écran par écran, avec vérification visuelle. | 8.2 | non — **si** le `display` suit | T1 2027 |
-| 5 | **Scinder le champ « e-mail ou téléphone »** du formulaire de contact : aucun jeton `autocomplete` ne couvre les deux à la fois. | 11.13 | **oui** | 2027 |
-| 6 | **Déclarations CSS de couleur** : 45 cas ne posent que le fond **ou** que le texte, dont 6 sur des éléments visibles. À traiter cas par cas — une correction en masse ferait courir un risque visuel pour un bénéfice théorique. | 10.5 | non | T2 2027 |
+| 4 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
 
 Traiter l'ensemble porte le taux à **100 %**.
 

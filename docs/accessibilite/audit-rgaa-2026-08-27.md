@@ -1,7 +1,7 @@
 # Audit RGAA 4.1 — Mézières Avec Toi (MAT)
 
 - **Date de l'audit** : 27 août 2026
-- **Version auditée** : v4.86 → v4.90 (cinq passes ; le taux publié est celui de la v4.90)
+- **Version auditée** : v4.86 → v4.91 (six passes ; le taux publié est celui de la v4.91)
 - **Référentiel** : RGAA version 4.1 — 106 critères, 13 thématiques
 - **Réalisé par** : audit interne outillé, commune de Mézières-lez-Cléry
 - **Statut** : **complet** — les 106 critères ont un verdict, aucun n'est laissé
@@ -164,12 +164,15 @@ champ en deux — un changement visible, hors du périmètre de cette passe. Le 
 | **9.2 / 12.6** | **Aucun repère de page.** Un lecteur d'écran devait tout parcourir de haut en bas, sans pouvoir sauter à l'en-tête, au contenu ou au pied. Les pages hors-ligne et architecture n'en avaient aucun. | `role="banner"`, `role="main"`, `role="contentinfo"` posés — **le rôle plutôt que la balise** : `<div>` → `<header>` aurait le même effet, mais imposerait de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié : un seul repère de chaque type par page. |
 | **10.8** | **Faux positif de la deuxième passe.** J'avais relevé « un conteneur `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne vérifiait pas si le conteneur était affiché. | Mesuré : le conteneur est en `display:none`, son bouton a une boîte de 0 px et n'est pas dans l'ordre de tabulation. Et le script bascule bien `aria-hidden` à `false` quand la fenêtre s'ouvre. **Conforme, sans correctif.** |
 
-**10.5 reste non conforme, et je n'y touche pas.** 45 déclarations inline posent le
-fond **ou** la couleur du texte, mais pas les deux — dont **6 seulement** sur des
-éléments visibles, et l'une d'elles est le fond de `<html>`, qui est légitime. Les
-autres héritent du fond d'un conteneur qui, lui, le déclare. Corriger les 45 à
-l'aveugle ferait courir un risque visuel réel pour un bénéfice théorique. Le
-chantier reste au plan, à traiter en regardant chaque cas.
+**10.5 reste non conforme, et je n'y touche pas.** Des déclarations posent le fond
+**ou** la couleur du texte, mais pas les deux. Corriger à l'aveugle ferait courir un
+risque visuel réel pour un bénéfice théorique. Le chantier reste au plan, à traiter
+en regardant chaque cas.
+
+> ⚠️ **Le chiffre annoncé ici — « 45 déclarations, dont 6 visibles » — était faux.**
+> Voir la sixième passe : le vrai compte est d'environ **356 emplacements**. Le
+> relevé d'origine ne regardait que les éléments déjà affichés au chargement, soit
+> une fraction de l'accueil, et ne regardait pas du tout les feuilles de style.
 
 ### Cinquième passe — les six derniers critères sont tranchés
 
@@ -225,6 +228,72 @@ issue vivante, mise à jour à chaque passage, refermée d'elle-même quand le c
 tombe à zéro. Il **ne fait pas échouer le build** : faire rougir chaque proposition de
 modification sur un passif connu de 33 erreurs apprendrait surtout à ignorer le rouge.
 
+### Sixième passe — 8.2 et 11.13 levés (v4.91, 28 août 2026)
+
+**11.13 — le champ « e-mail ou téléphone » est scindé.** Aucun jeton `autocomplete`
+ne couvre les deux à la fois : le navigateur ne pouvait rien pré-remplir. Deux
+champs, `autocomplete="email"` et `autocomplete="tel"`, tous deux facultatifs comme
+avant, avec le clavier adapté sur téléphone. La carte Trello reçue par la mairie
+garde exactement le même format. Bonus 11.10 : chaque erreur de saisie désigne
+maintenant le bon champ, au lieu d'un message commun. → **`C`**
+
+**8.2 — les 33 erreurs de validité sont corrigées. Le code est valide à 100 %.**
+
+| Famille | Correctif | Piège |
+|---|---|---|
+| 28 × `<div>` dans un `<button>` — les tuiles de l'accueil | 52 `<div>` → `<span>` dans les 14 boutons `.card` | **`.ct`, `.ct-label` et `.ct-sub` ne déclaraient AUCUN `display`.** Ils le tenaient de la balise `<div>`. Sans la règle CSS ajoutée en même temps, le sous-titre de chaque tuile remontait sur la ligne du titre. |
+| 4 × `<div>` dans un `<label>` — cartes à cocher de `partager.html` | idem, `<span>` + `display:block` | même piège |
+| 1 × `<style>` dans le `<body>` | déplacé dans le `<head>`, juste après `mat-desktop.css` | vérifié avant : **rien d'autre ne pose de CSS entre les deux**, donc l'ordre de la cascade est inchangé |
+
+La transformation des tuiles a été faite par un script borné aux blocs
+`<button class="card">`, qui **refuse d'écrire** si le compte de `<div>` ouvrants et
+fermants ne correspond pas dans un bloc. Il a refusé une première fois — un bug de
+mon marcheur de balises lui faisait avaler tout le fichier. Contrôle final :
++104 octets pour 104 balises renommées, soit un caractère chacune, et pas une ligne
+de plus. → **`C`**
+
+Un test de non-régression garde la mise en page : `tests/e2e/tuiles-mise-en-page.spec.js`
+asserte le **style calculé** et la **géométrie** — le sous-titre doit être sous le
+titre — et **refuse de conclure sur une carte de hauteur nulle**. Sa première
+version, elle, passait sur ordinateur, où la grille du téléphone est masquée : deux
+boîtes de 0 px sont toujours « empilées ». Encore ADR-0030. Le test a ensuite été
+vérifié en retirant le `display:block` : il rougit.
+
+> ### ⚠️ Et une troisième erreur de mesure de cet audit : le critère 10.5
+>
+> En voulant traiter 10.5, j'ai re-mesuré. Le compte annoncé plus haut — **45
+> déclarations, dont 6 visibles** — est faux, pour deux raisons cumulées :
+>
+> 1. le relevé ne regardait que les éléments **déjà affichés au chargement**, soit
+>    une fraction de l'accueil et aucun des 31 écrans ;
+> 2. il ne regardait **que les styles en ligne**, pas les feuilles de style.
+>
+> Et la première tentative de relevé des feuilles de style a elle-même échoué en
+> silence : elle testait `if (rule.cssRules)` pour distinguer un bloc `@media`
+> d'une règle simple. Or **toute** règle CSS porte un `cssRules` — vide, mais
+> *truthy* (support du CSS imbriqué). Chaque règle était donc prise pour un
+> conteneur, parcourue à vide, et sautée : **87 règles comptées sur 1 046, dont
+> zéro avec une couleur.** Un zéro qui vient d'une boucle cassée ressemble
+> exactement à un zéro qui vient d'un code propre.
+>
+> **Compte réel, mesuré sur le DOM complet avec les 31 écrans hydratés :**
+>
+> | | Nombre |
+> |---|---|
+> | Règles CSS parcourues | 1 201 |
+> | dont déséquilibrées | 612 |
+> | **dont portant réellement du texte** | **91** |
+> | **Déclarations en ligne portant du texte** | **265** |
+> | **Total des emplacements à traiter** | **≈ 356** |
+>
+> La conclusion de fond, elle, ne change pas — elle se renforce : c'est un chantier
+> **cas par cas**. Un `.ct-label` sur une tuile à dégradé ne peut pas recevoir de
+> couleur de fond plate sans écraser le dégradé. Poser `background: transparent`
+> partout satisferait la lettre du critère sans rien apporter à personne : ce que
+> 10.5 protège, c'est le lecteur qui force ses propres couleurs, et `transparent`
+> ne le protège pas. Le chantier reste au plan, et son ampleur y est désormais
+> honnête.
+
 ---
 
 ## 5. Les 106 critères
@@ -243,10 +312,10 @@ modification sur un passif connu de 33 erreurs apprendrait surtout à ignorer le
 | **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
-| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `NC` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 mesuré au validateur du W3C : **33 erreurs** restantes (4 corrigées), trois familles structurelles. |
+| **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `C` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 mesuré au validateur du W3C : **33 erreurs** restantes (4 corrigées), trois familles structurelles. |
 | **9. Structuration** (4) | 9.1 `NC` · 9.2 `C` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : 45 déclarations inline ne posent que le fond **ou** que le texte, dont 6 seulement sur des éléments visibles. |
-| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `NC` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte — chiffre corrigé en sixième passe. |
+| **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `C` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
 | **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
 | **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `C` · 13.4 `C` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `C` · 13.11 `C` · 13.12 `NA` | 13.3/13.4 : les documents du PLUi sont des exports numériques, non des scans. 13.10 : la carte 3D se pilote entièrement aux boutons (référent). |
 
@@ -254,8 +323,8 @@ modification sur un passif connu de 33 erreurs apprendrait surtout à ignorer le
 
 | | Nombre |
 |---|---|
-| Conformes | **56** |
-| Non conformes | **9** |
+| Conformes | **58** |
+| Non conformes | **7** |
 | Non applicables | **41** |
 | Non tranchés | **0** |
 | Total | **106** |
@@ -265,7 +334,7 @@ modification sur un passif connu de 33 erreurs apprendrait surtout à ignorer le
 Critères applicables : 106 − 41 = **65**. **Aucun critère n'est laissé sans verdict** :
 le taux n'est plus un plancher prudent, c'est la mesure.
 
-> ## Taux de conformité : **86,2 %** (56 sur 65)
+> ## Taux de conformité : **89,2 %** (58 sur 65)
 > ### Mention RGAA : **partiellement conforme**
 
 | Étape | Conformes | Taux |
@@ -274,7 +343,8 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 | Première et deuxième passe | 37 | 56,9 % |
 | Troisième passe | 48 | 73,8 % |
 | Quatrième passe | 51 | 78,5 % (6 critères encore ouverts) |
-| **Cinquième passe** | **56** | **86,2 %** |
+| Cinquième passe | 56 | 86,2 % |
+| **Sixième passe** | **58** | **89,2 %** |
 | Si tout le plan est traité | 65 | 100 % |
 
 > Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
@@ -282,16 +352,14 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 > il échoue. La quatrième passe l'espérait à 87,7 % ; la mesure dit 86,2 %. C'est la
 > différence entre un pronostic et un audit.
 
-### Les 9 non-conformités restantes
+### Les 7 non-conformités restantes
 
 | Critères | Chantier | Visible à l'écran ? |
 |---|---|---|
 | 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
 | 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
 | 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
-| 8.2 | 33 erreurs de validité HTML — 28 tuiles, 4 cartes à cocher, un `<style>` déplacé | non, **si** le `display` est repris avec |
-| 10.5 | 45 déclarations inline ne posent que le fond **ou** que le texte | non |
-| 11.13 | Scinder le champ « e-mail ou téléphone » | **oui** |
+| 10.5 | ≈ 356 emplacements ne posent que le fond **ou** que le texte | non |
 
 ## 7. Reproduire cet audit
 

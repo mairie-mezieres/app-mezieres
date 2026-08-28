@@ -5,6 +5,69 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.91] — 28 août 2026
+
+### Corrigé
+- **RGAA 11.13 — le champ « e-mail ou téléphone » est scindé.** Un champ unique
+  n'admet **aucun** jeton `autocomplete` : il n'en existe pas pour « l'un ou
+  l'autre ». Le navigateur ne pouvait donc rien pré-remplir. Deux champs
+  (`autocomplete="email"` et `autocomplete="tel"`, `type` correspondant pour
+  appeler le bon clavier sur téléphone), tous deux facultatifs comme avant.
+  La carte Trello reçue par la mairie garde **exactement** le même format : une
+  ligne `Réponse :` composée des valeurs saisies.
+  Bonus RGAA 11.10 : chaque erreur de saisie désigne maintenant le bon champ,
+  au lieu d'un message commun aux deux.
+- **RGAA 8.2 — les 33 erreurs de validité sont levées. Le code est valide à 100 %.**
+  - **28 × `<div>` dans un `<button>`** (les tuiles de l'accueil) → 52 balises
+    converties en `<span>` dans les 14 boutons `.card`.
+    ⚠️ **`.ct`, `.ct-label` et `.ct-sub` ne déclaraient AUCUN `display`** : ils le
+    tenaient de la balise `<div>`. Sans le `display:block` ajouté dans `mat.css` en
+    même temps, le sous-titre de chaque tuile remontait sur la ligne du titre.
+    C'est le piège annoncé en v4.90, et il était réel.
+  - **4 × `<div>` dans un `<label>`** (cartes à cocher de `partager.html`) → même
+    traitement, `display:block` sur `.rc-title` et `.rc-desc`.
+  - **1 × `<style>` dans le `<body>`** → déplacé dans le `<head>`, juste après
+    `mat-desktop.css`. Vérifié avant de bouger : **rien d'autre ne pose de CSS
+    entre les deux**, donc l'ordre de la cascade est inchangé.
+
+### Ajouté
+- `tests/e2e/tuiles-mise-en-page.spec.js` — filet de la conversion ci-dessus. Il
+  asserte le **style calculé** et la **géométrie** (le sous-titre doit être *sous*
+  le titre), pas le balisage. Vérifié en retirant le `display:block` : il rougit.
+  ⚠️ Il **refuse de conclure sur une carte de hauteur nulle**. Sa première version
+  passait sur ordinateur, où la grille du téléphone est masquée : deux boîtes de
+  0 px sont toujours « empilées ». Encore ADR-0030.
+
+### Audit — une troisième erreur de mesure corrigée
+- **Le critère 10.5 était annoncé à « 45 déclarations, dont 6 visibles ». C'est
+  faux : il y en a environ 356.** Deux causes cumulées — le relevé ne regardait
+  que les éléments **affichés au chargement** (une fraction de l'accueil, aucun
+  des 31 écrans), et **uniquement les styles en ligne**, jamais les feuilles.
+- **Et le premier relevé des feuilles a échoué en silence.** Il testait
+  `if (rule.cssRules)` pour distinguer un bloc `@media` d'une règle simple. Or
+  **toute** règle CSS porte un `cssRules` — vide, mais *truthy* (support du CSS
+  imbriqué). Chaque règle était prise pour un conteneur, parcourue à vide, sautée :
+  **87 règles comptées sur 1 046, dont zéro avec une couleur.** Un zéro qui vient
+  d'une boucle cassée ressemble trait pour trait à un zéro qui vient d'un code
+  propre. Même famille que le contrôle de validité de la v4.90 et que les tests
+  axe d'ADR-0030.
+- Compte réel, DOM complet avec les 31 écrans hydratés : **1 201 règles CSS
+  parcourues, 612 déséquilibrées, 91 portant réellement du texte** ; **265
+  déclarations en ligne** dans le même cas. Total : **≈ 356 emplacements**.
+- La conclusion de fond ne bouge pas, elle se renforce : chantier **cas par cas**.
+  Un `.ct-label` sur une tuile à dégradé ne peut pas recevoir de fond plat sans
+  écraser le dégradé, et poser `background: transparent` partout satisferait la
+  lettre du critère sans protéger le lecteur qui force ses propres couleurs — ce
+  que 10.5 est précisément là pour protéger.
+
+### Modifié
+- **Taux de conformité RGAA : 86,2 % → 89,2 %** (58 conformes sur 65 applicables).
+  Mention inchangée : **partiellement conforme**. Non-conformités restantes : 9 → **7**.
+- Audit (§ Sixième passe, tableau des 106 critères, décompte, taux), schéma
+  pluriannuel, déclaration publiée dans l'app et `CLAUDE.md` mis en phase.
+
+---
+
 ## [4.90] — 27 août 2026
 
 ### Ajouté
