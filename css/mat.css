@@ -175,9 +175,16 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .card{display:flex;align-items:center;gap:9px;background:var(--card);border-radius:var(--r);padding:14px 10px;text-decoration:none;color:var(--text);border:none;width:100%;text-align:left;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;transition:transform 0.1s;}
 .card:active{transform:scale(0.97);}
 .ico{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.ct{flex:1;min-width:0;}
-.ct-label{font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
-.ct-sub{font-size:0.75rem;color:var(--muted);font-weight:600;line-height:1.25;margin-top:1px;}
+/* ⚠️ RGAA 8.2 — `display:block` est OBLIGATOIRE ici, il n'est pas décoratif.
+   Ces trois éléments étaient des <div> à l'intérieur d'un <button>, ce que le
+   validateur du W3C refuse. Passés en <span>, ils perdent le display:block que
+   la balise <div> leur donnait gratuitement : .ct-label et .ct-sub se
+   retrouveraient sur UNE SEULE LIGNE, sur les 28 tuiles de l'accueil.
+   .ct est un enfant flex de .card et serait donc blockifié de toute façon —
+   on l'écrit quand même, pour que la règle ne dépende pas d'un contexte. */
+.ct{flex:1;min-width:0;display:block;}
+.ct-label{display:block;font-size:0.82rem;font-weight:800;color:var(--text);line-height:1.2;}
+.ct-sub{display:block;font-size:0.75rem;color:var(--muted);font-weight:600;line-height:1.25;margin-top:1px;}
 .notif-status-on{color:#16a34a !important;font-weight:900 !important;}
 .notif-status-off{color:#dc2626 !important;font-weight:900 !important;}
 .notif-status-loading{color:#b45309 !important;font-weight:900 !important;}

@@ -411,12 +411,23 @@ function contactViaMessenger(){window.open('https://m.me/RadioMezieres','_blank'
 
 async function submitContactForm(){
   const name=document.getElementById('contact-name').value.trim();
-  const reply=document.getElementById('contact-reply').value.trim();
+  // RGAA 11.13 — le champ unique « téléphone ou email » a été scindé : aucun
+  // jeton `autocomplete` ne couvre les deux à la fois, le navigateur ne pouvait
+  // donc rien pré-remplir. Deux champs, deux validations, et surtout deux
+  // messages d'erreur qui désignent le bon champ (RGAA 11.10).
+  const email=document.getElementById('contact-email').value.trim();
+  const tel=document.getElementById('contact-tel').value.trim();
   const msg=document.getElementById('contact-msg').value.trim();
   if(!msg){await alertMAT('Merci de renseigner votre message.','Contacter la mairie','💬');_champInvalide('contact-msg');return;}
-  if(reply && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(reply) && !/^\d{10}$/.test(reply.replace(/[\s.\-]/g,''))){
-    await alertMAT('Votre adresse e-mail ou numéro de téléphone semble invalide — vérifiez-le ou laissez le champ vide.','Contacter la mairie','💬');_champInvalide('contact-reply');return;
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+    await alertMAT('Votre adresse e-mail semble invalide — vérifiez-la ou laissez le champ vide.','Contacter la mairie','💬');_champInvalide('contact-email');return;
   }
+  if(tel && !/^\d{10}$/.test(tel.replace(/[\s.\-]/g,''))){
+    await alertMAT('Votre numéro de téléphone semble invalide — il doit comporter 10 chiffres. Vérifiez-le ou laissez le champ vide.','Contacter la mairie','💬');_champInvalide('contact-tel');return;
+  }
+  // Une seule ligne « Réponse » dans la carte Trello, comme avant : la mairie
+  // lit le même format, que l'habitant ait donné l'un, l'autre ou les deux.
+  const reply=[email,tel].filter(Boolean).join(' · ');
   const btn=document.querySelector('#contact-form .submit-btn');
   btn.textContent='Envoi…'; btn.disabled=true;
   const contactId=Date.now();
@@ -454,7 +465,7 @@ function restoreContactFormState(){
 function resetContact(){
   document.getElementById('contact-form').style.display='block';
   document.getElementById('contact-success').style.display='none';
-  ['contact-name','contact-reply','contact-msg'].forEach(id=>{document.getElementById(id).value='';});
+  ['contact-name','contact-email','contact-tel','contact-msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const btn=document.querySelector('#contact-form .submit-btn');
   if(btn){btn.textContent='📤 Envoyer ma demande';btn.disabled=false;}
   closeOv('contact');
