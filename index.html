@@ -43,7 +43,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.12">
+<link rel="stylesheet" href="css/mat.css?v=4.14.13">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.1">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -76,6 +76,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
 <script defer src="js/mat-perf.js?v=1.0.9"></script>
+<script defer src="js/mat-plan-site.js?v=1.0.0"></script>
 <script defer src="js/mat-boot.js?v=4.12.3"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -160,8 +161,8 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="mat-text">
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
-<div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.92 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<h1 class="mat-title">Mézières Avec Toi</h1>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.93 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -269,99 +270,99 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <span class="plui-title">🗺️ PLUi-H-D — Dessinons le territoire de 2040</span>
 <span class="plui-sub">Suivez l’étude et donnez votre avis</span>
 </button>
-<div class="sec">Démarches et Services</div>
-<div class="grid2" style="margin-bottom:9px">
-<button class="card simple-card mel-entry" onclick="openMel()">
+<h2 class="sec">Démarches et Services</h2>
+<ul class="grid2" style="margin-bottom:9px">
+<li><button class="card simple-card mel-entry" onclick="openMel()">
 <span class="ico ico-mel mel-wiggle">👩‍💼</span>
 <span class="ct">
 <span class="ct-label">MEL</span>
 <span class="ct-sub">Vos démarches</span>
 </span>
-</button>
-<button class="card simple-card" onclick="openGuideArrivee()">
+</button></li>
+<li><button class="card simple-card" onclick="openGuideArrivee()">
 <span class="ico" style="background:#e8f5e9">📦</span>
 <span class="ct"><span class="ct-label">Je viens d’emménager</span><span class="ct-sub">Guide d’arrivée</span></span>
-</button>
-</div>
-<div class="grid2">
-<button class="card" onclick="matOuvrirCarte3D()">
+</button></li>
+</ul>
+<ul class="grid2">
+<li><button class="card" onclick="matOuvrirCarte3D()">
 <span class="ico" style="background:#e3f2fd">🏘️</span>
 <span class="ct"><span class="ct-label">Mon village en 3D</span><span class="ct-sub">Zonage du PLU</span></span>
-</button>
-<button class="card" onclick="openDocs()">
+</button></li>
+<li><button class="card" onclick="openDocs()">
 <span class="ico" style="background:#e8f5e9;position:relative">📁<span id="docs-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box" aria-hidden="true">!</span></span>
 <span class="ct"><span class="ct-label">Documents officiels</span><span class="ct-sub">Bulletins, CR…</span></span>
-</button>
-</div>
-<div class="sec">Actualité et Calendrier</div>
-<div class="grid2">
-<button class="card simple-card" onclick="openNotifs()">
+</button></li>
+</ul>
+<h2 class="sec">Actualité et Calendrier</h2>
+<ul class="grid2">
+<li><button class="card simple-card" onclick="openNotifs()">
 <span class="ico ico-notif ico-notif-wrap">🔔<span class="notif-badge" id="notif-unread-badge">0</span></span>
 <span class="ct"><span class="ct-label">Actualités</span><span class="ct-sub" id="notif-card-status">Vérification…</span></span>
-</button>
-<button class="card simple-card" onclick="openAgenda()">
+</button></li>
+<li><button class="card simple-card" onclick="openAgenda()">
 <span class="ico ico-cal">📅</span>
 <span class="ct"><span class="ct-label">Agenda</span><span class="ct-sub">Manifestations</span></span>
-</button>
-</div>
-<div class="sec">Participez</div>
-<div class="grid2">
-<button class="card" onclick="openIdees()">
+</button></li>
+</ul>
+<h2 class="sec">Participez</h2>
+<ul class="grid2">
+<li><button class="card" onclick="openIdees()">
 <span class="ico ico-ideas">💡</span>
 <span class="ct"><span class="ct-label">Vos idées</span><span class="ct-sub">Boîte à idées</span></span>
-</button>
-<button class="card" onclick="openSondages()">
+</button></li>
+<li><button class="card" onclick="openSondages()">
 <span class="ico" style="background:#f0fdf4;position:relative">📊<span id="sondages-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></span>
 <span class="ct"><span class="ct-label">Sondage citoyen</span></span>
-</button>
-<div class="card" style="padding:0;overflow:hidden;gap:0">
+</button></li>
+<li><div class="card" style="padding:0;overflow:hidden;gap:0">
 <div onclick="openPhotos()" role="button" tabindex="0" aria-label="Ouvrir la galerie de photos de la commune" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotos();}" style="display:flex;align-items:center;gap:11px;flex:1;padding:14px 0 14px 14px;cursor:pointer;min-width:0">
 <div class="ico" style="background:#fdf4ff;position:relative;flex-shrink:0">📸<span id="photos-badge" style="display:none;position:absolute;top:-5px;right:-5px;background:#ef4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:0.75rem;font-weight:900;align-items:center;justify-content:center;line-height:20px;text-align:center;padding:0 3px;box-sizing:border-box">!</span></div>
 <div class="ct"><div class="ct-label">Vos photos</div></div>
 </div>
 <button onclick="launchDiapo()" title="Lancer le diaporama plein écran" aria-label="Diaporama" style="flex-shrink:0;border:none;border-left:1px solid var(--border);background:none;padding:0 16px;height:100%;cursor:pointer;font-size:1.3rem;color:var(--muted);font-family:inherit;align-self:stretch;display:flex;align-items:center">▶</button>
-</div>
-<button class="card simple-card" onclick="openContact()">
+</div></li>
+<li><button class="card simple-card" onclick="openContact()">
 <span class="ico ico-hab">💬</span>
 <span class="ct"><span class="ct-label">Contacter vos élus</span></span>
-</button>
-</div>
-<div class="sec">Signalements et Contacts</div>
-<div class="grid2">
-<button class="card simple-card" onclick="openSignal()">
+</button></li>
+</ul>
+<h2 class="sec">Signalements et Contacts</h2>
+<ul class="grid2">
+<li><button class="card simple-card" onclick="openSignal()">
 <span class="ico ico-signal">🚨</span>
 <span class="ct"><span class="ct-label">Signalement</span><span class="ct-sub">Voirie, déchets…</span></span>
-</button>
-<button class="card" id="btn-install-or-bug" onclick="openBug()">
+</button></li>
+<li><button class="card" id="btn-install-or-bug" onclick="openBug()">
 <span class="ico" id="iob-ico" style="background:linear-gradient(135deg,#fde8f0,#f8d0e4)">🐞</span>
 <span class="ct">
 <span class="ct-label" id="iob-label">Signaler un bug</span>
 </span>
-</button>
-</div>
-<div class="sec">Réseaux mairie et citoyens</div>
-<div class="grid2">
-<a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">
+</button></li>
+</ul>
+<h2 class="sec">Réseaux mairie et citoyens</h2>
+<ul class="grid2">
+<li><a class="card" href="https://www.facebook.com/RadioMezieres" target="_blank" rel="noopener noreferrer">
 <div class="ico ico-radio">📻</div>
 <div class="ct"><div class="ct-label">Radio Mézières</div><div class="ct-sub">Facebook</div></div>
-</a>
-<a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer">
+</a></li>
+<li><a class="card" href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer">
 <div class="ico ico-communaute">👥</div>
 <div class="ct"><div class="ct-label">Communauté</div><div class="ct-sub">Ici c’est Mézières</div></div>
-</a>
-</div>
-<div class="sec">Associations &amp; Entreprises</div>
-<div class="grid2">
-<button class="card" onclick="openAssociations()">
+</a></li>
+</ul>
+<h2 class="sec">Associations &amp; Entreprises</h2>
+<ul class="grid2">
+<li><button class="card" onclick="openAssociations()">
 <span class="ico" style="background:#e8f5e9">🤝</span>
 <span class="ct"><span class="ct-label">Associations</span><span class="ct-sub">Vie associative</span></span>
-</button>
-<button class="card" onclick="openEntreprises()">
+</button></li>
+<li><button class="card" onclick="openEntreprises()">
 <span class="ico" style="background:#e8f0fe">🛠️</span>
 <span class="ct"><span class="ct-label">Entreprises &amp; services</span></span>
-</button>
-</div>
-<div class="sec" style="margin-top:18px">Sorties locales</div>
+</button></li>
+</ul>
+<h2 class="sec" style="margin-top:18px">Sorties locales</h2>
 <div style="margin-top:4px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
 <a class="card" href="https://mairie-mezieres.github.io/randonnees/rando.html" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#2d6a4f,#40916c);border:none;border-radius:16px;padding:14px 12px;text-decoration:none;color:#fff">
 <div class="ico" style="background:rgba(255,255,255,0.18);flex-shrink:0">🥾</div>
@@ -488,8 +489,9 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openRgpd()">🔒 RGPD</button>
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
+<button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.92</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.93</button>
 </div>
 </div>
 </div>
@@ -669,10 +671,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div style="padding:0 14px 14px;font-size:0.8rem;color:var(--text);line-height:1.65">
 <p style="margin:6px 0">La Mairie de Mézières-lez-Cléry s'engage à rendre son application accessible, conformément à l'article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005.</p>
 <p style="margin:10px 0 4px"><strong>État de conformité</strong></p>
-<p style="margin:0 0 6px">L'application MAT est <strong>partiellement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 89,2&nbsp;%</strong> — 58&nbsp;critères conformes sur les 65 qui s'appliquent à elle.</p>
+<p style="margin:0 0 6px">L'application MAT est <strong>partiellement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 96,9&nbsp;%</strong> — 63&nbsp;critères conformes sur les 65 qui s'appliquent à elle.</p>
 <p style="margin:0 0 6px">L'audit est <strong>terminé</strong>&nbsp;: chacun des 106&nbsp;critères a été instruit jusqu'à un verdict, aucun n'est laissé de côté. Ce taux n'est donc plus une estimation prudente&nbsp;— c'est la mesure.</p>
 <p style="margin:0 0 6px">Un <strong>audit interne des 106&nbsp;critères a été mené le 27&nbsp;août 2026</strong>. Il a corrigé quinze défauts, dont l'absence de nom annoncé sur les douze interrupteurs de cet écran, sur six champs de formulaire et sur les trente fenêtres de l'application&nbsp;; un contraste insuffisant sur le bouton d'appel des pompiers&nbsp;; et des bordures de champs de saisie à peine visibles (1,17 pour un minimum de 3).</p>
-<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>58 conformes</strong> et 7 non conformes, que le plan d'action ci-dessous traite un par un.</p>
+<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>63 conformes</strong> et 2 non conformes, que le plan d'action ci-dessous traite un par un.</p>
 <p style="margin:10px 0 4px"><strong>Mesures d'accessibilité déjà mises en œuvre</strong></p>
 <ul style="margin:0;padding-left:18px;line-height:1.7">
 <li>Tailles de texte ajustables (normal / agrandi / très agrandi)</li>
@@ -690,10 +692,8 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <p style="margin:0 0 6px">Si vous rencontrez un défaut d'accessibilité vous empêchant d'accéder à un contenu, contactez la Mairie de Mézières-lez-Cléry — 36 rue du bourg, 45370 — 📞 02&nbsp;38&nbsp;45&nbsp;61&nbsp;76, afin qu'une alternative vous soit proposée.</p>
 <p style="margin:10px 0 4px"><strong>Schéma pluriannuel et plan d'action</strong></p>
 <p style="margin:0 0 6px">Schéma pluriannuel de mise en accessibilité <strong>2026-2029</strong>, plan d'action <strong>2026-2027</strong>.</p>
-<p style="margin:8px 0 4px"><em>Les sept non-conformités qui restent à traiter&nbsp;:</em></p>
+<p style="margin:8px 0 4px"><em>Les deux non-conformités qui restent à traiter&nbsp;:</em></p>
 <ol style="margin:0;padding-left:18px;line-height:1.7">
-<li><strong>Structurer le contenu par des titres et des listes</strong> — la navigation par titres n'est pas encore possible <em>(début 2027)</em></li>
-<li><strong>Second moyen de navigation</strong> et <strong>plan du site</strong> <em>(début 2027)</em></li>
 <li><strong>Lever les 136 contrastes indéterminés</strong> — texte sur dégradé ou sur photo <em>(début 2027)</em></li>
 <li><strong>Déclarations de couleur</strong>&nbsp;: environ 350&nbsp;endroits ne posent que le fond ou que le texte, à reprendre un par un <em>(2027)</em></li>
 </ol>
@@ -713,9 +713,9 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <button class="tts-bar-btn" onclick="ttsStop()" title="Arrêter" aria-label="Arrêter la lecture">⏹</button>
 </div>
 <div class="footer" role="contentinfo">
-<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left">
-<span>MAT · Mézières-lez-Cléry</span>
-<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center">
+<div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;row-gap:4px">
+<button onclick="openPlanSite()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🗺️ Plan du site</button>
 <a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;letter-spacing:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
 <button onclick="openRgpd()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🔒 RGPD</button>
 </div>
@@ -1771,6 +1771,25 @@ et accompagnée des documents suivants :
 </div>
 </template>
 </div>
+<!-- Plan du site — RGAA 12.1 / 12.3 / 12.4. Le corps est REMPLI PAR LE CODE à
+     l'ouverture (js/mat-plan-site.js) : les intitulés sont lus dans les écrans
+     eux-mêmes, jamais recopiés ici. Une liste écrite à la main se périmerait au
+     premier écran ajouté, en silence — et 12.3 retomberait sans que rien ne le
+     signale. `tests/e2e/plan-du-site.spec.js` refuse tout écran non classé. -->
+<div class="ov" id="ov-plansite" onclick="ovClick('plansite',event)">
+<template data-lazy-ov>
+<div class="panel">
+<div class="panel-hdr">
+<div class="panel-ico" style="background:#e8f0fc">🗺️</div>
+<div class="panel-title">Plan du site</div>
+<button class="panel-close" aria-label="Fermer" onclick="closeOv('plansite')">✕</button>
+</div>
+<div class="panel-body" id="plansite-body">
+<p style="font-size:0.82rem;color:var(--muted);line-height:1.55;margin:0 0 4px">Tous les écrans de l’application, rassemblés. Touchez un intitulé pour l’ouvrir.</p>
+</div>
+</div>
+</template>
+</div>
 <div class="ov" id="ov-changelog" onclick="ovClick('changelog',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1782,6 +1801,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 ao&ucirc;t 2026 — v4.93</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Nouveau&nbsp;: un &laquo;&nbsp;Plan du site&nbsp;&raquo;</strong>, en bas de chaque &eacute;cran. Tous les &eacute;crans de l&rsquo;application rassembl&eacute;s en une liste, pour retrouver quelque chose sans repasser par l&rsquo;accueil</li>
+<li><strong>L&rsquo;accueil a enfin une structure.</strong> Il ne portait aucun titre&nbsp;: une personne aveugle devait tout &eacute;couter dans l&rsquo;ordre, &agrave; chaque ouverture. Elle peut d&eacute;sormais sauter de rubrique en rubrique, comme votre &oelig;il parcourt la page</li>
+<li>Taux de conformit&eacute; RGAA&nbsp;: <strong>89,2&nbsp;% &rarr; 96,9&nbsp;%</strong></li>
+<li>Seul changement visible&nbsp;: le pied de page, o&ugrave; le lien &laquo;&nbsp;Plan du site&nbsp;&raquo; prend la place du libell&eacute; &laquo;&nbsp;MAT&nbsp;&middot;&nbsp;M&eacute;zi&egrave;res-lez-Cl&eacute;ry&nbsp;&raquo;. L&rsquo;accueil, lui, est <strong>inchang&eacute; au pixel pr&egrave;s</strong></li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 ao&ucirc;t 2026 — v4.92</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le pied de page annon&ccedil;ait &laquo;&nbsp;Accessibilit&eacute;&nbsp;100&nbsp;&raquo; pendant que la d&eacute;claration officielle annon&ccedil;ait 89,2&nbsp;%.</strong> Ces 100 sont le r&eacute;sultat d&rsquo;un contr&ocirc;le automatique, qui ne v&eacute;rifie qu&rsquo;une quarantaine de points sur les 106 du r&eacute;f&eacute;rentiel&nbsp;: ce n&rsquo;est <strong>pas</strong> un taux de conformit&eacute;. Le badge dit maintenant &laquo;&nbsp;Contr&ocirc;le auto&nbsp;100&nbsp;&raquo; et renvoie &agrave; la d&eacute;claration pour le vrai chiffre</li>

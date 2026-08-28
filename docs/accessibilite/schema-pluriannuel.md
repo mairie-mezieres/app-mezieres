@@ -59,7 +59,7 @@ Ce schéma organise le passage de cet acquis à une **conformité mesurée**.
 ## 4. État des lieux au 27 août 2026
 
 Un audit interne outillé des **106 critères** a été mené le 27 août 2026
-(`audit-rgaa-2026-08-27.md`), en six passes. **Il est complet : aucun critère n'est
+(`audit-rgaa-2026-08-27.md`), en sept passes. **Il est complet : aucun critère n'est
 laissé sans verdict.**
 
 **La première a montré que l'instrument de mesure était faussé.** Les contrôles
@@ -102,10 +102,19 @@ de l'audit** : le critère 10.5 était annoncé à « 45 déclarations », le vr
 d'environ **356 emplacements** — le relevé d'origine ne regardait ni les écrans non
 affichés, ni les feuilles de style.
 
-**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
-Parmi eux, **58 conformes** et **7 non conformes** (état v4.91, 28 août 2026).
+**La septième a donné une structure à l'accueil et lui a ajouté un plan du site.**
+L'écran d'accueil ne portait, sur téléphone, **aucun titre** : la navigation par
+titres — celle qu'utilise toute personne aveugle pour survoler une page — ne
+faisait rien. Le titre du bandeau, qui existait depuis toujours, est désormais
+déclaré comme tel ; les sept intitulés de rubrique sont des titres de niveau 2 et
+les grilles de tuiles de vraies listes, **sans qu'un pixel de l'écran change**. Un
+écran « Plan du site », atteignable depuis le pied de page de chaque écran, apporte
+le second chemin de navigation qui manquait sur téléphone.
 
-> **Taux de conformité : 89,2 %** — mention **partiellement conforme**.
+**Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
+Parmi eux, **63 conformes** et **2 non conformes** (état v4.93, 28 août 2026).
+
+> **Taux de conformité : 96,9 %** — mention **partiellement conforme**.
 >
 > Ce taux n'est plus un plancher prudent : chaque critère applicable a été instruit
 > jusqu'à un verdict.
@@ -116,14 +125,12 @@ Les six critères ouverts au moment de la quatrième passe ont été traités : 
 conformes, un — la validité du code — a échoué à la mesure et rejoint le plan
 ci-dessous.
 
-### Les 7 non-conformités restantes
+### Les 2 non-conformités restantes
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
-| 1 | **Structurer le contenu par des titres et des listes.** L'accueil ne porte qu'un titre et aucune liste : la navigation par titres est impossible. | 9.1, 9.3 | **oui** | T1 2027 |
-| 2 | **Second système de navigation + page « plan du site ».** | 12.1, 12.3, 12.4 | **oui** | T1 2027 |
-| 3 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo, à juger à l'œil. | 3.2 | selon | T1 2027 |
-| 4 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
+| 1 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo. La plupart sont du texte sur le dégradé du bandeau : un dégradé ayant deux extrémités connues, il suffit de calculer le contraste contre la plus claire. C'est un calcul, pas un jugement. | 3.2 | selon | T1 2027 |
+| 2 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
 
 Traiter l'ensemble porte le taux à **100 %**.
 

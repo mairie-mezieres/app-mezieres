@@ -5,6 +5,80 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.93] — 28 août 2026
+
+### Ajouté
+- **Écran « Plan du site »** (RGAA 12.1, 12.3, 12.4) — `js/mat-plan-site.js`,
+  overlay `ov-plansite`, accessible depuis le pied de page **de chaque écran**.
+  Le `<nav>` de l'application étant **masqué sur téléphone**, il n'existait
+  qu'un seul chemin vers chaque écran : sa tuile sur l'accueil. Le plan apporte
+  le second, et satisfait les trois critères d'un coup.
+  ⚠️ **Ses intitulés ne sont écrits nulle part.** Ils sont lus à l'ouverture
+  dans le `.panel-title` de chaque écran. Une liste recopiée aurait divergé au
+  premier intitulé modifié, en silence — la classe d'erreur qui a déjà mordu ce
+  dépôt sur les associations, la fibre et l'arbre MEL. Seul le **classement par
+  rubrique** est déclaré à la main (`PLAN_RUBRIQUES`), avec une liste explicite
+  d'écrans écartés et leur raison (`PLAN_ECARTES`).
+  ⚠️ Une tuile d'accueil **n'aurait pas satisfait 12.4** : elle disparaît dès
+  qu'on ouvre autre chose. Le pied de page est le seul endroit présent partout.
+- `tests/e2e/plan-du-site.spec.js` — **échoue si un écran n'est ni classé ni
+  explicitement écarté**, et si un identifiant classé ne correspond à aucun
+  écran. Oublier un écran devient impossible en silence : c'est ce qui protège
+  la « pertinence » qu'exige 12.3. Le test a servi immédiatement — il a rejeté
+  sept identifiants devinés au lieu d'être relevés (`actus` pour `notifs`,
+  `bugs` pour `bug`, `associations` pour `assoc`…). Écrit après coup, il
+  n'aurait rien trouvé.
+
+### Corrigé
+- **RGAA 9.1 et 9.3 — l'accueil a enfin une structure, sans bouger d'un pixel.**
+  Sur téléphone, il ne portait **aucun titre**, d'aucun niveau : la navigation
+  par titres, celle qu'utilise toute personne aveugle pour survoler une page, ne
+  faisait rien.
+
+  | Élément | Avant | Après |
+  |---|---|---|
+  | Titre de la page | *aucun* | `<h1>` — **le titre qui était déjà là** |
+  | Intitulés de rubrique | 7 × `<div class="sec">` | 7 × `<h2 class="sec">` |
+  | Grilles de tuiles | 7 × `<div class="grid2">` | 7 × `<ul>`, 16 tuiles en `<li>` |
+
+  Le `h1` n'est **pas** un titre ajouté : c'est « Mézières Avec Toi », en haut du
+  bandeau depuis toujours, écrit `<div class="mat-title">`. Signalé par le
+  porteur alors que la proposition était d'en ajouter un nouveau — promouvoir
+  l'existant est plus juste et ne coûte rien. Même correctif que `partager.html`
+  en première passe de l'audit.
+
+  ⚠️ **Trois `margin:0` et un `list-style:none` portent tout le rendu.** Un
+  `<h1>` apporte 0,67 em de marge, un `<h2>` 0,83 em, un `<ul>` une marge
+  verticale, 40 px d'indentation et des puces — que les `<div>` n'avaient pas.
+  Sans ces neutralisations posées dans `mat.css` **dans le même commit**,
+  l'accueil se serait décalé partout. Le `<li>` devenant l'élément de grille,
+  `.grid2 > li{display:flex}` et `.card{height:100%}` préservent l'égalité des
+  hauteurs de rangée. C'est le piège des tuiles de la v4.91, en plus large.
+
+  **Vérifié :** la zone de contenu rendue donne la **même empreinte de fichier**
+  qu'avant modification (`230a35590f51e51e…`) et la page fait **1836 px dans les
+  deux cas**.
+
+### Modifié
+- **Pied de page** — seul changement visible de cette version. Sur téléphone, le
+  libellé « MAT · Mézières-lez-Cléry » cède sa place au lien « Plan du site », et
+  les trois liens se centrent sur une ligne. Aucune information perdue : ces deux
+  noms sont exactement le `h1` du bandeau.
+  Mesuré : **88 px avant, 88 px après** en 412 et 360 px de large ; **129 → 111 px**
+  en 320 px, où le libellé passait à la ligne — le pied y est donc **plus court
+  qu'avant**. Aucun débordement horizontal.
+  ⚠️ Une première tentative ajoutait simplement un troisième lien à la suite :
+  elle **faisait déborder le pied de page horizontalement à 320 px**. Réparer un
+  défaut d'accessibilité en en créant un autre — mesuré avant d'être commité.
+  Sur ordinateur, le lien s'ajoute aux liens de pied existants ; le libellé y reste.
+- **Taux de conformité RGAA : 89,2 % → 96,9 %** (63 conformes sur 65 applicables).
+  Mention inchangée : **partiellement conforme** — elle ne change qu'à 100 %.
+  Non-conformités restantes : 7 → **2** (critères 3.2 et 10.5).
+- Audit (§ Septième passe, tableau des 106 critères, décompte, taux), schéma
+  pluriannuel, déclaration publiée dans l'app et `CLAUDE.md` mis en phase.
+
+---
+
 ## [4.92] — 28 août 2026
 
 ### Corrigé
