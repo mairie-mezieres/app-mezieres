@@ -75,7 +75,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
-<script defer src="js/mat-perf.js?v=1.0.8"></script>
+<script defer src="js/mat-perf.js?v=1.0.9"></script>
 <script defer src="js/mat-boot.js?v=4.12.3"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -161,7 +161,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <div class="mat-title">Mézières Avec Toi</div>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.91 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.92 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -489,7 +489,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openBug()">✉️ Contact admin</button>
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.91</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.92</button>
 </div>
 </div>
 </div>
@@ -1782,6 +1782,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 ao&ucirc;t 2026 — v4.92</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le pied de page annon&ccedil;ait &laquo;&nbsp;Accessibilit&eacute;&nbsp;100&nbsp;&raquo; pendant que la d&eacute;claration officielle annon&ccedil;ait 89,2&nbsp;%.</strong> Ces 100 sont le r&eacute;sultat d&rsquo;un contr&ocirc;le automatique, qui ne v&eacute;rifie qu&rsquo;une quarantaine de points sur les 106 du r&eacute;f&eacute;rentiel&nbsp;: ce n&rsquo;est <strong>pas</strong> un taux de conformit&eacute;. Le badge dit maintenant &laquo;&nbsp;Contr&ocirc;le auto&nbsp;100&nbsp;&raquo; et renvoie &agrave; la d&eacute;claration pour le vrai chiffre</li>
+<li>Le taux de conformit&eacute; RGAA reste <strong>89,2&nbsp;%</strong> &mdash; il n&rsquo;a pas boug&eacute;, c&rsquo;est son voisin trompeur qui est corrig&eacute;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 28 ao&ucirc;t 2026 — v4.91</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le formulaire de contact demande maintenant votre e-mail et votre t&eacute;l&eacute;phone s&eacute;par&eacute;ment.</strong> Un seul champ &laquo;&nbsp;t&eacute;l&eacute;phone ou email&nbsp;&raquo; emp&ecirc;chait votre t&eacute;l&eacute;phone de le remplir tout seul. Les deux restent facultatifs, et le bon clavier s&rsquo;ouvre pour chacun</li>

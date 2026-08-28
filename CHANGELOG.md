@@ -5,6 +5,47 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.92] — 28 août 2026
+
+### Corrigé
+- **Le pied de page affichait « ♿ Accessibilité 100 » pendant que la déclaration
+  publiée annonçait 89,2 %.** Deux chiffres contradictoires sous les yeux des
+  habitants, et le plus flatteur des deux n'engageait rien.
+  Le score lui-même est exact — Lighthouse renvoie bien 100 (`data/ecoindex.json`).
+  Ce qui était faux, c'est **l'infobulle** : « Accessibilité Lighthouse :
+  **conformité RGAA/WCAG** — 100/100 ». Lighthouse ne mesure pas la conformité
+  RGAA ; il passe une quarantaine de contrôles automatisables là où le
+  référentiel en compte 106, dont beaucoup ne se mesurent pas sans jugement
+  humain — Lighthouse le dit lui-même.
+  - Libellé : `♿ Accessibilité 100` → **`♿ Contrôle auto 100`**, qui ne se lit
+    plus comme un taux.
+  - Infobulle : dit explicitement que **ce n'est pas** le taux de conformité, et
+    renvoie à la déclaration pour le chiffre officiel.
+  - ⚠️ **Le taux réel n'est PAS recopié dans le pied de page** : il y vivrait en
+    double et divergerait au premier audit. Une seule source, la déclaration.
+  Signalé par le porteur. C'est la même erreur que celle qui a ouvert l'audit
+  d'août 2026, prise par l'autre bout : **prendre un contrôle automatique vert
+  pour une conformité.**
+
+### Ajouté
+- `tests/e2e/badge-perf.spec.js` — verrouille la formulation. Vérifié par
+  sabotage : l'ancienne infobulle remise en place fait rougir le test.
+  Deux pièges rencontrés en l'écrivant, tous deux documentés dans le fichier :
+  - il y a **deux** `.footer-perf` (mobile et ordinateur) dont l'un est replié à
+    0 px ; viser « le premier » et asserter sa visibilité échouait sur une boîte
+    vide — ADR-0030, encore. Le test attend un badge peuplé et vérifie **tous**
+    les exemplaires ;
+  - chercher la sous-chaîne « conformité RGAA » ne marche pas : **le démenti la
+    contient aussi**. Le test vise l'affirmation exacte à interdire, et exige le
+    démenti — un texte qui ne dirait ni l'un ni l'autre échoue également.
+
+### Non modifié
+- **Le taux de conformité RGAA reste 89,2 %** (58 conformes sur 65 applicables).
+  Aucun critère ne change : c'est un affichage trompeur qui est corrigé, pas une
+  mesure.
+
+---
+
 ## [4.91] — 28 août 2026
 
 ### Corrigé

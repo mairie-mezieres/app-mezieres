@@ -294,6 +294,30 @@ vérifié en retirant le `display:block` : il rougit.
 > ne le protège pas. Le chantier reste au plan, et son ampleur y est désormais
 > honnête.
 
+### Le badge du pied de page annonçait 100 (v4.92)
+
+Signalé par le porteur après la publication du taux : le pied de page affichait
+**« ♿ Accessibilité 100 »** — le score Lighthouse — juste à côté d'une déclaration
+annonçant **89,2 %**. L'infobulle allait plus loin et présentait ce score comme la
+**« conformité RGAA/WCAG »**.
+
+Le score est exact ; sa qualification ne l'était pas. **Lighthouse ne mesure pas la
+conformité RGAA** : une quarantaine de contrôles automatisables, contre 106 critères
+dont beaucoup exigent un jugement humain — ce document en donne cinq exemples à la
+cinquième passe. Lighthouse le dit lui-même dans sa documentation.
+
+C'est la même confusion que celle qui a ouvert cet audit, prise par l'autre bout :
+**un contrôle automatique vert n'est pas une conformité.** La première fois, elle
+faisait paraître l'application pire qu'elle n'était ; ici, meilleure.
+
+Corrigé : le badge dit `♿ Contrôle auto 100`, et son infobulle renvoie à la
+déclaration pour le taux officiel. Le taux **n'est pas recopié** dans le pied de
+page — il y vivrait en double et divergerait au premier audit. Verrouillé par
+`tests/e2e/badge-perf.spec.js`, vérifié par sabotage.
+
+**Aucun critère ne change : 89,2 %.** Ce n'était pas une mesure fausse, c'était un
+affichage trompeur.
+
 ---
 
 ## 5. Les 106 critères
