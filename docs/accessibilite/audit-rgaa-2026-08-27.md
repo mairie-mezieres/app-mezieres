@@ -1,7 +1,7 @@
 # Audit RGAA 4.1 — Mézières Avec Toi (MAT)
 
 - **Date de l'audit** : 27 août 2026
-- **Version auditée** : v4.86 → v4.91 (six passes ; le taux publié est celui de la v4.91)
+- **Version auditée** : v4.86 → v4.93 (sept passes ; le taux publié est celui de la v4.93)
 - **Référentiel** : RGAA version 4.1 — 106 critères, 13 thématiques
 - **Réalisé par** : audit interne outillé, commune de Mézières-lez-Cléry
 - **Statut** : **complet** — les 106 critères ont un verdict, aucun n'est laissé
@@ -318,6 +318,71 @@ page — il y vivrait en double et divergerait au premier audit. Verrouillé par
 **Aucun critère ne change : 89,2 %.** Ce n'était pas une mesure fausse, c'était un
 affichage trompeur.
 
+### Septième passe — la structure et le plan du site (v4.93, 28 août 2026)
+
+**9.1 et 9.3 — l'accueil a enfin une structure, et il n'a pas bougé d'un pixel.**
+
+Sur téléphone, l'écran d'accueil ne portait **aucun titre**, d'aucun niveau : la
+navigation par titres, celle qu'utilise toute personne aveugle pour survoler une
+page, ne faisait rien. Les sept intitulés de rubrique étaient des `<div>`, et les
+grilles de tuiles n'étaient pas des listes.
+
+| Élément | Avant | Après |
+|---|---|---|
+| Titre de la page | *aucun* | `<h1>` — **le titre qui était déjà là** |
+| Intitulés de rubrique | 7 × `<div class="sec">` | 7 × `<h2 class="sec">` |
+| Grilles de tuiles | 7 × `<div class="grid2">` | 7 × `<ul>`, 16 tuiles en `<li>` |
+
+> **Le `h1` n'est pas un titre ajouté.** C'est « Mézières Avec Toi », en haut du
+> bandeau depuis toujours, écrit `<div class="mat-title">`. Le porteur l'a fait
+> remarquer alors que ce document proposait d'en ajouter un nouveau : promouvoir
+> l'existant est plus juste, et ne coûte rien. Même correctif que pour
+> `partager.html` en première passe.
+
+⚠️ **Trois `margin:0` et un `list-style:none` portent tout le rendu.** Un `<h1>`
+apporte 0,67 em de marge, un `<h2>` 0,83 em, un `<ul>` une marge verticale, 40 px
+d'indentation et des puces — que les `<div>` n'avaient pas. Sans ces neutralisations
+posées dans le même commit, l'accueil se serait décalé partout. C'est le piège des
+tuiles de la v4.91, en plus large.
+
+**Vérification :** la zone de contenu rendue donne la **même empreinte de fichier**
+qu'avant modification — `230a35590f51e51e…` — et la page fait 1836 px dans les deux
+cas. Les hauteurs de rangées restent égales (le `<li>` devient l'élément de grille,
+d'où `.grid2 > li{display:flex}` et `.card{height:100%}`).
+
+**12.1, 12.3 et 12.4 — un écran « Plan du site ».**
+
+Le `<nav>` de l'application est **masqué sur téléphone** : il n'existait donc qu'un
+seul chemin vers chaque écran, la tuile de l'accueil. Le plan du site apporte le
+second, et satisfait les trois critères d'un coup.
+
+⚠️ **Ses intitulés ne sont écrits nulle part.** Ils sont lus à l'ouverture dans le
+`.panel-title` de chaque écran (`js/mat-plan-site.js`). Une liste recopiée aurait
+divergé au premier intitulé modifié, en silence — la classe d'erreur qui a déjà
+mordu ce dépôt sur les associations, la fibre et l'arbre MEL. Ce qui est déclaré à
+la main, c'est le seul classement par rubrique ; et
+`tests/e2e/plan-du-site.spec.js` **échoue si un écran n'est ni classé ni
+explicitement écarté**, ou si un identifiant classé ne correspond à aucun écran.
+Oublier un écran devient impossible en silence.
+
+> Le test a immédiatement servi : il a rejeté sept identifiants que j'avais devinés
+> au lieu de les relever (`actus` pour `notifs`, `bugs` pour `bug`, `associations`
+> pour `assoc`…). Écrit après coup, il n'aurait rien trouvé.
+
+**Le plan est atteignable depuis le pied de page**, présent sur chaque écran — ce
+qu'exige 12.4. Une tuile d'accueil n'aurait pas suffi : elle disparaît dès qu'on
+ouvre autre chose.
+
+**Ce qui se voit, et c'est tout :** dans le pied de page du téléphone, le libellé
+« MAT · Mézières-lez-Cléry » cède sa place au lien, et les trois liens se centrent
+sur une ligne. Aucune information perdue — ces deux noms sont le `h1` du bandeau.
+Mesuré : **88 px avant, 88 px après** en 412 et 360 px ; **129 → 111 px** en 320 px,
+où le libellé passait à la ligne. Aucun débordement horizontal.
+
+> Une première tentative ajoutait simplement un troisième lien à la suite : elle
+> **faisait déborder le pied de page horizontalement à 320 px**. Réparer un défaut
+> d'accessibilité en en créant un autre ; mesuré avant d'être commité.
+
 ---
 
 ## 5. Les 106 critères
@@ -337,18 +402,18 @@ affichage trompeur.
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
 | **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `C` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 mesuré au validateur du W3C : **33 erreurs** restantes (4 corrigées), trois familles structurelles. |
-| **9. Structuration** (4) | 9.1 `NC` · 9.2 `C` · 9.3 `NC` · 9.4 `NA` | Un seul titre et aucune liste sur l'accueil. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
+| **9. Structuration** (4) | 9.1 `C` · 9.2 `C` · 9.3 `C` · 9.4 `NA` | 9.1 et 9.3 levés en septième passe : le titre du bandeau devient le `h1`, les 7 intitulés de rubrique des `h2`, les 7 grilles de tuiles de vraies listes — à rendu identique. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
 | **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte — chiffre corrigé en sixième passe. |
 | **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `C` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
-| **12. Navigation** (11) | 12.1 `NC` · 12.2 `C` · 12.3 `NC` · 12.4 `NC` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | Manquent un second système de navigation et une page « plan du site ». |
+| **12. Navigation** (11) | 12.1 `C` · 12.2 `C` · 12.3 `C` · 12.4 `C` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | 12.1, 12.3 et 12.4 levés en septième passe : un écran « Plan du site », atteignable depuis le pied de page de chaque écran, qui sert aussi de second système de navigation. |
 | **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `C` · 13.4 `C` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `C` · 13.11 `C` · 13.12 `NA` | 13.3/13.4 : les documents du PLUi sont des exports numériques, non des scans. 13.10 : la carte 3D se pilote entièrement aux boutons (référent). |
 
 ### Décompte
 
 | | Nombre |
 |---|---|
-| Conformes | **58** |
-| Non conformes | **7** |
+| Conformes | **63** |
+| Non conformes | **2** |
 | Non applicables | **41** |
 | Non tranchés | **0** |
 | Total | **106** |
@@ -358,7 +423,7 @@ affichage trompeur.
 Critères applicables : 106 − 41 = **65**. **Aucun critère n'est laissé sans verdict** :
 le taux n'est plus un plancher prudent, c'est la mesure.
 
-> ## Taux de conformité : **89,2 %** (58 sur 65)
+> ## Taux de conformité : **96,9 %** (63 sur 65)
 > ### Mention RGAA : **partiellement conforme**
 
 | Étape | Conformes | Taux |
@@ -368,7 +433,8 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 | Troisième passe | 48 | 73,8 % |
 | Quatrième passe | 51 | 78,5 % (6 critères encore ouverts) |
 | Cinquième passe | 56 | 86,2 % |
-| **Sixième passe** | **58** | **89,2 %** |
+| Sixième passe | 58 | 89,2 % |
+| **Septième passe** | **63** | **96,9 %** |
 | Si tout le plan est traité | 65 | 100 % |
 
 > Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
@@ -376,12 +442,10 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 > il échoue. La quatrième passe l'espérait à 87,7 % ; la mesure dit 86,2 %. C'est la
 > différence entre un pronostic et un audit.
 
-### Les 7 non-conformités restantes
+### Les 2 non-conformités restantes
 
 | Critères | Chantier | Visible à l'écran ? |
 |---|---|---|
-| 9.1, 9.3 | Structurer le contenu par des titres et des listes | **oui** |
-| 12.1, 12.3, 12.4 | Second système de navigation + page « plan du site » | **oui** |
 | 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
 | 10.5 | ≈ 356 emplacements ne posent que le fond **ou** que le texte | non |
 

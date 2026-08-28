@@ -102,7 +102,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .mat-img{width:auto;object-fit:contain;object-position:top;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));cursor:pointer;max-height:138px;}
 .mat-text{flex:1;min-width:0;}
 .mat-badge{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#d8f3dc;margin-bottom:5px;}
-.mat-title{font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
+/* ⚠️ `margin:0` OBLIGATOIRE. C'est le <h1> de l'application depuis la v4.93 :
+   le titre existait déjà à l'écran, il était simplement écrit <div>. Un <h1>
+   apporte une marge par défaut de 0.67em — la retirer est ce qui garde le
+   bandeau identique au pixel près. font-size et font-weight, déjà posés ici,
+   écrasent ceux du h1. */
+.mat-title{margin:0;font-family:'Grape Nuts',cursive;font-size:1.5rem;font-weight:400;font-style:normal;color:var(--cream);line-height:1.2;letter-spacing:0.01em;}
 .mat-sub{font-size:0.75rem;color:rgba(216,243,220,0.65);margin-top:3px;font-family:'Nunito',sans-serif;}
 .mat-version{font-size:0.75rem;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:5px;}
 
@@ -151,7 +156,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
-.sec{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;line-height:1.2;color:var(--muted);padding:9px 2px 6px;}
+/* ⚠️ `margin:0` OBLIGATOIRE, il n'est pas décoratif. Ces intitulés étaient des
+   <div> ; ce sont des <h2> depuis la v4.93 (RGAA 9.1 — sans eux, la navigation
+   par titres est impossible). Un <h2> apporte une marge par défaut de 0.83em
+   que le <div> n'avait pas : la retirer est ce qui garde l'écran au pixel près.
+   Idem pour font-size et font-weight, déjà posés ici, qui écrasent ceux du h2. */
+.sec{margin:0;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;line-height:1.2;color:var(--muted);padding:9px 2px 6px;}
 /* Bandeau « Grand dossier » PLUi-H-D (accueil mobile) — accessible seniors :
    grand texte, fort contraste sur dégradé forêt→feuille, zone tap large. */
 .plui-banner{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;box-sizing:border-box;margin:6px 0 4px;padding:18px 18px 20px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--forest) 0%,var(--leaf) 100%);box-shadow:0 8px 24px rgba(26,61,43,0.28);color:#fff;font-family:'Nunito',sans-serif;text-align:left;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;}
@@ -164,7 +174,15 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .sec:first-child{padding-top:4px;}
 
 /* ── Grille 2 par ligne ── */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:0;}
+/* ⚠️ `list-style:none;padding:0;margin:0` OBLIGATOIRES. Les grilles de tuiles
+   sont des <ul> depuis la v4.93 (RGAA 9.3) : un <ul> apporte des puces, une
+   indentation de 40px et une marge verticale que le <div> n'avait pas. Les
+   retirer est ce qui garde l'accueil identique au pixel près. */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 0 0;margin-bottom:0;list-style:none;padding:0;}
+/* Le <li> est devenu l'élément de grille ; la tuile doit remplir sa case,
+   sinon les rangées perdent leur hauteur égale (cf. tests/e2e/typographie). */
+.grid2 > li{display:flex;min-width:0;}
+.grid2 > li > .card{height:100%;}
 
 /* ── Cartes boutons ── */
 /* ⚠️ Marges horizontales resserrées (14→10 px) et gap icône/texte (11→9 px)
@@ -1679,3 +1697,12 @@ html.theme-sombre .content [role="button"]:focus-visible {
 @media (prefers-reduced-motion:reduce){
   .c3d-fiche{transition:none}
 }
+
+/* ── Plan du site (RGAA 12.1 / 12.3 / 12.4) ─────────────────────────────
+   Un sommaire, pas un second accueil : des liens soulignés, pas des tuiles.
+   Le contenu est posé par js/mat-plan-site.js à l'ouverture. */
+.plan-rubrique{margin:18px 0 6px;font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+.plan-liste{list-style:none;margin:0;padding:0;}
+.plan-liste li{margin:0;}
+.plan-lien{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--leaf);padding:9px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.plan-lien:hover{color:var(--forest);background:var(--mist);}
