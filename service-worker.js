@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.94.0';
+const CACHE = 'mat-v4.95.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -22,10 +22,10 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.13',
+  './css/mat.css?v=4.14.14',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.8',
-  './js/mat-core.js?v=4.3.8'
+  './js/mat-core.js?v=4.3.9'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -33,14 +33,14 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.13',
-  './css/mat-desktop.css?v=4.5.1',
+  './css/mat.css?v=4.14.14',
+  './css/mat-desktop.css?v=4.5.2',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.8',
-  './js/mat-core.js?v=4.3.8',
+  './js/mat-core.js?v=4.3.9',
   './js/mat-accessibility.js?v=4.3.9',
-  './js/mat-widgets.js?v=4.5.3',
+  './js/mat-widgets.js?v=4.5.4',
   './js/mat-ambiance.js?v=1.8.0',
   './js/mat-agenda.js?v=4.3.5',
   './js/mat-forms.js?v=4.6.8',
@@ -48,9 +48,9 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.4.9',
   './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.5.2',
-  './js/mat-boot.js?v=4.12.3',
+  './js/mat-boot.js?v=4.12.4',
   './js/mat-pwa-notif.js?v=4.2.8',
-  './js/mat-dechets-notif.js?v=4.2.9',
+  './js/mat-dechets-notif.js?v=4.3.0',
   './js/mat-jours-feries.js?v=4.2.3',
   './js/mat-sondages.js?v=4.3.1',
   './js/mat-associations.js?v=4.2.4',

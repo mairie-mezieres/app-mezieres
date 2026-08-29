@@ -92,9 +92,12 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .ib-ico{width:40px;height:40px;background:rgba(255,255,255,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .ib-t{flex:1;}
 .ib-title{font-size:0.82rem;font-weight:900;color:#3d2000;}
-.ib-sub{font-size:0.75rem;color:rgba(61,32,0,0.7);}
+/* ⛔ CONTRASTE — opaque : à 70 % ce brun tombait à 3,68:1 sur l'or. */
+.ib-sub{font-size:0.75rem;color:#3d2000;}
 .ib-btn{background:rgba(255,255,255,0.9);color:#3d2000;border:none;border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;cursor:pointer;flex-shrink:0;}
-.ib-x{background:none;border:none;color:rgba(61,32,0,0.4);font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0;}
+/* ⛔ CONTRASTE — la croix de fermeture était à 2,00:1, le pire score de
+   l'accueil. C'est un bouton : il doit se voir. Opaque. */
+.ib-x{background:none;border:none;color:#3d2000;font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0;}
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
@@ -122,37 +125,69 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
    racine, soit 18 px de hauteur de ligne à 12 px de texte — alors que leurs
    voisins immédiats (.top-main, .ct-label) sont à 1.15–1.2. C'est ce qui
    faisait enfler les tuiles de 30 % au passage au plancher de 12 px. */
-.top-title{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;line-height:1.2;color:rgba(255,255,255,.72);}
+/* ⛔ CONTRASTE (RGAA 3.2) — NE PAS ÉCLAIRCIR CES DÉGRADÉS NI RENDRE CES
+   TEXTES SEMI-TRANSPARENTS. Les 35 mesures du bandeau (texte + pastille,
+   mode normal ET mode daltonisme) échouaient toutes avant la v4.95 : la
+   plus basse était le titre de « Prochaine manifestation » à 1,73:1, pour
+   un seuil de 4,5:1. Trois pièges à connaître avant de retoucher :
+   1. un texte en `rgba(255,255,255,.72)` DOIT être composité sur son fond
+      avant comparaison — ce n'est pas du blanc, c'est du gris clair ;
+   2. le contraste se mesure sur TOUT le dégradé, pas à ses deux bouts :
+      l'extrémité claire de #38bdf8 tombait à 1,73:1 ;
+   3. la pastille portait un voile CLAIR (rgba(255,255,255,.16)) qui
+      éclaircissait encore son fond — c'était le point le plus faible de
+      tous. Elle porte désormais un voile SOMBRE, ce qui la sort du
+      chemin critique et évite d'assombrir les quatre dégradés.
+   Valeurs recalculées par balayage sur 201 points. Marge visée : 4,6:1.
+   Voir docs/accessibilite/audit-rgaa-2026-08-27.md § « Huitième passe ». */
+.top-title{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;line-height:1.2;color:#fff;}
 .top-main{font-size:.86rem;font-weight:900;color:var(--cream);line-height:1.15;}
-.top-sub{font-size:0.75rem;color:rgba(255,255,255,.82);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:1px 6px;line-height:1.35;border-radius:999px;font-size:0.75rem;font-weight:900;background:rgba(255,255,255,.16);color:#fff;}
-.top-meteo{background:linear-gradient(135deg,#2563eb,#38bdf8);}
-.top-dechets{background:linear-gradient(135deg,#15803d,#22c55e);}
-.top-mairie{background:linear-gradient(135deg,#7c3aed,#a855f7);}
-.top-event{background:linear-gradient(135deg,#d97706,#f59e0b);}
+.top-sub{font-size:0.75rem;color:#fff;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.top-badge{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:4px;padding:1px 6px;line-height:1.35;border-radius:999px;font-size:0.75rem;font-weight:900;background:rgba(0,0,0,.20);color:#fff;}
+.top-meteo{background:linear-gradient(135deg,#2563eb,#0678aa);}
+.top-dechets{background:linear-gradient(135deg,#15803d,#16813e);}
+.top-mairie{background:linear-gradient(135deg,#7c3aed,#9938f6);}
+.top-event{background:linear-gradient(135deg,#b45309,#a3560a);}
 .meteo-strip,.dechets-strip,.mairie-strip,.event-strip{position:relative;}
 .dechet-row{display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;color:var(--cream);line-height:1.2;}
 .dechet-ico{font-size:.92rem;flex-shrink:0;}
-.dechet-ok{color:#bbf7d0;}
-.dechet-warn{color:#fde68a;}
+/* ⛔ CONTRASTE — ces deux teintes pâles étaient à 3,8-3,9:1 sur le vert.
+   Elles ont été éclaircies juste assez pour passer 4,5:1 tout en gardant
+   leur cast vert / ambré. Ne pas revenir à #bbf7d0 / #fde68a. */
+.dechet-ok{color:#f3fff7;}
+.dechet-warn{color:#fffcf2;}
 .dechet-info{color:var(--cream);}
 .dechet-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .dechet-dot-noir{background:#111;box-shadow:0 0 0 1.5px rgba(255,255,255,0.35);}
 .dechet-dot-jaune{background:#facc15;}
 .dechet-label{font-weight:800;flex:1;}
-.dechet-label-noir{color:#111;}
-.dechet-label-jaune{color:#facc15;}
+/* ⛔ CONTRASTE — ces deux libellés portaient la couleur du bac : #111 sur
+   le vert (3,76:1) et #facc15 (1,49:1). Ils tiraient dans le sens INVERSE
+   des textes blancs du même bandeau — le noir veut un fond clair, le blanc
+   un fond sombre — donc aucun réglage du dégradé ne pouvait satisfaire les
+   deux. Le repère de couleur est passé sur les PASTILLES (.dechet-dot-noir
+   et .dechet-dot-jaune, qui sont du non-texte : seuil 3:1, tenu à 3,11:1),
+   et le libellé dit déjà « Bac noir » / « Bac jaune ». Ne pas recolorer. */
+.dechet-label-noir{color:var(--cream);}
+.dechet-label-jaune{color:var(--cream);}
 .dechet-info-cell{font-size:0.75rem;font-weight:800;color:#fff;white-space:nowrap;}
-.dechet-consigne-pill{display:inline-block;background:rgba(255,255,255,0.92);color:#15803d;border-radius:999px;padding:1px 7px;font-size:0.75rem;font-weight:900;line-height:1.5;white-space:nowrap;}
+/* ⛔ CONTRASTE — fond opaque, pas 0.92 : sous le voile le vert transparaît
+   et fait tomber le texte à 4,49:1 en mode daltonisme. Opaque : 5,02:1. */
+.dechet-consigne-pill{display:inline-block;background:#fff;color:#15803d;border-radius:999px;padding:1px 7px;font-size:0.75rem;font-weight:900;line-height:1.5;white-space:nowrap;}
 .meteo-ico{font-size:1.2rem;flex-shrink:0;}
 .meteo-temp{font-size:.96rem;font-weight:900;color:var(--cream);}
-.meteo-desc{font-size:0.75rem;color:rgba(255,255,255,.88);flex:1;}
-.meteo-alerte{background:rgba(255,255,255,.18);color:#fff;font-size:0.75rem;font-weight:900;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,.18);}
-.meteo-loading{font-size:0.75rem;color:rgba(255,255,255,.72);font-style:italic;}
-.event-date{font-size:0.75rem;font-weight:800;color:#fff7d6;text-transform:uppercase;letter-spacing:.06em;}
+.meteo-desc{font-size:0.75rem;color:#fff;flex:1;}
+/* ⛔ CONTRASTE — voile SOMBRE, comme .top-badge : un voile clair éclaircit
+   le fond sous du texte blanc et le fait chuter sous le seuil. */
+.meteo-alerte{background:rgba(0,0,0,.20);color:#fff;font-size:0.75rem;font-weight:900;padding:2px 6px;border-radius:999px;border:1px solid rgba(255,255,255,.18);}
+.meteo-loading{font-size:0.75rem;color:#fff;font-style:italic;}
+/* ⛔ CONTRASTE — ces deux crèmes chaudes (#fff7d6, #fff2c7) n'atteignaient
+   4,5:1 qu'au prix d'un fond BRUN. Passées en blanc, le bandeau garde un
+   ambre franc (#b45309). Ne pas les retiédir sans réassombrir le fond. */
+.event-date{font-size:0.75rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.06em;}
 .event-name{font-size:0.75rem;font-weight:800;color:var(--cream);line-height:1.2;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.event-days{font-size:0.75rem;color:#fff2c7;margin-top:2px;}
-.event-loading{font-size:0.75rem;color:rgba(255,255,255,.8);font-style:italic;}
+.event-days{font-size:0.75rem;color:#fff;margin-top:2px;}
+.event-loading{font-size:0.75rem;color:#fff;font-style:italic;}
 
 /* ── Contenu ── */
 .content{padding:14px 13px;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));}
@@ -167,7 +202,8 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .plui-banner{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;box-sizing:border-box;margin:6px 0 4px;padding:18px 18px 20px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--forest) 0%,var(--leaf) 100%);box-shadow:0 8px 24px rgba(26,61,43,0.28);color:#fff;font-family:'Nunito',sans-serif;text-align:left;cursor:pointer;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 .plui-banner::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(124,179,66,0.35),transparent 70%);pointer-events:none;}
 .plui-banner:active{transform:scale(0.99);}
-.plui-banner .plui-tag{position:relative;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;background:rgba(255,255,255,0.2);color:#fff;padding:4px 10px;border-radius:999px;margin-bottom:4px;}
+/* ⛔ CONTRASTE — voile sombre : blanc sur voile clair = 4,07:1. */
+.plui-banner .plui-tag{position:relative;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;background:rgba(0,0,0,0.22);color:#fff;padding:4px 10px;border-radius:999px;margin-bottom:4px;}
 .plui-banner .plui-title{position:relative;font-size:1.12rem;font-weight:900;line-height:1.3;}
 .plui-banner .plui-sub{position:relative;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.92);margin-top:2px;}
 .plui-banner .plui-badge{display:none;position:absolute;top:14px;right:14px;align-items:center;justify-content:center;background:#ef4444;color:#fff;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;padding:4px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(239,68,68,0.5);}
@@ -231,7 +267,11 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .panel-hdr{background:linear-gradient(135deg,var(--forest),var(--leaf));padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .panel-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .panel-title{font-family:'Nunito',sans-serif;font-size:0.9rem;color:var(--cream);font-weight:900;flex:1;letter-spacing:0.01em;}
-.panel-close{background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:rgba(255,255,255,0.8);font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+/* ⛔ CONTRASTE — la croix de fermeture est le bouton le plus répété de
+   l'application : présente sur chacun des 29 écrans. À 80 % d'opacité
+   sur un voile CLAIR, elle plafonnait à 3,55:1 — et à 3,38:1 sur les
+   en-têtes colorés. Opaque, sur un voile sombre : ≥ 6,4:1 partout. */
+.panel-close{background:rgba(0,0,0,0.18);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .panel-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
 
 /* ── MEL Chat ── */
@@ -334,7 +374,8 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .notif-title{font-size:0.85rem;font-weight:800;color:var(--text);}
 .notif-sub{font-size:0.7rem;color:var(--muted);margin-top:2px;}
 .notif-btn{color:white;border:none;border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
-.notif-btn.on{background:linear-gradient(135deg,#15803d,#16a34a);}
+/* ⛔ CONTRASTE — blanc sur #16a34a = 3,30:1. */
+.notif-btn.on{background:linear-gradient(135deg,#116a32,#12863d);}
 .notif-btn.off{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;}
 .actu-item{background:white;border-radius:14px;margin-bottom:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .actu-img{width:100%;height:auto;max-height:320px;object-fit:contain;display:block;background:var(--mist);}
@@ -374,7 +415,8 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .contact-title{font-size:0.84rem;font-weight:800;color:var(--text);}
 .contact-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.5;}
 .contact-action{margin-left:auto;align-self:center;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:0.74rem;font-weight:800;cursor:pointer;white-space:nowrap;}
-.contact-action.alt{background:linear-gradient(135deg,#1d4ed8,#3b82f6);}
+/* ⛔ CONTRASTE — blanc sur #3b82f6 = 3,68:1. */
+.contact-action.alt{background:linear-gradient(135deg,#1a45c0,#1a6df4);}
 .contact-note{font-size:0.68rem;color:var(--muted);margin:6px 2px 14px;line-height:1.5;}
 
 /* ── Agenda MAT ── */
@@ -442,7 +484,11 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   gap:4px;
   padding:10px 12px;
   border-radius:14px;
-  background:rgba(255,210,80,.14);
+/* ⛔ CONTRASTE (RGAA 3.2) — voile SOMBRE, pas clair. Un voile clair sur le
+   vert du bandeau remonte le fond juste assez pour faire chuter les textes
+   blancs et les accents pâles sous 4,5:1. La teinte du panneau est portée
+   par le liseré (box-shadow inset), pas par le fond. */
+  background:rgba(70,45,0,.22);
   box-shadow:inset 0 0 0 1px rgba(255,210,80,.28);
   cursor:pointer;
   transition:transform .12s ease, background .12s ease;
@@ -453,17 +499,19 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .fuel-strip:active{ transform:scale(.99); }
 .fuel-strip-head{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
 .fuel-strip-ico{ font-size:.95rem; }
+/* ⛔ CONTRASTE — opaques. À 68 %/65 % ces libellés tombaient à 3,7-3,9:1
+   sur le fond vert du bandeau. Voir l'audit RGAA § « Huitième passe ». */
 .fuel-strip-title{
   font-size:0.75rem;
   font-weight:900;
   text-transform:uppercase;
   letter-spacing:.08em;
-  color:rgba(255,255,255,.68);
+  color:#fff;
 }
 #fuel-prices{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
 .fuel-price-row{
   font-size:0.75rem;
-  color:rgba(255,255,255,.92);
+  color:#fff;
   line-height:1.35;
   white-space:nowrap;
   overflow:hidden;
@@ -501,7 +549,11 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   width:100%;
   padding:10px 12px;
   border-radius:14px;
-  background:rgba(180,210,255,.16);
+/* ⛔ CONTRASTE (RGAA 3.2) — voile SOMBRE, pas clair. Un voile clair sur le
+   vert du bandeau remonte le fond juste assez pour faire chuter les textes
+   blancs et les accents pâles sous 4,5:1. La teinte du panneau est portée
+   par le liseré (box-shadow inset), pas par le fond. */
+  background:rgba(12,40,80,.22);
   box-shadow:inset 0 0 0 1px rgba(180,210,255,.30);
   cursor:pointer;
   transition:transform .12s ease, background .12s ease;
@@ -529,12 +581,14 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 .bus-strip-ico{font-size:.95rem;}
 
+/* ⛔ CONTRASTE — opaques. À 68 %/65 % ces libellés tombaient à 3,7-3,9:1
+   sur le fond vert du bandeau. Voir l'audit RGAA § « Huitième passe ». */
 .bus-strip-title{
   font-size:0.75rem;
   font-weight:900;
   text-transform:uppercase;
   letter-spacing:.08em;
-  color:rgba(255,255,255,.68);
+  color:#fff;
 }
 
 .bus-strip-periode{
@@ -562,7 +616,7 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   flex:1;
   min-width:0;
   font-size:0.75rem;
-  color:rgba(255,255,255,.92);
+  color:#fff;
   line-height:1.35;
   white-space:nowrap;
   overflow:hidden;
@@ -571,19 +625,21 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 
 .bus-stop-name{
   font-size:0.75rem;
-  color:rgba(255,255,255,.68);
+  color:#fff;
   font-weight:800;
   margin-right:4px;
 }
 
+/* ⛔ CONTRASTE — #bfdbfe était à 4,50:1, pile sur le seuil : le moindre
+   ajustement du fond le faisait basculer. #dbeafe garde le bleu à 5,24:1. */
 .bus-next{
   font-weight:900;
-  color:#bfdbfe;
+  color:#dbeafe;
 }
 
 .bus-loading{
   font-size:0.75rem;
-  color:rgba(255,255,255,.65);
+  color:#fff;
   font-style:italic;
 }
 
@@ -688,6 +744,14 @@ html.high-contrast {
 html.high-contrast .header { background: linear-gradient(160deg,#003319,#004d26); }
 html.high-contrast .card   { border: 2px solid #000 !important; }
 html.high-contrast .ct-label { color: #000 !important; font-weight: 900 !important; }
+/* ⛔ CONTRASTE — deux tuiles (« Randonnées », « Événements ») portent un
+   dégradé coloré EN STYLE INLINE. Le mode contraste élevé forçait leur
+   libellé en noir par-dessus : 2,82:1 et 2,84:1, soit moins bien que le
+   thème par défaut. Ce mode veut du noir sur blanc — on le lui donne
+   vraiment, `!important` compris, sinon le style inline gagne. */
+html.high-contrast .card { background: #fff !important; }
+html.high-contrast .ct-sub { color: #000 !important; }
+html.high-contrast .card .ico { background: #e8e8e8 !important; }
 
 /* Grands boutons tactiles */
 html.large-touch .card { padding: 18px 14px !important; min-height: 72px; }
@@ -714,7 +778,8 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 .sv-ligne{
   display:flex;align-items:center;gap:8px;width:100%;
   padding:9px 12px;border:none;border-radius:12px;cursor:pointer;
-  background:rgba(255,255,255,.13);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  /* ⛔ CONTRASTE — voile sombre (cf. .bus-strip). */
+  background:rgba(0,0,0,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
   font-family:'Nunito',sans-serif;color:var(--cream);text-align:left;
   min-height:44px;-webkit-tap-highlight-color:transparent;
 }
@@ -726,7 +791,8 @@ html.line-spacing .contact-sub { line-height: 1.9 !important; }
 .sv-ligne[aria-expanded="true"] .sv-ligne-chev{transform:rotate(90deg);}
 .sv-corps{
   margin-top:6px;padding:12px 14px;border-radius:12px;
-  background:rgba(255,255,255,.13);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  /* ⛔ CONTRASTE — voile sombre (cf. .bus-strip). */
+  background:rgba(0,0,0,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
 }
 .sv-question{font-size:.82rem;font-weight:800;color:var(--cream);line-height:1.5;}
 .sv-choix{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px;}
@@ -757,7 +823,8 @@ html.no-header .sv-bloc{display:none !important;}
 .acc-btn{position:static !important;justify-content:center;min-height:44px;}
 .header-tool-btn,.acc-btn{border:1.5px solid rgba(255,255,255,0.28);border-radius:12px;padding:10px 12px;color:white;font-size:0.75rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.16);font-family:'Nunito',sans-serif;white-space:nowrap;}
 .header-tool-btn{background:linear-gradient(135deg,#b91c1c,#dc2626);border-color:rgba(255,255,255,0.18);}
-.acc-btn{background:rgba(255,255,255,0.18);position:static;margin-left:0;}
+/* ⛔ CONTRASTE — voile sombre (cf. .bus-strip) : blanc sur voile clair = 4,25:1. */
+.acc-btn{background:rgba(0,0,0,0.16);position:static;margin-left:0;}
 .header-tool-btn:hover,.acc-btn:hover{filter:brightness(1.04);}
 .header-tool-btn:active,.acc-btn:active{transform:scale(0.98);}
 @media (max-width:380px){.header-tool-btn,.acc-btn{font-size:0.75rem;padding:9px 8px;gap:4px;}}
@@ -765,12 +832,18 @@ html.no-header .sv-bloc{display:none !important;}
 /* Mode daltonien */
 html.colorblind-mode{
   --forest:#1e3a8a;--leaf:#1d4ed8;--sage:#f59e0b;--mist:#dbeafe;
-  --gold:#f97316;--amber:#fbbf24;
+  /* ⛔ CONTRASTE — le fond --mist passe ici à un bleu clair (#dbeafe) :
+     le gris --muted de la palette par défaut n'y tenait plus que 4,37:1,
+     et le --gold n'y faisait que 4,34:1 sur le bandeau de la carte 3D. */
+  --gold:#fb923c;--amber:#fbbf24;--muted:#4f6459;
 }
 html.colorblind-mode .header{background:linear-gradient(160deg,#1e3a8a,#1d4ed8);}
 html.colorblind-mode .panel-hdr{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);}
-html.colorblind-mode .top-dechets{background:linear-gradient(135deg,#0f766e,#0891b2);}
-html.colorblind-mode .top-mairie{background:linear-gradient(135deg,#7c2d12,#ea580c);}
+/* ⛔ CONTRASTE — mêmes règles que les dégradés d'origine (voir § .top-title).
+   Le mode daltonisme n'est PAS dispensé du seuil 4,5:1 : il échouait sur
+   ses 8 mesures avant la v4.95. */
+html.colorblind-mode .top-dechets{background:linear-gradient(135deg,#0f766e,#077a96);}
+html.colorblind-mode .top-mairie{background:linear-gradient(135deg,#7c2d12,#c2490a);}
 
 /* Overlay accessibilité */
 .acc-option{background:white;border-radius:14px;padding:14px 16px;border:1px solid var(--border);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-bottom:10px;}
@@ -1190,7 +1263,9 @@ html.theme-sombre .mat-modal-btn.secondary{background:#374151;color:#e2e8f0;}
 .trombi-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;}
 .trombi-badge{position:absolute;bottom:0;left:0;right:0;padding:4px 5px;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);font-size:0.48rem;font-weight:900;color:white;text-align:center;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
 .trombi-badge.is-adjoint{background:linear-gradient(to top,rgba(26,61,43,0.85),transparent);}
-.trombi-badge.is-maire{background:linear-gradient(135deg,rgba(180,130,0,0.9),rgba(26,61,43,0.85));}
+/* ⛔ CONTRASTE — l'or à 0,9 d'alpha donnait 3,42:1 pour le libellé blanc,
+   par-dessus une photo dont on ne maîtrise pas la clarté. */
+.trombi-badge.is-maire{background:linear-gradient(135deg,rgba(125,90,0,0.94),rgba(26,61,43,0.9));}
 .trombi-name{font-size:0.6rem;font-weight:800;color:var(--text);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
 html.theme-sombre .trombi-name{color:#f1f5f9;}
 html.theme-sombre .trombi-photo-wrap{box-shadow:0 3px 10px rgba(0,0,0,0.35);}
@@ -1310,8 +1385,9 @@ html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:
   font-weight:900;
 }
 
+/* ⛔ CONTRASTE — #8a6a25 était à 4,01:1 sur l'or pâle de la tuile MEL. */
 .mel-entry .ct-sub{
-  color:#8a6a25;
+  color:#7d5f1e;
 }
 
 .mel-entry .ico{

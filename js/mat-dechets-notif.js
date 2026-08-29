@@ -104,7 +104,7 @@ function _buildTriCard() {
       + '<button onclick="_triToggle(\'' + b.id + '\')" class="tri-bac-btn tri-bac-btn-' + b.id + '" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + b.bg + ';border:none;cursor:pointer;font-family:Nunito,sans-serif;text-align:left">'
       + '<span style="font-size:1rem">' + b.emoji + '</span>'
       + '<span style="flex:1;font-size:0.82rem;font-weight:900;color:var(--text)">' + b.label + ' <span style="font-weight:600;color:var(--muted)">· ' + b.subtitle + '</span></span>'
-      + '<span id="tri-chev-' + b.id + '" style="font-size:0.65rem;color:#94a3b8">▼</span>'
+      + '<span id="tri-chev-' + b.id + '" style="font-size:0.65rem;color:#5b6875">▼</span>'
       + '</button>'
       + '<div id="tri-body-' + b.id + '" class="tri-bac-body" style="display:none;padding:10px 12px;background:var(--card)">'
       + '<ul style="margin:0 0 8px 0;padding-left:18px;list-style:none">';

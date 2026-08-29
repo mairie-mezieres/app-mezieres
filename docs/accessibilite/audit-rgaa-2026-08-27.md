@@ -398,6 +398,118 @@ où le libellé passait à la ligne. Aucun débordement horizontal.
 
 ---
 
+### Huitième passe — 3.2, les contrastes (v4.95, 29 août 2026)
+
+Le critère 3.2 était la plus ancienne non-conformité de cet audit, et la seule
+qui se voyait à l'œil nu. Il restait ouvert parce que personne n'avait de
+chiffre : axe-core range le texte posé sur un dégradé ou une photo dans
+`incomplete`, pas dans `violations`. **136 nœuds indéterminés**, aucun verdict.
+Un rapport « 0 violation » ne disait rien d'eux.
+
+#### Ce qu'il fallait mesurer, et que rien ne mesurait
+
+Trois raisons pour lesquelles ces défauts ont survécu à sept passes :
+
+1. **Un blanc translucide n'est pas du blanc.** `rgba(255,255,255,.72)` doit être
+   composité sur son fond avant comparaison. Relire la feuille de style donne
+   « blanc sur bleu » et rassure ; l'écran affiche du gris clair.
+2. **Un dégradé n'a pas deux couleurs, il en a un continuum.** `#2563eb` passait ;
+   `#38bdf8`, à l'autre extrémité de la **même** carte, tombait à 1,73:1. Ne
+   mesurer que la première couleur déclarée verdit.
+3. **Un voile clair sur fond sombre est un piège.** `rgba(255,255,255,.16)` sous
+   la pastille « Aucune alerte » *éclaircissait* son fond — c'était le point le
+   plus faible de toute l'application, à 1,91:1, et il était invisible dans le
+   code : la couleur du texte y est `#fff`, celle du fond `#fff`, tout paraît
+   cohérent.
+
+#### La méthode
+
+Un balayage écrit pour l'occasion parcourt **tout** le texte peint, reconstruit
+le fond effectif en compositant les couches de l'élément vers la racine,
+échantillonne chaque dégradé sur 201 points, et applique le seuil de la taille
+réelle (4,5:1, ou 3:1 pour les grands textes). Il tourne sur l'accueil **et sur
+les 28 écrans** ouverts par leur propre fonction, dans chacun des rendus livrés.
+
+Deux réglages ont chacun coûté une passe à blanc :
+
+- Écarter « tout ce qui n'a ni lettre ni chiffre » pour ignorer les emoji est
+  **trop large** : `✕`, `→`, `▼` sont du texte ordinaire, peint par `color`.
+  Ce filtre a laissé passer la croix de fermeture de la bannière d'installation
+  à **2,00:1** — et `.panel-close`, présente sur les 29 écrans, à 3,55:1. Seuls
+  les caractères `Extended_Pictographic` échappent à `color`.
+- Sauter les couches semi-transparentes fait mesurer le fond d'un ancêtre
+  lointain et **invente** des défauts (`.c3d-statut`, alpha 0,93) ; s'y arrêter
+  en fait **manquer** de vrais (les panneaux à voile, alpha 0,13 à 0,22). Il
+  faut les compositer.
+
+#### Ce qui a été corrigé
+
+| Zone | Avant | Après |
+|---|---|---|
+| **Les 4 bandeaux de l'accueil** (Mairie, Météo, Déchets, Manifestation) | 18 textes, **0 conforme**, minimum **1,73:1** | 18 sur 18, minimum **4,60:1** |
+| Les mêmes en **mode daltonisme** | 8 mesures, 0 conforme | 8 sur 8 |
+| `.panel-close` — la croix de fermeture, sur les 29 écrans | 3,38 à 3,55:1 | ≥ **6,4:1** |
+| Bannière d'installation (`.ib-sub`, `.ib-x`) | 3,68:1 et **2,00:1** | 6,75:1 |
+| Bandeaux Bus Rémi et Carburant, ligne « Le saviez-vous ? », bouton ♿, étiquette PLUi | 3,7 à 4,4:1 | ≥ 6,1:1 |
+| Tuiles « Randonnées » et « Événements » | 3,12 à 4,23:1 | ≥ 4,63:1 |
+| Boutons « Être alerté », « Ouvrir », badge « ⭐ Maire », en-tête Carburant | 3,19 à 3,68:1 | ≥ 4,60:1 |
+| Mode **contraste élevé** : deux tuiles y étaient **moins** lisibles qu'en mode normal | 2,82 et 2,84:1 | noir sur blanc, ≥ 12:1 |
+| Hero de la mise en page **bureau** (texte sur photographie) | voile de 0,45 à 0,10 | voile calculé pour le **pire cas absolu** |
+
+Deux corrections méritent d'être nommées, parce qu'elles ne sont pas des
+retouches de couleur :
+
+- **Les libellés des bacs.** « Bac noir » était écrit en `#111` et « Bac jaune »
+  en `#facc15`, sur le vert du bandeau — 3,76:1 et **1,49:1**. Ces deux textes
+  tiraient dans le sens **inverse** des textes blancs de la même carte : le noir
+  veut un fond clair, le blanc un fond sombre. Aucun réglage du dégradé ne
+  pouvait satisfaire les deux. Le repère de couleur est donc passé sur les
+  **pastilles rondes** — du non-texte, seuil 3:1, tenu à 3,11:1 — et le libellé,
+  qui dit déjà « Bac noir », est passé en crème.
+- **Le voile des panneaux.** Six panneaux translucides (`.bus-strip`,
+  `.fuel-strip`, `.sv-ligne`, `.sv-corps`, `.acc-btn`, `.plui-tag`) posaient un
+  voile **clair** sur le vert du bandeau. Ils sont passés à un voile **sombre**,
+  la teinte du panneau étant désormais portée par son liseré. C'est le même
+  geste que pour la pastille météo, et il fait gagner deux points de contraste
+  à tous leurs textes d'un coup.
+
+#### Le hero de la mise en page bureau : dimensionner sur le pire cas
+
+Le titre « Bienvenue à Mézières-lez-Cléry » est posé sur une **photographie du
+village**, que la mairie peut remplacer. Dimensionner le voile sur les pixels
+d'aujourd'hui rendrait l'accessibilité otage du prochain changement d'image —
+exactement la classe de régression silencieuse que ce dépôt collectionne. Le
+voile est donc calculé pour le **pire cas absolu**, un pixel blanc sous le
+filtre `brightness(.82)` : à 0,78 d'opacité sur la moitié gauche, le blanc tient
+**7,16:1** et le vert d'eau du nom de la commune **5,58:1**, quelle que soit la
+photo. La moitié droite reste claire.
+
+#### Ce que ça vaut, et ce que ça ne vaut pas
+
+**Ce qui est mesuré à zéro défaut** : l'accueil et les 28 écrans, dans les trois
+rendus livrés par défaut — normal, **daltonisme**, **contraste élevé**.
+
+**Ce qui reste ouvert** : les deux thèmes de couleur optionnels, **« bleu »
+(30 textes)** et **« sombre » (68 textes)**, et la mise en page **bureau** hors
+de son hero (`.d-mel-online` à 2,35:1, entre autres). Ce sont des rendus livrés :
+tant qu'ils échouent, **3.2 reste non conforme**. Le taux ne bouge donc pas —
+mais l'expérience par défaut, elle, a changé.
+
+> ⚠️ **Un contrôle qui ne mesure rien ne rougit pas, il verdit** — sixième
+> occurrence. Le premier test de non-régression écrit pour cette passe est
+> resté **vert** avec `.ib-x` ramené à 2,00:1 : la bannière d'installation ne
+> s'affiche jamais sous Playwright (le navigateur ne propose pas l'installation),
+> donc ses règles ne sont peintes dans aucun test. `contraste-global.spec.js`
+> la déplie maintenant de force. Vérifié par sabotage, comme les six autres.
+
+Deux tests verrouillent la passe, tous deux vérifiés par sabotage :
+`tests/e2e/contraste-bandeaux.spec.js` (les quatre cartes, élément par élément,
+en normal et en daltonisme) et `tests/e2e/contraste-global.spec.js` (le balayage
+générique, sans liste à tenir à jour, dans les trois rendus, bannière
+d'installation dépliée).
+
+---
+
 ## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable
@@ -409,7 +521,7 @@ où le libellé passait à la ligne. Aucun débordement horizontal.
 |---|---|---|
 | **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `C` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. 1.3 tranché par le référent (cinquième passe). |
 | **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
-| **3. Couleurs** (3) | 3.1 `C` · 3.2 `NC` · 3.3 `C` | 3.1 : partout un mot ou un symbole double la couleur (référent). 3.2 : **136 nœuds indéterminés** (texte sur dégradé ou photo). |
+| **3. Couleurs** (3) | 3.1 `C` · 3.2 `NC` · 3.3 `C` | 3.1 : partout un mot ou un symbole double la couleur (référent). 3.2 : les 136 nœuds indéterminés ont été **mesurés** en huitième passe. **Zéro défaut** sur l'accueil et les 28 écrans dans les trois rendus livrés par défaut (normal, daltonisme, contraste élevé) ; il reste **98 textes** dans les deux thèmes optionnels « bleu » et « sombre », plus la mise en page bureau. Tant qu'ils échouent, le critère reste `NC`. |
 | **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
 | **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
@@ -448,6 +560,7 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 | Cinquième passe | 56 | 86,2 % |
 | Sixième passe | 58 | 89,2 % |
 | **Septième passe** | **63** | **96,9 %** |
+| Huitième passe | 63 | 96,9 % — 3.2 largement traité mais **pas** levé (voir ci-dessous) |
 | Si tout le plan est traité | 65 | 100 % |
 
 > Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
@@ -459,7 +572,7 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 
 | Critères | Chantier | Visible à l'écran ? |
 |---|---|---|
-| 3.2 | Lever les 136 contrastes indéterminés | selon les cas |
+| 3.2 | Thèmes optionnels « bleu » (30 textes) et « sombre » (68), et mise en page bureau hors de son hero. Le rendu par défaut est à zéro depuis la v4.95. | oui, mais seulement pour qui a choisi un de ces thèmes |
 | 10.5 | ≈ 356 emplacements ne posent que le fond **ou** que le texte | non |
 
 ## 7. Reproduire cet audit
