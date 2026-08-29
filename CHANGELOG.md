@@ -5,6 +5,64 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.97] — 29 août 2026
+
+### Corrigé
+- **Critère RGAA 10.5 levé — l'application est totalement conforme, 100 %.**
+  C'était la dernière non-conformité, chiffrée par l'audit à « ≈ 356
+  emplacements (91 règles CSS, 265 styles en ligne) qui ne posent que le fond
+  OU que le texte ». **Ce chiffre était faux, et c'est cet audit qui l'avait
+  produit.**
+  Les tests 10.5.1 et 10.5.2 portent une note qui change tout : la couleur
+  manquante peut venir d'un **élément parent**, « au moins par héritage ». Le
+  référentiel n'exige pas que les deux propriétés soient posées sur le même
+  sélecteur. Compter chaque règle posant l'une sans l'autre revenait à compter
+  des centaines de fois un problème qui n'existe presque nulle part : la bonne
+  unité n'est pas la **déclaration**, c'est l'**élément rendu**.
+  Mesuré sur les 29 écrans, dans les deux mises en page : **0** texte sans
+  aucun fond déclaré dans sa chaîne, et **9** dont le fond ne venait que de
+  `body` — les sept intitulés de rubrique de l'accueil (`.sec`), les intitulés
+  de colonne du bureau (`.d-col-titre`) et le message d'attente (`.d-loading`).
+  **Trois règles CSS.** Elles déclarent désormais la couleur RÉELLEMENT peinte
+  derrière elles (`var(--warm)`, qui suit le thème), pas un `transparent` qui
+  satisferait la lettre du critère sans protéger personne.
+- **Le mode daltonisme clignotait à chaque ouverture.** Le script anti-flash en
+  tête d'`index.html` lisait `saved.daltonien` là où l'application écrit
+  `colorblind` : le mode n'était donc JAMAIS appliqué avant le premier rendu, et
+  l'habitant qui l'a choisi voyait la palette verte lui passer sous les yeux à
+  chaque lancement. Il s'appliquait bien ensuite, par `loadAccessibilite()` —
+  c'est ce qui rendait le défaut invisible à la relecture comme aux tests.
+
+### Ajouté
+- `tests/e2e/declarations-couleur.spec.js` — les deux sens du critère, sur les
+  29 écrans : chaque texte peint repose-t-il sur un fond déclaré ? aucun ne
+  dépend-il de `body` (lecture sévère) ? la racine déclare-t-elle bien les deux
+  propriétés, `color` étant héritée ?
+
+### Leçon — un test qu'on ne sait pas faire rougir est un test dont on ne sait rien
+Le contrôle « chaque texte repose sur un fond déclaré » **résiste au sabotage** :
+même en retirant les trois déclarations de fond de `html` et `body` dans la
+feuille de style, la racine en garde une — le script anti-flash pose
+`documentElement.style.background` avant le chargement du CSS.
+
+Plutôt que de garder un test dont la sensibilité n'est pas démontrable, on
+vérifie le **mécanisme** : sur un élément détaché, sans fond nulle part, le
+détecteur doit rendre « aucun » ; sous un parent qui pose un fond, il doit
+s'arrêter à ce parent. C'est un auto-contrôle du détecteur, pas du produit — et
+c'est précisément ce qui manquait aux six contrôles qui ont verdi à tort au fil
+de cet audit. Les deux autres contrôles, eux, ont été mis en défaut par
+sabotage : retirer le fond de `.sec` fait échouer la lecture sévère ; retirer
+celui de `html` et `body` fait échouer 10.5.2.
+
+### Bilan de l'audit
+**106 critères, 41 non applicables, 65 applicables — 65 conformes.** Mention
+**totalement conforme**. Le schéma pluriannuel devient un plan de *maintien*.
+Au passage, cet audit aura vu **six contrôles verdir à tort** et **deux rougir à
+tort** ; chaque passe en documente la cause, parce que c'est la seule chose qui
+empêche le taux de redescendre en silence.
+
+---
+
 ## [4.96] — 29 août 2026
 
 ### Corrigé

@@ -111,7 +111,10 @@
      gauche descendait 344 px plus bas que les deux autres. */
   .content{display:none}
   .d-main-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:1400px;margin:8px auto 24px;padding:0 32px;flex:1}
-  .d-col-titre{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--sage-ink);padding:0 4px 8px;border-bottom:2px solid var(--mist);margin-bottom:14px}
+  /* ⛔ RGAA 10.5 — même raison que `.sec` côté mobile : ces intitulés de
+     colonne étaient les seuls textes du bureau dont le fond ne venait que
+     de `body`. On déclare la couleur réellement peinte, pas `transparent`. */
+  .d-col-titre{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--sage-ink);background:var(--warm);padding:0 4px 8px;border-bottom:2px solid var(--mist);margin-bottom:14px}
 
   /* CARD */
   .d-card{background:#fff;border-radius:18px;border:1px solid var(--border,#e8f0ea);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px rgba(26,61,43,.05)}
@@ -141,7 +144,7 @@
   .d-card-hdr span{font-size:.82rem;font-weight:900;color:var(--forest)}
   .d-card-hdr button{background:none;border:none;color:var(--sage-ink);font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:800;cursor:pointer}
   .d-card-body{padding:12px 16px}
-  .d-loading{font-size:.75rem;color:#666;padding:8px 0;text-align:center}
+  .d-loading{font-size:.75rem;color:#666;background:var(--warm);padding:8px 0;text-align:center}
 
   /* ACTUALITÉS */
   .d-actu-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;align-items:flex-start}

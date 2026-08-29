@@ -114,7 +114,7 @@ le second chemin de navigation qui manquait sur téléphone.
 **Résultat.** Sur 106 critères : **41 non applicables**, donc **65 applicables**.
 Parmi eux, **63 conformes** et **2 non conformes** (état v4.93, 28 août 2026).
 
-> **Taux de conformité : 98,5 %** — mention **partiellement conforme**.
+> **Taux de conformité : 100 %** — mention **totalement conforme**.
 >
 > Ce taux n'est plus un plancher prudent : chaque critère applicable a été instruit
 > jusqu'à un verdict.
@@ -125,6 +125,13 @@ Les six critères ouverts au moment de la quatrième passe ont été traités : 
 conformes, un — la validité du code — a échoué à la mesure et rejoint le plan
 ci-dessous.
 
+> **Mise à jour du 29 août 2026 (v4.97) — l'application est totalement conforme.**
+> Le critère 10.5, dernière non-conformité, était chiffré à « ≈ 356 emplacements ».
+> Ce chiffre comptait des **déclarations** ; le critère se mesure par **élément
+> rendu**, et sa note admet un fond déclaré sur un élément parent. Mesuré sur les
+> 29 écrans : **0** texte sans fond déclaré, **9** dépendant de `body` — trois
+> règles CSS, corrigées. Taux : **100 %**, mention **totalement conforme**.
+>
 > **Mise à jour du 29 août 2026 (v4.96) — le critère 3.2 est levé.** Les 29
 > écrans tiennent le seuil dans les **cinq affichages livrés** (normal,
 > daltonisme, contraste élevé, thème bleu, thème sombre) et dans les deux mises
@@ -140,13 +147,13 @@ ci-dessous.
 > qui n'a rien réglé est désormais conforme, et deux tests de non-régression
 > l'empêchent de repartir.
 
-### La non-conformité restante
+### Aucune non-conformité restante
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
 | 1 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
 
-Traiter ce dernier point porte le taux à **100 %**.
+Les 65 critères applicables sont conformes. Ce plan devient un plan de **maintien**.
 
 ## 6. Années suivantes
 

@@ -33,7 +33,13 @@ var cls = document.documentElement.classList;
 if(saved.theme === 'bleu') cls.add('theme-bleu');
 if(saved.theme === 'sombre') cls.add('theme-sombre');
 if(saved.contrast) cls.add('high-contrast');
-if(saved.daltonien) cls.add('colorblind-mode');
+/* ⛔ La clé est `colorblind` — c'est ce qu'écrit saveAccessibilite().
+   Ce script lisait `daltonien`, qui n'existe nulle part : le mode
+   daltonisme n'était donc JAMAIS appliqué avant le premier rendu, et
+   l'habitant qui l'a choisi voyait la palette verte lui passer sous les
+   yeux à chaque ouverture. Le mode s'appliquait bien ensuite, par
+   loadAccessibilite() — c'est ce qui rendait le défaut invisible. */
+if(saved.colorblind) cls.add('colorblind-mode');
 var bg = '#f4f0ea';
 if(cls.contains('theme-sombre')) bg = '#0f172a';
 else if(cls.contains('theme-bleu')) bg = '#dbeafe';
@@ -43,8 +49,8 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.15">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.5.3">
+<link rel="stylesheet" href="css/mat.css?v=4.14.16">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.5.4">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
      de CSS entre les deux, donc l'ordre de la cascade est INCHANGÉ. -->
@@ -162,7 +168,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.96 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.97 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -491,7 +497,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openAccessibilite()">♿ Accessibilité</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.96</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.97</button>
 </div>
 </div>
 </div>
@@ -671,10 +677,10 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div style="padding:0 14px 14px;font-size:0.8rem;color:var(--text);line-height:1.65">
 <p style="margin:6px 0">La Mairie de Mézières-lez-Cléry s'engage à rendre son application accessible, conformément à l'article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005.</p>
 <p style="margin:10px 0 4px"><strong>État de conformité</strong></p>
-<p style="margin:0 0 6px">L'application MAT est <strong>partiellement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 98,5&nbsp;%</strong> — 64&nbsp;critères conformes sur les 65 qui s'appliquent à elle.</p>
+<p style="margin:0 0 6px">L'application MAT est <strong>totalement conforme</strong> au RGAA (Référentiel Général d'Amélioration de l'Accessibilité, version&nbsp;4.1), avec un <strong>taux de conformité de 100&nbsp;%</strong> — les 65&nbsp;critères qui s'appliquent à elle sont conformes.</p>
 <p style="margin:0 0 6px">L'audit est <strong>terminé</strong>&nbsp;: chacun des 106&nbsp;critères a été instruit jusqu'à un verdict, aucun n'est laissé de côté. Ce taux n'est donc plus une estimation prudente&nbsp;— c'est la mesure.</p>
 <p style="margin:0 0 6px">Un <strong>audit interne des 106&nbsp;critères a été mené le 27&nbsp;août 2026</strong>. Il a corrigé quinze défauts, dont l'absence de nom annoncé sur les douze interrupteurs de cet écran, sur six champs de formulaire et sur les trente fenêtres de l'application&nbsp;; un contraste insuffisant sur le bouton d'appel des pompiers&nbsp;; et des bordures de champs de saisie à peine visibles (1,17 pour un minimum de 3).</p>
-<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>64 conformes</strong> et une seule non-conformité, que le plan d'action ci-dessous traite.</p>
+<p style="margin:0 0 6px">Sur 106&nbsp;critères, <strong>41 ne s'appliquent pas</strong> à cette application (ni vidéo, ni son, ni cadre, ni CAPTCHA). Sur les <strong>65 restants</strong>&nbsp;: <strong>65 conformes</strong>. Aucune non-conformité ne subsiste&nbsp;; le schéma pluriannuel porte désormais sur le <em>maintien</em> de ce taux.</p>
 <p style="margin:10px 0 4px"><strong>Mesures d'accessibilité déjà mises en œuvre</strong></p>
 <ul style="margin:0;padding-left:18px;line-height:1.7">
 <li>Tailles de texte ajustables (normal / agrandi / très agrandi)</li>
@@ -1801,6 +1807,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 ao&ucirc;t 2026 — v4.97</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>L&rsquo;application est <em>totalement conforme</em> au RGAA.</strong> Taux de conformit&eacute;&nbsp;: <strong>98,5&nbsp;% &rarr; 100&nbsp;%</strong>, 65 crit&egrave;res applicables sur 65. La d&eacute;claration d&rsquo;accessibilit&eacute; ci-dessus est &agrave; jour</li>
+<li><strong>Correctif&nbsp;: le mode daltonisme clignotait &agrave; l&rsquo;ouverture.</strong> La palette verte s&rsquo;affichait une fraction de seconde avant que le mode ne s&rsquo;applique, &agrave; chaque lancement. Il s&rsquo;applique maintenant d&egrave;s le premier affichage</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 ao&ucirc;t 2026 — v4.96</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le th&egrave;me sombre affichait du texte invisible.</strong> Sur l&rsquo;&eacute;cran des bus R&eacute;mi, les jours et les arr&ecirc;ts &eacute;taient &eacute;crits en <em>noir sur noir</em>. Idem pour plusieurs encadr&eacute;s des Subventions, du RGPD et de la carte 3D, rest&eacute;s sur fond clair avec du texte clair. Tout est corrig&eacute;</li>
