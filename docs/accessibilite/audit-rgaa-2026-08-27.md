@@ -164,7 +164,7 @@ champ en deux — un changement visible, hors du périmètre de cette passe. Le 
 | **9.2 / 12.6** | **Aucun repère de page.** Un lecteur d'écran devait tout parcourir de haut en bas, sans pouvoir sauter à l'en-tête, au contenu ou au pied. Les pages hors-ligne et architecture n'en avaient aucun. | `role="banner"`, `role="main"`, `role="contentinfo"` posés — **le rôle plutôt que la balise** : `<div>` → `<header>` aurait le même effet, mais imposerait de retrouver la bonne balise fermante dans un gabarit de 560 lignes. Vérifié : un seul repère de chaque type par page. |
 | **10.8** | **Faux positif de la deuxième passe.** J'avais relevé « un conteneur `aria-hidden` contient un élément focusable » à partir d'un comptage qui ne vérifiait pas si le conteneur était affiché. | Mesuré : le conteneur est en `display:none`, son bouton a une boîte de 0 px et n'est pas dans l'ordre de tabulation. Et le script bascule bien `aria-hidden` à `false` quand la fenêtre s'ouvre. **Conforme, sans correctif.** |
 
-**10.5 reste non conforme, et je n'y touche pas.** Des déclarations posent le fond
+**10.5 reste non conforme à ce stade, et je n'y touche pas** *(levé en dixième passe — voir plus bas : le chiffre annoncé ici comptait des déclarations, pas des éléments rendus).* Des déclarations posent le fond
 **ou** la couleur du texte, mais pas les deux. Corriger à l'aveugle ferait courir un
 risque visuel réel pour un bénéfice théorique. Le chantier reste au plan, à traiter
 en regardant chaque cas.
@@ -596,6 +596,83 @@ quatre sabotages de contrôle sont documentés dans le CHANGELOG.
 
 ---
 
+### Dixième passe — 10.5 levé, et une mesure corrigée (v4.97, 29 août 2026)
+
+Le critère 10.5 était la dernière non-conformité, chiffrée par cet audit à
+« **≈ 356 emplacements** (91 règles CSS, 265 styles en ligne) qui ne posent que
+le fond **ou** que le texte ». **Ce chiffre était faux, et c'est cet audit qui
+l'avait produit.**
+
+#### Ce que le critère demande réellement
+
+Les tests 10.5.1 et 10.5.2 sont accompagnés d'une note qui change tout : la
+couleur manquante peut venir d'un **élément parent**, « au moins par héritage ».
+Le référentiel n'exige pas que les deux propriétés soient posées sur le même
+sélecteur.
+
+Compter, dans le code, chaque règle posant l'une sans l'autre revient donc à
+compter des centaines de fois un problème qui n'existe presque nulle part. La
+bonne unité de mesure n'est pas la **déclaration**, c'est l'**élément rendu** :
+pour chaque texte peint, y a-t-il un fond déclaré derrière lui, et une couleur
+déclarée sur lui ou héritée ?
+
+#### La mesure
+
+Sur les 29 écrans, dans les deux mises en page :
+
+| Question | Réponse |
+|---|---|
+| Textes sans **aucun** fond déclaré dans leur chaîne d'ancêtres | **0** |
+| Textes dont le fond ne vient que de `body` (lecture la plus sévère) | **9** |
+| La racine déclare-t-elle couleur **et** fond ? (10.5.2) | oui, `html` et `body` |
+
+Les neuf : les sept intitulés de rubrique de l'accueil (`.sec`) et, côté bureau,
+les intitulés de colonne (`.d-col-titre`) et le message d'attente (`.d-loading`).
+Trois règles CSS. Elles déclarent désormais la couleur **réellement peinte**
+derrière elles — `var(--warm)`, qui suit le thème — et non un `transparent` qui
+satisferait la lettre du critère sans protéger personne.
+
+10.5.2 est satisfait par `html` et `body`, qui déclarent les deux propriétés.
+Ce n'est pas un artifice : `color` **est** une propriété héritée, c'est le
+mécanisme même de CSS. Mais c'est le seul point qui porte tout le critère, donc
+c'est le point à verrouiller — un test le fait.
+
+#### Un test qu'on ne sait pas faire rougir est un test dont on ne sait rien
+
+Le contrôle « chaque texte repose sur un fond déclaré » **résiste au sabotage** :
+même en retirant les trois déclarations de fond de `html` et `body` dans la
+feuille de style, la racine en garde une — un script en tête d'`index.html` pose
+`documentElement.style.background` avant le chargement du CSS, pour éviter le
+flash de palette au démarrage.
+
+Plutôt que de laisser passer un test dont la sensibilité n'est pas démontrable,
+on vérifie le **mécanisme** : sur un élément détaché, sans fond nulle part, le
+détecteur doit rendre « aucun » ; sous un parent qui pose un fond, il doit
+s'arrêter à ce parent. C'est un auto-contrôle du détecteur, pas du produit — et
+c'est précisément ce qui manquait aux six contrôles qui ont verdi à tort dans
+cet audit.
+
+Les deux autres contrôles, eux, ont été mis en défaut par sabotage : retirer le
+fond de `.sec` fait échouer la lecture sévère ; retirer celui de `html` et `body`
+fait échouer 10.5.2.
+
+#### Un défaut trouvé en chemin
+
+Le script anti-flash lisait `saved.daltonien` là où l'application écrit
+`colorblind`. Le mode daltonisme n'était donc **jamais appliqué avant le premier
+rendu** : l'habitant qui l'a choisi voyait la palette verte lui passer sous les
+yeux à chaque ouverture. Le mode s'appliquait bien ensuite, par
+`loadAccessibilite()` — c'est ce qui rendait le défaut invisible à la relecture
+comme aux tests.
+
+#### Résultat
+
+**Les 65 critères applicables sont conformes.** Taux : **100 %**, mention
+**totalement conforme**. Le schéma pluriannuel porte désormais sur le maintien
+de ce taux, plus sur sa conquête.
+
+---
+
 ## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable
@@ -614,7 +691,7 @@ quatre sabotages de contrôle sont documentés dans le CHANGELOG.
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
 | **8. Éléments obligatoires** (10) | 8.1 `C` · 8.2 `C` · 8.3 `C` · 8.4 `C` · 8.5 `C` · 8.6 `C` · 8.7 `NA` · 8.8 `NA` · 8.9 `C` · 8.10 `NA` | 8.2 mesuré au validateur du W3C : **33 erreurs** restantes (4 corrigées), trois familles structurelles. |
 | **9. Structuration** (4) | 9.1 `C` · 9.2 `C` · 9.3 `C` · 9.4 `NA` | 9.1 et 9.3 levés en septième passe : le titre du bandeau devient le `h1`, les 7 intitulés de rubrique des `h2`, les 7 grilles de tuiles de vraies listes — à rendu identique. Repères de page posés : `banner`, `main`, `contentinfo`, `navigation` sur l'accueil ; `main` sur les pages hors-ligne et architecture, qui n'en avaient aucun. |
-| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `NC` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte — chiffre corrigé en sixième passe. |
+| **10. Présentation** (14) | 10.1 `C` · 10.2 `C` · 10.3 `C` · 10.4 `C` · 10.5 `C` · 10.6 `C` · 10.7 `C` · 10.8 `C` · 10.9 `C` · 10.10 `C` · 10.11 `C` · 10.12 `C` · 10.13 `NA` · 10.14 `NA` | 10.5 : levé en dixième passe. Le compte de « ≈ 356 emplacements » comptait des **déclarations** ; le critère se mesure par **élément rendu**, et admet un fond déclaré sur un parent. Mesuré sur les 29 écrans : **0** texte sans fond déclaré, **9** dépendant de `body` — trois règles CSS, corrigées. |
 | **11. Formulaires** (13) | 11.1 `C` · 11.2 `C` · 11.3 `C` · 11.4 `C` · 11.5 `C` · 11.6 `C` · 11.7 `C` · 11.8 `NA` · 11.9 `C` · 11.10 `C` · 11.11 `C` · 11.12 `NA` · 11.13 `C` | 11.13 : le champ e-mail **ou** téléphone n'admet aucun jeton `autocomplete`. |
 | **12. Navigation** (11) | 12.1 `C` · 12.2 `C` · 12.3 `C` · 12.4 `C` · 12.5 `NA` · 12.6 `C` · 12.7 `C` · 12.8 `C` · 12.9 `C` · 12.10 `NA` · 12.11 `NA` | 12.1, 12.3 et 12.4 levés en septième passe : un écran « Plan du site », atteignable depuis le pied de page de chaque écran, qui sert aussi de second système de navigation. |
 | **13. Consultation** (12) | 13.1 `NA` · 13.2 `C` · 13.3 `C` · 13.4 `C` · 13.5 `NA` · 13.6 `NA` · 13.7 `C` · 13.8 `C` · 13.9 `C` · 13.10 `C` · 13.11 `C` · 13.12 `NA` | 13.3/13.4 : les documents du PLUi sont des exports numériques, non des scans. 13.10 : la carte 3D se pilote entièrement aux boutons (référent). |
@@ -623,8 +700,8 @@ quatre sabotages de contrôle sont documentés dans le CHANGELOG.
 
 | | Nombre |
 |---|---|
-| Conformes | **64** |
-| Non conformes | **1** |
+| Conformes | **65** |
+| Non conformes | **0** |
 | Non applicables | **41** |
 | Non tranchés | **0** |
 | Total | **106** |
@@ -634,8 +711,8 @@ quatre sabotages de contrôle sont documentés dans le CHANGELOG.
 Critères applicables : 106 − 41 = **65**. **Aucun critère n'est laissé sans verdict** :
 le taux n'est plus un plancher prudent, c'est la mesure.
 
-> ## Taux de conformité : **98,5 %** (64 sur 65)
-> ### Mention RGAA : **partiellement conforme**
+> ## Taux de conformité : **100 %** (65 sur 65)
+> ### Mention RGAA : **totalement conforme**
 
 | Étape | Conformes | Taux |
 |---|---|---|
@@ -645,21 +722,29 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 | Quatrième passe | 51 | 78,5 % (6 critères encore ouverts) |
 | Cinquième passe | 56 | 86,2 % |
 | Sixième passe | 58 | 89,2 % |
-| **Septième passe** | **63** | **96,9 %** |
+| Septième passe | 63 | 96,9 % |
 | Huitième passe | 63 | 96,9 % — 3.2 largement traité mais **pas** levé |
-| **Neuvième passe** | **64** | **98,5 %** — 3.2 levé |
-| Si tout le plan est traité | 65 | 100 % |
+| Neuvième passe | 64 | 98,5 % — 3.2 levé |
+| **Dixième passe** | **65** | **100 %** — 10.5 levé |
 
 > Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
 > de jugement ont reçu une réponse favorable, le sixième — 8.2 — a été **mesuré** et
 > il échoue. La quatrième passe l'espérait à 87,7 % ; la mesure dit 86,2 %. C'est la
 > différence entre un pronostic et un audit.
 
-### La non-conformité restante
+### Aucune non-conformité restante
 
-| Critères | Chantier | Visible à l'écran ? |
-|---|---|---|
-| 10.5 | ≈ 356 emplacements ne posent que le fond **ou** que le texte | non |
+Les 65 critères applicables sont conformes. Ce qui reste à faire n'est plus un
+rattrapage mais un **maintien** — et le maintien tient à des contrôles qui
+mesurent vraiment quelque chose. Cet audit en a vu **six** verdir à tort et
+**deux** rougir à tort ; chaque passe en documente la cause.
+
+| À surveiller | Où |
+|---|---|
+| Contrastes, 29 écrans × 5 rendus × 2 mises en page | `tests/e2e/contraste-global.spec.js`, `tests/e2e/contraste-bandeaux.spec.js` |
+| Déclarations de couleur et de fond (10.5) | `tests/e2e/declarations-couleur.spec.js` |
+| Validité du code (8.2) | `.github/workflows/validite-html.yml` — ⚠️ ne fait pas échouer le build |
+| Structure, plan du site, clavier, typographie | `plan-du-site`, `accessibilite-clavier`, `typographie` |
 
 ## 7. Reproduire cet audit
 
