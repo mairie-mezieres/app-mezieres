@@ -35,20 +35,14 @@ const EXTERNAL_HOSTS = [
   'tile.openstreetmap.org', 'openstreetmap.org'
 ];
 
-// ⚠️ PÉRIMÈTRE — ce balayage ne couvre que la mise en page MOBILE, celle de
-// la PWA installée et celle qu'a auditée le RGAA. La mise en page BUREAU
-// (les règles `.d-*` de css/mat-desktop.css) est une surface distincte,
-// pas encore traitée : son hero pose du texte sur une PHOTOGRAPHIE, que
-// ce balayage ne sait pas mesurer — la photo est une couche sœur en
-// position absolue, pas un fond d'ancêtre, et l'algorithme conclurait
-// « blanc sur crème » à 1,19:1 alors que le voile assombrit tout.
-// Ce voile est donc dimensionné par le calcul (cf. css/mat-desktop.css,
-// `.d-hero-bg::after`) et non par ce test. Restreindre ici est un choix
-// déclaré, pas un oubli : le jour où le bureau sera traité, retirer ce
-// garde et corriger ce que le balayage remontera.
-// Le basculement se fait à `@media(min-width:1024px)` (css/mat-desktop.css).
-test.skip(({ viewport }) => (viewport ? viewport.width : 1280) >= 1024,
-  'balayage restreint à la mise en page mobile — voir le commentaire ci-dessus');
+// PÉRIMÈTRE — mobile ET bureau, depuis la v4.96. Le hero de la mise en page
+// bureau posait un problème que ce balayage ne sait pas résoudre seul : sa
+// photographie est une couche SŒUR en position absolue, pas un fond
+// d'ancêtre, donc remonter le DOM donne « blanc sur crème », à 1,19:1.
+// La réponse n'est pas d'excepter l'élément — c'est de dire la vérité au
+// contrôle : `.d-hero` porte désormais un `background` égal au pire cas
+// mesuré du voile (#425e50). Il n'est jamais visible, et il rend l'écran
+// mesurable. Voir css/mat-desktop.css.
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('mat_onboarded_v3', '1'));
@@ -72,16 +66,41 @@ const SCAN = () => {
     const n = m[1].split(',').map(Number); return { rgb: n.slice(0, 3), a: n.length > 3 ? n[3] : 1 };
   });
 
+  // ⚠️ Un dégradé ne se mesure pas en entier : il se mesure LÀ OÙ LE TEXTE EST.
+  // Le bandeau d'accueil finit sur un orange de coucher de soleil, mais cet
+  // orange est tout en bas, sous des cartes opaques — aucun texte ne s'y pose
+  // jamais. Mesurer tout le dégradé signalait 4 faux défauts sur le thème
+  // « bleu ». On projette donc le rectangle du texte sur l'axe du dégradé et
+  // on n'échantillonne que cette portion.
+  const angleDeg = (img) => { const m = (img || '').match(/linear-gradient\(\s*(-?[\d.]+)deg/); return m ? parseFloat(m[1]) : 180; };
+  function plage(el, hote, img) {
+    const a = (90 - angleDeg(img)) * Math.PI / 180;   // en CSS, 0deg pointe vers le haut
+    const dx = Math.cos(a), dy = -Math.sin(a);
+    const H = hote.getBoundingClientRect(), E = el.getBoundingClientRect();
+    if (H.width < 1 || H.height < 1) return [0, 1];
+    const L = Math.abs(H.width * dx) + Math.abs(H.height * dy);
+    if (!(L > 0)) return [0, 1];
+    const cx = H.left + H.width / 2, cy = H.top + H.height / 2;
+    let lo = 1, hi = 0;
+    for (const q of [[E.left, E.top], [E.right, E.top], [E.left, E.bottom], [E.right, E.bottom]]) {
+      const t = 0.5 + ((q[0] - cx) * dx + (q[1] - cy) * dy) / L;
+      lo = Math.min(lo, t); hi = Math.max(hi, t);
+    }
+    return [Math.max(0, Math.min(1, lo)), Math.max(0, Math.min(1, hi))];
+  }
+
   function fonds(el) {
     const pile = []; let base = null;
     for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
       const cs = getComputedStyle(n);
       const g = stops(cs.backgroundImage);
       if (g.length >= 2) {
+        const pl = plage(el, n, cs.backgroundImage);
         const ech = [];
-        for (let s = 0; s < g.length - 1; s++) for (let i = 0; i <= 8; i++) {
-          const t = i / 8;
-          ech.push([0, 1, 2].map((k) => g[s].rgb[k] + (g[s + 1].rgb[k] - g[s].rgb[k]) * t));
+        for (let i = 0; i <= 24; i++) {
+          const t = pl[0] + (pl[1] - pl[0]) * (i / 24);
+          const u = t * (g.length - 1), k = Math.min(g.length - 2, Math.floor(u)), f = u - k;
+          ech.push([0, 1, 2].map((j) => g[k].rgb[j] + (g[k + 1].rgb[j] - g[k].rgb[j]) * f));
         }
         base = ech; break;
       }
@@ -148,10 +167,63 @@ test('la bannière d’installation, jamais visible en test, tient aussi le seui
   expect(banniere).toEqual([]);
 });
 
-for (const [nom, classe] of [['par défaut', ''], ['daltonisme', 'colorblind-mode'], ['contraste élevé', 'high-contrast']]) {
+// ── Le balayage qui compte : TOUS les écrans, TOUS les rendus ──────────
+//
+// L'accueil seul ne prouve pas grand-chose. Les défauts les plus graves de
+// la v4.96 étaient ailleurs : l'écran Rémi affichait ses jours et ses arrêts
+// en NOIR SUR NOIR (1,01:1) dans le thème sombre — pas un contraste faible,
+// du texte effacé — et le RGPD, les subventions, la carte 3D portaient des
+// fonds clairs que le thème sombre n'avait jamais atteints.
+//
+// Cause commune : `--forest` et `--leaf` sont des verts foncés dans la
+// palette claire, parfaits en couleur de TEXTE ; le thème sombre les
+// redéfinit en couleurs de FOND. Toute règle qui les employait en texte
+// devenait invisible. Aucun contrôle ne pouvait le voir sans ouvrir les
+// écrans un par un, dans chaque thème.
+test('les 29 écrans tiennent le seuil dans les cinq rendus livrés', async ({ page }) => {
+  test.slow();
+  const ouverts = await page.evaluate(async () => {
+    const ids = Object.keys(PLAN_OUVERTURE);
+    for (const id of ids) { try { _ouvrirEcran(id); } catch (_) { /* l'écran suivant */ } }
+    await new Promise((r) => setTimeout(r, 1500));
+    return ids.length;
+  });
+  expect(ouverts, 'aucun écran ouvert — le balayage ne peut pas conclure').toBeGreaterThan(20);
+
+  const bilan = [];
+  for (const classe of ['', 'colorblind-mode', 'high-contrast', 'theme-bleu', 'theme-sombre']) {
+    await page.evaluate((c) => {
+      const l = document.documentElement.classList;
+      ['colorblind-mode', 'high-contrast', 'theme-bleu', 'theme-sombre'].forEach((x) => l.remove(x));
+      if (c) l.add(c);
+      void document.body.offsetHeight;
+      document.querySelectorAll('*').forEach((o) => { getComputedStyle(o).color; });
+    }, classe);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await page.waitForTimeout(350);
+    const { echecs, mesures } = await page.evaluate(SCAN);
+    expect(mesures, `rendu « ${classe || 'par défaut'} » : aucun texte mesuré`).toBeGreaterThan(200);
+    for (const e of echecs) bilan.push({ rendu: classe || 'par défaut', ...e });
+  }
+  expect(bilan, 'contrastes insuffisants :\n' + JSON.stringify(bilan, null, 2)).toEqual([]);
+});
+
+for (const [nom, classe] of [['par défaut', ''], ['daltonisme', 'colorblind-mode'], ['contraste élevé', 'high-contrast'], ['thème bleu', 'theme-bleu'], ['thème sombre', 'theme-sombre']]) {
   test(`accueil — aucun texte sous le seuil (rendu ${nom})`, async ({ page }) => {
     if (classe) {
-      await page.evaluate((c) => document.documentElement.classList.add(c), classe);
+      // ⚠️ Changer la classe de thème ne suffit pas : sur une page qui porte
+      // déjà plusieurs écrans, Chrome diffère le recalcul et `getComputedStyle`
+      // rend une valeur PÉRIMÉE — l'ancienne palette. Le balayage signalait
+      // ainsi 8 défauts qui n'existaient pas, tous sur des règles de thème
+      // dont on a vérifié qu'elles s'appliquaient bien. Un contrôle ne se
+      // trompe pas qu'en verdissant à tort : il peut aussi rougir à tort, et
+      // faire corriger du code qui n'a rien. On force donc la purge.
+      await page.evaluate((c) => {
+        document.documentElement.classList.add(c);
+        void document.body.offsetHeight;
+        document.querySelectorAll('*').forEach((o) => { getComputedStyle(o).color; });
+      }, classe);
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
       await page.waitForTimeout(250);
     }
     const { echecs, mesures } = await page.evaluate(SCAN);

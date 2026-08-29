@@ -1300,7 +1300,7 @@ function loadRemiDetail() {
     + '<a class="remi-link-btn" href="https://www.remi-centrevaldeloire.fr/se-deplacer/transports-a-la-demande" target="_blank" rel="noopener">Réserver · En savoir plus →</a>'
     + '</div>'
     + '<details style="margin:8px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden">'
-    + '<summary style="cursor:pointer;padding:10px 14px;font-size:.82rem;font-weight:800;color:#1a6b8a;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">'
+    + '<summary class="remi-summary" style="cursor:pointer;padding:10px 14px;font-size:.82rem;font-weight:800;list-style:none;display:flex;align-items:center;gap:6px;user-select:none">'
     + '<span style="font-size:1rem">🗺️</span> Plan de la ligne <span style="margin-left:auto">▼</span>'
     + '</summary>'
     + '<div style="padding:0 12px 12px;display:flex;justify-content:center">'

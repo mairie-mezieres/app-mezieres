@@ -5,6 +5,72 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.96] — 29 août 2026
+
+### Corrigé
+- **Critère RGAA 3.2 levé.** Les 29 écrans tiennent le seuil dans les **cinq
+  rendus livrés** — normal, daltonisme, contraste élevé, thème bleu, thème
+  sombre — et dans les **deux mises en page**, téléphone et ordinateur. Taux
+  de conformité : **96,9 % → 98,5 %**.
+- **Le thème sombre n'affichait pas du texte peu lisible : il ne l'affichait
+  pas.** Sur l'écran des bus Rémi, les jours (« samedi 29 août ») et les noms
+  d'arrêts étaient à **1,01:1** — du noir sur du noir.
+  **Cause structurelle :** `--forest` et `--leaf` sont des verts foncés dans la
+  palette claire, parfaits comme couleur de TEXTE sur du blanc. Le thème sombre
+  les redéfinit en couleurs de FOND (#111827, #1f2937). Toute règle qui les
+  employait en texte devenait invisible dès qu'on activait ce thème. Le miroir
+  existait aussi : des fonds CLAIRS posés en style inline (#f0f8f3, #e8f5e9,
+  `white`) qu'aucune règle de thème ne pouvait atteindre sans `!important`,
+  sous du texte clair, à 1,02:1.
+- **Le thème bleu : 26 textes, un seul jeton.** `--leaf` valait `#2563eb` et
+  servait de couleur de texte sur `--mist` (`#dbeafe`) : 4,24:1. Intitulés,
+  en-têtes de tableau, liens du RGPD, badges de l'écran Rémi — tous dus à cette
+  unique paire. `#1b4fca` les lève d'un coup.
+- **Le bouton « Bloquées » des notifications** (blanc sur `#ef4444`, 3,76:1) et
+  le **hero de la mise en page bureau** passent aussi le seuil.
+- Trois couleurs qui vivaient en style INLINE dans le JS — message d'erreur,
+  lien dépliant de l'écran Rémi, chevron des bacs — passent en **classes**
+  (`.mat-erreur`, `.remi-summary`, `.tri-chev`), pour que les thèmes puissent
+  les reprendre. Une couleur inline est hors de portée de tout thème.
+
+### Ajouté
+- `tests/e2e/contraste-global.spec.js` — un test qui ouvre **les 29 écrans** et
+  balaie **les cinq rendus**. L'accueil seul ne prouvait pas grand-chose : le
+  bouton « Bloquées » n'apparaît que si le navigateur a refusé les
+  notifications, et aucun balayage de l'accueil ne le rencontre.
+
+### Leçon — un contrôle peut aussi rougir à tort
+Les trois quarts du temps de cette version sont partis à poursuivre des défauts
+qui n'existaient pas. Trois défauts de l'outil de mesure, pas du produit :
+
+1. **Un dégradé se mesure là où le texte est, pas sur toute sa longueur.** Le
+   bandeau d'accueil finit sur un orange de coucher de soleil — mais cet orange
+   est tout en bas, SOUS les cartes opaques. Aucun texte ne s'y pose jamais.
+   4 faux défauts sur le thème bleu. Le balayage projette désormais le
+   rectangle du texte sur l'axe du dégradé.
+2. **`getComputedStyle` peut rendre une valeur périmée.** Sur une page portant
+   déjà 29 écrans, changer la classe de thème ne suffit pas : Chrome diffère le
+   recalcul et la mesure lit l'ANCIENNE palette. 8 faux défauts, sur des règles
+   dont on a vérifié — en interrogeant le navigateur règle par règle — qu'elles
+   s'appliquaient correctement. Sans cette vérification, on corrigeait du code
+   qui n'avait rien.
+3. **Un fond invisible peut être la seule façon de dire la vérité.** La photo du
+   hero bureau est une couche SŒUR en position absolue, pas un fond d'ancêtre :
+   remonter le DOM donne « blanc sur crème », à 1,19:1. Excepter l'élément
+   aurait rendu le contrôle aveugle à un vrai défaut futur. `.d-hero` porte donc
+   un `background` égal au pire cas mesuré du voile (`#425e50`) — jamais
+   visible, entièrement recouvert, et qui rend l'écran mesurable.
+
+Quatre sabotages vérifiés : `--leaf` du thème bleu remis à `#2563eb`, les titres
+Rémi rendus au thème sombre, `.d-hero` privé de son fond, le bouton « Bloquées »
+rendu à son rouge clair. Chacun fait échouer la suite.
+
+### Reste ouvert
+Le critère **10.5** (≈ 356 emplacements qui ne posent que le fond **ou** que le
+texte) est la dernière non-conformité. Le traiter porte le taux à **100 %**.
+
+---
+
 ## [4.95] — 29 août 2026
 
 ### Corrigé

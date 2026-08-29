@@ -376,7 +376,10 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .notif-btn{color:white;border:none;border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:800;cursor:pointer;flex-shrink:0;}
 /* ⛔ CONTRASTE — blanc sur #16a34a = 3,30:1. */
 .notif-btn.on{background:linear-gradient(135deg,#116a32,#12863d);}
-.notif-btn.off{background:linear-gradient(135deg,#dc2626,#ef4444);color:white;}
+/* ⛔ CONTRASTE — blanc sur #ef4444 = 3,76:1. Ce bouton n'apparaît que
+   lorsque les notifications sont bloquées : aucun balayage de l'accueil ne
+   le rencontre, seul le parcours des 29 écrans l'a trouvé. */
+.notif-btn.off{background:linear-gradient(135deg,#b71d1d,#e81414);color:white;}
 .actu-item{background:white;border-radius:14px;margin-bottom:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .actu-img{width:100%;height:auto;max-height:320px;object-fit:contain;display:block;background:var(--mist);}
 .actu-body{padding:12px 14px;}
@@ -677,6 +680,13 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 /* ── Overlay Rémi ── */
 .remi-tad-block{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #86efac;border-radius:16px;padding:14px;margin-bottom:4px;box-shadow:var(--shadow);}
 .remi-tad-title{font-size:.9rem;font-weight:900;color:#15803d;margin-bottom:6px;}
+/* ⛔ CONTRASTE — trois couleurs qui vivaient en style INLINE dans le JS et
+   qu'aucun thème ne pouvait donc atteindre : le message d'erreur, le lien
+   dépliant de l'écran Rémi et le chevron des bacs. Passées en classes pour
+   que le thème sombre puisse les reprendre (voir plus bas). */
+.mat-erreur{color:#b91c1c;}
+.remi-summary{color:#1a6b8a;}
+.tri-chev{color:#5b6875;}
 .remi-tad-text{font-size:.76rem;color:var(--muted);line-height:1.5;margin:0 0 8px;}
 .remi-tad-rows{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
 .remi-tad-row{display:flex;align-items:center;gap:10px;padding:6px 10px;background:white;border-radius:10px;border:1px solid #bbf7d0;}
@@ -818,7 +828,8 @@ html.no-header .sv-bloc{display:none !important;}
 
 .header-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .header-tool-btn{border:none;border-radius:12px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:0.76rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;}
-.header-tool-btn.urgent{background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;box-shadow:0 4px 14px rgba(185,28,28,.25);}
+/* ⛔ CONTRASTE — même famille que .notif-btn.off. */
+.header-tool-btn.urgent{background:linear-gradient(135deg,#981717,#e81414);color:#fff;box-shadow:0 4px 14px rgba(185,28,28,.25);}
 .header-tool-btn.urgent:active{transform:scale(.98);}
 .acc-btn{position:static !important;justify-content:center;min-height:44px;}
 .header-tool-btn,.acc-btn{border:1.5px solid rgba(255,255,255,0.28);border-radius:12px;padding:10px 12px;color:white;font-size:0.75rem;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.16);font-family:'Nunito',sans-serif;white-space:nowrap;}
@@ -871,17 +882,25 @@ html.colorblind-mode .top-mairie{background:linear-gradient(135deg,#7c2d12,#c249
 
 /* ── Thèmes de personnalisation ── */
 html.theme-bleu {
-  --forest:#1a3a5c;--leaf:#2563eb;--sage:#38bdf8;--mist:#dbeafe;
-  --gold:#f59e0b;--amber:#fbbf24;
+  /* ⛔ CONTRASTE (RGAA 3.2) — --leaf sert de COULEUR DE TEXTE sur --mist
+     (intitulés, en-têtes de tableau, liens du RGPD…). À #2563eb sur
+     #dbeafe il ne faisait que 4,24:1 : ce thème échouait sur 26 textes,
+     tous dus à cette seule paire de jetons. #1b4fca donne 5,70:1, et
+     6,96:1 pour du blanc quand --leaf sert de fond. --muted hérite
+     sinon du gris de la palette claire, à 4,37:1 sur ce bleu pâle. */
+  --forest:#1a3a5c;--leaf:#1b4fca;--sage:#38bdf8;--mist:#dbeafe;
+  --gold:#f59e0b;--amber:#fbbf24;--muted:#495c51;
 }
 html.theme-bleu .header { background: linear-gradient(160deg,#1a3a5c,#2563eb); }
 html.theme-bleu .panel-hdr { background: linear-gradient(135deg,#1a3a5c,#2563eb); }
 html.theme-bleu .majordome-panel .panel-hdr { background: linear-gradient(135deg,#1a3a5c,#2563eb); }
 
 html.theme-sombre {
+  /* ⛔ CONTRASTE (RGAA 3.2) — --muted était à 4,02:1 sur --mist et 4,49:1
+     sur le bleu nuit des cartes déchets. #adb9c9 : ≥ 5,18:1 partout. */
   --forest:#111827;--leaf:#1f2937;--sage:#6b7280;--sage-ink:#6ee7b7;--mist:#374151;
   --gold:#d4a843;--amber:#f4a261;--warm:#0f172a;--card:#1e293b;
-  --text:#f1f5f9;--muted:#94a3b8;--border:rgba(255,255,255,0.08);--border-champ:rgba(255,255,255,0.5);
+  --text:#f1f5f9;--muted:#adb9c9;--border:rgba(255,255,255,0.08);--border-champ:rgba(255,255,255,0.5);
   --shadow:0 2px 16px rgba(0,0,0,0.4);
 }
 html.theme-sombre body { background: #0f172a; }
@@ -891,10 +910,10 @@ html.theme-sombre .mel-panel { background: #1e293b; }
 html.theme-sombre .panel-hdr { background: linear-gradient(135deg,#111827,#1f2937); }
 html.theme-sombre .msg.bot .bub { background:#2d3748;border-color:rgba(255,255,255,0.1);color:#f1f5f9; }
 html.theme-sombre .cat-btn,html.theme-sombre .idea-input,html.theme-sombre .form-textarea { background:#2d3748;color:#f1f5f9;border-color:rgba(255,255,255,0.1); }
-html.theme-sombre .sug { background:#2d3748;border-color:#6b7280;color:#94a3b8; }
+html.theme-sombre .sug { background:#2d3748;border-color:#6b7280;color:var(--muted); }
 html.theme-sombre .card { background:#1e293b;color:#f1f5f9; }
 html.theme-sombre .card .ct-label { color:#f1f5f9 !important; }
-html.theme-sombre .card .ct-sub { color:#94a3b8 !important; }
+html.theme-sombre .card .ct-sub { color:var(--muted) !important; }
 html.theme-sombre .mbar { background:#1e293b;border-color:rgba(255,255,255,0.1); }
 html.theme-sombre .minp { background:#2d3748;color:#f1f5f9;border-color:rgba(255,255,255,0.1); }
 
@@ -902,46 +921,46 @@ html.theme-sombre .minp { background:#2d3748;color:#f1f5f9;border-color:rgba(255
 html.theme-sombre .panel-body { background:#1e293b; }
 html.theme-sombre .panel-body .agenda-date-badge { background:#374151;color:#e2e8f0; }
 html.theme-sombre .panel-body .agenda-title { color:#f1f5f9; }
-html.theme-sombre .panel-body .agenda-meta { color:#94a3b8; }
+html.theme-sombre .panel-body .agenda-meta { color:var(--muted); }
 html.theme-sombre .panel-body .agenda-month-day { background:#2d3748;border-color:#374151;color:#e2e8f0; }
 html.theme-sombre .panel-body .agenda-month-day.has-event { background:#1e3a5f;border-color:#3b82f6;color:#93c5fd; }
-html.theme-sombre .panel-body .agenda-month-head { background:#374151;color:#94a3b8; }
+html.theme-sombre .panel-body .agenda-month-head { background:#374151;color:var(--muted); }
 html.theme-sombre .panel-body .agenda-month-day.today { outline-color:#f59e0b; }
 html.theme-sombre .panel-body .agenda-item { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .event-detail-card { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .event-detail-title { color:#f1f5f9; }
-html.theme-sombre .panel-body .event-detail-meta { color:#94a3b8; }
+html.theme-sombre .panel-body .event-detail-meta { color:var(--muted); }
 html.theme-sombre .panel-body .event-detail-desc { color:#e2e8f0; }
 html.theme-sombre .actu-btn-like { background:#2d3748;color:#e2e8f0;border-color:#374151; }
 html.theme-sombre .event-btn-rsvp { background:#2d3748;color:#e2e8f0;border-color:#374151; }
 html.theme-sombre .panel-body .contact-card { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .contact-title { color:#f1f5f9; }
-html.theme-sombre .panel-body .contact-sub { color:#94a3b8; }
-html.theme-sombre .panel-body .contact-note { color:#94a3b8; }
+html.theme-sombre .panel-body .contact-sub { color:var(--muted); }
+html.theme-sombre .panel-body .contact-note { color:var(--muted); }
 html.theme-sombre .panel-body .form-label { color:#e2e8f0; }
-html.theme-sombre .panel-body .form-group p { color:#94a3b8; }
-html.theme-sombre .panel-body .rgpd-text { color:#94a3b8; }
+html.theme-sombre .panel-body .form-group p { color:var(--muted); }
+html.theme-sombre .panel-body .rgpd-text { color:var(--muted); }
 html.theme-sombre .panel-body .rgpd-title { color:#93c5fd; }
 html.theme-sombre .panel-body .actu-title { color:#f1f5f9; }
-html.theme-sombre .panel-body .actu-text { color:#94a3b8; }
+html.theme-sombre .panel-body .actu-text { color:var(--muted); }
 html.theme-sombre .panel-body .notif-title { color:#f1f5f9; }
-html.theme-sombre .panel-body .notif-sub { color:#94a3b8; }
+html.theme-sombre .panel-body .notif-sub { color:var(--muted); }
 html.theme-sombre .panel-body .notif-banner { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .idea-card { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .idea-text { color:#f1f5f9; }
 html.theme-sombre .panel-body .idea-form { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .idea-cats button { background:#374151;color:#e2e8f0; }
 html.theme-sombre .panel-body table td { color:#e2e8f0;border-color:#374151; }
-html.theme-sombre .panel-body table th { background:#374151;color:#94a3b8; }
+html.theme-sombre .panel-body table th { background:#374151;color:var(--muted); }
 html.theme-sombre .panel-body .rgpd-contact { background:#1e3a5f;color:#93c5fd; }
 html.theme-sombre .panel-body .acc-option { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .acc-option-label { color:#f1f5f9; }
-html.theme-sombre .panel-body .acc-option-sub { color:#94a3b8; }
+html.theme-sombre .panel-body .acc-option-sub { color:var(--muted); }
 html.theme-sombre .panel-body .acc-preview { background:#374151;color:#e2e8f0; }
 html.theme-sombre .panel-body .acc-size-btn { background:#374151;color:#e2e8f0;border-color:#4b5563; }
 html.theme-sombre .idea-submit { background:linear-gradient(135deg,#92400e,#b45309);color:white; }
 html.theme-sombre .s-title { color:#6ee7b7; }
-html.theme-sombre .s-sub { color:#94a3b8; }
+html.theme-sombre .s-sub { color:var(--muted); }
 
 /* Règles génériques pour tous les overlays avec style inline blanc */
 html.theme-sombre .panel-body div[style*="background:white"],
@@ -950,7 +969,7 @@ html.theme-sombre .panel-body div[style*="background: white"] {
   border-color:#374151 !important;
 }
 html.theme-sombre .panel-body [style*="color:var(--text)"] { color:#f1f5f9 !important; }
-html.theme-sombre .panel-body [style*="color:var(--muted)"] { color:#94a3b8 !important; }
+html.theme-sombre .panel-body [style*="color:var(--muted)"] { color:var(--muted) !important; }
 html.theme-sombre .panel-body [style*="color:var(--leaf)"] { color:#6ee7b7 !important; }
 html.theme-sombre .panel-body [style*="color:var(--forest)"] { color:#6ee7b7 !important; }
 html.theme-sombre .panel-body [style*="color:var(--sage)"] { color:#6ee7b7 !important; }
@@ -973,7 +992,7 @@ html.theme-sombre .panel-body [style*="color:var(--sage-ink)"] { color:#6ee7b7 !
    gagne. Écrit sans le préfixe .leaflet-container, ce correctif est resté
    sans effet (style calculé : text-decoration-line:none, mesuré). */
 .leaflet-container .leaflet-control-attribution a { text-decoration: underline; }
-html.theme-sombre .panel-body p { color:#94a3b8; }
+html.theme-sombre .panel-body p { color:var(--muted); }
 
 
 /* ── Overlay météo premium ── */
@@ -1135,9 +1154,9 @@ html.theme-sombre #suivi-body [style*="font-weight:700;font-size:.82rem"]{color:
 html.theme-sombre .photo-btn { background:#2d3748 !important;border-color:#374151 !important;color:#f1f5f9 !important; }
 /* Météo — colonnes "Prochaines 12 heures" en mode sombre */
 html.theme-sombre .meteo-hour-col{background:linear-gradient(180deg,rgba(37,99,235,.2),rgba(30,41,59,.8)) !important;border-color:rgba(59,130,246,.22) !important;}
-html.theme-sombre .meteo-hour-mm{color:#94a3b8 !important;}
+html.theme-sombre .meteo-hour-mm{color:var(--muted) !important;}
 html.theme-sombre .meteo-hour-wind{color:#cbd5e1 !important;}
-html.theme-sombre .meteo-hour-time{color:#94a3b8 !important;}
+html.theme-sombre .meteo-hour-time{color:var(--muted) !important;}
 /* Météo — écart à la normale en mode sombre. Sans ces règles, le bloc garderait
    son dégradé clair et son texte #4b5563 : gris foncé sur blanc devenu gris
    foncé sur gris foncé, le défaut corrigé en v4.78 sur les titres 🌿 Air. */
@@ -1150,17 +1169,17 @@ html.theme-sombre .meteo-now-norm.tone-froid .meteo-norm-ecart{background:#1e3a5
 html.theme-sombre .meteo-risk-item{background:#2d3748 !important;border-color:#374151 !important;color:#e2e8f0 !important;}
 html.theme-sombre .meteo-risk-calm{background:#1c3526 !important;border-color:#2d5a3d !important;}
 html.theme-sombre .meteo-risk-label{color:#f1f5f9 !important;}
-html.theme-sombre .meteo-risk-when{color:#94a3b8 !important;}
+html.theme-sombre .meteo-risk-when{color:var(--muted) !important;}
 html.theme-sombre .meteo-risk-value{color:#cbd5e1 !important;}
 html.theme-sombre .meteo-risk-gauge{background:rgba(226,232,240,.16) !important;}
 html.theme-sombre .meteo-risk-block{border-top-color:rgba(226,232,240,.14) !important;}
 /* Météo — carte d'alerte en mode sombre (le dégradé de niveau est écrasé par
    le fond sombre de .meteo-card : les gris clairs deviennent illisibles). */
 html.theme-sombre .meteo-alert-text{color:#cbd5e1 !important;}
-html.theme-sombre .meteo-alert-zone{color:#94a3b8 !important;}
+html.theme-sombre .meteo-alert-zone{color:var(--muted) !important;}
 html.theme-sombre .meteo-alert-timeline{background:rgba(255,255,255,.06) !important;border-color:rgba(226,232,240,.14) !important;}
 html.theme-sombre .meteo-alert-countdown{color:#f1f5f9 !important;}
-html.theme-sombre .meteo-alert-bounds{color:#94a3b8 !important;}
+html.theme-sombre .meteo-alert-bounds{color:var(--muted) !important;}
 html.theme-sombre .meteo-alert-bar{background:rgba(226,232,240,.16) !important;}
 /* Météo — carte « Maintenant », bandeau hors ligne, chips et barre soleil */
 html.theme-sombre .meteo-now-stat { background:#2d3748 !important;border-color:#374151 !important; }
@@ -1191,7 +1210,7 @@ html.theme-sombre .actu-title { color:#f1f5f9 !important; }
 html.theme-sombre .actu-text { color:#cbd5e1 !important; }
 html.theme-sombre .actu-event { background:#374151 !important; color:#6ee7b7 !important; }
 html.theme-sombre .actu-date { color:#6b7280 !important; }
-html.theme-sombre .actu-empty { color:#94a3b8; }
+html.theme-sombre .actu-empty { color:var(--muted); }
 html.theme-sombre .panel-body .chart-wrap { background:#2d3748;border-color:#374151; }
 html.theme-sombre .panel-body .actu-fb-link { color:#60a5fa !important; }
 html.theme-sombre .panel-body .actu-detail-card { background:#2d3748;border-color:#374151; }
@@ -1203,7 +1222,7 @@ html.theme-sombre .panel-body .ideas-sort-btn.on { background:#0f766e;border-col
 
 /* Textes génériques dans panel-body */
 html.theme-sombre .panel-body strong { color:#f1f5f9; }
-html.theme-sombre .majordome-text { background:#2d3748;border-color:#374151;color:#94a3b8; }
+html.theme-sombre .majordome-text { background:#2d3748;border-color:#374151;color:var(--muted); }
 html.theme-sombre .majordome-name { color:#6ee7b7; }
 html.theme-sombre .majordome-tagline { color:#6ee7b7; }
 
@@ -1317,6 +1336,51 @@ html.theme-sombre .mel-cat-btn{background:#2d3748;border-color:#374151;color:#e2
 html.theme-sombre .mel-q-btn{background:#2d3748;border-color:#374151;color:#e2e8f0;}
 html.theme-sombre .mel-zone-block{background:#2d3748;}
 html.theme-sombre .mel-addr-input,html.theme-sombre .mel-zone-manual{background:#374151;color:#e2e8f0;border-color:#4b5563;}
+
+/* ⛔ CONTRASTE (RGAA 3.2) — thème sombre : ce que ce thème n'avait jamais
+   assombri. Deux familles de défauts, toutes deux invisibles à la relecture
+   du code, et toutes deux pires qu'un simple manque de contraste :
+
+   1. Des jetons employés comme COULEUR DE TEXTE que ce thème redéfinit en
+      couleur de FOND. `--forest` et `--leaf` sont des verts foncés dans la
+      palette claire — parfaits en texte sur du blanc ; ici ils valent
+      #111827 et #1f2937, soit du noir sur du noir : 1,01:1. Ce n'est pas un
+      contraste faible, c'est du texte effacé. L'écran Rémi affichait ainsi
+      ses jours et ses arrêts en invisible.
+   2. Des fonds CLAIRS posés en style INLINE, qu'aucune règle de thème ne
+      pouvait atteindre sans `!important` : texte clair sur fond clair, à
+      1,02:1. Le sélecteur d'attribut est ici volontaire — il vise la valeur
+      exacte écrite dans index.html, et échouera bruyamment (au balayage) si
+      elle change, là où une classe ajoutée après coup se désynchroniserait
+      en silence.
+
+   Aucune de ces valeurs n'est choisie à l'œil : voir l'audit § « Neuvième
+   passe » et tests/e2e/contraste-global.spec.js, qui balaie les cinq rendus. */
+html.theme-sombre .remi-day-title,
+html.theme-sombre .remi-stop-title{color:var(--text);}
+html.theme-sombre .remi-day-badge,
+html.theme-sombre .c3d-fiche-zone{color:#e2e8f0;}
+html.theme-sombre .remi-tad-block{background:#1e293b;border-color:#2f6f52;}
+html.theme-sombre .c3d-btn{background:rgba(30,41,59,.94);color:var(--text);}
+html.theme-sombre .photo-remove-btn{background:#3b1f22;border-color:rgba(248,113,113,.35);color:#fca5a5;}
+/* Fonds clairs écrits en inline dans index.html (blocs d'information des
+   écrans Subventions, Majordome…). */
+html.theme-sombre [style*="background:#f0f8f3"],
+html.theme-sombre [style*="background:#e8f5e9"],
+html.theme-sombre [style*="background:#f0fdf4"],
+html.theme-sombre [style*="background:white"]{background:#233047 !important;color:var(--text) !important;}
+html.theme-sombre [style*="background:#fff8e1"]{background:#3d3518 !important;color:#fde68a !important;}
+/* Le pied de page est sur --warm (#0f172a) : --sage y tombe à 3,67:1. */
+html.theme-sombre .footer a,
+html.theme-sombre .footer button{color:var(--sage-ink) !important;}
+/* Les deux tuiles « Sorties locales » gardent leur dégradé coloré : leurs
+   libellés doivent rester BLANCS, pas passer au gris atténué du thème. */
+html.theme-sombre .card[style*="linear-gradient"] .ct-label,
+html.theme-sombre .card[style*="linear-gradient"] .ct-sub{color:#fff !important;}
+html.theme-sombre .mat-erreur{color:#fca5a5;}
+html.theme-sombre .remi-summary{color:#7dd3fc;}
+html.theme-sombre .tri-chev{color:var(--muted);}
+html.theme-sombre .remi-tad-title{color:var(--sage-ink);}
 
 /* ══ PLU — Réponses directes ══════════════════════════════════ */
 .mel-plu-answer{margin-top:6px;}
