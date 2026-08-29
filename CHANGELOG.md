@@ -5,6 +5,81 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.95] — 29 août 2026
+
+### Corrigé
+- **Critère RGAA 3.2 — les contrastes.** Le rendu par défaut de l'application
+  passe de **0 texte conforme** sur ses quatre bandeaux d'accueil à **zéro
+  défaut** sur l'accueil et les 28 écrans, dans les trois rendus livrés par
+  défaut (normal, **daltonisme**, **contraste élevé**).
+  **Ce qui échouait**, et pourquoi personne ne le voyait :
+  - `rgba(255,255,255,.72)` **n'est pas du blanc.** Sans compositage sur le
+    fond, la feuille de style dit « blanc sur bleu » et rassure ; l'écran
+    affiche du gris clair. Le titre « Prochaine manifestation » était à
+    **1,73:1** pour un seuil de 4,5.
+  - **Un dégradé n'a pas deux couleurs, il en a un continuum.** `#2563eb`
+    passait ; `#38bdf8`, à l'autre bout de la *même* carte, tombait à 1,73:1.
+  - **Un voile clair sur fond sombre éclaircit.** `rgba(255,255,255,.16)` sous
+    la pastille « Aucune alerte » était le point le plus faible de toute
+    l'application (**1,91:1**) — et invisible dans le code : texte `#fff`,
+    voile `#fff`, tout paraît cohérent. Six autres panneaux avaient le même
+    voile. Ils portent désormais un voile **sombre**, la teinte du panneau
+    étant tenue par son liseré ; deux points de contraste gagnés d'un coup.
+  - **axe-core ne conclut pas** sur du texte posé sur un dégradé : il le range
+    dans `incomplete`. Le rapport « 0 violation » ne disait rien de ces
+    **136 nœuds**.
+- **Les libellés des bacs.** « Bac noir » en `#111` (3,76:1) et « Bac jaune »
+  en `#facc15` (**1,49:1**) tiraient dans le sens **inverse** des textes blancs
+  de la même carte : le noir veut un fond clair, le blanc un fond sombre.
+  Aucun réglage du dégradé ne satisfaisait les deux. Le repère de couleur est
+  passé sur les **pastilles rondes** (non-texte, seuil 3:1, tenu à 3,11:1) ;
+  le libellé, qui dit déjà « Bac noir », est passé en crème.
+- **La croix de fermeture (`.panel-close`), présente sur les 29 écrans**, était
+  à 3,38-3,55:1. Opaque, sur voile sombre : ≥ 6,4:1.
+- **Le mode « contraste élevé » était moins lisible que le mode normal** sur
+  deux tuiles : il forçait leur libellé en noir par-dessus un dégradé coloré
+  posé en style *inline* (2,82:1 et 2,84:1). Il rend maintenant vraiment du
+  noir sur blanc.
+- **Hero de la mise en page bureau** : texte blanc sur une photographie que la
+  mairie peut remplacer. Le voile est dimensionné pour le **pire cas absolu**
+  (un pixel blanc sous `brightness(.82)`) et non sur les pixels d'aujourd'hui —
+  sinon l'accessibilité devient otage du prochain changement d'image. À 0,78
+  sur la moitié gauche : blanc **7,16:1**, vert d'eau **5,58:1**, quelle que
+  soit la photo.
+
+### Ajouté
+- `tests/e2e/contraste-bandeaux.spec.js` — les quatre cartes, élément par
+  élément, en normal **et** en daltonisme : balayage du dégradé sur 51 points,
+  compositage des alphas, seuil 4,5:1. Plus un contrôle que les pastilles de
+  couleur tiennent le seuil non-texte, et un garde-fou de forme contre le
+  retour d'un texte semi-transparent. Cinq sabotages vérifiés.
+- `tests/e2e/contraste-global.spec.js` — le balayage **générique** : tout le
+  texte peint, sans liste d'éléments à tenir à jour, dans les trois rendus.
+  C'est lui qui a trouvé les 15 défauts que personne n'avait listés.
+
+### Leçon — sixième occurrence de « un contrôle qui ne mesure rien verdit »
+Le premier test de non-régression écrit pour cette passe est resté **vert** avec
+`.ib-x` ramené à **2,00:1** : la bannière d'installation ne s'affiche jamais sous
+Playwright — le navigateur n'y propose pas l'installation — donc **ses règles ne
+sont peintes dans aucun test**. `contraste-global.spec.js` la déplie maintenant
+de force, et échoue si elle n'est pas peinte.
+
+Deux réglages du balayage ont chacun coûté une passe à blanc :
+- Écarter « tout ce qui n'a ni lettre ni chiffre » pour ignorer les emoji est
+  **trop large** : `✕`, `→`, `▼` sont du texte ordinaire, peint par `color`.
+  C'est ce filtre qui masquait la croix de la bannière et `.panel-close`.
+- Sauter les couches semi-transparentes fait mesurer le fond d'un ancêtre
+  lointain et **invente** des défauts (`.c3d-statut`, alpha 0,93) ; s'y arrêter
+  en fait **manquer** de vrais (les panneaux à voile). Il faut les compositer.
+
+### Reste ouvert
+Le critère 3.2 **n'est pas levé** : les deux thèmes de couleur optionnels
+« bleu » (30 textes) et « sombre » (68) et la mise en page bureau hors de son
+hero échouent encore. Le taux RGAA reste donc à **96,9 %** — mais ce que voit un
+habitant qui n'a rien réglé est conforme, et deux tests l'empêchent de repartir.
+
+---
+
 ## [4.94] — 28 août 2026
 
 ### Corrigé

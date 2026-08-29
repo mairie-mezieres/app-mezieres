@@ -125,11 +125,19 @@ Les six critères ouverts au moment de la quatrième passe ont été traités : 
 conformes, un — la validité du code — a échoué à la mesure et rejoint le plan
 ci-dessous.
 
+> **Mise à jour du 29 août 2026 (v4.95).** Le chantier 3.2 a été mené sur le rendu
+> par défaut : 18 textes sur 18 dans les quatre bandeaux de l'accueil, la croix de
+> fermeture des 29 écrans, la bannière d'installation, six panneaux translucides,
+> deux tuiles et le hero de la mise en page bureau. Le critère n'est pas levé pour
+> autant — deux thèmes optionnels restent en défaut — mais ce que voit un habitant
+> qui n'a rien réglé est désormais conforme, et deux tests de non-régression
+> l'empêchent de repartir.
+
 ### Les 2 non-conformités restantes
 
 | # | Action | Critères | Visible | Échéance |
 |---|---|---|---|---|
-| 1 | **Lever les 136 contrastes indéterminés** — texte sur dégradé ou sur photo. La plupart sont du texte sur le dégradé du bandeau : un dégradé ayant deux extrémités connues, il suffit de calculer le contraste contre la plus claire. C'est un calcul, pas un jugement. | 3.2 | selon | T1 2027 |
+| 1 | **Contrastes** — les 136 nœuds indéterminés ont été mesurés et traités en v4.95 (huitième passe) : le rendu par défaut, le mode daltonisme et le mode contraste élevé sont à **zéro défaut** sur l'accueil et les 28 écrans. Reste à traiter les deux **thèmes de couleur optionnels** — « bleu » (30 textes) et « sombre » (68) — et la **mise en page bureau** hors de son hero. Ce sont des rendus livrés : tant qu'ils échouent, le critère reste non conforme. | 3.2 | oui, pour qui a choisi un de ces thèmes | T1 2027 |
 | 2 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
 
 Traiter l'ensemble porte le taux à **100 %**.

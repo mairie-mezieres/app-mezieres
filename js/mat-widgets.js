@@ -1162,7 +1162,12 @@ function loadDechets(){
   else if(hP<apF){dOuv=true;dTxt='Déchetterie ouverte — ferme à '+apF+'h';}
   else{dTxt='Déchetterie fermée — ouvre '+(dowP<6?'demain':'lundi')+' à '+matO+'h';}
   const dEl=document.getElementById('dechetterie-text'), dIco=document.getElementById('dech-ico');
-  if(dEl){dEl.textContent=dTxt;dEl.style.color=dOuv?'#86efac':'rgba(216,243,220,0.75)';}
+  // ⛔ CONTRASTE (RGAA 3.2) — un style INLINE écrase la feuille de style :
+  // ces deux teintes échappaient donc à toute relecture de mat.css. Elles
+  // étaient à 3,52:1 (ouverte) et 3,06:1 (fermée) sur le vert du bandeau.
+  // On réutilise les valeurs mesurées de .dechet-ok / .dechet-warn (≥ 4,8:1) ;
+  // le repère vert/ambre reste, doublé par l'icône 🟢/🔴 et par le texte.
+  if(dEl){dEl.textContent=dTxt;dEl.style.color=dOuv?'#f3fff7':'#fffcf2';}
   if(dIco){dIco.textContent=dOuv?'🟢':'🔴';}
 }
 

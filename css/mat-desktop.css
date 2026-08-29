@@ -32,13 +32,22 @@
   .header{display:none}
   .d-hero{display:block;position:relative;height:340px;overflow:hidden}
   .d-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;filter:brightness(.82)}
-  .d-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,61,43,.45) 25%,rgba(26,61,43,.1))}
+  /* ⛔ CONTRASTE (RGAA 3.2) — le voile ne décore pas, il GARANTIT.
+     Le texte du hero est posé sur une photographie que la mairie peut
+     remplacer : dimensionner le voile sur les pixels d'aujourd'hui, c'est
+     rendre l'accessibilité otage du prochain changement d'image. Il est
+     donc calculé pour le pire cas absolu — un pixel BLANC sous le filtre
+     brightness(.82) — et couvre la moitié gauche, là où vit le texte ;
+     la droite (photo + carte météo) reste claire. À .78 : blanc 7,16:1,
+     vert d'eau #a7f3d0 5,58:1, quelle que soit la photo. Ne pas alléger. */
+  .d-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(26,61,43,.78) 0%,rgba(26,61,43,.78) 46%,rgba(26,61,43,.30) 74%,rgba(26,61,43,.10) 100%)}
   .d-hero-inner{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between;gap:32px}
   .d-hero-text{flex:1;max-width:560px}
-  .d-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:.68rem;font-weight:800;color:rgba(255,255,255,.9);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+  /* ⛔ CONTRASTE — voile sombre et texte opaque (cf. .top-badge). */
+  .d-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.18);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:.68rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
   .d-hero-title{font-family:'Playfair Display',Georgia,serif;font-size:2.6rem;font-weight:700;color:#fff;margin:0 0 12px;line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,.3)}
   .d-hero-title em{font-style:italic;color:#a7f3d0}
-  .d-hero-desc{font-size:.88rem;color:rgba(255,255,255,.85);line-height:1.6;margin:0 0 20px}
+  .d-hero-desc{font-size:.88rem;color:#fff;line-height:1.6;margin:0 0 20px}
   .d-hero-btns{display:flex;gap:10px;flex-wrap:wrap}
   .d-btn-primary{background:linear-gradient(135deg,var(--leaf),var(--forest));color:#fff;border:none;border-radius:12px;padding:11px 20px;font-family:'Nunito',sans-serif;font-size:.84rem;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(26,61,43,.4)}
   .d-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,61,43,.5)}

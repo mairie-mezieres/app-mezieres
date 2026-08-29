@@ -512,7 +512,7 @@ function loadTempDocs() {
       + '<div style="font-weight:900;font-size:0.86rem">' + esc(doc.title) + '</div>'
       + (doc.description ? '<div style="font-size:0.73rem;color:var(--muted);margin-top:2px;line-height:1.4">' + esc(doc.description) + '</div>' : '')
       + '</div>'
-      + '<div style="color:var(--sage);font-size:1rem;flex-shrink:0">→</div>'
+      + '<div style="color:var(--sage-ink);font-size:1rem;flex-shrink:0">→</div>'
       + '</a>';
   }).join('');
 }
