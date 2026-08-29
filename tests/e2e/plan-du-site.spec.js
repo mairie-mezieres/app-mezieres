@@ -102,6 +102,144 @@ test('un lien du plan ouvre bien l’écran visé', async ({ page }) => {
   await expect(page.locator('.ov.open .panel-title')).toHaveText(intitule, { timeout: 5000 });
 });
 
+/*
+ * ⛔ LE TEST QUI MANQUAIT EN v4.93, ET QUE LE PORTEUR A DÛ FAIRE À MA PLACE.
+ *
+ * Le test ci-dessus vérifie que l'écran S'OUVRE. Il ne vérifiait pas qu'il se
+ * REMPLIT. Or `openOv(id)` ne pose que la coquille : c'est la fonction dédiée
+ * de chaque écran qui va chercher le contenu (`openConseil()` = `openOv` PUIS
+ * `buildTrombi()`). Le plan appelait `openOv` directement : « Conseil
+ * municipal » et « Je viens d'emménager » s'ouvraient vides, en production.
+ *
+ * Un écran ouvert mais vide passe tous les contrôles de structure. Seule la
+ * vérification du CONTENU l'attrape. Elle porte donc sur TOUS les liens, pas
+ * sur le premier.
+ */
+test('chaque lien du plan ouvre un écran RENSEIGNÉ, pas une coquille vide', async ({ page }) => {
+  await page.evaluate(() => window.openPlanSite());
+  const ids = await page.evaluate(() =>
+    PLAN_RUBRIQUES.flatMap(([, l]) => l).filter((id) => _titreEcran(id)));
+
+  expect(ids.length, 'aucun écran à vérifier : le test ne mesurerait rien').toBeGreaterThan(15);
+
+  const vides = [];
+  for (const id of ids) {
+    await page.evaluate((id) => {
+      document.querySelectorAll('.ov.open').forEach((o) => o.classList.remove('open'));
+      _ouvrirEcran(id);
+    }, id);
+    // Le contenu de certains écrans arrive après un aller-retour réseau coupé
+    // par les tests : on laisse le temps du rendu local, pas celui du réseau.
+    await page.waitForTimeout(500);
+
+    const etat = await page.evaluate((id) => {
+      // ⚠️ On regarde TOUT l'écran, pas `.panel-body` : MEL, la carte 3D et le
+      // majordome ont leur propre gabarit (`mel-panel`, `c3d-panel`,
+      // `majordome-panel`) et n'en ont pas. Une première version de ce test les
+      // déclarait vides à tort — le contrôle doit épouser l'application, pas
+      // l'inverse.
+      const ov = document.getElementById('ov-' + id);
+      if (!ov) return { absent: true };
+      const txt = (ov.textContent || '').replace(/\s+/g, ' ').trim();
+      // On retire le titre et le bouton de fermeture, présents même à vide.
+      const entete = (ov.querySelector('.panel-title') || {}).textContent || '';
+      const utile = txt.replace(entete.trim(), '').replace(/^[✕\s]+/, '').trim();
+      return {
+        elements: ov.querySelectorAll('*').length,
+        utile: utile.length,
+        // Un écran resté sur « Chargement… » n'a jamais reçu son contenu.
+        // À distinguer d'un message d'échec réseau (« Impossible de charger… »),
+        // qui est un état RENDU : les tests tournent sans backend, c'est normal.
+        bloqueSurChargement: /^(chargement|patientez)/i.test(utile) && utile.length < 40
+      };
+    }, id);
+
+    if (etat.absent || etat.bloqueSurChargement || etat.elements < 6) {
+      vides.push(`${id} (${etat.absent ? 'écran absent' :
+        etat.bloqueSurChargement ? 'bloqué sur « Chargement… »' : etat.elements + ' élément(s)'})`);
+    }
+  }
+
+  expect(vides,
+    'écran(s) ouverts VIDES depuis le plan du site — la fonction d’ouverture dédiée '
+    + 'n’a pas été appelée, ou n’est pas déclarée dans PLAN_OUVERTURE')
+    .toEqual([]);
+});
+
+/*
+ * ⛔ LE TEST QUI ATTRAPE VRAIMENT LE BUG DE LA v4.93.
+ *
+ * Le test de contenu ci-dessus ne suffit PAS : vérifié par sabotage, en
+ * remettant `openOv` à la place de la fonction dédiée, il restait VERT. Un
+ * écran non rempli garde son gabarit — en-tête, message d'accueil — et
+ * franchit n'importe quel seuil de « nombre d'éléments ». « Conseil
+ * municipal » vide affiche encore sa consigne « Cliquez sur une photo ».
+ *
+ * Ce test-ci ne mesure pas le résultat, il vérifie LE CONTRAT : la fonction
+ * d'ouverture déclarée est-elle réellement appelée, avec ses arguments ?
+ * C'est la question à laquelle la v4.93 répondait non.
+ */
+test('_ouvrirEcran appelle bien la fonction dédiée de chaque écran', async ({ page }) => {
+  const bilan = await page.evaluate(() => {
+    const ids = PLAN_RUBRIQUES.flatMap(([, l]) => l).filter((id) => _titreEcran(id));
+    const jamaisAppelees = [];
+    const mauvaisArguments = [];
+
+    for (const id of ids) {
+      const decl = PLAN_OUVERTURE[id];
+      if (!decl) continue;                       // null = openOv suffit, assumé
+      const nom = Array.isArray(decl) ? decl[0] : decl;
+      const attendus = Array.isArray(decl) ? decl.slice(1) : [];
+
+      const vraie = window[nom];
+      let appels = 0, recus = null;
+      window[nom] = function () { appels++; recus = [...arguments]; };
+      try { _ouvrirEcran(id); } catch (_) { /* peu importe : on compte l’appel */ }
+      window[nom] = vraie;                       // on remet toujours la vraie
+
+      if (!appels) { jamaisAppelees.push(`${id} → ${nom}`); continue; }
+      if (JSON.stringify(recus) !== JSON.stringify(attendus)) {
+        mauvaisArguments.push(`${id} → ${nom}(${JSON.stringify(recus)}) au lieu de ${JSON.stringify(attendus)}`);
+      }
+    }
+    return { total: ids.length, jamaisAppelees, mauvaisArguments };
+  });
+
+  expect(bilan.total, 'aucun écran vérifié : le test ne mesurerait rien').toBeGreaterThan(15);
+  expect(bilan.jamaisAppelees,
+    'fonction(s) d’ouverture JAMAIS appelée(s) : l’écran s’ouvrira vide, comme en v4.93')
+    .toEqual([]);
+  expect(bilan.mauvaisArguments,
+    'fonction(s) appelée(s) avec les mauvais arguments — openSuivi() sans type reste sur « Chargement… »')
+    .toEqual([]);
+});
+
+test('chaque écran du plan a une fonction d’ouverture déclarée et existante', async ({ page }) => {
+  const bilan = await page.evaluate(() => {
+    const ids = PLAN_RUBRIQUES.flatMap(([, l]) => l).filter((id) => _titreEcran(id));
+    return {
+      total: ids.length,
+      // null est une déclaration valide : « pas de fonction dédiée, openOv suffit ».
+      nonDeclares: ids.filter((id) => !(id in PLAN_OUVERTURE)),
+      // Une déclaration vaut un nom de fonction, ou un tableau
+      // [nom, ...arguments] quand la fonction en attend.
+      introuvables: ids.filter((id) => {
+        const d = PLAN_OUVERTURE[id];
+        if (!d) return false;                 // null = openOv suffit
+        const n = Array.isArray(d) ? d[0] : d;
+        return typeof window[n] !== 'function';
+      })
+    };
+  });
+  expect(bilan.total).toBeGreaterThan(15);
+  expect(bilan.nonDeclares,
+    'écran(s) sans entrée dans PLAN_OUVERTURE : ajoutez le nom de la fonction, '
+    + 'ou `null` si openOv suffit').toEqual([]);
+  expect(bilan.introuvables,
+    'fonction(s) d’ouverture déclarée(s) mais inexistante(s) : faute de frappe, '
+    + 'ou fonction renommée').toEqual([]);
+});
+
 test('le plan est atteignable depuis le pied de page (12.4)', async ({ page }) => {
   // Le pied de page est présent sur chaque écran : c'est ce qui satisfait
   // « de manière identique depuis chaque page ».
