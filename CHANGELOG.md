@@ -5,6 +5,46 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.98] — 29 août 2026
+
+### Ajouté
+- **La mention « Accessibilité : totalement conforme » en pied de page**, sur
+  chaque écran, dans les deux mises en page (mobile et bureau — le pied de page
+  bureau *remplace* celui du mobile à partir de 1024 px, la mention doit donc
+  exister aux deux endroits). Un clic ouvre la déclaration, **dépliée**.
+  Ce n'est pas une décoration : le **décret n° 2019-768** impose cette mention
+  sur la page d'accueil, atteignable depuis chaque page. Elle vivait jusqu'ici à
+  trois clics, repliée dans l'écran ♿ Personnalisation — l'application était
+  donc conforme à 100 % **sans le dire là où le droit l'exige**.
+  Le libellé est celui du décret, pas une reformulation.
+- `tests/e2e/mention-accessibilite.spec.js`.
+
+### Ce que le test garde vraiment
+Pas « la mention existe » — **que la mention et la déclaration ne divergent
+pas.** Le jour où le taux redescend, la déclaration changera ; la mention, écrite
+en dur dans `index.html`, resterait « totalement conforme » sans que rien ne
+bronche. Un pied de page qui ment sur la conformité est pire que pas de mention
+du tout : c'est une affirmation publique fausse, sur un point de droit. Le test
+lit le niveau dans les deux endroits et refuse qu'ils diffèrent.
+
+Il vérifie aussi que la mention **déplie** la déclaration. L'écran Accessibilité
+est monté paresseusement (`data-lazy-ov`) : `#decl-a11y` n'existe pas avant
+l'ouverture. Une version naïve ouvrait donc l'écran sans déplier ce que la
+mention annonce — et un contrôle qui se contente de « l'écran s'ouvre » ne
+l'aurait jamais vu.
+
+Trois sabotages vérifiés : mention passée à « partiellement conforme » alors que
+la déclaration dit 100 % → rouge ; mention retirée du pied mobile → rouge ;
+mention qui ouvre l'écran sans déplier → rouge.
+
+### Mesuré
+Aucun débordement horizontal de 320 à 1440 px — le pied mobile passe de 108 à
+131 px à 320 px, la mention prenant sa propre ligne. C'est le même piège qu'en
+v4.93, où l'ajout d'un troisième lien avait fait déborder le pied de page à
+320 px : réparer un défaut d'accessibilité en en créant un autre.
+
+---
+
 ## [4.97] — 29 août 2026
 
 ### Corrigé
