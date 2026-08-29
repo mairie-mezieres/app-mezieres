@@ -72,7 +72,7 @@ document.documentElement.style.background = bg;
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.8"></script>
 <script defer src="js/mat-core.js?v=4.3.9"></script>
-<script defer src="js/mat-accessibility.js?v=4.3.9"></script>
+<script defer src="js/mat-accessibility.js?v=4.3.10"></script>
 <script defer src="js/mat-widgets.js?v=4.5.5"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.5"></script>
@@ -168,7 +168,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.97 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.98 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -494,10 +494,13 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <a href="https://www.facebook.com/groups/icimezieres" target="_blank" rel="noopener noreferrer" title="Groupe Facebook « Ici c'est Mézières ! »">🏘️ Communauté</a>
 <button onclick="openRgpd()">🔒 RGPD</button>
 <button onclick="openBug()">✉️ Contact admin</button>
-<button onclick="openAccessibilite()">♿ Accessibilité</button>
+<!-- ⛔ MENTION OBLIGATOIRE (décret n° 2019-768) — ce pied de page REMPLACE
+     celui du mobile à partir de 1024 px : la mention doit exister aux deux
+     endroits, sinon elle disparaît pour qui consulte depuis un ordinateur. -->
+<button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.97</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.98</button>
 </div>
 </div>
 </div>
@@ -672,7 +675,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <button class="submit-btn" style="margin-top:6px;background:linear-gradient(135deg,#dc2626,#b91c1c)" onclick="clearCacheAndReload()">
 🗑️ Vider le cache &amp; recharger
 </button>
-<details style="margin-top:18px;border:1px solid var(--border);border-radius:12px;padding:0;overflow:hidden;background:var(--warm)">
+<details id="decl-a11y" style="margin-top:18px;border:1px solid var(--border);border-radius:12px;padding:0;overflow:hidden;background:var(--warm)">
 <summary style="cursor:pointer;padding:12px 14px;font-weight:800;font-size:0.82rem;color:var(--forest);list-style:none">📄 Déclaration d'accessibilité (RGAA)</summary>
 <div style="padding:0 14px 14px;font-size:0.8rem;color:var(--text);line-height:1.65">
 <p style="margin:6px 0">La Mairie de Mézières-lez-Cléry s'engage à rendre son application accessible, conformément à l'article 47 de la loi n°&nbsp;2005-102 du 11&nbsp;février&nbsp;2005.</p>
@@ -724,6 +727,15 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <button onclick="openPlanSite()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🗺️ Plan du site</button>
 <a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;letter-spacing:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
 <button onclick="openRgpd()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🔒 RGPD</button>
+<!-- ⛔ MENTION OBLIGATOIRE — décret n° 2019-768, art. 3 : la mention
+     « Accessibilité : totalement conforme » doit figurer sur la page d'accueil
+     et rester atteignable depuis chaque page. Ce pied de page est présent sur
+     tous les écrans : c'est ce qui satisfait le « depuis chaque page ».
+     Le libellé est celui du décret — ne pas le reformuler. S'il change de
+     valeur (partiellement / non conforme), il doit changer ICI aussi, en même
+     temps que la déclaration : tests/e2e/mention-accessibilite.spec.js refuse
+     que les deux divergent. -->
+<button onclick="openDeclarationA11y()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 </div>
 </div>
 <div id="footer-perf" class="footer-perf"></div>
@@ -1807,6 +1819,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 ao&ucirc;t 2026 — v4.98</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>La mention &laquo;&nbsp;Accessibilit&eacute;&nbsp;: totalement conforme&nbsp;&raquo; appara&icirc;t d&eacute;sormais en pied de page</strong>, sur chaque &eacute;cran. Un clic ouvre la d&eacute;claration compl&egrave;te. C&rsquo;est une mention <strong>obligatoire</strong> (d&eacute;cret n&deg;&nbsp;2019-768)&nbsp;: elle &eacute;tait jusqu&rsquo;ici &agrave; trois clics, repli&eacute;e dans l&rsquo;&eacute;cran Personnalisation</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 ao&ucirc;t 2026 — v4.97</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>L&rsquo;application est <em>totalement conforme</em> au RGAA.</strong> Taux de conformit&eacute;&nbsp;: <strong>98,5&nbsp;% &rarr; 100&nbsp;%</strong>, 65 crit&egrave;res applicables sur 65. La d&eacute;claration d&rsquo;accessibilit&eacute; ci-dessus est &agrave; jour</li>

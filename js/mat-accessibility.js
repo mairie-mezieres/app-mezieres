@@ -183,6 +183,26 @@ function openAccessibilite() {
   try { if (typeof checkNotifToggles === 'function') checkNotifToggles(); } catch(_) {}
 }
 
+/* Ouvre l'écran Accessibilité ET déplie la déclaration, depuis la mention
+   obligatoire du pied de page (décret n° 2019-768).
+   ⚠️ Le contenu de cet écran est monté paresseusement (`data-lazy-ov`) :
+   `#decl-a11y` n'existe PAS avant l'appel à openAccessibilite(). D'où la
+   recherche APRÈS ouverture, et une seconde tentative à la frame suivante —
+   sans quoi la mention ouvrirait l'écran sans jamais déplier ce qu'elle
+   annonce, et le seul contrôle possible serait « l'écran s'ouvre », qui ne
+   prouve rien. */
+function openDeclarationA11y() {
+  openAccessibilite();
+  const deplier = () => {
+    const d = document.getElementById('decl-a11y');
+    if (!d) return false;
+    d.open = true;
+    d.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    return true;
+  };
+  if (!deplier()) requestAnimationFrame(() => { requestAnimationFrame(deplier); });
+}
+
 function resetAccessibilite() {
   applyFontSize('normal', false);
   applyContrast(false, false);

@@ -739,8 +739,18 @@ rattrapage mais un **maintien** — et le maintien tient à des contrôles qui
 mesurent vraiment quelque chose. Cet audit en a vu **six** verdir à tort et
 **deux** rougir à tort ; chaque passe en documente la cause.
 
+> **La conformité doit aussi se DIRE.** Le décret n° 2019-768 impose que la
+> mention « Accessibilité : totalement conforme » figure sur la page d'accueil
+> et reste atteignable depuis chaque page. Elle vivait à trois clics, repliée
+> dans l'écran ♿ Personnalisation : l'application était conforme à 100 % **sans
+> le dire là où le droit l'exige**. Depuis la v4.98, elle est en pied de page,
+> sur chaque écran, dans les deux mises en page — et un test refuse qu'elle
+> diverge de la déclaration, parce qu'un pied de page qui ment sur la
+> conformité est pire que pas de mention du tout.
+
 | À surveiller | Où |
 |---|---|
+| La mention obligatoire, et sa cohérence avec la déclaration | `tests/e2e/mention-accessibilite.spec.js` |
 | Contrastes, 29 écrans × 5 rendus × 2 mises en page | `tests/e2e/contraste-global.spec.js`, `tests/e2e/contraste-bandeaux.spec.js` |
 | Déclarations de couleur et de fond (10.5) | `tests/e2e/declarations-couleur.spec.js` |
 | Validité du code (8.2) | `.github/workflows/validite-html.yml` — ⚠️ ne fait pas échouer le build |
