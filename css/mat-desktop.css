@@ -30,7 +30,14 @@
 
   /* HERO */
   .header{display:none}
-  .d-hero{display:block;position:relative;height:340px;overflow:hidden}
+  /* ⛔ CONTRASTE (RGAA 3.2) — ce fond n'est JAMAIS visible : .d-hero-bg le
+     recouvre entièrement (photo + voile). Il est là pour dire la vérité aux
+     contrôles : la photo est une couche SŒUR en position absolue, donc un
+     balayage qui remonte les ancêtres ne la voit pas et conclut « blanc sur
+     crème », à 1,19:1. #425e50 est la couleur mesurée du pire cas réel —
+     le voile à 0,78 sur un pixel blanc. Le retirer ne changera rien à
+     l'écran et fera rougir le balayage à tort. */
+  .d-hero{display:block;position:relative;height:340px;overflow:hidden;background:#425e50}
   .d-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;filter:brightness(.82)}
   /* ⛔ CONTRASTE (RGAA 3.2) — le voile ne décore pas, il GARANTIT.
      Le texte du hero est posé sur une photographie que la mairie peut
@@ -203,7 +210,8 @@
   .d-mel-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#f8fdf9,#f0f8f3);border-bottom:1px solid var(--border,#e8f0ea)}
   .d-mel-img{width:38px;height:38px;border-radius:10px;object-fit:contain}
   .d-mel-name{font-size:.82rem;font-weight:900;color:var(--forest)}
-  .d-mel-online{font-size:.68rem;font-weight:700;color:#10b981;margin-left:6px}
+  /* ⛔ CONTRASTE — #10b981 ne faisait que 2,39:1 sur la carte de MEL. */
+  .d-mel-online{font-size:.68rem;font-weight:700;color:#097552;margin-left:6px}
   .d-mel-sub{font-size:.68rem;color:var(--sage-ink);margin-top:1px}
   .d-mel-bubble{background:#f0f8f3;border-radius:12px;margin:12px 16px;padding:10px 12px;font-size:.78rem;color:var(--forest);line-height:1.5}
   .d-mel-cats{display:flex;flex-wrap:wrap;gap:6px;padding:4px 16px 10px}

@@ -134,7 +134,7 @@ async function loadPhotos() {
     // Toutes les photos sont désormais considérées comme vues.
     localStorage.setItem(_PHOTOS_SEEN_KEY, String(_allPhotos.length));
   } catch(_) {
-    list.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#b91c1c">Impossible de charger les photos.</div>';
+    list.innerHTML = '<div class="mat-erreur" style="grid-column:1/-1;text-align:center;padding:24px">Impossible de charger les photos.</div>';
   }
 }
 
