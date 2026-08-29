@@ -65,6 +65,16 @@ Quatre sabotages vérifiés : `--leaf` du thème bleu remis à `#2563eb`, les ti
 Rémi rendus au thème sombre, `.d-hero` privé de son fond, le bouton « Bloquées »
 rendu à son rouge clair. Chacun fait échouer la suite.
 
+**Et une cinquième fois la même leçon, en CI.** La première version de ce test
+basculait la classe de thème sur une page déjà peinte, puis forçait la purge du
+style. Cela suffisait sur une machine de développement et **pas sur le runner de
+CI**, plus lent : le test est passé rouge à sa première exécution distante, sur
+les mêmes faux défauts. Un test à moitié déterministe est un test qui ment une
+fois sur deux. Chaque rendu est désormais mesuré sur une **page rechargée dans
+ce rendu**, le réglage écrit dans `mat_accessibility` — exactement comme un
+habitant qui a choisi son thème. Trois exécutions consécutives, deux sabotages
+re-vérifiés.
+
 ### Reste ouvert
 Le critère **10.5** (≈ 356 emplacements qui ne posent que le fond **ou** que le
 texte) est la dernière non-conformité. Le traiter porte le taux à **100 %**.

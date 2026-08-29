@@ -180,52 +180,70 @@ test('la bannière d’installation, jamais visible en test, tient aussi le seui
 // redéfinit en couleurs de FOND. Toute règle qui les employait en texte
 // devenait invisible. Aucun contrôle ne pouvait le voir sans ouvrir les
 // écrans un par un, dans chaque thème.
+//
+// ⛔ CHAQUE RENDU EST MESURÉ SUR UNE PAGE CHARGÉE DANS CE RENDU — jamais en
+// basculant une classe sur une page déjà peinte. La première version faisait
+// l'inverse, et `getComputedStyle` lui rendait une valeur PÉRIMÉE : sur une
+// page portant 29 écrans, Chrome diffère le recalcul. Elle signalait 8
+// défauts qui n'existaient pas — vérifié en interrogeant le navigateur règle
+// par règle : les règles de thème s'appliquaient parfaitement. Forcer la
+// purge du style suffisait sur une machine de développement et PAS sur le
+// runner de CI, plus lent : le test est passé rouge à la première exécution
+// distante. Un test à moitié déterministe est un test qui ment une fois sur
+// deux. On recharge donc la page, avec le réglage écrit dans `mat_accessibility`,
+// exactement comme un habitant qui a choisi son thème.
+const RENDUS = [
+  ['par défaut',      {}],
+  ['daltonisme',      { colorblind: true }],
+  ['contraste élevé', { contrast: true }],
+  ['thème bleu',      { theme: 'bleu' }],
+  ['thème sombre',    { theme: 'sombre' }]
+];
+
+async function chargerDans(page, reglages) {
+  await page.addInitScript((r) => {
+    localStorage.setItem('mat_onboarded_v3', '1');
+    localStorage.setItem('mat_accessibility', JSON.stringify(r));
+  }, reglages);
+  await page.goto('/');
+  await page.waitForSelector('body.app-ready', { timeout: 15000 });
+  await page.waitForTimeout(600);
+}
+
 test('les 29 écrans tiennent le seuil dans les cinq rendus livrés', async ({ page }) => {
   test.slow();
-  const ouverts = await page.evaluate(async () => {
-    const ids = Object.keys(PLAN_OUVERTURE);
-    for (const id of ids) { try { _ouvrirEcran(id); } catch (_) { /* l'écran suivant */ } }
-    await new Promise((r) => setTimeout(r, 1500));
-    return ids.length;
-  });
-  expect(ouverts, 'aucun écran ouvert — le balayage ne peut pas conclure').toBeGreaterThan(20);
-
   const bilan = [];
-  for (const classe of ['', 'colorblind-mode', 'high-contrast', 'theme-bleu', 'theme-sombre']) {
-    await page.evaluate((c) => {
-      const l = document.documentElement.classList;
-      ['colorblind-mode', 'high-contrast', 'theme-bleu', 'theme-sombre'].forEach((x) => l.remove(x));
-      if (c) l.add(c);
-      void document.body.offsetHeight;
-      document.querySelectorAll('*').forEach((o) => { getComputedStyle(o).color; });
-    }, classe);
-    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-    await page.waitForTimeout(350);
+  for (const [nom, reglages] of RENDUS) {
+    await chargerDans(page, reglages);
+
+    // Le rendu doit être RÉELLEMENT actif : sans cette vérification, un
+    // réglage mal nommé ferait mesurer cinq fois le thème par défaut et
+    // conclure que tout va bien.
+    const actif = await page.evaluate(() => document.documentElement.className);
+    const attendu = reglages.theme === 'sombre' ? 'theme-sombre'
+      : reglages.theme === 'bleu' ? 'theme-bleu'
+      : reglages.colorblind ? 'colorblind-mode'
+      : reglages.contrast ? 'high-contrast' : null;
+    if (attendu) expect(actif, `rendu « ${nom} » : la classe ${attendu} n’est pas appliquée`).toContain(attendu);
+
+    const ouverts = await page.evaluate(async () => {
+      const ids = Object.keys(PLAN_OUVERTURE);
+      for (const id of ids) { try { _ouvrirEcran(id); } catch (_) { /* l’écran suivant */ } }
+      await new Promise((r) => setTimeout(r, 1500));
+      return ids.length;
+    });
+    expect(ouverts, `rendu « ${nom} » : aucun écran ouvert`).toBeGreaterThan(20);
+
     const { echecs, mesures } = await page.evaluate(SCAN);
-    expect(mesures, `rendu « ${classe || 'par défaut'} » : aucun texte mesuré`).toBeGreaterThan(200);
-    for (const e of echecs) bilan.push({ rendu: classe || 'par défaut', ...e });
+    expect(mesures, `rendu « ${nom} » : aucun texte mesuré`).toBeGreaterThan(200);
+    for (const e of echecs) bilan.push({ rendu: nom, ...e });
   }
   expect(bilan, 'contrastes insuffisants :\n' + JSON.stringify(bilan, null, 2)).toEqual([]);
 });
 
-for (const [nom, classe] of [['par défaut', ''], ['daltonisme', 'colorblind-mode'], ['contraste élevé', 'high-contrast'], ['thème bleu', 'theme-bleu'], ['thème sombre', 'theme-sombre']]) {
+for (const [nom, reglages] of RENDUS) {
   test(`accueil — aucun texte sous le seuil (rendu ${nom})`, async ({ page }) => {
-    if (classe) {
-      // ⚠️ Changer la classe de thème ne suffit pas : sur une page qui porte
-      // déjà plusieurs écrans, Chrome diffère le recalcul et `getComputedStyle`
-      // rend une valeur PÉRIMÉE — l'ancienne palette. Le balayage signalait
-      // ainsi 8 défauts qui n'existaient pas, tous sur des règles de thème
-      // dont on a vérifié qu'elles s'appliquaient bien. Un contrôle ne se
-      // trompe pas qu'en verdissant à tort : il peut aussi rougir à tort, et
-      // faire corriger du code qui n'a rien. On force donc la purge.
-      await page.evaluate((c) => {
-        document.documentElement.classList.add(c);
-        void document.body.offsetHeight;
-        document.querySelectorAll('*').forEach((o) => { getComputedStyle(o).color; });
-      }, classe);
-      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-      await page.waitForTimeout(250);
-    }
+    await chargerDans(page, reglages);
     const { echecs, mesures } = await page.evaluate(SCAN);
     // ⚠️ Un balayage qui ne mesure rien ne rougit pas : il verdit. Le
     // garde-fou est ici, pas dans le nombre d'échecs.

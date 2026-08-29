@@ -557,8 +557,15 @@ découvert en poursuivant un défaut qui n'existait pas :
    signalés sur des règles dont on a vérifié, en interrogeant le navigateur
    règle par règle, qu'elles s'appliquaient correctement. **Un contrôle ne se
    trompe pas qu'en verdissant à tort — il peut aussi rougir à tort**, et faire
-   corriger du code qui n'a rien. Le balayage force désormais la purge du style
-   avant toute mesure.
+   corriger du code qui n'a rien.
+   Forcer la purge du style a suffi en local et **pas sur le runner de CI**,
+   plus lent : le test est repassé rouge à sa première exécution distante, sur
+   les mêmes faux défauts. Un test à moitié déterministe est un test qui ment
+   une fois sur deux. Chaque rendu est donc mesuré sur une **page rechargée
+   dans ce rendu**, le réglage écrit dans `mat_accessibility` — comme un
+   habitant qui a choisi son thème. Le test vérifie en outre que la classe
+   attendue est bien appliquée : sans cela, un réglage mal nommé ferait mesurer
+   cinq fois le thème par défaut et conclure que tout va bien.
 3. **Un fond invisible peut être la seule façon de dire la vérité.** La photo du
    hero bureau est une couche **sœur** en position absolue, pas un fond
    d'ancêtre : remonter le DOM donne « blanc sur crème », à 1,19:1. Excepter
