@@ -10,6 +10,11 @@ let dp = null;
 function isStandaloneMode(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
+// Publiée explicitement : mat-pwa-notif.js est injecté dynamiquement par
+// mat-boot.js et s'exécute donc dans un contexte où l'on ne peut pas tenir
+// pour acquis que ce fichier a bien été chargé (cache partiel, coupure
+// réseau sur ce seul .js). Voir le repli de checkFirstStandaloneRun.
+window.isStandaloneMode = isStandaloneMode;
 
 function shouldHideInstallBanner(){
   if(isStandaloneMode()) return true;

@@ -19,7 +19,14 @@ function fmtShort(d){
   if(isNaN(dt.getTime()))return '';
   return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
 }
+// Écart en jours de calendrier — source unique : matDaysUntil (mat-utils.js).
+// La copie locale est conservée en repli au cas où mat-utils.js manquerait ;
+// elle doit rester STRICTEMENT identique (minuit local des deux côtés,
+// Math.round pour les journées de 23 h/25 h). C'est la divergence entre les
+// deux implémentations qui avait laissé le mobile annoncer « Demain » pour un
+// événement du jour alors que le bureau disait juste.
 function daysUntil(d){
+  if(typeof matDaysUntil==='function') return matDaysUntil(d);
   var now=new Date(); now.setHours(0,0,0,0);
   var dt=d instanceof Date?new Date(d):new Date(d); dt.setHours(0,0,0,0);
   return Math.round((dt-now)/86400000);

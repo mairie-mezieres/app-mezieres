@@ -135,6 +135,34 @@ function esc(str) {
     .replace(/'/g, '&#39;');
 }
 
+// ── Écart en JOURS DE CALENDRIER ─────────────────────────────
+// ⛔ Ne JAMAIS compter les jours avec (date - now) / 86400000 : ce quotient
+// mesure des durées, pas des dates. Un conseil municipal le 31 août à 19 h,
+// lu le 31 août à 7 h 28, donne 0,48 → `Math.ceil` = 1 → « Demain », alors que
+// c'est aujourd'hui. Symétriquement `Math.floor` annonce « Aujourd'hui » un
+// événement de demain matin vu ce soir. Il faut ramener les deux dates à
+// MINUIT local avant de soustraire, puis arrondir — `Math.round` absorbe les
+// journées de 23 h et 25 h des changements d'heure.
+// Renvoie NaN si la date est invalide (l'appelant décide quoi afficher).
+function matDaysUntil(date){
+  var b = (date instanceof Date) ? new Date(date.getTime()) : new Date(date);
+  if (isNaN(b.getTime())) return NaN;
+  var a = new Date();
+  a.setHours(0, 0, 0, 0);
+  b.setHours(0, 0, 0, 0);
+  return Math.round((b - a) / 86400000);
+}
+
+// Libellé habitant d'un écart en jours : « Aujourd'hui », « Demain », « Dans N j. ».
+// `suffixe` permet au bureau d'écrire « jours » là où le mobile écrit « j. ».
+function matDaysLabel(days, suffixe){
+  if (isNaN(days)) return '';
+  if (days <= 0) return 'Aujourd\'hui';
+  if (days === 1) return 'Demain';
+  var mot = suffixe || 'j.';
+  return 'Dans ' + days + ' ' + (mot === 'jour' ? (days > 1 ? 'jours' : 'jour') : mot);
+}
+
 // ── URL base64 → Uint8Array (pour VAPID) ────────────────────
 function urlBase64ToUint8Array(b64){
   const pad='='.repeat((4-b64.length%4)%4);

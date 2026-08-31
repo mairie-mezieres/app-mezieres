@@ -5,6 +5,43 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.99] — 31 août 2026
+
+### Corrigé
+- **La carte « Prochaine manifestation » annonçait « Demain » un événement du
+  jour.** Le 31 août 2026 à 7 h 28, le conseil municipal du 31 août à 19 h était
+  présenté comme étant le lendemain — sous la date « 31 AOÛT », affichée juste
+  au-dessus. Le calcul était
+  `Math.ceil((debut - maintenant) / 86400000)` : un écart de 11 h 32 donne
+  0,48 jour, arrondi au-dessus. Ce quotient mesure une **durée** quand le libellé
+  parle de **dates** ; aucun arrondi ne le rattrape (`Math.floor` produit la
+  faute symétrique le soir pour un événement du lendemain matin).
+  Le calcul passe désormais par `matDaysUntil` / `matDaysLabel`
+  (`js/mat-utils.js`), qui ramènent les deux dates à **minuit local**.
+  La version bureau était déjà juste : c'est la double implémentation qui a
+  laissé le bug vivre — `js/mat-desktop.js` **délègue** maintenant au helper
+  partagé. Voir **ADR-0031**.
+- **Sentry #425 — `ReferenceError: isStandaloneMode is not defined`** sur la
+  première ligne de `checkFirstStandaloneRun` (`js/mat-pwa-notif.js`). Ce fichier
+  est **injecté** par `mat-boot.js` et appelait une fonction de `mat-core.js` :
+  un seul `.js` manquant (cache partiel du service worker, requête coupée) rendait
+  l'appel impossible. Le plantage emportait d'un coup le drapeau d'installation
+  (la bannière « Installer » revenait chez quelqu'un qui avait déjà installé),
+  le comptage des installations, et la proposition d'activer les alertes —
+  **sans rien afficher**. Repli local côté appelant
+  (`_isStandaloneModeSafe`, via `typeof`, qui ne lève pas sur un identifiant non
+  déclaré) et point d'entrée publié côté `mat-core.js`. Voir **ADR-0032**.
+
+### Ajouté
+- `tests/e2e/prochaine-manifestation.spec.js` — sert un agenda iCal fabriqué
+  (les tests tournent sans backend) et vérifie les quatre cas qui piégeaient
+  l'ancien calcul, dont l'événement du jour à **23 h 59**, celui où la durée
+  restante frôle 24 h. Les 8 tests (2 projets) échouent sur l'ancien code.
+- `docs/adr/0031-compter-des-jours-de-calendrier-pas-des-durees.md` et
+  `docs/adr/0032-un-script-injecte-ne-peut-pas-tenir-ses-dependances-pour-acquises.md`.
+
+---
+
 ## [4.98] — 29 août 2026
 
 ### Ajouté
