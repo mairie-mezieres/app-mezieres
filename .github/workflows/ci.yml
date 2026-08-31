@@ -50,3 +50,11 @@ jobs:
         run: node scripts/check-cache-bust.js
         env:
           BASE_REF: origin/${{ github.base_ref || 'main' }}
+
+      # Le re-raccordement des tokens de suivi ne peut PAS être testé de bout en
+      # bout : le service worker est bloqué sous Playwright (ADR-0006) et
+      # `pushsubscriptionchange` est déclenché par le navigateur, des semaines
+      # plus tard. Un habitant cessait de recevoir les réponses de la mairie
+      # sans le moindre signal, ni côté app ni côté admin. Voir ADR-0034.
+      - name: Notification relink check
+        run: node scripts/check-notify-relink.js

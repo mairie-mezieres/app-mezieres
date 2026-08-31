@@ -349,6 +349,23 @@ Les notifications push vous permettent de recevoir des alertes sur votre télép
 3. Appuyez sur **S'abonner**.
 4. Autorisez les notifications quand votre navigateur vous le demande.
 
+### Recevoir la réponse de la mairie à votre signalement
+
+Après avoir envoyé un signalement, une demande ou un rapport de bug, l'application
+vous propose **« Recevoir une réponse ? »**. Si vous acceptez, votre téléphone vous
+préviendra dès que la mairie changera le statut de votre dossier ou y répondra.
+
+C'est le **seul** canal de retour : l'application ne vous demande jamais votre
+adresse mail.
+
+> **Corrigé en v4.102.** Votre navigateur renouvelle périodiquement son abonnement
+> aux notifications, de lui-même et sans prévenir. Jusqu'ici, ce renouvellement
+> rompait le lien avec votre dossier : les réponses de la mairie cessaient d'arriver
+> au bout de quelques semaines, sans que rien ne le signale — ni sur votre téléphone,
+> ni côté mairie. Le lien se rétablit désormais tout seul, y compris lorsque le
+> renouvellement a lieu application fermée. Si vous attendiez une réponse, elle vous
+> parviendra de nouveau après votre première ouverture de la v4.102.
+
 ### Désactiver les notifications
 
 - Depuis le même panneau, appuyez sur **Se désabonner**.

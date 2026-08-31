@@ -10,7 +10,7 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.101.0';
+const CACHE = 'mat-v4.102.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -48,8 +48,8 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.4.9',
   './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.5.2',
-  './js/mat-boot.js?v=4.12.6',
-  './js/mat-pwa-notif.js?v=4.2.9',
+  './js/mat-boot.js?v=4.12.7',
+  './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
   './js/mat-sondages.js?v=4.3.1',
@@ -432,6 +432,31 @@ self.addEventListener('pushsubscriptionchange', e => {
             body: JSON.stringify(subM),
             keepalive: true
           }).catch(() => {});
+        }
+      }
+    } catch (_) {}
+
+    // Re-raccorder les tokens de suivi (signalements, idées, demandes, bugs).
+    // Ils vivent en localStorage, inaccessible depuis un service worker : le
+    // client en dépose une copie dans le Cache API (`_updateNotifyTokensCache`).
+    // Sans ce bloc, une rotation d'endpoint survenue sans onglet ouvert coupait
+    // définitivement les réponses de la mairie — le backend passe `sub` à null
+    // sur 410 en comptant sur ce re-raccordement.
+    try {
+      const tokCache = await caches.open('mat-config-v1');
+      const tokResp  = await tokCache.match('mat-notify-tokens');
+      if (tokResp) {
+        const tokens = await tokResp.json();
+        if (Array.isArray(tokens)) {
+          for (const token of tokens) {
+            if (!token) continue;
+            fetch(MAT_API + '/notify/register-token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token, sub }),
+              keepalive: true
+            }).catch(() => {});
+          }
         }
       }
     } catch (_) {}

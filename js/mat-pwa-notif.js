@@ -27,6 +27,55 @@ function _updatePushPrefsCache() {
 }
 _updatePushPrefsCache();
 
+// Recopie dans le Cache API la liste des tokens de suivi (signalements, idées,
+// demandes, bugs) stockés en localStorage. Le service worker n'a PAS accès au
+// localStorage : sans cette copie, il ne peut pas re-raccorder ces tokens lors
+// d'un `pushsubscriptionchange` survenu sans onglet ouvert — et l'habitant ne
+// reçoit plus jamais la réponse de la mairie. Même mécanisme que les préfs.
+function _readNotifyTokens() {
+  var out = [];
+  try {
+    var keys = Object.keys(localStorage);
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i].indexOf('mat:notify:idea:') !== 0 && keys[i].indexOf('mat:notify:signal:') !== 0) continue;
+      var t = localStorage.getItem(keys[i]);
+      if (t && out.indexOf(t) === -1) out.push(t);
+    }
+  } catch (_) {}
+  return out;
+}
+
+function _updateNotifyTokensCache() {
+  if (!('caches' in window)) return;
+  var tokens = _readNotifyTokens();
+  caches.open('mat-config-v1').then(function(cache) {
+    cache.put('mat-notify-tokens', new Response(JSON.stringify(tokens), { headers: { 'Content-Type': 'application/json' } }));
+  }).catch(function() {});
+}
+_updateNotifyTokensCache();
+
+// Ce fichier est injecté par mat-boot.js : `_registerPendingNotifyTokens` vit
+// dans mat-actus.js et peut manquer (cache partiel du SW, cf. ADR-0032). Repli
+// local plutôt que de sauter le re-raccordement en silence.
+function _registerNotifyTokensSafe(sub) {
+  if (!sub) return;
+  try {
+    if (typeof _registerPendingNotifyTokens === 'function') {
+      _registerPendingNotifyTokens(sub).catch(function() {});
+      return;
+    }
+  } catch (_) {}
+  var tokens = _readNotifyTokens();
+  for (var i = 0; i < tokens.length; i++) {
+    try {
+      fetch(window.MAT_API + '/notify/register-token', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokens[i], sub: sub }), keepalive: true
+      }).catch(function() {});
+    } catch (_) {}
+  }
+}
+
 // Re-synchronise les canaux push spécifiques (déchets + météo) selon les
 // préférences enregistrées en localStorage. Fire-and-forget, erreurs ignorées.
 function _syncSubChannels(sub) {
@@ -64,6 +113,13 @@ async function checkAndRenewPushSubscription() {
     var reg = await navigator.serviceWorker.ready;
     var sub = await reg.pushManager.getSubscription();
     if (sub) {
+      // ⛔ Les tokens de suivi se re-raccordent AVANT le garde-fou ci-dessous.
+      // Ils appartiennent justement aux abonnements "réponse uniquement", qui
+      // n'ont jamais PUSH_ACTIVE_KEY : les traiter après, c'est ne jamais les
+      // traiter. Le backend met `sub = null` sur 410 en comptant sur ce
+      // re-raccordement — sans lui, la réponse de la mairie n'arrive plus.
+      _updateNotifyTokensCache();
+      _registerNotifyTokensSafe(sub);
       // Ne ré-inscrire aux alertes générales que si l'utilisateur a explicitement opté
       // (évite d'inscrire les abonnements "réponse uniquement" créés via les formulaires)
       if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
@@ -81,10 +137,6 @@ async function checkAndRenewPushSubscription() {
       // Re-sync canaux spécifiques : si l'endpoint a tourné, ces listes ont
       // gardé l'ancien endpoint mort — on remet le nouveau sans attendre.
       _syncSubChannels(sub);
-      // Re-sync tokens de signalements/idées stockés en localStorage
-      if (typeof _registerPendingNotifyTokens === 'function') {
-        _registerPendingNotifyTokens(sub).catch(function() {});
-      }
       return;
     }
     if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;
@@ -103,9 +155,8 @@ async function checkAndRenewPushSubscription() {
       else localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1');
     }).catch(function() { localStorage.setItem(PUSH_PENDING_SYNC_KEY, '1'); });
     _syncSubChannels(newSub);
-    if (typeof _registerPendingNotifyTokens === 'function') {
-      _registerPendingNotifyTokens(newSub).catch(function() {});
-    }
+    _updateNotifyTokensCache();
+    _registerNotifyTokensSafe(newSub);
   } catch(e) {}
 }
 
