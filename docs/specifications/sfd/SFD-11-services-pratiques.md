@@ -64,6 +64,13 @@ Alors les numéros (SAMU, pompiers, police, etc.) sont affichés et consultables
 
 ### Carburants
 - **RG-11.2** — Les **prix** proviennent de l'open data **data.gouv.fr** (stations proches, ~30 km).
+- **RG-11.2 bis** — Le bandeau d'accueil affiche **la date du relevé** à côté du nom de la station.
+  Le relevé national n'est pas quotidien : sans sa date, un prix vieux de plusieurs jours est
+  indistinguable d'un prix du jour. La date n'ajoute **pas** de ligne au bandeau et n'est **jamais**
+  tronquée — c'est le nom de la station qui s'abrège si la place manque.
+- **RG-11.2 ter** — La station affichée est **Cléry** (la plus proche) tant que son relevé est le
+  plus récent connu. Sinon, on affiche la **moins chère** parmi les stations au relevé le plus
+  récent, avec son nom et sa date. Les cinq stations restent consultables dans l'écran dédié.
 
 ### Eau & sécheresse
 - **RG-11.3** — Sources : **HubEau** (nappe phréatique, niveau Loire), **VigiEau** (restrictions,

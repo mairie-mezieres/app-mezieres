@@ -78,6 +78,14 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 
 Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondant.
 
+**Prix des carburants — lisez la date.** Le bandeau « Carburant » affiche le nom de la
+station **et la date de son relevé** (« Intermarché Cléry 24/08 ») : les prix viennent du
+relevé national, que les stations ne mettent pas à jour tous les jours. Tant que le relevé
+de Cléry est le plus récent connu, c'est lui qui s'affiche — c'est la station la plus
+proche. S'il a pris du retard, le bandeau montre la **station la moins chère parmi les
+relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des cinq
+stations suivies, chacune avec son heure de mise à jour.
+
 ### Sur ordinateur
 
 Au-dessus de 1024 px de large, l'accueil adopte une mise en page en trois
