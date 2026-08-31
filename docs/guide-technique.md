@@ -670,7 +670,7 @@ La même erreur a été retrouvée deux fois en v4.77 dans `loadMeteoDetail` :
 températures et l'UV **de la veille** — un conseil canicule pouvait donc manquer le
 jour où il servait. Les deux passent désormais par `meteoTodayIndex`.
 
-### ⚠️ « Aujourd'hui » / « Demain » — jours de calendrier, jamais une durée (v4.99)
+### ⚠️ « Aujourd'hui » / « Demain » — jours de calendrier, jamais une durée (v4.100)
 
 La carte « Prochaine manifestation » de l'accueil (`loadEvents`, `js/mat-widgets.js`)
 calculait son libellé ainsi :
@@ -958,7 +958,7 @@ La clé publique est présente en **deux endroits** :
 - Variable d'env `VAPID_PUBLIC_KEY` côté backend
 - Dans `js/mat-utils.js` côté frontend (constante `VAPID_PUB` ligne 13) — consommée par `mat-pwa-notif.js`, `mat-dechets-notif.js` et `mat-actus.js`
 
-### ⚠️ `mat-pwa-notif.js` est injecté — il ne présuppose aucun autre `.js` (v4.99)
+### ⚠️ `mat-pwa-notif.js` est injecté — il ne présuppose aucun autre `.js` (v4.100)
 
 Ce fichier n'a **pas** de balise dans `index.html` : `js/mat-boot.js` l'injecte
 (`document.createElement('script')`). L'ordre d'exécution semble garanti — `mat-boot.js`

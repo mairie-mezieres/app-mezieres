@@ -5,7 +5,7 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
-## [4.99] — 31 août 2026
+## [4.100] — 31 août 2026
 
 ### Corrigé
 - **La carte « Prochaine manifestation » annonçait « Demain » un événement du
@@ -39,6 +39,46 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   restante frôle 24 h. Les 8 tests (2 projets) échouent sur l'ancien code.
 - `docs/adr/0031-compter-des-jours-de-calendrier-pas-des-durees.md` et
   `docs/adr/0032-un-script-injecte-ne-peut-pas-tenir-ses-dependances-pour-acquises.md`.
+
+---
+
+## [4.99] — 29 août 2026
+
+### Corrigé
+- **La déclaration d'accessibilité se contredisait, en production.** Elle
+  annonçait « Sur les 65 restants : 65 conformes. Aucune non-conformité ne
+  subsiste » — puis, six lignes plus bas, « *Les deux non-conformités qui restent
+  à traiter :* » avec les deux chantiers déjà clos et des échéances 2027, et
+  concluait « une fois tout traité, le taux atteint 100 % ».
+  Le plan d'action publié affiche désormais ce qu'il est réellement devenu : un
+  **plan de maintien** (empêcher le taux de redescendre, remesurer à la parution
+  du RGAA 5, envisager un audit externe, recueillir l'avis d'usagers en situation
+  de handicap). La date de mise à jour de la déclaration passe au 29 août 2026 —
+  elle disait encore le 27, avant les trois versions qui l'ont changée.
+- Mêmes corrections dans `docs/accessibilite/schema-pluriannuel.md`, dont le
+  tableau « Plan d'action » listait encore 10.5 à traiter pour le T2 2027, sous
+  un titre « Aucune non-conformité restante ».
+
+### Leçon — un contrôle qui compare deux textes ne regarde pas à l'intérieur d'eux
+Le test écrit la veille (v4.98) comparait le **mot** « totalement conforme » entre
+le pied de page et la déclaration. Les deux disaient la même chose : il est passé
+au vert. La contradiction était **à l'intérieur** de la déclaration, là où il ne
+regardait pas. C'est le porteur qui l'a vue, pas un test — et le texte était déjà
+en ligne.
+
+Une déclaration d'accessibilité est un **document opposable**. Qu'elle se
+contredise est plus grave qu'une couleur trop pâle : elle devient inutilisable
+pour l'habitant qui veut savoir à quoi s'en tenir, et indéfendable pour la mairie
+si on la lui oppose.
+
+`tests/e2e/mention-accessibilite.spec.js` vérifie désormais la **cohérence interne**
+de la déclaration : à 100 %, elle ne peut porter aucune tournure annonçant un
+chantier restant (« restent à traiter », « une fois tout traité »…), et son
+décompte doit s'additionner (« sur les N restants : N conformes »).
+
+Deux sabotages vérifiés, dont le plus utile : **remettre le texte exact qui était
+parti en production** → rouge. Puis un décompte incohérent (65 applicables,
+64 conformes, mais « totalement conforme ») → rouge.
 
 ---
 
