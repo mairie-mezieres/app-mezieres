@@ -5,6 +5,45 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.102] — 31 août 2026
+
+### Corrigé
+- **Les réponses de la mairie à un signalement cessaient d'arriver après une
+  rotation d'endpoint push, définitivement et en silence.** Le backend est
+  pourtant conçu pour ce cas : sur 410/404 il garde le token et met
+  `sub = null`, en comptant sur le frontend pour le re-raccorder. Ce
+  re-raccordement n'avait jamais lieu, pour deux raisons indépendantes.
+  Voir **ADR-0034**.
+- **`checkAndRenewPushSubscription()` sortait sur `mat_push_active` avant de
+  re-raccorder les tokens.** Ce drapeau n'est posé que par le menu
+  « Notifications » et le prompt post-installation : un habitant ayant activé
+  les alertes depuis le **formulaire** d'un signalement ne l'a jamais — c'est la
+  définition d'un abonnement « réponse uniquement ». Le garde-fou filtrait donc
+  exactement la population qu'il désignait, et emportait la seule opération dont
+  elle dépendait.
+- **Le handler `pushsubscriptionchange` du service worker ignorait
+  `/notify/register-token`.** Il re-synchronisait actus, déchets et météo. C'est
+  le cas le plus fréquent : la rotation survient typiquement application fermée.
+
+### Ajouté
+- **Les tokens de suivi transitent par le Cache API** sous `mat-notify-tokens` —
+  un service worker n'a pas accès au `localStorage`. Même mécanisme que
+  `mat-push-prefs` pour les préférences de canal.
+- **Repli local `_registerNotifyTokensSafe`** : `mat-pwa-notif.js` est injecté par
+  `mat-boot.js` et ne peut pas tenir `_registerPendingNotifyTokens`
+  (`mat-actus.js`) pour acquis. Le `typeof … === 'function'` qui l'entourait
+  sautait l'opération en silence (ADR-0032).
+- **`scripts/check-notify-relink.js`**, lancé par la CI : verrouille l'ordre
+  appel/garde-fou, la présence de `/notify/register-token` dans le handler, et
+  l'identité de la clé de cache des deux côtés. Un test de bout en bout est
+  impossible (service worker bloqué sous Playwright, ADR-0006 ;
+  `pushsubscriptionchange` déclenché par le navigateur des semaines plus tard).
+  Le script a verdi à tort sur deux sabotages sur trois avant d'être corrigé —
+  `indexOf` trouvait la déclaration au lieu de l'appel, et
+  `'mat-notify-tokens-v2'.includes('mat-notify-tokens')` vaut `true`.
+
+---
+
 ## [4.101] — 31 août 2026
 
 ### Corrigé

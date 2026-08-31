@@ -1020,6 +1020,44 @@ En plus des notifications broadcast (actus, météo, déchets), MAT envoie des n
 **Fichiers concernés (backend) :** `lib/push-notify.js`, `routes/trello-webhook.js`, `routes/signalements.js`.
 **Fichier concerné (frontend) :** `js/mat-pwa-notif.js` (renouvellement abonnement), `js/mat-actus.js` (`_registerPendingNotifyTokens`).
 
+#### ⛔ Le re-raccordement des tokens n'est PAS derrière `mat_push_active` (v4.102)
+
+Un navigateur fait tourner l'endpoint push de temps à autre. Le backend traite ce
+cas sans perdre le token : sur 410/404 il met `entry.sub = null` **et garde
+l'entrée**, en comptant sur le frontend pour la re-raccorder au chargement suivant.
+Encore faut-il que ce re-raccordement ait lieu.
+
+Il ne l'avait pas, pour exactement les habitants concernés. `mat_push_active` n'est
+posé que par le menu « Notifications » (`togglePush`) et par le prompt
+post-installation. Un habitant qui a activé les alertes depuis le **formulaire d'un
+signalement** (`_doAskPush`, `js/mat-forms.js`) ne l'a jamais — c'est le sens même
+d'un abonnement « réponse uniquement ». Or `checkAndRenewPushSubscription()` sortait
+sur ce drapeau **avant** d'appeler `_registerPendingNotifyTokens` :
+
+```js
+if (sub) {
+  if (!localStorage.getItem(PUSH_ACTIVE_KEY)) return;   // ← sortie
+  …
+  _registerPendingNotifyTokens(sub);                    // ← jamais atteint
+```
+
+Le garde-fou est légitime (ne pas inscrire ces abonnements aux **alertes
+générales**), mais il emportait aussi la seule chose dont ils dépendaient. Le
+re-raccordement passe donc **avant** le garde-fou ; seule la ré-inscription aux
+canaux généraux reste derrière.
+
+Deuxième trou, même conséquence : le handler `pushsubscriptionchange` du service
+worker re-synchronisait `/push/subscribe`, `/push/subscribe/dechets` et
+`/push/subscribe/meteo` — **jamais** `/notify/register-token`. Un service worker n'a
+pas accès au `localStorage` où vivent les clés `mat:notify:signal:*` et
+`mat:notify:idea:*` ; le client en dépose donc une copie dans le Cache API sous
+`mat-notify-tokens`, exactement comme pour les préférences de canal.
+
+**Symptôme** : aucun. L'habitant ne voit rien, l'app n'affiche rien, et côté mairie
+le push renvoie `{skipped: true, reason: "subscription expired"}` dans les logs — un
+message qui décrit un abonnement expiré, pas une chaîne rompue. Verrouillé par
+`node scripts/check-notify-relink.js` (CI). Voir **ADR-0034**.
+
 ---
 
 ## 9. Webhook Facebook
