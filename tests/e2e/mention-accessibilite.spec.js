@@ -82,6 +82,47 @@ test('la mention ouvre la déclaration, dépliée', async ({ page }) => {
   await expect(page.locator('#ov-accessibilite.open')).toHaveCount(1);
 });
 
+// ⛔ LA DÉCLARATION DOIT ÊTRE COHÉRENTE AVEC ELLE-MÊME.
+//
+// Le 29 août 2026, la déclaration publiée annonçait « aucune non-conformité ne
+// subsiste » et listait, six lignes plus bas, « les deux non-conformités qui
+// restent à traiter », avec des échéances 2027. Ce texte est parti en
+// production. Le contrôle écrit le même jour ne comparait que le MOT
+// « totalement conforme » entre le pied de page et la déclaration : la
+// contradiction était À L'INTÉRIEUR de la déclaration, là où il ne regardait
+// pas. C'est le porteur qui l'a vue, pas un test.
+//
+// Une déclaration d'accessibilité est un document opposable. Qu'elle se
+// contredise est plus grave qu'une couleur trop pâle : elle devient inutilisable
+// pour l'habitant qui veut savoir à quoi s'en tenir, et indéfendable pour la
+// mairie si on la lui oppose.
+test('à 100 %, la déclaration n’annonce aucun chantier restant', async ({ page }) => {
+  await page.evaluate(() => openDeclarationA11y());
+  await page.waitForTimeout(700);
+  const decl = (await page.locator('#decl-a11y').textContent()).replace(/\u00a0/g, ' ');
+  const niveau = NIVEAUX.find((n) => decl.toLowerCase().includes(n));
+  expect(niveau, 'la déclaration n’énonce plus son niveau').toBeTruthy();
+  if (niveau !== 'totalement conforme') return;   // rien à vérifier si elle admet des écarts
+
+  // Tournures qui annoncent un défaut encore ouvert. Une déclaration à 100 %
+  // ne peut pas les porter — c'est ce qui a échappé au contrôle précédent.
+  const contradictions = [
+    /non[-\s]conformités? qui restent/i,
+    /restent? à traiter/i,
+    /une fois tout traité/i,
+    /le taux atteint 100/i,
+    /reste à (?:lever|corriger|traiter)/i
+  ].filter((re) => re.test(decl)).map(String);
+  expect(contradictions,
+    'la déclaration se dit « totalement conforme » ET annonce des chantiers restants :\n'
+    + JSON.stringify(contradictions, null, 2)).toEqual([]);
+
+  // Et la cohérence arithmétique : « sur les N restants : M conformes ».
+  const m = decl.match(/sur les\s*(\d+)\s*restants?\s*:\s*(\d+)\s*conformes?/i);
+  expect(m, 'la déclaration n’énonce plus son décompte dans la forme attendue').toBeTruthy();
+  expect(m[2], `déclarée totalement conforme, mais ${m && m[2]} conformes sur ${m && m[1]} applicables`).toBe(m[1]);
+});
+
 test('aucun pied de page ne déborde, de 320 à 1440 px', async ({ page }) => {
   // 1024 px et au-delà : c'est le pied de page BUREAU qui porte la mention.
   for (const width of [320, 360, 412, 1024, 1440]) {

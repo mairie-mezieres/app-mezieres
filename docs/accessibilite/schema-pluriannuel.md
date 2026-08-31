@@ -100,7 +100,9 @@ contact demande désormais l'adresse et le numéro séparément, ce qui permet e
 navigateur de les pré-remplir. Elle a aussi **corrigé une troisième erreur de mesure
 de l'audit** : le critère 10.5 était annoncé à « 45 déclarations », le vrai compte est
 d'environ **356 emplacements** — le relevé d'origine ne regardait ni les écrans non
-affichés, ni les feuilles de style.
+affichés, ni les feuilles de style. *(Ce compte-là était faux à son tour : voir la
+dixième passe. Le critère se mesure par élément rendu, pas par déclaration ; le vrai
+compte était de **9**.)*
 
 **La septième a donné une structure à l'accueil et lui a ajouté un plan du site.**
 L'écran d'accueil ne portait, sur téléphone, **aucun titre** : la navigation par
@@ -149,11 +151,26 @@ ci-dessous.
 
 ### Aucune non-conformité restante
 
-| # | Action | Critères | Visible | Échéance |
-|---|---|---|---|---|
-| 1 | **Déclarations de couleur** : environ **356 emplacements** (91 règles CSS, 265 styles en ligne) ne posent que le fond **ou** que le texte. À traiter cas par cas — un texte posé sur un dégradé ne peut pas recevoir de fond plat, et poser `transparent` partout satisferait la lettre du critère sans protéger personne. | 10.5 | non | T2 2027 |
+Les 65 critères applicables sont conformes. **Aucune action de mise en conformité
+n'est en attente** : les deux derniers chantiers — 3.2 le 29 août 2026 (v4.96),
+10.5 le même jour (v4.97) — sont clos. Ce plan devient un plan de **maintien**.
 
-Les 65 critères applicables sont conformes. Ce plan devient un plan de **maintien**.
+| # | Action de maintien | Comment | Échéance |
+|---|---|---|---|
+| 1 | **Empêcher le taux de redescendre** | Mesure automatique à chaque modification : contrastes des 29 écrans × 5 rendus × 2 mises en page, déclarations de couleur, validité du code, clavier, typographie. Chaque contrôle a été **mis en défaut par sabotage** avant d'être retenu. | continu |
+| 2 | **Remesurer à la parution du RGAA 5**, attendue fin 2026 | Le taux porte sur la version 4.1 du référentiel. Une nouvelle version peut ajouter, retirer ou reformuler des critères : le 100 % devra être réétabli, pas reconduit. | dès sa parution |
+| 3 | **Envisager un audit externe** | Cet audit est **interne** — ce que le décret admet, mais qui reste un audit conduit par la partie intéressée. Un regard extérieur rendrait le taux inattaquable, et verrait ce que nos propres contrôles ne savent pas voir. | 2027 |
+| 4 | **Recueillir l'avis d'usagers en situation de handicap** | Aucun référentiel ne dit ce qu'une personne vit réellement devant l'écran. C'est la seule mesure que ce document ne sait pas produire. | 2027-2028 |
+
+> ⚠️ **Ce plan a lui-même été pris en défaut.** Le 29 août 2026, la déclaration
+> publiée dans l'application a annoncé « aucune non-conformité ne subsiste » tout
+> en listant, six lignes plus bas, « les deux non-conformités qui restent à
+> traiter », avec des échéances 2027 — et ce texte est parti en production. Le
+> contrôle écrit le même jour ne comparait que le **mot** « totalement conforme »
+> entre le pied de page et la déclaration ; la contradiction était **à
+> l'intérieur** de la déclaration, là où il ne regardait pas. Signalé par le
+> porteur, pas par un test. `tests/e2e/mention-accessibilite.spec.js` refuse
+> désormais qu'une déclaration à 100 % annonce des chantiers restants.
 
 ## 6. Années suivantes
 

@@ -170,7 +170,9 @@ risque visuel réel pour un bénéfice théorique. Le chantier reste au plan, à
 en regardant chaque cas.
 
 > ⚠️ **Le chiffre annoncé ici — « 45 déclarations, dont 6 visibles » — était faux.**
-> Voir la sixième passe : le vrai compte est d'environ **356 emplacements**. Le
+> Voir la sixième passe : le vrai compte est d'environ **356 emplacements**. *(Faux
+> lui aussi — voir la dixième passe : le critère se mesure par élément rendu, et le
+> vrai compte était de 9.)* Le
 > relevé d'origine ne regardait que les éléments déjà affichés au chargement, soit
 > une fraction de l'accueil, et ne regardait pas du tout les feuilles de style.
 
@@ -760,7 +762,7 @@ mesurent vraiment quelque chose. Cet audit en a vu **six** verdir à tort et
 
 ```bash
 cd tests/e2e && npm ci
-npx playwright test                 # 260 tests, dont les contrôles axe par écran
+npx playwright test                 # 295 tests, dont les contrôles axe par écran
 ```
 
 Et pour le critère 8.2, le validateur officiel — le même moteur que
