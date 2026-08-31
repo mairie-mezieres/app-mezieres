@@ -1570,8 +1570,12 @@ async function loadEvents(){
       document.getElementById('next-event-days').textContent='Ouvrir l\'agenda';
       return;
     }
-    var diff=Math.ceil((first.start-new Date())/(1000*60*60*24));
-    var diffTxt=diff<=0?'Aujourd\'hui':diff===1?'Demain':'Dans '+diff+' j.';
+    // Jours de CALENDRIER (matDaysUntil, mat-utils.js) : un événement de ce
+    // soir vu ce matin est « Aujourd'hui ». L'ancien calcul divisait un écart
+    // en millisecondes et arrondissait au-dessus — le conseil municipal du
+    // 31 août à 19 h s'annonçait « Demain » le 31 août au matin.
+    var diff=matDaysUntil(first.start);
+    var diffTxt=matDaysLabel(diff);
     document.getElementById('next-event-date').textContent=first.start.getDate()+' '+shortMonth(first.start);
     document.getElementById('next-event-name').textContent=first.summary;
     document.getElementById('next-event-days').textContent=diffTxt;

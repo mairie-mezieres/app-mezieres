@@ -70,10 +70,10 @@ document.documentElement.style.background = bg;
 </style>
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
-<script defer src="js/mat-utils.js?v=4.3.8"></script>
-<script defer src="js/mat-core.js?v=4.3.9"></script>
+<script defer src="js/mat-utils.js?v=4.3.9"></script>
+<script defer src="js/mat-core.js?v=4.4.0"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.10"></script>
-<script defer src="js/mat-widgets.js?v=4.5.5"></script>
+<script defer src="js/mat-widgets.js?v=4.5.6"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.5"></script>
 <script defer src="js/mat-forms.js?v=4.6.9"></script>
@@ -83,7 +83,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
 <script defer src="js/mat-perf.js?v=1.0.9"></script>
 <script defer src="js/mat-plan-site.js?v=1.0.1"></script>
-<script defer src="js/mat-boot.js?v=4.12.5"></script>
+<script defer src="js/mat-boot.js?v=4.12.6"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -168,7 +168,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.99 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.100 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -500,7 +500,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.99</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.100</button>
 </div>
 </div>
 </div>
@@ -1732,7 +1732,7 @@ et accompagnée des documents suivants :
 </div>
 </template>
 </div>
-<script defer src="js/mat-desktop.js?v=4.3.1"></script>
+<script defer src="js/mat-desktop.js?v=4.3.2"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1820,6 +1820,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 31 ao&ucirc;t 2026 — v4.100</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Correctif&nbsp;: la carte &laquo;&nbsp;Prochaine manifestation&nbsp;&raquo; annon&ccedil;ait &laquo;&nbsp;Demain&nbsp;&raquo; un &eacute;v&eacute;nement du jour.</strong> Le conseil municipal du 31&nbsp;ao&ucirc;t &agrave; 19&nbsp;h &eacute;tait pr&eacute;sent&eacute; comme &eacute;tant le lendemain quand on ouvrait l&rsquo;application le matin m&ecirc;me&nbsp;: le d&eacute;compte mesurait les <em>heures restantes</em> au lieu des <em>jours du calendrier</em>. Un rendez-vous du jour affiche d&eacute;sormais &laquo;&nbsp;Aujourd&rsquo;hui&nbsp;&raquo;, quelle que soit l&rsquo;heure</li>
+<li><strong>Correctif&nbsp;: sur certains t&eacute;l&eacute;phones, l&rsquo;application install&eacute;e ne proposait plus d&rsquo;activer les alertes.</strong> Une erreur au d&eacute;marrage interrompait &agrave; la fois cette proposition et le comptage des installations</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 29 ao&ucirc;t 2026 — v4.99</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Correctif&nbsp;: la d&eacute;claration d&rsquo;accessibilit&eacute; se contredisait.</strong> Elle annon&ccedil;ait &laquo;&nbsp;aucune non-conformit&eacute; ne subsiste&nbsp;&raquo; puis listait, six lignes plus bas, deux chantiers &laquo;&nbsp;qui restent &agrave; traiter&nbsp;&raquo; pour 2027. Le plan d&rsquo;action affiche d&eacute;sormais ce qu&rsquo;il est vraiment&nbsp;: un <strong>plan de maintien</strong></li>

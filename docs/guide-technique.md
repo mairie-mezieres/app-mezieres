@@ -670,6 +670,36 @@ La même erreur a été retrouvée deux fois en v4.77 dans `loadMeteoDetail` :
 températures et l'UV **de la veille** — un conseil canicule pouvait donc manquer le
 jour où il servait. Les deux passent désormais par `meteoTodayIndex`.
 
+### ⚠️ « Aujourd'hui » / « Demain » — jours de calendrier, jamais une durée (v4.100)
+
+La carte « Prochaine manifestation » de l'accueil (`loadEvents`, `js/mat-widgets.js`)
+calculait son libellé ainsi :
+
+```js
+var diff = Math.ceil((first.start - new Date()) / (1000*60*60*24));   // ⛔
+```
+
+Ce quotient mesure une **durée**, alors que le libellé parle de **dates**. Le 31 août
+2026 à 7 h 28, le conseil municipal du 31 août à 19 h était à 11 h 32, soit 0,48 jour :
+`Math.ceil` → 1 → **« Demain »**, juste sous la date « 31 août ». Aucun arrondi ne
+rattrape ce calcul — `Math.floor` produit la faute symétrique (un événement de demain
+matin devient « Aujourd'hui » quand on regarde le soir).
+
+**Source unique** : `matDaysUntil(date)` et `matDaysLabel(jours, suffixe)` dans
+`js/mat-utils.js`. `matDaysUntil` ramène les deux dates à **minuit local** avant de
+soustraire, puis arrondit avec `Math.round` — indispensable pour les journées de 23 h
+et 25 h des changements d'heure. Il renvoie `NaN` sur une date invalide.
+
+`daysUntil` de `js/mat-desktop.js` **délègue** désormais à `matDaysUntil` (copie locale
+conservée en repli seulement). C'est la divergence entre les deux implémentations —
+le bureau juste, le mobile faux — qui avait laissé le bug vivre.
+
+⛔ La division par `86400000` reste légitime pour ce qu'elle mesure vraiment : une durée
+(péremption d'un cache, ancienneté d'une donnée). Elle ne l'est jamais pour écrire
+« aujourd'hui », « demain » ou « dans N jours ». Verrouillé par
+`tests/e2e/prochaine-manifestation.spec.js`, qui sert un agenda iCal fabriqué (les tests
+tournent sans backend) et couvre l'événement du jour à 23 h 59. Voir **ADR-0031**.
+
 ### Carte d'alerte météo et « Prochains risques » (v4.77)
 
 `meteoBuildAlertRiskCard` (`js/mat-widgets.js`) rend une seule carte, en deux blocs :
@@ -927,6 +957,39 @@ La paire de clés VAPID identifie le serveur émetteur. Générée une fois avec
 La clé publique est présente en **deux endroits** :
 - Variable d'env `VAPID_PUBLIC_KEY` côté backend
 - Dans `js/mat-utils.js` côté frontend (constante `VAPID_PUB` ligne 13) — consommée par `mat-pwa-notif.js`, `mat-dechets-notif.js` et `mat-actus.js`
+
+### ⚠️ `mat-pwa-notif.js` est injecté — il ne présuppose aucun autre `.js` (v4.100)
+
+Ce fichier n'a **pas** de balise dans `index.html` : `js/mat-boot.js` l'injecte
+(`document.createElement('script')`). L'ordre d'exécution semble garanti — `mat-boot.js`
+est le dernier `defer`, donc `mat-core.js` est déjà passé — mais il ne l'est que si **les
+deux fichiers arrivent**. Un `js/mat-core.js?v=…` absent du cache du service worker, ou
+une requête coupée sur ce seul fichier, suffit à casser le lien.
+
+C'est ce qu'a remonté Sentry (issue #425) :
+
+```
+ReferenceError: isStandaloneMode is not defined
+  at checkFirstStandaloneRun (/js/mat-pwa-notif.js:219:3)
+```
+
+L'erreur tombait sur la **première ligne** de la fonction, donc emportait tout ce qui
+suit : le drapeau `INSTALL_KEY` (la bannière « Installer » revenait chez quelqu'un qui
+avait déjà installé), `trackInstallOnce({method:'standalone'})` (le badge « N Macérien(ne)s
+ont installé MAT » sous-comptait) et surtout `showPostInstallNotifPrompt()` — l'habitant
+n'était **jamais** invité à activer les alertes. Rien ne se voyait à l'écran.
+
+Le garde-fou est du côté de l'appelant : `_isStandaloneModeSafe()` teste
+`typeof isStandaloneMode === 'function'` (le `typeof` d'un identifiant non déclaré ne lève
+pas) et refait sinon le test lui-même. `mat-core.js` publie en regard
+`window.isStandaloneMode = isStandaloneMode;` pour marquer le point d'entrée.
+
+⛔ **Règle pour tout module injecté par `mat-boot.js`** — `mat-pwa-notif.js`,
+`mat-dechets-notif.js`, `mat-jours-feries.js`, `mat-sondages.js`, `mat-carte3d.js`,
+`mat-saviez-vous.js`, `mat-plui.js`… : jamais d'appel direct à une fonction d'un autre
+fichier, surtout dans une sortie anticipée (`if (!f()) return;`) où le plantage emporte le
+plus de code. Les tests E2E ne voient pas cette classe de bug (le service worker y est
+bloqué, ADR-0006) : la détection reste Sentry. Voir **ADR-0032**.
 
 ### Abonnements expirés
 

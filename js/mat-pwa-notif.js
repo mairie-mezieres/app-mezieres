@@ -215,8 +215,25 @@ function _showNotifSheet() {
   });
 }
 
+// Ce fichier est injecté dynamiquement par mat-boot.js : il ne peut PAS tenir
+// pour acquis que mat-core.js a été exécuté. Sentry #425 :
+// « ReferenceError: isStandaloneMode is not defined » — un seul .js manquant
+// (cache partiel du service worker, coupure réseau) suffisait à faire planter
+// tout le démarrage standalone, donc le comptage d'installation ET la
+// proposition d'activer les notifications. Le repli reproduit le test de
+// mat-core.js ; il doit rester en phase avec lui.
+function _isStandaloneModeSafe() {
+  try {
+    if (typeof isStandaloneMode === 'function') return isStandaloneMode();
+  } catch (e) {}
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+  } catch (e) { return false; }
+}
+
 function checkFirstStandaloneRun() {
-  if (!isStandaloneMode()) return;
+  if (!_isStandaloneModeSafe()) return;
   if (localStorage.getItem(INSTALL_KEY) !== '1') {
     localStorage.setItem(INSTALL_KEY, '1');
     try { updateInstallBtn(); } catch(e) {}
