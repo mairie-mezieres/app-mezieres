@@ -1,3 +1,21 @@
+## 2026-08-31
+- Chrome 152 (152.0.7977.64/.65), 327 correctifs dont CVE-2026-79282 (évasion bac à sable ANGLE, critique) (26 août 2026) — https://www.malwarebytes.com/blog/bugs/2026/08/update-chrome-before-you-browse-again
+- Sentry SDK JS v11 : dataCollection remplace sendDefaultPii, collecte davantage par défaut (~28 août 2026) — https://blog.sentry.io/datacollection-control-panel/
+- Anthropic : prix Claude Sonnet 5 maintenu à 2$/10$ par MTok, hausse au 1er sept annulée (10 août 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Anthropic : SDK Python v1.0, ruptures de compatibilité (httpx→httpx2, retrait Text Completions) (20 août 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Mistral AI : lancement d'Agentic Search, recherche documentaire agentique (20 août 2026) — https://mistral.ai/news/agentic-search/
+- Mistral/AI Act : entrée en application de l'article 50 (transparence), résidence des données critère d'achat public (2 août 2026) — https://www.digitalapplied.com/blog/mistral-sovereign-ai-eu-compliance-stack-2026
+- Render.com : nouveaux plans de calcul, IDs reformatés en specs (26 août 2026) — https://render.com/changelog
+- Render.com : incident de déploiement ~1h06 (20 août 2026) — https://status.render.com/
+- iOS/iPadOS 26.6.1, correctifs de sécurité portés depuis les bêtas iOS/iPadOS 27 (17 août 2026) — https://www.macrumors.com/2026/08/10/apple-releases-ios-26-6-1/
+- Bulletin CERT-FR CERTFR-2026-ACT-036 : faille GitLab exploitée CVE-2026-19478, failles critiques SPIP (24 août 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-036/
+- Cyberattaque à Gagny (Seine-Saint-Denis), accès non autorisé à des données personnelles d'habitants (10 août 2026) — https://www.cyberattaque.org/cyberattaque-a-gagny-la-ville-confirme-un-acces-non-autorise-a-des-donnees-personnelles/
+- [reco] Tester la PWA MAT sur Chrome 152
+- [reco] Anticiper le changement de comportement par défaut du SDK Sentry v11 (dataCollection) avant mise à jour
+- [reco] Tester la PWA MAT sur iOS/iPadOS 26.6.1
+- [reco] Sensibiliser les agents municipaux à la vigilance données personnelles suite au cas Gagny
+- [reco] Suivre l'entrée en application de l'article 50 de l'AI Act européen pour l'usage de Mistral AI
+
 ## 2026-08-24
 - Attaque supply-chain npm keyv/cacheable/flat-cache/file-entry-cache, ver auto-propagé (4 août 2026, relayé CERT-FR ACT-034 le 10 août, MàJ 17 août) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-034/
 - Chrome 151 : correctifs critiques d'évasion de bac à sable (18-20 août 2026) — https://www.techtimes.com/articles/324984/20260819/chrome-update-patches-two-sandbox-escape-flaws-codex-security-gets-first-browser-credit.htm
