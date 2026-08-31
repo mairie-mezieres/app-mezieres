@@ -533,9 +533,22 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   font-size:0.75rem;
   color:rgba(255,255,255,.6);
   font-weight:800;
-  display:block;
+  display:flex;
+  align-items:baseline;
+  gap:2px;
   margin-bottom:1px;
 }
+/* Le nom cède la place, la date jamais : sur un écran de 360 px la ligne
+   « Intermarché Cléry 31/08 » dépasse de quelques pixels, et c'est l'ellipse
+   de fin qui mangeait la date — soit exactement l'information ajoutée.
+   `white-space:pre` sur la date préserve l'espace qui la sépare du nom. */
+.fuel-station-nom{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.fuel-station-maj{ flex-shrink:0; white-space:pre; }
 .fuel-val{ font-weight:900; color:#fde68a; }
 .fuel-sep{ color:rgba(255,255,255,.35); margin:0 3px; }
 .fuel-strip-cta{
@@ -546,11 +559,10 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   white-space:nowrap;
   margin-top:2px;
 }
-.fuel-maj{
-  font-size:0.75rem;
-  color:rgba(255,255,255,.4);
-  margin-top:2px;
-}
+/* ⛔ Pas de `.fuel-maj` : la date du relevé est écrite DANS la ligne du nom
+   (`.fuel-station-name`). La règle qui vivait ici — une 3ᵉ ligne en blanc à
+   40 % — n'a jamais servi, et son contraste sur le bandeau vert (≈ 2,3:1)
+   n'aurait pas passé le critère RGAA 3.2. Voir l'audit § « Huitième passe ». */
 
 /* ── Bus Rémi strip ── */
 .bus-strip{

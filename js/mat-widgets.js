@@ -1342,6 +1342,101 @@ function loadBusRemi() {
 // ── Prix carburant ───────────────────────────────────────
 var _carburantCache = null;
 
+/* Ordre = proximité de Mézières. Sert aussi de départage à prix égal. */
+var CARBURANT_CLES = ['clery', 'meung', 'olivet', 'beaugency', 'saintpryve'];
+
+/* Noms courts pour le bandeau d'accueil : les libellés du backend
+   (« Intermarché Cléry-St-André ») débordent d'une ligne tronquée à
+   l'ellipse sur téléphone. Le panneau, lui, garde le libellé complet. */
+var CARBURANT_NOMS_COURTS = {
+  clery:      'Intermarché Cléry',
+  meung:      'Super U Meung',
+  olivet:     'Leclerc Olivet',
+  beaugency:  'Leclerc Beaugency',
+  saintpryve: 'Super U St-Pryvé'
+};
+
+/* Date du relevé d'une station, sous deux formes : `jour` (AAAAMMJJ, pour
+   comparer) et `court` (« 24/08 », pour afficher). null si inconnue.
+   Le backend expose `majISO` (horodatage brut) ; `maj` reste une chaîne
+   « JJ/MM HH:MM » SANS ANNÉE — indatable seule, d'où le repli qui la
+   rapporte à aujourd'hui. Utile tant qu'un payload mis en cache par
+   l'ancien backend circule (TTL Redis : 1 h). */
+function _carburantReleve(info) {
+  if (!info) return null;
+  var d = null;
+  if (info.majISO) {
+    var t = new Date(info.majISO);
+    if (!isNaN(t.getTime())) d = t;
+  }
+  if (!d && info.maj) {
+    var m = /^(\d{2})\/(\d{2})/.exec(info.maj);
+    if (m) {
+      var now = new Date();
+      d = new Date(now.getFullYear(), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+      // « 31/12 » lu le 2 janvier : le relevé est de l'année précédente.
+      if (d.getTime() - now.getTime() > 7 * 86400000) d.setFullYear(d.getFullYear() - 1);
+    }
+  }
+  if (!d || isNaN(d.getTime())) return null;
+  var jj = String(d.getDate()).padStart(2, '0');
+  var mm = String(d.getMonth() + 1).padStart(2, '0');
+  return {
+    jour:  d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(),
+    court: jj + '/' + mm
+  };
+}
+
+/* Prix de référence pour comparer deux stations : le gazole, à défaut le
+   SP95. Comparer un gazole à un SP95 n'aurait pas de sens, mais c'est le
+   seul cas où une station n'a qu'un seul carburant renseigné. */
+function _carburantPrix(info) {
+  var p = (info && info.gazole != null) ? info.gazole : (info && info.sp95 != null ? info.sp95 : null);
+  if (p == null) return null;
+  p = parseFloat(p);
+  return isNaN(p) ? null : p;
+}
+
+/* Quelle station montrer dans le bandeau d'accueil ?
+   Cléry par défaut — c'est la station de la commune voisine, celle qui
+   intéresse les habitants. Mais le relevé national n'est pas quotidien :
+   celui de Cléry peut dater de plusieurs jours, et rien ne le disait. Si
+   d'autres stations ont un relevé plus récent, on bascule sur la MOINS CHÈRE
+   d'entre elles. Dans tous les cas la date du relevé est affichée, sur la
+   ligne du nom : le bandeau garde ses deux lignes. */
+function choisirStationCarburant(d) {
+  if (!d) return null;
+  var dispo = CARBURANT_CLES.filter(function(k) {
+    return d[k] && (d[k].sp95 != null || d[k].gazole != null);
+  });
+  if (!dispo.length) return null;
+
+  var releves = {};
+  dispo.forEach(function(k) { releves[k] = _carburantReleve(d[k]); });
+
+  var recent = null;
+  dispo.forEach(function(k) {
+    var r = releves[k];
+    if (r && (recent === null || r.jour > recent)) recent = r.jour;
+  });
+
+  var clery = releves['clery'];
+  // Aucune date connue nulle part, ou Cléry est à jour → on reste sur Cléry.
+  if (dispo.indexOf('clery') >= 0 && (recent === null || (clery && clery.jour === recent))) {
+    return { key: 'clery', releve: clery };
+  }
+
+  var candidats = dispo.filter(function(k) { return releves[k] && releves[k].jour === recent; });
+  if (!candidats.length) return { key: dispo[0], releve: releves[dispo[0]] };
+
+  var meilleur = candidats[0];
+  candidats.forEach(function(k) {
+    var p = _carburantPrix(d[k]), best = _carburantPrix(d[meilleur]);
+    if (p != null && (best == null || p < best)) meilleur = k;
+  });
+  return { key: meilleur, releve: releves[meilleur] };
+}
+
 async function loadCarburant() {
   var el = document.getElementById('fuel-prices');
   if (!el) return;
@@ -1356,13 +1451,23 @@ async function loadCarburant() {
       _carburantCache = fetched;
     }
     var d = _carburantCache;
-    var s = d['clery'];
+    var choix = choisirStationCarburant(d);
+    var s = choix ? d[choix.key] : null;
     var html = '';
     if (s) {
       var sp  = s.sp95   != null ? '<span class="fuel-val">' + parseFloat(s.sp95).toFixed(3)   + '</span> SP95' : '';
       var go  = s.gazole != null ? '<span class="fuel-val">' + parseFloat(s.gazole).toFixed(3) + '</span> GO'   : '';
       var line = [sp, go].filter(Boolean).join('<span class="fuel-sep">·</span>');
-      html = '<span class="fuel-price-row fuel-station-name">Intermarché Cléry</span>';
+      var nom  = CARBURANT_NOMS_COURTS[choix.key] || s.label || '';
+      // La date part dans la MÊME ligne (et le même contraste) que le nom :
+      // pas de troisième ligne, et pas de gris pâle sur le bandeau vert.
+      // Deux `<span>` parce que la ligne est trop courte pour tout tenir sur
+      // un écran de 360 px : c'est le NOM qui doit s'abréger à l'ellipse, pas
+      // la date — la date est justement ce qu'on est venu ajouter.
+      html = '<span class="fuel-price-row fuel-station-name">'
+           + '<span class="fuel-station-nom">' + esc(nom) + '</span>'
+           + (choix.releve ? '<span class="fuel-station-maj"> ' + esc(choix.releve.court) + '</span>' : '')
+           + '</span>';
       html += '<span class="fuel-price-row">' + (line || '<span style="color:rgba(255,255,255,.4)">N/D</span>') + '</span>';
     }
     if (!html) html = '<span class="bus-loading">Données indisponibles</span>';

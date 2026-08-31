@@ -49,7 +49,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.16">
+<link rel="stylesheet" href="css/mat.css?v=4.14.17">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.4">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -73,7 +73,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-utils.js?v=4.3.9"></script>
 <script defer src="js/mat-core.js?v=4.4.0"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.10"></script>
-<script defer src="js/mat-widgets.js?v=4.5.6"></script>
+<script defer src="js/mat-widgets.js?v=4.5.7"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.5"></script>
 <script defer src="js/mat-forms.js?v=4.6.9"></script>
@@ -168,7 +168,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.100 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.101 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -500,7 +500,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.100</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:0">🆕 v4.101</button>
 </div>
 </div>
 </div>
@@ -1820,6 +1820,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 31 ao&ucirc;t 2026 — v4.101</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le bandeau &laquo;&nbsp;Carburant&nbsp;&raquo; affiche d&eacute;sormais la <em>date</em> du relev&eacute;</strong> &mdash; &laquo;&nbsp;Intermarch&eacute; Cl&eacute;ry 24/08&nbsp;&raquo;. Les prix viennent du relev&eacute; national, qui n&rsquo;est pas quotidien&nbsp;: un prix de la semaine derni&egrave;re &eacute;tait jusqu&rsquo;ici indistinguable d&rsquo;un prix du jour</li>
+<li><strong>Et si Cl&eacute;ry a pris du retard, c&rsquo;est la station la moins ch&egrave;re parmi les relev&eacute;s les plus r&eacute;cents qui s&rsquo;affiche</strong>, avec son nom et sa date. Les cinq stations restent consultables d&rsquo;un clic sur le bandeau</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 31 ao&ucirc;t 2026 — v4.100</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Correctif&nbsp;: la carte &laquo;&nbsp;Prochaine manifestation&nbsp;&raquo; annon&ccedil;ait &laquo;&nbsp;Demain&nbsp;&raquo; un &eacute;v&eacute;nement du jour.</strong> Le conseil municipal du 31&nbsp;ao&ucirc;t &agrave; 19&nbsp;h &eacute;tait pr&eacute;sent&eacute; comme &eacute;tant le lendemain quand on ouvrait l&rsquo;application le matin m&ecirc;me&nbsp;: le d&eacute;compte mesurait les <em>heures restantes</em> au lieu des <em>jours du calendrier</em>. Un rendez-vous du jour affiche d&eacute;sormais &laquo;&nbsp;Aujourd&rsquo;hui&nbsp;&raquo;, quelle que soit l&rsquo;heure</li>

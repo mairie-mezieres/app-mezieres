@@ -20,9 +20,14 @@
 
 ## Carburant & géo
 
-- **`GET /carburant`** : cache Redis `mat:carburant:v7` (TTL **3600 s**) ; 5 stations interrogées sur
+- **`GET /carburant`** : cache Redis `mat:carburant:v8` (TTL **3600 s**) ; 5 stations interrogées sur
   data.economie.gouv.fr (timeout 8 s, repli v2.1 → v1). Succès `{ _ts, clery, meung, olivet,
   beaugency, saintpryve }`. 500 `{ error: <e.message> }`.
+  Chaque station porte `{ label, sp95, gazole, maj, majISO }` : `maj` est une chaîne d'affichage
+  **« JJ/MM HH:MM » sans année** — incomparable d'une station à l'autre — et `majISO` l'horodatage
+  brut, dont l'app a besoin pour savoir quel relevé est le plus récent (cf. SFD-11 RG-11.2 ter).
+  **La clé Redis change avec la forme du payload** : la faire évoluer en même temps qu'un champ,
+  sinon l'app reçoit pendant une heure des relevés à l'ancien format.
 - **`GET /api/zone-plu`** : query `lat`/`lon` (requis, numériques) → IGN apicarto (timeout 8 s).
   400 `lat et lon requis` / `lat/lon invalides` ; 200 `{ ok:true, zone:null, message:"Aucune zone PLU
   trouvée (hors périmètre ou PLU non publié)" }` ; 502 `Service IGN indisponible`.

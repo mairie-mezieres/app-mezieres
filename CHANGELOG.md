@@ -5,6 +5,44 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.101] — 31 août 2026
+
+### Corrigé
+- **Le bandeau « Carburant » présentait un relevé vieux de plusieurs jours comme
+  un prix du jour.** Les prix viennent du relevé national
+  (`data.economie.gouv.fr`), que chaque station alimente quand elle le veut :
+  celui de l'Intermarché de Cléry avait pris du retard, et rien dans le bandeau
+  ne permettait de le voir. L'écran détaillé portait pourtant déjà
+  « Mis à jour le … » pour les cinq stations — l'information existait, elle ne
+  remontait pas là où la décision se prend. Voir **ADR-0033**.
+
+### Ajouté
+- **La date du relevé, sur la ligne du nom** : « Intermarché Cléry 24/08 ».
+  Aucune ligne supplémentaire — le bandeau partage sa rangée avec celui du bus
+  Rémi. La ligne dépassant de 9 px sur un écran de 360 px, elle est découpée en
+  deux `<span>` en `flex` : le **nom** porte l'ellipse et cède la place, la
+  **date** est en `flex-shrink:0` et ne se tronque jamais (sans quoi l'ellipse
+  aurait mangé exactement l'information ajoutée).
+- **La station affichée n'est plus figée sur Cléry** : tant que son relevé est le
+  plus récent connu, c'est elle (la plus proche). Sinon, le bandeau montre la
+  **moins chère parmi les stations au relevé le plus récent**, avec son nom et sa
+  date. Les cinq stations restent consultables d'un appui.
+- `tests/e2e/carburant-fraicheur.spec.js` — six cas servis depuis un payload
+  `/carburant` fabriqué (les tests tournent sans backend), dont la mesure du
+  rendu (`scrollWidth` / `clientWidth`) qui interdit de tronquer la date, et un
+  payload de l'ancien backend, sans `majISO`.
+- `docs/adr/0033-un-prix-sans-sa-date-est-un-prix-du-jour.md`.
+
+### Modifié
+- **Backend** : `GET /carburant` expose `majISO` (horodatage brut) à côté de
+  `maj` — une chaîne « JJ/MM HH:MM » **sans année**, incomparable d'une station à
+  l'autre. Cache Redis `mat:carburant:v7` → `mat:carburant:v8`, la clé devant
+  suivre la forme du payload.
+- Suppression de la règle CSS `.fuel-maj`, jamais utilisée, et dont le blanc à
+  40 % n'aurait pas passé le critère RGAA 3.2 sur le fond vert du bandeau.
+
+---
+
 ## [4.100] — 31 août 2026
 
 ### Corrigé
