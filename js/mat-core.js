@@ -779,7 +779,16 @@ document.addEventListener('keydown', function(e) {
       var b = document.createElement('div');
       b.id = 'mat-server-banner';
       b.textContent = '🌿 Serveur très sollicité — certaines informations chargent lentement, merci de patienter';
-      b.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:9px 16px;background:#b45309;color:white;font-family:Nunito,sans-serif;font-size:0.75rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
+      // ⛔ `sticky`, PAS `fixed`. En `position:fixed` ce bandeau ne prend aucune
+      // place : il RECOUVRAIT le haut de la page pendant ses 20 secondes — et
+      // notamment les boutons « Installer » et « ✕ » de la bannière
+      // d'installation, qui devenaient inutilisables. Le cas n'a rien de
+      // théorique : une première visite pendant que le backend Render se
+      // réveille, c'est exactement les deux bannières en même temps.
+      // En `sticky`, il occupe sa place dans le flux (donc ne masque rien) tout
+      // en restant visible au défilement. Trouvé en anticipant le critère
+      // WCAG 2.2 « 2.4.11 Focus non masqué » — voir tests/e2e/cible-taille.spec.js.
+      b.style.cssText = 'position:sticky;top:0;padding:9px 16px;background:#b45309;color:white;font-family:Nunito,sans-serif;font-size:0.75rem;font-weight:800;text-align:center;z-index:99997;box-shadow:0 2px 10px rgba(0,0,0,.25)';
       document.body.prepend(b);
       setTimeout(function(){ var e=document.getElementById('mat-server-banner'); if(e) e.remove(); }, 20000);
     }
