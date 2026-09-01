@@ -96,8 +96,10 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .ib-sub{font-size:0.75rem;color:#3d2000;}
 .ib-btn{background:rgba(255,255,255,0.9);color:#3d2000;border:none;border-radius:10px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;cursor:pointer;flex-shrink:0;}
 /* ⛔ CONTRASTE — la croix de fermeture était à 2,00:1, le pire score de
-   l'accueil. C'est un bouton : il doit se voir. Opaque. */
-.ib-x{background:none;border:none;color:#3d2000;font-size:1rem;cursor:pointer;padding:4px;flex-shrink:0;}
+   l'accueil. C'est un bouton : il doit se voir. Opaque.
+   ⛔ WCAG 2.2 / 2.5.8 — et elle ne faisait que 21 px de LARGE (28 de haut) :
+   `min-width` + `padding` horizontal, sans toucher au glyphe. */
+.ib-x{background:none;border:none;color:#3d2000;font-size:1rem;cursor:pointer;padding:4px 6px;min-width:24px;flex-shrink:0;}
 
 /* ── Header MAT ── */
 .header{background:linear-gradient(160deg,var(--forest) 0%,var(--leaf) 100%);padding:0 16px 16px;padding-top:calc(0px + env(safe-area-inset-top,0px));position:relative;overflow:hidden;}
@@ -419,6 +421,26 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-detail-title{font-size:1.05rem;line-height:1.3;color:var(--forest);margin-bottom:8px;}
 .actu-detail-text{font-size:0.84rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;}
 .actu-empty{text-align:center;padding:24px;color:var(--muted);font-size:0.8rem;}
+
+/* ── WCAG 2.2 — 2.5.8 Taille de la cible (24 × 24 px) ───────────────────
+   Anticipation du RGAA 5, attendu fin 2026 : il intègre les WCAG 2.2, dont
+   ce critère. Un balayage des 29 écrans n'a trouvé que NEUF cibles sous
+   24 px sans marge suffisante : huit liens de pied de page ou de texte,
+   hauts de 14 à 18 px, et la croix de la bannière d'installation (`.ib-x`,
+   21 px de LARGE — voir sa règle plus haut). On leur donne la taille par du
+   `padding`, jamais par une taille fixe : le texte ne bouge pas, seule la
+   zone cliquable grandit. Les cibles déjà espacées de 24 px bénéficient de
+   l'exception d'espacement du critère et n'ont rien à changer.
+   ⚠️ Mesuré à 320 px après coup : le pied de page ne doit pas déborder —
+   c'est le piège de la v4.93. Voir tests/e2e/cible-taille.spec.js. */
+.footer a, .footer button{ padding-top:4px; padding-bottom:4px; }
+.actu-empty a{ display:inline-block; padding:4px 2px; }
+/* Le lien du dossier de subvention et l'adresse de la mairie, posés dans
+   des encadrés d'information (styles en ligne dans index.html). */
+.panel-body a[href^="mailto:"]{ display:inline-block; padding:4px 0; }
+/* Attribution de la carte : imposée par la licence, mais c'est un lien.
+   Aucune exception du critère ne la couvre — on l'agrandit. */
+.leaflet-container .leaflet-control-attribution a{ display:inline-block; padding:4px 2px; }
 
 /* ── Contact mairie ── */
 .contact-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px;}

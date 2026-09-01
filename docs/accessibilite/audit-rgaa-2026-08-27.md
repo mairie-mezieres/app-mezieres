@@ -675,6 +675,73 @@ de ce taux, plus sur sa conquête.
 
 ---
 
+### Onzième passe — anticiper le RGAA 5 (v4.103, 1er septembre 2026)
+
+**Ce qui suit ne concerne aucun critère du RGAA 4.1 et ne change pas le taux.**
+C'est une avance prise sur le **RGAA 5**, attendu fin 2026, qui intégrera les
+**WCAG 2.2** — publiées par le W3C en octobre 2023, donc mesurables aujourd'hui.
+Le texte français n'existant pas encore, seuls les critères WCAG dont l'énoncé
+est stable ont été traités ; le reste attend la parution. **Anticiper au-delà,
+ce serait deviner.**
+
+Deux des neuf nouveaux critères AA se mesurent mécaniquement :
+
+| WCAG 2.2 | Énoncé | Ce que le balayage a trouvé |
+|---|---|---|
+| **2.5.8** Taille de la cible (minimum) | 24 × 24 px, sauf exception d'espacement ou de cible en ligne | **9** cibles trop petites |
+| **2.4.11** Focus non masqué (minimum) | l'élément focalisé n'est pas *entièrement* recouvert par du contenu de l'auteur | **1** défaut, réel et jamais rapporté |
+
+**Les 9 cibles.** Huit sont des liens de pied de page ou de texte courant : les
+liens du pied mobile, celui du pied bureau, l'adresse e-mail des panneaux, le
+lien de l'écran « aucune actualité », l'attribution des cartes Leaflet. La
+neuvième est la **croix de la bannière d'installation**, 21 px de large. Toutes
+ont été agrandies par du `padding` — **le libellé ne bouge pas**, seule la zone
+touchable grandit. Vérifié à 320, 360, 412, 1024 et 1440 px : aucun débordement
+horizontal.
+
+> ⚠️ **La neuvième n'a été trouvée qu'à la deuxième exécution — et pour une
+> mauvaise raison.** Le contrôle passait au vert lancé seul et au rouge dans la
+> suite complète, sur exactement la même application. En cause, l'exception
+> d'espacement : une cible de 21 px n'est un défaut que si une autre cible passe
+> assez près, et la géométrie voisine variait avec l'état de la page au moment
+> de la mesure. Un contrôle qui examine une cible « quand ça tombe bien »
+> n'examine rien. La bannière est désormais **dépliée de force** avant la
+> mesure, et une assertion de couverture refuse de conclure si `.ib-x` n'a pas
+> été examinée. C'est la même leçon que la première passe de cet audit : *un
+> contrôle vert ne prouve rien tant qu'on n'a pas vérifié qu'il mesure.*
+
+**Le défaut de 2.4.11 était un vrai bug, trouvé par ce contrôle.** Le bandeau
+`#mat-server-banner` — « serveur très sollicité, patientez » — était en
+`position:fixed;top:0;left:0;right:0`. Pendant ses 20 secondes, il **recouvrait
+entièrement** le bouton « Installer » de la bannière d'installation et sa croix
+de fermeture. Le cas typique est la toute première visite, quand le serveur
+gratuit sort de veille : l'habitant voit le bouton, le vise, et rien ne se
+passe. Passé en `position:sticky;top:0`, le bandeau **occupe** sa place au lieu
+de passer par-dessus.
+
+> ⚠️ **Ce qui rend ce contrôle honnête, c'est l'exception d'espacement.** Le
+> critère admet une cible plus petite si un disque de 24 px centré sur elle ne
+> croise le disque d'aucune autre cible — sinon on ferait « corriger » des
+> dizaines d'éléments que la norme accepte, ce qui est une autre façon de ne
+> pas mesurer la bonne chose. Le contrôle de 2.4.11 est, lui, **restreint à
+> l'accueil** : avec les 29 écrans ouverts en pile, les commandes de l'accueil
+> sont légitimement couvertes par les panneaux, et un contrôle qui les compte
+> rougit sur une situation qui n'existe pas.
+>
+> Les deux tests ont été **mis en défaut par sabotage** avant d'être retenus :
+> retirer le `padding` du pied de page rougit le premier, remettre `.ib-x` à
+> `padding:4px` le rougit aussi (sur la mise en page téléphone — sur 1280 px
+> l'exception d'espacement s'applique légitimement), et remettre le bandeau en
+> `position:fixed` rougit le second. `tests/e2e/cible-taille.spec.js`.
+
+**Ce qui reste hors de portée** : le RGAA 5 étendra le périmètre aux
+**documents bureautiques** (les PDF publiés par la mairie — PLUi, comptes rendus
+de conseil). Ceux-ci ne sont pas produits par l'application et leur accessibilité
+ne se corrige pas dans son code. C'est le seul chantier réel que la nouvelle
+version ouvrira ici.
+
+---
+
 ## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable

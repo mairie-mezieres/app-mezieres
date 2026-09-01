@@ -5,6 +5,39 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.103] — 1er septembre 2026
+
+### Corrigé
+- **Le bandeau « serveur très sollicité » recouvrait le bouton « Installer ».**
+  `#mat-server-banner` était en `position:fixed;top:0;left:0;right:0` : pendant
+  ses 20 secondes, il masquait **entièrement** le bouton d'installation et sa
+  croix de fermeture. Cas typique : la toute première visite, quand l'hébergement
+  gratuit sort de veille — l'habitant voit le bouton, le vise, rien ne se passe.
+  Passé en `position:sticky;top:0`, il occupe sa place au lieu de passer par-dessus.
+  Trouvé par le contrôle **WCAG 2.4.11**, pas par un signalement.
+
+### Ajouté
+- **Anticipation du RGAA 5** (attendu fin 2026, il intégrera les WCAG 2.2,
+  publiées depuis 2023). Les deux nouveaux critères AA mécaniquement mesurables
+  sont traités :
+  - **2.5.8 Taille de la cible** — 9 cibles sous 24 px agrandies par du
+    `padding` : liens des deux pieds de page, adresses e-mail des panneaux, lien
+    « aucune actualité », attribution Leaflet, croix de la bannière
+    d'installation. **Le libellé ne bouge pas**, seule la zone touchable grandit ;
+    aucun débordement horizontal de 320 à 1440 px.
+  - **2.4.11 Focus non masqué** — un seul défaut, le bandeau ci-dessus.
+- `tests/e2e/cible-taille.spec.js` — les deux contrôles, **mis en défaut par
+  sabotage** avant d'être retenus. Le contrôle de 2.5.8 a d'abord dû être rendu
+  **déterministe** : il concluait au vert lancé seul et au rouge dans la suite
+  complète, sur la même application, parce que l'exception d'espacement dépendait
+  de l'état de la page. La bannière est maintenant dépliée de force et une
+  assertion de couverture refuse de conclure sans avoir examiné `.ib-x`.
+
+> **Le taux RGAA 4.1 reste à 100 %** : rien de tout cela n'est un critère du
+> référentiel en vigueur. C'est une avance prise, pas une mise en conformité.
+
+---
+
 ## [4.102] — 31 août 2026
 
 ### Corrigé
