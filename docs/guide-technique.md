@@ -1366,9 +1366,10 @@ Le serveur statique de test est `tests/e2e/static-server.js`. Toutes les requêt
 
 ## 10 bis. Atelier fichiers de l'administration
 
-Onglet **📎 Atelier fichiers**, premier de la barre d'`admin.html`. Cinq outils :
-compresser des images vers un poids cible, compresser un PDF, extraire les pages
-d'un PDF en images, assembler images et PDF, extraire le texte d'un PDF.
+Onglet **📎 Atelier fichiers**, premier de la barre d'`admin.html`. Sept outils :
+compresser des images vers un poids cible, **masquer une zone d'une photo**,
+compresser un PDF, **organiser les pages d'un PDF**, extraire les pages d'un PDF
+en images, assembler images et PDF, extraire le texte d'un PDF.
 
 Il existe pour une raison précise : sans lui, compresser une photo de 8 Mo ou un
 procès-verbal scanné passait par un site de conversion en ligne — donc par le
@@ -1420,6 +1421,22 @@ doit rester vide**.
 - **Les moteurs de compression ne se réécrivent pas sans mesure.** `imageToTarget`,
   `COMBOS`, `pickCombo`, `pdfToTarget` sont éprouvés ; le préréglage « 100 Ko » vise
   en réalité 0,1 × 1 048 576 = 102 Ko, et cet écart de 2 % ne justifie pas d'y toucher.
+- **« Organiser un PDF » ne rasterise JAMAIS** (`pdf-lib.copyPages`), à l'inverse de
+  « Compresser un PDF ». Leurs descriptions le disent : les deux outils sont voisins
+  dans la même barre, et se tromper ne se voit qu'après coup, quand le texte du
+  document n'est plus sélectionnable. Une rotation **s'ajoute** à celle que la page
+  portait déjà, et la vignette est **re-rendue** plutôt que tournée en CSS.
+- **Seul le masque « noir opaque » est irréversible.** Le flou reste le défaut (c'est
+  ce qu'on attend sur une photo de manifestation), mais l'interface indique en une
+  phrase que pour une plaque ou une adresse, le noir s'impose. Les zones sont
+  stockées en coordonnées **normalisées** : l'aperçu fait 720 px, la photo plusieurs
+  milliers.
+- **Le retrait des métadonnées est une promesse affichée**, plus un effet de bord
+  heureux : les outils qui produisent une image la réencodent, donc perdent l'EXIF
+  et la **position GPS**. Ne jamais « optimiser » en renvoyant les octets d'origine
+  tels quels — c'est ce que le correctif du réencodage inutile a failli faire.
+- ⚠️ **Un `<canvas>` sans attribut fait 300 px de large.** « Le canvas a une largeur »
+  ne prouve donc pas que l'aperçu est chargé — ni dans le code, ni dans un test.
 
 Voir [ADR-0035](adr/0035-atelier-fichiers-les-documents-de-la-mairie-ne-sortent-pas-du-navigateur.md)
 et [SFD-14](specifications/sfd/SFD-14-administration-backoffice.md) §RG-14.19 à RG-14.23.
