@@ -254,6 +254,27 @@ tr:hover td{background:#f9fafb;}
 #tab-atelier .af-text{width:100%;min-height:280px;margin-top:16px;padding:12px;font:0.78rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:1.5px solid var(--border);border-radius:10px;resize:vertical;color:var(--text);background:var(--warm);}
 #tab-atelier .af-text:focus-visible{outline:2px solid var(--forest);outline-offset:1px;}
 #tab-atelier .af-hidden{display:none;}
+/* Organiser un PDF — grille de vignettes */
+#tab-atelier .af-pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:16px;}
+#tab-atelier .af-pg{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card);}
+#tab-atelier .af-pg.out{opacity:.4;}
+#tab-atelier .af-pg.out .af-pg-vue{background:repeating-linear-gradient(45deg,var(--warm),var(--warm) 6px,var(--mist) 6px,var(--mist) 12px);}
+#tab-atelier .af-pg-vue{display:flex;align-items:center;justify-content:center;height:180px;background:var(--warm);padding:6px;}
+#tab-atelier .af-pg-vue canvas{max-width:100%;max-height:100%;box-shadow:0 1px 6px rgba(0,0,0,.18);}
+#tab-atelier .af-pg-bar{display:flex;align-items:center;gap:2px;padding:6px;border-top:1px solid var(--border);}
+#tab-atelier .af-pg-num{flex:1;min-width:0;font-size:0.7rem;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#tab-atelier .af-pg-bar .af-mini{width:22px;height:22px;font-size:0.7rem;}
+#tab-atelier .af-pg-bar .af-mini.on{border-color:var(--leaf);color:var(--leaf);}
+/* Masquer une zone — aperçu et tracé */
+#tab-atelier .af-editor{margin-top:16px;}
+#tab-atelier .af-editor canvas{max-width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:10px;cursor:crosshair;touch-action:none;background:var(--warm);}
+#tab-atelier .af-editor-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+#tab-atelier .af-note{margin:10px 0 0;font-size:0.74rem;color:var(--muted);line-height:1.5;max-width:66ch;}
+#tab-atelier .af-privacy{margin:10px 0 0;font-size:0.74rem;color:var(--leaf);font-weight:600;}
+#tab-atelier li.af-pick{cursor:pointer;}
+#tab-atelier li.af-pick:hover{background:var(--warm);}
+#tab-atelier li.af-pick{padding-left:8px;}
+#tab-atelier li.af-pick.on{background:var(--mist);box-shadow:inset 3px 0 0 var(--forest);}
 
 </style>
 <!-- Sentry — remplacez la chaîne vide par votre DSN admin pour activer le suivi d'erreurs -->
@@ -350,11 +371,26 @@ tr:hover td{background:#f9fafb;}
 
           <div class="af-shoot af-hidden" id="af-shootRow">
             <button type="button" class="af-btn ghost" id="af-shoot">Prendre une photo</button>
-            <span class="af-status">Ajoutez une page à la fois, l'ordre est modifiable ensuite.</span>
+            <span class="af-status" id="af-shootHint"></span>
           </div>
           <input type="file" id="af-cam" accept="image/*" capture="environment" class="af-hidden" aria-label="Prendre une photo">
 
           <ul class="af-files" id="af-list"></ul>
+          <p class="af-privacy af-hidden" id="af-privacy">🔒 L'image produite est réencodée : elle n'emporte aucune métadonnée de l'originale, <b>position GPS comprise</b>.</p>
+
+          <!-- « Organiser un PDF » : une vignette par page, remplie par le module -->
+          <div class="af-pages af-hidden" id="af-pages"></div>
+
+          <!-- « Masquer une zone » : aperçu sur lequel on trace les rectangles -->
+          <div class="af-editor af-hidden" id="af-editor">
+            <canvas id="af-canvas" aria-label="Aperçu de la photo — tracez un rectangle sur la zone à masquer"></canvas>
+            <div class="af-editor-bar">
+              <button type="button" class="af-btn ghost" id="af-undo">Annuler la dernière zone</button>
+              <button type="button" class="af-btn ghost" id="af-clearZones">Tout effacer</button>
+              <span class="af-status" id="af-zonesInfo" role="status" aria-live="polite"></span>
+            </div>
+            <p class="af-note">Seul le masque <b>noir opaque</b> est irréversible. Un flou léger sur un petit visage peut encore se deviner : pour une plaque ou une adresse dans un document, préférez le noir.</p>
+          </div>
 
           <div class="af-bar">
             <button type="button" class="af-btn" id="af-run" disabled>Traiter</button>
@@ -3752,6 +3788,6 @@ async function deleteEntreprise(id) {
 </script>
 <!-- 📎 Atelier fichiers — module externe, aucun gestionnaire en attribut.
      Ne charge ses bibliothèques (vendor/) qu'à l'ouverture de l'onglet. -->
-<script src="js/mat-atelier-fichiers.js?v=1.0.0"></script>
+<script src="js/mat-atelier-fichiers.js?v=1.1.0"></script>
 </body>
 </html>

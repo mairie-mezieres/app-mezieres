@@ -112,9 +112,10 @@ Et une structure invalide est rejetée avec un message.
 
 ### Atelier fichiers (onglet 📎, premier de la barre)
 
-- **RG-14.19** — Cinq outils : compression d'images vers un poids cible, compression de PDF,
-  extraction des pages d'un PDF en images, assemblage d'images et de PDF en un document,
-  extraction du texte d'un PDF. Sorties multiples réunies en archive ZIP.
+- **RG-14.19** — Sept outils : compression d'images vers un poids cible, masquage d'une
+  zone d'une photo, compression de PDF, organisation des pages d'un PDF, extraction des
+  pages d'un PDF en images, assemblage d'images et de PDF en un document, extraction du
+  texte d'un PDF. Sorties multiples réunies en archive ZIP.
 - **RG-14.20** — ⛔ **Le traitement est intégralement local.** Aucun fichier ni aucune
   métadonnée n'est transmis à un serveur, aucune télémétrie, et **aucun nom de fichier
   n'est journalisé** — un nom de fichier est déjà une donnée. Un journal réseau vide
@@ -126,7 +127,16 @@ Et une structure invalide est rejetée avec un message.
 - **RG-14.23** — Le poids cible est respecté par ajustement automatique de la qualité **puis**
   des dimensions ; s'il reste hors d'atteinte, l'outil le **dit** au lieu de livrer
   silencieusement un fichier trop lourd.
-- Voir [ADR-0035](../../adr/0035-atelier-fichiers-les-documents-de-la-mairie-ne-sortent-pas-du-navigateur.md).
+- **RG-14.24** — **Organiser un PDF** : les pages conservées sont **recopiées**, jamais
+  rasterisées — texte sélectionnable et qualité d'origine préservés. Une rotation
+  s'ajoute à celle que la page portait déjà.
+- **RG-14.25** — **Masquer une zone** : trois masques (flou par défaut, pixels, noir).
+  ⛔ L'interface doit indiquer que **seul le noir est irréversible**. Le masque est
+  appliqué à la pleine résolution, jamais sur l'aperçu.
+- **RG-14.26** — Les outils produisant une image **retirent les métadonnées**, position
+  GPS comprise, et l'annoncent. Aucune sortie ne peut être les octets d'origine.
+- Voir [ADR-0035](../../adr/0035-atelier-fichiers-les-documents-de-la-mairie-ne-sortent-pas-du-navigateur.md)
+  et [ADR-0036](../../adr/0036-masquer-une-zone-seul-le-noir-est-irreversible.md).
 
 ## 6. Données manipulées
 
