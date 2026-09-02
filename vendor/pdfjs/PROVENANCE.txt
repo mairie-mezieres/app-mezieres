@@ -1,0 +1,5 @@
+pdfjs-dist 3.11.174
+
+Copié depuis node_modules/pdfjs-dist/ par scripts/vendor-libs.js.
+Ne pas modifier à la main : régénérer avec « npm ci && npm run vendor ».
+La version est figée dans package.json (devDependencies).

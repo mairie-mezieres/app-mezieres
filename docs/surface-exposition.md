@@ -25,9 +25,27 @@ domaine principal sert directement la PWA statique.
 
 ### Bibliothèques tierces embarquées
 
-Elles sont **vendorées** dans le dépôt (`vendor/leaflet`, `vendor/sentry`) plutôt
-que chargées depuis un CDN : pas de dépendance à un tiers au chargement, et le
-contenu servi est celui qui a été relu et committé.
+Elles sont **vendorées** dans le dépôt plutôt que chargées depuis un CDN : pas de
+dépendance à un tiers au chargement, et le contenu servi est celui qui a été relu
+et committé.
+
+| Dossier | Bibliothèque | Version | Où elle sert |
+|---|---|---|---|
+| `vendor/leaflet` | Leaflet | voir `PROVENANCE.txt` | cartes 2D (signalements, suivi) |
+| `vendor/maplibre` | MapLibre GL | voir le fichier | carte 3D du village, à la demande |
+| `vendor/sentry` | Sentry Browser | voir le fichier | remontée d'erreurs |
+| `vendor/pdfjs` | pdfjs-dist | 3.11.174 | atelier fichiers de l'admin, à la demande |
+| `vendor/pdf-lib` | pdf-lib | 1.17.1 | idem |
+| `vendor/jszip` | JSZip | 3.10.1 | idem |
+
+Les trois dernières sont figées dans le `package.json` de la racine et recopiées
+par `npm ci && npm run vendor` : c'est **ce couple** qu'il faut consulter pour
+répondre à « sommes-nous concernés par cette alerte ? ». Le `package.json` ne
+construit rien — l'application est servie telle quelle.
+
+⚠️ Une exception demeure : `admin.html` charge **Chart.js depuis
+`cdn.jsdelivr.net`** (avec `integrity`). C'est la dernière dépendance de
+chargement à un tiers du dépôt.
 
 ---
 

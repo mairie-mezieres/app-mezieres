@@ -23,6 +23,8 @@ documents, entreprises, encart d'information, mascotte, et configuration de l'as
   d'améliorer ses réponses.
 - **US-14.5** — En tant qu'administrateur, je veux gérer les contenus pratiques (documents,
   entreprises, encart d'info, mascotte) afin de tenir l'application à jour.
+- **US-14.6** — En tant qu'administrateur, je veux compresser et convertir des fichiers
+  **sans les téléverser chez un tiers** afin de ne pas exposer des documents communaux.
 
 ## 4. Critères d'acceptation (Gherkin)
 
@@ -108,6 +110,24 @@ Et une structure invalide est rejetée avec un message.
 - **RG-14.18** — **Photo MAT & MEL (mascotte)** : image unique activable/désactivable (personnalisation
   saisonnière) ; à défaut, illustration par défaut.
 
+### Atelier fichiers (onglet 📎, premier de la barre)
+
+- **RG-14.19** — Cinq outils : compression d'images vers un poids cible, compression de PDF,
+  extraction des pages d'un PDF en images, assemblage d'images et de PDF en un document,
+  extraction du texte d'un PDF. Sorties multiples réunies en archive ZIP.
+- **RG-14.20** — ⛔ **Le traitement est intégralement local.** Aucun fichier ni aucune
+  métadonnée n'est transmis à un serveur, aucune télémétrie, et **aucun nom de fichier
+  n'est journalisé** — un nom de fichier est déjà une donnée. Un journal réseau vide
+  pendant un traitement est le critère d'acceptation.
+- **RG-14.21** — ⛔ **Aucun stockage persistant** : ni `localStorage`, ni `sessionStorage`,
+  ni IndexedDB, ni Cache API. Fermer l'onglet ne laisse aucune trace.
+- **RG-14.22** — Les bibliothèques (pdf.js, pdf-lib, JSZip) sont servies depuis `vendor/`,
+  **jamais depuis un CDN**, et ne sont chargées qu'à l'ouverture de l'onglet (1,94 Mo).
+- **RG-14.23** — Le poids cible est respecté par ajustement automatique de la qualité **puis**
+  des dimensions ; s'il reste hors d'atteinte, l'outil le **dit** au lieu de livrer
+  silencieusement un fichier trop lourd.
+- Voir [ADR-0035](../../adr/0035-atelier-fichiers-les-documents-de-la-mairie-ne-sortent-pas-du-navigateur.md).
+
 ## 6. Données manipulées
 
 - Toutes les clés Redis de contenu (`mat:actus`, `mat:idees`, `mat:photos`, `mat:sondages`,
@@ -118,6 +138,7 @@ Et une structure invalide est rejetée avec un message.
 ## 7. Intégrations & dépendances
 
 - **Cloudinary**, **Facebook**, **Google Calendar**, **Trello**, **Web Push**.
+- **Atelier fichiers : aucune** — il n'appelle aucune route, aucun service, aucun domaine.
 - Routes `/admin/*` (voir [SFD-15](SFD-15-supervision-conformite.md) pour la liste de supervision).
 
 ## 8. Cas limites & mode dégradé
