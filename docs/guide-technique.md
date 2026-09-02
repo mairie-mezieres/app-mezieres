@@ -16,6 +16,7 @@
 8. [Notifications push](#8-notifications-push)
 9. [Webhook Facebook](#9-webhook-facebook)
 10. [CI/CD (GitHub Actions)](#10-cicd-github-actions)
+10 bis. [Atelier fichiers de l'administration](#10-bis-atelier-fichiers-de-ladministration)
 11. [Déploiement](#11-déploiement)
 12. [Ajouter une fonctionnalité](#12-ajouter-une-fonctionnalité)
 13. [Gestion des secrets](#13-gestion-des-secrets)
@@ -96,12 +97,19 @@ app-mezieres/
 │   ├── mat-eau8.js         Eau (qualité, distribution)
 │   ├── mat-jours-feries.js Calcul jours fériés français
 │   ├── mat-partager.js     Logique du générateur partager.html
+│   ├── mat-atelier-fichiers.js  Atelier fichiers de l'admin (100 % local, hors app habitant)
 │   └── mat-utils.js        Utilitaires communs
 │
 ├── vendor/                 Bibliothèques auto-hébergées (pas de CDN)
 │   ├── leaflet/            Cartes 2D (signalements, suivi)
 │   ├── maplibre/           Rendu 3D — ~1 Mo, chargé À LA DEMANDE, non précaché (ADR-0018)
+│   ├── pdfjs/              Lecture PDF — atelier fichiers de l'admin, à la demande (ADR-0035)
+│   ├── pdf-lib/            Écriture PDF — idem
+│   ├── jszip/              Archive ZIP des sorties multiples — idem
 │   └── sentry/             Remontée d'erreurs
+│
+├── package.json            ⚠️ NE construit RIEN : fige seulement les versions des
+│                           bibliothèques copiées dans vendor/ (npm run vendor)
 │
 ├── docs/
 │   ├── guide-utilisateur.md  Guide citoyen
@@ -1353,6 +1361,68 @@ Les tests sont dans `tests/e2e/smoke.spec.js` :
 - Audit AXE : zéro violation `serious` ou `critical` (WCAG 2.1 AA)
 
 Le serveur statique de test est `tests/e2e/static-server.js`. Toutes les requêtes vers des hôtes externes sont interceptées et bloquées (tests hermétiques).
+
+---
+
+## 10 bis. Atelier fichiers de l'administration
+
+Onglet **📎 Atelier fichiers**, premier de la barre d'`admin.html`. Cinq outils :
+compresser des images vers un poids cible, compresser un PDF, extraire les pages
+d'un PDF en images, assembler images et PDF, extraire le texte d'un PDF.
+
+Il existe pour une raison précise : sans lui, compresser une photo de 8 Mo ou un
+procès-verbal scanné passait par un site de conversion en ligne — donc par le
+**téléversement d'un document communal chez un tiers inconnu**.
+
+### ⛔ Quatre propriétés qui SONT la fonctionnalité
+
+Ce ne sont pas des détails d'implémentation. Les perdre, c'est reconstruire le
+problème que l'outil supprime.
+
+1. **Aucun octet ne sort.** Pas de `fetch`, pas de `XMLHttpRequest`, pas de balise
+   vers un domaine tiers, aucune télémétrie — et **aucun nom de fichier dans un
+   `console.*`** : « recours-gracieux-M-X.pdf » est déjà une donnée.
+2. **Aucun stockage persistant.** Ni `localStorage`, ni `sessionStorage`, ni
+   IndexedDB, ni Cache API. Tout vit en mémoire.
+3. **Aucun domaine externe.** pdf.js, pdf-lib et JSZip sont dans `vendor/`.
+4. **Aucun script en ligne dans le module** — uniquement `addEventListener`.
+
+Le contrôle est direct : ouvrir l'onglet Réseau, traiter un fichier, **le journal
+doit rester vide**.
+
+### Fichiers concernés
+
+| Fichier | Rôle |
+|---|---|
+| `js/mat-atelier-fichiers.js` | toute la logique, dans une IIFE (ids du DOM préfixés `af-`) |
+| `admin.html` | le panneau `#tab-atelier`, le bouton de nav, le CSS préfixé `af-` et confiné à `#tab-atelier` |
+| `package.json` + `scripts/vendor-libs.js` | fige les versions et les recopie dans `vendor/` |
+| `vendor/pdfjs`, `vendor/pdf-lib`, `vendor/jszip` | ce qui est réellement servi (1,94 Mo) |
+
+### ⚠️ Pièges
+
+- **`package.json` ne construit rien.** GitHub Pages sert le dépôt tel quel : une
+  dépendance restée dans `node_modules/` n'arrive jamais chez l'utilisateur. Le
+  fichier servi est celui de `vendor/`, et il est committé. Après une montée de
+  version : `npm ci && npm run vendor`, **puis** incrémenter les `?v=` des trois
+  `<script>` en tête de `js/mat-atelier-fichiers.js` — le service worker répond en
+  *stale-while-revalidate*, une URL inchangée sert l'ancienne copie (ADR-0019).
+- **pdf.js est figé en 3.11.174.** À partir de la 5, `page.render()` attend `canvas`
+  là où le code éprouvé passe `canvasContext`. Monter de version = réécrire et
+  remesurer le moteur de rendu.
+- **pdf.js réclame son worker par URL**, donc une requête réseau à chaque
+  `getDocument`. D'où le worker construit **une fois** à l'ouverture de l'onglet et
+  partagé via `GlobalWorkerOptions.workerPort`. Retirer ce partage remet trois
+  lignes dans le journal réseau — inoffensives, mais elles rendent la propriété 1
+  invérifiable d'un coup d'œil.
+- **Le CSS est confiné à `#tab-atelier`.** Les sélecteurs de la maquette d'origine
+  (`nav button`, `main`, `h1`, `.btn`…) écraseraient les 18 autres onglets.
+- **Les moteurs de compression ne se réécrivent pas sans mesure.** `imageToTarget`,
+  `COMBOS`, `pickCombo`, `pdfToTarget` sont éprouvés ; le préréglage « 100 Ko » vise
+  en réalité 0,1 × 1 048 576 = 102 Ko, et cet écart de 2 % ne justifie pas d'y toucher.
+
+Voir [ADR-0035](adr/0035-atelier-fichiers-les-documents-de-la-mairie-ne-sortent-pas-du-navigateur.md)
+et [SFD-14](specifications/sfd/SFD-14-administration-backoffice.md) §RG-14.19 à RG-14.23.
 
 ---
 

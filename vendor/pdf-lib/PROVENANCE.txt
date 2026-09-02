@@ -1,0 +1,5 @@
+pdf-lib 1.17.1
+
+Copié depuis node_modules/pdf-lib/ par scripts/vendor-libs.js.
+Ne pas modifier à la main : régénérer avec « npm ci && npm run vendor ».
+La version est figée dans package.json (devDependencies).

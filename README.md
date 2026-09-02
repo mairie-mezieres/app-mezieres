@@ -91,6 +91,7 @@ GitHub Pages, Netlify…).
 | `js/mat-boot.js` | Séquence d'initialisation |
 | `service-worker.js` | Cache offline, push notifications |
 | `admin.html` | Interface d'administration (protégée par token) |
+| `js/mat-atelier-fichiers.js` | Atelier fichiers de l'admin — compression images/PDF, assemblage, extraction de texte, **100 % dans le navigateur** |
 
 Le backend est le projet [chatbot-mairie-mezieres](https://github.com/mairie-mezieres/chatbot-mairie-mezieres)
 hébergé sur Render.

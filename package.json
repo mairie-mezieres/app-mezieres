@@ -1,0 +1,16 @@
+{
+  "name": "mat-mezieres-avec-toi",
+  "version": "4.103.0",
+  "private": true,
+  "description": "MAT — Mézières Avec Toi : PWA communale (HTML/CSS/JS vanilla, sans build). Ce package.json ne sert QU'À figer les bibliothèques tierces vendorisées dans vendor/ — l'application, elle, est servie telle quelle par GitHub Pages.",
+  "license": "MIT",
+  "scripts": {
+    "vendor": "node scripts/vendor-libs.js",
+    "check": "node scripts/check-css.js && node scripts/check-cache-bust.js && node scripts/check-notify-relink.js"
+  },
+  "devDependencies": {
+    "jszip": "3.10.1",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "3.11.174"
+  }
+}
