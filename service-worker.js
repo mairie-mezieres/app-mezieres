@@ -13,7 +13,7 @@
 // J8   : « Le jeu du moment » — le jeu COURANT est précaché à l'installation,
 //         lu dans jeux/jeux.json. Aucun nom de jeu n'est écrit ici : changer de
 //         jeu ne doit toucher aucun code. Voir ADR-0037.
-const CACHE = 'mat-v4.104.0';
+const CACHE = 'mat-v4.105.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -25,7 +25,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.19',
+  './css/mat.css?v=4.14.20',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.1'
@@ -36,7 +36,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.19',
+  './css/mat.css?v=4.14.20',
   './css/mat-desktop.css?v=4.5.5',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
@@ -83,7 +83,7 @@ const PRECACHE_URLS = [
   // listé ici : il est ajouté à l'installation d'après `courant` du manifeste
   // (voir plus bas). C'est ce qui permet de changer de jeu sans toucher au code.
   './css/mat-jeu.css?v=1.0.0',
-  './js/mat-jeu.js?v=1.0.0',
+  './js/mat-jeu.js?v=1.1.0',
   './jeu/index.html',
   './jeu/archives/index.html',
   './jeux/jeux.json'

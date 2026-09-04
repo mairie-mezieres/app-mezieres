@@ -500,6 +500,14 @@ un fichier variable à une adresse fixe : il n'y a pas de serveur pour choisir.
 fichier du jeu. `replace` et non `assign` : le retour arrière ramène à
 l'application au lieu de reboucler.
 
+**⚠️ La tuile d'accueil ne nomme pas le jeu** (depuis la v4.105) : ni son titre, ni
+sa saison — on les découvre en ouvrant `/jeu`. Elle porte un libellé fixe, « Le jeu
+du moment », et la **seule** chose qui y varie est la pastille. Conséquence pour les
+tests : rien de visible ne prouve que `js/mat-jeu.js` a tourné, d'où l'attribut
+`data-jeu-pret` posé sur la tuile après hydratation. Sans lui, un contrôle mesurerait
+l'état **avant** que la pastille soit décidée, et conclurait au hasard selon la
+vitesse de la machine. Le titre et la saison, eux, restent affichés par le lanceur.
+
 **La pastille « Nouveau ».** `localStorage['jeu-vu']` porte **l'identifiant** du
 dernier jeu ouvert — pas une date. La pastille s'affiche si cet identifiant
 diffère de `courant` ; `publie` ne sert qu'à ne rien annoncer avant sa date.

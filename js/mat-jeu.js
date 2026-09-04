@@ -158,21 +158,18 @@
 
   /* ════════════════ RÔLE 1 — la tuile de l'accueil ════════════ */
 
+  /* ⚠️ LA TUILE NE NOMME PAS LE JEU. Ni son titre, ni sa saison : on les
+     découvre en l'ouvrant. Elle porte un libellé fixe, « Le jeu du moment »,
+     et la seule chose qui y varie est la pastille — décidée par le manifeste.
+     Le titre et la saison, eux, restent affichés par le lanceur `/jeu`.
+
+     Conséquence pour les tests : rien de visible ne prouve que le module a
+     tourné. D'où `data-jeu-pret`, posé après hydratation — sans quoi un test
+     mesurerait l'état AVANT que la pastille soit décidée, et conclurait au
+     hasard. */
   function hydraterTuile(m) {
     var lien = document.querySelector('[data-jeu-tuile]');
     if (!lien) return;
-    var j = courant(m);
-
-    if (!j) {
-      // Ni réseau ni miroir local : la tuile reste un lien valide vers /jeu,
-      // qui saura, lui, quoi dire. On n'affiche pas un titre inventé.
-      _texte(lien.querySelector('[data-jeu-titre]'), 'Le jeu du moment');
-      _texte(lien.querySelector('[data-jeu-saison]'), 'Touchez pour jouer');
-      return;
-    }
-
-    _texte(lien.querySelector('[data-jeu-titre]'), j.titre || j.id);
-    _texte(lien.querySelector('[data-jeu-saison]'), j.saison || '');
 
     var neuf = estNouveau(m);
     var badge = lien.querySelector('[data-jeu-badge]');
@@ -182,9 +179,9 @@
     // accessible du lien. Un habitant qui n'y voit pas — ou qui ne distingue
     // pas le rouge — apprend la nouveauté de la même façon que les autres.
     lien.setAttribute('aria-label',
-      'Le jeu du moment : ' + (j.titre || j.id)
-      + (j.saison ? ', ' + j.saison : '')
-      + (neuf ? '. Nouveau jeu disponible' : ''));
+      'Le jeu du moment' + (neuf ? '. Nouveau jeu disponible' : ''));
+
+    lien.setAttribute('data-jeu-pret', '1');
   }
 
   function initTuile() {

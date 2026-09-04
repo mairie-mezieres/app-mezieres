@@ -67,10 +67,14 @@ async function accueil(page, seed, manifeste) {
   }
   await page.goto('/');
   await page.waitForSelector('body.app-ready', { timeout: 15000 });
-  await page.waitForFunction(() => {
-    const t = document.querySelector('[data-jeu-titre]');
-    return t && t.textContent.trim().length > 0;
-  }, null, { timeout: 10000 });
+  // ⚠️ La tuile n'affiche aucun texte variable : rien de visible ne dit que le
+  // module a tourné. Sans ce repère, on mesurerait l'état AVANT que la pastille
+  // soit décidée — et le contrôle conclurait au hasard, dans un sens ou dans
+  // l'autre selon la vitesse de la machine.
+  // `attached` et non `visible` : au-delà de 1024 px la grille du téléphone est
+  // masquée, et attendre la visibilité y expirerait — alors que le module a bien
+  // tourné. Les contrôles qui exigent la visibilité portent leur propre garde.
+  await page.waitForSelector('[data-jeu-tuile][data-jeu-pret]', { state: 'attached', timeout: 10000 });
 }
 
 /* ── 1. Le manifeste lui-même ──────────────────────────────────────── */
@@ -120,14 +124,24 @@ function mobileSeulement(viewport) {
   test.skip(!viewport || viewport.width >= 1024, 'grille du téléphone uniquement');
 }
 
-test('la tuile annonce le jeu du manifeste, sans rien recopier dans le code', async ({ page }) => {
+test('la tuile mène à /jeu et ne dévoile pas le jeu', async ({ page }) => {
   await accueil(page);
   const tuile = page.locator('[data-jeu-tuile]');
 
   await expect(tuile).toHaveCount(1);
   await expect(tuile.locator('.ct-label')).toHaveText('Le jeu du moment');
-  await expect(tuile.locator('[data-jeu-titre]')).toHaveText(COURANT.titre);
-  await expect(tuile.locator('[data-jeu-saison]')).toHaveText(COURANT.saison);
+
+  // ⛔ La tuile ne nomme NI le jeu NI sa saison : on les découvre en l'ouvrant.
+  // Ni à l'écran, ni dans le nom accessible du lien — sinon un lecteur d'écran
+  // annoncerait ce que les autres ne voient pas.
+  const texte = (await tuile.textContent()).replace(/\s+/g, ' ').trim();
+  expect(texte, 'la tuile affiche le titre du jeu').not.toContain(COURANT.titre);
+  expect(texte, 'la tuile affiche la saison du jeu').not.toContain(COURANT.saison);
+  const nom = await tuile.getAttribute('aria-label');
+  expect(nom, 'le nom accessible du lien nomme le jeu').not.toContain(COURANT.titre);
+  // Garde-fou : le nom accessible doit tout de même contenir le libellé visible
+  // (WCAG 2.5.3) — sans quoi ce contrôle passerait sur un aria-label vide.
+  expect(nom).toContain('Le jeu du moment');
 
   // La route stable, celle des affiches et des QR codes.
   expect(new URL(await tuile.getAttribute('href'), page.url()).pathname).toBe('/jeu/');
