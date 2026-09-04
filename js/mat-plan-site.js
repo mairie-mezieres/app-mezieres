@@ -75,6 +75,25 @@ function _ouvrirEcran(id) {
   openOv(id);
 }
 
+/* Pages à part entière — pas des écrans de l'application.
+   « Le jeu du moment » n'est pas un `.ov` : c'est une page statique servie à
+   une adresse fixe, `/jeu`, parce qu'elle est imprimée sur des affiches et
+   qu'un jeu en canvas se comporte mal dans une vue imbriquée (ADR-0037).
+   Le relevé automatique des écrans ne peut donc pas la voir, et le plan du
+   site l'ignorerait en silence — exactement le trou que ce fichier existe
+   pour empêcher (RGAA 12.3).
+
+   ⚠️ ICI, ET SEULEMENT ICI, un intitulé est RECOPIÉ : on ne peut pas lire le
+   titre d'un autre document. `tests/e2e/plan-du-site.spec.js` vérifie donc
+   que ce libellé reste identique à celui de la tuile d'accueil — une
+   divergence rougit au lieu de passer inaperçue. */
+const PLAN_PAGES = [
+  ['Se détendre', [
+    { href: 'jeu/',          titre: 'Le jeu du moment' },
+    { href: 'jeu/archives/', titre: 'Jeux précédents' }
+  ]]
+];
+
 // Écrans volontairement absents du plan, avec leur raison. Le test exige que
 // tout écran soit ici ou dans une rubrique — jamais nulle part.
 const PLAN_ECARTES = {
@@ -143,6 +162,33 @@ function construirePlanSite() {
     });
     frag.appendChild(ul);
   });
+
+  // Les pages autonomes : de vrais liens, pas des boutons — ils quittent
+  // l'application, et le clavier comme le clic droit doivent s'en apercevoir.
+  PLAN_PAGES.forEach(([rubrique, pages]) => {
+    if (!pages.length) return;
+
+    const h = document.createElement('h2');
+    h.setAttribute('data-plan', '');
+    h.className = 'plan-rubrique';
+    h.textContent = rubrique;
+    frag.appendChild(h);
+
+    const ul = document.createElement('ul');
+    ul.setAttribute('data-plan', '');
+    ul.className = 'plan-liste';
+    pages.forEach(p => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.className = 'plan-lien';
+      a.href = p.href;
+      a.textContent = p.titre;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    frag.appendChild(ul);
+  });
+
   corps.appendChild(frag);
 }
 

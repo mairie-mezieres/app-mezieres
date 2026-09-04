@@ -5,6 +5,71 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.104] — 4 septembre 2026
+
+### Ajouté
+- **« Le jeu du moment »** — un petit jeu communal, qui change au fil des saisons.
+  Le premier est *La Hotte* (les vendanges).
+  - **Route stable `/jeu`** (`jeu/index.html`), destinée à être imprimée sur des
+    affiches et des QR codes : elle sert toujours le jeu courant, quel qu'il soit.
+    C'est un **lanceur**, pas le jeu — sur un hébergement statique, une adresse fixe
+    ne peut pas servir un fichier variable, il n'y a pas de serveur pour choisir.
+    Il lit le manifeste et fait `location.replace()` (jamais `assign` : le retour
+    arrière doit ramener à l'application, pas reboucler).
+  - **`jeux/jeux.json`, source unique** : titre, saison, résumé, fichier, vignette,
+    date, et `courant`. Publier le jeu suivant = déposer un fichier, ajouter une
+    entrée, changer une ligne. **Aucun code à toucher.**
+  - **Tuile d'accueil** avec pastille « Nouveau ». La mémoire de l'appareil est
+    `localStorage['jeu-vu']`, un **identifiant** — pas une date : comparer des dates
+    aurait rallumé la pastille sur toute la commune à la première coquille corrigée
+    dans `publie`. La date ne sert qu'à ne rien annoncer avant elle.
+  - **`/jeu/archives`** — les jeux des saisons passées, toujours jouables.
+  - **Hors-ligne en trois couches** : précache de la coquille **et** du jeu que
+    `courant` désigne (lu dans le manifeste à l'installation, jamais écrit en dur) ;
+    manifeste servi **réseau d'abord, cache en secours** ; message `CACHE_JEU` du
+    lanceur au service worker, pour qu'un jeu publié sans nouvelle version de l'app
+    soit en cache dès sa première ouverture.
+  - `tests/e2e/jeu.spec.js` — 13 contrôles, dont trois qui gardent les promesses :
+    **aucun nom de jeu dans le code** (échoue si le titre courant apparaît dans
+    `index.html` ou son identifiant dans `service-worker.js`), **aucune requête
+    réseau pendant une partie** (mesurée, doigt sur l'écran, trois secondes), et
+    **aucun jeu du manifeste ne dépend du réseau** — y compris ceux qui n'existent
+    pas encore.
+  - Voir **ADR-0037**.
+
+### Modifié
+- **La tuile « Contacter vos élus » de l'accueil mobile a cédé sa place au jeu.**
+  Elle appelait `openContact()` — exactement comme le bandeau « Mairie » en haut du
+  même écran. Doublon signalé par le porteur. L'écran reste atteignable depuis ce
+  bandeau, depuis la mise en page bureau et depuis le plan du site.
+- **Le meilleur score du jeu est passé en `localStorage`** (`mat-jeu-best-<id>`) : il
+  vivait en mémoire et disparaissait à chaque rechargement. Une clé par jeu — le jeu
+  suivant ne doit pas effacer le record du précédent. Rien n'est envoyé nulle part.
+- **`maximum-scale=1,user-scalable=no` retiré** du `<meta viewport>` du jeu :
+  interdire le zoom est un défaut RGAA 13.9. `touch-action:none` suffit à empêcher le
+  double-tap et le pincement de gêner la partie.
+- **Plan du site (RGAA 12.3)** — `js/mat-plan-site.js` liste désormais des **pages**
+  autonomes en plus des écrans (`PLAN_PAGES`, rubrique « Se détendre »). `/jeu` n'est
+  pas un `.ov` : le relevé automatique des écrans ne pouvait pas le voir, et le plan
+  l'aurait ignoré en silence. ⚠️ C'est le seul endroit du plan où un intitulé est
+  **recopié** — on ne peut pas lire le titre d'un autre document ; deux tests
+  vérifient qu'il ne diverge ni de `PLAN_PAGES` ni de la tuile d'accueil.
+- **`tests/e2e/static-server.js` résout les index de répertoire**, comme GitHub Pages
+  (`/jeu/` → `jeu/index.html`, `/jeu` → 301 vers `/jeu/`). Sans cela `/jeu/` renvoyait
+  404 **dans les tests seulement** : un contrôle qui échoue là où la production marche
+  apprend à se méfier du signal.
+
+### Connu, et assumé
+- **La mise en page bureau (≥ 1024 px) n'a pas de point d'entrée dédié vers le jeu** :
+  la grille du téléphone y est masquée, l'accès se fait par le plan du site en pied de
+  page. Choix explicite, à revoir avec une carte dans la colonne de droite.
+- **Un jeu publié sans nouvelle version de l'application n'est pas jouable hors
+  connexion avant d'avoir été ouvert une fois.** Le service worker en place ne rejoue
+  pas son `install`. Pour le précacher d'emblée, bumper `CACHE` (et donc le numéro
+  affiché).
+
+---
+
 ## [4.103] — 1er septembre 2026
 
 ### Corrigé

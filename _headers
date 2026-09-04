@@ -29,6 +29,12 @@
 /data/*.json
   Cache-Control: public, max-age=300, must-revalidate
 
+# ⚠️ AVANT DE DURCIR script-src (retirer 'unsafe-inline') : les jeux de /jeux/
+# sont des fichiers HTML AUTONOMES, script en ligne compris — c'est ce qui permet
+# d'en déposer un nouveau sans toucher au code (ADR-0037). Un durcissement global
+# les casserait tous, d'un coup, sans rien afficher. Prévoir alors une exception
+# de chemin pour /jeux/*, ou un hash par fichier. Les pages MAT elles-mêmes
+# (/jeu, /jeu/archives) n'ont, elles, aucun script en ligne.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN

@@ -1,6 +1,6 @@
 {
   "name": "mat-mezieres-avec-toi",
-  "version": "4.103.0",
+  "version": "4.104.0",
   "private": true,
   "description": "MAT — Mézières Avec Toi : PWA communale (HTML/CSS/JS vanilla, sans build). Ce package.json ne sert QU'À figer les bibliothèques tierces vendorisées dans vendor/ — l'application, elle, est servie telle quelle par GitHub Pages.",
   "license": "MIT",

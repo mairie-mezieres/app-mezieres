@@ -49,7 +49,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.18">
+<link rel="stylesheet" href="css/mat.css?v=4.14.19">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.5.5">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -82,7 +82,12 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
 <script defer src="js/mat-perf.js?v=1.0.9"></script>
-<script defer src="js/mat-plan-site.js?v=1.0.1"></script>
+<script defer src="js/mat-plan-site.js?v=1.1.0"></script>
+<!-- Le jeu du moment : remplit la tuile de l'accueil d'après jeux/jeux.json et
+     décide de la pastille « Nouveau ». Le même module sert /jeu et /jeu/archives.
+     Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
+     module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
+<script defer src="js/mat-jeu.js?v=1.0.0"></script>
 <script defer src="js/mat-boot.js?v=4.12.7"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -168,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.103 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.104 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -328,10 +333,25 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 <button onclick="launchDiapo()" title="Lancer le diaporama plein écran" aria-label="Diaporama" style="flex-shrink:0;border:none;border-left:1px solid var(--border);background:none;padding:0 16px;height:100%;cursor:pointer;font-size:1.3rem;color:var(--muted);font-family:inherit;align-self:stretch;display:flex;align-items:center">▶</button>
 </div></li>
-<li><button class="card simple-card" onclick="openContact()">
-<span class="ico ico-hab">💬</span>
-<span class="ct"><span class="ct-label">Contacter vos élus</span></span>
-</button></li>
+<!-- ⚠️ Cette tuile a remplacé « Contacter vos élus », qui faisait DOUBLON avec le
+     bandeau « Mairie » du haut de l'accueil : les deux appelaient openContact().
+     L'écran « Contacter vos élus » existe toujours et reste atteignable depuis ce
+     bandeau, depuis la mise en page bureau et depuis le plan du site.
+     ⛔ Le nom du jeu n'est écrit NULLE PART ici : titre et saison sont lus dans
+     jeux/jeux.json par js/mat-jeu.js. Changer de jeu ne doit toucher aucun code. -->
+<li><a class="card simple-card jeu-tuile" href="jeu/" data-jeu-tuile aria-label="Le jeu du moment">
+<span class="ico ico-jeu" aria-hidden="true">🍇</span>
+<span class="ct">
+<!-- ⚠️ La pastille est DANS le flux, avant le titre — pas en position absolue
+     dans un coin. Dans une tuile de demi-largeur, un « NOUVEAU » posé en haut à
+     droite recouvre « du moment » : le titre passe dessous, et réserver la place
+     par du `padding` ne laisserait qu'une quinzaine de pixels au libellé. -->
+<span class="jeu-badge" data-jeu-badge aria-hidden="true" hidden>Nouveau</span>
+<span class="ct-label">Le jeu du moment</span>
+<span class="ct-sub" data-jeu-titre></span>
+<span class="ct-sub jeu-saison" data-jeu-saison></span>
+</span>
+</a></li>
 </ul>
 <h2 class="sec">Signalements et Contacts</h2>
 <ul class="grid2">
@@ -500,7 +520,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.103</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.104</button>
 </div>
 </div>
 </div>
@@ -1820,6 +1840,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 4 septembre 2026 — v4.104</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Nouveau&nbsp;: &laquo;&nbsp;Le jeu du moment&nbsp;&raquo;.</strong> Un petit jeu communal, qui change au fil des saisons. On commence par <em>La Hotte</em>&nbsp;: le raisin tombe de la treille, remplissez la hotte du vendangeur et videz-la dans la charrette</li>
+<li><strong>Il fonctionne sans connexion</strong>, une fois ouvert une premi&egrave;re fois, et <strong>rien n&rsquo;en sort</strong>&nbsp;: pas de compte, pas de publicit&eacute;, pas de classement en ligne. Votre meilleur score reste sur votre t&eacute;l&eacute;phone</li>
+<li><strong>Une pastille &laquo;&nbsp;Nouveau&nbsp;&raquo;</strong> vous signale l&rsquo;arriv&eacute;e d&rsquo;un jeu in&eacute;dit, et s&rsquo;&eacute;teint d&egrave;s que vous l&rsquo;avez ouvert. Les jeux des saisons pass&eacute;es restent jouables dans &laquo;&nbsp;Jeux pr&eacute;c&eacute;dents&nbsp;&raquo;</li>
+<li>La tuile &laquo;&nbsp;Contacter vos &eacute;lus&nbsp;&raquo; lui a c&eacute;d&eacute; sa place&nbsp;: elle faisait <strong>doublon</strong> avec le bandeau &laquo;&nbsp;Mairie&nbsp;&raquo; en haut de l&rsquo;accueil, qui ouvre exactement le m&ecirc;me &eacute;cran</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 1er septembre 2026 — v4.103</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Les petits liens et la croix de la banni&egrave;re d&rsquo;installation sont plus faciles &agrave; toucher.</strong> Leur zone tactile atteint d&eacute;sormais 24&nbsp;px, sans que le texte bouge&nbsp;: c&rsquo;est la r&egrave;gle du futur RGAA&nbsp;5, attendu fin 2026</li>

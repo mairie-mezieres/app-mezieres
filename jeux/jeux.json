@@ -1,0 +1,14 @@
+{
+  "courant": "la-hotte",
+  "jeux": [
+    {
+      "id": "la-hotte",
+      "titre": "La Hotte",
+      "saison": "Septembre — les vendanges",
+      "resume": "Le raisin tombe de la treille, remplissez la hotte.",
+      "fichier": "/jeux/la-hotte.html",
+      "vignette": "/jeux/la-hotte.svg",
+      "publie": "2026-09-04"
+    }
+  ]
+}

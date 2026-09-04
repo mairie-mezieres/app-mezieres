@@ -10,7 +10,10 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-const CACHE = 'mat-v4.103.0';
+// J8   : « Le jeu du moment » — le jeu COURANT est précaché à l'installation,
+//         lu dans jeux/jeux.json. Aucun nom de jeu n'est écrit ici : changer de
+//         jeu ne doit toucher aucun code. Voir ADR-0037.
+const CACHE = 'mat-v4.104.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -22,7 +25,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.18',
+  './css/mat.css?v=4.14.19',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.1'
@@ -33,7 +36,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.18',
+  './css/mat.css?v=4.14.19',
   './css/mat-desktop.css?v=4.5.5',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
@@ -57,7 +60,7 @@ const PRECACHE_URLS = [
   './js/mat-desktop.js?v=4.3.2',
   './js/mat-eau8.js?v=4.3.0',
   './js/mat-plui.js?v=1.2.0',
-  './js/mat-plan-site.js?v=1.0.1',
+  './js/mat-plan-site.js?v=1.1.0',
   // ⚠️ `js/mat-carte3d.js` est précaché (29 Ko), mais PAS
   // `vendor/maplibre/maplibre-gl.js` (~1 Mo) : le précacher triplerait le
   // poids d'installation de l'application pour une page que la plupart des
@@ -74,7 +77,16 @@ const PRECACHE_URLS = [
   './img/MAT et MEL.webp',
   './notif.html',
   './icon-192.png',
-  './icon-badge.png'
+  './icon-badge.png',
+  // « Le jeu du moment » — la coquille : le lanceur /jeu, les archives, le
+  // manifeste et le module qui les anime. Le FICHIER DU JEU, lui, n'est pas
+  // listé ici : il est ajouté à l'installation d'après `courant` du manifeste
+  // (voir plus bas). C'est ce qui permet de changer de jeu sans toucher au code.
+  './css/mat-jeu.css?v=1.0.0',
+  './js/mat-jeu.js?v=1.0.0',
+  './jeu/index.html',
+  './jeu/archives/index.html',
+  './jeux/jeux.json'
 ];
 
 self.addEventListener('install', e => {
@@ -97,6 +109,26 @@ self.addEventListener('install', e => {
       // L'install échoue → l'ancienne version reste active, l'utilisateur
       // garde une app fonctionnelle (vs. un cache nouveau mais cassé).
       throw new Error('[SW] precache critique échoué: ' + failed.join(', '));
+    }
+
+    // ── Le jeu du moment ──────────────────────────────────────────────
+    // On lit le manifeste et on précache le fichier que `courant` désigne.
+    // ⛔ Ne JAMAIS écrire un nom de jeu ici : ce serait une seconde source,
+    // et elle divergerait du manifeste au premier changement de saison.
+    // Best-effort : un manifeste absent ou illisible ne doit pas empêcher
+    // l'installation de tout le reste de l'application.
+    try {
+      const rep = await fetch('./jeux/jeux.json', { cache: 'no-store' });
+      const m = rep.ok ? await rep.json() : null;
+      const jeux = (m && Array.isArray(m.jeux)) ? m.jeux : [];
+      const jeu = jeux.find(j => j && String(j.id) === String(m.courant)) || jeux[0];
+      if (jeu && jeu.fichier) {
+        const cible = new URL(String(jeu.fichier).replace(/^\/+/, ''), self.registration.scope).href;
+        await c.add(cible);
+        _PRECACHE_SET.add(cible);   // protégé de l'éviction, comme le reste de la coquille
+      }
+    } catch (err) {
+      console.warn('[SW] jeu courant non précaché:', err && err.message);
     }
   })());
 });
@@ -156,6 +188,29 @@ self.addEventListener('fetch', e => {
 
   // Hors-GET : laisser passer sans interception (POST same-origin éventuels)
   if (e.request.method !== 'GET') return;
+
+  // ── Manifeste des jeux : RÉSEAU D'ABORD, cache en secours ──────────
+  // Tout le reste est servi en stale-while-revalidate, ce qui conviendrait
+  // mal ici : le jour où la mairie change de jeu, l'affiche imprimée et
+  // l'application diraient deux choses différentes jusqu'au lancement
+  // suivant. Le manifeste est minuscule (quelques centaines d'octets), le
+  // coût est nul, et hors connexion le cache prend le relais.
+  if (url.includes('/jeux/jeux.json')) {
+    e.respondWith((async () => {
+      try {
+        const res = await fetch(e.request);
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone)).catch(() => {});
+          return res;
+        }
+      } catch (_) { /* hors ligne : on retombe sur le cache */ }
+      return (await caches.match(e.request))
+        || (await caches.match('./jeux/jeux.json'))
+        || Response.error();
+    })());
+    return;
+  }
 
   // Stale-while-revalidate : on sert la version en cache immédiatement (chargement
   // quasi instantané pour les visites récurrentes) et on rafraîchit le cache en
@@ -354,6 +409,27 @@ self.addEventListener('message', e => {
   // l'utilisateur a confirmé via le prompt 'Mise à jour disponible'.
   if (e.data === 'SKIP_WAITING' || (typeof e.data === 'object' && e.data.action === 'SKIP_WAITING')) {
     self.skipWaiting();
+    return;
+  }
+
+  // ── Le jeu du moment : mise en cache à la première ouverture ───────
+  // Le service worker installé précache le jeu que le manifeste désignait
+  // CE JOUR-LÀ. Quand la mairie publie le jeu suivant sans nouvelle version
+  // de l'application, ce service worker-là ne rejouera pas son install : sans
+  // ce message, le nouveau jeu ne serait jamais disponible hors connexion.
+  // C'est /jeu qui le demande, une fois qu'il sait quel fichier il ouvre.
+  // ⚠️ Same-origin uniquement : ce canal ne doit pas pouvoir faire mettre en
+  // cache une adresse tierce.
+  if (typeof e.data === 'object' && e.data.action === 'CACHE_JEU' && e.data.url) {
+    e.waitUntil((async () => {
+      try {
+        const cible = new URL(String(e.data.url), self.registration.scope);
+        if (cible.origin !== self.location.origin) return;
+        const c = await caches.open(CACHE);
+        await c.add(cible.href);
+        _PRECACHE_SET.add(cible.href);   // protégé de l'éviction
+      } catch (_) {}
+    })());
     return;
   }
 

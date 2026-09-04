@@ -25,6 +25,8 @@
 16. [Grand dossier PLUi-H-D](#16-grand-dossier-plui-h-d)
 17. [Je viens d'emménager — le guide d'arrivée](#17-je-viens-demménager--le-guide-darrivée)
 18. [« Le saviez-vous ? » — le fait du jour](#18--le-saviez-vous---le-fait-du-jour)
+19. [« Le jeu du moment »](#19--le-jeu-du-moment-)
+20. [Pour la mairie — publier le jeu suivant](#20-pour-la-mairie--publier-le-jeu-suivant)
 
 ---
 
@@ -795,5 +797,75 @@ pas question de prendre le moindre risque d'erreur.
 
 ---
 
-*Dernière mise à jour : août 2026*
+## 19. « Le jeu du moment »
+
+Un petit jeu communal, qui **change au fil des saisons**. On y accède depuis la tuile
+🍇 **Le jeu du moment** sur l'écran d'accueil, ou directement à l'adresse
+**mezieres-lez-clery.fr/jeu** — celle qui est imprimée sur les affiches et les QR codes
+de la commune. Cette adresse ne changera jamais : elle mène toujours au jeu du moment,
+quel qu'il soit.
+
+### Ce qu'il faut savoir
+
+- **Il se joue au doigt** — glissez sur l'écran. Au clavier : flèches gauche et droite,
+  barre d'espace ou Entrée pour commencer.
+- **Il fonctionne sans connexion**, une fois que vous l'avez ouvert une première fois.
+- **Rien ne sort de votre téléphone.** Pas de compte, pas de publicité, pas de
+  classement en ligne, aucune statistique de partie. **Votre meilleur score reste chez
+  vous** : personne d'autre ne le voit, et il disparaît si vous effacez les données du
+  site.
+- **La pastille « Nouveau »** apparaît sur la tuile quand un jeu inédit est publié. Elle
+  s'éteint dès que vous l'avez ouvert, et ne revient qu'au jeu suivant.
+- **Les jeux des saisons passées restent jouables** : le lien « Jeux précédents », en bas
+  de la page du jeu, les rassemble tous.
+
+---
+
+## 20. Pour la mairie — publier le jeu suivant
+
+Trois gestes, et **aucun code à toucher**. Tout se passe dans le dépôt `app-mezieres`.
+
+1. **Déposer le fichier du jeu** dans le dossier `jeux/`, par exemple
+   `jeux/le-fournil.html`. Ce doit être un fichier HTML **autonome** : il ne doit rien
+   aller chercher sur internet (ni image distante, ni police, ni bibliothèque), sinon il
+   ne fonctionnera pas hors connexion. Facultatif : une vignette à côté, par exemple
+   `jeux/le-fournil.svg`.
+
+2. **Ajouter son entrée** dans `jeux/jeux.json`, dans la liste `jeux` :
+
+   ```json
+   {
+     "id": "le-fournil",
+     "titre": "Le Fournil",
+     "saison": "Décembre — les fêtes",
+     "resume": "Enfournez les pains avant que le four ne refroidisse.",
+     "fichier": "/jeux/le-fournil.html",
+     "vignette": "/jeux/le-fournil.svg",
+     "publie": "2026-12-01"
+   }
+   ```
+
+3. **Changer `"courant"`** en haut du même fichier :
+   `"courant": "le-fournil"`.
+
+C'est tout. La tuile d'accueil affiche le nouveau titre et sa saison, la pastille
+« Nouveau » se rallume pour tout le monde, `/jeu` mène au nouveau jeu, et l'ancien
+bascule automatiquement dans « Jeux précédents ».
+
+> ⚠️ **Ne supprimez jamais l'ancienne entrée** de la liste : c'est elle qui garde le jeu
+> précédent jouable dans les archives.
+
+> ⚠️ **La date `publie` ne doit pas être dans le futur** si vous voulez que le jeu
+> s'annonce tout de suite. Une date à venir est le moyen de déposer un jeu **à l'avance**
+> : il restera invisible jusqu'à ce jour-là.
+
+> 💡 **Les habitants déjà équipés** reçoivent le nouveau jeu dès qu'ils ouvrent
+> l'application avec une connexion. Il devient jouable hors connexion après leur première
+> partie. Si vous voulez qu'il le soit **avant** même d'avoir été ouvert, il faut
+> accompagner la publication d'une nouvelle version de l'application (voir le guide
+> technique) — ce n'est pas nécessaire dans le cas courant.
+
+---
+
+*Dernière mise à jour : septembre 2026*
 *Application MAT — Commune de Mézières-lez-Cléry — Licence MIT*
