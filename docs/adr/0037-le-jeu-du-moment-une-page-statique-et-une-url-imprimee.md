@@ -150,3 +150,21 @@ le plan du site.
   adresse IP. `tests/e2e/jeu.spec.js` refuse tout jeu du manifeste qui citerait
   un domaine externe ou appellerait le réseau — y compris ceux qui n'existent
   pas encore.
+
+## Mise à jour — v4.105 (4 septembre 2026)
+
+**La tuile d'accueil ne nomme plus le jeu.** Elle affichait « Le jeu du moment »,
+puis le titre, puis la saison — quatre lignes avec la pastille, dans une tuile de
+demi-largeur. Décision du porteur après l'avoir vue en place : la tuile porte
+désormais son seul libellé, et le jeu se découvre en l'ouvrant. Le titre et la
+saison restent affichés par le lanceur `/jeu`, et vivent toujours dans le
+manifeste — rien n'a changé au mécanisme.
+
+Le nom accessible du lien suit : il n'annonce plus le titre non plus. Un lecteur
+d'écran ne doit pas dire ce que personne ne voit.
+
+⚠️ Effet de bord à connaître : **plus rien de visible ne prouve que le module a
+tourné.** D'où `data-jeu-pret`, posé sur la tuile après hydratation, sur lequel les
+tests s'accrochent. Sans lui, ils mesuraient l'état de la pastille avant qu'elle
+soit décidée — vert ou rouge selon la vitesse de la machine, ce qui est la
+définition d'un contrôle qui ne mesure rien.

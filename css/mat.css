@@ -236,10 +236,6 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
    que le contour par défaut du navigateur — variable, et parfois invisible sur
    fond crème. `:focus-visible` : rien ne change au doigt ni à la souris. */
 .jeu-tuile:focus-visible{outline:3px solid var(--forest);outline-offset:2px;box-shadow:0 0 0 6px rgba(255,255,255,0.9);border-radius:var(--r);}
-/* ⚠️ Pas de `color:var(--leaf)` ici : le thème sombre redéfinit `--leaf` en
-   FOND, et cette ligne y deviendrait du noir sur noir. La saison hérite de
-   `.ct-sub`, qui est mesurée dans les cinq rendus. */
-.jeu-tuile .jeu-saison{font-weight:700;}
 .jeu-badge{display:inline-flex;align-items:center;justify-content:center;margin-bottom:3px;background:#b91c1c;color:#fff;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:999px;box-shadow:0 2px 8px rgba(185,28,28,0.45);}
 /* Sans cette ligne, l'attribut `hidden` ne masquerait RIEN : la règle
    ci-dessus l'emporte sur le `display:none` par défaut du navigateur. */

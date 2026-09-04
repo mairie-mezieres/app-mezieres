@@ -800,7 +800,8 @@ pas question de prendre le moindre risque d'erreur.
 ## 19. « Le jeu du moment »
 
 Un petit jeu communal, qui **change au fil des saisons**. On y accède depuis la tuile
-🍇 **Le jeu du moment** sur l'écran d'accueil, ou directement à l'adresse
+🍇 **Le jeu du moment** sur l'écran d'accueil — qui ne dit volontairement pas de quel
+jeu il s'agit : on le découvre en l'ouvrant — ou directement à l'adresse
 **mezieres-lez-clery.fr/jeu** — celle qui est imprimée sur les affiches et les QR codes
 de la commune. Cette adresse ne changera jamais : elle mène toujours au jeu du moment,
 quel qu'il soit.
@@ -848,9 +849,9 @@ Trois gestes, et **aucun code à toucher**. Tout se passe dans le dépôt `app-m
 3. **Changer `"courant"`** en haut du même fichier :
    `"courant": "le-fournil"`.
 
-C'est tout. La tuile d'accueil affiche le nouveau titre et sa saison, la pastille
-« Nouveau » se rallume pour tout le monde, `/jeu` mène au nouveau jeu, et l'ancien
-bascule automatiquement dans « Jeux précédents ».
+C'est tout. La pastille « Nouveau » se rallume pour tout le monde, `/jeu` mène au
+nouveau jeu — qui annonce son titre et sa saison à l'ouverture — et l'ancien bascule
+automatiquement dans « Jeux précédents ».
 
 > ⚠️ **Ne supprimez jamais l'ancienne entrée** de la liste : c'est elle qui garde le jeu
 > précédent jouable dans les archives.

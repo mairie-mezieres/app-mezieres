@@ -5,6 +5,25 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.105] — 4 septembre 2026
+
+### Modifié
+- **La tuile « Le jeu du moment » ne nomme plus le jeu.** Elle affichait le libellé,
+  puis le titre, puis la saison — quatre lignes avec la pastille, dans une tuile de
+  demi-largeur. Elle porte désormais son seul libellé ; le titre et la saison restent
+  affichés par le lanceur `/jeu`, et vivent toujours dans `jeux/jeux.json`. Le nom
+  accessible du lien suit : il n'annonce plus le titre non plus — un lecteur d'écran
+  ne doit pas dire ce que personne ne voit.
+- ⚠️ **Effet de bord** : plus rien de visible ne prouve que `js/mat-jeu.js` a tourné.
+  D'où **`data-jeu-pret`**, posé sur la tuile après hydratation, sur lequel les tests
+  s'accrochent. Sans lui, ils mesuraient l'état de la pastille **avant** qu'elle soit
+  décidée — vert ou rouge selon la vitesse de la machine, ce qui est la définition
+  d'un contrôle qui ne mesure rien. (`waitForSelector` en `attached` et non `visible` :
+  au-delà de 1024 px la grille du téléphone est masquée.)
+- Voir **ADR-0037**, §« Mise à jour — v4.105 ».
+
+---
+
 ## [4.104] — 4 septembre 2026
 
 ### Ajouté
