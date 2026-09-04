@@ -74,15 +74,30 @@ test('le plan liste les écrans avec leur vrai intitulé', async ({ page }) => {
 
   const r = await page.evaluate(() => {
     const liens = [...document.querySelectorAll('#plansite-body .plan-lien')];
+    // Deux natures de liens, et deux exigences différentes :
+    //  • les ÉCRANS sont des <button> — leur intitulé est LU dans l'écran, il
+    //    ne doit donc jamais s'en écarter ;
+    //  • les PAGES autonomes (« Le jeu du moment ») sont des <a> — on ne peut
+    //    pas lire le titre d'un autre document, leur intitulé est forcément
+    //    recopié dans PLAN_PAGES. On vérifie alors qu'il correspond bien à ce
+    //    qui y est déclaré (et `jeu.spec.js` vérifie, lui, qu'il reste
+    //    identique à l'intitulé de la tuile d'accueil).
+    const ecrans = liens.filter((l) => l.tagName === 'BUTTON');
+    const pages  = liens.filter((l) => l.tagName === 'A');
+    const declares = PLAN_PAGES.flatMap(([, p]) => p.map((x) => x.titre));
     return {
       nb: liens.length,
+      nbPages: pages.length,
       rubriques: document.querySelectorAll('#plansite-body .plan-rubrique').length,
       vides: liens.filter((b) => !b.textContent.trim()).length,
       // Chaque intitulé affiché doit être celui de l'écran correspondant.
       // C'est ce qui interdit une liste recopiée qui divergerait.
-      ecarts: liens
+      ecarts: ecrans
         .map((b) => b.textContent.trim())
-        .filter((t) => !_tousLesEcrans().some((id) => _titreEcran(id) === t))
+        .filter((t) => !_tousLesEcrans().some((id) => _titreEcran(id) === t)),
+      ecartsPages: pages
+        .map((a) => a.textContent.trim())
+        .filter((t) => declares.indexOf(t) === -1)
     };
   });
 
@@ -91,6 +106,13 @@ test('le plan liste les écrans avec leur vrai intitulé', async ({ page }) => {
   expect(r.vides, 'lien(s) sans intitulé').toBe(0);
   expect(r.ecarts,
     'intitulé(s) affiché(s) ne correspondant à aucun écran — le plan a divergé').toEqual([]);
+
+  // Garde-fou : si plus aucun lien de page n'était rendu, l'assertion
+  // ci-dessus sur `ecartsPages` serait vraie sans rien mesurer.
+  expect(r.nbPages, 'aucune page autonome listée : le plan ignore /jeu (RGAA 12.3)')
+    .toBeGreaterThan(0);
+  expect(r.ecartsPages,
+    'intitulé(s) de page ne correspondant pas à PLAN_PAGES').toEqual([]);
 });
 
 test('un lien du plan ouvre bien l’écran visé', async ({ page }) => {

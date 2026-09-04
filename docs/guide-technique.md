@@ -71,6 +71,7 @@ app-mezieres/
 ├── css/
 │   ├── mat.css             Styles principaux (mobile + thèmes)
 │   ├── mat-desktop.css     Styles layout desktop (≥ 1024 px)
+│   ├── mat-jeu.css         Lanceur /jeu et archives (le jeu, lui, est autonome)
 │   └── fonts.css           Polices auto-hébergées (Nunito)
 │
 ├── js/
@@ -98,7 +99,17 @@ app-mezieres/
 │   ├── mat-jours-feries.js Calcul jours fériés français
 │   ├── mat-partager.js     Logique du générateur partager.html
 │   ├── mat-atelier-fichiers.js  Atelier fichiers de l'admin (100 % local, hors app habitant)
+│   ├── mat-jeu.js          « Le jeu du moment » : tuile + pastille, lanceur, archives
 │   └── mat-utils.js        Utilitaires communs
+│
+├── jeu/                    Le jeu du moment — pages, PAS de jeu (ADR-0037)
+│   ├── index.html          ⛔ Route STABLE /jeu, imprimée sur affiches et QR codes
+│   └── archives/index.html Les jeux des saisons passées, toujours jouables
+│
+├── jeux/                   Les jeux eux-mêmes
+│   ├── jeux.json           ⛔ SOURCE UNIQUE : titre, saison, fichier, date, « courant »
+│   ├── la-hotte.html       Fichier HTML autonome — aucune dépendance externe
+│   └── la-hotte.svg        Vignette (facultative)
 │
 ├── vendor/                 Bibliothèques auto-hébergées (pas de CDN)
 │   ├── leaflet/            Cartes 2D (signalements, suivi)
@@ -455,10 +466,77 @@ est versionné dans le dépôt et listé dans `PRECACHE_URLS` :
 | `data/mel-tree.json` | L'arbre de décision de MEL |
 | `data/plu-data.json` | Le module PLU / urbanisme |
 | `data/saviez-vous.json` | Le fait du jour — voir ci-dessous |
+| `jeux/jeux.json` | Le jeu du moment — voir ci-dessous |
 
 ⚠️ **Tout nouveau fichier de contenu doit être ajouté à `PRECACHE_URLS` avec son
 paramètre `?v=`**, sinon il ne sera pas disponible hors ligne et échappera à
 l'invalidation de cache.
+
+### « Le jeu du moment » — route stable `/jeu`, manifeste, pastille (v4.104)
+
+Voir **ADR-0037** pour les raisons ; ce qui suit est le mode d'emploi.
+
+**Les fichiers**
+
+| Chemin | Rôle |
+|---|---|
+| `jeux/jeux.json` | **La seule source.** Titre, saison, résumé, fichier, vignette, date, et `courant`. |
+| `jeux/<id>.html` | Le jeu, fichier HTML **autonome** (aucune dépendance externe). |
+| `jeux/<id>.svg` | La vignette, affichée dans les archives. Facultative. |
+| `jeu/index.html` | **Le lanceur** — la route stable, imprimée sur les affiches et les QR codes. |
+| `jeu/archives/index.html` | La liste des jeux précédents, toujours jouables. |
+| `js/mat-jeu.js` | Un module, trois rôles : tuile d'accueil, lanceur, archives. |
+| `css/mat-jeu.css` | Les deux pages qui encadrent le jeu. Le jeu, lui, n'utilise rien de commun. |
+
+**⛔ Le nom d'un jeu ne s'écrit QUE dans `jeux/jeux.json`.** Ni dans `index.html`,
+ni dans le service worker, ni dans un test. `tests/e2e/jeu.spec.js` échoue si le
+titre du jeu courant apparaît dans `index.html`, ou son identifiant dans
+`service-worker.js` — parce que ce serait une double source, et qu'elle
+divergerait au premier changement de saison, en silence.
+
+**Pourquoi `/jeu` est un lanceur et pas le jeu.** GitHub Pages ne peut pas servir
+un fichier variable à une adresse fixe : il n'y a pas de serveur pour choisir.
+`jeu/index.html` lit donc le manifeste et fait `location.replace()` vers le
+fichier du jeu. `replace` et non `assign` : le retour arrière ramène à
+l'application au lieu de reboucler.
+
+**La pastille « Nouveau ».** `localStorage['jeu-vu']` porte **l'identifiant** du
+dernier jeu ouvert — pas une date. La pastille s'affiche si cet identifiant
+diffère de `courant` ; `publie` ne sert qu'à ne rien annoncer avant sa date.
+⚠️ Comparer des dates rallumerait la pastille sur toute la commune si la mairie
+corrigeait une coquille dans `publie`. Elle porte le mot « Nouveau » et le lien
+annonce « Nouveau jeu disponible » (`aria-label`) : jamais la couleur seule.
+
+**Le hors-ligne, en trois couches** — c'est la partie qu'on oublie :
+
+1. le service worker précache la coquille **et** le fichier que `courant`
+   désigne, lu dans le manifeste à l'installation ;
+2. `jeux/jeux.json` est servi **réseau d'abord, cache en secours** (tout le reste
+   est en *stale-while-revalidate*) — sinon l'affiche imprimée annoncerait un jeu
+   que l'application ne sert pas encore ;
+3. le lanceur envoie au service worker un message `CACHE_JEU` avec l'adresse du
+   jeu qu'il vient de résoudre → le jeu est en cache dès sa **première
+   ouverture**, même si le service worker en place ne rejoue jamais son `install`.
+
+⚠️ **Limite assumée** : un jeu publié sans nouvelle version de l'application
+n'est pas jouable hors connexion **avant** d'avoir été ouvert une fois. Pour
+qu'il le soit, bumper `CACHE` dans `service-worker.js` (et donc le numéro
+affiché, cf. la règle du dépôt).
+
+**Publier le jeu suivant** — voir `docs/guide-utilisateur.md` §19 pour la version
+non technique. En bref : déposer `jeux/<id>.html`, ajouter l'entrée, changer
+`courant`. Aucun code à toucher.
+
+⚠️ **Ce que le jeu n'a pas le droit de faire** : citer un domaine externe,
+appeler `fetch`/`XMLHttpRequest`, charger une police distante (`@font-face`,
+`@import`), ouvrir un `Worker`. `tests/e2e/jeu.spec.js` refuse **tous** les jeux
+du manifeste qui le feraient — y compris ceux qui n'existent pas encore. C'est
+cette propriété qui rend le jeu jouable en mode avion *et* qui garantit qu'aucune
+donnée ne sort de l'appareil.
+
+⚠️ **Le meilleur score reste local**, dans une clé propre au jeu
+(`mat-jeu-best-<id>`) : le jeu suivant ne doit pas effacer le record du
+précédent. Aucun envoi, aucun classement en ligne.
 
 ### Documents officiels — pastille « Nouveau » et cache local
 

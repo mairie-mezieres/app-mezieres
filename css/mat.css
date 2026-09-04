@@ -220,6 +220,31 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .plui-banner .plui-badge{display:none;position:absolute;top:14px;right:14px;align-items:center;justify-content:center;background:#ef4444;color:#fff;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;padding:4px 10px;border-radius:999px;box-shadow:0 2px 8px rgba(239,68,68,0.5);}
 .sec:first-child{padding-top:4px;}
 
+/* ── Tuile « Le jeu du moment » (accueil mobile) ──────────────────────
+   Le titre et la saison sont écrits par js/mat-jeu.js d'après jeux/jeux.json :
+   aucun nom de jeu ne vit dans le CSS ni dans le HTML.
+   ⛔ CONTRASTE de la pastille : #b91c1c avec du blanc = 6,47:1. Ne pas la
+   repasser en #ef4444 (3,76:1) « pour faire comme les autres » — celles-là ne
+   sont mesurées par aucun test parce qu'elles sont masquées par défaut, alors
+   que celle-ci est faite pour être vue.
+   ⛔ ET ELLE NE REPOSE PAS SUR LA COULEUR SEULE : elle porte le mot
+   « Nouveau », et le lien annonce « Nouveau jeu disponible » dans son
+   aria-label (RGAA 3.1). */
+.jeu-tuile{position:relative;}
+/* La tuile est un <a>, pas un [role="button"] : elle ne reçoit donc pas
+   l'anneau de focus commun défini plus bas. Sans cette règle, elle n'aurait
+   que le contour par défaut du navigateur — variable, et parfois invisible sur
+   fond crème. `:focus-visible` : rien ne change au doigt ni à la souris. */
+.jeu-tuile:focus-visible{outline:3px solid var(--forest);outline-offset:2px;box-shadow:0 0 0 6px rgba(255,255,255,0.9);border-radius:var(--r);}
+/* ⚠️ Pas de `color:var(--leaf)` ici : le thème sombre redéfinit `--leaf` en
+   FOND, et cette ligne y deviendrait du noir sur noir. La saison hérite de
+   `.ct-sub`, qui est mesurée dans les cinq rendus. */
+.jeu-tuile .jeu-saison{font-weight:700;}
+.jeu-badge{display:inline-flex;align-items:center;justify-content:center;margin-bottom:3px;background:#b91c1c;color:#fff;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;padding:2px 8px;border-radius:999px;box-shadow:0 2px 8px rgba(185,28,28,0.45);}
+/* Sans cette ligne, l'attribut `hidden` ne masquerait RIEN : la règle
+   ci-dessus l'emporte sur le `display:none` par défaut du navigateur. */
+.jeu-badge[hidden]{display:none;}
+
 /* ── Grille 2 par ligne ── */
 /* ⚠️ `list-style:none;padding:0;margin:0` OBLIGATOIRES. Les grilles de tuiles
    sont des <ul> depuis la v4.93 (RGAA 9.3) : un <ul> apporte des puces, une
@@ -260,6 +285,7 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .ico-site{background:linear-gradient(135deg,#e8f0fc,#d0e4f8);}
 .ico-radio{background:linear-gradient(135deg,#fde8f0,#f8d0e4);}
 .ico-hab{background:linear-gradient(135deg,#ede8f8,#ddd0f0);}
+.ico-jeu{background:linear-gradient(135deg,#f3e8ff,#e4d0f8);}
 .ico-cal{background:linear-gradient(135deg,#fef3e0,#fce8c0);}
 .ico-rando{background:linear-gradient(135deg,#eaf8e8,#d4f0d4);}
 .ico-pocket{background:linear-gradient(135deg,#fff0e8,#ffe0d0);}
@@ -1887,5 +1913,8 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .plan-rubrique{margin:18px 0 6px;font-size:0.62rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
 .plan-liste{list-style:none;margin:0;padding:0;}
 .plan-liste li{margin:0;}
-.plan-lien{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--leaf);padding:9px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+/* `display:block` n'est pas décoratif : la rubrique « Se détendre » liste des
+   PAGES, donc des <a> — inline par défaut, ils ignoreraient `width:100%` et
+   s'afficheraient à une largeur différente des <button> des autres rubriques. */
+.plan-lien{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--leaf);padding:9px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 .plan-lien:hover{color:var(--forest);background:var(--mist);}

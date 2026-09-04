@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180" role="img" aria-label="La Hotte : une grappe de raisin devant un coucher de soleil sur les vignes">
+  <title>La Hotte</title>
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1035"/>
+      <stop offset=".32" stop-color="#4A1D53"/>
+      <stop offset=".58" stop-color="#96305C"/>
+      <stop offset=".80" stop-color="#DE6A3E"/>
+      <stop offset="1" stop-color="#FFC061"/>
+    </linearGradient>
+    <radialGradient id="soleil" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#FFE9B0" stop-opacity=".95"/>
+      <stop offset=".35" stop-color="#FFB45A" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#FF9646" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#ciel)"/>
+  <circle cx="228" cy="118" r="62" fill="url(#soleil)"/>
+  <circle cx="228" cy="118" r="16" fill="#FFE9B0"/>
+  <path d="M0 180V126c40-14 66 6 104-2s60-22 104-14 74 22 112 12v58Z" fill="#57285C"/>
+  <path d="M0 180V146c48-10 74 8 118 2s66-16 110-10 62 16 92 10v32Z" fill="#3A1B44"/>
+  <!-- la treille, en haut : c'est de là que tombe le raisin -->
+  <rect width="320" height="20" fill="#160C1E"/>
+  <rect y="20" width="320" height="4" fill="#20122A"/>
+  <g fill="#160C1E">
+    <ellipse cx="34" cy="20" rx="26" ry="13"/><ellipse cx="112" cy="18" rx="30" ry="14"/>
+    <ellipse cx="196" cy="20" rx="26" ry="12"/><ellipse cx="272" cy="18" rx="30" ry="14"/>
+  </g>
+  <!-- la grappe -->
+  <g transform="translate(96 96)">
+    <path d="M0-40v-12" stroke="#7CD65C" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="11" cy="-49" rx="12" ry="7" transform="rotate(-28 11 -49)" fill="#5FA847"/>
+    <g fill="#C77DFF">
+      <circle cx="0" cy="-22" r="10"/><circle cx="-15" cy="-8" r="10"/><circle cx="15" cy="-8" r="10"/>
+      <circle cx="-24" cy="8" r="10"/><circle cx="0" cy="8" r="10"/><circle cx="24" cy="8" r="10"/>
+      <circle cx="-13" cy="24" r="10"/><circle cx="13" cy="24" r="10"/><circle cx="0" cy="39" r="10"/>
+    </g>
+    <g fill="#FFF6E8" opacity=".38">
+      <circle cx="-18" cy="-11" r="3"/><circle cx="-3" cy="5" r="3"/><circle cx="10" cy="21" r="3"/>
+    </g>
+  </g>
+</svg>

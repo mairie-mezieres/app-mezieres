@@ -36,13 +36,31 @@ const server = http.createServer((req, res) => {
     return res.end('403');
   }
 
-  fs.readFile(filePath, (err, data) => {
+  // Index de répertoire, comme GitHub Pages : « /jeu/ » sert « /jeu/index.html »,
+  // et « /jeu » redirige vers « /jeu/ ». Sans cela, les pages du jeu du moment
+  // seraient introuvables ICI et nulle part ailleurs — le test conclurait à une
+  // panne que la production n'a pas, ou l'inverse.
+  let cible = filePath;
+  try {
+    if (fs.statSync(cible).isDirectory()) {
+      if (!pathname.endsWith('/')) {
+        res.writeHead(301, { location: pathname + '/' });
+        return res.end();
+      }
+      cible = path.join(cible, 'index.html');
+    }
+  } catch (_) { /* n'existe pas : le readFile ci-dessous répondra 404 */ }
+
+  fs.readFile(cible, (err, data) => {
     if (err) {
       res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
       return res.end('404');
     }
     res.writeHead(200, {
-      'content-type': MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream'
+      // ⚠️ `cible` et non `filePath` : sur « /jeu/ », `filePath` est un
+      // répertoire, dont l'extension est vide — la page serait servie en
+      // « application/octet-stream » et le navigateur la téléchargerait.
+      'content-type': MIME[path.extname(cible).toLowerCase()] || 'application/octet-stream'
     });
     res.end(data);
   });

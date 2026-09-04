@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B0716">
+<title>Le jeu du moment — Mézières-lez-Cléry</title>
+<meta name="description" content="Le jeu du moment de la commune de Mézières-lez-Cléry. Gratuit, sans compte, sans publicité.">
+<!--
+  ⛔ CETTE ADRESSE NE CHANGERA JAMAIS. `/jeu` est imprimée sur des affiches et
+  des QR codes : elle doit servir le jeu courant quel qu'il soit, aujourd'hui
+  et dans cinq ans. Sur un hébergement statique, une adresse fixe qui sert un
+  fichier variable impose une indirection — c'est le rôle de cette page. Elle
+  lit `jeux/jeux.json`, note l'identifiant du jeu ouvert (ce qui éteint la
+  pastille « Nouveau » de l'accueil) et remplace la page par le jeu.
+  Voir docs/adr/0037-le-jeu-du-moment-une-page-statique-et-une-url-imprimee.md
+
+  ⛔ AUCUN SCRIPT EN LIGNE ICI, et aucun domaine externe : la page doit rester
+  servable sous une CSP stricte. Tout le comportement vit dans js/mat-jeu.js.
+  Les chemins sont relatifs pour qu'une commune qui réplique l'application dans
+  un sous-répertoire n'ait rien à réécrire.
+-->
+<link rel="icon" href="../icon-192.png">
+<link rel="stylesheet" href="../css/mat-jeu.css?v=1.0.0">
+<script defer src="../js/mat-jeu.js?v=1.0.0"></script>
+</head>
+<body data-jeu-lanceur>
+<main class="lanceur">
+<h1>Le jeu du moment</h1>
+<p class="nom" data-jeu-titre></p>
+<p class="saison" data-jeu-saison></p>
+<p class="etat" data-jeu-etat role="status">Chargement du jeu…</p>
+<noscript>
+<p class="etat">Ce jeu se joue dans le navigateur&nbsp;: il a besoin de JavaScript pour
+s’afficher. Activez-le, puis rechargez cette page.</p>
+</noscript>
+<ul class="liens">
+<li><a href="../">← Retour à l’application</a></li>
+<li><a href="archives/">Jeux précédents</a></li>
+</ul>
+</main>
+</body>
+</html>

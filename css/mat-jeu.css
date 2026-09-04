@@ -1,0 +1,166 @@
+/* ════════════════════════════════════════════════════════════
+   MAT — Le jeu du moment v1.0.0
+   Feuille des DEUX pages qui encadrent le jeu : le lanceur `/jeu` et les
+   archives `/jeu/archives`. Le jeu lui-même est autonome et n'utilise rien
+   d'ici — c'est ce qui permet d'en déposer un autre sans toucher au code.
+
+   Palette sombre, volontairement : le lanceur ne fait que passer avant un jeu
+   qui l'est aussi. Un fond clair produirait un éclair blanc au démarrage.
+
+   ⚠️ Toute règle qui déclare une couleur de texte déclare aussi son fond
+   (RGAA 10.5) : sans quoi un thème de navigateur peut poser un fond clair
+   sous un texte crème. Les rapports de contraste sont notés en regard.
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  --jeu-fond:  #0B0716;
+  --jeu-carte: #180F26;
+  --jeu-texte: #FFF6E8;   /* 18,6:1 sur le fond */
+  --jeu-doux:  #C9BBD9;   /* 11,0:1 sur le fond */
+  --jeu-or:    #FFD966;   /* 14,6:1 sur le fond */
+  --jeu-bord:  #3A2440;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--jeu-fond);
+  color: var(--jeu-texte);
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Plancher typographique du projet : 12 px de rendu, jamais moins. */
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-tap-highlight-color: transparent;
+}
+
+main {
+  box-sizing: border-box;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 18px calc(env(safe-area-inset-bottom, 0px) + 28px);
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--jeu-texte);
+  background: var(--jeu-fond);
+}
+
+.chapo, .etat, .vide {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  color: var(--jeu-doux);
+  background: var(--jeu-fond);
+}
+
+/* ── Lanceur ─────────────────────────────────────────────── */
+
+.lanceur { text-align: center; padding-top: 15vh; }
+
+.lanceur .nom {
+  margin: 14px 0 0;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--jeu-or);
+  background: var(--jeu-fond);
+}
+
+.lanceur .saison {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--jeu-doux);
+  background: var(--jeu-fond);
+}
+
+/* ── Archives ────────────────────────────────────────────── */
+
+.jeux { list-style: none; margin: 18px 0 0; padding: 0; }
+.jeux > li { margin: 0 0 12px; }
+
+.jeu {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--jeu-bord);
+  border-radius: 16px;
+  background: var(--jeu-carte);
+  color: var(--jeu-texte);
+  text-decoration: none;
+}
+
+.jeu .vignette {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--jeu-fond);
+}
+
+.jeu .txt { min-width: 0; }
+
+.jeu .titre {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--jeu-texte);
+  background: var(--jeu-carte);
+}
+
+.jeu .saison {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--jeu-or);
+  background: var(--jeu-carte);
+}
+
+.jeu .resume,
+.jeu .publie {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--jeu-doux);
+  background: var(--jeu-carte);
+}
+
+.jeu .publie { font-size: 0.8rem; margin-top: 2px; }
+
+/* ── Liens de pied de page ───────────────────────────────── */
+
+.liens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* La zone tactile fait au moins 24 px de haut (WCAG 2.2 — 2.5.8), sans que
+   le texte ne bouge : c'est le `padding` qui grandit, pas le libellé. */
+.liens a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 6px 2px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--jeu-or);
+  background: var(--jeu-fond);
+  text-decoration: underline;
+}
+
+a:focus-visible,
+.jeu:focus-visible {
+  outline: 3px solid var(--jeu-or);
+  outline-offset: 3px;
+}
