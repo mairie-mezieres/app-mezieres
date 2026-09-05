@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7FB4D8">
+<title>Les Bâtisseurs — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#0E1626;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">Les Bâtisseurs : jeu de rangement en images. Des pierres de formes
+différentes tombent dans un plateau&nbsp;; rangez-les pour compléter des lignes, et chaque
+ligne complète fait monter le château d’un cran. Au doigt&nbsp;: quatre grands boutons en bas
+de l’écran — gauche, tourner, droite, poser. Au clavier&nbsp;: flèches gauche et droite pour
+déplacer, flèche haut pour tourner, flèche bas pour descendre, barre d’espace pour poser d’un
+coup. Le jeu se joue à l’image&nbsp;; il n’a pas d’équivalent textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : le plateau et le château en construction"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=400,H=720;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1;
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  ciel1:'#FFD9C2', ciel2:'#FFC0CE', ciel3:'#BFD9F0', ciel4:'#8FC4E8',
+  herbe:'#7FB55A', herbeF:'#5C9142',
+  pierre:'#D9CDB8', pierreO:'#B8A98F', pierreF:'#8E8069',
+  ardoise:'#6C7A93', ardoiseO:'#4E5A70',
+  bois:'#B07E4E', or:'#F0B93C', rouge:'#E05A45', vert:'#4FA86B',
+  bleu:'#5C93D6', rose:'#F090B0', violet:'#9B7BD6',
+  trait:'#3A3328', texte:'#2E2A22', clair:'#FFFDF6', doux:'#7A7263'
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-les-batisseurs';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ `best` ne monte que sur un VRAI record. En l'ecrasant a chaque fin de
+   partie, l'ecran de fin (`score>=best`) affichait « MEILLEUR » a tous les coups. */
+function majBest(){
+  if(score>best){ best=score; try{ localStorage.setItem(CLE_BEST,String(best)); }catch(_){} }
+}
+
+/* ═══ plateau ═══ */
+const COLS=10, ROWS=16, CELL=26;
+const BX=(W-COLS*CELL)/2, BY=192;
+const CHAT_Y0=62, CHAT_H=122;                 // bandeau du chantier
+const BTN_Y=BY+ROWS*CELL+14;
+
+/* ═══ pièces ═══ */
+const PIECES=[
+  {m:[[1,1,1,1]],            c:C.bleu,   n:'la poutre'},
+  {m:[[1,1],[1,1]],          c:C.or,     n:'le bloc'},
+  {m:[[0,1,0],[1,1,1]],      c:C.violet, n:'la clé'},
+  {m:[[1,0,0],[1,1,1]],      c:C.rouge,  n:'l\'équerre'},
+  {m:[[0,0,1],[1,1,1]],      c:C.vert,   n:'la contre-équerre'},
+  {m:[[0,1,1],[1,1,0]],      c:C.rose,   n:'le décalé'},
+  {m:[[1,1,0],[0,1,1]],      c:'#59B9C4',n:'l\'autre décalé'}
+];
+const tourner=m=>m[0].map((_,i)=>m.map(r=>r[i]).reverse());
+
+/* ═══ état ═══ */
+let etat='menu',t=0,shake=0,flash=0;
+let grille=[],piece=null,suivante=null,chute=0,vitesse=82;
+let score=0,lignes=0,niveau=1,best=lireBest();
+let effets=[],petales=[],textes=[],annonce=null;
+
+for(let i=0;i<22;i++) petales.push({x:rnd(0,W),y:rnd(0,H),vy:rnd(.3,.9),
+  ph:rnd(0,6.3),r:rnd(3,6),col:[C.rose,'#FFFFFF','#FFD9E4'][(Math.random()*3)|0]});
+
+function videGrille(){ grille=Array.from({length:ROWS},()=>Array(COLS).fill(0)); }
+
+function nouvelle(){
+  videGrille(); score=0; lignes=0; niveau=1; vitesse=82;
+  effets=[]; textes=[]; annonce=null;
+  suivante=tirerPiece(); nouvellePiece();
+  etat='jeu'; t=0;
+  annoncer('LE CHANTIER OUVRE','chaque ligne complète monte d\'un cran',170);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:60,taille:ta||18});
+
+function tirerPiece(){
+  const p=PIECES[(Math.random()*PIECES.length)|0];
+  return {m:p.m.map(r=>r.slice()),c:p.c,n:p.n};
+}
+function nouvellePiece(){
+  piece=suivante; suivante=tirerPiece();
+  piece.x=((COLS-piece.m[0].length)/2)|0; piece.y=0;
+  if(collision(piece.m,piece.x,piece.y)){ majBest(); etat='fin'; t=0; }
+}
+function collision(m,px,py){
+  for(let j=0;j<m.length;j++)for(let i=0;i<m[j].length;i++){
+    if(!m[j][i])continue;
+    const gx=px+i, gy=py+j;
+    if(gx<0||gx>=COLS||gy>=ROWS)return true;
+    if(gy>=0&&grille[gy][gx])return true;
+  }
+  return false;
+}
+function deplacer(dx){ if(!collision(piece.m,piece.x+dx,piece.y)) piece.x+=dx; }
+function pivoter(){
+  const m=tourner(piece.m);
+  for(const k of [0,-1,1,-2,2]){
+    if(!collision(m,piece.x+k,piece.y)){ piece.m=m; piece.x+=k; return; }
+  }
+}
+function descendre(){
+  if(!collision(piece.m,piece.x,piece.y+1)){ piece.y++; return true; }
+  poser(); return false;
+}
+function chuteRapide(){
+  let n=0; while(!collision(piece.m,piece.x,piece.y+1)){ piece.y++; n++; }
+  score+=n*2; shake=Math.max(shake,4); poser();
+}
+function poser(){
+  for(let j=0;j<piece.m.length;j++)for(let i=0;i<piece.m[j].length;i++){
+    if(!piece.m[j][i])continue;
+    const gy=piece.y+j, gx=piece.x+i;
+    if(gy>=0) grille[gy][gx]=piece.c;
+  }
+  for(let i=0;i<8;i++) effets.push({x:BX+(piece.x+piece.m[0].length/2)*CELL,
+    y:BY+(piece.y+piece.m.length)*CELL,vx:rnd(-1.4,1.4),vy:rnd(-1.6,-.2),
+    r:rnd(1.6,3.4),col:C.pierreO,t:rnd(14,28),g:.09});
+  nettoyer();
+  if(etat==='jeu') nouvellePiece();
+}
+function nettoyer(){
+  let faites=[];
+  for(let j=ROWS-1;j>=0;j--) if(grille[j].every(v=>v)) faites.push(j);
+  if(!faites.length)return;
+  for(const j of faites){
+    for(let i=0;i<COLS;i++) for(let k=0;k<3;k++)
+      effets.push({x:BX+i*CELL+CELL/2,y:BY+j*CELL+CELL/2,
+        vx:rnd(-2.2,2.2),vy:rnd(-2.6,.4),r:rnd(2,4.5),col:grille[j][i],t:rnd(20,44),g:.1});
+    grille.splice(j,1); grille.unshift(Array(COLS).fill(0));
+  }
+  const gains=[0,100,300,600,1000][faites.length];
+  score+=gains*niveau; lignes+=faites.length;
+  const noms=['','UNE ASSISE','DEUX ASSISES','TROIS ASSISES','UN ÉTAGE ENTIER'];
+  texte(noms[faites.length]+'  +'+gains*niveau,W/2,BY+140,
+    faites.length>=3?C.or:C.clair,faites.length>=3?22:18);
+  shake=Math.max(shake,6+faites.length*4); flash=Math.max(flash,.2+faites.length*.12);
+  const nv=1+Math.floor(lignes/12);
+  if(nv>niveau){ niveau=nv; vitesse=Math.max(20,86-niveau*6);
+    annoncer('LE CHANTIER ACCÉLÈRE','niveau '+niveau,110); }
+}
+
+/* ═══ commandes : quatre gros boutons ═══ */
+const BTNS=[
+  {id:'g', lbl:'◀', x:8,   w:90, col:'#CFE3F7', txt:'GAUCHE'},
+  {id:'r', lbl:'↻', x:106, w:90, col:'#FFE6AE', txt:'TOURNER'},
+  {id:'d', lbl:'▶', x:204, w:90, col:'#CFE3F7', txt:'DROITE'},
+  {id:'b', lbl:'▼', x:302, w:90, col:'#CDEBD8', txt:'POSER'}
+];
+const BTN_H=92;
+let presse=null,repete=0;
+function btnAt(px,py){
+  if(py<BTN_Y||py>BTN_Y+BTN_H)return null;
+  for(const b of BTNS) if(px>=b.x&&px<=b.x+b.w)return b;
+  return null;
+}
+function agir(id){
+  if(etat!=='jeu')return;
+  if(id==='g')deplacer(-1);
+  if(id==='d')deplacer(1);
+  if(id==='r')pivoter();
+  if(id==='b')chuteRapide();
+}
+function pos(e){ const r=cv.getBoundingClientRect();
+  const s=e.changedTouches?e.changedTouches[0]:e;
+  return[(s.clientX-r.left)/scale,(s.clientY-r.top)/scale]; }
+addEventListener('pointerdown',e=>{
+  e.preventDefault(); const[a,b]=pos(e);
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  const btn=btnAt(a,b);
+  if(btn){ presse=btn; repete=26; agir(btn.id); }
+},{passive:false});
+addEventListener('pointerup',()=>{presse=null;});
+addEventListener('pointercancel',()=>{presse=null;});
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{
+  if(etat!=='jeu'){ if(t>22&&(e.key===' '||e.key==='Enter')){e.preventDefault();nouvelle();} return; }
+  if(e.key==='ArrowLeft'){e.preventDefault();agir('g');}
+  if(e.key==='ArrowRight'){e.preventDefault();agir('d');}
+  if(e.key==='ArrowUp'){e.preventDefault();agir('r');}
+  if(e.key==='ArrowDown'){e.preventDefault();descendre();}
+  if(e.key===' '){e.preventDefault();agir('b');}
+});
+
+/* ═══ mise à jour ═══ */
+function update(){
+  t++;
+  if(shake>.3)shake*=.85; else shake=0;
+  if(flash>0)flash-=.05;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.7;return u.t>0;});
+  for(const p of effets){ p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.t--; }
+  effets=effets.filter(p=>p.t>0);
+  for(const p of petales){ p.y+=p.vy; p.ph+=.04; p.x+=Math.sin(p.ph)*.5;
+    if(p.y>H+8){p.y=-8;p.x=rnd(0,W);} }
+  if(etat!=='jeu')return;
+
+  if(presse&&presse.id!=='b'){ if(--repete<=0){ agir(presse.id); repete=8; } }
+
+  if(++chute>=vitesse){ chute=0; descendre(); }
+}
+
+/* ═══ dessins ═══ */
+function pierre(px,py,col,taille){
+  const s=taille||CELL;
+  x.fillStyle=col;
+  x.beginPath();
+  if(x.roundRect)x.roundRect(px+1,py+1,s-2,s-2,4); else x.rect(px+1,py+1,s-2,s-2);
+  x.fill();
+  x.fillStyle='rgba(255,255,255,.34)'; x.fillRect(px+3,py+3,s-6,3.5);
+  x.fillStyle='rgba(0,0,0,.18)'; x.fillRect(px+3,py+s-7,s-6,3.5);
+  x.strokeStyle='rgba(58,51,40,.55)'; x.lineWidth=1.6;
+  x.beginPath();
+  if(x.roundRect)x.roundRect(px+1,py+1,s-2,s-2,4); else x.rect(px+1,py+1,s-2,s-2);
+  x.stroke();
+}
+
+/* le château qui monte : révélé du bas vers le haut selon les lignes faites */
+function chateau(){
+  const prog=clamp(lignes/44,0,1);
+  const cx=W/2, base=CHAT_Y0+CHAT_H-14;
+  // ciel du bandeau
+  x.save();
+  x.beginPath(); x.rect(0,CHAT_Y0,W,CHAT_H); x.clip();
+  const g=x.createLinearGradient(0,CHAT_Y0,0,CHAT_Y0+CHAT_H);
+  g.addColorStop(0,C.ciel4); g.addColorStop(.55,C.ciel3); g.addColorStop(1,'#DDEAF6');
+  x.fillStyle=g; x.fillRect(0,CHAT_Y0,W,CHAT_H);
+  // pelouse
+  x.fillStyle=C.herbe; x.fillRect(0,base,W,CHAT_H);
+  x.fillStyle=C.herbeF;
+  for(let i=0;i<26;i++){ x.beginPath();
+    x.ellipse((i*29+11)%W,base+4+(i%3)*4,9,3,0,0,7); x.fill(); }
+  // arbres en fleurs
+  for(const ax of [30,368]){
+    x.fillStyle=C.bois; x.fillRect(ax-3,base-24,6,24);
+    x.fillStyle=C.rose;
+    x.beginPath(); x.arc(ax,base-32,15,0,7); x.arc(ax-10,base-24,10,0,7);
+    x.arc(ax+10,base-24,10,0,7); x.fill();
+  }
+
+  // partie bâtie : on clippe à la hauteur atteinte
+  const hMax=112, hb=hMax*ease(prog);
+  x.save();
+  x.beginPath(); x.rect(0,base-hb,W,hb+4); x.clip();
+  x.strokeStyle=C.trait; x.lineWidth=2;
+  // corps principal
+  x.fillStyle=C.pierre;
+  x.beginPath(); x.rect(cx-62,base-72,124,72); x.fill(); x.stroke();
+  x.fillStyle=C.pierreO;
+  for(let j=0;j<6;j++)for(let i=0;i<7;i++){
+    if((i+j)%2)continue;
+    x.fillRect(cx-60+i*18,base-70+j*12,16,10);
+  }
+  // tours
+  for(const s of [-1,1]){
+    x.fillStyle=C.pierre;
+    x.beginPath(); x.rect(cx+s*80-17,base-96,34,96); x.fill(); x.stroke();
+    x.fillStyle=C.pierreF;
+    for(let j=0;j<8;j++) x.fillRect(cx+s*80-15,base-94+j*12,30,2);
+    x.fillStyle=C.ardoise;
+    x.beginPath(); x.moveTo(cx+s*80-23,base-96); x.lineTo(cx+s*80,base-132);
+    x.lineTo(cx+s*80+23,base-96); x.closePath(); x.fill(); x.stroke();
+    x.fillStyle=C.ardoiseO;
+    x.beginPath(); x.moveTo(cx+s*80,base-132); x.lineTo(cx+s*80+23,base-96);
+    x.lineTo(cx+s*80+8,base-96); x.closePath(); x.fill();
+  }
+  // toit central
+  x.fillStyle=C.ardoise;
+  x.beginPath(); x.moveTo(cx-68,base-72); x.lineTo(cx,base-104);
+  x.lineTo(cx+68,base-72); x.closePath(); x.fill(); x.stroke();
+  // fenêtres et porte
+  x.fillStyle=C.or;
+  for(let i=0;i<3;i++){ x.beginPath();
+    x.rect(cx-42+i*36,base-58,20,22); x.fill(); x.stroke(); }
+  for(const s of [-1,1]){ x.beginPath();
+    x.rect(cx+s*80-8,base-80,16,18); x.fill(); x.stroke(); }
+  x.fillStyle=C.bois;
+  x.beginPath();
+  x.moveTo(cx-15,base); x.lineTo(cx-15,base-24);
+  x.quadraticCurveTo(cx,base-40,cx+15,base-24); x.lineTo(cx+15,base);
+  x.closePath(); x.fill(); x.stroke();
+  x.restore();
+
+  // échafaudage au-dessus de la partie bâtie
+  if(prog<1){
+    x.strokeStyle='rgba(176,126,78,.85)'; x.lineWidth=2.4;
+    const hy=base-hb;
+    x.beginPath();
+    x.moveTo(cx-104,hy); x.lineTo(cx+104,hy);
+    for(const px of [cx-92,cx-40,cx+40,cx+92]){
+      x.moveTo(px,hy); x.lineTo(px,Math.max(CHAT_Y0+6,hy-26));
+    }
+    x.moveTo(cx-104,Math.max(CHAT_Y0+6,hy-26)); x.lineTo(cx+104,Math.max(CHAT_Y0+6,hy-26));
+    x.stroke();
+  }else{
+    // drapeau une fois terminé
+    x.strokeStyle=C.trait; x.lineWidth=2;
+    x.beginPath(); x.moveTo(cx,base-104); x.lineTo(cx,base-130); x.stroke();
+    x.fillStyle=C.rouge;
+    x.beginPath(); x.moveTo(cx,base-130); x.lineTo(cx+22+Math.sin(t*.08)*3,base-124);
+    x.lineTo(cx,base-116); x.closePath(); x.fill(); x.stroke();
+  }
+  x.restore();
+
+  // cadre et jauge
+  x.strokeStyle='rgba(58,51,40,.35)'; x.lineWidth=2;
+  x.strokeRect(0,CHAT_Y0,W,CHAT_H);
+  x.fillStyle='rgba(46,42,34,.14)'; x.fillRect(12,CHAT_Y0+CHAT_H-9,W-24,5);
+  x.fillStyle=C.or; x.fillRect(12,CHAT_Y0+CHAT_H-9,(W-24)*prog,5);
+}
+
+function plateau(){
+  x.fillStyle='rgba(46,42,34,.10)';
+  x.fillRect(BX-4,BY-4,COLS*CELL+8,ROWS*CELL+8);
+  x.strokeStyle='rgba(58,51,40,.4)'; x.lineWidth=2.4;
+  x.strokeRect(BX-4,BY-4,COLS*CELL+8,ROWS*CELL+8);
+  x.strokeStyle='rgba(58,51,40,.07)'; x.lineWidth=1;
+  for(let i=1;i<COLS;i++){ x.beginPath();
+    x.moveTo(BX+i*CELL,BY); x.lineTo(BX+i*CELL,BY+ROWS*CELL); x.stroke(); }
+  for(let j=1;j<ROWS;j++){ x.beginPath();
+    x.moveTo(BX,BY+j*CELL); x.lineTo(BX+COLS*CELL,BY+j*CELL); x.stroke(); }
+  for(let j=0;j<ROWS;j++)for(let i=0;i<COLS;i++)
+    if(grille[j][i]) pierre(BX+i*CELL,BY+j*CELL,grille[j][i]);
+}
+
+function pieceCourante(){
+  if(!piece)return;
+  // repère de chute
+  let gy=piece.y; while(!collision(piece.m,piece.x,gy+1)) gy++;
+  x.save(); x.globalAlpha=.22;
+  for(let j=0;j<piece.m.length;j++)for(let i=0;i<piece.m[j].length;i++)
+    if(piece.m[j][i]){ x.fillStyle=piece.c;
+      x.fillRect(BX+(piece.x+i)*CELL+2,BY+(gy+j)*CELL+2,CELL-4,CELL-4); }
+  x.restore();
+  for(let j=0;j<piece.m.length;j++)for(let i=0;i<piece.m[j].length;i++)
+    if(piece.m[j][i]) pierre(BX+(piece.x+i)*CELL,BY+(piece.y+j)*CELL,piece.c);
+}
+
+function boutons(){
+  for(const b of BTNS){
+    const on=presse===b;
+    x.fillStyle=on?'#F5EFE0':b.col;
+    x.strokeStyle=C.trait; x.lineWidth=3;
+    x.beginPath();
+    if(x.roundRect)x.roundRect(b.x,BTN_Y+(on?2:0),b.w,BTN_H,14);
+    else x.rect(b.x,BTN_Y,b.w,BTN_H);
+    x.fill(); x.stroke();
+    x.fillStyle=C.texte; x.font='800 36px system-ui,-apple-system,sans-serif';
+    x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(b.lbl,b.x+b.w/2,BTN_Y+BTN_H/2-8+(on?2:0));
+    x.font='800 11px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText(b.txt,b.x+b.w/2,BTN_Y+BTN_H-16+(on?2:0));
+  }
+}
+
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C.ciel2); g.addColorStop(.28,C.ciel1); g.addColorStop(1,'#FFF6EA');
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+
+  for(const p of petales){ x.save(); x.globalAlpha=.6;
+    x.translate(p.x,p.y); x.rotate(p.ph); x.fillStyle=p.col;
+    x.beginPath(); x.ellipse(0,0,p.r,p.r*.5,0,0,7); x.fill(); x.restore(); }
+
+  // en-tête
+  x.textBaseline='middle';
+  x.font='800 15px system-ui,sans-serif'; x.textAlign='left';
+  x.fillStyle=C.doux; x.fillText('MÉZIÈRES-LEZ-CLÉRY',14,20);
+  x.font='800 30px system-ui,sans-serif'; x.fillStyle=C.texte;
+  x.fillText(score,14,46);
+  x.textAlign='right';
+  x.font='600 12px system-ui,sans-serif'; x.fillStyle=C.doux;
+  x.fillText('LIGNES '+lignes+'   ·   NIVEAU '+niveau,W-14,20);
+  // pièce suivante
+  if(suivante&&etat==='jeu'){
+    x.font='600 10px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('SUIVANTE',W-14,36);
+    const s=13, mw=suivante.m[0].length*s;
+    for(let j=0;j<suivante.m.length;j++)for(let i=0;i<suivante.m[j].length;i++)
+      if(suivante.m[j][i]) pierre(W-14-mw+i*s,44+j*s,suivante.c,s);
+  }
+
+  chateau();
+
+  x.save(); if(shake)x.translate(rnd(-shake,shake),rnd(-shake,shake));
+  plateau();
+  if(etat==='jeu') pieceCourante();
+  for(const p of effets){ x.globalAlpha=Math.min(1,p.t/24); x.fillStyle=p.col;
+    x.fillRect(p.x-p.r,p.y-p.r,p.r*2,p.r*2); }
+  x.globalAlpha=1;
+  x.restore();
+
+  if(etat==='jeu') boutons();
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/26);
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillStyle=u.col; x.strokeStyle='rgba(255,253,246,.9)'; x.lineWidth=4;
+    x.strokeText(u.s,clamp(u.x,80,W-80),u.y);
+    x.fillText(u.s,clamp(u.x,80,W-80),u.y); x.restore(); });
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    x.fillStyle='rgba(255,253,246,.92)';
+    x.fillRect(0,BY+150,W,66);
+    x.font='800 26px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText(annonce.a,W/2,BY+172);
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(annonce.b,W/2,BY+196);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(255,246,234,.9)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 16px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,84);
+    x.font='800 52px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('LES',W/2,134); x.fillText('BÂTISSEURS',W/2,186);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Le chantier de printemps.',W/2,224);
+    const r=[[C.bleu,'Les pierres tombent. Rangez-les.'],
+             [C.or,  'Une ligne complète disparaît'],
+             [C.or,  'et le château monte d\'un cran.'],
+             [C.vert,'Quarante-quatre lignes et il est debout.']];
+    r.forEach((u,i)=>{ const yy=290+i*34;
+      if(i!==2){ x.fillStyle=u[0]; x.beginPath(); x.arc(48,yy,7,0,7); x.fill(); }
+      x.textAlign='left'; x.font='600 15px system-ui,sans-serif';
+      x.fillStyle=C.texte; x.fillText(u[1],68,yy); });
+    x.textAlign='center';
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Quatre gros boutons en bas : gauche, tourner,',W/2,452);
+    x.fillText('droite, et poser d\'un coup.',W/2,472);
+    if((t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('TOUCHEZ POUR COMMENCER',W/2,556); }
+    if(best){ x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux;
+      x.fillText('meilleur chantier : '+best,W/2,610); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(255,246,234,.93)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 34px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText(lignes>=44?'CHÂTEAU DEBOUT':'CHANTIER ARRÊTÉ',W/2,220);
+    x.font='800 60px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText(score,W/2,300);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(lignes+' lignes  ·  niveau '+niveau,W/2,348);
+    x.fillText(Math.round(clamp(lignes/44,0,1)*100)+' % du château bâti',W/2,374);
+    if(score>=best&&score>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.vert;
+      x.fillText('MEILLEUR CHANTIER',W/2,414); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('REMETTRE ÇA',W/2,494); }
+  }
+
+  if(flash>0){ x.fillStyle='rgba(255,255,255,'+(flash*.55)+')'; x.fillRect(0,0,W,H); }
+}
+
+videGrille();
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>

@@ -5,6 +5,57 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.106] — 5 septembre 2026
+
+### Ajouté
+- **Le jeu du moment tourne tout seul avec les saisons.** Six jeux rejoignent
+  *La Hotte* : *La Bataille de boules de neige* (janvier-février), *Les Bâtisseurs*
+  (mars-avril), *Le Parcours VTT* (mai-juin), *Le Feu d'artifice* (juillet-août),
+  *La Course d'automne* (21 octobre - novembre), *Où est le Père Noël ?* (décembre).
+  - Le champ `courant` disparaît : chaque entrée porte une période `debut`/`fin` au
+    format **JJ-MM, sans année** — elle se répète donc d'elle-même chaque année.
+    Personne n'a rien à faire le 1er décembre. `forcer` épingle un jeu hors saison,
+    et un `forcer` inconnu retombe sur le calendrier plutôt que de figer l'app.
+  - ⛔ **Un trou ou un chevauchement dans le calendrier ne se verrait qu'une fois
+    par an**, le jour où il tombe, et personne ne serait là pour le corriger. Le
+    test balaie donc **les 366 jours d'une année bissextile** et refuse les deux.
+  - Le service worker précache **tous** les jeux, plus seulement celui du jour : la
+    bascule doit fonctionner hors connexion le jour venu. ~150 Ko pour sept jeux.
+    Mise en cache fichier par fichier — avec un `await` unique, le premier 404
+    emportait tous les suivants.
+- **Le nombre de personnes qui jouent entre dans les statistiques quotidiennes.**
+  Aucun mécanisme nouveau : `POST /stats/track` avec `service: 'jeu'`, le canal
+  générique de MEL, de l'agenda et des déchets. Côté backend, un libellé ; côté
+  admin, trois lignes (`SVC_LABELS`, `icons`, **et la liste `services`** — celle-là
+  est explicite, un service absent n'apparaît pas dans le tableau de bord).
+  - ⛔ **Ce qui est compté : l'ouverture, une fois par appareil et par jour** (clé
+    `mat_jeu_compte`, qui porte le jour — une seule clé, et non une par jour qui
+    s'empilerait). Le chiffre est donc un nombre de **personnes**, pas de clics.
+  - ⛔ **Ce qui n'est pas compté** : score, durée, nombre de parties, jeu joué.
+  - ⚠️ Le comptage vit **dans le lanceur, avant la redirection** — jamais dans un
+    jeu. C'est ce qui permet aux fichiers de jeu de rester sans réseau et au
+    contrôle « zéro requête pendant une partie » de rester vrai. Deux tests le
+    verrouillent, dont un qui refuse `stats/track` dans le fichier d'un jeu.
+  - ⚠️ Aucun identifiant n'est **créé** : on réutilise `mat_device_id_v1` s'il
+    existe. Qui arrive par QR code sans avoir jamais ouvert l'app est compté sans
+    identifiant. Le comptage suit le réglage « statistiques détaillées » de l'admin.
+
+### Modifié
+- **Les six jeux fournis ont été retouchés** — quatre lignes chacun, aucun
+  changement de gameplay — pour tenir des promesses déjà faites : zoom rétabli
+  (`user-scalable=no` retiré, RGAA 13.9), lien de retour vers l'application (sans
+  lui, qui arrive par un QR code y est coincé), alternative textuelle au canvas, et
+  meilleur score persistant (il vivait en mémoire et disparaissait au rechargement).
+  ⚠️ Le contrôle du zoom lit **la balise `<meta viewport>`**, pas le fichier : le
+  commentaire qui explique le retrait contient les mots « user-scalable=no », et un
+  `grep` sur tout le fichier rougirait sur un commentaire.
+- « Jeux précédents » devient **« Les autres jeux »** : avec une rotation annuelle,
+  la moitié des jeux listés sont ceux des saisons *à venir*.
+- Les liens de retour et les icônes des jeux passent en **relatif** (`../`) : une
+  commune qui réplique l'app dans un sous-répertoire n'a rien à réécrire.
+
+---
+
 ## [4.105] — 4 septembre 2026
 
 ### Modifié

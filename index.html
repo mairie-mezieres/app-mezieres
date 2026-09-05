@@ -82,12 +82,12 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
 <script defer src="js/mat-mel.js?v=4.5.2"></script>
 <script defer src="js/mat-perf.js?v=1.0.9"></script>
-<script defer src="js/mat-plan-site.js?v=1.1.0"></script>
+<script defer src="js/mat-plan-site.js?v=1.2.0"></script>
 <!-- Le jeu du moment : remplit la tuile de l'accueil d'après jeux/jeux.json et
      décide de la pastille « Nouveau ». Le même module sert /jeu et /jeu/archives.
      Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
      module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
-<script defer src="js/mat-jeu.js?v=1.1.0"></script>
+<script defer src="js/mat-jeu.js?v=2.0.0"></script>
 <script defer src="js/mat-boot.js?v=4.12.7"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.105 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.106 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -520,7 +520,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.105</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.106</button>
 </div>
 </div>
 </div>
@@ -1840,6 +1840,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 5 septembre 2026 — v4.106</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le jeu du moment change maintenant tout seul avec les saisons.</strong> Six nouveaux jeux rejoignent <em>La Hotte</em>&nbsp;: une bataille de boules de neige en hiver, un chantier de ch&acirc;teau au printemps, un parcours VTT, un feu d&rsquo;artifice l&rsquo;&eacute;t&eacute;, une course d&rsquo;automne, et un P&egrave;re No&euml;l &agrave; retrouver en d&eacute;cembre</li>
+<li><strong>Aucun jeu ne dispara&icirc;t</strong>&nbsp;: &laquo;&nbsp;Les autres jeux&nbsp;&raquo;, en bas de la page du jeu, les rassemble tous — ceux des autres saisons compris, jouables toute l&rsquo;ann&eacute;e</li>
+<li><strong>Les jeux se laissent d&eacute;sormais agrandir</strong> (le zoom &eacute;tait bloqu&eacute;), gardent votre meilleur score d&rsquo;une fois sur l&rsquo;autre, et offrent tous un retour vers l&rsquo;application</li>
+<li>La mairie voit d&eacute;sormais <strong>combien de personnes ont jou&eacute; chaque jour</strong> — et rien d&rsquo;autre&nbsp;: ni votre score, ni combien de temps, ni combien de parties. C&rsquo;est le m&ecirc;me comptage que pour les autres &eacute;crans de l&rsquo;application</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 4 septembre 2026 — v4.105</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>La tuile &laquo;&nbsp;Le jeu du moment&nbsp;&raquo; ne d&eacute;voile plus le jeu.</strong> Elle n&rsquo;annonce plus son titre ni sa saison&nbsp;: on les d&eacute;couvre en l&rsquo;ouvrant. La pastille &laquo;&nbsp;Nouveau&nbsp;&raquo; continue, elle, de signaler un jeu in&eacute;dit</li>

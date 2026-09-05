@@ -472,6 +472,11 @@ MAT respecte votre vie privée :
 - **L'IA (MEL)** utilise Mistral AI, hébergée en France — vos questions sont anonymisées avant traitement.
 - **Les signalements** sont anonymes.
 - **Les notifications push** : seule l'adresse de votre navigateur (endpoint) est stockée, sans données personnelles associées.
+- **Le comptage d'usage** : l'application compte combien d'appareils ouvrent chaque écran
+  chaque jour — MEL, l'agenda, les déchets, le jeu… Ce sont des **compteurs**, pas un
+  historique : rien n'enregistre ce que vous faites une fois l'écran ouvert. Pour le jeu,
+  cela veut dire le nombre de personnes qui ont joué, et **ni score, ni durée, ni nombre de
+  parties**. La mairie peut couper ce comptage depuis son tableau de bord.
 
 Pour toute question sur vos données : mairie@mezieres-lez-clery.fr ou 02 38 45 61 76.
 
@@ -799,9 +804,10 @@ pas question de prendre le moindre risque d'erreur.
 
 ## 19. « Le jeu du moment »
 
-Un petit jeu communal, qui **change au fil des saisons**. On y accède depuis la tuile
-🍇 **Le jeu du moment** sur l'écran d'accueil — qui ne dit volontairement pas de quel
-jeu il s'agit : on le découvre en l'ouvrant — ou directement à l'adresse
+Un petit jeu communal, qui **change tout seul au fil des saisons** — personne n'a rien à
+faire le jour de la bascule. On y accède depuis la tuile 🍇 **Le jeu du moment** sur
+l'écran d'accueil — qui ne dit volontairement pas de quel jeu il s'agit : on le découvre
+en l'ouvrant — ou directement à l'adresse
 **mezieres-lez-clery.fr/jeu** — celle qui est imprimée sur les affiches et les QR codes
 de la commune. Cette adresse ne changera jamais : elle mène toujours au jeu du moment,
 quel qu'il soit.
@@ -815,10 +821,25 @@ quel qu'il soit.
   classement en ligne, aucune statistique de partie. **Votre meilleur score reste chez
   vous** : personne d'autre ne le voit, et il disparaît si vous effacez les données du
   site.
-- **La pastille « Nouveau »** apparaît sur la tuile quand un jeu inédit est publié. Elle
-  s'éteint dès que vous l'avez ouvert, et ne revient qu'au jeu suivant.
-- **Les jeux des saisons passées restent jouables** : le lien « Jeux précédents », en bas
-  de la page du jeu, les rassemble tous.
+- **La pastille « Nouveau »** apparaît sur la tuile quand le jeu change. Elle s'éteint dès
+  que vous l'avez ouvert, et ne revient qu'à la bascule suivante.
+- **Aucun jeu ne disparaît** : le lien « Les autres jeux », en bas de la page du jeu, les
+  rassemble tous — ceux des autres saisons compris, jouables toute l'année.
+- **La mairie sait combien de personnes ont joué chaque jour**, et rien de plus : ni votre
+  score, ni combien de temps, ni combien de parties. C'est le même comptage que pour les
+  autres écrans de l'application (voir §13).
+
+### Le calendrier des jeux
+
+| Période | Jeu |
+|---|---|
+| janvier — février | La Bataille de boules de neige |
+| mars — avril | Les Bâtisseurs |
+| mai — juin | Le Parcours VTT |
+| juillet — août | Le Feu d'artifice |
+| 1ᵉʳ septembre — 20 octobre | La Hotte |
+| 21 octobre — novembre | La Course d'automne |
+| décembre | Où est le Père Noël ? |
 
 ---
 
@@ -838,27 +859,34 @@ Trois gestes, et **aucun code à toucher**. Tout se passe dans le dépôt `app-m
    {
      "id": "le-fournil",
      "titre": "Le Fournil",
-     "saison": "Décembre — les fêtes",
+     "saison": "Les fêtes",
      "resume": "Enfournez les pains avant que le four ne refroidisse.",
      "fichier": "/jeux/le-fournil.html",
-     "vignette": "/jeux/le-fournil.svg",
-     "publie": "2026-12-01"
+     "vignette": "/jeux/le-fournil.png",
+     "debut": "01-12",
+     "fin": "31-12"
    }
    ```
 
-3. **Changer `"courant"`** en haut du même fichier :
-   `"courant": "le-fournil"`.
+3. **Libérer la place** : `debut` et `fin` sont des dates **sans année** (`JJ-MM`), donc
+   elles se répètent chaque année toutes seules. Si le nouveau jeu prend décembre, le jeu
+   qui l'occupait doit reculer — sinon deux jeux se disputent les mêmes jours.
 
-C'est tout. La pastille « Nouveau » se rallume pour tout le monde, `/jeu` mène au
-nouveau jeu — qui annonce son titre et sa saison à l'ouverture — et l'ancien bascule
-automatiquement dans « Jeux précédents ».
+C'est tout, et il n'y a **aucune date à surveiller ensuite** : le jour venu, la bascule se
+fait seule. La pastille « Nouveau » se rallume pour tout le monde, `/jeu` mène au nouveau
+jeu — qui annonce son titre et sa saison à l'ouverture — et l'ancien reste jouable dans
+« Les autres jeux ».
 
-> ⚠️ **Ne supprimez jamais l'ancienne entrée** de la liste : c'est elle qui garde le jeu
-> précédent jouable dans les archives.
+> ⚠️ **Ne supprimez jamais une ancienne entrée** : c'est elle qui garde le jeu jouable le
+> reste de l'année.
 
-> ⚠️ **La date `publie` ne doit pas être dans le futur** si vous voulez que le jeu
-> s'annonce tout de suite. Une date à venir est le moyen de déposer un jeu **à l'avance**
-> : il restera invisible jusqu'à ce jour-là.
+> ⚠️ **Ne laissez pas de trou dans le calendrier** et ne faites pas se chevaucher deux
+> périodes. Un contrôle automatique balaie les 365 jours de l'année à chaque modification
+> et refuse les deux cas — vous le verrez avant les habitants.
+
+> 💡 **Montrer un jeu hors de sa saison** : mettez son identifiant dans `"forcer"`, tout en
+> haut du fichier (`"forcer": "le-fournil"`). Il reste à l'affiche tant que vous ne
+> remettez pas `"forcer": null`. Pratique pour une fête de village en juin.
 
 > 💡 **Les habitants déjà équipés** reçoivent le nouveau jeu dès qu'ils ouvrent
 > l'application avec une connexion. Il devient jouable hors connexion après leur première

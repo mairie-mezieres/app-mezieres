@@ -142,8 +142,11 @@ le plan du site.
 
 - **Pas de classement en ligne, même anonyme.** Un score envoyé est une donnée
   qui sort, et un identifiant qui apparaît. Le jeu n'en a pas besoin.
-- **Pas de comptage de parties.** Même remarque. On ne saura pas combien de gens
-  jouent ; c'est le prix, et il est petit.
+- **Pas de comptage de parties.** Même remarque : ni score, ni durée, ni nombre
+  de parties. ⚠️ La v4.106 compte en revanche les **ouvertures** du jeu, sur le
+  canal commun de l'application — voir la mise à jour en fin de document. La
+  distinction n'est pas cosmétique : on sait combien de personnes ouvrent le jeu,
+  on ne sait rien de ce qu'elles y font.
 - **Pas d'iframe** — voir plus haut.
 - **Pas de bibliothèque de jeu, pas de CDN, pas de police distante.** Un jeu qui
   charge quoi que ce soit ne fonctionne pas en mode avion, et fait sortir une
@@ -168,3 +171,67 @@ tourné.** D'où `data-jeu-pret`, posé sur la tuile après hydratation, sur leq
 tests s'accrochent. Sans lui, ils mesuraient l'état de la pastille avant qu'elle
 soit décidée — vert ou rouge selon la vitesse de la machine, ce qui est la
 définition d'un contrôle qui ne mesure rien.
+
+
+## Mise à jour — v4.106 (5 septembre 2026)
+
+**Le jeu change tout seul.** Le champ `courant` disparaît : chaque entrée du
+manifeste porte une période `debut`/`fin` au format **JJ-MM, sans année**. Elle se
+répète donc d'elle-même chaque année — personne n'a rien à faire le 1er décembre,
+et c'est tout l'intérêt. Sept jeux couvrent l'année.
+
+Ce que ce choix implique, et qu'il faut avoir vu :
+
+- **Un trou dans le calendrier ne se verrait qu'une fois par an**, le jour où il
+  tombe, et personne ne serait là pour le corriger. Idem pour deux périodes qui se
+  chevauchent : le gagnant dépendrait de l'ordre du tableau, ce qui n'est pas une
+  règle. `tests/e2e/jeu.spec.js` balaie donc les 366 jours d'une année bissextile
+  et refuse les deux cas.
+- **Le service worker précache TOUS les jeux**, plus seulement celui du jour. La
+  bascule doit fonctionner hors connexion le jour venu — c'est précisément le jour
+  où l'on ne peut plus rien y faire. Coût : ~150 Ko pour sept jeux, assumé. La mise
+  en cache est faite fichier par fichier : avec un `await` unique, le premier 404
+  emportait tous les suivants.
+- `forcer` remplace `courant` pour épingler un jeu hors saison. Un `forcer`
+  inconnu **retombe sur le calendrier** au lieu de figer l'application sur rien.
+
+**Les six jeux fournis ont été retouchés** — quatre lignes chacun, aucun changement
+de gameplay — pour tenir trois promesses que le dépôt avait déjà faites : le zoom
+reste possible (`user-scalable=no` retiré, RGAA 13.9), un lien ramène à
+l'application (sans quoi qui arrive par un QR code y est coincé), le canvas a une
+alternative textuelle, et le meilleur score survit au rechargement (il vivait en
+mémoire). ⚠️ Le contrôle du zoom lit **la balise `<meta viewport>`**, pas le
+fichier : le commentaire qui explique le retrait contient les mots
+« user-scalable=no », et un `grep` sur tout le fichier rougirait sur un commentaire.
+
+## Mise à jour — v4.106 : compter les joueurs sans trahir la promesse
+
+La mairie veut savoir **combien de personnes jouent**. Les deux cahiers des charges
+disaient « pas de télémétrie, pas de statistiques de parties ». Les deux tiennent,
+à condition de tracer la ligne au bon endroit :
+
+- ce qui est compté, c'est **l'ouverture du jeu**, exactement comme l'application
+  compte déjà l'ouverture de MEL, de l'agenda ou des déchets — même route
+  (`POST /stats/track`), même réglage d'admin, même agrégat quotidien ;
+- **une fois par appareil et par jour** (clé `mat_jeu_compte`, qui porte le jour) :
+  le chiffre est donc un nombre de **personnes**, pas de clics. Trois parties
+  d'affilée ne font pas trois joueurs ;
+- ce qui n'est **pas** compté : le score, la durée, le nombre de parties, le jeu
+  joué. Rien de ce qui se passe pendant la partie ne sort ;
+- le comptage a lieu **dans le lanceur, avant la redirection**. Jamais dans un jeu.
+  C'est ce qui permet aux fichiers de jeu de rester sans réseau — et au contrôle
+  « zéro requête pendant une partie » de rester vrai. Un test refuse `stats/track`
+  dans le fichier d'un jeu ;
+- **aucun identifiant n'est créé** : on réutilise `mat_device_id_v1` s'il existe.
+  Qui arrive par un QR code sans avoir jamais ouvert l'app est compté sans
+  identifiant.
+
+Aucun mécanisme nouveau côté backend : la route accepte n'importe quel nom de
+service et le mail quotidien affiche ce qu'il trouve. Il a suffi d'un libellé, à
+deux endroits. ⚠️ Dans `admin.html`, **trois** endroits : `SVC_LABELS`, `icons`, et
+la liste `services` — cette dernière est explicite, un service absent n'apparaît
+pas dans le tableau de bord.
+
+**Ce qu'on continue de ne pas faire** : aucun score envoyé, aucun classement,
+aucune mesure de durée. Le paragraphe « Ce qu'on ne fait pas » ci-dessus reste vrai
+mot pour mot.
