@@ -10,10 +10,11 @@
 //         frontend (safeHref dans mat-utils.js).
 // J7   : notificationclick via notif.html (query string) — corrige l'atterrissage
 //         sur la page d'accueil Firefox au lieu de l'app après clic sur notif.
-// J8   : « Le jeu du moment » — le jeu COURANT est précaché à l'installation,
-//         lu dans jeux/jeux.json. Aucun nom de jeu n'est écrit ici : changer de
-//         jeu ne doit toucher aucun code. Voir ADR-0037.
-const CACHE = 'mat-v4.105.0';
+// J8   : « Le jeu du moment » — TOUS les jeux du manifeste sont précachés à
+//         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
+//         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
+//         hors connexion le jour venu. Voir ADR-0037.
+const CACHE = 'mat-v4.106.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -60,7 +61,7 @@ const PRECACHE_URLS = [
   './js/mat-desktop.js?v=4.3.2',
   './js/mat-eau8.js?v=4.3.0',
   './js/mat-plui.js?v=1.2.0',
-  './js/mat-plan-site.js?v=1.1.0',
+  './js/mat-plan-site.js?v=1.2.0',
   // ⚠️ `js/mat-carte3d.js` est précaché (29 Ko), mais PAS
   // `vendor/maplibre/maplibre-gl.js` (~1 Mo) : le précacher triplerait le
   // poids d'installation de l'application pour une page que la plupart des
@@ -79,11 +80,11 @@ const PRECACHE_URLS = [
   './icon-192.png',
   './icon-badge.png',
   // « Le jeu du moment » — la coquille : le lanceur /jeu, les archives, le
-  // manifeste et le module qui les anime. Le FICHIER DU JEU, lui, n'est pas
-  // listé ici : il est ajouté à l'installation d'après `courant` du manifeste
-  // (voir plus bas). C'est ce qui permet de changer de jeu sans toucher au code.
-  './css/mat-jeu.css?v=1.0.0',
-  './js/mat-jeu.js?v=1.1.0',
+  // manifeste et le module qui les anime. Les FICHIERS DE JEU, eux, ne sont pas
+  // listés ici : ils sont ajoutés à l'installation d'après le manifeste (voir
+  // plus bas). C'est ce qui permet d'ajouter un jeu sans toucher au code.
+  './css/mat-jeu.css?v=1.1.0',
+  './js/mat-jeu.js?v=2.0.0',
   './jeu/index.html',
   './jeu/archives/index.html',
   './jeux/jeux.json'
@@ -112,23 +113,37 @@ self.addEventListener('install', e => {
     }
 
     // ── Le jeu du moment ──────────────────────────────────────────────
-    // On lit le manifeste et on précache le fichier que `courant` désigne.
+    // On lit le manifeste et on précache TOUS les jeux qu'il déclare.
+    //
+    // ⚠️ Tous, et pas seulement celui du jour : le jeu change de lui-même à
+    // date fixe (périodes `debut`/`fin`). Si seul le jeu courant était en
+    // cache, la bascule du 1er décembre ne fonctionnerait pas hors connexion —
+    // et c'est précisément le jour où l'on ne peut plus rien y faire. Chaque
+    // jeu pèse une vingtaine de kilo-octets ; les sept tiennent dans ~150 Ko.
+    //
     // ⛔ Ne JAMAIS écrire un nom de jeu ici : ce serait une seconde source,
     // et elle divergerait du manifeste au premier changement de saison.
-    // Best-effort : un manifeste absent ou illisible ne doit pas empêcher
-    // l'installation de tout le reste de l'application.
+    //
+    // Best-effort, et fichier par fichier : un jeu absent ne doit empêcher ni
+    // l'installation, ni la mise en cache des six autres. Avec un `await`
+    // unique, le premier 404 emportait tous les suivants.
     try {
       const rep = await fetch('./jeux/jeux.json', { cache: 'no-store' });
       const m = rep.ok ? await rep.json() : null;
       const jeux = (m && Array.isArray(m.jeux)) ? m.jeux : [];
-      const jeu = jeux.find(j => j && String(j.id) === String(m.courant)) || jeux[0];
-      if (jeu && jeu.fichier) {
-        const cible = new URL(String(jeu.fichier).replace(/^\/+/, ''), self.registration.scope).href;
-        await c.add(cible);
-        _PRECACHE_SET.add(cible);   // protégé de l'éviction, comme le reste de la coquille
-      }
+      const cibles = jeux
+        .filter(j => j && j.fichier)
+        .map(j => new URL(String(j.fichier).replace(/^\/+/, ''), self.registration.scope).href);
+      const rs = await Promise.allSettled(cibles.map(u => c.add(u)));
+      rs.forEach((r, i) => {
+        if (r.status === 'fulfilled') {
+          _PRECACHE_SET.add(cibles[i]);   // protégé de l'éviction, comme le reste de la coquille
+        } else {
+          console.warn('[SW] jeu non précaché:', cibles[i], r.reason && r.reason.message);
+        }
+      });
     } catch (err) {
-      console.warn('[SW] jeu courant non précaché:', err && err.message);
+      console.warn('[SW] manifeste des jeux illisible:', err && err.message);
     }
   })());
 });

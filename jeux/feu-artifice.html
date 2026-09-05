@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070B1C">
+<title>Le Feu d’artifice — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#04060F;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">Le Feu d’artifice : jeu de rythme en images, au-dessus du village, pendant
+quatre-vingt-dix secondes. Touchez l’écran pour tirer une fusée, retouchez pour la faire
+éclater&nbsp;; les étoiles prises dans la gerbe rapportent des points, et plusieurs d’un coup
+les multiplient. Au clavier&nbsp;: barre d’espace ou Entrée pour tirer puis éclater. Le jeu se
+joue à l’image&nbsp;; il n’a pas d’équivalent textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : le ciel au-dessus du village"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=400,H=700;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1;
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  nuit1:'#070B1C', nuit2:'#101A38', nuit3:'#1B2B52',
+  village:'#0A1024', foule:'#05080F', eau:'#0E1730',
+  fenetre:'#FFC96B', clair:'#FFF8E8', doux:'#9FB2D4', or:'#FFD166'
+};
+const PALETTES=[
+  ['#FF5A5A','#FFB03A','#FFF0C0'],
+  ['#5AC8FF','#7EE8FF','#EAFBFF'],
+  ['#B078FF','#FF7ED4','#FFE4F6'],
+  ['#7BFF9E','#D8FF7B','#F4FFE8'],
+  ['#FFD166','#FF9A3C','#FFF3D0'],
+  ['#FF6FB5','#FFC2E2','#FFFFFF']
+];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const RAND=a=>a[(Math.random()*a.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-feu-artifice';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ `best` ne monte que sur un VRAI record. En l'ecrasant a chaque fin de
+   partie, l'ecran de fin (`score>=best`) affichait « MEILLEUR » a tous les coups. */
+function majBest(){
+  if(score>best){ best=score; try{ localStorage.setItem(CLE_BEST,String(best)); }catch(_){} }
+}
+
+const HALOS={};
+function halo(col){
+  if(HALOS[col])return HALOS[col];
+  const s=128,c=document.createElement('canvas'); c.width=c.height=s;
+  const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,col); gr.addColorStop(.3,col+'99'); gr.addColorStop(1,col+'00');
+  g.fillStyle=gr; g.fillRect(0,0,s,s);
+  return HALOS[col]=c;
+}
+function lueur(px,py,r,col,a){
+  x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a===undefined?1:a;
+  x.drawImage(halo(col),px-r,py-r,r*2,r*2); x.restore();
+}
+
+/* ═══ décor du village, pré-rendu ═══ */
+const HORIZON=556, EAU0=566, EAU1=624;
+let fond=null;
+function construireFond(){
+  fond=document.createElement('canvas'); fond.width=W; fond.height=H;
+  const g=fond.getContext('2d');
+  const ciel=g.createLinearGradient(0,0,0,HORIZON);
+  ciel.addColorStop(0,C.nuit1); ciel.addColorStop(.6,C.nuit2); ciel.addColorStop(1,C.nuit3);
+  g.fillStyle=ciel; g.fillRect(0,0,W,HORIZON);
+  for(let i=0;i<110;i++){ const sx=(i*97+31)%W, sy=(i*57+i*i*3)%HORIZON;
+    g.fillStyle='rgba(255,255,255,'+(.15+Math.random()*.45)+')';
+    g.fillRect(sx,sy,i%11?1:2,i%11?1:2); }
+
+  // silhouette du village
+  g.fillStyle=C.village;
+  const maison=(mx,lg,ht)=>{
+    g.fillRect(mx-lg/2,HORIZON-ht,lg,ht);
+    g.beginPath(); g.moveTo(mx-lg/2-5,HORIZON-ht);
+    g.lineTo(mx,HORIZON-ht-14); g.lineTo(mx+lg/2+5,HORIZON-ht); g.closePath(); g.fill();
+  };
+  maison(40,54,44); maison(96,44,34); maison(300,50,40); maison(356,58,48);
+  // l'église
+  g.fillRect(178,HORIZON-58,84,58);
+  g.fillRect(236,HORIZON-124,26,66);
+  g.beginPath(); g.moveTo(231,HORIZON-122); g.lineTo(249,HORIZON-160);
+  g.lineTo(267,HORIZON-122); g.closePath(); g.fill();
+  g.fillRect(247,HORIZON-172,3,13); g.fillRect(243,HORIZON-166,11,3);
+  // fenêtres
+  g.fillStyle=C.fenetre;
+  const fen=[[30,42],[50,40],[92,34],[104,32],[196,40],[220,40],[296,38],[352,44],[366,42]];
+  for(const[fx,fy]of fen) g.fillRect(fx,HORIZON-fy,7,9);
+  g.fillRect(245,HORIZON-108,9,12);
+
+  // la rivière
+  const eau=g.createLinearGradient(0,EAU0,0,EAU1);
+  eau.addColorStop(0,'#16224A'); eau.addColorStop(1,C.eau);
+  g.fillStyle=eau; g.fillRect(0,EAU0,W,EAU1-EAU0);
+  g.fillStyle='rgba(255,201,107,.10)';
+  for(const[fx,fy]of fen) g.fillRect(fx,EAU0+4+(56-fy)*.2,7,16);
+
+  // la foule au premier plan
+  g.fillStyle=C.foule;
+  g.fillRect(0,EAU1+18,W,H-EAU1-18);
+  for(let i=0;i<26;i++){
+    const hx=i*17+((i*37)%11), hh=26+((i*13)%16);
+    g.beginPath(); g.ellipse(hx,EAU1+22-hh*.5,7,9,0,0,7); g.fill();
+    g.beginPath();
+    g.moveTo(hx-10,EAU1+30); g.lineTo(hx-7,EAU1+22-hh*.3);
+    g.lineTo(hx+7,EAU1+22-hh*.3); g.lineTo(hx+10,EAU1+30); g.closePath(); g.fill();
+  }
+}
+construireFond();
+
+/* ═══ état ═══ */
+const DUREE=90, BOUQUET=14;
+let etat='menu',t=0,flash=0,dernier=0;
+let temps=DUREE,score=0,tirs=0,best=lireBest(),meilleurGerbe=0;
+let fusee=null,parts=[],fumees=[],etoiles=[],textes=[],annonce=null;
+let spawn=0,eclat=0;
+
+function nouvelle(){
+  temps=DUREE; score=0; tirs=0; meilleurGerbe=0;
+  fusee=null; parts=[]; fumees=[]; etoiles=[]; textes=[];
+  spawn=20; eclat=0; annonce=null;
+  etat='jeu'; t=0; dernier=performance.now();
+  annoncer('LE SPECTACLE COMMENCE','touchez pour tirer, retouchez pour éclater',170);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:70,taille:ta||18});
+
+/* ═══ étoiles à toucher ═══ */
+function semerEtoile(){
+  const dore=Math.random()<.1;
+  const g=Math.random()<.5;
+  etoiles.push({x:g?-24:W+24,y:rnd(80,430),vx:(g?1:-1)*rnd(.22,.62),
+    r:dore?15:12,dore,ph:rnd(0,6.3)});
+  spawn=(temps<BOUQUET?rnd(26,50):rnd(70,130));
+}
+
+/* ═══ fusées et gerbes ═══ */
+function tirer(px){
+  fusee={x:clamp(px,26,W-26),y:HORIZON-30,vx:rnd(-.35,.35),vy:-7.6,
+    pal:RAND(PALETTES),ph:0,tr:[]};
+  tirs++;
+  for(let i=0;i<10;i++) parts.push({x:fusee.x,y:fusee.y,vx:rnd(-.8,.8),vy:rnd(0,1.6),
+    r:rnd(1,2.4),col:'#FFD9A0',t:rnd(10,22),g:.02,px:fusee.x,py:fusee.y});
+}
+
+function eclater(){
+  if(!fusee)return;
+  const cx=fusee.x, cy=fusee.y, pal=fusee.pal;
+  const n=78, R=104;
+  for(let i=0;i<n;i++){
+    const a=rnd(0,6.283), s=rnd(.5,1)*rnd(2.4,5.6);
+    parts.push({x:cx,y:cy,px:cx,py:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,
+      r:rnd(1.6,3.2),col:RAND(pal),t:rnd(52,104),g:.036,drag:.982,scin:Math.random()<.4});
+  }
+  for(let i=0;i<16;i++){
+    const a=rnd(0,6.283), s=rnd(.4,1.6);
+    parts.push({x:cx,y:cy,px:cx,py:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,
+      r:rnd(2.6,4.6),col:pal[2],t:rnd(24,50),g:.02,drag:.97});
+  }
+  fumees.push({x:cx,y:cy,r:26,t:0,max:180});
+  eclat=1; flash=Math.max(flash,.34);
+
+  // étoiles prises dans la gerbe
+  let pris=0,dores=0;
+  for(const e of etoiles){
+    if((e.x-cx)**2+(e.y-cy)**2 < (R+e.r)**2){
+      e.mort=1; pris++; if(e.dore)dores++;
+      for(let i=0;i<14;i++){ const a=rnd(0,6.283),s=rnd(.6,2.4);
+        parts.push({x:e.x,y:e.y,px:e.x,py:e.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,
+          r:rnd(1.6,3),col:e.dore?C.or:C.clair,t:rnd(26,56),g:.03,drag:.98,scin:1}); }
+    }
+  }
+  etoiles=etoiles.filter(e=>!e.mort);
+  if(pris){
+    const bonus=temps<BOUQUET?2:1;
+    const gain=(pris*100+dores*250)*pris*bonus;
+    score+=gain;
+    meilleurGerbe=Math.max(meilleurGerbe,pris);
+    const noms=['','','BELLE GERBE','TRIPLE GERBE','QUADRUPLE GERBE','BOUQUET !'];
+    texte((pris>1?(noms[Math.min(pris,5)]+'  '):'')+'+'+gain,cx,cy-40,
+      pris>1?C.or:C.clair,pris>1?22:18);
+  }
+  fusee=null;
+}
+
+/* ═══ entrée ═══ */
+function pos(e){const r=cv.getBoundingClientRect();
+  const s=e.changedTouches?e.changedTouches[0]:e; return (s.clientX-r.left)/scale;}
+addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  if(fusee) eclater(); else tirer(pos(e));
+},{passive:false});
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); } else if(fusee)eclater(); else tirer(rnd(80,W-80)); }});
+
+/* ═══ mise à jour ═══ */
+function update(){
+  const now=performance.now(), dt=Math.min(.05,(now-dernier)/1000); dernier=now;
+  t++;
+  if(flash>0)flash-=.045;
+  if(eclat>0)eclat-=.07;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.7;return u.t>0;});
+
+  for(const p of parts){
+    p.px=p.x; p.py=p.y;
+    p.x+=p.vx; p.y+=p.vy; p.vy+=p.g;
+    if(p.drag){ p.vx*=p.drag; p.vy*=p.drag; }
+    p.t--;
+  }
+  if(parts.length>900)parts.splice(0,parts.length-900);
+  parts=parts.filter(p=>p.t>0&&p.y<HORIZON+10);
+  for(const f of fumees){ f.t++; f.r+=.6; f.y-=.12; }
+  fumees=fumees.filter(f=>f.t<f.max);
+
+  if(etat!=='jeu')return;
+
+  const avant=temps;
+  temps-=dt;
+  if(avant>=BOUQUET&&temps<BOUQUET) annoncer('BOUQUET FINAL','points doublés',150);
+  if(temps<=0){ temps=0; majBest(); etat='fin'; t=0; return; }
+
+  if(fusee){
+    fusee.ph+=.2;
+    fusee.tr.push({x:fusee.x,y:fusee.y}); if(fusee.tr.length>9)fusee.tr.shift();
+    fusee.x+=fusee.vx+Math.sin(fusee.ph)*.22;
+    fusee.y+=fusee.vy; fusee.vy+=.062;
+    if(t%2===0) parts.push({x:fusee.x,y:fusee.y+5,px:fusee.x,py:fusee.y+5,
+      vx:rnd(-.4,.4),vy:rnd(.2,1),r:rnd(1,2.2),col:'#FFCF8A',t:rnd(12,26),g:.02});
+    if(fusee.vy>=0) eclater();                    // au sommet, elle part toute seule
+  }
+
+  if(--spawn<=0) semerEtoile();
+  for(const e of etoiles){ e.x+=e.vx; e.ph+=.05;
+    e.y+=Math.sin(e.ph*.7)*.22; }
+  etoiles=etoiles.filter(e=>e.x>-50&&e.x<W+50);
+}
+
+/* ═══ rendu ═══ */
+function particules(reflet){
+  x.save(); x.globalCompositeOperation='lighter';
+  if(reflet){ x.beginPath(); x.rect(0,EAU0,W,EAU1-EAU0); x.clip(); x.globalAlpha=.28; }
+  for(const p of parts){
+    const a=Math.min(1,p.t/34)*(p.scin?(.45+Math.random()*.55):1);
+    let px=p.x,py=p.y,ppx=p.px,ppy=p.py;
+    if(reflet){ py=EAU0+(EAU0-p.y)*.26; ppy=EAU0+(EAU0-p.py)*.26;
+      if(py<EAU0||py>EAU1)continue; }
+    x.globalAlpha=(reflet?.28:1)*a*.9;
+    x.strokeStyle=p.col; x.lineWidth=p.r*(reflet?.8:1.1); x.lineCap='round';
+    x.beginPath(); x.moveTo(ppx,ppy); x.lineTo(px,py); x.stroke();
+    if(!reflet) x.drawImage(halo(p.col),px-p.r*3,py-p.r*3,p.r*6,p.r*6);
+  }
+  x.restore();
+}
+
+function dessinEtoile(e){
+  const p=.7+Math.sin(e.ph*2)*.3;
+  lueur(e.x,e.y,e.r*3.2,e.dore?C.or:'#BFE4FF',.34*p);
+  x.save(); x.translate(e.x,e.y); x.rotate(e.ph*.35);
+  x.fillStyle=e.dore?C.or:C.clair;
+  x.beginPath();
+  for(let i=0;i<10;i++){ const a=i/10*6.283-1.57, r=i%2?e.r*.42:e.r;
+    x[i?'lineTo':'moveTo'](Math.cos(a)*r,Math.sin(a)*r); }
+  x.closePath(); x.fill();
+  x.restore();
+}
+
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  x.drawImage(fond,0,0);
+
+  // la lumière de l'explosion éclaire le village
+  if(eclat>0){
+    x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=eclat*.28;
+    x.fillStyle='#FFD9A0'; x.fillRect(0,HORIZON-170,W,H-HORIZON+170);
+    x.restore();
+  }
+
+  // fumées
+  x.save(); x.globalCompositeOperation='lighter';
+  for(const f of fumees){ x.globalAlpha=Math.max(0,(1-f.t/f.max))*.09;
+    x.drawImage(halo('#9FB2D4'),f.x-f.r,f.y-f.r,f.r*2,f.r*2); }
+  x.restore();
+
+  if(etat!=='menu'){
+    for(const e of etoiles) dessinEtoile(e);
+    if(fusee){
+      x.save(); x.globalCompositeOperation='lighter';
+      fusee.tr.forEach((p,i)=>{ x.globalAlpha=(i/fusee.tr.length)*.5;
+        x.drawImage(halo('#FFCF8A'),p.x-7,p.y-7,14,14); });
+      x.restore();
+      lueur(fusee.x,fusee.y,20,'#FFE6B0',.85);
+      x.fillStyle=C.clair;
+      x.beginPath(); x.ellipse(fusee.x,fusee.y,2.6,5,0,0,7); x.fill();
+    }
+  }
+
+  particules(true);      // reflet dans la rivière
+  particules(false);
+
+  if(etat==='jeu'){
+    x.save(); x.textBaseline='middle';
+    x.font='800 32px system-ui,-apple-system,sans-serif'; x.textAlign='left';
+    x.fillStyle=C.clair; x.fillText(score,16,34);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(tirs+' fusées',16,56);
+    x.textAlign='right';
+    x.font='800 30px system-ui,sans-serif';
+    x.fillStyle=temps<BOUQUET?C.or:C.clair;
+    x.fillText(Math.ceil(temps)+' s',W-16,32);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(temps<BOUQUET?'BOUQUET FINAL':'SPECTACLE',W-16,54);
+    x.fillStyle='rgba(255,248,232,.18)'; x.fillRect(16,66,W-32,4);
+    x.fillStyle=temps<BOUQUET?C.or:'#7EC8FF';
+    x.fillRect(16,66,(W-32)*clamp(temps/DUREE,0,1),4);
+    x.restore();
+    if(!fusee&&tirs<3&&(t>>4)%2){
+      x.save(); x.textAlign='center'; x.globalAlpha=.8;
+      x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.clair;
+      x.fillText('TOUCHEZ POUR TIRER',W/2,H-58); x.restore();
+    }
+    if(fusee&&(t>>3)%2){
+      x.save(); x.textAlign='center'; x.globalAlpha=.85;
+      x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('RETOUCHEZ POUR ÉCLATER',W/2,H-58); x.restore();
+    }
+  }
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/28);
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.strokeStyle='rgba(7,11,28,.7)'; x.lineWidth=5;
+    x.strokeText(u.s,clamp(u.x,80,W-80),u.y);
+    x.fillStyle=u.col; x.fillText(u.s,clamp(u.x,80,W-80),u.y); x.restore(); });
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    lueur(W/2,180,190,C.or,a*.16);
+    x.font='800 30px system-ui,sans-serif'; x.fillStyle=C.clair; x.fillText(annonce.a,W/2,176);
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux; x.fillText(annonce.b,W/2,204);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(7,11,28,.62)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 16px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,96);
+    x.font='800 44px system-ui,sans-serif'; x.fillStyle=C.clair;
+    x.fillText('LE FEU',W/2,146); x.fillText('D\'ARTIFICE',W/2,194);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Quatre-vingt-dix secondes de spectacle.',W/2,238);
+    const r=[[C.clair,'Touchez : la fusée part.'],
+             [C.or,   'Retouchez : elle éclate là où elle est.'],
+             ['#BFE4FF','Les étoiles prises dans la gerbe rapportent.'],
+             [C.or,   'Plusieurs d\'un coup : les points se multiplient.']];
+    r.forEach((u,i)=>{ const yy=300+i*36;
+      x.fillStyle=u[0]; x.beginPath(); x.arc(34,yy,7,0,7); x.fill();
+      lueur(34,yy,20,u[0],.4);
+      x.textAlign='left'; x.font='600 14px system-ui,sans-serif';
+      x.fillStyle=C.clair; x.fillText(u[1],54,yy); });
+    x.textAlign='center';
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Les quatorze dernières secondes comptent double.',W/2,470);
+    if((t>>4)%2){ lueur(W/2,548,140,C.or,.24);
+      x.font='800 22px system-ui,sans-serif'; x.fillStyle=C.clair;
+      x.fillText('TOUCHEZ POUR COMMENCER',W/2,548); }
+    if(best){ x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('meilleur spectacle : '+best,W/2,606); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(7,11,28,.76)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 34px system-ui,sans-serif'; x.fillStyle=C.clair;
+    x.fillText('RIDEAU',W/2,204);
+    x.font='800 60px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText(score,W/2,286);
+    lueur(W/2,286,150,C.or,.16);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(tirs+' fusées tirées  ·  plus belle gerbe : '+meilleurGerbe,W/2,340);
+    if(score>=best&&score>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('MEILLEUR SPECTACLE',W/2,382); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.clair;
+      x.fillText('RECOMMENCER',W/2,466); }
+  }
+
+  if(flash>0){ x.save(); x.globalCompositeOperation='lighter';
+    x.fillStyle='rgba(255,235,200,'+(flash*.4)+')'; x.fillRect(0,0,W,H); x.restore(); }
+}
+
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16234A">
+<title>La Bataille de boules de neige — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#0B1226;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">La Bataille de boules de neige : jeu d’adresse en images, sur la place du
+bourg. Des enfants surgissent derrière des murs de neige&nbsp;; touchez-les pour leur envoyer
+une boule, et touchez les boules qui arrivent vers vous pour les casser. Trois boules reçues
+et la partie s’arrête. Le jeu se joue au doigt, sur l’image&nbsp;; il n’a pas d’équivalent
+textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : la place du bourg sous la neige"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=400,H=680;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1,rect={left:0,top:0};
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  nuit:'#16234A', nuit2:'#2E4E7E',
+  neige:'#EFF5FF', neigeO:'#BACDE8', neigeF:'#9AB2D4',
+  fenetre:'#FFC96B', or:'#FFD166',
+  trait:'#16203A', peau:'#F2C39B', peau2:'#D9A87C',
+  rouge:'#E8452C', vert:'#2FA86B', bleu:'#3D8BD6', violet:'#9B6BD6',
+  texte:'#F2F7FF', doux:'#A9BEDC'
+};
+const BONNETS=[C.rouge,C.vert,C.bleu,C.violet,'#F0A03C'];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const RAND=a=>a[(Math.random()*a.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-bataille-boules-neige';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ `best` ne monte que sur un VRAI record. En l'ecrasant a chaque fin de
+   partie, l'ecran de fin (`score>=best`) affichait « MEILLEUR » a tous les coups. */
+function majBest(){
+  if(score>best){ best=score; try{ localStorage.setItem(CLE_BEST,String(best)); }catch(_){} }
+}
+
+const HALOS={};
+function halo(col){
+  if(HALOS[col])return HALOS[col];
+  const s=128,c=document.createElement('canvas'); c.width=c.height=s;
+  const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,col); gr.addColorStop(.35,col+'88'); gr.addColorStop(1,col+'00');
+  g.fillStyle=gr; g.fillRect(0,0,s,s);
+  return HALOS[col]=c;
+}
+function lueur(px,py,r,col,a){
+  x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a===undefined?1:a;
+  x.drawImage(halo(col),px-r,py-r,r*2,r*2); x.restore();
+}
+function trait(w){ x.strokeStyle=C.trait; x.lineWidth=w||2.4; x.lineJoin='round'; }
+
+/* ═══ le décor du bourg, pré-rendu ═══ */
+const HORIZON=300, SOLJ=640;
+let fond=null;
+function construireFond(){
+  fond=document.createElement('canvas'); fond.width=W; fond.height=H;
+  const g=fond.getContext('2d');
+  const ciel=g.createLinearGradient(0,0,0,HORIZON+60);
+  ciel.addColorStop(0,'#101B3C'); ciel.addColorStop(.55,'#1E3563'); ciel.addColorStop(1,'#3B6091');
+  g.fillStyle=ciel; g.fillRect(0,0,W,HORIZON+60);
+  // lune et étoiles
+  g.fillStyle='rgba(255,246,220,.9)'; g.beginPath(); g.arc(320,66,26,0,7); g.fill();
+  g.fillStyle='#1E3563'; g.beginPath(); g.arc(332,58,22,0,7); g.fill();
+  for(let i=0;i<60;i++){ const sx=(i*97+31)%W, sy=(i*53+i*i*7)%HORIZON;
+    g.fillStyle='rgba(255,255,255,'+(.25+Math.random()*.5)+')';
+    g.fillRect(sx,sy,i%9?1:2,i%9?1:2); }
+
+  // maisons enneigées du bourg
+  const maison=(mx,by,lg,ht,mur,toit)=>{
+    g.strokeStyle=C.trait; g.lineWidth=2.2; g.lineJoin='round';
+    g.fillStyle=mur; g.beginPath(); g.rect(mx-lg/2,by-ht,lg,ht); g.fill(); g.stroke();
+    g.fillStyle=toit; g.beginPath();
+    g.moveTo(mx-lg/2-7,by-ht); g.lineTo(mx,by-ht-20); g.lineTo(mx+lg/2+7,by-ht);
+    g.closePath(); g.fill(); g.stroke();
+    g.fillStyle=C.neige; g.beginPath();          // neige sur le toit
+    g.moveTo(mx-lg/2-7,by-ht); g.lineTo(mx,by-ht-20); g.lineTo(mx+lg/2+7,by-ht);
+    g.lineTo(mx+lg/2+2,by-ht+4); g.lineTo(mx,by-ht-13); g.lineTo(mx-lg/2-2,by-ht+4);
+    g.closePath(); g.fill();
+    g.fillStyle=C.fenetre;
+    for(let i=0;i<Math.floor(lg/26);i++){
+      g.beginPath(); g.rect(mx-lg/2+9+i*26,by-ht+13,13,15); g.fill(); g.stroke(); }
+  };
+  maison(52,HORIZON+30,64,52,'#5E7BA8','#8A4A44');
+  maison(120,HORIZON+34,54,44,'#6B86B0','#7A4038');
+  maison(348,HORIZON+32,62,50,'#5E7BA8','#8A4A44');
+
+  // l'église du bourg
+  const bx=232,by=HORIZON+34;
+  g.strokeStyle=C.trait; g.lineWidth=2.4;
+  g.fillStyle='#7D93BC'; g.beginPath(); g.rect(bx-46,by-60,92,60); g.fill(); g.stroke();
+  g.fillStyle='#6B82AC'; g.beginPath(); g.rect(bx+22,by-128,30,68); g.fill(); g.stroke();
+  g.fillStyle='#8A4A44'; g.beginPath();
+  g.moveTo(bx+16,by-126); g.lineTo(bx+37,by-168); g.lineTo(bx+58,by-126); g.closePath();
+  g.fill(); g.stroke();
+  g.fillStyle=C.neige; g.beginPath();
+  g.moveTo(bx-46,by-60); g.lineTo(bx+46,by-60); g.lineTo(bx+46,by-53); g.lineTo(bx-46,by-53);
+  g.closePath(); g.fill();
+  g.fillStyle=C.trait; g.fillRect(bx+35,by-180,3,14); g.fillRect(bx+31,by-174,11,3);
+  g.fillStyle=C.fenetre;
+  g.beginPath(); g.rect(bx-30,by-44,15,26); g.fill(); g.stroke();
+  g.beginPath(); g.rect(bx-4,by-44,15,26); g.fill(); g.stroke();
+  g.beginPath(); g.rect(bx+30,by-116,14,17); g.fill(); g.stroke();
+
+  // sapin de la place
+  g.fillStyle='#1E4A38'; g.strokeStyle=C.trait; g.lineWidth=2.2;
+  for(let i=0;i<3;i++){ const yy=HORIZON+16-i*26, lg=44-i*11;
+    g.beginPath(); g.moveTo(392-lg,yy); g.lineTo(392,yy-34); g.lineTo(392+lg,yy);
+    g.closePath(); g.fill(); g.stroke(); }
+
+  // la place enneigée
+  const sol=g.createLinearGradient(0,HORIZON+20,0,H);
+  sol.addColorStop(0,'#B8CCE8'); sol.addColorStop(.4,'#D6E4F6'); sol.addColorStop(1,'#EFF5FF');
+  g.fillStyle=sol; g.fillRect(0,HORIZON+22,W,H-HORIZON-22);
+  g.fillStyle='rgba(150,175,210,.35)';
+  for(let i=0;i<26;i++){ const yy=HORIZON+40+i*13;
+    g.beginPath(); g.ellipse(rnd(0,W),yy,rnd(20,60),3,0,0,7); g.fill(); }
+}
+construireFond();
+
+/* ═══ postes de tir ═══ */
+const POSTES=[
+  {x: 74,y:404,s:.82},{x:200,y:396,s:.80},{x:326,y:404,s:.82},
+  {x:120,y:508,s:1.0},{x:280,y:508,s:1.0}
+];
+const JOUEUR={x:200,y:SOLJ};
+
+/* ═══ état ═══ */
+let etat='menu',t=0,shake=0,flash=0,ralenti=0;
+let score=0,touches=0,niveau=1,bonnets=3,best=lireBest();
+let enfants=[],volants=[],parts=[],flocons=[],textes=[],ondes=[];
+let spawn=0,invul=0,brasJ=0,annonce=null;
+
+for(let i=0;i<70;i++) flocons.push({x:rnd(0,W),y:rnd(0,H),vy:rnd(.4,1.5),
+  vx:rnd(-.4,.2),r:rnd(1.2,3.2),ph:rnd(0,6.3)});
+
+function nouvelle(){
+  score=0; touches=0; niveau=1; bonnets=3; invul=0; brasJ=0;
+  enfants=[];volants=[];parts=[];textes=[];ondes=[];
+  spawn=60; annonce=null;
+  etat='jeu'; t=0;
+  annoncer('EN GARDE','touchez un enfant pour lui envoyer une boule',170);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:56,taille:ta||18});
+const onde=(px,py,max,col,ep)=>ondes.push({x:px,y:py,r:4,max,col,t:0,ep:ep||3});
+function neigeEclat(px,py,n,f){
+  for(let i=0;i<n;i++){ const a=rnd(0,6.283),v=rnd(.5,1)*f;
+    parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.6,
+      r:rnd(1.8,4.4),col:C.neige,t:rnd(18,40),g:.08}); }
+}
+
+/* ═══ enfants ═══ */
+function surgir(){
+  const libres=POSTES.map((p,i)=>i).filter(i=>!enfants.some(e=>e.p===i));
+  if(!libres.length)return;
+  const p=RAND(libres);
+  const expo=Math.max(70,150-niveau*9);
+  enfants.push({p,phase:'monte',t:0,monte:0,expo,
+    bonnet:RAND(BONNETS),echarpe:RAND(BONNETS),
+    dore:Math.random()<.08,touche:0});
+  spawn=Math.max(26,74-niveau*4)*rnd(.7,1.3);
+}
+
+function frapper(e){
+  const P=POSTES[e.p];
+  e.phase='touche'; e.t=0;
+  const pts=e.dore?300:100;
+  score+=pts; touches++;
+  neigeEclat(P.x,P.y-34*P.s,e.dore?26:14,e.dore?2.6:1.8);
+  onde(P.x,P.y-34*P.s,e.dore?90:52,e.dore?C.or:C.neige,e.dore?4:2.4);
+  texte(e.dore?'BOULE D\'OR  +300':'+100',P.x,P.y-70*P.s,e.dore?C.or:C.texte,e.dore?20:17);
+  brasJ=14;
+  const nv=1+Math.floor(touches/14);
+  if(nv>niveau){ niveau=nv; annoncer('ÇA S\'ANIME','niveau '+niveau,110); }
+}
+
+function recevoir(){
+  if(invul>0)return;
+  bonnets--; invul=90; shake=16; flash=.55; ralenti=14;
+  neigeEclat(JOUEUR.x,JOUEUR.y-58,26,2.4);
+  onde(JOUEUR.x,JOUEUR.y-58,140,C.neige,4);
+  texte('EN PLEINE FIGURE',JOUEUR.x,JOUEUR.y-120,C.rouge,19);
+  if(bonnets<=0){ majBest(); etat='fin'; t=0; }
+}
+
+/* ═══ entrée : on touche, c'est tout ═══ */
+function toucher(px,py){
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  // priorité aux boules qui arrivent
+  let cible=null,dmin=1e9;
+  for(const b of volants){
+    const d=(b.x-px)**2+(b.y-py)**2;
+    if(d<40*40&&d<dmin){dmin=d;cible=b;}
+  }
+  if(cible){
+    cible.mort=1; score+=50; brasJ=10;
+    neigeEclat(cible.x,cible.y,14,1.9);
+    onde(cible.x,cible.y,60,C.neige,2.6);
+    texte('PARÉE  +50',cible.x,cible.y-24,C.bleu,16);
+    return;
+  }
+  for(const e of enfants){
+    if(e.phase!=='haut'&&e.phase!=='arme')continue;
+    const P=POSTES[e.p];
+    const d=(P.x-px)**2+(P.y-34*P.s-py)**2;
+    if(d<46*46&&d<dmin){dmin=d;cible=e;}
+  }
+  if(cible) frapper(cible); else brasJ=8;
+}
+function pos(e){
+  const r=cv.getBoundingClientRect();
+  const s=e.changedTouches?e.changedTouches[0]:e;
+  return[(s.clientX-r.left)/scale,(s.clientY-r.top)/scale];
+}
+addEventListener('pointerdown',e=>{e.preventDefault();const[a,b]=pos(e);toucher(a,b);},{passive:false});
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{ if((e.key===' '||e.key==='Enter')&&etat!=='jeu'&&t>22){
+  e.preventDefault(); nouvelle(); }});
+
+/* ═══ mise à jour ═══ */
+function update(){
+  t++;
+  if(shake>.3)shake*=.85; else shake=0;
+  if(flash>0)flash-=.05;
+  if(ralenti>0)ralenti--;
+  if(brasJ>0)brasJ--;
+  const sm=ralenti>0?.45:1;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.9;return u.t>0;});
+  for(const p of parts){ p.x+=p.vx*sm;p.y+=p.vy*sm;p.vy+=p.g*sm;p.t--; }
+  if(parts.length>260)parts.splice(0,parts.length-260);
+  parts=parts.filter(p=>p.t>0);
+  for(const o of ondes){ o.r+=(o.max-o.r)*.17; o.t++; }
+  ondes=ondes.filter(o=>o.t<28);
+  for(const f of flocons){ f.y+=f.vy*sm; f.ph+=.02; f.x+=Math.sin(f.ph)*.4+f.vx;
+    if(f.y>H+6){f.y=-6;f.x=rnd(0,W);} if(f.x<-6)f.x=W+6; }
+
+  if(etat!=='jeu')return;
+  if(invul>0)invul--;
+
+  if(--spawn<=0) surgir();
+
+  for(const e of enfants){
+    e.t++;
+    if(e.phase==='monte'){ e.monte=Math.min(1,e.monte+.09);
+      if(e.monte>=1){ e.phase='haut'; e.t=0; } }
+    else if(e.phase==='haut'){ if(e.t>e.expo*.55){ e.phase='arme'; e.t=0; } }
+    else if(e.phase==='arme'){
+      if(e.t>Math.max(34,62-niveau*3)){
+        const P=POSTES[e.p];
+        volants.push({x:P.x,y:P.y-38*P.s,x0:P.x,y0:P.y-38*P.s,
+          t:0,dur:Math.max(52,86-niveau*3)});
+        e.phase='descend'; e.t=0;
+      }
+    }
+    else if(e.phase==='touche'){ e.monte=Math.max(0,e.monte-.11);
+      if(e.monte<=0)e.fini=1; }
+    else if(e.phase==='descend'){ e.monte=Math.max(0,e.monte-.07);
+      if(e.monte<=0)e.fini=1; }
+  }
+  enfants=enfants.filter(e=>!e.fini);
+
+  for(const b of volants){
+    b.t+=sm;
+    const k=b.t/b.dur;
+    b.x=b.x0+(JOUEUR.x-b.x0)*k;
+    b.y=b.y0+(JOUEUR.y-72-b.y0)*k - Math.sin(k*Math.PI)*70;
+    b.r=7+k*9;
+    if(k>=1){ b.mort=1; recevoir(); }
+  }
+  volants=volants.filter(b=>!b.mort);
+}
+
+/* ═══ dessins ═══ */
+function fort(P){
+  const s=P.s;
+  x.save(); x.translate(P.x,P.y); x.scale(s,s);
+  trait(2.4);
+  x.fillStyle=C.neige;
+  x.beginPath();
+  if(x.roundRect)x.roundRect(-46,-24,92,42,10); else x.rect(-46,-24,92,42);
+  x.fill(); x.stroke();
+  x.fillStyle=C.neigeO;
+  for(let i=0;i<4;i++){ x.beginPath(); x.arc(-32+i*21,-24,11,Math.PI,0); x.fill(); x.stroke(); }
+  x.restore();
+}
+
+function enfantDessin(e){
+  const P=POSTES[e.p], s=P.s, m=ease(e.monte);
+  if(m<=0)return;
+  x.save();
+  x.translate(P.x,P.y); x.scale(s,s);
+  x.save();
+  x.beginPath(); x.rect(-60,-120,120,120); x.clip();   // il sort de derrière le mur
+  x.translate(0,(1-m)*46);
+  trait(2.4);
+  // écharpe qui flotte
+  x.fillStyle=e.echarpe;
+  x.beginPath();
+  x.moveTo(-13,-30); x.lineTo(13,-30); x.lineTo(13,-23); x.lineTo(-13,-23); x.closePath();
+  x.fill(); x.stroke();
+  // manteau
+  x.fillStyle=e.dore?'#C79B33':'#3E5C8C';
+  x.beginPath();
+  if(x.roundRect)x.roundRect(-15,-30,30,34,8); else x.rect(-15,-30,30,34);
+  x.fill(); x.stroke();
+  // bras : armé quand il prépare son tir
+  const arme=e.phase==='arme';
+  x.fillStyle=e.dore?'#C79B33':'#3E5C8C';
+  x.save(); x.translate(13,-26); x.rotate(arme?-2.3:-.5);
+  x.beginPath();
+  if(x.roundRect)x.roundRect(-4.5,0,9,20,4.5); else x.rect(-4.5,0,9,20);
+  x.fill(); x.stroke(); x.restore();
+  if(arme){                                   // la boule prête, bien visible
+    x.fillStyle=C.neige;
+    x.beginPath(); x.arc(24,-42,8,0,7); x.fill(); x.stroke();
+  }
+  // tête
+  x.fillStyle=C.peau;
+  x.beginPath(); x.arc(0,-44,13,0,7); x.fill(); x.stroke();
+  x.fillStyle=C.trait;
+  x.beginPath(); x.arc(-5,-46,2.2,0,7); x.arc(5,-46,2.2,0,7); x.fill();
+  x.strokeStyle=C.trait; x.lineWidth=1.8;
+  x.beginPath(); x.arc(0,-41,5,.25,2.9); x.stroke();
+  x.fillStyle='#F09AA0'; x.globalAlpha=.6;
+  x.beginPath(); x.arc(-10,-41,3.4,0,7); x.arc(10,-41,3.4,0,7); x.fill(); x.globalAlpha=1;
+  // bonnet
+  trait(2.4);
+  x.fillStyle=e.dore?C.or:e.bonnet;
+  x.beginPath(); x.arc(0,-52,13.5,Math.PI,0); x.fill(); x.stroke();
+  x.beginPath();
+  if(x.roundRect)x.roundRect(-14,-54,28,7,3.5); else x.rect(-14,-54,28,7);
+  x.fill(); x.stroke();
+  x.fillStyle=C.neige;
+  x.beginPath(); x.arc(0,-68,6,0,7); x.fill(); x.stroke();
+  x.restore();
+  x.restore();
+
+  if(arme) lueur(P.x,P.y-46*s,54*s,C.rouge,.22+Math.sin(t*.3)*.1);
+  else if(e.phase==='haut') lueur(P.x,P.y-40*s,46*s,C.or,.14);
+}
+
+function joueur(){
+  const px=JOUEUR.x,py=JOUEUR.y;
+  if(invul>0&&(t>>2)%2){} else {
+    x.save(); x.translate(px,py); trait(2.6);
+    // manteau
+    x.fillStyle='#B8402C';
+    x.beginPath();
+    if(x.roundRect)x.roundRect(-22,-58,44,50,12); else x.rect(-22,-58,44,50);
+    x.fill(); x.stroke();
+    // bras lanceur
+    x.save(); x.translate(20,-52); x.rotate(brasJ>0?-2.1+brasJ*.09:-.35);
+    x.fillStyle='#B8402C';
+    x.beginPath();
+    if(x.roundRect)x.roundRect(-6,0,12,28,6); else x.rect(-6,0,12,28);
+    x.fill(); x.stroke(); x.restore();
+    // tête
+    x.fillStyle=C.peau;
+    x.beginPath(); x.arc(0,-78,18,0,7); x.fill(); x.stroke();
+    x.fillStyle=C.trait;
+    x.beginPath(); x.arc(-7,-80,2.8,0,7); x.arc(7,-80,2.8,0,7); x.fill();
+    x.strokeStyle=C.trait; x.lineWidth=2;
+    x.beginPath(); x.arc(0,-74,7,.25,2.9); x.stroke();
+    // bonnet
+    trait(2.6);
+    x.fillStyle='#2FA86B';
+    x.beginPath(); x.arc(0,-89,18.5,Math.PI,0); x.fill(); x.stroke();
+    x.beginPath();
+    if(x.roundRect)x.roundRect(-19,-92,38,9,4.5); else x.rect(-19,-92,38,9);
+    x.fill(); x.stroke();
+    x.fillStyle=C.neige;
+    x.beginPath(); x.arc(0,-108,8,0,7); x.fill(); x.stroke();
+    x.restore();
+  }
+  // mon mur de neige
+  x.save(); x.translate(px,py+14); trait(2.6);
+  x.fillStyle=C.neige;
+  x.beginPath();
+  if(x.roundRect)x.roundRect(-96,-22,192,50,14); else x.rect(-96,-22,192,50);
+  x.fill(); x.stroke();
+  x.fillStyle=C.neigeO;
+  for(let i=0;i<7;i++){ x.beginPath(); x.arc(-78+i*26,-22,14,Math.PI,0); x.fill(); x.stroke(); }
+  x.restore();
+}
+
+function bouleVolante(b){
+  const k=b.t/b.dur;
+  // ombre au sol : on voit où elle va tomber
+  x.save(); x.globalAlpha=.22; x.fillStyle='#5C7CA8';
+  x.beginPath(); x.ellipse(b.x,b.y0+(JOUEUR.y-40-b.y0)*k,b.r*1.5,b.r*.5,0,0,7); x.fill(); x.restore();
+  lueur(b.x,b.y,b.r*3.2,'#BFE0FF',.3);
+  x.fillStyle=C.neige; trait(2.4);
+  x.beginPath(); x.arc(b.x,b.y,b.r,0,7); x.fill(); x.stroke();
+  x.fillStyle=C.neigeO;
+  x.beginPath(); x.arc(b.x+b.r*.3,b.y+b.r*.25,b.r*.42,0,7); x.fill();
+  // cercle de visée qui se resserre
+  x.save(); x.globalAlpha=.5;
+  x.strokeStyle=k>.7?C.rouge:'#BFE0FF'; x.lineWidth=2.4;
+  x.beginPath(); x.arc(b.x,b.y,b.r+16*(1-k)+8,0,7); x.stroke(); x.restore();
+}
+
+/* ═══ rendu ═══ */
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  x.drawImage(fond,0,0);
+  lueur(232,HORIZON-10,110,C.fenetre,.1);
+
+  x.save(); if(shake)x.translate(rnd(-shake,shake),rnd(-shake,shake));
+  if(etat!=='menu'){
+    for(let i=0;i<3;i++){ fort(POSTES[i]); }
+    enfants.filter(e=>e.p<3).forEach(enfantDessin);
+    for(let i=0;i<3;i++){ /* murs déjà tracés */ }
+    for(let i=3;i<5;i++) fort(POSTES[i]);
+    enfants.filter(e=>e.p>=3).forEach(enfantDessin);
+    for(let i=3;i<5;i++) fort(POSTES[i]);
+    for(const b of volants) bouleVolante(b);
+    if(etat==='jeu') joueur();
+  }
+  x.save(); x.globalCompositeOperation='lighter';
+  for(const p of parts){ x.globalAlpha=Math.min(1,p.t/24);
+    x.drawImage(halo(p.col),p.x-p.r*2.2,p.y-p.r*2.2,p.r*4.4,p.r*4.4); }
+  x.restore();
+  for(const o of ondes){ const a=Math.max(0,1-o.t/28);
+    x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a*.7;
+    x.strokeStyle=o.col; x.lineWidth=o.ep*(1-o.t/32);
+    x.beginPath(); x.arc(o.x,o.y,o.r,0,7); x.stroke(); x.restore(); }
+  x.restore();
+
+  for(const f of flocons){ x.save(); x.globalAlpha=.75; x.fillStyle='#FFFFFF';
+    x.beginPath(); x.arc(f.x,f.y,f.r,0,7); x.fill(); x.restore(); }
+
+  if(etat==='jeu'){
+    x.save(); x.textBaseline='middle';
+    x.font='800 30px system-ui,-apple-system,sans-serif'; x.textAlign='left';
+    x.fillStyle=C.texte; x.fillText(score,18,32);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('NIVEAU '+niveau,18,54);
+    for(let i=0;i<3;i++){ const dx=W-26-i*28;
+      x.save(); x.translate(dx,34); x.scale(.42,.42); trait(4);
+      x.fillStyle=i<bonnets?'#2FA86B':'rgba(242,247,255,.18)';
+      x.beginPath(); x.arc(0,0,20,Math.PI,0); x.fill(); x.stroke();
+      x.beginPath(); x.rect(-21,-4,42,10); x.fill(); x.stroke();
+      x.restore(); }
+    x.font='600 11px system-ui,sans-serif'; x.textAlign='right'; x.fillStyle=C.doux;
+    x.fillText('BONNETS',W-18,58);
+    x.restore();
+  }
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/24);
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.fillStyle=u.col; x.fillText(u.s,clamp(u.x,70,W-70),u.y); x.restore(); });
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    lueur(W/2,150,180,C.fenetre,a*.18);
+    x.font='800 30px system-ui,sans-serif'; x.fillStyle=C.texte; x.fillText(annonce.a,W/2,146);
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux; x.fillText(annonce.b,W/2,174);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(11,18,38,.62)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 16px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,88);
+    x.font='800 40px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('LA BATAILLE',W/2,132);
+    x.font='800 34px system-ui,sans-serif';
+    x.fillText('DE BOULES DE NEIGE',W/2,172);
+    const r=[[C.or,   'Un enfant surgit : touchez-le.'],
+             ['#BFE0FF','Une boule arrive : touchez-la pour la casser.'],
+             [C.rouge,'Trois boules reçues et c\'est fini.']];
+    r.forEach((u,i)=>{ const yy=270+i*40;
+      x.fillStyle=u[0]; x.beginPath(); x.arc(46,yy,7,0,7); x.fill();
+      lueur(46,yy,20,u[0],.4);
+      x.textAlign='left'; x.font='600 15px system-ui,sans-serif';
+      x.fillStyle=C.texte; x.fillText(u[1],66,yy); });
+    x.textAlign='center';
+    x.font='600 14px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Quand un enfant lève le bras, il va tirer.',W/2,414);
+    x.fillText('La boule dorée vaut trois fois plus.',W/2,438);
+    if((t>>4)%2){ lueur(W/2,530,130,C.or,.26);
+      x.font='800 22px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('TOUCHEZ POUR COMMENCER',W/2,530); }
+    if(best){ x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('meilleure bataille : '+best,W/2,592); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(11,18,38,.78)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 34px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('TRÊVE DE NOËL',W/2,196);
+    x.font='800 60px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText(score,W/2,282);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(touches+' touchés  ·  niveau '+niveau,W/2,330);
+    if(score>=best&&score>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('MEILLEURE BATAILLE',W/2,370); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('REJOUER',W/2,452); }
+  }
+
+  if(flash>0){ x.save(); x.globalCompositeOperation='lighter';
+    x.fillStyle='rgba(220,236,255,'+(flash*.5)+')'; x.fillRect(0,0,W,H); x.restore(); }
+}
+
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>

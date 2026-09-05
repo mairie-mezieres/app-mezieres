@@ -1,14 +1,76 @@
 {
-  "courant": "la-hotte",
+  "_lisezmoi": "Rotation annuelle du jeu du moment. Les périodes sont en JJ-MM sans année : elles se répètent chaque année sans intervention. Pour figer un jeu hors calendrier, mettez son id dans 'forcer' (et remettez null ensuite).",
+  "forcer": null,
   "jeux": [
+    {
+      "id": "pere-noel",
+      "titre": "Où est le Père Noël ?",
+      "saison": "Décembre",
+      "resume": "Il se cache dans un des trois paquets. On mélange, retrouvez-le.",
+      "fichier": "/jeux/pere-noel.html",
+      "vignette": "/jeux/vignettes/pere-noel.png",
+      "debut": "01-12",
+      "fin": "31-12"
+    },
+    {
+      "id": "bataille-boules-neige",
+      "titre": "La Bataille de boules de neige",
+      "saison": "Le coeur de l'hiver",
+      "resume": "Sur la place du bourg. Touchez les enfants, cassez les boules qui arrivent.",
+      "fichier": "/jeux/bataille-boules-neige.html",
+      "vignette": "/jeux/vignettes/bataille-boules-neige.png",
+      "debut": "01-01",
+      "fin": "29-02"
+    },
+    {
+      "id": "les-batisseurs",
+      "titre": "Les Bâtisseurs",
+      "saison": "Le chantier de printemps",
+      "resume": "Rangez les pierres. Chaque ligne complète fait monter le château.",
+      "fichier": "/jeux/les-batisseurs.html",
+      "vignette": "/jeux/vignettes/les-batisseurs.png",
+      "debut": "01-03",
+      "fin": "30-04"
+    },
+    {
+      "id": "parcours-vtt",
+      "titre": "Le Parcours VTT",
+      "saison": "Le printemps sportif",
+      "resume": "800 mètres dans les bois, au chrono. Virages, tremplins et bidons.",
+      "fichier": "/jeux/parcours-vtt.html",
+      "vignette": "/jeux/vignettes/parcours-vtt.png",
+      "debut": "01-05",
+      "fin": "30-06"
+    },
+    {
+      "id": "feu-artifice",
+      "titre": "Le Feu d'artifice",
+      "saison": "L'été et le 14 juillet",
+      "resume": "Quatre-vingt-dix secondes de spectacle au-dessus du village.",
+      "fichier": "/jeux/feu-artifice.html",
+      "vignette": "/jeux/vignettes/feu-artifice.png",
+      "debut": "01-07",
+      "fin": "31-08"
+    },
     {
       "id": "la-hotte",
       "titre": "La Hotte",
-      "saison": "Septembre — les vendanges",
-      "resume": "Le raisin tombe de la treille, remplissez la hotte.",
+      "saison": "Les vendanges",
+      "resume": "Le raisin tombe de la treille. Remplissez la hotte et videz-la dans la charrette.",
       "fichier": "/jeux/la-hotte.html",
-      "vignette": "/jeux/la-hotte.svg",
-      "publie": "2026-09-04"
+      "vignette": "/jeux/vignettes/la-hotte.png",
+      "debut": "01-09",
+      "fin": "20-10"
+    },
+    {
+      "id": "course-automne",
+      "titre": "La Course d'automne",
+      "saison": "Octobre et novembre",
+      "resume": "De la forêt au bourg par la butte des Élus. Appuyez pour sauter.",
+      "fichier": "/jeux/course-automne.html",
+      "vignette": "/jeux/vignettes/course-automne.png",
+      "debut": "21-10",
+      "fin": "30-11"
     }
   ]
 }

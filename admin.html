@@ -967,7 +967,7 @@ function renderOverview() {
 }
 
 function renderServiceBadges(services) {
-  const icons = {mel:'🤖',signalement:'🚨',actualites:'🔔',meteo:'🌤️',contact:'💬',idees:'💡',installation:'📲',bug:'🐞',agenda:'📅',transport:'🚌',carburant:'⛽',events_locaux:'🎭',dechets:'🗑️',sondages:'📊',docs:'📄',nums:'📞',conseil:'🏛️',remi:'🚌',app_open:'🟢',app_resume:'↩️'};
+  const icons = {mel:'🤖',signalement:'🚨',actualites:'🔔',meteo:'🌤️',contact:'💬',idees:'💡',installation:'📲',bug:'🐞',agenda:'📅',transport:'🚌',carburant:'⛽',events_locaux:'🎭',dechets:'🗑️',sondages:'📊',docs:'📄',nums:'📞',conseil:'🏛️',remi:'🚌',app_open:'🟢',app_resume:'↩️',jeu:'🎮'};
   const HIDDEN = ['installation','conseil_municipal'];
   const entries = Object.entries(services).filter(([k])=>!HIDDEN.includes(k)&&!k.startsWith('elu_')).sort((a,b)=>b[1]-a[1]);
   if (!entries.length) return '<div style="color:var(--muted);font-size:0.8rem;padding:12px 0">Aucun accès aujourd\'hui.</div>';
@@ -1365,8 +1365,8 @@ function renderApp() {
   for (const [day,svcs] of Object.entries(parJour)) { const m=day.slice(0,7); if(!parMois[m])parMois[m]={}; for(const[svc,cnt]of Object.entries(svcs))parMois[m][svc]=(parMois[m][svc]||0)+cnt; }
   const source  = appView==='daily'?parJour:parMois;
   const periods = Object.keys(source).sort().slice(-30);
-  const SVC_LABELS = {mel:'🤖 MEL chat',signalement:'🚨 Signalement',actualites:'🔔 Actualités',meteo:'🌤️ Météo',contact:'💬 Contact',idees:'💡 Idées',installation:'📲 Installation',carburant:'⛽ Carburant',events_locaux:'🎭 Événements',agenda:'📅 Agenda',dechets:'🗑️ Déchets',sondages:'📊 Sondages',docs:'📄 Documents',nums:'📞 Numéros utiles',conseil:'🏛️ Conseil municipal',remi:'🚌 Bus Rémi',app_open:'🟢 Ouvertures / jour',app_resume:'↩️ Retours en avant-plan',partager_visite:'🔗 Partager — visites',partager_prompt:'🔗 Partager — prompts générés'};
-  const services= ['mel','meteo','actualites','carburant','events_locaux','agenda','dechets','sondages','docs','nums','remi','conseil','contact','signalement','idees','partager_visite','partager_prompt'];
+  const SVC_LABELS = {mel:'🤖 MEL chat',signalement:'🚨 Signalement',actualites:'🔔 Actualités',meteo:'🌤️ Météo',contact:'💬 Contact',idees:'💡 Idées',installation:'📲 Installation',carburant:'⛽ Carburant',events_locaux:'🎭 Événements',agenda:'📅 Agenda',dechets:'🗑️ Déchets',sondages:'📊 Sondages',docs:'📄 Documents',nums:'📞 Numéros utiles',conseil:'🏛️ Conseil municipal',remi:'🚌 Bus Rémi',app_open:'🟢 Ouvertures / jour',app_resume:'↩️ Retours en avant-plan',partager_visite:'🔗 Partager — visites',partager_prompt:'🔗 Partager — prompts générés',jeu:'🎮 Jeu du moment'};
+  const services= ['mel','meteo','actualites','carburant','events_locaux','agenda','dechets','sondages','docs','nums','remi','conseil','contact','signalement','idees','jeu','partager_visite','partager_prompt'];
   const colors  = ['#2563eb','#38bdf8','#f59e0b','#f97316','#8b5cf6','#0891b2','#16a34a','#ec4899','#d4a843','#6b7280','#64748b','#1e40af','#7c3aed','#dc2626','#a16207','#059669','#10b981'];
   const allSvcs = Object.keys(Object.assign({}, ...(periods.map(p=>source[p]||{})))).filter(k=>!k.startsWith('elu_'));
   const chartSvcs = services.filter(s=>allSvcs.includes(s)||periods.some(p=>source[p]?.[s]));

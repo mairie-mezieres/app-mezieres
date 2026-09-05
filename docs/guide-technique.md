@@ -472,7 +472,7 @@ est versionné dans le dépôt et listé dans `PRECACHE_URLS` :
 paramètre `?v=`**, sinon il ne sera pas disponible hors ligne et échappera à
 l'invalidation de cache.
 
-### « Le jeu du moment » — route stable `/jeu`, manifeste, pastille (v4.104)
+### « Le jeu du moment » — rotation par période, route stable `/jeu` (v4.106)
 
 Voir **ADR-0037** pour les raisons ; ce qui suit est le mode d'emploi.
 
@@ -480,17 +480,30 @@ Voir **ADR-0037** pour les raisons ; ce qui suit est le mode d'emploi.
 
 | Chemin | Rôle |
 |---|---|
-| `jeux/jeux.json` | **La seule source.** Titre, saison, résumé, fichier, vignette, date, et `courant`. |
+| `jeux/jeux.json` | **La seule source.** Titre, saison, résumé, fichier, vignette, période `debut`/`fin`, et `forcer`. |
 | `jeux/<id>.html` | Le jeu, fichier HTML **autonome** (aucune dépendance externe). |
-| `jeux/<id>.svg` | La vignette, affichée dans les archives. Facultative. |
+| `jeux/vignettes/<id>.png` | La vignette des archives. **Facultative** : une image absente est simplement retirée du rendu (`img.onerror`), jamais affichée cassée. |
 | `jeu/index.html` | **Le lanceur** — la route stable, imprimée sur les affiches et les QR codes. |
-| `jeu/archives/index.html` | La liste des jeux précédents, toujours jouables. |
+| `jeu/archives/index.html` | Tous les jeux sauf celui du jour, toujours jouables. |
 | `js/mat-jeu.js` | Un module, trois rôles : tuile d'accueil, lanceur, archives. |
 | `css/mat-jeu.css` | Les deux pages qui encadrent le jeu. Le jeu, lui, n'utilise rien de commun. |
 
+**⚠️ LE JEU CHANGE TOUT SEUL.** Il n'y a **pas** de champ « jeu courant » : chaque
+entrée porte une période `debut`/`fin` au format **JJ-MM, sans année** — elle se
+répète donc d'elle-même chaque année, sans que personne n'intervienne le 1er
+décembre. Une période peut enjamber le 31 décembre (`01-12` → `28-02`), d'où les
+deux branches de `periodeContient`. `forcer` épingle un jeu hors calendrier ; un
+`forcer` qui ne correspond à rien retombe sur le calendrier plutôt que de figer
+l'application sur rien.
+
+⛔ **Un trou ou un chevauchement dans le calendrier ne se verrait qu'une fois par
+an — le jour où il tombe, et personne ne serait là pour le corriger.**
+`tests/e2e/jeu.spec.js` balaie donc **les 366 jours d'une année bissextile** et
+refuse aussi bien un jour sans jeu qu'un jour à deux jeux.
+
 **⛔ Le nom d'un jeu ne s'écrit QUE dans `jeux/jeux.json`.** Ni dans `index.html`,
 ni dans le service worker, ni dans un test. `tests/e2e/jeu.spec.js` échoue si le
-titre du jeu courant apparaît dans `index.html`, ou son identifiant dans
+titre d'un jeu apparaît dans `index.html` (hors changelog), ou son identifiant dans
 `service-worker.js` — parce que ce serait une double source, et qu'elle
 divergerait au premier changement de saison, en silence.
 
@@ -509,16 +522,45 @@ l'état **avant** que la pastille soit décidée, et conclurait au hasard selon 
 vitesse de la machine. Le titre et la saison, eux, restent affichés par le lanceur.
 
 **La pastille « Nouveau ».** `localStorage['jeu-vu']` porte **l'identifiant** du
-dernier jeu ouvert — pas une date. La pastille s'affiche si cet identifiant
-diffère de `courant` ; `publie` ne sert qu'à ne rien annoncer avant sa date.
-⚠️ Comparer des dates rallumerait la pastille sur toute la commune si la mairie
-corrigeait une coquille dans `publie`. Elle porte le mot « Nouveau » et le lien
-annonce « Nouveau jeu disponible » (`aria-label`) : jamais la couleur seule.
+dernier jeu ouvert. Elle s'allume donc exactement quand la période bascule, et
+s'éteint à l'ouverture — **aucune date à tenir à jour, rien à faire le jour J**.
+⚠️ Ne jamais la faire reposer sur une date de publication : la corriger d'une
+coquille rallumerait la pastille sur toute la commune, pour un jeu déjà vu. Elle
+porte le mot « Nouveau » et le lien annonce « Nouveau jeu disponible »
+(`aria-label`) : jamais la couleur seule.
+
+**Le comptage des ouvertures (v4.106).** Le lanceur envoie `POST /stats/track`
+avec `service: 'jeu'` — **le canal générique de l'application**, celui de MEL, de
+l'agenda et des déchets. Aucune route, aucun stockage, aucun réglage nouveau : le
+backend accepte n'importe quel nom de service, et le mail quotidien affiche tout
+ce qu'il trouve dans `parJour[jour]`. Il a suffi d'ajouter le libellé
+`jeu:'🎮 Jeu du moment'` dans `routes/admin-email.js` et dans `admin.html`
+(`SVC_LABELS`, `icons`, **et la liste `services`** — celle-là est explicite, un
+service absent n'apparaît pas dans le tableau de bord).
+
+⛔ **Ce qui est compté : l'OUVERTURE, une fois par appareil et par jour** (clé
+`mat_jeu_compte`, qui porte le jour — une seule clé, et non une par jour qui
+s'empilerait). Le chiffre du jour est donc un **nombre de personnes**, pas un
+nombre de clics : trois parties d'affilée ne font pas trois joueurs.
+⛔ **Ce qui n'est pas compté** : le score, la durée, le nombre de parties, le jeu
+joué. Rien de ce qui se passe pendant la partie ne sort.
+⚠️ Le comptage a lieu **dans le lanceur, avant la redirection** — jamais dans un
+jeu. C'est ce qui permet aux fichiers de jeu de rester sans réseau, et au contrôle
+« zéro requête pendant une partie » de rester vrai. Deux tests le verrouillent :
+l'un compte les envois, l'autre refuse `stats/track` dans le fichier d'un jeu.
+⚠️ Aucun identifiant n'est **créé** ici : on réutilise `mat_device_id_v1` s'il
+existe déjà. Qui arrive par un QR code sans avoir jamais ouvert l'app est compté
+sans identifiant. Et le comptage suit le réglage « statistiques détaillées » de
+l'admin : coupé là, il ne compte plus.
 
 **Le hors-ligne, en trois couches** — c'est la partie qu'on oublie :
 
-1. le service worker précache la coquille **et** le fichier que `courant`
-   désigne, lu dans le manifeste à l'installation ;
+1. le service worker précache la coquille **et TOUS les jeux** du manifeste, lus à
+   l'installation. ⚠️ Tous, et pas seulement celui du jour : **la bascule doit
+   fonctionner hors connexion le jour venu**, et c'est précisément le jour où l'on
+   ne peut plus rien y faire. Sept jeux ≈ 150 Ko. La mise en cache est faite
+   fichier par fichier (`Promise.allSettled`) : avec un `await` unique, le premier
+   404 emportait tous les suivants ;
 2. `jeux/jeux.json` est servi **réseau d'abord, cache en secours** (tout le reste
    est en *stale-while-revalidate*) — sinon l'affiche imprimée annoncerait un jeu
    que l'application ne sert pas encore ;
@@ -526,14 +568,16 @@ annonce « Nouveau jeu disponible » (`aria-label`) : jamais la couleur seule.
    jeu qu'il vient de résoudre → le jeu est en cache dès sa **première
    ouverture**, même si le service worker en place ne rejoue jamais son `install`.
 
-⚠️ **Limite assumée** : un jeu publié sans nouvelle version de l'application
-n'est pas jouable hors connexion **avant** d'avoir été ouvert une fois. Pour
-qu'il le soit, bumper `CACHE` dans `service-worker.js` (et donc le numéro
-affiché, cf. la règle du dépôt).
+⚠️ **Limite assumée** : un jeu **ajouté** sans nouvelle version de l'application
+n'est pas jouable hors connexion avant d'avoir été ouvert une fois. Pour qu'il le
+soit, bumper `CACHE` dans `service-worker.js` (et donc le numéro affiché, cf. la
+règle du dépôt). Les jeux **déjà dans le manifeste** au moment de l'installation,
+eux, sont tous en cache : la rotation annuelle ne demande rien.
 
-**Publier le jeu suivant** — voir `docs/guide-utilisateur.md` §19 pour la version
-non technique. En bref : déposer `jeux/<id>.html`, ajouter l'entrée, changer
-`courant`. Aucun code à toucher.
+**Ajouter un jeu ou décaler une période** — voir `docs/guide-utilisateur.md` §20
+pour la version non technique. En bref : déposer `jeux/<id>.html`, ajouter
+l'entrée avec sa période, et libérer la place chez le voisin. Aucun code à
+toucher.
 
 ⚠️ **Ce que le jeu n'a pas le droit de faire** : citer un domaine externe,
 appeler `fetch`/`XMLHttpRequest`, charger une police distante (`@font-face`,

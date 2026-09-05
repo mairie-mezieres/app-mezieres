@@ -124,15 +124,12 @@ h1 {
   background: var(--jeu-carte);
 }
 
-.jeu .resume,
-.jeu .publie {
+.jeu .resume {
   display: block;
   font-size: 0.85rem;
   color: var(--jeu-doux);
   background: var(--jeu-carte);
 }
-
-.jeu .publie { font-size: 0.8rem; margin-top: 2px; }
 
 /* ── Liens de pied de page ───────────────────────────────── */
 

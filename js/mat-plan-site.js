@@ -90,7 +90,7 @@ function _ouvrirEcran(id) {
 const PLAN_PAGES = [
   ['Se détendre', [
     { href: 'jeu/',          titre: 'Le jeu du moment' },
-    { href: 'jeu/archives/', titre: 'Jeux précédents' }
+    { href: 'jeu/archives/', titre: 'Les autres jeux' }
   ]]
 ];
 

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2A1220">
+<title>Où est le Père Noël ? — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#1A0B14;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">Où est le Père Noël : jeu d’observation en images. Le Père Noël se cache
+dans l’un de trois paquets identiques&nbsp;; les paquets se mélangent, il faut désigner le
+bon. Au doigt&nbsp;: touchez un paquet. Au clavier&nbsp;: touches 1, 2 et 3 pour désigner le
+paquet de gauche, du milieu ou de droite, barre d’espace ou Entrée pour commencer une
+partie. Le jeu se joue à l’image&nbsp;; il n’a pas d’équivalent textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : les trois paquets"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=400,H=700;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1;
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  fond1:'#2A1220', fond2:'#3D1A2A', tapis:'#5A2233',
+  rouge:'#D63A3A', vert:'#2E8B57', bleu:'#3E6FB0',
+  ruban:'#F5EDE0', rubanO:'#C9BCA8',
+  ouvert:'#FFF8EC', ombre:'#1A0B14',
+  or:'#FFD166', alerte:'#FF6B5B', okay:'#5FD08A',
+  texte:'#FFF8EC', doux:'#C9AEBB', trait:'#2A1220',
+  peau:'#F2C39B', barbe:'#FFFFFF'
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-pere-noel';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ `best` ne monte que sur un VRAI record. En l'écrasant à chaque fin de
+   partie, l'écran de fin (`score>=best`) affichait « MEILLEUR » à tous les coups. */
+function majBest(){
+  if(score>best){ best=score; try{ localStorage.setItem(CLE_BEST,String(best)); }catch(_){} }
+}
+
+const HALOS={};
+function halo(col){
+  if(HALOS[col])return HALOS[col];
+  const s=128,c=document.createElement('canvas'); c.width=c.height=s;
+  const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,col); gr.addColorStop(.35,col+'88'); gr.addColorStop(1,col+'00');
+  g.fillStyle=gr; g.fillRect(0,0,s,s);
+  return HALOS[col]=c;
+}
+function lueur(px,py,r,col,a){
+  x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a===undefined?1:a;
+  x.drawImage(halo(col),px-r,py-r,r*2,r*2); x.restore();
+}
+function rrect(px,py,w,h,r){
+  x.beginPath();
+  if(x.roundRect)x.roundRect(px,py,w,h,r); else x.rect(px,py,w,h);
+}
+
+/* ═══ mise en place ═══ */
+const TAILLE=104, YB=360;
+const XS=[W/2-124, W/2, W/2+124];
+const PAPIER=C.rouge;          /* les trois paquets sont identiques */
+const CONTENU=C.vert;         /* et les deux lots de consolation aussi */
+
+/* ═══ état ═══ */
+const DUREE=90;
+let etat='menu',t=0,shake=0,flash=0,dernier=0;
+let temps=DUREE,score=0,manche=0,serie=0,meilleureSerie=0,erreurs=3,best=lireBest();
+let boites=[],pereNoel=0,phase='apercu',phaseT=0;
+let echange=null,restants=0,choix=-1;
+let parts=[],textes=[],flocons=[],annonce=null;
+
+for(let i=0;i<40;i++) flocons.push({x:rnd(0,W),y:rnd(0,H),vy:rnd(.3,.9),
+  vx:rnd(-.25,.15),r:rnd(1.2,2.8),ph:rnd(0,6.3)});
+
+function nouvelle(){
+  temps=DUREE; score=0; manche=0; serie=0; meilleureSerie=0; erreurs=3;
+  parts=[];textes=[]; annonce=null;
+  etat='jeu'; t=0; dernier=performance.now();
+  nouvelleManche();
+  annoncer('OÙ EST LE PÈRE NOËL ?','suivez son paquet des yeux',160);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:64,taille:ta||20});
+function etincelles(px,py,n,col,f){
+  for(let i=0;i<n;i++){ const a=rnd(0,6.283),v=rnd(.5,1)*f;
+    parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.6,
+      r:rnd(1.8,4.2),col,t:rnd(20,44),g:.08}); }
+}
+
+function nouvelleManche(){
+  manche++;
+  boites=[0,1,2].map(i=>({slot:i,ouvert:1,anim:1,secoue:0}));
+  pereNoel=(Math.random()*3)|0;
+  choix=-1; echange=null;
+  restants=Math.min(9,2+Math.floor(manche*.8));
+  phase='apercu'; phaseT=Math.max(50,92-manche*4);
+}
+
+function lancerEchange(){
+  const a=(Math.random()*3)|0;
+  let b=(Math.random()*3)|0;
+  while(b===a) b=(Math.random()*3)|0;
+  const dur=Math.max(11,26-manche);
+  echange={a,b,t:0,dur,sens:Math.random()<.5?1:-1};
+}
+
+function choisir(i){
+  if(phase!=='choix')return;
+  choix=i;
+  for(const b of boites) b.ouvert=1;
+  const gagne=boites[i].slot===undefined?false:(i===pereNoel);
+  if(gagne){
+    serie++; meilleureSerie=Math.max(meilleureSerie,serie);
+    const gain=100*manche+(serie>1?serie*50:0);
+    score+=gain;
+    const px=XS[boites.findIndex(b=>b.slot===i)] ?? W/2;
+    etincelles(W/2,YB,26,C.or,2.6);
+    texte(serie>2?('SÉRIE DE '+serie+'  +'+gain):('TROUVÉ  +'+gain),W/2,YB-96,C.or,24);
+    flash=.35; shake=6;
+  }else{
+    serie=0; erreurs--;
+    etincelles(W/2,YB,14,C.alerte,1.8);
+    texte('RATÉ',W/2,YB-96,C.alerte,24);
+    shake=14; flash=.3;
+    if(erreurs<=0){ majBest(); etat='fin'; t=0; return; }
+  }
+  phase='resultat'; phaseT=64;
+}
+
+/* ═══ position d'une boîte ═══ */
+function posBoite(i){
+  const b=boites[i];
+  let px=XS[b.slot], py=YB;
+  if(echange&&(echange.a===i||echange.b===i)){
+    const k=ease(echange.t/echange.dur);
+    const autre=echange.a===i?echange.b:echange.a;
+    const x0=XS[b.slot], x1=XS[boites[autre].slot];
+    px=x0+(x1-x0)*k;
+    const dessus=(echange.a===i)===(echange.sens>0);
+    py=YB+Math.sin(k*Math.PI)*(dessus?-46:38);
+  }
+  return[px,py];
+}
+
+/* ═══ entrée ═══ */
+function pos(e){const r=cv.getBoundingClientRect();
+  const s=e.changedTouches?e.changedTouches[0]:e;
+  return[(s.clientX-r.left)/scale,(s.clientY-r.top)/scale];}
+addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  const[a,b]=pos(e);
+  if(phase!=='choix')return;
+  for(let i=0;i<3;i++){
+    const[px,py]=posBoite(i);
+    if(Math.abs(a-px)<TAILLE*.62&&Math.abs(b-py)<TAILLE*.62){ choisir(i); return; }
+  }
+},{passive:false});
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{
+  if(etat!=='jeu'){ if(t>22&&(e.key===' '||e.key==='Enter')){e.preventDefault();nouvelle();} return; }
+  const k={'1':0,'2':1,'3':2}[e.key];
+  if(k!==undefined&&phase==='choix'){
+    const i=boites.findIndex(b=>b.slot===k); if(i>=0)choisir(i);
+  }
+});
+
+/* ═══ mise à jour ═══ */
+function update(){
+  const now=performance.now(), dt=Math.min(.05,(now-dernier)/1000); dernier=now;
+  t++;
+  if(shake>.3)shake*=.85; else shake=0;
+  if(flash>0)flash-=.05;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.8;return u.t>0;});
+  for(const p of parts){ p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.t--; }
+  parts=parts.filter(p=>p.t>0);
+  for(const f of flocons){ f.y+=f.vy; f.ph+=.02; f.x+=Math.sin(f.ph)*.35+f.vx;
+    if(f.y>H+6){f.y=-6;f.x=rnd(0,W);} if(f.x<-6)f.x=W+6; }
+  for(const b of boites){ b.anim+=((b.ouvert?1:0)-b.anim)*.2; if(b.secoue>0)b.secoue--; }
+  if(etat!=='jeu')return;
+
+  temps-=dt;
+  if(temps<=0){ temps=0; majBest(); etat='fin'; t=0; return; }
+
+  if(phase==='apercu'){
+    if(--phaseT<=0){ for(const b of boites) b.ouvert=0; phase='melange'; }
+  }
+  else if(phase==='melange'){
+    if(echange){
+      echange.t++;
+      if(echange.t>=echange.dur){
+        const A=boites[echange.a], B=boites[echange.b];
+        const s=A.slot; A.slot=B.slot; B.slot=s;
+        A.secoue=6; B.secoue=6;
+        echange=null; restants--;
+        if(restants<=0) phase='choix';
+      }
+    }else if(restants>0) lancerEchange();
+    else phase='choix';
+  }
+  else if(phase==='resultat'){
+    if(--phaseT<=0) nouvelleManche();
+  }
+}
+
+/* ═══ dessins ═══ */
+function pereNoelDessin(px,py,s){
+  x.save(); x.translate(px,py); x.scale(s,s);
+  x.strokeStyle=C.trait; x.lineWidth=2.6/s; x.lineJoin='round';
+  // corps
+  x.fillStyle='#D63A3A';
+  x.beginPath(); x.moveTo(-16,26); x.quadraticCurveTo(-18,2,0,0);
+  x.quadraticCurveTo(18,2,16,26); x.closePath(); x.fill(); x.stroke();
+  // ceinture
+  x.fillStyle='#3A2A22'; x.fillRect(-17,16,34,7); x.strokeRect(-17,16,34,7);
+  x.fillStyle=C.or; x.fillRect(-5,15,10,9); x.strokeRect(-5,15,10,9);
+  // tête
+  x.fillStyle=C.peau;
+  x.beginPath(); x.arc(0,-12,13,0,7); x.fill(); x.stroke();
+  // barbe
+  x.fillStyle=C.barbe;
+  x.beginPath(); x.moveTo(-13,-12);
+  x.quadraticCurveTo(-15,10,0,14); x.quadraticCurveTo(15,10,13,-12);
+  x.quadraticCurveTo(7,-4,0,-4); x.quadraticCurveTo(-7,-4,-13,-12);
+  x.closePath(); x.fill(); x.stroke();
+  // moustache et yeux
+  x.fillStyle=C.barbe;
+  x.beginPath(); x.ellipse(-5,-6,6,3.4,-.2,0,7); x.ellipse(5,-6,6,3.4,.2,0,7); x.fill();
+  x.fillStyle=C.trait;
+  x.beginPath(); x.arc(-5,-14,2.2,0,7); x.arc(5,-14,2.2,0,7); x.fill();
+  x.fillStyle='#F09AA0'; x.globalAlpha=.6;
+  x.beginPath(); x.arc(-10,-9,3.4,0,7); x.arc(10,-9,3.4,0,7); x.fill(); x.globalAlpha=1;
+  // bonnet
+  x.fillStyle='#D63A3A';
+  x.beginPath(); x.moveTo(-14,-20); x.quadraticCurveTo(-2,-42,16,-36);
+  x.quadraticCurveTo(6,-26,14,-20); x.closePath(); x.fill(); x.stroke();
+  x.fillStyle=C.barbe;
+  x.beginPath(); x.ellipse(0,-20,15,5,0,0,7); x.fill(); x.stroke();
+  x.beginPath(); x.arc(18,-36,6,0,7); x.fill(); x.stroke();
+  x.restore();
+}
+function cadeauSimple(px,py,s,col){
+  x.save(); x.translate(px,py); x.scale(s,s);
+  x.strokeStyle=C.trait; x.lineWidth=2.6/s;
+  x.fillStyle=col;
+  rrect(-19,-14,38,32,5); x.fill(); x.stroke();
+  x.fillStyle=C.ruban; x.fillRect(-4,-14,8,32);
+  x.fillStyle=col; rrect(-22,-20,44,10,4); x.fill(); x.stroke();
+  x.fillStyle=C.ruban; x.fillRect(-4,-20,8,10);
+  x.strokeStyle=C.trait; x.lineWidth=2.2/s;
+  x.beginPath(); x.ellipse(-8,-24,7,5,-.4,0,7); x.fill(); x.stroke();
+  x.beginPath(); x.ellipse(8,-24,7,5,.4,0,7); x.fill(); x.stroke();
+  x.restore();
+}
+
+function dessinBoite(i){
+  const b=boites[i], [px,py]=posBoite(i);
+  const a=ease(b.anim), s=TAILLE;
+  const sec=b.secoue>0?Math.sin(b.secoue*1.6)*3:0;
+  const estPN=(i===pereNoel);
+  const perdu=(phase==='resultat'&&choix>=0&&i===choix&&!estPN);
+
+  x.save(); x.translate(px+sec,py);
+  // ombre au sol
+  x.save(); x.globalAlpha=.35; x.fillStyle=C.ombre;
+  x.beginPath(); x.ellipse(0,s*.56,s*.44,10,0,0,7); x.fill(); x.restore();
+
+  // contenu, visible quand la boîte est ouverte
+  x.save(); x.globalAlpha=a;
+  x.fillStyle=C.ouvert; rrect(-s/2,-s/2,s,s,16); x.fill();
+  x.strokeStyle=perdu?C.alerte:(estPN&&a>.5?C.or:C.trait);
+  x.lineWidth=perdu||estPN?4:2.8; x.stroke();
+  if(estPN) pereNoelDessin(0,4,1.05);
+  else cadeauSimple(0,6,.95,CONTENU);
+  x.restore();
+
+  // le paquet fermé
+  if(a<.98){
+    x.save(); x.globalAlpha=1-a;
+    x.fillStyle=PAPIER; rrect(-s/2,-s/2,s,s,16); x.fill();
+    x.save(); rrect(-s/2,-s/2,s,s,16); x.clip();
+    x.globalAlpha=(1-a)*.16; x.fillStyle='#FFFFFF';
+    for(let k=-s;k<s*2;k+=20){ x.beginPath();
+      x.moveTo(-s/2+k,-s/2); x.lineTo(-s/2+k+s,s/2);
+      x.lineTo(-s/2+k+s+9,s/2); x.lineTo(-s/2+k+9,-s/2); x.closePath(); x.fill(); }
+    x.restore();
+    x.globalAlpha=1-a;
+    x.fillStyle=C.ruban;
+    x.fillRect(-9,-s/2,18,s); x.fillRect(-s/2,-9,s,18);
+    x.fillStyle=C.rubanO;
+    x.fillRect(4,-s/2,5,s); x.fillRect(-s/2,4,s,5);
+    x.fillStyle=C.ruban; x.strokeStyle=C.trait; x.lineWidth=2.4;
+    x.beginPath(); x.ellipse(-16,-9,14,10,-.4,0,7); x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(16,-9,14,10,.4,0,7); x.fill(); x.stroke();
+    x.beginPath(); x.arc(0,-9,7.5,0,7); x.fill(); x.stroke();
+    x.strokeStyle=C.trait; x.lineWidth=3;
+    rrect(-s/2,-s/2,s,s,16); x.stroke();
+    x.restore();
+  }
+  x.restore();
+
+  if(estPN&&a>.5) lueur(px,py,s*.8,C.or,.22);
+  if(phase==='choix'){
+    x.save(); x.globalAlpha=.3+Math.sin(t*.12+i)*.12;
+    x.strokeStyle=C.texte; x.lineWidth=2.4; x.setLineDash([7,7]);
+    rrect(px-s/2-7,py-s/2-7,s+14,s+14,20); x.stroke(); x.restore();
+  }
+}
+
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C.fond1); g.addColorStop(.62,C.fond2); g.addColorStop(1,'#26101C');
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  // guirlande
+  x.strokeStyle='rgba(255,248,236,.16)'; x.lineWidth=1.6;
+  x.beginPath();
+  for(let i=0;i<=9;i++){ const px=22+i*45, py=26+Math.sin(i*.9)*9;
+    i?x.lineTo(px,py):x.moveTo(px,py); }
+  x.stroke();
+  for(let i=0;i<9;i++){
+    const px=22+i*45, py=26+Math.sin(i*.9)*9;
+    const col=[C.rouge,C.or,C.vert,'#7EC8FF'][i%4];
+    lueur(px,py,17,col,.4+Math.sin(t*.1+i)*.2);
+    x.fillStyle=col; x.beginPath(); x.arc(px,py,4.5,0,7); x.fill();
+  }
+  // tapis
+  x.fillStyle=C.tapis;
+  x.beginPath(); x.ellipse(W/2,YB+62,178,34,0,0,7); x.fill();
+
+  for(const f of flocons){ x.save(); x.globalAlpha=.6; x.fillStyle='#FFFFFF';
+    x.beginPath(); x.arc(f.x,f.y,f.r,0,7); x.fill(); x.restore(); }
+
+  x.save(); if(shake)x.translate(rnd(-shake,shake),rnd(-shake,shake));
+  if(etat!=='menu'){
+    // celle qui passe par-dessus se dessine en dernier
+    const ordre=[0,1,2].sort((a,b)=>posBoite(a)[1]-posBoite(b)[1]);
+    for(const i of ordre) dessinBoite(i);
+  }
+  for(const p of parts){ x.globalAlpha=Math.min(1,p.t/24); x.fillStyle=p.col;
+    x.beginPath(); x.arc(p.x,p.y,p.r,0,7); x.fill(); }
+  x.globalAlpha=1;
+  x.restore();
+
+  if(etat==='jeu'){
+    x.save(); x.textBaseline='middle';
+    x.font='800 30px system-ui,-apple-system,sans-serif'; x.textAlign='left';
+    x.fillStyle=C.texte; x.fillText(score,18,86);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('MANCHE '+manche+(serie>1?'   ·   SÉRIE DE '+serie:''),18,108);
+    x.textAlign='right';
+    x.font='800 28px system-ui,sans-serif';
+    x.fillStyle=temps<15?C.alerte:C.texte; x.fillText(Math.ceil(temps)+' s',W-18,84);
+    for(let i=0;i<3;i++){ const dx=W-26-i*26;
+      x.beginPath(); x.arc(dx,110,8,0,7);
+      x.fillStyle=i<erreurs?C.rouge:'rgba(255,248,236,.16)'; x.fill();
+      x.strokeStyle=C.trait; x.lineWidth=2; x.stroke(); }
+    // consigne, toujours affichée
+    x.textAlign='center'; x.font='800 22px system-ui,sans-serif';
+    const msg = phase==='apercu' ? ['LE VOICI','#FFD166']
+              : phase==='melange' ? ['SUIVEZ-LE','#FFF8EC']
+              : phase==='choix' ? ['OÙ EST-IL ?','#5FD08A']
+              : [choix>=0&&choix===pereNoel?'BRAVO':'C\'ÉTAIT CELUI-LÀ',
+                 choix===pereNoel?'#5FD08A':'#FF6B5B'];
+    x.fillStyle=msg[1]; x.fillText(msg[0],W/2,196);
+    x.restore();
+  }
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/26);
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.strokeStyle='rgba(26,11,20,.8)'; x.lineWidth=5;
+    x.strokeText(u.s,clamp(u.x,90,W-90),u.y);
+    x.fillStyle=u.col; x.fillText(u.s,clamp(u.x,90,W-90),u.y); x.restore(); });
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    lueur(W/2,144,180,C.or,a*.18);
+    x.font='800 27px system-ui,sans-serif'; x.fillStyle=C.texte; x.fillText(annonce.a,W/2,140);
+    x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux; x.fillText(annonce.b,W/2,168);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(26,11,20,.74)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 16px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,110);
+    x.font='800 38px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('OÙ EST LE',W/2,160); x.fillText('PÈRE NOËL ?',W/2,206);
+    pereNoelDessin(W/2,306,1.9);
+    x.font='600 16px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Il se cache dans un des trois paquets.',W/2,400);
+    x.fillText('On mélange. Retrouvez-le.',W/2,428);
+    x.font='600 14px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Ça va de plus en plus vite. Trois erreurs et c\'est fini.',W/2,478);
+    if((t>>4)%2){ lueur(W/2,556,140,C.or,.24);
+      x.font='800 22px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('TOUCHEZ POUR JOUER',W/2,556); }
+    if(best){ x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('meilleur réveillon : '+best,W/2,614); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(26,11,20,.82)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 32px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText(erreurs>0?'C\'EST L\'HEURE':'IL VOUS A EU',W/2,196);
+    x.font='800 58px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText(score,W/2,280);
+    lueur(W/2,280,140,C.or,.16);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText((manche-1)+' manches  ·  meilleure série : '+meilleureSerie,W/2,336);
+    if(score>=best&&score>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.okay;
+      x.fillText('MEILLEUR RÉVEILLON',W/2,376); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('REJOUER',W/2,458); }
+  }
+
+  if(flash>0){ x.fillStyle='rgba(255,240,220,'+(flash*.4)+')'; x.fillRect(0,0,W,H); }
+}
+
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>
