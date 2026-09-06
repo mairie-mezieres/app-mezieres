@@ -558,7 +558,7 @@ l'admin : coupé là, il ne compte plus.
 1. le service worker précache la coquille **et TOUS les jeux** du manifeste, lus à
    l'installation. ⚠️ Tous, et pas seulement celui du jour : **la bascule doit
    fonctionner hors connexion le jour venu**, et c'est précisément le jour où l'on
-   ne peut plus rien y faire. Sept jeux ≈ 150 Ko. La mise en cache est faite
+   ne peut plus rien y faire. Neuf jeux ≈ 200 Ko. La mise en cache est faite
    fichier par fichier (`Promise.allSettled`) : avec un `await` unique, le premier
    404 emportait tous les suivants ;
 2. `jeux/jeux.json` est servi **réseau d'abord, cache en secours** (tout le reste

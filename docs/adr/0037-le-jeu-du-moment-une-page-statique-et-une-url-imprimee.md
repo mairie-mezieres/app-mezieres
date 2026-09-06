@@ -235,3 +235,31 @@ pas dans le tableau de bord.
 **Ce qu'on continue de ne pas faire** : aucun score envoyé, aucun classement,
 aucune mesure de durée. Le paragraphe « Ce qu'on ne fait pas » ci-dessus reste vrai
 mot pour mot.
+
+## Mise à jour — v4.107 (6 septembre 2026)
+
+**Neuf jeux, et le calendrier redécoupé.** Deux jeux s'ajoutent (« Attrape le lapin »
+en octobre, « Lancer de tong » en août) et « Bataille de boules de neige » est
+remplacé par une version revue par la mairie. Conséquence en cascade : *La Course
+d'automne* passe de mai-juin à **novembre** — c'est le jeu qui portait déjà le mois,
+et laisser *Le Parcours VTT* au printemps évite de déplacer deux jeux pour en insérer
+un. Le calendrier couvre l'année sans trou ni chevauchement ; le balayage des 366
+jours l'a vérifié, ce qu'aucune relecture ne fait de façon fiable — les frontières
+qui comptent (31-07/01-08, 30-09/01-10, 31-10/01-11, 30-11/01-12, 29-02) sont des
+dates qu'on ne teste jamais à la main.
+
+Le manifeste reste le **seul** endroit modifié pour cela : neuf entrées, aucune ligne
+de code. C'était la promesse de la décision initiale, et c'est la première fois
+qu'elle est mise à l'épreuve par un changement de cette taille.
+
+⚠️ **Un bug trouvé dans le jeu fourni** : la palette de « Bataille de boules de
+neige » ne définissait pas `C.alerte`, utilisé pour le message « PAS L'OURS ! » et
+son anneau. Un `fillStyle` / `strokeStyle` à `undefined` est **silencieusement
+ignoré** par le canvas : il ne lève rien, ne trace pas en noir, et **conserve la
+couleur laissée par le dessin précédent**. L'avertissement s'affichait donc dans une
+couleur variable, parfois confondue avec le décor. Corrigé par l'ajout de la couleur
+manquante. À retenir pour tout jeu fourni : une couleur absente ne se voit pas dans
+la console, seulement à l'écran, et seulement parfois.
+
+Le coût du précache passe à **~200 Ko** pour neuf jeux. Toujours assumé : la bascule
+doit fonctionner hors connexion le jour venu.

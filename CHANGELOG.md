@@ -5,6 +5,34 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.107] — 6 septembre 2026
+
+### Ajouté
+- **Deux jeux de plus, et le calendrier se resserre — neuf jeux couvrent l'année.**
+  - *Attrape le lapin* (**1er → 31 octobre**) : une minute dans un pré en bordure de
+    vigne, deux boutons pour tourner, et un lapin qui apprend une ruse à chaque
+    capture — anticipation, crochets, buissons, terriers.
+  - *Le Lancer de tong* (**1er → 31 août**) : trois lancers, on garde le meilleur,
+    avec battement de tong en vol et rafales de vent qui portent.
+  - Décalages induits : *Le Feu d'artifice* se replie sur **juillet**, *La Hotte* sur
+    **septembre**, *La Course d'automne* sur **novembre**. Calendrier revérifié sur
+    les 366 jours d'une année bissextile : aucun trou, aucun chevauchement.
+
+### Modifié
+- **La Bataille de boules de neige est remplacée par la version révisée** : rythme
+  plus vif (apparitions et tirs plus rapides, niveau tous les 10 touchés) et un
+  **ours blanc** qui se rend, pattes en l'air — le toucher coûte un bonnet.
+- ⚠️ **Correctif dans le jeu fourni : `C.alerte` n'existait pas dans sa palette.**
+  Le canvas **ignore en silence** une couleur `undefined` : l'onde et le message
+  « PAS L'OURS ! » se peignaient dans la teinte laissée par le dessin précédent,
+  sans la moindre erreur. La couleur est déclarée (`#FF6B5B`).
+- Les trois fichiers ont reçu la retouche habituelle — zoom rétabli (RGAA 13.9),
+  retour vers l'application, alternative textuelle au canvas, meilleur score
+  persistant. ⚠️ Pour *Le Lancer de tong*, le record est une **distance** et vit dans
+  `meilleur`, pas dans `best` : la clé `mat-jeu-best-lancer-de-tong` stocke un flottant.
+
+---
+
 ## [4.106] — 5 septembre 2026
 
 ### Ajouté

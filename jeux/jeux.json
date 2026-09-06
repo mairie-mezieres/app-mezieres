@@ -1,5 +1,5 @@
 {
-  "_lisezmoi": "Rotation annuelle du jeu du moment. Les périodes sont en JJ-MM sans année : elles se répètent chaque année sans intervention. Pour figer un jeu hors calendrier, mettez son id dans 'forcer' (et remettez null ensuite).",
+  "_lisezmoi": "Rotation annuelle du jeu du moment. Les périodes sont en JJ-MM sans année : elles se répètent chaque année sans intervention. Les neuf périodes se suivent sans trou ni chevauchement — un contrôle balaie les 366 jours à chaque modification et refuse les deux cas. Pour figer un jeu hors calendrier, mettez son id dans 'forcer' (et remettez null ensuite).",
   "forcer": null,
   "jeux": [
     {
@@ -16,7 +16,7 @@
       "id": "bataille-boules-neige",
       "titre": "La Bataille de boules de neige",
       "saison": "Le coeur de l'hiver",
-      "resume": "Sur la place du bourg. Touchez les enfants, cassez les boules qui arrivent.",
+      "resume": "Sur la place du bourg. Touchez les enfants, cassez les boules qui arrivent, épargnez l'ours.",
       "fichier": "/jeux/bataille-boules-neige.html",
       "vignette": "/jeux/vignettes/bataille-boules-neige.png",
       "debut": "01-01",
@@ -45,11 +45,21 @@
     {
       "id": "feu-artifice",
       "titre": "Le Feu d'artifice",
-      "saison": "L'été et le 14 juillet",
+      "saison": "Le 14 juillet",
       "resume": "Quatre-vingt-dix secondes de spectacle au-dessus du village.",
       "fichier": "/jeux/feu-artifice.html",
       "vignette": "/jeux/vignettes/feu-artifice.png",
       "debut": "01-07",
+      "fin": "31-07"
+    },
+    {
+      "id": "lancer-de-tong",
+      "titre": "Le Lancer de tong",
+      "saison": "Le plein été",
+      "resume": "Trois lancers, on garde le meilleur. Tirez, lâchez, et visez les rafales.",
+      "fichier": "/jeux/lancer-de-tong.html",
+      "vignette": "/jeux/vignettes/lancer-de-tong.png",
+      "debut": "01-08",
       "fin": "31-08"
     },
     {
@@ -60,16 +70,26 @@
       "fichier": "/jeux/la-hotte.html",
       "vignette": "/jeux/vignettes/la-hotte.png",
       "debut": "01-09",
-      "fin": "20-10"
+      "fin": "30-09"
+    },
+    {
+      "id": "attrape-le-lapin",
+      "titre": "Attrape le lapin",
+      "saison": "Octobre, en bordure de vigne",
+      "resume": "Une minute pour l'attraper. À chaque capture, il apprend une ruse de plus.",
+      "fichier": "/jeux/attrape-le-lapin.html",
+      "vignette": "/jeux/vignettes/attrape-le-lapin.png",
+      "debut": "01-10",
+      "fin": "31-10"
     },
     {
       "id": "course-automne",
       "titre": "La Course d'automne",
-      "saison": "Octobre et novembre",
+      "saison": "Novembre",
       "resume": "De la forêt au bourg par la butte des Élus. Appuyez pour sauter.",
       "fichier": "/jeux/course-automne.html",
       "vignette": "/jeux/vignettes/course-automne.png",
-      "debut": "21-10",
+      "debut": "01-11",
       "fin": "30-11"
     }
   ]

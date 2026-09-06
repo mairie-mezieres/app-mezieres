@@ -836,9 +836,11 @@ quel qu'il soit.
 | janvier — février | La Bataille de boules de neige |
 | mars — avril | Les Bâtisseurs |
 | mai — juin | Le Parcours VTT |
-| juillet — août | Le Feu d'artifice |
-| 1ᵉʳ septembre — 20 octobre | La Hotte |
-| 21 octobre — novembre | La Course d'automne |
+| juillet | Le Feu d'artifice |
+| août | Le Lancer de tong |
+| septembre | La Hotte |
+| octobre | Attrape le lapin |
+| novembre | La Course d'automne |
 | décembre | Où est le Père Noël ? |
 
 ---

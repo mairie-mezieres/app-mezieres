@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6FAE4A">
+<title>Attrape le lapin — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#1C2A16;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">Attrape le lapin : jeu de poursuite en images, une minute dans un pré en bordure
+de vigne. Vous courez sans arrêt&nbsp;; deux grands boutons en bas de l’écran vous font tourner
+à gauche ou à droite. Rejoignez le lapin pour l’attraper&nbsp;: à chaque capture il apprend une
+nouvelle ruse. Quand il s’arrête pour grignoter, c’est le moment. Au clavier&nbsp;: flèches
+gauche et droite pour tourner, barre d’espace ou Entrée pour commencer. Le jeu se joue à
+l’image&nbsp;; il n’a pas d’équivalent textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : le pré en bordure de vigne"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=400,H=700;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1;
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  herbe:'#6FAE4A', herbe2:'#5C9640', herbe3:'#84C25C', terre:'#B08A5C',
+  feuille:'#3E7A3A', feuille2:'#579A4C', bois:'#8A5A32', vigne:'#6B8C4A',
+  poil:'#D8C0A0', poilO:'#B79C7C', poilV:'#FFF6EC', oreille:'#E8A0A8',
+  peau:'#F7D3AE', cheveux:'#7A5433', haut:'#E8452C', bas:'#2A4A6E',
+  trait:'#20301A', texte:'#FFFDF2', doux:'#C6D6B8',
+  or:'#FFC93C', rouge:'#E8452C', bouton:'#FFFDF2'
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const RAND=a=>a[(Math.random()*a.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-attrape-le-lapin';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ Le record ne monte que sur un VRAI record. En l'écrasant à chaque fin de
+   partie, l'écran de fin (`score >= best`) affichait « MEILLEUR » à tous les coups. */
+function majBest(){
+  if(score>best){ best=score; try{ localStorage.setItem(CLE_BEST,String(best)); }catch(_){} }
+}
+const hash=n=>{const s=Math.sin(n*127.1)*43758.5453; return s-Math.floor(s);};
+function trait(w){ x.strokeStyle=C.trait; x.lineWidth=w||2.4; x.lineJoin='round'; }
+function rrect(px,py,w,h,r){
+  x.beginPath();
+  if(x.roundRect)x.roundRect(px,py,w,h,r); else x.rect(px,py,w,h);
+}
+const HALOS={};
+function halo(col){
+  if(HALOS[col])return HALOS[col];
+  const s=128,c=document.createElement('canvas'); c.width=c.height=s;
+  const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,col); gr.addColorStop(.35,col+'88'); gr.addColorStop(1,col+'00');
+  g.fillStyle=gr; g.fillRect(0,0,s,s);
+  return HALOS[col]=c;
+}
+function lueur(px,py,r,col,a){
+  x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a===undefined?1:a;
+  x.drawImage(halo(col),px-r,py-r,r*2,r*2); x.restore();
+}
+
+/* ═══ le pré, en bordure de vigne ═══ */
+const AX=14, AY=96, AW=W-28, AH=452;
+const OBSTACLES=[
+  {x:92, y:180,r:30,t:'arbre'},
+  {x:306,y:242,r:27,t:'arbre'},
+  {x:200,y:350,r:26,t:'buisson'},
+  {x:70, y:430,r:25,t:'buisson'},
+  {x:330,y:440,r:26,t:'buisson'},
+  {x:250,y:146,r:21,t:'buisson'}
+];
+const TERRIERS=[{x:60,y:300},{x:340,y:180},{x:210,y:470}];
+
+/* ═══ les ruses, débloquées une par capture ═══ */
+const RUSES=[
+  {n:'IL A COMPRIS',        s:'il court plus vite'},
+  {n:'IL ANTICIPE',         s:'il fuit là où vous allez, pas où vous êtes'},
+  {n:'IL FAIT DES CROCHETS',s:'il change de direction sans prévenir'},
+  {n:'IL SE SERT DES BUISSONS', s:'il tourne autour pour vous semer'},
+  {n:'IL CONNAÎT LES TERRIERS', s:'il plonge et ressort ailleurs'},
+  {n:'IL EST INSUPPORTABLE',s:'et il accélère encore'}
+];
+
+/* ═══ commandes ═══ */
+const BY=H-108, BH=92;
+const BTNS=[
+  {id:'g',x:22, w:164,lbl:'◀',sous:'GAUCHE'},
+  {id:'d',x:214,w:164,lbl:'▶',sous:'DROITE'}
+];
+function btnAt(px,py){
+  if(py<BY||py>BY+BH)return null;
+  for(const b of BTNS) if(px>=b.x&&px<=b.x+b.w)return b;
+  return null;
+}
+
+/* ═══ état ═══ */
+const DUREE=60;
+let etat='menu',t=0,shake=0,flash=0,dernier=0;
+let temps=DUREE,attrapes=0,score=0,ruse=0,best=lireBest(),meilleurT=0,chrono=0;
+let jo,lap,parts=[],textes=[],annonce=null,bulle=null;
+const tenus=new Map(), clavier=new Set();
+
+function nouvelle(){
+  temps=DUREE; attrapes=0; score=0; ruse=0; chrono=0; meilleurT=0;
+  parts=[];textes=[]; annonce=null; bulle=null; tenus.clear(); clavier.clear();
+  jo={x:W/2,y:AY+AH-70,a:-Math.PI/2,v:2.72,ph:0};
+  lap={x:W/2,y:AY+90,vx:0,vy:0,dir:1,ph:0,vitesse:1.85,
+       etat:'fuite',tmr:0,crochet:0,cache:0,oreille:0};
+  etat='jeu'; t=0; dernier=performance.now();
+  annoncer('ATTRAPE LE LAPIN','vous courez sans arrêt : tournez à gauche ou à droite',180);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:64,taille:ta||18});
+function poussiere(px,py,n,col,f){
+  for(let i=0;i<n;i++){ const a=rnd(0,6.283),v=rnd(.5,1)*f;
+    parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.5,
+      r:rnd(1.8,4.2),col:col||C.terre,t:rnd(18,40),g:.08}); }
+}
+const chr=s=>{const m=(s/60)|0,r=s-m*60;
+  return (m?m+"' ":'')+(m?String(Math.floor(r)).padStart(2,'0'):Math.floor(r))+'"'+
+    String(Math.floor((r%1)*10));};
+
+/* ═══ déplacements ═══ */
+function horsObstacles(e,rayon){
+  for(const o of OBSTACLES){
+    const dx=e.x-o.x, dy=e.y-o.y, d=Math.hypot(dx,dy), min=o.r+rayon;
+    if(d<min&&d>.01){ e.x=o.x+dx/d*min; e.y=o.y+dy/d*min; }
+  }
+  e.x=clamp(e.x,AX+18,AX+AW-18);
+  e.y=clamp(e.y,AY+18,AY+AH-18);
+}
+
+function cerveauLapin(){
+  if(lap.etat==='terrier'){                       // sous terre
+    if(--lap.tmr<=0){
+      let loin=TERRIERS[0],dm=0;
+      for(const tr of TERRIERS){ const d=Math.hypot(tr.x-jo.x,tr.y-jo.y);
+        if(d>dm){dm=d;loin=tr;} }
+      lap.x=loin.x; lap.y=loin.y; lap.vx=0; lap.vy=0;
+      lap.etat='fuite'; poussiere(lap.x,lap.y,14,C.terre,2);
+      bulle={s:'coucou',t:70};
+    }
+    return;
+  }
+
+  // cible fuie : la position actuelle, ou anticipée dès la ruse 2
+  let cx=jo.x, cy=jo.y;
+  if(ruse>=2){ cx+=Math.cos(jo.a)*jo.v*17; cy+=Math.sin(jo.a)*jo.v*17; }
+  const dx=lap.x-cx, dy=lap.y-cy, d=Math.hypot(dx,dy)||1;
+  const dj=Math.hypot(lap.x-jo.x,lap.y-jo.y);
+
+  // pause pour grignoter, quand le danger est loin : c'est votre fenêtre
+  if(lap.etat==='fuite'&&dj>165&&Math.random()<.013){
+    lap.etat='pause'; lap.tmr=rnd(80,160);
+  }
+  if(lap.etat==='pause'){
+    lap.vx*=.82; lap.vy*=.82; lap.x+=lap.vx; lap.y+=lap.vy;
+    lap.oreille+=.08;
+    if(--lap.tmr<=0||dj<104){ lap.etat='fuite';
+      if(dj<104){ lap.tmr=0; poussiere(lap.x,lap.y+8,5,C.terre,1.2); } }
+    horsObstacles(lap,16); return;
+  }
+
+  let fx=dx/d, fy=dy/d;
+
+  // ruse 3 : crochets secs quand on le serre
+  if(ruse>=3){
+    if(lap.crochet>0){ lap.crochet--;
+      const a=Math.atan2(fy,fx)+lap.sens*1.25;
+      fx=Math.cos(a); fy=Math.sin(a);
+    }else if(dj<80&&Math.random()<.028){
+      lap.crochet=19; lap.sens=Math.random()<.5?1:-1;
+      poussiere(lap.x,lap.y+8,6,C.terre,1.4);
+    }
+  }
+
+  // ruse 4 : il tourne autour des buissons pour se mettre à couvert
+  if(ruse>=4&&dj<190){
+    let pr=null,pd=1e9;
+    for(const o of OBSTACLES){ const od=Math.hypot(lap.x-o.x,lap.y-o.y);
+      if(od<o.r+80&&od<pd){pd=od;pr=o;} }
+    if(pr){
+      const tx=-(lap.y-pr.y), ty=(lap.x-pr.x), tn=Math.hypot(tx,ty)||1;
+      const sg=((jo.x-pr.x)*ty-(jo.y-pr.y)*tx)>0?1:-1;
+      fx+=sg*tx/tn*1.5; fy+=sg*ty/tn*1.5;
+    }
+  }
+
+  // ruse 5 : il file au terrier le plus proche quand on le talonne
+  if(ruse>=5&&dj<118){
+    let pt=null,pd=1e9;
+    for(const tr of TERRIERS){ const td=Math.hypot(lap.x-tr.x,lap.y-tr.y);
+      if(td<pd){pd=td;pt=tr;} }
+    if(pt){
+      if(pd<20){ lap.etat='terrier'; lap.tmr=rnd(42,68);
+        poussiere(pt.x,pt.y,16,C.terre,2.2); bulle=null; return; }
+      if(pd<140){ fx+=(pt.x-lap.x)/pd*1.4; fy+=(pt.y-lap.y)/pd*1.4; }
+    }
+  }
+
+  // murs et obstacles
+  const m=118;
+  const gG=lap.x-AX, gD=AX+AW-lap.x, gH=lap.y-AY, gB=AY+AH-lap.y;
+  if(gG<m) fx+=(1-gG/m)*1.9;
+  if(gD<m) fx-=(1-gD/m)*1.9;
+  if(gH<m) fy+=(1-gH/m)*1.9;
+  if(gB<m) fy-=(1-gB/m)*1.9;
+  for(const o of OBSTACLES){
+    const ox=lap.x-o.x, oy=lap.y-o.y, od=Math.hypot(ox,oy), port=o.r+40;
+    if(od<port&&od>.01){ const w=(1-od/port)*2.2; fx+=ox/od*w; fy+=oy/od*w; }
+  }
+
+  const n=Math.hypot(fx,fy)||1; fx/=n; fy/=n;
+  const v=lap.vitesse*(dj<90?1.05:1);
+  lap.vx+=(fx*v-lap.vx)*.18;
+  lap.vy+=(fy*v-lap.vy)*.18;
+  lap.x+=lap.vx; lap.y+=lap.vy;
+  if(Math.abs(lap.vx)>.3) lap.dir=lap.vx>0?1:-1;
+  horsObstacles(lap,16);
+  lap.ph+=Math.hypot(lap.vx,lap.vy)*.19;
+}
+
+/* ═══ entrée ═══ */
+function pos(e){const r=cv.getBoundingClientRect();
+  return[(e.clientX-r.left)/scale,(e.clientY-r.top)/scale];}
+addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  const[a,b]=pos(e); const btn=btnAt(a,b);
+  if(btn) tenus.set(e.pointerId,btn.id);
+},{passive:false});
+const relacher=e=>tenus.delete(e.pointerId);
+addEventListener('pointerup',relacher);
+addEventListener('pointercancel',relacher);
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{
+  if(etat!=='jeu'){ if(t>22&&(e.key===' '||e.key==='Enter')){e.preventDefault();nouvelle();} return; }
+  if(e.key==='ArrowLeft')clavier.add('g');
+  if(e.key==='ArrowRight')clavier.add('d');
+});
+addEventListener('keyup',e=>{
+  if(e.key==='ArrowLeft')clavier.delete('g');
+  if(e.key==='ArrowRight')clavier.delete('d');
+});
+const tenu=id=>[...tenus.values()].includes(id)||clavier.has(id);
+
+/* ═══ jeu ═══ */
+function attraper(){
+  attrapes++;
+  const gain=400+attrapes*150;
+  score+=gain;
+  if(!meilleurT||chrono<meilleurT) meilleurT=chrono;
+  chrono=0;
+  poussiere(lap.x,lap.y,30,C.or,2.6);
+  texte('ATTRAPÉ !  +'+gain,lap.x,lap.y-46,C.or,22);
+  flash=.45; shake=12;
+  if(ruse<RUSES.length){
+    const r=RUSES[ruse];
+    annoncer(r.n,r.s,150);
+    ruse++;
+  }
+  lap.vitesse=Math.min(2.95,lap.vitesse+.11);
+  const coins=[[AX+44,AY+44],[AX+AW-44,AY+44],[AX+44,AY+AH-44],[AX+AW-44,AY+AH-44]];
+  let loin=coins[0],dm=0;
+  for(const c of coins){ const d=Math.hypot(c[0]-jo.x,c[1]-jo.y); if(d>dm){dm=d;loin=c;} }
+  lap.x=loin[0]; lap.y=loin[1]; lap.vx=0; lap.vy=0; lap.etat='fuite'; lap.crochet=0;
+  majBest();
+}
+
+function update(){
+  const now=performance.now(), dt=Math.min(.05,(now-dernier)/1000); dernier=now;
+  t++;
+  if(shake>.3)shake*=.86; else shake=0;
+  if(flash>0)flash-=.05;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  if(bulle){ bulle.t--; if(bulle.t<=0)bulle=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.9;return u.t>0;});
+  for(const p of parts){ p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.t--; }
+  parts=parts.filter(p=>p.t>0);
+  if(etat!=='jeu')return;
+
+  temps-=dt;
+  if(temps<=0){ temps=0; majBest(); etat='fin'; t=0; return; }
+  chrono+=dt;
+
+  if(tenu('g')) jo.a-=.042;
+  if(tenu('d')) jo.a+=.042;
+  const ax=jo.x, ay=jo.y;
+  jo.x+=Math.cos(jo.a)*jo.v; jo.y+=Math.sin(jo.a)*jo.v;
+  horsObstacles(jo,17);
+  if(Math.abs(jo.x-ax)<.02&&Math.abs(jo.y-ay)<.02&&t%7===0)
+    poussiere(jo.x,jo.y+12,1,'#C8B48A',.7);
+  jo.ph+=.27;
+
+  cerveauLapin();
+
+  if(lap.etat!=='terrier'&&Math.hypot(jo.x-lap.x,jo.y-lap.y)<37) attraper();
+}
+
+/* ═══ décor ═══ */
+function pre(){
+  x.fillStyle=C.herbe; x.fillRect(AX,AY,AW,AH);
+  x.save(); x.beginPath(); x.rect(AX,AY,AW,AH); x.clip();
+  x.fillStyle=C.herbe2;
+  for(let i=0;i<90;i++){ const k=hash(i*3.7);
+    x.beginPath(); x.ellipse(AX+k*AW,AY+hash(i*7.1)*AH,11+k*8,4,0,0,7); x.fill(); }
+  x.fillStyle=C.herbe3;
+  for(let i=0;i<70;i++) x.fillRect(AX+hash(i*5.3)*AW,AY+hash(i*9.7)*AH,2,6);
+  // rangs de vigne en haut du pré
+  x.strokeStyle='rgba(32,48,26,.2)'; x.lineWidth=1.4;
+  for(let i=0;i<9;i++){ const px=AX+14+i*42;
+    x.fillStyle=C.bois; x.fillRect(px,AY+6,3,16);
+    x.fillStyle=C.vigne;
+    x.beginPath(); x.ellipse(px+1.5,AY+6,11,7,0,0,7); x.fill();
+    x.beginPath(); x.moveTo(AX,AY+12); x.lineTo(AX+AW,AY+12); x.stroke(); }
+  x.restore();
+  trait(3); x.strokeStyle='rgba(32,48,26,.5)';
+  rrect(AX,AY,AW,AH,16); x.stroke();
+  // terriers
+  for(const tr of TERRIERS){
+    x.save(); x.translate(tr.x,tr.y);
+    x.fillStyle='#4A3520';
+    x.beginPath(); x.ellipse(0,0,15,10,0,0,7); x.fill();
+    x.fillStyle='#22160C';
+    x.beginPath(); x.ellipse(0,1,11,7,0,0,7); x.fill();
+    x.fillStyle=C.terre; x.globalAlpha=.75;
+    x.beginPath(); x.ellipse(0,9,17,5,0,0,7); x.fill();
+    x.restore();
+  }
+}
+function obstacle(o){
+  x.save(); x.translate(o.x,o.y);
+  x.globalAlpha=.28; x.fillStyle='#1B2E16';
+  x.beginPath(); x.ellipse(4,6,o.r,o.r*.62,0,0,7); x.fill(); x.globalAlpha=1;
+  trait(2.6);
+  if(o.t==='arbre'){
+    x.fillStyle=C.feuille;
+    x.beginPath(); x.arc(0,0,o.r,0,7); x.fill(); x.stroke();
+    x.fillStyle=C.feuille2;
+    x.beginPath(); x.arc(-o.r*.22,-o.r*.22,o.r*.62,0,7); x.fill();
+  }else{
+    x.fillStyle=C.feuille2;
+    x.beginPath();
+    x.arc(-o.r*.4,0,o.r*.66,0,7); x.arc(o.r*.4,0,o.r*.66,0,7);
+    x.arc(0,-o.r*.34,o.r*.7,0,7); x.fill(); x.stroke();
+  }
+  x.restore();
+}
+
+/* ═══ personnages ═══ */
+function lapin(p){
+  if(p.etat==='terrier')return;
+  const bond=p.etat==='pause'?0:Math.abs(Math.sin(p.ph))*7;
+  const or=p.etat==='pause'?Math.sin(p.oreille*3)*.18:0;
+  x.save(); x.translate(p.x,p.y);
+  x.globalAlpha=.3; x.fillStyle='#1B2E16';
+  x.beginPath(); x.ellipse(2,16,16,5,0,0,7); x.fill(); x.globalAlpha=1;
+  x.translate(0,-bond);
+  x.scale(p.dir,1); trait(2.6);
+  // pattes arrière
+  x.fillStyle=C.poilO;
+  x.beginPath(); x.ellipse(9,6,12,8,0,0,7); x.fill(); x.stroke();
+  // corps
+  x.fillStyle=C.poil;
+  x.beginPath(); x.ellipse(2,-4,20,15,-.1,0,7); x.fill(); x.stroke();
+  // queue
+  x.fillStyle=C.poilV;
+  x.beginPath(); x.arc(20,-6,8,0,7); x.fill(); x.stroke();
+  // oreilles
+  for(const s of [-1,1]){
+    x.save(); x.translate(-13+s*3,-24); x.rotate(s*.22+or*s);
+    x.fillStyle=C.poil;
+    x.beginPath(); x.ellipse(0,0,6.5,16,0,0,7); x.fill(); x.stroke();
+    x.fillStyle=C.oreille;
+    x.beginPath(); x.ellipse(0,1,3.2,11,0,0,7); x.fill();
+    x.restore();
+  }
+  // tête
+  x.fillStyle=C.poil;
+  x.beginPath(); x.ellipse(-13,-12,13,11,0,0,7); x.fill(); x.stroke();
+  // museau
+  x.fillStyle=C.poilV;
+  x.beginPath(); x.ellipse(-22,-8,8,6,-.2,0,7); x.fill(); x.stroke();
+  // œil
+  x.fillStyle='#FFFFFF';
+  x.beginPath(); x.ellipse(-15,-15,4.4,4.8,0,0,7); x.fill(); x.stroke();
+  x.fillStyle=C.trait;
+  x.beginPath(); x.arc(-15.6,-14.8,2.4,0,7); x.fill();
+  x.fillStyle='#FFFFFF';
+  x.beginPath(); x.arc(-16.4,-15.6,1,0,7); x.fill();
+  // nez et moustaches
+  x.fillStyle=C.oreille;
+  x.beginPath(); x.ellipse(-27,-10,2.6,2,0,0,7); x.fill();
+  x.strokeStyle=C.trait; x.lineWidth=1.3;
+  x.beginPath(); x.moveTo(-27,-9); x.lineTo(-39,-13);
+  x.moveTo(-27,-8); x.lineTo(-39,-6);
+  x.moveTo(-27,-9.5); x.lineTo(-38,-10); x.stroke();
+  x.restore();
+  if(p.etat==='pause') lueur(p.x,p.y-10,40,C.or,.14);
+}
+
+function joueur(p){
+  const pas=Math.sin(p.ph)*3.6;
+  x.save(); x.translate(p.x,p.y);
+  x.globalAlpha=.3; x.fillStyle='#1B2E16';
+  x.beginPath(); x.ellipse(2,25,17,6,0,0,7); x.fill(); x.globalAlpha=1;
+  x.save(); x.rotate(p.a); x.globalAlpha=.55;
+  x.fillStyle=C.texte;
+  x.beginPath(); x.moveTo(38,0); x.lineTo(26,-8); x.lineTo(26,8); x.closePath(); x.fill();
+  x.restore();
+  x.scale(Math.cos(p.a)>=0?1:-1,1); trait(2.6);
+  x.fillStyle=C.bas;
+  rrect(-10,8+pas,9,16,4.5); x.fill(); x.stroke();
+  rrect(2,8-pas,9,16,4.5); x.fill(); x.stroke();
+  x.fillStyle='#FFFDF2';
+  rrect(-11,21+pas,11,6,3); x.fill(); x.stroke();
+  rrect(1,21-pas,11,6,3); x.fill(); x.stroke();
+  x.fillStyle=C.haut;
+  rrect(-14,-15,28,26,9); x.fill(); x.stroke();
+  x.fillStyle='#FFFDF2'; x.fillRect(-14,-2,28,5);
+  x.fillStyle=C.peau;
+  rrect(-19,-12+pas*.7,7,15,3.5); x.fill(); x.stroke();
+  rrect(12,-12-pas*.7,7,15,3.5); x.fill(); x.stroke();
+  x.fillStyle=C.peau;
+  x.beginPath(); x.arc(0,-30,15,0,7); x.fill(); x.stroke();
+  x.beginPath(); x.ellipse(-15,-29,3.4,4.6,0,0,7); x.ellipse(15,-29,3.4,4.6,0,0,7);
+  x.fill(); x.stroke();
+  x.fillStyle=C.cheveux;
+  x.beginPath(); x.arc(0,-31,15.4,Math.PI+.05,-.05); x.fill(); x.stroke();
+  x.beginPath();
+  x.moveTo(-15.2,-32); x.quadraticCurveTo(-6,-23,2,-27);
+  x.quadraticCurveTo(10,-30,15.2,-32); x.closePath(); x.fill();
+  // casquette
+  x.fillStyle=C.haut; trait(2.6);
+  x.beginPath(); x.arc(0,-33,15.6,Math.PI,0); x.fill(); x.stroke();
+  rrect(9,-37,16,6,3); x.fill(); x.stroke();
+  // visage
+  x.fillStyle='#FFFFFF';
+  x.beginPath(); x.ellipse(-5.6,-28.6,4.3,4.9,0,0,7); x.ellipse(5.6,-28.6,4.3,4.9,0,0,7); x.fill();
+  x.strokeStyle=C.trait; x.lineWidth=1.6; x.stroke();
+  x.fillStyle=C.trait;
+  x.beginPath(); x.arc(-5,-28,2.3,0,7); x.arc(6.2,-28,2.3,0,7); x.fill();
+  x.fillStyle='#F09AA0'; x.globalAlpha=.55;
+  x.beginPath(); x.arc(-11,-23,4,0,7); x.arc(11,-23,4,0,7); x.fill(); x.globalAlpha=1;
+  x.strokeStyle=C.trait; x.lineWidth=2;
+  x.beginPath(); x.arc(0,-20,5,.25,2.9); x.stroke();
+  x.restore();
+}
+
+function dessinBulle(){
+  if(!bulle)return;
+  const px=clamp(lap.x,80,W-80), py=lap.y-56;
+  const a=Math.min(1,bulle.t/18);
+  x.save(); x.globalAlpha=a;
+  x.font='800 17px system-ui,-apple-system,sans-serif';
+  const w=x.measureText(bulle.s).width+28;
+  x.fillStyle='#FFFDF2'; trait(2.8);
+  rrect(px-w/2,py-20,w,32,12); x.fill(); x.stroke();
+  x.beginPath(); x.moveTo(px-8,py+11); x.lineTo(px+1,py+24); x.lineTo(px+8,py+11);
+  x.closePath(); x.fill();
+  x.strokeStyle='#FFFDF2'; x.lineWidth=3;
+  x.beginPath(); x.moveTo(px-7,py+11); x.lineTo(px+7,py+11); x.stroke();
+  x.fillStyle=C.trait; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText(bulle.s,px,py-3);
+  x.restore();
+}
+
+function boutons(){
+  for(const b of BTNS){
+    const on=[...tenus.values()].includes(b.id)||clavier.has(b.id);
+    x.save();
+    x.fillStyle=on?'#E4EBDA':C.bouton; trait(3.2);
+    rrect(b.x,BY+(on?3:0),b.w,BH,20); x.fill(); x.stroke();
+    x.fillStyle=C.trait; x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 42px system-ui,sans-serif';
+    x.fillText(b.lbl,b.x+b.w/2,BY+40+(on?3:0));
+    x.font='800 12px system-ui,sans-serif';
+    x.fillText(b.sous,b.x+b.w/2,BY+72+(on?3:0));
+    x.restore();
+  }
+}
+
+/* ═══ rendu ═══ */
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#2A3D20'); g.addColorStop(1,'#1C2A16');
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+
+  x.save(); if(shake)x.translate(rnd(-shake,shake),rnd(-shake,shake));
+  pre();
+  const tous=OBSTACLES.map(o=>({y:o.y,d:()=>obstacle(o)}));
+  if(etat!=='menu'){
+    tous.push({y:lap.y,d:()=>lapin(lap)});
+    tous.push({y:jo.y,d:()=>joueur(jo)});
+  }
+  tous.sort((a,b)=>a.y-b.y);
+  for(const p of tous) p.d();
+  for(const p of parts){ x.globalAlpha=Math.min(1,p.t/24); x.fillStyle=p.col;
+    x.fillRect(p.x-p.r,p.y-p.r,p.r*2,p.r*2); }
+  x.globalAlpha=1;
+  if(etat!=='menu') dessinBulle();
+  x.restore();
+
+  if(etat==='jeu'){
+    x.save(); x.textBaseline='middle';
+    x.font='800 30px system-ui,-apple-system,sans-serif'; x.textAlign='left';
+    x.fillStyle=C.texte; x.fillText(score,18,30);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(attrapes+(attrapes>1?' fois attrapé':' fois attrapé'),18,52);
+    x.textAlign='right';
+    x.font='800 30px system-ui,sans-serif';
+    x.fillStyle=temps<10?C.rouge:C.texte;
+    x.fillText(Math.ceil(temps)+' s',W-18,30);
+    x.font='600 11px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(ruse?RUSES[Math.min(ruse,RUSES.length)-1].n.toLowerCase():'il reste',W-18,52);
+    x.restore();
+    boutons();
+  }
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/26);
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.strokeStyle='rgba(28,42,22,.8)'; x.lineWidth=5;
+    x.strokeText(u.s,clamp(u.x,70,W-70),u.y);
+    x.fillStyle=u.col; x.fillText(u.s,clamp(u.x,70,W-70),u.y); x.restore(); });
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    x.fillStyle='rgba(255,253,242,.92)'; x.fillRect(0,AY+AH*.36,W,66);
+    x.font='800 25px system-ui,sans-serif'; x.fillStyle=C.trait;
+    x.fillText(annonce.a,W/2,AY+AH*.36+24);
+    x.font='600 12.5px system-ui,sans-serif'; x.fillStyle='#6E7A5E';
+    x.fillText(annonce.b,W/2,AY+AH*.36+48);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(28,42,22,.82)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 15px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,74);
+    x.font='800 42px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('ATTRAPE',W/2,120);
+    x.fillStyle=C.poil; x.fillText('LE LAPIN',W/2,166);
+    x.save(); x.translate(W/2+16,258); x.scale(1.9,1.9);
+    lapin({x:0,y:0,ph:t*.11,dir:-1,etat:'fuite',oreille:0}); x.restore();
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('Une minute dans le pré, en bordure de vigne.',W/2,364);
+    const r=[[C.texte,'Vous courez sans arrêt : ◀ ▶ vous font tourner.'],
+             [C.or,   'Touchez le lapin pour l\'attraper.'],
+             [C.rouge,'À chaque capture, il apprend une nouvelle ruse.'],
+             [C.poil, 'Quand il s\'arrête pour grignoter, foncez.']];
+    r.forEach((u,i)=>{ const yy=410+i*30;
+      x.fillStyle=u[0]; x.beginPath(); x.arc(28,yy,6,0,7); x.fill();
+      x.textAlign='left'; x.font='600 14px system-ui,sans-serif';
+      x.fillStyle=C.texte; x.fillText(u[1],46,yy); });
+    x.textAlign='center';
+    if((t>>4)%2){ x.font='800 22px system-ui,sans-serif'; x.fillStyle=C.or;
+      x.fillText('TOUCHEZ POUR COMMENCER',W/2,570); }
+    if(best){ x.font='600 12px system-ui,sans-serif'; x.fillStyle=C.doux;
+      x.fillText('meilleur score : '+best,W/2,614); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(28,42,22,.88)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 30px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText('LA MINUTE EST FINIE',W/2,190);
+    x.font='800 64px system-ui,sans-serif'; x.fillStyle=C.or;
+    x.fillText(attrapes,W/2,280);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(attrapes>1?'fois attrapé':'fois attrapé',W/2,330);
+    x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+    x.fillText(score+' points',W/2,372);
+    if(meilleurT){ x.font='600 14px system-ui,sans-serif'; x.fillStyle=C.doux;
+      x.fillText('le plus rapide : '+chr(meilleurT),W/2,408); }
+    if(score>=best&&score>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.poil;
+      x.fillText('MEILLEUR SCORE',W/2,446); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.texte;
+      x.fillText('REJOUER',W/2,510); }
+  }
+
+  if(flash>0){ x.fillStyle='rgba(255,253,242,'+(flash*.4)+')'; x.fillRect(0,0,W,H); }
+}
+
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>
