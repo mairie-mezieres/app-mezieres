@@ -150,13 +150,14 @@ test('chaque jeu laisse zoomer, sait revenir à l’app et décrit son canvas', 
 
 /* ── 3. La bascule ─────────────────────────────────────────────────── */
 
-test('le bon jeu est choisi aux six dates de bascule', async ({ page }) => {
+test('le bon jeu est choisi à chaque date de bascule', async ({ page }) => {
   await accueil(page);
 
-  // Les dates du cahier des charges, plus les deux bords qui coincent :
-  // le 29 février et le passage d'année.
-  const DATES = ['2026-03-01', '2026-05-16', '2026-07-01', '2026-09-01',
-    '2026-10-21', '2026-12-01', '2026-12-31', '2027-01-01', '2028-02-29'];
+  // Le premier jour de chaque période, plus la veille de la première bascule,
+  // plus les deux bords qui coincent : le 29 février et le passage d'année.
+  const DATES = ['2026-02-28', '2026-03-01', '2026-05-01', '2026-07-01',
+    '2026-08-01', '2026-09-01', '2026-10-01', '2026-11-01', '2026-12-01',
+    '2026-12-31', '2027-01-01', '2028-02-29'];
 
   const obtenu = await page.evaluate(async (dates) => {
     const m = await window.matJeu.charger();

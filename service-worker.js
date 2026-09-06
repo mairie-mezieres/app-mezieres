@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.106.0';
+const CACHE = 'mat-v4.107.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -119,13 +119,13 @@ self.addEventListener('install', e => {
     // date fixe (périodes `debut`/`fin`). Si seul le jeu courant était en
     // cache, la bascule du 1er décembre ne fonctionnerait pas hors connexion —
     // et c'est précisément le jour où l'on ne peut plus rien y faire. Chaque
-    // jeu pèse une vingtaine de kilo-octets ; les sept tiennent dans ~150 Ko.
+    // jeu pèse une vingtaine de kilo-octets ; les neuf tiennent dans ~200 Ko.
     //
     // ⛔ Ne JAMAIS écrire un nom de jeu ici : ce serait une seconde source,
     // et elle divergerait du manifeste au premier changement de saison.
     //
     // Best-effort, et fichier par fichier : un jeu absent ne doit empêcher ni
-    // l'installation, ni la mise en cache des six autres. Avec un `await`
+    // l'installation, ni la mise en cache des autres. Avec un `await`
     // unique, le premier 404 emportait tous les suivants.
     try {
       const rep = await fetch('./jeux/jeux.json', { cache: 'no-store' });

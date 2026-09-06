@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- ⚠️ PAS de « maximum-scale=1,user-scalable=no » : le zoom doit rester possible
+     (RGAA 13.9). `touch-action:none` suffit à protéger la partie. -->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7CC4E8">
+<title>Le Lancer de tong — Le jeu du moment — Mézières-lez-Cléry</title>
+<link rel="icon" href="../icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#0E1A22;touch-action:none;overscroll-behavior:none}
+body{display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;border:0}
+.retour{position:fixed;z-index:10;
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;
+  border-radius:999px;background:#12101A;border:1px solid #C9BBD9;color:#FFF6E8;
+  font:700 14px/1.2 system-ui,-apple-system,sans-serif;text-decoration:none}
+.retour:focus-visible{outline:3px solid #FFD166;outline-offset:3px}
+</style>
+</head>
+<body>
+<p class="sr-only">Le Lancer de tong : jeu d’adresse en images, trois lancers, on garde le meilleur.
+Tirez la tong vers l’arrière avec le doigt puis lâchez pour la lancer&nbsp;; en vol, touchez
+une fois pour un battement de tong qui la relance. Les rafales de vent la portent plus loin.
+Au clavier&nbsp;: barre d’espace ou Entrée pour passer au lancer suivant. Le jeu se joue à
+l’image&nbsp;; il n’a pas d’équivalent textuel jouable.</p>
+<canvas id="c" role="img" aria-label="Aire de jeu : le pré du lancer, vu de côté"></canvas>
+<a class="retour" href="../">← Retour à l’application</a>
+<script>
+(()=>{
+'use strict';
+const W=720,H=420;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+let scale=1,dpr=1;
+function resize(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  scale=Math.min(innerWidth/W,innerHeight/H);
+  cv.style.width=(W*scale)+'px'; cv.style.height=(H*scale)+'px';
+  cv.width=Math.round(W*scale*dpr); cv.height=Math.round(H*scale*dpr);
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+addEventListener('resize',resize); resize();
+
+const C={
+  ciel1:'#7CC4E8', ciel2:'#BFE4F2', ciel3:'#EAF6E8',
+  herbe:'#6FAE4A', herbe2:'#5C9640', herbe3:'#84C25C',
+  terre:'#C09A64', bois:'#A9713F',
+  peau:'#F2C39B', maillot:'#3D8BD6', short:'#E8452C',
+  tong:'#F0B93C', tongB:'#2E7DD6',
+  trait:'#213018', texte:'#FFFDF2', doux:'#5C6B4E',
+  or:'#FFC93C', bleu:'#4C8DF0', vert:'#4FA86B', rouge:'#E8452C'
+};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const ease=v=>v<0?0:v>1?1:v*v*(3-2*v);
+
+/* ═══ meilleur score ═══
+   Il reste sur l'appareil et n'en sort jamais : aucun envoi, aucun classement.
+   Une clé par jeu, pour que le jeu suivant ne l'efface pas. Tout est enveloppé :
+   en navigation privée, un accès à localStorage peut lever. */
+const CLE_BEST='mat-jeu-best-lancer-de-tong';
+function lireBest(){
+  try{ const v=parseFloat(localStorage.getItem(CLE_BEST));
+    return Number.isFinite(v)&&v>0?v:0; }catch(_){ return 0; }
+}
+/* ⚠️ Le record ne monte que sur un VRAI record. En l'écrasant à chaque fin de
+   partie, l'écran de fin (`record >= meilleur`) affichait « MEILLEUR » à tous les coups. */
+function majBest(){
+  if(record>meilleur){ meilleur=record; try{ localStorage.setItem(CLE_BEST,String(meilleur)); }catch(_){} }
+}
+const hash=n=>{const s=Math.sin(n*127.1)*43758.5453; return s-Math.floor(s);};
+
+const HALOS={};
+function halo(col){
+  if(HALOS[col])return HALOS[col];
+  const s=128,c=document.createElement('canvas'); c.width=c.height=s;
+  const g=c.getContext('2d'),gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  gr.addColorStop(0,col); gr.addColorStop(.35,col+'88'); gr.addColorStop(1,col+'00');
+  g.fillStyle=gr; g.fillRect(0,0,s,s);
+  return HALOS[col]=c;
+}
+function lueur(px,py,r,col,a){
+  x.save(); x.globalCompositeOperation='lighter'; x.globalAlpha=a===undefined?1:a;
+  x.drawImage(halo(col),px-r,py-r,r*2,r*2); x.restore();
+}
+function trait(w){ x.strokeStyle=C.trait; x.lineWidth=w||2.4; x.lineJoin='round'; }
+function rrect(px,py,w,h,r){
+  x.beginPath();
+  if(x.roundRect)x.roundRect(px,py,w,h,r); else x.rect(px,py,w,h);
+}
+
+/* ═══ monde ═══ */
+const METRE=12, SOL=H-84, X0=110;          // X0 : le pied du lanceur
+const G=.28;
+const ESSAIS=3;
+
+/* ═══ état ═══ */
+let etat='menu',t=0,shake=0,flash=0;
+let essai=0,distances=[],record=0,meilleur=lireBest();
+let tong=null,phase='vise',vent=0,battu=false;
+let visee=null,rafales=[],parts=[],textes=[],annonce=null;
+let cam={x:0,y:0,s:1};
+
+function nouvelle(){
+  essai=0; distances=[]; record=0;
+  parts=[];textes=[]; annonce=null;
+  etat='jeu'; t=0;
+  preparer();
+  annoncer('TROIS LANCERS','tirez la tong vers l\'arrière, puis lâchez',170);
+}
+function annoncer(a,b,d){ annonce={a,b,t:d||150,max:d||150}; }
+const texte=(s,px,py,col,ta)=>textes.push({s,x:px,y:py,col,t:70,taille:ta||20});
+function gerbe(px,py,n,col,f){
+  for(let i=0;i<n;i++){ const a=rnd(0,6.283),v=rnd(.4,1)*f;
+    parts.push({x:px,y:py,vx:Math.cos(a)*v,vy:Math.sin(a)*v-.5,
+      r:rnd(1.8,4.2),col,t:rnd(18,40),g:.09}); }
+}
+
+function preparer(){
+  essai++;
+  vent=rnd(-.055,.075);
+  battu=false; visee=null;
+  tong={x:X0+18,y:SOL-46,vx:0,vy:0,a:0,va:0,age:0,tr:[]};
+  phase='vise';
+  cam={x:0,y:0,s:1};
+  rafales=[];
+  for(let i=0;i<5;i++) rafales.push({
+    x:X0+rnd(420,2400)+i*260, y:SOL-rnd(90,250), r:34, ph:rnd(0,6.3), prise:0});
+}
+
+/* ═══ entrée : on tire, on lâche ═══ */
+function pos(e){const r=cv.getBoundingClientRect();
+  const s=e.changedTouches?e.changedTouches[0]:e;
+  return[(s.clientX-r.left)/scale,(s.clientY-r.top)/scale];}
+
+addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); return; }
+  const[a,b]=pos(e);
+  if(phase==='vise'){ visee={x0:a,y0:b,x:a,y:b}; }
+  else if(phase==='vol'&&!battu){                 // le battement de tong
+    battu=true;
+    tong.vy-=4.6; tong.vx+=2.2; tong.va+=.6;
+    gerbe(tong.x,tong.y,10,'#FFFFFF',1.6);
+    texte('BATTEMENT !',tong.x,tong.y-40,C.or,20);
+  }
+  else if(phase==='pose'){ suite(); }
+},{passive:false});
+addEventListener('pointermove',e=>{
+  if(visee&&phase==='vise'){ e.preventDefault(); const[a,b]=pos(e); visee.x=a; visee.y=b; }
+},{passive:false});
+addEventListener('pointerup',e=>{
+  if(!visee||phase!=='vise')return;
+  const dx=visee.x0-visee.x, dy=visee.y0-visee.y;
+  const d=Math.hypot(dx,dy);
+  visee=null;
+  if(d<18)return;                                  // simple effleurement : on ne lance pas
+  const p=clamp(d/150,0,1)*22;
+  const a=Math.atan2(dy,dx);
+  tong.vx=Math.cos(a)*p; tong.vy=Math.sin(a)*p; tong.va=rnd(.18,.34);
+  if(tong.vx<0.5)tong.vx=0.5;
+  phase='vol';
+  gerbe(tong.x,tong.y,12,C.terre,1.8);
+  shake=5;
+});
+addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('keydown',e=>{ if((e.key===' '||e.key==='Enter')){
+  e.preventDefault();
+  if(etat!=='jeu'){ if(t>22)nouvelle(); }
+  else if(phase==='pose') suite(); }});
+
+function suite(){
+  if(essai>=ESSAIS){ majBest(); etat='fin'; t=0; }
+  else preparer();
+}
+
+/* ═══ mise à jour ═══ */
+function update(){
+  t++;
+  if(shake>.3)shake*=.86; else shake=0;
+  if(flash>0)flash-=.05;
+  if(annonce){ annonce.t--; if(annonce.t<=0)annonce=null; }
+  textes=textes.filter(u=>{u.t--;u.y-=.9;return u.t>0;});
+  for(const p of parts){ p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.t--; }
+  parts=parts.filter(p=>p.t>0);
+  for(const r of rafales) r.ph+=.05;
+  if(etat!=='jeu')return;
+
+  if(phase==='vol'){
+    if(++tong.age>1400){ poser(); return; }      // garde-fou
+    tong.tr.push({x:tong.x,y:tong.y}); if(tong.tr.length>14)tong.tr.shift();
+    tong.vy+=G; tong.vx+=vent;
+    tong.vx*=.9992;
+    tong.x+=tong.vx; tong.y+=tong.vy; tong.a+=tong.va;
+
+    for(const r of rafales){
+      if(r.prise)continue;
+      if(Math.hypot(r.x-tong.x,r.y-tong.y)<r.r+10){
+        r.prise=1;
+        tong.vx*=1.22; tong.vy-=2.1;
+        gerbe(r.x,r.y,14,'#BFE4F2',2);
+        texte('RAFALE  +20 %',r.x,r.y-30,C.bleu,18);
+        flash=.2;
+      }
+    }
+
+    if(tong.y>=SOL-6){
+      tong.y=SOL-6; tong.vx=0; tong.vy=0; tong.va=0;
+      gerbe(tong.x,SOL,14,C.terre,1.9);
+      shake=7;
+      poser();
+    }
+  }
+
+  // caméra
+  if(phase==='vol'){
+    const haut=SOL-tong.y;
+    const cible={x:tong.x-W*.32, y:clamp(haut-140,0,320)*.55, s:clamp(300/(haut+240),.62,1)};
+    cam.x+=(cible.x-cam.x)*.12;
+    cam.y+=(cible.y-cam.y)*.08;
+    cam.s+=(cible.s-cam.s)*.05;
+  }
+}
+
+function poser(){
+  phase='pose';
+  const m=(tong.x-X0)/METRE;
+  record=Math.max(record,m); distances.push(m);
+  gerbe(tong.x,SOL,16,C.herbe3,1.8);
+  texte(m.toFixed(1).replace('.',',')+' m',tong.x,SOL-70,
+    m>=record?C.or:C.texte,30);
+  shake=8;
+}
+
+/* ═══ décor ═══ */
+function sol(){
+  x.fillStyle=C.herbe; x.fillRect(-4000,SOL,12000,H*2);
+  x.fillStyle=C.herbe2;
+  for(let i=-40;i<340;i++){ const wx=i*34+hash(i)*20;
+    x.beginPath(); x.ellipse(wx,SOL+10+hash(i*3)*16,13,4,0,0,7); x.fill(); }
+  x.fillStyle=C.herbe3;
+  for(let i=-40;i<340;i++){ const wx=i*29+hash(i*5)*22;
+    x.fillRect(wx,SOL-6-hash(i*7)*5,2,7); }
+  x.strokeStyle='rgba(33,48,24,.4)'; x.lineWidth=2.4;
+  x.beginPath(); x.moveTo(-4000,SOL); x.lineTo(8000,SOL); x.stroke();
+  // bornes tous les 20 m
+  for(let m=20;m<=400;m+=20){
+    const wx=X0+m*METRE;
+    x.fillStyle='#FFFDF2'; trait(2.2);
+    x.fillRect(wx-2,SOL-30,4,30); x.strokeRect(wx-2,SOL-30,4,30);
+    rrect(wx-16,SOL-48,32,18,4); x.fill(); x.stroke();
+    x.fillStyle=C.trait; x.font='800 12px system-ui,sans-serif';
+    x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(m,wx,SOL-39);
+  }
+}
+function arbres(){
+  for(let i=0;i<40;i++){
+    const wx=X0-200+i*260+hash(i*9)*120, hh=48+hash(i*3)*30;
+    x.fillStyle='#6B4A2A'; x.fillRect(wx-4,SOL-hh*.5,8,hh*.5);
+    x.fillStyle='#4C7A3A';
+    x.beginPath(); x.arc(wx,SOL-hh*.75,hh*.46,0,7); x.fill();
+    x.fillStyle='#5C9640';
+    x.beginPath(); x.arc(wx-hh*.14,SOL-hh*.86,hh*.3,0,7); x.fill();
+  }
+}
+function lanceur(){
+  const px=X0, py=SOL, vis=phase==='vise';
+  const el=visee?clamp(Math.hypot(visee.x0-visee.x,visee.y0-visee.y)/150,0,1):0;
+  x.save(); x.translate(px,py);
+  trait(2.6);
+  // jambes
+  x.fillStyle=C.short;
+  rrect(-11,-30,9,30,4); x.fill(); x.stroke();
+  rrect(3,-30,9,30,4); x.fill(); x.stroke();
+  // buste
+  x.fillStyle=C.maillot;
+  x.save(); x.rotate(vis?-.18*el:0);
+  rrect(-13,-62,26,34,9); x.fill(); x.stroke();
+  x.restore();
+  // bras armé
+  x.save(); x.translate(6,-56); x.rotate(vis?-2.5+el*1.5:-1.1);
+  x.fillStyle=C.peau; rrect(-4.5,0,9,24,4.5); x.fill(); x.stroke(); x.restore();
+  // tête
+  x.fillStyle=C.peau;
+  x.beginPath(); x.arc(1,-72,11,0,7); x.fill(); x.stroke();
+  x.fillStyle=C.trait; x.beginPath(); x.arc(6,-73,2.2,0,7); x.fill();
+  x.strokeStyle=C.trait; x.lineWidth=1.8;
+  x.beginPath(); x.arc(4,-68,4,.2,1.3); x.stroke();
+  // casquette
+  trait(2.6); x.fillStyle=C.rouge;
+  x.beginPath(); x.arc(1,-75,11.4,Math.PI,0); x.fill(); x.stroke();
+  rrect(7,-78,14,5,2.5); x.fill(); x.stroke();
+  x.restore();
+  // manche à air
+  const fx=X0-56, fy=SOL-96;
+  x.strokeStyle=C.trait; x.lineWidth=3;
+  x.beginPath(); x.moveTo(fx,SOL); x.lineTo(fx,fy); x.stroke();
+  const dir=vent>=0?1:-1, fo=clamp(Math.abs(vent)/.075,.25,1);
+  x.fillStyle=vent>=0?C.vert:C.rouge; trait(2.2);
+  x.beginPath(); x.moveTo(fx,fy);
+  x.lineTo(fx+dir*36*fo,fy+4+Math.sin(t*.1)*3);
+  x.lineTo(fx+dir*36*fo,fy+15+Math.sin(t*.1)*3);
+  x.lineTo(fx,fy+16); x.closePath(); x.fill(); x.stroke();
+}
+
+function dessinTong(){
+  x.save(); x.translate(tong.x,tong.y); x.rotate(tong.a);
+  trait(2.6);
+  x.fillStyle=C.tong;
+  x.beginPath(); x.ellipse(0,0,20,9,0,0,7); x.fill(); x.stroke();
+  x.fillStyle='#FFE9A8';
+  x.beginPath(); x.ellipse(-3,-1.5,14,5,0,0,7); x.fill();
+  x.strokeStyle=C.tongB; x.lineWidth=3.4; x.lineCap='round';
+  x.beginPath(); x.moveTo(-12,-4); x.lineTo(4,-1); x.lineTo(-12,4); x.stroke();
+  x.restore();
+}
+
+function dessinRafale(r){
+  if(r.prise)return;
+  const p=.8+Math.sin(r.ph)*.2;
+  lueur(r.x,r.y,r.r*1.6,'#BFE4F2',.22*p);
+  x.save(); x.translate(r.x,r.y); x.rotate(r.ph*.5);
+  x.strokeStyle='rgba(255,255,255,.85)'; x.lineWidth=3.4; x.lineCap='round';
+  for(let i=0;i<3;i++){
+    x.beginPath();
+    x.arc(0,0,r.r-i*9,i*.6,i*.6+2.4); x.stroke();
+  }
+  x.restore();
+}
+
+/* ═══ rendu ═══ */
+function draw(){
+  x.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,C.ciel1); g.addColorStop(.62,C.ciel2); g.addColorStop(1,C.ciel3);
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  // nuages
+  x.fillStyle='rgba(255,255,255,.72)';
+  for(let i=0;i<7;i++){
+    const nx=((i*260-cam.x*.25)%(W+400))-140, ny=40+((i*57)%80);
+    x.beginPath(); x.ellipse(nx,ny,42,17,0,0,7);
+    x.ellipse(nx+30,ny-9,30,13,0,0,7); x.ellipse(nx-28,ny-4,26,12,0,0,7); x.fill();
+  }
+
+  x.save();
+  if(shake)x.translate(rnd(-shake,shake),rnd(-shake,shake));
+  x.translate(W/2,H*.62); x.scale(cam.s,cam.s); x.translate(-W/2,-H*.62);
+  x.translate(-cam.x,cam.y);
+
+  x.save(); x.globalAlpha=.55; x.translate(cam.x*.55,0); arbres(); x.restore();
+  sol();
+  for(const r of rafales) dessinRafale(r);
+  if(etat!=='menu'){
+    lanceur();
+    // trace de vol
+    if(tong.tr.length>1){
+      x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=2.6; x.setLineDash([5,7]);
+      x.beginPath(); tong.tr.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));
+      x.stroke(); x.setLineDash([]);
+    }
+    // aperçu de trajectoire pendant la visée
+    if(visee&&phase==='vise'){
+      const dx=visee.x0-visee.x, dy=visee.y0-visee.y, d=Math.hypot(dx,dy);
+      const p=clamp(d/150,0,1)*22, a=Math.atan2(dy,dx);
+      let sx=tong.x, sy=tong.y, sv=Math.cos(a)*p, svy=Math.sin(a)*p;
+      x.fillStyle='rgba(33,48,24,.45)';
+      for(let i=0;i<34;i++){
+        sx+=sv; sy+=svy; svy+=G; sv+=vent;
+        if(sy>SOL-6)break;
+        if(i%2===0){ x.beginPath(); x.arc(sx,sy,2.6,0,7); x.fill(); }
+      }
+      // jauge de puissance
+      x.strokeStyle='rgba(33,48,24,.5)'; x.lineWidth=3;
+      x.beginPath(); x.moveTo(tong.x,tong.y);
+      x.lineTo(tong.x-Math.cos(a)*d*.5,tong.y-Math.sin(a)*d*.5); x.stroke();
+    }
+    dessinTong();
+  }
+  for(const p of parts){ x.globalAlpha=Math.min(1,p.t/24); x.fillStyle=p.col;
+    x.beginPath(); x.arc(p.x,p.y,p.r,0,7); x.fill(); }
+  x.globalAlpha=1;
+  x.restore();
+
+  textes.forEach(u=>{ x.save(); x.globalAlpha=Math.min(1,u.t/28);
+    const sx=(u.x-cam.x-W/2)*cam.s+W/2, sy=(u.y+cam.y-H*.62)*cam.s+H*.62;
+    x.font='800 '+u.taille+'px system-ui,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+    x.strokeStyle='rgba(255,253,242,.9)'; x.lineWidth=5;
+    x.strokeText(u.s,clamp(sx,80,W-80),sy);
+    x.fillStyle=u.col; x.fillText(u.s,clamp(sx,80,W-80),sy); x.restore(); });
+
+  if(etat==='jeu'){
+    x.save(); x.textBaseline='middle';
+    x.font='800 34px system-ui,-apple-system,sans-serif'; x.textAlign='left';
+    x.fillStyle=C.trait;
+    const m=phase==='vise'?0:(tong.x-X0)/METRE;
+    x.fillText(m.toFixed(1).replace('.',',')+' m',20,34);
+    x.font='600 12px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('LANCER '+essai+' SUR '+ESSAIS,20,58);
+    x.textAlign='right';
+    x.font='800 22px system-ui,sans-serif'; x.fillStyle=C.trait;
+    x.fillText('record  '+record.toFixed(1).replace('.',',')+' m',W-20,32);
+    x.font='600 12px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(vent>=0?'vent favorable':'vent de face',W-20,54);
+    x.restore();
+
+    x.save(); x.textAlign='center'; x.globalAlpha=.9;
+    x.font='800 20px system-ui,sans-serif'; x.fillStyle=C.trait;
+    if(phase==='vise'&&!visee&&(t>>4)%2)
+      x.fillText('TIREZ LA TONG VERS L\'ARRIÈRE, PUIS LÂCHEZ',W/2,H-26);
+    if(phase==='vol'&&!battu&&(t>>3)%2)
+      x.fillText('TOUCHEZ POUR UN BATTEMENT DE TONG',W/2,H-26);
+    if(phase==='pose'&&(t>>4)%2)
+      x.fillText(essai>=ESSAIS?'TOUCHEZ POUR LE RÉSULTAT':'TOUCHEZ POUR LE LANCER SUIVANT',W/2,H-26);
+    x.restore();
+  }
+
+  if(annonce){
+    const e=annonce.max-annonce.t,a=ease(Math.min(e/16,annonce.t/16));
+    x.save(); x.globalAlpha=a; x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 34px system-ui,sans-serif'; x.fillStyle=C.trait; x.fillText(annonce.a,W/2,110);
+    x.font='600 14px system-ui,sans-serif'; x.fillStyle=C.doux; x.fillText(annonce.b,W/2,140);
+    x.restore();
+  }
+
+  if(etat==='menu'){
+    x.fillStyle='rgba(234,246,232,.86)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font='800 16px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText('MÉZIÈRES-LEZ-CLÉRY',W/2,62);
+    x.font='800 52px system-ui,sans-serif'; x.fillStyle=C.trait;
+    x.fillText('LE LANCER DE TONG',W/2,110);
+    x.save(); x.translate(W/2,178); x.rotate(Math.sin(t*.05)*.2); x.scale(2,2);
+    trait(1.3); x.fillStyle=C.tong;
+    x.beginPath(); x.ellipse(0,0,20,9,0,0,7); x.fill(); x.stroke();
+    x.fillStyle='#FFE9A8'; x.beginPath(); x.ellipse(-3,-1.5,14,5,0,0,7); x.fill();
+    x.strokeStyle=C.tongB; x.lineWidth=1.7; x.lineCap='round';
+    x.beginPath(); x.moveTo(-12,-4); x.lineTo(4,-1); x.lineTo(-12,4); x.stroke();
+    x.restore();
+    const r=[[C.trait,'Tirez la tong vers l\'arrière, puis lâchez.'],
+             [C.bleu, 'En vol, touchez une fois : battement de tong.'],
+             ['#8FA8C8','Traversez les rafales, elles portent loin.'],
+             [C.or,   'Trois lancers. On garde le meilleur.']];
+    r.forEach((u,i)=>{ const yy=238+i*30;
+      x.fillStyle=u[0]; x.beginPath(); x.arc(W/2-210,yy,6,0,7); x.fill();
+      x.textAlign='left'; x.font='600 15px system-ui,sans-serif';
+      x.fillStyle=C.trait; x.fillText(u[1],W/2-192,yy); });
+    x.textAlign='center';
+    if((t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.trait;
+      x.fillText('TOUCHEZ POUR COMMENCER',W/2,378); }
+    if(meilleur){ x.font='600 13px system-ui,sans-serif'; x.fillStyle=C.doux;
+      x.fillText('record du village : '+meilleur.toFixed(1).replace('.',',')+' m',W/2,406); }
+  }
+
+  if(etat==='fin'){
+    x.fillStyle='rgba(234,246,232,.92)'; x.fillRect(0,0,W,H);
+    x.textAlign='center'; x.textBaseline='middle';
+    const med = record>=175?['OR',C.or] : record>=135?['ARGENT','#A8B0BC'] :
+                record>=95?['BRONZE','#C88A52'] : ['PARTICIPATION',C.doux];
+    x.font='800 30px system-ui,sans-serif'; x.fillStyle=C.trait;
+    x.fillText('MEILLEUR LANCER',W/2,92);
+    x.font='800 66px system-ui,sans-serif'; x.fillStyle=med[1];
+    x.fillText(record.toFixed(1).replace('.',',')+' m',W/2,158);
+    x.font='800 22px system-ui,sans-serif'; x.fillStyle=med[1];
+    x.fillText('MÉDAILLE  '+med[0],W/2,208);
+    x.font='600 15px system-ui,sans-serif'; x.fillStyle=C.doux;
+    x.fillText(distances.map(d=>d.toFixed(1).replace('.',',')+' m').join('   ·   '),W/2,254);
+    if(record>=meilleur&&record>0){ x.font='800 18px system-ui,sans-serif'; x.fillStyle=C.vert;
+      x.fillText('RECORD DU VILLAGE',W/2,292); }
+    if(t>22&&(t>>4)%2){ x.font='800 24px system-ui,sans-serif'; x.fillStyle=C.trait;
+      x.fillText('REMETTRE ÇA',W/2,352); }
+  }
+
+  if(flash>0){ x.fillStyle='rgba(255,255,255,'+(flash*.4)+')'; x.fillRect(0,0,W,H); }
+}
+
+(function boucle(){ update(); draw(); requestAnimationFrame(boucle); })();
+})();
+</script>
+</body>
+</html>
