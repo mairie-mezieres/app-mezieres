@@ -1,3 +1,20 @@
+## 2026-09-07
+- Chrome 152.0.7977.82/.83, zero-day V8 activement exploité CVE-2026-85046, ajouté au KEV CISA (3-4 sept 2026) — https://thehackernews.com/2026/09/google-releases-chrome-update-to-patch.html
+- GitHub Actions : permission vulnerability-alerts, API de dépréciation des runners (3 sept 2026) — https://github.blog/changelog/2026-09-03-github-actions-early-september-2026-updates/
+- Playwright 1.63.0 : verrous nommés, reporter perfetto, --add-reporter (4 sept 2026) — https://github.com/microsoft/playwright/releases/tag/v1.63.0
+- Anthropic : lancement Claude Fable 5.1 (GA) et Claude Mythos 5.1 (accès restreint), -75% coût lecture cache (1er sept 2026) — https://www.anthropic.com/claude-fable-and-mythos-5-1
+- Render.com : télémétrie CLI activée par défaut (v2.26.0+), nouveau plan de calcul flex pour Workflows (1er sept 2026) — https://render.com/changelog
+- Gazette des communes : Forum du numérique consacré à l'IA en collectivités, 17 sept 2026 à Paris — https://evenements.infopro-digital.com/gazette-des-communes/numerique-et-smart-city-T2723
+- Cyberattaque Association des Maires de France (AMF) : injection SQL, 114 000 entrées dont mots de passe en clair (4 sept 2026) — https://www.cyberattaque.org/association-des-maires-de-france-114-000-lignes-en-fuite-apres-une-cyberattaque/
+- Cyberattaque Ville de Libercourt, 817 Go revendiqués par le groupe Kairos (2 sept 2026) — https://www.cyberattaque.org/ville-de-libercourt-817-go-de-donnees-revendiquesapres-une-cyberattaque/
+- Alerte CERT-FR CERTFR-2026-ALE-009 : failles critiques SonicWall SMA1000, SSRF non authentifiée + RCE (2 sept 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-009/
+- Bulletin CERT-FR CERTFR-2026-ACT-037 : Papercut, Metabase, Keycloak, Cisco IOS XE (31 août 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-037/
+- [reco] Vérifier que les postes d'administration MAT tournent sur Chrome 152.0.7977.82/.83 (CVE-2026-85046)
+- [reco] Vérifier/patcher tout boîtier SonicWall SMA1000 utilisé par un prestataire de la mairie (CERT-FR ALE-009)
+- [reco] Auditer le stockage des mots de passe côté backend/Redis de MAT suite à la fuite AMF
+- [reco] Mettre à jour Playwright vers 1.63.0
+- [reco] Vérifier le comportement de télémétrie du CLI Render (activée par défaut depuis v2.26.0)
+
 ## 2026-08-31
 - Chrome 152 (152.0.7977.64/.65), 327 correctifs dont CVE-2026-79282 (évasion bac à sable ANGLE, critique) (26 août 2026) — https://www.malwarebytes.com/blog/bugs/2026/08/update-chrome-before-you-browse-again
 - Sentry SDK JS v11 : dataCollection remplace sendDefaultPii, collecte davantage par défaut (~28 août 2026) — https://blog.sentry.io/datacollection-control-panel/
