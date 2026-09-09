@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.107.0';
+const CACHE = 'mat-v4.108.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -51,8 +51,8 @@ const PRECACHE_URLS = [
   './js/mat-photos.js?v=1.3.6',
   './js/mat-actus.js?v=4.4.9',
   './js/mat-trombi.js?v=4.2.7',
-  './js/mat-mel.js?v=4.5.2',
-  './js/mat-boot.js?v=4.12.7',
+  './js/mat-mel.js?v=4.5.3',
+  './js/mat-boot.js?v=4.12.8',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -68,12 +68,12 @@ const PRECACHE_URLS = [
   // habitants n'ouvriront jamais. Conséquence assumée : la carte 3D ne
   // fonctionne pas hors connexion, et elle le dit. Voir ADR-0018.
   './js/mat-carte3d.js?v=1.9.0',
-  './js/mat-guide-arrivee.js?v=1.0.7',
+  './js/mat-guide-arrivee.js?v=1.0.8',
   './js/mat-entreprises.js?v=1.2.1',
-  './js/mat-saviez-vous.js?v=1.4.0',
+  './js/mat-saviez-vous.js?v=1.5.0',
   './data/plu-data.json?v=4.2.3',
-  './data/mel-tree.json?v=4.2.8',
-  './data/saviez-vous.json?v=1.4.0',
+  './data/mel-tree.json?v=3.7.6',
+  './data/saviez-vous.json?v=1.5.0',
   './img/mat-header.webp',
   './img/MAT et MEL.webp',
   './notif.html',

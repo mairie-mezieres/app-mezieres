@@ -5,6 +5,52 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.108] — 9 septembre 2026
+
+### Ajouté
+- **École de la Forêt et services périscolaires, à jour du règlement intérieur
+  2026-2027.** MEL répond désormais directement sur les horaires de classe (8h30-11h45 et
+  13h45-16h30, quatre jours, accueil dix minutes avant, portail fermé à l'heure de la
+  classe), les APC du lundi et du jeudi, le signalement d'une absence, les médicaments et
+  le PAI, les règles de vie de l'école (téléphone confisqué une semaine, écharpes
+  proscrites, tenues, vélo sur autorisation écrite) et le **calendrier des vacances
+  2026-2027**.
+- **Quatrième fiche « Accueil du mercredi »** dans les deux copies de l'arbre de décision
+  (7h30-18h00, journée ou demi-journée, avec ou sans repas) : ses horaires d'arrivée, ses
+  délais de réservation et sa limite de retard diffèrent tous de ceux du matin et du soir.
+- **Le portail parents est le point d'entrée unique** du périscolaire — dossier,
+  réservations, annulations, personnes autorisées, paiement — avec ses délais : 3 jours
+  avant pour le matin et le soir, le mardi de la semaine précédente pour la cantine et le
+  mercredi.
+- Dix entrées scolaires dans « Le saviez-vous ? » (corpus 1.5.0, 180 entrées).
+
+### Modifié
+- **Un horaire faux depuis longtemps** : l'arbre annonçait une ouverture « à 8h20 et
+  13h30 ». L'après-midi commence à **13h45**, l'accueil à **13h35**.
+- **L'inscription « par fiche à déposer en mairie avant le 30 juin » n'existe plus** :
+  l'entrée correspondante du corpus est remplacée par une entrée qui répond *non* à la
+  même question.
+- `centre_loisirs` décrit l'**ALSH du Val d'Ardoux** (3-13 ans, Cléry-Saint-André, toutes
+  les vacances **sauf Noël**) au lieu d'une réponse générique.
+
+### Supprimé
+- **Une grille tarifaire de cantine datée de 2022-2023**, affichée pendant quatre ans dans
+  `js/mat-mel.js`. Les tarifs sont votés chaque année par le conseil municipal et calculés
+  sur le quotient familial CAF : l'application dit désormais **comment** le prix se forme
+  et **où** trouver la grille, sans en recopier aucune.
+- **Les noms des personnels** (direction de l'école, direction du périscolaire), qui
+  vivaient dans l'arbre de décision. On désigne une fonction, qui survit à un mouvement de
+  personnel. Deux tests refusent leur retour, y compris en commentaire.
+
+### Corrigé
+- `demarches_etatcivil` (backend) attrapait le mot `certificat` nu : « certificat de
+  radiation » et « certificat médical pour une absence » recevaient une réponse sur les
+  actes de naissance.
+
+Voir `docs/adr/0038-un-nom-de-personnel-perime-plus-vite-qu-un-horaire.md`.
+
+---
+
 ## [4.107] — 6 septembre 2026
 
 ### Ajouté

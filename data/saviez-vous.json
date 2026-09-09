@@ -1,6 +1,6 @@
 {
-  "version": "1.4.0",
-  "maj": "2026-08-27",
+  "version": "1.5.0",
+  "maj": "2026-09-09",
   "_lisez_moi": "⛔ Chaque entrée DOIT porter une source vérifiable. Une entrée sans source ne part pas — le test d'intégrité de tests/e2e la rejette. On ne rédige JAMAIS une affirmation fausse : le champ « question » pose une question, seule « explication » porte du contenu factuel. Voir docs/adr/0012.",
   "entrees": [
     {
@@ -682,28 +682,100 @@
       "id": "ecole-horaires-fin",
       "question": "Les cours se terminent-ils à 17 h à l’école de la Forêt ?",
       "reponse": false,
-      "explication": "Non, à 16 h 30 — et 11 h 45 le matin. L’école ouvre à 8 h 20 et à 13 h 30. Elle est située 36 rue du Bourg.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "explication": "Non, à 16 h 30 — et 11 h 45 le matin. La classe commence à 8 h 30 et à 13 h 45 ; l’accueil des élèves est assuré dix minutes avant, et le portail ferme à l’heure de la classe. L’école est située 36 rue du Bourg.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §1.1 et §5.2",
       "url": "",
       "categorie": "vie-communale"
+    },
+    {
+      "id": "ecole-quatre-jours",
+      "question": "Y a-t-il classe le mercredi à l’école de la Forêt ?",
+      "reponse": false,
+      "explication": "Non : la semaine scolaire est de quatre jours — lundi, mardi, jeudi et vendredi — pour 24 heures d’enseignement. Le mercredi, la commune ouvre en revanche un accueil périscolaire de 7 h 30 à 18 h, en journée ou en demi-journée.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §1.1 et partie II §3",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "ecole-apc",
+      "question": "Les activités pédagogiques complémentaires ont-elles lieu après la classe ?",
+      "reponse": false,
+      "explication": "Non : à l’école de la Forêt, les APC se tiennent sur le temps méridien, les lundis et jeudis, pour les élèves de la GS au CM2. Elles supposent l’accord des parents.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §1.2",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "ecole-portable",
+      "question": "Un enfant peut-il apporter son téléphone portable à l’école ?",
+      "reponse": false,
+      "explication": "Non : le téléphone portable et les jeux électroniques sont interdits, conformément à l’article L. 511-5 du code de l’éducation. Un appareil apporté est confisqué et remis aux parents dans un délai d’une semaine.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §5.4",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "ecole-echarpe",
+      "question": "L’écharpe est-elle admise dans la cour de l’école ?",
+      "reponse": false,
+      "explication": "Non : les écharpes et les foulards sont interdits pour éviter les risques d’étranglement, notamment si le vêtement se prend dans les roues d’un objet roulant. Le règlement recommande un tour de cou.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §5.4",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "ecole-medicament",
+      "question": "Le personnel de l’école peut-il donner un médicament à un enfant ?",
+      "reponse": false,
+      "explication": "Non, ni à l’école ni au périscolaire — sauf dans le cadre d’un PAI (projet d’accueil individualisé). Seul le traitement contre l’asthme est admis, avec une copie de l’ordonnance.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §2.1 et partie I §2.3",
+      "url": "",
+      "categorie": "sante"
     },
     {
       "id": "cantine-cent-repas",
       "question": "Le restaurant scolaire de Mézières prépare-t-il plus de 50 repas par jour ?",
       "reponse": true,
-      "explication": "Environ cent, à partir de produits frais. Les tarifs sont calculés selon le quotient familial.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "explication": "Environ cent, confectionnés sur place par un cuisinier communal qui élabore les menus en privilégiant les circuits courts. Les tarifs sont calculés selon le quotient familial CAF.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, partie II §2, et mairie de Mézières-lez-Cléry",
       "url": "",
       "categorie": "vie-communale"
     },
     {
-      "id": "inscriptions-30-juin",
-      "question": "Les inscriptions au restaurant scolaire se ferment-elles dès la fin juin ?",
-      "reponse": true,
-      "explication": "Oui : les fiches sont à déposer en mairie avant le 30 juin pour l’année suivante — bien avant la rentrée. Même échéance pour l’accueil périscolaire, auprès de la directrice.",
-      "source": "Mairie de Mézières-lez-Cléry — arbre de décision de l’assistante MEL, rubrique Enfance & Jeunesse",
+      "id": "cantine-midi-ferme",
+      "question": "Peut-on venir chercher son enfant au restaurant scolaire entre 11 h 45 et 13 h 30 ?",
+      "reponse": false,
+      "explication": "Non : aucun départ ni retour n’est accepté sur cette plage. Seuls les enfants venus en classe le matin sont admis au restaurant scolaire.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, partie II §2.1 et §2.2",
       "url": "",
       "categorie": "vie-communale"
+    },
+    {
+      "id": "inscriptions-portail-parents",
+      "question": "Faut-il déposer une fiche papier en mairie pour inscrire son enfant à la cantine ?",
+      "reponse": false,
+      "explication": "Non, depuis l’année scolaire 2026-2027 : tout passe par le portail parents — un dossier unique pour l’ensemble des services périscolaires, puis les réservations, les annulations et le paiement. Réservez au plus tard le mardi de la semaine précédente pour la cantine et le mercredi, et 3 jours avant pour l’accueil du matin et du soir.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, partie I §1.1 et partie II §1.2, §2.3, §3.3",
+      "url": "https://parents.logiciel-enfance.fr/mezieres-lez-clery",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "periscolaire-gouter",
+      "question": "Faut-il apporter le goûter du soir au périscolaire ?",
+      "reponse": false,
+      "explication": "Non : le goûter est fourni par la collectivité, pour l’accueil du soir comme pour le mercredi. L’accueil du soir se tient de 16 h 30 à 18 h 30, celui du matin de 7 h 30 à 8 h 20 en arrivée échelonnée.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, partie II §1.1, §1.3 et §3.4",
+      "url": "",
+      "categorie": "vie-communale"
+    },
+    {
+      "id": "alsh-noel",
+      "question": "L’accueil de loisirs du Val d’Ardoux ouvre-t-il à toutes les vacances ?",
+      "reponse": false,
+      "explication": "Non : il fonctionne à toutes les vacances scolaires sauf celles de Noël. Organisé par la Communauté de Communes pour les 3-13 ans, il se tient à Cléry-Saint-André et ponctuellement à Mézières-lez-Cléry.",
+      "source": "École de la Forêt — règlement intérieur scolaire et périscolaire 2026-2027, §5 « Informations diverses »",
+      "url": "",
+      "categorie": "intercommunalite"
     },
     {
       "id": "marmousets-familiale",
