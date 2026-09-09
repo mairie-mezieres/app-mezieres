@@ -243,6 +243,64 @@ modalités sont donnés par la mairie (02 38 45 61 76) et détaillés dans la ru
 « Location de matériel » de l'arbre de décision de MEL — ils ne sont volontairement pas
 recopiés dans le code, pour que la mairie reste seule à les tenir à jour.
 
+#### École de la Forêt et services périscolaires
+
+Depuis la v4.108, MEL répond directement aux questions sur l'école et le périscolaire, à
+partir du **règlement intérieur scolaire et périscolaire 2026-2027** remis par la mairie.
+
+**L'école de la Forêt** — école primaire publique, 36 rue du Bourg, 02 38 45 65 00,
+`ec-mezieres-lez-clery@ac-orleans-tours.fr` — fonctionne sur une semaine de **quatre
+jours** :
+
+| | Matin | Après-midi |
+|---|---|---|
+| Lundi, mardi, jeudi, vendredi | 8h30 – 11h45 | 13h45 – 16h30 |
+
+L'accueil des élèves est assuré **dix minutes avant** la classe (8h20 et 13h35) et le
+**portail ferme à 8h30 et à 13h45**. Il n'y a **pas de classe le mercredi**. Des **APC**
+(activités pédagogiques complémentaires) peuvent s'ajouter pour les élèves de la GS au
+CM2, **les lundis et jeudis sur le temps méridien**.
+
+MEL sait aussi répondre sur : le signalement d'une absence (le jour même, avec le motif —
+et la saisine du DASEN à partir de quatre demi-journées non justifiées dans le mois), les
+médicaments (**aucun**, sauf PAI ; seul l'asthme, avec copie de l'ordonnance), les règles
+de vie (téléphone portable et jeux électroniques interdits et confisqués une semaine,
+écharpes et foulards proscrits, billes tolérées dans la cour du bas, tenues adaptées),
+l'autorisation écrite pour rentrer seul à vélo, et le **calendrier des vacances
+2026-2027**.
+
+**Les services périscolaires** — « L'Accueil enchanté », chemin des écoliers,
+09 67 28 01 20, `enfance@mezieres-lez-clery.fr` — sont gérés par la commune :
+
+| Service | Jours | Horaires |
+|---|---|---|
+| Accueil du matin | lundi, mardi, jeudi, vendredi | 7h30 – 8h20 (arrivée échelonnée) |
+| Restaurant scolaire | lundi, mardi, jeudi, vendredi | 11h45 – 13h30 |
+| Accueil du soir (goûter fourni) | lundi, mardi, jeudi, vendredi | 16h30 – 18h30 |
+| Accueil du mercredi (goûter fourni) | mercredi, en période scolaire | 7h30 – 18h00 |
+
+**Tout passe par le portail parents** — `https://parents.logiciel-enfance.fr/mezieres-lez-clery`
+— un dossier unique pour l'ensemble des services, puis les réservations, les annulations,
+la mise à jour des personnes autorisées à venir chercher l'enfant et le paiement. Les
+délais que MEL rappelle : **3 jours avant** pour l'accueil du matin et du soir, **le mardi
+de la semaine précédente** pour la cantine et le mercredi ; au-delà, l'inscription passe
+par mail et un surcoût est facturé. Les retards après 18h30 (18h00 le mercredi) sont
+facturés par enfant.
+
+> ⚠️ **Deux choses ne sont volontairement pas écrites dans l'application.**
+>
+> **Aucun tarif.** Ils sont votés **chaque année par délibération du conseil municipal** et
+> calculés sur le **quotient familial CAF au 1er août** ; sans justificatif, le tarif
+> maximum s'applique. L'arbre de décision affichait encore, en septembre 2026, une grille
+> de cantine datée de 2022-2023 — quatre ans de retard, que personne n'avait vus. MEL
+> renvoie désormais à la grille en vigueur, sur le portail parents ou auprès du service
+> enfance.
+>
+> **Aucun nom de personnel.** L'arbre nommait la directrice de l'école et la directrice du
+> périscolaire. Ces personnes changent d'une rentrée à l'autre : on s'adresse désormais à
+> « la direction de l'école », à « l'enseignante de votre enfant » ou au « service
+> enfance ». Un nom faux est pire qu'une fonction juste.
+
 #### Crèche familiale « Les Marmousets »
 
 Depuis la v4.85, MEL répond directement aux questions sur la crèche, à partir du

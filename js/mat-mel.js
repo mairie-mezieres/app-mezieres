@@ -518,17 +518,34 @@ const _MEL_TREE_FALLBACK = {
   enfance:{
     label:"Enfance & Jeunesse", ico:"🎒", needZone:false,
     questions:[
-      {id:"ecole",ico:"📚",label:"École La Forêt",
-        directAnswer:{text:"L'école La Forêt est située 36 rue du Bourg. Elle ouvre à 8h20 (matin) et 13h30 (après-midi), les cours se terminent à 11h45 et 16h30. Vous pouvez joindre la directrice Mme GUILBERT-CHOLET tous les jours ou lui écrire.",
+      // ⚠️ Source : règlement intérieur scolaire et périscolaire 2026-2027 de
+      // l'école de la Forêt. Deux garde-fous, verrouillés par
+      // tests/e2e/ecole-periscolaire.spec.js :
+      //   • AUCUN nom de personnel — pas même en commentaire. Ce bloc nommait
+      //     la directrice de l'école et la directrice du périscolaire : des
+      //     personnes qui changent d'une rentrée à l'autre, et rien ne le
+      //     signalait. On désigne une fonction, jamais quelqu'un.
+      //   • AUCUN montant, pas même en commentaire. La ligne cantine affichait
+      //     encore, en septembre 2026, une grille tarifaire de quatre ans son
+      //     aînée — datée dans le texte, et personne ne l'avait vue. Les tarifs
+      //     sont votés chaque année par le conseil municipal et calculés sur le
+      //     quotient familial CAF : ils vivent sur le portail parents, pas ici.
+      //     Même règle que la salle communale et la crèche.
+      {id:"ecole",ico:"📚",label:"École de la Forêt",
+        directAnswer:{text:"L'école de la Forêt est l'école primaire publique de la commune, 36 rue du Bourg. La semaine est de 4 jours — lundi, mardi, jeudi et vendredi — de 8h30 à 11h45 et de 13h45 à 16h30 ; il n'y a pas de classe le mercredi. L'accueil des élèves est assuré dix minutes avant la classe, à 8h20 et à 13h35, et le portail ferme à 8h30 et à 13h45. Des activités pédagogiques complémentaires (APC) peuvent s'ajouter pour les élèves de la GS au CM2, les lundis et jeudis sur le temps méridien. Toute absence est à signaler le jour même en précisant le motif, par téléphone, par mail ou dans le cahier de liaison. Aucun médicament n'est administré à l'école, sauf dans le cadre d'un PAI ; seul le traitement contre l'asthme est admis, avec copie de l'ordonnance. Votre premier interlocuteur est l'enseignante de votre enfant ; pour une question administrative, adressez-vous à la direction de l'école.",
           links:[{label:"📞 École : 02 38 45 65 00",tel:"0238456500"},{label:"✉️ ec-mezieres-lez-clery@ac-orleans-tours.fr",url:"mailto:ec-mezieres-lez-clery@ac-orleans-tours.fr"}]}
       },
       {id:"periscolaire",ico:"🌅",label:"Accueil périscolaire",
-        directAnswer:{text:"La commune propose un accueil périscolaire avant et après l'école pour les élèves de l'École de la Forêt. Les inscriptions et fiches de réservation sont à remettre en mairie avant le 30 juin pour l'année suivante.",
-          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
+        directAnswer:{text:"Les services périscolaires — « L'Accueil enchanté », chemin des écoliers — sont gérés par la commune. L'accueil du matin se fait de 7h30 à 8h20 en arrivée échelonnée, celui du soir de 16h30 à 18h30, avec le goûter fourni, les lundi, mardi, jeudi et vendredi. Tout passe par le portail parents : dossier d'inscription unique pour tous les services périscolaires (copie des vaccins, attestation d'assurance mentionnant la responsabilité civile et l'individuelle accident), réservations, annulations, mise à jour des personnes autorisées à venir chercher l'enfant, paiement par carte. Les réservations et annulations du matin et du soir se font au plus tard 3 jours avant ; passé ce délai, l'inscription se fait par mail et un surcoût est facturé. Au-delà de 18h30, un retard est facturé par enfant. Les tarifs sont fixés chaque année par délibération du conseil municipal et calculés sur le quotient familial CAF au 1er août : la grille en vigueur est sur le portail parents.",
+          links:[{label:"🌐 Portail parents",url:"https://parents.logiciel-enfance.fr/mezieres-lez-clery"},{label:"📞 Périscolaire : 09 67 28 01 20",tel:"0967280120"},{label:"✉️ enfance@mezieres-lez-clery.fr",url:"mailto:enfance@mezieres-lez-clery.fr"}]}
+      },
+      {id:"mercredi",ico:"🗓️",label:"Accueil du mercredi",
+        directAnswer:{text:"L'accueil périscolaire du mercredi est ouvert tous les mercredis en période scolaire, de 7h30 à 18h00, en journée entière ou en demi-journée, avec ou sans repas. Les arrivées du matin se font entre 7h30 et 9h00, celles de l'après-midi entre 11h50 et 12h00 avec repas ou entre 13h15 et 13h30 sans repas ; les départs de fin de journée à partir de 16h00. Les réservations et annulations se font sur le portail parents, au plus tard le mardi de la semaine précédente ; passé ce délai, l'inscription se fait par mail et un surcoût est facturé. Le goûter est fourni. Au-delà de 18h00 le mercredi, un retard est facturé par enfant. Les tarifs suivent le quotient familial CAF et sont fixés chaque année par délibération du conseil municipal.",
+          links:[{label:"🌐 Portail parents",url:"https://parents.logiciel-enfance.fr/mezieres-lez-clery"},{label:"📞 Périscolaire : 09 67 28 01 20",tel:"0967280120"},{label:"✉️ enfance@mezieres-lez-clery.fr",url:"mailto:enfance@mezieres-lez-clery.fr"}]}
       },
       {id:"cantine",ico:"🍽️",label:"Restaurant scolaire",
-        directAnswer:{text:"Le restaurant scolaire prépare environ 100 repas par jour à partir de produits frais. Tarifs 2022/2023 : 3,80 € (1er enfant), 3,06 € (2e enfant), 2,32 € (3e enfant et +). Les fiches d'inscription sont à déposer en mairie avant le 30 juin.",
-          links:[{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"},{label:"✉️ mairie@mezieres-lez-clery.fr",url:"mailto:mairie@mezieres-lez-clery.fr"}]}
+        directAnswer:{text:"Le restaurant scolaire est ouvert les lundi, mardi, jeudi et vendredi de 11h45 à 13h30. Les repas — une centaine par jour — sont confectionnés sur place par un cuisinier communal, qui élabore les menus en veillant à l'équilibre nutritionnel et en privilégiant les circuits courts ; prévoyez une serviette de table dans une trousse marquée au nom de l'enfant. Seuls les enfants venus en classe le matin sont admis, et aucun départ ni retour n'est accepté entre 11h45 et 13h30. L'inscription et les réservations se font sur le portail parents, au plus tard le mardi de la semaine précédente ; passé ce délai, l'inscription se fait par mail et un surcoût est facturé. En cas de régime alimentaire médical, un PAI doit être établi et réactualisé chaque rentrée : la commune ne réalise pas de menu spécifique et s'en tient à la neutralité religieuse en matière de repas. Les tarifs suivent le quotient familial CAF au 1er août et sont fixés chaque année par délibération du conseil municipal : la grille en vigueur est sur le portail parents.",
+          links:[{label:"🌐 Portail parents",url:"https://parents.logiciel-enfance.fr/mezieres-lez-clery"},{label:"📞 Périscolaire : 09 67 28 01 20",tel:"0967280120"},{label:"✉️ enfance@mezieres-lez-clery.fr",url:"mailto:enfance@mezieres-lez-clery.fr"}]}
       },
       {id:"creche",ico:"👶",label:"Crèche familiale Les Marmousets",
         // ⚠️ Chiffres tirés du règlement de fonctionnement « parents » 2026-2027
@@ -548,7 +565,7 @@ const _MEL_TREE_FALLBACK = {
           links:[{label:"📞 LAEP : 06 62 65 59 04",tel:"0662655904"},{label:"✉️ laep@ccterresduvaldeloire.fr",url:"mailto:laep@ccterresduvaldeloire.fr"},{label:"🌐 Le LAEP sur le site de la CCTVL",url:"https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/"}]}
       },
       {id:"loisirs",ico:"🎨",label:"Centre de loisirs",
-        directAnswer:{text:"Le centre de loisirs accueille les 3-13 ans pendant toutes les vacances scolaires, basé à Cléry-Saint-André (et ponctuellement à Mézières). 1ère inscription : dossier à retirer en mairie ou à la CCTVL. Réinscription : dossier pré-rempli par email.",
+        directAnswer:{text:"L'accueil de loisirs sans hébergement (ALSH) du Val d'Ardoux, organisé par la Communauté de Communes des Terres du Val de Loire, accueille les 3-13 ans pendant les vacances scolaires — à l'exception des vacances de Noël. Il est basé à Cléry-Saint-André, et ponctuellement à Mézières-lez-Cléry. 1ʳᵉ inscription : dossier à retirer auprès de la CCTVL. Réinscription : dossier pré-rempli par email. Vacances 2026-2027 : automne du 19 octobre au 1er novembre 2026, hiver du 22 février au 7 mars 2027, printemps du 19 avril au 2 mai 2027, été à partir du 5 juillet 2027 — sous réserve du maintien du calendrier scolaire.",
           links:[{label:"✉️ accueilloisirs.ardoux@ccterresduvaldeloire.fr",url:"mailto:accueilloisirs.ardoux@ccterresduvaldeloire.fr"},{label:"🌐 Site CCTVL",url:"https://www.ccterresduvaldeloire.fr/listes/enfance-jeunesse/"}]}
       },
     ]
@@ -654,7 +671,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.5';
+  const V = '3.7.6';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,

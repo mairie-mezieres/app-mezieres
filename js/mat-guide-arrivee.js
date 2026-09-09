@@ -106,9 +106,10 @@ var GUIDE_ETAPES = [
       },
       {
         id:'ecole', ico:'🎒', titre:'Inscrivez vos enfants à l’école',
-        texte:'L’inscription à l’école de la Forêt passe d’abord par la mairie, qui délivre le certificat d’inscription, puis par la direction de l’école. Apportez le livret de famille, un justificatif de domicile et le carnet de santé. En cas de changement d’école, joignez le certificat de radiation.',
+        texte:'L’inscription à l’école de la Forêt — 36 rue du Bourg — passe d’abord par la mairie, qui délivre le certificat d’inscription, puis par la direction de l’école. Apportez le livret de famille, un justificatif de domicile et le carnet de santé. En cas de changement d’école, joignez le certificat de radiation. La semaine est de 4 jours : lundi, mardi, jeudi et vendredi, de 8h30 à 11h45 et de 13h45 à 16h30, avec un accueil dix minutes avant la classe et un portail qui ferme à 8h30 et 13h45.',
         liens:[
-          { label:'02 38 45 61 76', tel:'0238456176' },
+          { label:'Mairie : 02 38 45 61 76', tel:'0238456176' },
+          { label:'École : 02 38 45 65 00', tel:'0238456500' },
           { label:'Demander à MEL', open:'openMel' }
         ]
       },
@@ -119,9 +120,10 @@ var GUIDE_ETAPES = [
         // déjà le garde-fou « ne dis jamais que la commune dispose d'une crèche »
         // (chatbot-mairie-mezieres/lib/mel.js). Ne pas réintroduire.
         id:'periscolaire', ico:'🧒', titre:'Pensez au périscolaire, à la cantine et à la petite enfance',
-        texte:'La commune dispose d’une garderie matin et soir, d’un restaurant scolaire et d’un centre de loisirs ; inscriptions et tarifs auprès de la mairie. La crèche familiale Les Marmousets est à Cléry-Saint-André : Mézières en étant commune partenaire, les familles macériennes peuvent y prétendre. Elle accueille de 10 semaines à l’entrée en maternelle, chez des assistantes maternelles salariées, du lundi au vendredi de 7h30 à 18h30 — inscription en liste d’attente, puis commission d’attribution. La Communauté de Communes ouvre par ailleurs, le 7 septembre 2026, un LAEP itinérant — gratuit et sans inscription, pour les moins de 6 ans accompagnés d’un adulte, et pour les futurs parents. Ce n’est pas un mode de garde et il ne passe pas par Mézières : la commune d’accueil la plus proche est Cléry-Saint-André. Le planning des créneaux n’est pas encore publié.',
+        texte:'La commune gère les services périscolaires sous le nom « L’Accueil enchanté », chemin des écoliers : accueil du matin de 7h30 à 8h20, accueil du soir de 16h30 à 18h30 avec le goûter fourni, restaurant scolaire de 11h45 à 13h30 les lundi, mardi, jeudi et vendredi, et accueil du mercredi de 7h30 à 18h00. Tout passe par le portail parents — un seul dossier pour tous les services, puis les réservations, les annulations et le paiement. Réservez au plus tard 3 jours avant pour le matin et le soir, et le mardi de la semaine précédente pour la cantine et le mercredi : au-delà, un surcoût s’applique. Les tarifs suivent le quotient familial CAF et sont votés chaque année par le conseil municipal. La crèche familiale Les Marmousets est à Cléry-Saint-André : Mézières en étant commune partenaire, les familles macériennes peuvent y prétendre. Elle accueille de 10 semaines à l’entrée en maternelle, chez des assistantes maternelles salariées, du lundi au vendredi de 7h30 à 18h30 — inscription en liste d’attente, puis commission d’attribution. La Communauté de Communes ouvre par ailleurs, le 7 septembre 2026, un LAEP itinérant — gratuit et sans inscription, pour les moins de 6 ans accompagnés d’un adulte, et pour les futurs parents. Ce n’est pas un mode de garde et il ne passe pas par Mézières : la commune d’accueil la plus proche est Cléry-Saint-André. Le planning des créneaux n’est pas encore publié.',
         liens:[
-          { label:'02 38 45 61 76', tel:'0238456176' },
+          { label:'Portail parents', url:'https://parents.logiciel-enfance.fr/mezieres-lez-clery' },
+          { label:'Périscolaire : 09 67 28 01 20', tel:'0967280120' },
           { label:'Crèche Les Marmousets : 02 38 45 76 56', tel:'0238457656' },
           { label:'LAEP : 06 62 65 59 04', tel:'0662655904' },
           { label:'Le LAEP (CCTVL)', url:'https://www.ccterresduvaldeloire.fr/laep-lieu-accueil-enfants-parents/' }

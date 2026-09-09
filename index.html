@@ -80,7 +80,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-photos.js?v=1.3.6"></script>
 <script defer src="js/mat-actus.js?v=4.4.9"></script>
 <script defer src="js/mat-trombi.js?v=4.2.7"></script>
-<script defer src="js/mat-mel.js?v=4.5.2"></script>
+<script defer src="js/mat-mel.js?v=4.5.3"></script>
 <script defer src="js/mat-perf.js?v=1.0.9"></script>
 <script defer src="js/mat-plan-site.js?v=1.2.0"></script>
 <!-- Le jeu du moment : remplit la tuile de l'accueil d'après jeux/jeux.json et
@@ -88,7 +88,7 @@ document.documentElement.style.background = bg;
      Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
      module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
 <script defer src="js/mat-jeu.js?v=2.0.0"></script>
-<script defer src="js/mat-boot.js?v=4.12.7"></script>
+<script defer src="js/mat-boot.js?v=4.12.8"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.107 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.108 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -520,7 +520,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.107</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.108</button>
 </div>
 </div>
 </div>
@@ -1840,6 +1840,16 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 septembre 2026 — v4.108</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>&Eacute;cole et p&eacute;riscolaire &agrave; jour du r&egrave;glement int&eacute;rieur 2026-2027.</strong> MEL conna&icirc;t d&eacute;sormais les horaires de classe (8h30-11h45 et 13h45-16h30, quatre jours), l&rsquo;accueil dix minutes avant la classe, les APC du lundi et du jeudi, la marche &agrave; suivre pour signaler une absence et les r&egrave;gles de vie de l&rsquo;&eacute;cole</li>
+<li><strong>Tout le p&eacute;riscolaire passe par le portail parents</strong>&nbsp;: un seul dossier pour l&rsquo;accueil du matin et du soir, la cantine et le mercredi, puis les r&eacute;servations, les annulations et le paiement. Les d&eacute;lais sont rappel&eacute;s — 3 jours avant pour le matin et le soir, le mardi de la semaine pr&eacute;c&eacute;dente pour la cantine et le mercredi</li>
+<li><strong>Nouvelle fiche &laquo;&nbsp;Accueil du mercredi&nbsp;&raquo;</strong> dans l&rsquo;arbre de MEL (7h30-18h, journ&eacute;e ou demi-journ&eacute;e, avec ou sans repas), et le <strong>calendrier des vacances 2026-2027</strong> r&eacute;pondu directement</li>
+<li><strong>Un tarif de cantine dat&eacute; de 2022 disparait</strong>&nbsp;: les tarifs suivent le quotient familial CAF et sont vot&eacute;s chaque ann&eacute;e — l&rsquo;application renvoie d&eacute;sormais &agrave; la grille en vigueur plut&ocirc;t que d&rsquo;en afficher une p&eacute;rim&eacute;e. Les noms des personnels ne sont plus cit&eacute;s&nbsp;: on s&rsquo;adresse &agrave; une fonction, qui ne change pas d&rsquo;une rentr&eacute;e &agrave; l&rsquo;autre</li>
+<li>Dix nouvelles questions dans &laquo;&nbsp;Le saviez-vous&nbsp;?&nbsp;&raquo; sur l&rsquo;&eacute;cole, la cantine et le p&eacute;riscolaire</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 6 septembre 2026 — v4.107</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Deux nouveaux jeux&nbsp;: <em>Attrape le lapin</em> en octobre</strong> — une minute pour le rattraper dans un pr&eacute; en bordure de vigne, et &agrave; chaque capture il apprend une ruse de plus — <strong>et <em>Le Lancer de tong</em> au mois d&rsquo;ao&ucirc;t</strong>, trois lancers, on garde le meilleur</li>
