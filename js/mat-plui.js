@@ -22,8 +22,8 @@ var PLUI_TIMELINE = [
   { statut:'done',    date:'1er juin 2026',               label:'Formation des élus' },
   { statut:'done',    date:'15 juin 2026',                label:'Mise à jour du diagnostic' },
   { statut:'done',    date:'23 juin → 8 juillet 2026', label:'Permanences avec les communes' },
-  { statut:'current', date:'8 septembre 2026',            label:'COPIL : restitution du PADD modifié' },
-  { statut:'todo',    date:'22 septembre 2026',           label:'Réunion de présentation des modifications' },
+  { statut:'done',    date:'8 septembre 2026',            label:'COPIL : restitution du PADD modifié' },
+  { statut:'current', date:'22 septembre 2026',           label:'Réunion de présentation des modifications' },
   { statut:'todo',    date:'Fin 2028',                    label:'Approbation prévue du PLUi-H-D' }
 ];
 

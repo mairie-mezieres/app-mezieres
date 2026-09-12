@@ -5,6 +5,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.110] — 12 septembre 2026
+
+### Modifié
+- **Frise du PLUi-H-D** : le COPIL de restitution du PADD modifié (8 septembre 2026)
+  passe en `done` ; l'étape en cours devient la **réunion de présentation des
+  modifications** du 22 septembre 2026 (`PLUI_TIMELINE`, `js/mat-plui.js`).
+
+---
+
 ## [4.109] — 12 septembre 2026
 
 ### Ajouté
