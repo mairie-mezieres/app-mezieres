@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.109.0';
+const CACHE = 'mat-v4.110.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -52,7 +52,7 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.5.0',
   './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.5.3',
-  './js/mat-boot.js?v=4.12.8',
+  './js/mat-boot.js?v=4.12.9',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -60,7 +60,7 @@ const PRECACHE_URLS = [
   './js/mat-associations.js?v=4.2.4',
   './js/mat-desktop.js?v=4.3.2',
   './js/mat-eau8.js?v=4.3.0',
-  './js/mat-plui.js?v=1.2.0',
+  './js/mat-plui.js?v=1.2.1',
   './js/mat-plan-site.js?v=1.2.0',
   // ⚠️ `js/mat-carte3d.js` est précaché (29 Ko), mais PAS
   // `vendor/maplibre/maplibre-gl.js` (~1 Mo) : le précacher triplerait le
