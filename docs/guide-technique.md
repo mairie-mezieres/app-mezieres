@@ -590,6 +590,59 @@ donnée ne sort de l'appareil.
 (`mat-jeu-best-<id>`) : le jeu suivant ne doit pas effacer le record du
 précédent. Aucun envoi, aucun classement en ligne.
 
+### Actualités à plusieurs photos — carrousel balayable (v4.109)
+
+Une actualité peut porter jusqu'à **6 images** (`MAX_ACTU_PHOTOS`, `lib/actu.js`).
+
+**Stockage** — `photos: [{url, publicId}]`, **en plus** de `photo` /
+`photoPublicId`, qui continuent de porter la **première** image (la couverture).
+⛔ Ces deux champs ne sont pas un reste historique : la vignette du rendu bureau
+(`js/mat-desktop.js`), la carte « prochaine manifestation », l'image de la
+notification push, la liste de l'admin et les actus venues du **webhook Facebook**
+lisent `photo` et ignorent `photos`. Les actus publiées avant la v4.109 n'ont que
+`photo`. ⛔ **Toute lecture des images d'une actu passe donc par `getActuPhotos`
+(`js/mat-actus.js`) ou `actuPhotoList` (backend `lib/actu.js`)** — l'enjeu n'est
+pas l'affichage mais la **suppression** : un `publicId` oublié reste sur Cloudinary
+sans plus rien pour le retrouver, et la suppression répond quand même `ok: true`.
+
+**Affichage** — `renderActuGallery(actu, {detail})` produit :
+- **1 photo** → exactement le rendu d'avant (`img.actu-img` / `.actu-detail-media`).
+  ⛔ Aucun carrousel, aucune barre, aucun compteur : c'est la régression la plus
+  probable, refusée par `tests/e2e/actu-galerie.spec.js`.
+- **≥ 2 photos** → piste `.actu-gal-strip` en `scroll-snap-type:x mandatory`, images
+  en `flex:0 0 100%`. Le balayage est **natif** : aucun gestionnaire
+  `touchstart`/`touchend` (contrairement au diaporama plein écran de
+  `js/mat-photos.js`, qui occupe tout l'écran et peut se le permettre) — sinon il
+  dispute le geste au défilement vertical de la page et au « retour » du navigateur.
+- La barre ◀ « 2 / 5 » ▶ est **sous** les photos, sur `var(--mist)` **opaque**.
+  ⛔ Jamais en surimpression : le contraste d'un libellé posé sur une photo change
+  avec chaque image, donc il n'est pas mesurable (piège de la neuvième passe de
+  l'audit RGAA). Les boutons font 44 px et portent `aria-label` ; la piste est
+  `tabindex="0"` + `role="group"` (même patron que `.meteo-days-scroll`).
+  ⛔ `color:var(--text)` et non `var(--forest)` sur ces contrôles : le thème sombre
+  redéfinit `--forest` en **fond**.
+- ⚠️ Les deux rendus d'une même actu (carte de liste **et** écran de détail)
+  coexistent dans le DOM : leurs identifiants portent un suffixe (`-l` / `-d`),
+  sans quoi le compteur de l'un piloterait l'autre.
+
+**Facebook** — pour N ≥ 2, chaque photo part en `published=false` sur
+`/{page}/photos`, puis **un** `POST /{page}/feed` porte le message et les
+`attached_media[i]` : un seul post, toutes les images. Un envoi non publié qui
+échoue ne crée **rien de public** — seul le `POST /feed` final reste ambigu en cas
+de timeout. Une photo refusée sur cinq → le post part avec les quatre autres
+(`skippedPhotos`) ; ⚠️ `fallbackUsed` reste **faux** dans ce cas, sinon le
+récapitulatif de l'admin annonce « fallback texte » pour un post qui a des photos.
+
+**Admin** — sélection multiple, vignettes réordonnables (◀ ▶) et retirables, la
+1ʳᵉ étiquetée « Couverture ». ⚠️ Chaque image est **redimensionnée dans le
+navigateur** (1600 px / 0,82, `pubCompress`) avant l'envoi : six photos brutes
+dépassent la limite de 6 Mo du backend, et **un 413 se lit comme une panne
+réseau**. `/admin/actus/schedule` a d'ailleurs été ajouté à `_isLargeBodyRoute`
+(`app.js`) — il en était absent, donc une programmation avec photo était refusée
+dès 256 Ko.
+
+Voir `docs/adr/0039-plusieurs-photos-une-couverture-et-un-balayage.md`.
+
 ### Documents officiels — pastille « Nouveau » et cache local
 
 L'écran 📁 **Documents officiels** (`ov-docs`, code dans `js/mat-core.js`) agrège deux

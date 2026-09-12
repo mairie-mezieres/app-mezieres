@@ -77,11 +77,22 @@ Alors les boutons de réaction (like/partage) ne sont pas proposés.
 - **RG-01.9** — Les réactions (like/partage) sont proposées uniquement si le réglage
   `reactionsEnabled` est actif (cf. [SFD-14](SFD-14-administration-backoffice.md)).
 - **RG-01.10** — Un like est **dédupliqué par `deviceId`** (cf. RG-T-6).
+- **RG-01.11** — Une actualité peut porter **jusqu'à 6 photos** (`photos[]`). Au-delà d'une seule,
+  elles se parcourent par **balayage horizontal** (`scroll-snap`), avec un compteur « n / N » et
+  deux boutons de 44 px sous l'image — seul accès au clavier et à la souris. ⛔ Une actualité à
+  **une** photo s'affiche sans carrousel. La barre de contrôle est sur fond **opaque**, jamais en
+  surimpression (le contraste d'un libellé posé sur une photo n'est pas mesurable).
+- **RG-01.12** — La **première** photo est la **couverture** : elle reste dans le champ `photo`, lu
+  par la liste, la notification push, la vue bureau et la carte « prochaine manifestation ». ⛔ Les
+  actualités d'avant la v4.109 et celles venues du webhook Facebook n'ont **que** ce champ : toute
+  lecture des images passe par `getActuPhotos` / `actuPhotoList`. Cf.
+  [ADR-0039](../../adr/0039-plusieurs-photos-une-couverture-et-un-balayage.md).
 
 ## 6. Données manipulées
 
 - **Actualité (Redis `mat:actus`)** : `id`, `title`, `description`, `date`, `dateISO`, `photo` (URL
-  Cloudinary), `photoPublicId`, `source` (`facebook` | `admin`), `likes`, `eventDate`, `eventLocation`.
+  Cloudinary de la **couverture**), `photoPublicId`, `photos[]` (`{url, publicId}`, ordre
+  d'affichage — absent des actualités d'avant la v4.109), `source` (`facebook` | `admin`), `likes`, `eventDate`, `eventLocation`.
 - **Likes** : set Redis `mat:likes:actu:{id}` (membres = `deviceId`).
 - **Local** : `mat_actus_seen_v1` (signatures vues), `mat_actus_notif_v1` (stats notification).
 

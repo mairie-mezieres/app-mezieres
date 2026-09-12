@@ -26,6 +26,81 @@ function getActuId(a){
   return a && a.id != null ? String(a.id) : '';
 }
 
+// ── Photos d'une actualité ──────────────────────────────────────────
+// ⚠️ DEUX formes de stockage coexistent pour toujours : les actus publiées avant
+// la v4.109 (et celles qui arrivent du webhook Facebook) n'ont qu'un champ
+// `photo` ; les suivantes ont `photos: [{url, publicId}]`, dont la première est
+// la couverture (c'est `photo`). Passer par cette fonction partout, sinon la
+// moitié du parc n'affiche plus rien — sans erreur, juste une carte sans image.
+function getActuPhotos(a){
+  if(!a) return [];
+  if(Array.isArray(a.photos) && a.photos.length){
+    const urls=a.photos.filter(p=>p&&p.url).map(p=>p.url);
+    if(urls.length) return urls;
+  }
+  return a.photo ? [a.photo] : [];
+}
+
+// Identifiant DOM d'un carrousel. Deux rendus coexistent pour la même actu (la
+// carte de la liste et l'écran de détail) : sans suffixe, les deux partageraient
+// le même id et le compteur de l'un piloterait l'autre.
+function _actuGalId(a, suffixe){
+  return 'agal-'+String(getActuId(a)||'x').replace(/[^A-Za-z0-9_-]/g,'_')+'-'+suffixe;
+}
+
+// Le balayage horizontal est natif (scroll-snap) : aucun gestionnaire de touch à
+// écrire, donc aucun conflit avec le défilement vertical de la page ni avec le
+// geste « retour » du navigateur. Les deux boutons ne sont pas un doublon du
+// balayage : ils sont le SEUL accès au clavier et à la souris.
+function renderActuGallery(a, opts){
+  const photos=getActuPhotos(a);
+  if(!photos.length) return '';
+  const detail=!!(opts&&opts.detail);
+  const largeur=detail?1000:700;
+  const secours="this.onerror=null;this.src='img/mat-header.webp'";
+  if(photos.length===1){
+    return detail
+      ? `<div class="actu-detail-media"><img class="actu-detail-img" src="${esc(matCloudImg(photos[0],largeur))}" alt="" onerror="${secours}"></div>`
+      : `<img class="actu-img" src="${esc(matCloudImg(photos[0],largeur))}" alt="" loading="lazy" onerror="${secours}">`;
+  }
+  const gid=_actuGalId(a, detail?'d':'l');
+  const slides=photos.map((u,i)=>
+    `<img class="actu-gal-img" src="${esc(matCloudImg(u,largeur))}" alt="Photo ${i+1} sur ${photos.length}" loading="${(i===0&&detail)?'eager':'lazy'}" onerror="${secours}">`
+  ).join('');
+  return `<div class="actu-gal${detail?' actu-gal-detail':''}">`
+    + `<div class="actu-gal-strip" id="${gid}" tabindex="0" role="group"`
+    + ` aria-label="Galerie de ${photos.length} photos — balayez horizontalement ou utilisez les flèches"`
+    + ` onscroll="actuGalSync('${gid}')">${slides}</div>`
+    + `<div class="actu-gal-bar">`
+    + `<button type="button" class="actu-gal-nav" aria-label="Photo précédente" onclick="actuGalStep('${gid}',-1)">◀</button>`
+    + `<span class="actu-gal-count" id="${gid}-count" aria-live="polite">1 / ${photos.length}</span>`
+    + `<button type="button" class="actu-gal-nav" aria-label="Photo suivante" onclick="actuGalStep('${gid}',1)">▶</button>`
+    + `</div></div>`;
+}
+
+// Défilement d'une « page » = la largeur visible, qui est exactement celle d'une
+// photo (flex:0 0 100%). Mesurer clientWidth plutôt que l'écrire en dur : la
+// carte ne fait pas la même largeur sur téléphone et dans le détail.
+function actuGalStep(id, dir){
+  const strip=document.getElementById(id);
+  if(!strip) return;
+  strip.scrollBy({left: dir*Math.max(1, strip.clientWidth), behavior:'smooth'});
+}
+
+// Compteur « 2 / 5 ». Mis à jour seulement quand l'index change : aria-live
+// annoncerait sinon chaque pixel de défilement.
+function actuGalSync(id){
+  const strip=document.getElementById(id);
+  if(!strip) return;
+  const n=strip.children.length||1;
+  const idx=Math.min(n-1, Math.max(0, Math.round(strip.scrollLeft/Math.max(1, strip.clientWidth))));
+  const out=document.getElementById(id+'-count');
+  if(out && out.dataset.idx!==String(idx)){
+    out.dataset.idx=String(idx);
+    out.textContent=(idx+1)+' / '+n;
+  }
+}
+
 function getActuPlainDescription(a){
   if(a && a.description && String(a.description).trim()) return String(a.description).trim();
   const fullText=((a && (a.text||a.title))||'').replace(/#(?:MAT(?![a-zA-ZÀ-ÿ0-9_])|app-mezieres)/gi,'').trim();
@@ -192,7 +267,7 @@ function formatEventDate(iso){
 function renderActuListItem(a){
   const id=getActuId(a);
   const jsId=JSON.stringify(id).replace(/"/g,'&quot;');
-  const imgHTML=a.photo?`<img class="actu-img" src="${esc(matCloudImg(a.photo,700))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='img/mat-header.webp'">`:''
+  const imgHTML=renderActuGallery(a);
   const titre=esc(getActuDisplayTitle(a));
   const preview=esc(getActuPreviewDescription(a, 190));
   const descriptionHTML=preview?`<div class="actu-text">${preview}</div>`:'';
@@ -250,7 +325,7 @@ function renderActuDetail(actu){
   const title=esc(getActuDisplayTitle(actu));
   const desc=getActuPlainDescription(actu);
   const descHTML=desc?`<div class="actu-detail-text">${esc(desc).replace(/\n/g,'<br>')}</div>`:'';
-  const imgHTML=actu.photo?`<div class="actu-detail-media"><img class="actu-detail-img" src="${esc(matCloudImg(actu.photo,1000))}" alt="" onerror="this.onerror=null;this.src='img/mat-header.webp'"></div>`:'';
+  const imgHTML=renderActuGallery(actu,{detail:true});
   const sourceLabel=actu.source==='facebook'?'Publication Facebook':'Publication mairie';
   const eventHTML = actu.eventDate ? `<div class="actu-event">📅 ${esc(formatEventDate(actu.eventDate))}${actu.eventLocation?' · 📍 '+esc(actu.eventLocation):''}</div>` : '';
   const id = getActuId(actu);

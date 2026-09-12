@@ -124,6 +124,18 @@ tr:hover td{background:#f9fafb;}
 .pub-image-zone.has-image{padding:0;border-style:solid;border-color:var(--sage);}
 .pub-image-preview{max-width:100%;max-height:250px;display:block;border-radius:8px;margin:0 auto;}
 .pub-image-remove{margin-top:8px;background:#fee2e2;color:var(--red);border:none;border-radius:8px;padding:6px 12px;font-weight:800;font-size:0.72rem;cursor:pointer;}
+/* Vignettes des photos d'une actualité : l'ordre affiché EST l'ordre publié,
+   et la première porte l'étiquette « Couverture » — sans elle, rien ne dit
+   laquelle sera reprise par la notification et la vue ordinateur. */
+.pub-image-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.pub-thumb{width:108px;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;background:var(--warm,#f4f0ea);}
+.pub-thumb.is-cover{border-color:var(--sage);box-shadow:0 0 0 2px rgba(82,183,136,.25);}
+.pub-thumb img{display:block;width:100%;height:74px;object-fit:cover;}
+.pub-thumb-bar{display:flex;align-items:center;gap:2px;padding:3px;font-size:0.62rem;font-weight:800;color:var(--muted);}
+.pub-thumb-bar span{flex:1;text-align:center;overflow:hidden;white-space:nowrap;}
+.pub-thumb-bar button{min-width:26px;min-height:26px;border:1px solid var(--border);border-radius:6px;background:white;color:var(--text);font-size:0.68rem;font-weight:900;cursor:pointer;}
+.pub-thumb-bar button[disabled]{opacity:.35;cursor:default;}
+.pub-thumb-bar .pub-thumb-del{background:#fee2e2;color:var(--red);border-color:#fecaca;}
 .pub-options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;}
 .pub-checkbox-row{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--warm);border-radius:10px;cursor:pointer;user-select:none;}
 .pub-checkbox-row input{width:18px;height:18px;cursor:pointer;flex-shrink:0;}
@@ -1504,13 +1516,15 @@ function renderActus() {
         <div class="pub-char-count" id="pub-desc-count">0 / 3000</div>
       </div>
       <div class="pub-row">
-        <label class="pub-label">Photo (facultatif)</label>
+        <label class="pub-label">Photos (facultatif — jusqu'à 6)</label>
         <div class="pub-image-zone" id="pub-image-zone" onclick="document.getElementById('pub-image-input').click()">
-          <div id="pub-image-empty"><div style="font-size:2rem;margin-bottom:4px">📷</div><div style="font-weight:800;color:var(--muted)">Cliquer pour choisir une image</div><div class="pub-hint">JPG, PNG — max 5 Mo</div></div>
+          <div id="pub-image-empty"><div style="font-size:2rem;margin-bottom:4px">📷</div><div style="font-weight:800;color:var(--muted)">Cliquer pour choisir une ou plusieurs images</div><div class="pub-hint">JPG, PNG, WEBP — 6 maximum, redimensionnées avant envoi</div></div>
           <img id="pub-image-preview" class="pub-image-preview" style="display:none">
         </div>
-        <input type="file" id="pub-image-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="pubHandleImage(event)">
-        <button type="button" id="pub-image-remove-btn" class="pub-image-remove" style="display:none" onclick="pubRemoveImage()">🗑️ Retirer l'image</button>
+        <input type="file" id="pub-image-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none" onchange="pubHandleImage(event)">
+        <div id="pub-image-list" class="pub-image-list"></div>
+        <div class="pub-hint" id="pub-image-hint" style="display:none">La <strong>1ʳᵉ photo</strong> est la couverture : c'est elle qui apparaît dans la liste des actualités, sur la notification et dans la vue ordinateur. Utilisez ◀ ▶ pour changer l'ordre.</div>
+        <button type="button" id="pub-image-remove-btn" class="pub-image-remove" style="display:none" onclick="pubRemoveImage()">🗑️ Retirer toutes les images</button>
       </div>
       <div class="pub-row">
         <label class="pub-label">Date de l'événement (facultatif)</label>
@@ -1580,7 +1594,7 @@ function renderActus() {
           </td>
           <td style="max-width:220px;font-size:0.72rem;color:var(--muted)">${a.description?(safe(a.description.substring(0,100))+(a.description.length>100?'…':'')):' —'}</td>
           <td style="font-size:0.72rem">${safe(a.date||'')}${a.eventDate?'<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>':''}</td>
-          <td>${a.photo?'<span class="badge badge-green">✓</span>':'<span class="badge">—</span>'}</td>
+          <td>${a.photo?('<span class="badge badge-green">'+((a.photos&&a.photos.length>1)?('🖼️ '+a.photos.length):'✓')+'</span>'):'<span class="badge">—</span>'}</td>
           <td>${a.source==='admin'
             ?'<span class="badge badge-blue">Admin</span>'+(a.fb&&a.fb.postId
               ?' <a href="https://www.facebook.com/'+encodeURIComponent(a.fb.postId)+'" target="_blank" rel="noopener" class="badge badge-green" style="text-decoration:none" title="'+(a.fb.fallback?'Publiée sur Facebook en texte seul (photo refusée)':'Publiée sur Facebook')+' — voir le post">📘</a>'
@@ -1647,7 +1661,7 @@ async function renderScheduledActus(){
         <span style="font-size:1.1rem">${failed?'⚠️':'🕒'}</span>
         <div style="flex:1;min-width:0">
           <div style="font-weight:800">${safe(s.title||'—')}</div>
-          <div style="color:var(--muted)">${failed?('Échec : '+safe(s.failedReason||'inconnu')):('Diffusion le '+when)} · ${chans}${s.photoUrl?' · 🖼️':''}</div>
+          <div style="color:var(--muted)">${failed?('Échec : '+safe(s.failedReason||'inconnu')):('Diffusion le '+when)} · ${chans}${s.photoUrl?(' · 🖼️'+((s.photos&&s.photos.length>1)?(' ×'+s.photos.length):'')):''}</div>
         </div>
         <button onclick="cancelScheduledActu(${s.id})" class="del-btn" title="Annuler">🗑️</button>
       </div>`;
@@ -1689,27 +1703,126 @@ function pubUpdate() {
   } else { prev.style.display='none'; }
 }
 
-function pubHandleImage(e) {
-  const file=e.target.files[0]; if(!file)return;
-  if(file.size>5*1024*1024){alert("Image trop lourde (max 5 Mo)");return;}
-  const reader=new FileReader();
-  reader.onload=()=>{
-    _pubImageBase64=reader.result;
-    document.getElementById('pub-image-preview').src=reader.result;
-    document.getElementById('pub-image-preview').style.display='block';
-    document.getElementById('pub-image-empty').style.display='none';
-    document.getElementById('pub-image-zone').classList.add('has-image');
-    document.getElementById('pub-image-remove-btn').style.display='inline-block';
-  };
-  reader.readAsDataURL(file);
+// ── Photos d'une actualité (jusqu'à PUB_MAX_IMAGES) ─────────────
+// _pubImages[0] est la COUVERTURE : le backend la recopie dans `photo`, et tout
+// ce qui n'affiche qu'une vignette (liste des actus, notification push, vue
+// ordinateur, carte « prochaine manifestation ») lit ce champ-là.
+const PUB_MAX_IMAGES = 6;
+let _pubImages = [];
+
+// Redimensionnement AVANT envoi. ⚠️ Sans lui, six photos de smartphone feraient
+// un corps de requête de plusieurs dizaines de Mo, refusé par le backend
+// (limite 6 Mo) — et un 413 se lit comme une panne réseau, pas comme « vos
+// photos sont trop lourdes ». Copie volontairement locale de `compressImage`
+// (js/mat-utils.js) : l'admin ne charge pas les scripts de l'app.
+function pubCompress(dataUrl, maxSize, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = function() {
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    // Une image illisible ne doit pas bloquer les autres : on garde l'original,
+    // le backend refusera proprement s'il le faut.
+    img.onerror = function() { resolve(dataUrl); };
+    img.src = dataUrl;
+  });
 }
+
+function _pubReadFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Lecture impossible : ' + file.name));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function pubHandleImage(e) {
+  const files = Array.from((e.target && e.target.files) || []);
+  if (!files.length) return;
+  const libres = PUB_MAX_IMAGES - _pubImages.length;
+  if (libres <= 0) { alert('Maximum ' + PUB_MAX_IMAGES + ' photos par actualité.'); e.target.value = ''; return; }
+  const aTraiter = files.slice(0, libres);
+  if (files.length > libres) alert('Seules les ' + libres + ' premières photos ont été ajoutées (maximum ' + PUB_MAX_IMAGES + ').');
+
+  const hint = document.getElementById('pub-image-hint');
+  for (const file of aTraiter) {
+    if (file.size > 15 * 1024 * 1024) { alert('« ' + file.name + ' » est trop lourde (max 15 Mo).'); continue; }
+    try {
+      const brut = await _pubReadFile(file);
+      const compresse = await pubCompress(brut, 1600, 0.82);
+      _pubImages.push({ b64: compresse, name: file.name });
+    } catch (err) { alert(err.message); }
+  }
+  e.target.value = '';   // permet de re-choisir le même fichier après retrait
+  _pubImageBase64 = _pubImages.length ? _pubImages[0].b64 : null;
+  if (hint) hint.style.display = _pubImages.length > 1 ? 'block' : 'none';
+  pubRenderImages();
+}
+
+function pubRenderImages() {
+  const list = document.getElementById('pub-image-list');
+  const preview = document.getElementById('pub-image-preview');
+  const empty = document.getElementById('pub-image-empty');
+  const zone = document.getElementById('pub-image-zone');
+  const removeBtn = document.getElementById('pub-image-remove-btn');
+  const hint = document.getElementById('pub-image-hint');
+
+  if (!_pubImages.length) {
+    if (list) list.innerHTML = '';
+    if (preview) preview.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    if (zone) zone.classList.remove('has-image');
+    if (removeBtn) removeBtn.style.display = 'none';
+    if (hint) hint.style.display = 'none';
+    return;
+  }
+  if (preview) { preview.src = _pubImages[0].b64; preview.style.display = 'block'; }
+  if (empty) empty.style.display = 'none';
+  if (zone) zone.classList.add('has-image');
+  if (removeBtn) { removeBtn.style.display = 'inline-block'; removeBtn.textContent = _pubImages.length > 1 ? '🗑️ Retirer toutes les images' : "🗑️ Retirer l'image"; }
+  if (hint) hint.style.display = _pubImages.length > 1 ? 'block' : 'none';
+  if (!list) return;
+  list.innerHTML = _pubImages.map((im, i) => `
+    <div class="pub-thumb${i === 0 ? ' is-cover' : ''}">
+      <img src="${im.b64}" alt="Photo ${i + 1} : ${safe(im.name || '')}">
+      <div class="pub-thumb-bar">
+        <button type="button" onclick="pubMoveImage(${i},-1)" aria-label="Déplacer la photo ${i + 1} vers la gauche"${i === 0 ? ' disabled' : ''}>◀</button>
+        <span>${i === 0 ? 'Couverture' : i + 1}</span>
+        <button type="button" onclick="pubMoveImage(${i},1)" aria-label="Déplacer la photo ${i + 1} vers la droite"${i === _pubImages.length - 1 ? ' disabled' : ''}>▶</button>
+        <button type="button" class="pub-thumb-del" onclick="pubDropImage(${i})" aria-label="Retirer la photo ${i + 1}">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function pubMoveImage(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= _pubImages.length) return;
+  const tmp = _pubImages[i]; _pubImages[i] = _pubImages[j]; _pubImages[j] = tmp;
+  _pubImageBase64 = _pubImages[0].b64;
+  pubRenderImages();
+}
+
+function pubDropImage(i) {
+  _pubImages.splice(i, 1);
+  _pubImageBase64 = _pubImages.length ? _pubImages[0].b64 : null;
+  const input = document.getElementById('pub-image-input'); if (input) input.value = '';
+  pubRenderImages();
+}
+
 function pubRemoveImage() {
-  _pubImageBase64=null;
+  _pubImages = [];
+  _pubImageBase64 = null;
   const input=document.getElementById('pub-image-input'); if(input)input.value='';
-  document.getElementById('pub-image-preview').style.display='none';
-  document.getElementById('pub-image-empty').style.display='block';
-  document.getElementById('pub-image-zone').classList.remove('has-image');
-  document.getElementById('pub-image-remove-btn').style.display='none';
+  pubRenderImages();
 }
 
 async function pubCheckDuplicates() {
@@ -1753,7 +1866,10 @@ async function pubSubmit() {
 
   try {
     const endpoint = pubMode==='schedule' ? '/admin/actus/schedule' : '/admin/actus/add';
-    const payload = {title, description, imageBase64:_pubImageBase64, eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar};
+    // imagesBase64 = toutes les photos dans l'ordre choisi ; imageBase64 reste
+    // envoyé (la couverture) pour qu'un backend non encore déployé continue de
+    // publier une image plutôt que rien.
+    const payload = {title, description, imageBase64:_pubImageBase64, imagesBase64:_pubImages.map(im=>im.b64), eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar};
     if(pubMode==='schedule') payload.scheduledAt = new Date(scheduleAt).toISOString();
     const r=await fetch(`${API}${endpoint}`,{
       method:'POST', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
@@ -1790,8 +1906,11 @@ async function pubSubmit() {
 
     if(publishFacebook){
       if(d.facebook?.ok){
-        const mode=d.facebook.mode==='photo'?'avec photo':'texte seul';
-        const fb=d.facebook.fallbackUsed?' <em>(photo non envoyée, fallback texte)</em>':'';
+        // mode 'photos' = un seul post portant plusieurs images (attached_media).
+        const mode=d.facebook.mode==='photos'?`avec ${d.facebook.photo_count||0} photos`
+                  :d.facebook.mode==='photo'?'avec photo':'texte seul';
+        const fb=d.facebook.fallbackUsed?' <em>(photo non envoyée, fallback texte)</em>'
+                :(d.facebook.skippedPhotos?` <em>(${d.facebook.skippedPhotos} photo(s) refusée(s) par Facebook)</em>`:'');
         const lien=d.facebook.post_id?` — <a href="https://www.facebook.com/${encodeURIComponent(d.facebook.post_id)}" target="_blank" rel="noopener">voir le post ↗</a>`:'';
         lines.push(`📘 Facebook — ${mode}${fb}${lien}`);
       } else if(d.facebook){

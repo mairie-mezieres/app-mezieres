@@ -438,6 +438,32 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-detail-card{background:white;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow);}
 .actu-detail-media{margin:-14px -14px 12px;}
 .actu-detail-img{display:block;width:100%;max-height:320px;object-fit:contain;border-radius:18px 18px 0 0;background:var(--mist);}
+/* ── Carrousel de photos d'une actualité (≥ 2 images) ───────────────────
+   Le balayage est NATIF : `scroll-snap-type:x mandatory` + des images en
+   `flex:0 0 100%`. Aucun gestionnaire `touchstart/touchend` — donc aucun
+   risque de voler le défilement vertical de la page ou le geste « retour »,
+   et le conteneur reste défilable au clavier (d'où `tabindex="0"` et l'anneau
+   de focus ci-dessous, même règle que `.meteo-days-scroll`).
+   ⛔ `object-fit:contain`, pas `cover` : une photo de groupe en portrait se
+   ferait rogner la tête. La hauteur est fixe parce que le snap exige des
+   pages de même largeur, et les bandes latérales prennent la couleur du fond.
+   ⛔ La barre de contrôle est SOUS les photos, sur un fond opaque
+   (`var(--mist)`), et pas en surimpression : un voile clair sur une photo
+   sombre — ou l'inverse — rend le contraste du libellé indécidable, et c'est
+   exactement le piège documenté dans l'audit RGAA (§ neuvième passe). */
+.actu-gal{background:var(--mist);}
+.actu-gal-detail{margin:-14px -14px 12px;border-radius:18px 18px 0 0;overflow:hidden;}
+.actu-gal-strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.actu-gal-strip::-webkit-scrollbar{display:none;}
+.actu-gal-strip:focus-visible{outline:2px solid var(--leaf);outline-offset:-2px;}
+.actu-gal-img{flex:0 0 100%;width:100%;height:220px;object-fit:contain;scroll-snap-align:center;display:block;background:var(--mist);}
+.actu-gal-detail .actu-gal-img{height:280px;}
+.actu-gal-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:6px;background:var(--mist);}
+/* ⛔ `color:var(--text)` et non `var(--forest)` : le thème sombre redéfinit
+   --forest en FOND (#111827), ce qui donnerait du noir sur noir. */
+.actu-gal-nav{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--border-champ);border-radius:11px;background:var(--warm);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:900;line-height:1;cursor:pointer;}
+.actu-gal-nav:active{transform:scale(.96);}
+.actu-gal-count{font-size:0.74rem;font-weight:900;color:var(--text);min-width:52px;text-align:center;}
 .event-detail-img{display:block;width:calc(100% + 28px);margin:-14px -14px 12px;max-height:260px;object-fit:contain;border-radius:16px 16px 0 0;background:var(--mist);}
 .actu-detail-meta{font-size:0.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
 .actu-detail-title{font-size:1.05rem;line-height:1.3;color:var(--forest);margin-bottom:8px;}
