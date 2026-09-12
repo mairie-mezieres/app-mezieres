@@ -72,10 +72,17 @@ Et une structure invalide est rejetée avec un message.
   ne sont pas comptées). **Pas de rôles** : tout admin a un accès complet.
 
 ### Publication d'actualité multi-canal
-- **RG-14.4** — Titre **≤ 150** caractères, description **≤ 3 000** ; image **≤ 6 Mo** (Cloudinary).
+- **RG-14.4** — Titre **≤ 150** caractères, description **≤ 3 000** ; **jusqu'à 6 images**,
+  redimensionnées dans le navigateur avant envoi (1600 px), corps de requête **≤ 6 Mo**.
+  ⛔ La **première** image est la **couverture** : elle est recopiée dans `photo` et c'est la seule
+  que montrent la liste des actualités, la notification push et la vue bureau.
 - **RG-14.5** — Enchaînement : **Cloudinary → Facebook → Redis → push → Google Agenda**. Si la
-  publication Facebook échoue, l'image Cloudinary est **nettoyée** (rollback) et une erreur 502 est
-  retournée (atomicité).
+  publication Facebook échoue, **toutes** les images fraîchement envoyées à Cloudinary sont
+  **nettoyées** (rollback) et une erreur 502 est retournée (atomicité).
+- **RG-14.5 bis** — Post Facebook à **plusieurs** images : envois en `published=false` puis **un
+  seul** `POST /feed` avec `attached_media`. Une image refusée n'empêche pas les autres de partir
+  (`skippedPhotos`) ; si **aucune** n'est acceptée, repli texte. Cf.
+  [ADR-0039](../../adr/0039-plusieurs-photos-une-couverture-et-un-balayage.md).
 - **RG-14.6** — Création/mise à jour d'événement agenda en **upsert** : un événement de **titre
   proche (> 60 % de similarité)** le même jour est **remplacé** plutôt que dupliqué.
 - **RG-14.7** — Publication Facebook **sans** le hashtag `#MAT` (évite la boucle d'import du webhook,

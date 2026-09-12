@@ -144,6 +144,12 @@ Ces animations sont purement décoratives : si votre téléphone est réglé sur
 La rubrique **Actualités** affiche les dernières nouvelles publiées par la mairie sur sa page Facebook (marquées `#MAT`). Les articles sont classés du plus récent au plus ancien.
 
 - Appuyez sur un article pour lire le texte complet et voir la photo associée.
+- **Plusieurs photos** : une actualité peut en porter jusqu'à six. Elles se
+  parcourent en **balayant horizontalement** l'image, du doigt. Un compteur
+  (« 2 / 5 ») indique où vous en êtes, et deux boutons ◀ ▶ juste en dessous
+  permettent de naviguer à la souris, au clavier, ou si le balayage vous est
+  difficile. La première photo est celle qui apparaît dans la liste et sur la
+  notification.
 - Les actualités sont mises à jour automatiquement dès qu'une publication est faite sur la page Facebook de la mairie.
 - Les 30 dernières actualités sont conservées.
 

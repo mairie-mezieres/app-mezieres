@@ -51,7 +51,9 @@
 - **`POST /admin/purge`** : `{ type (requis), beforeDate (requis) }`.
   - **Types** : `actus`, `signals`, `stats_parjour`, `ia_stats_daily`, `ia_categories_parjour`,
     `mel_questions`, `all_before`.
-  - `actus` / `all_before` suppriment aussi les **images Cloudinary** (via `photoPublicId`) ;
+  - `actus` / `all_before` suppriment aussi les **images Cloudinary** — ⛔ **toutes** celles de
+    l'actu (`actuPhotoList`, qui couvre `photos[]` **et** le `photoPublicId` des actus
+    d'avant la v4.109), pas seulement la couverture ;
     `mel_questions` purge `mat:mel:questions:<date>` sur une fenêtre de **90 jours** avant la date limite.
   - **Irréversible** (pas de corbeille). 400 `type et beforeDate requis` / `type inconnu`,
     500 `<e.message>` ; succès `{ ok:true, deleted:<n>, cloudinary?:[…] }`.

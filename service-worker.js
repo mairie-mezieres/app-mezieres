@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.108.0';
+const CACHE = 'mat-v4.109.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -26,7 +26,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.20',
+  './css/mat.css?v=4.14.21',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.1'
@@ -37,7 +37,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.20',
+  './css/mat.css?v=4.14.21',
   './css/mat-desktop.css?v=4.5.5',
   './css/fonts.css?v=1',
   './js/mat-config.js?v=1',
@@ -49,7 +49,7 @@ const PRECACHE_URLS = [
   './js/mat-agenda.js?v=4.3.5',
   './js/mat-forms.js?v=4.6.9',
   './js/mat-photos.js?v=1.3.6',
-  './js/mat-actus.js?v=4.4.9',
+  './js/mat-actus.js?v=4.5.0',
   './js/mat-trombi.js?v=4.2.7',
   './js/mat-mel.js?v=4.5.3',
   './js/mat-boot.js?v=4.12.8',

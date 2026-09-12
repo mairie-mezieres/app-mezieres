@@ -5,6 +5,42 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.109] — 12 septembre 2026
+
+### Ajouté
+- **Plusieurs photos par actualité (jusqu'à 6).** L'admin accepte une sélection
+  multiple, réordonnable (◀ ▶) et retirable vignette par vignette ; la première est la
+  **couverture**. Côté habitant, les photos se parcourent par **balayage horizontal**
+  (`scroll-snap`) sur la carte comme dans l'article, avec un compteur « 2 / 5 » et deux
+  boutons de 44 px — seul accès au clavier et à la souris. Une photo unique produit
+  exactement le rendu d'avant : aucun carrousel.
+- **Publication Facebook multi-images** : les photos partent en `published=false` puis
+  un seul `POST /feed` les attache (`attached_media`) — un post, toutes les images. Une
+  photo refusée n'empêche plus les autres de partir (`skippedPhotos`).
+
+### Corrigé
+- **`/admin/actus/schedule` refusait toute photo de plus de 256 Ko** depuis sa création :
+  la route était absente de `_isLargeBodyRoute` (`app.js`), et le 413 obtenu se lit comme
+  une panne réseau. Les images d'une publication programmée sont pourtant hébergées *à la
+  programmation*, pas à l'heure dite.
+- **La suppression d'une actu ne libérait que sa couverture sur Cloudinary.** Les trois
+  chemins de suppression (actu, purge, annulation d'une programmation) passent désormais
+  par `actuPhotoList`, qui couvre les deux formes de stockage — sans quoi cinq images sur
+  six restaient hébergées sans plus rien pour les retrouver, sous un `ok: true`.
+
+### Technique
+- `photos: [{url, publicId}]` **s'ajoute** à `photo` / `photoPublicId`, qui continuent de
+  porter la couverture : cinq affichages (vignette bureau, prochaine manifestation, image
+  de la notification push, liste admin, actus du webhook Facebook) lisent `photo` et
+  l'ignorent. Chaque image est redimensionnée dans le navigateur (1600 px / 0,82) avant
+  l'envoi.
+- Nouveaux verrous : `test/actu-photos.test.js` (backend) et
+  `tests/e2e/actu-galerie.spec.js` (app — deux formes de stockage, style calculé du
+  scroll-snap, largeur réelle d'une diapositive, bornes, cibles ≥ 44 px).
+- ADR-0039 — « Plusieurs photos : une couverture, un balayage, un seul post Facebook ».
+
+---
+
 ## [4.108] — 9 septembre 2026
 
 ### Ajouté
