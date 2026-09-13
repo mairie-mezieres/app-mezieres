@@ -72,7 +72,9 @@ app-mezieres/
 │   ├── mat.css             Styles principaux (mobile + thèmes)
 │   ├── mat-desktop.css     Styles layout desktop (≥ 1024 px)
 │   ├── mat-jeu.css         Lanceur /jeu et archives (le jeu, lui, est autonome)
-│   └── fonts.css           Polices auto-hébergées (Nunito)
+│   └── fonts.css           Polices auto-hébergées — Nunito est VARIABLE :
+│                           une seule déclaration par sous-ensemble, en
+│                           `font-weight: 200 1000` (voir ADR-0040)
 │
 ├── js/
 │   ├── mat-boot.js         Bootstrap : détection device, thème, onboarding

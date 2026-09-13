@@ -1,24 +1,34 @@
 # État des lieux — MAT (Mézières Avec Toi)
 
-**Date du relevé :** 21 août 2026
+**Date du relevé :** 21 août 2026 — **entièrement recompté le 13 septembre 2026**
 **Périmètre :** dépôts `mairie-mezieres/app-mezieres` (application) et
 `mairie-mezieres/chatbot-mairie-mezieres` (backend), branches `origin/main`.
 **Méthode :** lecture directe du code, de la documentation versionnée et de
 l'historique git. Aucune donnée d'usage n'est accessible depuis le code
 (voir §6).
 
-**Version en production au moment du relevé :** v4.80 (cache service worker
-`mat-v4.80.0`), backend `6.9.0`.
+**Version en production :** v4.111 (cache service worker `mat-v4.111.0`),
+backend `6.9.0`.
 
 > Note de lecture : ce document ne contient que des éléments vérifiables dans
 > les dépôts. Chaque incertitude est signalée explicitement.
 
-> ⚠️ **Une section a été mise à jour après le relevé : §3, conformité
-> réglementaire.** Le 21 août, l'application était déclarée *non conforme* faute
-> d'audit. L'**audit RGAA complet a été mené le 27 août 2026** : le taux est
-> désormais de **86,2 %**, mention *partiellement conforme*. La date du relevé
-> ci-dessus reste celle du reste du document — les chiffres de code, de tests et
-> de commits n'ont pas été recomptés.
+> ⚠️ **Le relevé du 21 août sous-évaluait le projet sur trois points, et il l'a
+> fait pendant trois semaines.** Il annonçait l'application *non conforme* au
+> RGAA faute d'audit ; l'audit a été mené le 27 août et une première mise à jour
+> partielle l'avait porté à **86,2 %, partiellement conforme**. Ce chiffre était
+> lui aussi périmé : depuis la **v4.97**, les 65 critères applicables sont
+> conformes — **100 %, totalement conforme**. Le document interdisait par
+> ailleurs d'écrire « conforme RGAA » : cette consigne était juste en août, elle
+> est fausse aujourd'hui et coûterait la mention la plus forte du référentiel
+> dans un dossier.
+> Dans le même intervalle, la version de production est passée de v4.80 à
+> v4.111 et le nombre de tests a plus que doublé.
+>
+> **Toutes les valeurs chiffrées ci-dessous ont été recomptées le 13 septembre
+> 2026** (tests exécutés, pas déduits), sauf mention contraire. La leçon vaut
+> pour la suite : un état des lieux daté vieillit plus vite qu'il n'en a l'air,
+> et c'est le point fort du projet — la conformité — qui se périme en premier.
 
 ---
 
@@ -174,18 +184,18 @@ notifications, Redis, services, signalements, sondages, réglages application.
 
 | | Nombre |
 |---|---|
-| Points d'entrée déclarés | **140** |
+| Points d'entrée déclarés | **139** |
 | dont réservés à l'administration (`/admin/…`) | 62 |
-| dont accessibles à l'application | 78 |
-| Fichiers de routes | 32 |
+| dont accessibles à l'application | 77 |
+| Fichiers de routes | 31 |
 
 ### Modules JavaScript côté application
 
 | | Nombre |
 |---|---|
-| Modules dans `js/` | **27** |
+| Modules dans `js/` | **30** |
 | Service worker | 1 fichier séparé |
-| Scripts de contrôle et d'automatisation (`scripts/`) | 10 |
+| Scripts de contrôle et d'automatisation (`scripts/`) | 12 |
 
 ### Lignes de code (hors dépendances)
 
@@ -194,30 +204,32 @@ fichiers `package-lock.json`.
 
 | Périmètre | Lignes |
 |---|---|
-| Application — JS | 19 420 |
-| Application — CSS | 2 072 |
-| Application — HTML | 7 022 |
-| **Sous-total code application** | **28 514** |
-| Backend — JS (routes, bibliothèques, tests, scripts) | 12 164 |
-| **Total code (JS + CSS + HTML)** | **40 678** |
-| Documentation versionnée (`.md`) | 12 588 |
-| Configuration CI/CD (`.yml`) | 1 820 |
-| Données versionnées (`.json`, hors lock) | 2 892 |
-| **Total tous fichiers versionnés** | **57 978** |
+| Application — JS (hors tests) | 19 624 |
+| Application — CSS | 2 547 |
+| Application — HTML | 7 651 |
+| **Sous-total code application** | **29 822** |
+| Backend — JS (routes, bibliothèques, tests, scripts) | 13 945 |
+| **Total code (JS + CSS + HTML)** | **43 767** |
+| Tests d'interface (`tests/e2e/*.spec.js`, comptés à part) | 5 398 |
+| Documentation versionnée (`.md`) | 19 169 |
+| Configuration CI/CD (`.yml`) | 2 232 |
+| Données versionnées (`.json`, hors lock) | 3 128 |
+| **Total tous fichiers versionnés** | **73 694** |
 
 > ⚠️ Le compte de lignes est à manier avec prudence pour ce projet : la
 > feuille de style principale fait en moyenne 68 caractères par ligne, et
 > plusieurs fichiers JS sont écrits en lignes longues. En volume de
-> caractères, le code représente environ **1,6 Mo** côté application et
-> **0,55 Mo** côté backend. Si un chiffre unique est nécessaire pour le
-> dossier, « environ 40 000 lignes de code » est défendable ; il ne dit rien
-> de la densité.
+> caractères, le code représente environ **1,7 Mo** côté application (JS 0,98 Mo,
+> HTML 0,57 Mo, CSS 0,17 Mo) et **0,67 Mo** côté backend. Si un chiffre unique
+> est nécessaire pour le dossier, « **plus de 43 000 lignes de code**, hors
+> dépendances et hors tests d'interface » est défendable ; il ne dit rien de la
+> densité.
 
 ### Documentation
 
 | | Nombre |
 |---|---|
-| Décisions d'architecture (ADR) | 27 côté application + 14 côté backend |
+| Décisions d'architecture (ADR) | **42** côté application + **18** côté backend |
 | Spécifications fonctionnelles (SFD) | 17 |
 | Spécifications techniques (STD) | 12 |
 | Guides et documents transverses (utilisateur, technique, architecture, déploiement, réplication, administration, surface d'exposition, sécurité ×2, README ×2, changelog) | 12 |
@@ -273,14 +285,14 @@ localement à partir de la date de Pâques.)*
 
 | | Application | Backend |
 |---|---|---|
-| Commits sur `main` | **949** | **384** |
+| Commits sur `main` | **1 030** | **417** |
 | Premier commit | 26 mars 2026 | 22 mars 2026 |
-| Dernier commit (au relevé) | 19 août 2026 | 16 août 2026 |
+| Dernier commit (au recompte) | 12 septembre 2026 | 12 septembre 2026 |
 
-**Total : 1 333 commits en cinq mois** (22 mars → 19 août 2026).
+**Total : 1 447 commits en six mois** (22 mars → 12 septembre 2026).
 
-Répartition des auteurs sur l'application : 779 `mairie-mezieres`, 122
-`Claude`, 27 `github-actions[bot]`, 12 compte personnel, 6 Dependabot.
+Répartition des auteurs sur l'application : 819 `mairie-mezieres`, 154
+`Claude`, 37 `github-actions[bot]`, 12 compte personnel, 8 Dependabot.
 
 ### Couverture de tests
 
@@ -293,9 +305,15 @@ Ce qui est mesurable :
 
 | | Nombre |
 |---|---|
-| Tests backend (`node:test`) | **140**, répartis en 17 fichiers |
-| Tests d'interface (Playwright) | **109** déclarations, exécutées sur 2 profils (ordinateur + téléphone), soit **218 exécutions** |
-| **Total** | **249 tests déclarés** |
+| Tests backend (`node:test`) | **234**, répartis en 26 fichiers |
+| Tests d'interface (Playwright) | **205** déclarations, rejouées sur 2 profils (ordinateur + téléphone), soit **410 exécutions** réparties en 22 fichiers |
+| **Total** | **439 tests déclarés**, **644 exécutions** |
+
+Chiffres obtenus en **exécutant** les deux suites le 13 septembre 2026, pas en
+comptant les occurrences de `test(` dans les sources : `npm test` côté backend
+(234 réussis, 0 échec) et `npx playwright test` côté application (382 réussis,
+28 écartés — un écart délibéré, ces scénarios ne s'appliquent pas aux deux
+profils —, 0 échec).
 
 Les tests backend couvrent en priorité les chemins sans appel réseau réel
 (validation, authentification, santé, CORS, règles de MEL, sécheresse,
@@ -332,67 +350,98 @@ Vérifiés dans `js/mat-accessibility.js`, `css/mat.css` et les tests.
 
 ### Vérification automatique
 
-- **axe-core** (`@axe-core/playwright`) est exécuté dans 4 des 9 fichiers de
+- **axe-core** (`@axe-core/playwright`) est exécuté dans 5 des 22 fichiers de
   tests d'interface, à chaque intégration ; le fichier `smoke.spec.js` passe
   axe sur chaque fenêtre qui se rend sans backend.
 - Un fichier de tests dédié à la navigation clavier existe parce qu'axe **ne
   peut pas** détecter un élément cliquable non focalisable — la limite est
   documentée et compensée par un test de propriété.
+- Sept fichiers supplémentaires mesurent ce qu'un outil automatique ne voit pas
+  seul : contraste réel sur dégradé et sur photo, taille des cibles tactiles
+  (WCAG 2.2 — 2.5.8), déclarations de couleur, plancher typographique de 12 px,
+  plan du site, et cohérence de la mention d'accessibilité avec la déclaration.
+  ⚠️ Un contrôle qui ne mesure rien **ne rougit pas, il verdit** : plusieurs de
+  ces fichiers portent un **auto-contrôle** vérifiant que le détecteur lui-même
+  échoue quand on le sabote (voir ADR-0030).
 
 ### Score Lighthouse
 
-Dernier audit enregistré, **17 août 2026** (`data/ecoindex.json`, produit par
+Dernier audit enregistré, **7 septembre 2026** (`data/ecoindex.json`, produit par
 le workflow Lighthouse sur le site en production, moyenne de 3 mesures en
 profil mobile) :
 
 | Métrique | Score |
 |---|---|
 | **Accessibilité** | **100 / 100** |
-| Performance | 72 / 100 |
+| Performance | 71 / 100 |
 | SEO | 100 / 100 |
 | Bonnes pratiques | 100 / 100 |
-| Eco-index | 46 / 100 — note D |
+| Eco-index | 45 / 100 — note D |
+
+> ⚠️ Ces deux derniers chiffres datent du **7 septembre**, donc **d'avant la
+> v4.111**, qui a supprimé 152,8 Ko de polices retéléchargées inutilement sur le
+> chemin critique (ADR-0040). Le prochain audit hebdomadaire les remesurera ; ne
+> pas citer 71 et 45 comme l'état actuel sans avoir rouvert `data/ecoindex.json`.
 
 ### Conformité réglementaire
 
-> ⚠️ **Mis à jour le 27 août 2026.** Ce paragraphe annonçait l'application comme
-> *non conforme, faute d'audit formel* — c'était exact au 21 août, ça ne l'est
-> plus. L'audit a été mené entre-temps.
+> ⚠️ **Recompté le 13 septembre 2026.** Ce paragraphe a été faux deux fois, dans
+> le même sens : il annonçait d'abord l'application *non conforme faute d'audit*
+> (exact au 21 août, plus au 27), puis *partiellement conforme à 86,2 %* (exact
+> le 27 août, plus depuis la v4.97). Les deux fois, il **sous-évaluait** le
+> projet. Les chiffres ci-dessous sont ceux de
+> `docs/accessibilite/audit-rgaa-2026-08-27.md` dans son état actuel.
 
 **L'audit RGAA 4.1 des 106 critères a été réalisé le 27 août 2026**, en interne
 et outillé (`docs/accessibilite/audit-rgaa-2026-08-27.md`). Il est **complet** :
-chaque critère a un verdict, aucun n'est laissé ouvert.
+chaque critère a un verdict, aucun n'est laissé ouvert. Il a été conduit en dix
+passes successives, chacune corrigeant les défauts de la précédente.
 
 | | |
 |---|---|
 | Critères non applicables | 41 (ni vidéo, ni son, ni cadre, ni CAPTCHA) |
 | Critères applicables | **65** |
-| Conformes | **56** |
-| Non conformes | **9** |
-| **Taux de conformité** | **86,2 %** |
-| **Mention RGAA** | **partiellement conforme** |
+| Conformes | **65** |
+| Non conformes | **0** |
+| **Taux de conformité** | **100 %** |
+| **Mention RGAA** | **totalement conforme** |
 
-La déclaration publiée dans l'application porte ce taux. Le **schéma pluriannuel
-2026-2029** et le **plan d'action 2026-2027** exigés par le décret n° 2019-768
-sont publiés (`docs/accessibilite/schema-pluriannuel.md`), avec un référent
-accessibilité nommé, un contact usagers et la voie de recours auprès du
-Défenseur des droits. Les 9 chantiers restants sont datés.
+Progression mesurée, passe par passe : 78,5 % → 86,2 % (cinquième passe) → …
+→ **100 %** (dixième passe, critère 10.5 levé). Atteint en production à la
+**v4.97**.
 
-L'audit a conduit à corriger, entre le 27 août et la v4.90, une vingtaine de
-défauts réels : les douze interrupteurs de l'écran Accessibilité n'avaient aucun
-nom annoncé, six champs de formulaire non plus, les bordures de saisie ne
-faisaient que 1,17:1 de contraste (minimum requis : 3), et aucune page ne portait
-de repère permettant à un lecteur d'écran de sauter au contenu.
+La déclaration publiée dans l'application porte ce taux, et la **mention
+« Accessibilité : totalement conforme »** figure en page d'accueil comme l'exige
+le décret n° 2019-768 — dans les **deux** pieds de page, mobile et bureau. Le
+**schéma pluriannuel 2026-2029** est publié
+(`docs/accessibilite/schema-pluriannuel.md`), avec un référent accessibilité
+nommé, un contact usagers et la voie de recours auprès du Défenseur des droits ;
+n'ayant plus de non-conformité à traiter, son plan d'action est devenu un **plan
+de maintien**.
+
+L'audit a conduit à corriger une cinquantaine de défauts réels : les douze
+interrupteurs de l'écran Accessibilité n'avaient aucun nom annoncé, six champs de
+formulaire non plus, les bordures de saisie ne faisaient que 1,17:1 de contraste
+(minimum requis : 3), aucune page ne portait de repère permettant à un lecteur
+d'écran de sauter au contenu, et 33 erreurs de validité HTML ont été levées
+(le code est valide à 100 % depuis la v4.91). Deux critères WCAG 2.2 sont
+traités **par anticipation** du RGAA 5 attendu fin 2026 : 2.5.8 (taille des
+cibles) et 2.4.11 (focus non masqué).
 
 > Pour le dossier : annoncer « **audit RGAA 4.1 complet des 106 critères,
-> partiellement conforme à 86,2 %, schéma pluriannuel et plan d'action publiés** »
-> est exact et vérifiable — le document d'audit expose la méthode et les preuves
-> critère par critère. Annoncer « conforme RGAA » ne le serait toujours pas :
-> cette mention suppose 100 %.
+> totalement conforme (100 %), déclaration, mention en page d'accueil et schéma
+> pluriannuel publiés** » est exact et vérifiable — le document d'audit expose la
+> méthode et les preuves critère par critère, et des tests automatisés refusent
+> que la mention et la déclaration divergent.
+> ⚠️ C'est la mention la plus forte du référentiel : **ne pas se sous-vendre**
+> en reprenant une formule de brouillon (« partiellement conforme », « en cours
+> de mise en conformité »). ⚠️ Et si le taux redescendait, la mention, la
+> déclaration **et** ce paragraphe devraient changer ensemble.
 
 Le score Lighthouse de 100/100 ci-dessus ne vaut toujours pas conformité RGAA —
 il mesure une quarantaine de points automatisables, là où le référentiel en
-compte 106, dont beaucoup ne se mesurent pas sans jugement humain.
+compte 106, dont beaucoup ne se mesurent pas sans jugement humain. C'est l'audit
+qui fonde la mention, pas Lighthouse.
 
 ---
 
@@ -406,6 +455,7 @@ compte 106, dont beaucoup ne se mesurent pas sans jugement humain.
 | **Audit Lighthouse hebdomadaire** | Chaque lundi matin, le site en production est audité (performance, accessibilité, référencement, bonnes pratiques) et le résultat est publié automatiquement. |
 | **Eco-index hebdomadaire** | Le même audit calcule l'empreinte environnementale de la page et met à jour le badge affiché dans l'application. |
 | **Détection de liens morts** | Chaque lundi, toutes les adresses citées dans l'application, le backend et la documentation sont testées ; une fiche unique est ouverte et mise à jour, puis refermée quand tout est réparé. |
+| **Validité HTML (W3C)** | Le code des pages est soumis chaque semaine au validateur du W3C. Zéro erreur depuis la v4.91 ; le contrôle signale sans bloquer la livraison. |
 | **Sauvegarde de la base** | Chaque lundi, réplication automatique de la base de données vers une base de secours. |
 | **Rappels de collecte** | Une tâche quotidienne déclenche l'envoi des rappels de ramassage des déchets. |
 | **Supervision des erreurs** | Sentry enregistre les erreurs du serveur et de l'application ; les erreurs sont aussi consultables dans le tableau de bord. |
@@ -415,9 +465,9 @@ compte 106, dont beaucoup ne se mesurent pas sans jugement humain.
 | **Mise à jour des bibliothèques** | Dependabot propose automatiquement les mises à jour de sécurité sur les deux dépôts. |
 | **Veille technologique** | Chaque semaine, un agent examine l'état de l'art des applications de ce type et ouvre une fiche d'actions concrètes ; il peut proposer des correctifs en brouillon, soumis à relecture. |
 | **Veille pour le bulletin et veille municipale** | Deux points mensuels : sujets pour le bulletin municipal, et subventions ou obligations qui concernent la commune. |
-| **Documentation liée au code** | Toute évolution doit mettre à jour la documentation dans la même livraison ; les décisions structurantes font l'objet d'une fiche datée (41 fiches à ce jour). |
+| **Documentation liée au code** | Toute évolution doit mettre à jour la documentation dans la même livraison ; les décisions structurantes font l'objet d'une fiche datée (**60 fiches** à ce jour : 42 côté application, 18 côté backend). |
 
-**Total : 11 chaînes automatisées** (8 côté application, 3 côté backend).
+**Total : 12 chaînes automatisées** (9 côté application, 3 côté backend).
 
 ---
 
@@ -561,17 +611,32 @@ code ne les contient. À récupérer manuellement :
 
 ## Points d'attention pour le dossier
 
-Trois éléments à connaître avant de rédiger le pitch :
+Quatre éléments à connaître avant de rédiger le pitch :
 
 1. **Le changelog a un trou de deux mois** (v4.16 à v4.53, juin-juillet 2026).
    Si le dossier s'appuie sur une chronologie, elle doit être reconstruite
    depuis l'historique git, pas depuis `CHANGELOG.md`.
-2. **La conformité RGAA est mesurée, pas totale** : l'audit complet des 106
-   critères a été mené le 27 août 2026 et donne **86,2 %** — mention
-   *partiellement conforme*, 9 non-conformités restantes, datées dans le plan
-   d'action. Ne pas écrire « conforme RGAA », qui suppose 100 % ; écrire le taux,
-   qui est vérifiable. Le score Lighthouse de 100/100 reste un indicateur
-   automatique, pas un audit.
-3. **L'Eco-index est à 46/100 (note D)** au dernier audit, pour une
-   performance à 72/100. C'est le seul indicateur mesuré qui ne soit pas au
-   maximum ; mieux vaut l'assumer que le laisser découvrir.
+2. **La conformité RGAA est totale, et c'est le point fort du dossier** :
+   l'audit complet des 106 critères donne **100 %** sur les 65 critères
+   applicables — mention ***totalement conforme***, aucune non-conformité. Elle
+   est portée par la déclaration, par la mention en page d'accueil, et tenue par
+   des tests qui refusent que les deux divergent. Le rapport de la Cour des
+   comptes de juin 2026 constatait une *non-conformité généralisée* de
+   l'accessibilité numérique publique : c'est le contexte dans lequel ce 100 %
+   se lit.
+   ⚠️ **Ne pas recopier une formule d'un brouillon antérieur** (« partiellement
+   conforme », « 86,2 % », « en cours de mise en conformité ») : ces mentions ont
+   circulé dans ce document même, et elles sous-vendent le projet de deux crans.
+   Le score Lighthouse de 100/100 reste, lui, un indicateur automatique, pas un
+   audit — c'est l'audit qui fonde la mention.
+3. **L'Eco-index est à 45/100 (note D)** au dernier audit du 7 septembre, pour
+   une performance à 71/100. C'est le seul indicateur mesuré qui ne soit pas au
+   maximum ; mieux vaut l'assumer que le laisser découvrir. ⚠️ Ces deux chiffres
+   sont **antérieurs à la v4.111**, qui a retiré 152,8 Ko du chemin critique :
+   rouvrir `data/ecoindex.json` avant de les citer.
+4. **Ce document se périme vite.** Entre le relevé du 21 août et son recompte du
+   13 septembre : 31 versions publiées, la conformité RGAA passée de 86,2 % à
+   100 %, le nombre de tests passé de 249 à 439. Avant tout usage externe,
+   vérifier au minimum la version en production, le taux RGAA et la date de
+   `data/ecoindex.json` — ce sont les trois chiffres qui bougent le plus vite, et
+   les trois que le lecteur retiendra.

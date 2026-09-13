@@ -5,6 +5,35 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.111] — 13 septembre 2026
+
+### Modifié
+- **Nunito n'est plus téléchargée qu'une fois.** `css/fonts.css` déclarait cinq
+  `@font-face` Nunito (400, 600, 700, 800, 900) × deux sous-ensembles, soit dix
+  URL — qui servaient **le même fichier, octet pour octet** (`md5sum` ne rendait
+  que deux hachages pour dix fichiers). Google Fonts ne livre plus de coupes
+  statiques pour Nunito : `wght@400` et `wght@200..1000` renvoient la même police
+  variable. Une URL distincte étant une entrée de cache distincte, le navigateur
+  retéléchargeait ces 39 Ko **une fois par graisse rencontrée** — quatre fois sur
+  le seul écran d'accueil.
+  Remplacé par **une** déclaration `font-weight: 200 1000` par sous-ensemble
+  (`fonts/nunito-variable-latin.woff2` et `-latin-ext.woff2`). Rendu identique :
+  ce sont les mêmes octets.
+  - Mesuré sur l'écran d'accueil (Chromium, profil téléphone, cache vide) :
+    **221,1 Ko de polices → 68,2 Ko**, soit **−152,8 Ko** et **−4 requêtes**.
+    Les cinq graisses étaient bien téléchargées, aucune n'était dispensée.
+  - Dépôt : `fonts/` passe de 480 Ko à 176 Ko (8 fichiers supprimés).
+  - `css/fonts.css?v=2` (`index.html` + `service-worker.js`), cache SW
+    `mat-v4.111.0`.
+
+### Documentation
+- `ETAT_DES_LIEUX.md` remis à jour : le relevé du 21 août annonçait encore RGAA
+  **86,2 % « partiellement conforme »** et interdisait d'écrire « conforme
+  RGAA » — l'audit est à **100 %, totalement conforme** depuis la v4.97. Version
+  de production, nombre de tests et chaînes automatisées recomptés.
+
+---
+
 ## [4.110] — 12 septembre 2026
 
 ### Modifié
