@@ -1,94 +1,37 @@
 /* Polices auto-hébergées — souveraineté + RGPD (aucune requête Google).
    Généré depuis Google Fonts (sous-ensembles latin + latin-ext).
-   Familles : Nunito, Playfair Display, Grape Nuts. */
+   Familles : Nunito, Playfair Display, Grape Nuts.
+
+   ⛔ NUNITO EST UNE POLICE VARIABLE — UN SEUL FICHIER PAR SOUS-ENSEMBLE.
+   Jusqu'à la v4.110, ce fichier déclarait cinq @font-face Nunito (400, 600,
+   700, 800, 900) pointant vers cinq URL différentes… qui servaient toutes le
+   MÊME fichier, octet pour octet (`md5sum fonts/nunito-*.woff2` rendait deux
+   hachages pour dix fichiers). Google Fonts ne livre plus de coupes statiques
+   pour Nunito : la requête `wght@400` et la requête `wght@200..1000` renvoient
+   la même police variable. Une URL distincte étant une entrée de cache
+   distincte, le navigateur téléchargeait ces 39 Ko une fois PAR graisse
+   rencontrée. Mesuré sur le seul écran d'accueil : les CINQ graisses partaient
+   (400, 600, 700, 800, 900), soit 195,6 Ko pour 39,1 Ko de police réelle.
+   Une seule déclaration en `font-weight: 200 1000` couvre tout l'intervalle :
+   le rendu est identique (mêmes octets), le téléchargement est unique.
+   Ne jamais « rajouter une graisse » ici : c'est le geste qui a créé la
+   duplication. Une graisse s'utilise, elle ne se déclare pas. */
 
 @font-face {
   font-family: 'Nunito';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 200 1000;
   font-display: swap;
-  src: url(../fonts/nunito-400-latin-ext.woff2) format('woff2');
+  src: url(../fonts/nunito-variable-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 @font-face {
   font-family: 'Nunito';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 200 1000;
   font-display: swap;
-  src: url(../fonts/nunito-400-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(../fonts/nunito-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(../fonts/nunito-600-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(../fonts/nunito-700-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(../fonts/nunito-700-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(../fonts/nunito-800-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(../fonts/nunito-800-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(../fonts/nunito-900-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(../fonts/nunito-900-latin.woff2) format('woff2');
+  src: url(../fonts/nunito-variable-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
