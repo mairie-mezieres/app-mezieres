@@ -89,7 +89,8 @@ app-mezieres/
 │   ├── mat-associations.js Liste des associations
 │   ├── mat-entreprises.js  Annuaire des entreprises
 │   ├── mat-plui.js         Grand dossier PLUi-H-D (page embarquée ; documents via /docs/plui)
-│   ├── mat-carte3d.js      Carte 3D du village + zonage PLU (MapLibre chargé à la demande)
+│   ├── mat-carte3d.js      Carte 3D du village + zonage PLU — le module ET MapLibre
+│   │                       sont chargés à la demande (ADR-0018, ADR-0041)
 │   ├── mat-guide-arrivee.js Guide d'arrivée des nouveaux habitants (embarqué)
 │   ├── mat-saviez-vous.js  « Le saviez-vous ? » — fait du jour (corpus + calculs)
 │   ├── mat-sondages.js     Sondages citoyens
@@ -1183,6 +1184,33 @@ pas) et refait sinon le test lui-même. `mat-core.js` publie en regard
 fichier, surtout dans une sortie anticipée (`if (!f()) return;`) où le plantage emporte le
 plus de code. Les tests E2E ne voient pas cette classe de bug (le service worker y est
 bloqué, ADR-0006) : la détection reste Sentry. Voir **ADR-0032**.
+
+### Modules chargés à la demande (v4.112)
+
+Quatre modules ne sont plus injectés au démarrage mais à la **première ouverture
+de leur écran** : `mat-carte3d.js` (98 Ko), `mat-guide-arrivee.js`,
+`mat-entreprises.js`, `mat-associations.js`. Un relais `matDifferer(src, noms)`
+(dans `js/mat-boot.js`) prend la place de la fonction d'ouverture, charge le
+module au premier appel — le module redéfinit la fonction, donc le relais
+disparaît — puis lui passe la main. 136 Ko retirés du démarrage.
+
+⛔ **Ne différer qu'un module sans effet de bord au chargement.** `mat-eau8.js`
+**enveloppe** `window.loadMeteoDetail` pour y greffer la section « eau » : son
+ordre par rapport à `mat-widgets.js` est signifiant, le différer le ferait
+envelopper une fonction déjà appelée, ou aucune. Même chose pour `mat-plui.js`
+et `mat-sondages.js`, qui alimentent une pastille de l'accueil dès leur
+chargement. Le critère n'est pas la taille, c'est « ce module ne fait rien tant
+qu'on ne l'appelle pas ».
+
+⚠️ Ces fichiers **restent dans `PRECACHE_URLS`**, et ce n'est pas contradictoire :
+le précache sert l'habitant qui a installé l'application (ouverture instantanée,
+y compris hors connexion), le chargement à la demande sert la **première
+visite**, qui n'a pas encore de service worker.
+
+⚠️ Un module chargé ainsi arrive après les autres, dans un ordre qui n'est plus
+garanti : la règle ADR-0032 ci-dessus s'y applique intégralement.
+
+Voir **ADR-0041**.
 
 ### Abonnements expirés
 

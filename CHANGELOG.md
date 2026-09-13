@@ -5,6 +5,67 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.112] — 13 septembre 2026
+
+Trois causes distinctes, toutes trouvées **en mesurant**, aucune visible à la
+lecture du code. Mesures : Chromium, profil téléphone, cache vide, service
+worker neutralisé, aucun appel réseau sortant.
+
+| | Avant | Après |
+|---|---|---|
+| Accueil — fichiers JS | 29 (1 067,4 Ko) | **25 (939,9 Ko)** |
+| Accueil — requêtes totales | 837 | **37** |
+| Trombinoscope — images de la grille | 569 (2 038,4 Ko) | **15 (118,8 Ko)** |
+
+### Modifié
+- **Quatre écrans ne se chargent plus qu'à leur ouverture.** `mat-carte3d.js`
+  (98 Ko), `mat-guide-arrivee.js`, `mat-entreprises.js` et
+  `mat-associations.js` étaient injectés par `mat-boot.js` à chaque lancement —
+  136 Ko pour des écrans que la plupart des habitants n'ouvriront jamais.
+  Nouveau relais `matDifferer()`, avec pastille « Chargement… » en
+  `role="status"` et réarmement après échec réseau.
+  ⛔ Ne différer qu'un module **sans effet de bord au chargement** :
+  `mat-eau8.js` enveloppe `loadMeteoDetail`, `mat-plui.js` et `mat-sondages.js`
+  alimentent une pastille.
+  ⚠️ Les fichiers **restent précachés** : le précache sert l'habitant installé,
+  le chargement à la demande sert la première visite.
+- **Trombinoscope : vignettes pour la grille, portrait pour la fiche.** La
+  grille chargeait quinze JPEG de 933 × 1400 (2 038 Ko) pour afficher quinze
+  carrés de 120 px. Elle charge désormais quinze WebP de 360 px (118,8 Ko) ;
+  le portrait pleine taille (~92 Ko, dimensions inchangées) n'arrive qu'à
+  l'ouverture d'une fiche. `loading="lazy"` + dimensions en attributs.
+- **Les photos sont nommées par un slug** (`romuald-genty.webp`). Les anciens
+  noms portaient l'âge et le nombre de mandats — et l'un d'eux annonçait
+  « 2 Mandats » quand la fiche de la même personne en disait 3. Une donnée
+  recopiée dans un nom de fichier ne se met jamais à jour, et personne ne la
+  relit.
+
+### Corrigé
+- **L'illustration de bienvenue du parcours guidé ne s'était jamais
+  affichée.** Dans `js/mat-accessibility.js`, son chemin n'avait pas son
+  dossier (`MAT-explique.webp` au lieu de `img/MAT-explique.webp`) ; le repli
+  `onerror` avait la même faute **et ne se désarmait pas** : 404 → `onerror` →
+  même 404 → `onerror`… **796 requêtes** sur la seule URL de repli, mesurées en
+  5 secondes. Corrigé des deux côtés, `onerror` désarmé.
+  ⚠️ Un `<img>` au `src` cassé est présent dans le DOM, a une taille et un
+  `alt` : aucun test de structure ne peut le voir, seul `naturalWidth === 0`
+  le trahit.
+
+### Documentation
+- `docs/adr/0041-charger-un-ecran-quand-on-l-ouvre.md` (nouveau), y compris la
+  commande de régénération des photos — il n'y a **pas** de dépendance de
+  traitement d'image dans le dépôt, et il ne doit pas y en avoir.
+- `CLAUDE.md` : deux entrées d'aiguillage (chargement à la demande, photos du
+  trombinoscope).
+- `service-worker.js` : le commentaire d'ADR-0018 disait « 29 Ko » pour
+  `mat-carte3d.js`, qui en fait 98.
+
+### Versions
+`css/mat.css?v=4.14.22`, `js/mat-boot.js?v=4.13.0`, `js/mat-trombi.js?v=4.3.0`,
+`js/mat-accessibility.js?v=4.3.11`, cache SW `mat-v4.112.0`.
+
+---
+
 ## [4.111] — 13 septembre 2026
 
 ### Modifié
