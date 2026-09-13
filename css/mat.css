@@ -1940,3 +1940,13 @@ html.theme-sombre .content [role="button"]:focus-visible {
    s'afficheraient à une largeur différente des <button> des autres rubriques. */
 .plan-lien{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--leaf);padding:9px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 .plan-lien:hover{color:var(--forest);background:var(--mist);}
+
+/* ── Pastille « Chargement… » des écrans chargés à la demande (ADR-0041) ──
+   Affichée par `matAttente()` le temps qu'un module différé arrive. Sans
+   elle, un appui sur « Mon village en 3D » ne produit rien de visible et
+   se lit comme un bouton mort.
+   ⚠️ `--forest` est le SEUL jeton utilisable ici : c'est un fond sombre dans
+   les cinq rendus (#1a3d2b, #003319, #1e3a8a, #1a3a5c, #111827), donc le
+   blanc y contraste partout. Un jeton clair y deviendrait illisible en
+   thème sombre — c'est le piège décrit dans CLAUDE.md. */
+.mat-attente{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;background:var(--forest);color:#fff;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);pointer-events:none;}

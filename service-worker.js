@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.111.0';
+const CACHE = 'mat-v4.112.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -26,7 +26,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.21',
+  './css/mat.css?v=4.14.22',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.1'
@@ -37,22 +37,22 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.21',
+  './css/mat.css?v=4.14.22',
   './css/mat-desktop.css?v=4.5.5',
   './css/fonts.css?v=2',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.1',
-  './js/mat-accessibility.js?v=4.3.10',
+  './js/mat-accessibility.js?v=4.3.11',
   './js/mat-widgets.js?v=4.5.7',
   './js/mat-ambiance.js?v=1.8.0',
   './js/mat-agenda.js?v=4.3.5',
   './js/mat-forms.js?v=4.6.9',
   './js/mat-photos.js?v=1.3.6',
   './js/mat-actus.js?v=4.5.0',
-  './js/mat-trombi.js?v=4.2.7',
+  './js/mat-trombi.js?v=4.3.0',
   './js/mat-mel.js?v=4.5.3',
-  './js/mat-boot.js?v=4.12.9',
+  './js/mat-boot.js?v=4.13.0',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -62,11 +62,17 @@ const PRECACHE_URLS = [
   './js/mat-eau8.js?v=4.3.0',
   './js/mat-plui.js?v=1.2.1',
   './js/mat-plan-site.js?v=1.2.0',
-  // ⚠️ `js/mat-carte3d.js` est précaché (29 Ko), mais PAS
+  // ⚠️ `js/mat-carte3d.js` est précaché (98 Ko), mais PAS
   // `vendor/maplibre/maplibre-gl.js` (~1 Mo) : le précacher triplerait le
   // poids d'installation de l'application pour une page que la plupart des
   // habitants n'ouvriront jamais. Conséquence assumée : la carte 3D ne
   // fonctionne pas hors connexion, et elle le dit. Voir ADR-0018.
+  // ⚠️ Il reste précaché BIEN QU'il ne soit plus injecté au démarrage
+  // (ADR-0041) : les deux ne se contredisent pas. Le précache sert
+  // l'habitant qui a installé l'application — l'ouverture lui est
+  // instantanée ; le chargement à la demande sert la première visite, qui
+  // n'a pas encore de service worker. Retirer cette ligne ne gagnerait rien
+  // au premier chargement et rendrait la carte plus lente ensuite.
   './js/mat-carte3d.js?v=1.9.0',
   './js/mat-guide-arrivee.js?v=1.0.8',
   './js/mat-entreprises.js?v=1.2.1',

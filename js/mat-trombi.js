@@ -3,21 +3,21 @@
    ════════════════════════════════════════════════════════════ */
 
 const ELUS = [
-  {nom:"Romuald GENTY",age:43,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"Le Bourg",role:"Maire",pole:"Finances et achats",representations:["3ème vice-président de la Communauté de communes"],img:"Romuald GENTY 43 ans - 2 Mandats - Officier Sapeur-Pompier Professionnel - Le Bourg.jpg"},
-  {nom:"Sandra BARET",age:50,prof:"Directrice d'établissements sociaux et médico-sociaux",mandats:"2 Mandats",hameau:"Manthelon",role:"2ème adjointe",pole:"Pôle Social et Environnement",img:"Sandra BARET 50 ans - 2 Mandats - Directrice d établissements sociaux et médico sociaux - Manthelon.jpg"},
-  {nom:"Damien BOUGRÉ",age:49,prof:"Chef de service Jeunesse, Réussite et Parentalité",mandats:"2 Mandats",hameau:"Mézières",role:"1er adjoint",pole:"Pôle Vie scolaire / enfance-jeunesse",img:"Damien BOUGR\u00c9 49 ans - 2 Mandats - Chef de service Jeunesse, R\u00e9ussite et Parentalit\u00e9 - M\u00e9zi\u00e8res.jpg"},
-  {nom:"Stéphanie GREUIN",age:43,prof:"Hypnothérapeute",mandats:"2 Mandats",hameau:"",role:"4ème adjointe",pole:"Pôle Relation avec les entreprises",img:"St\u00e9phanie GREUIN-Hypnoth\u00e9ratpeute-43-2 Mandats.jpg"},
-  {nom:"Stéphane MAROIS",age:55,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"La Grange",role:"3ème adjoint",pole:"Pôle Voirie et Sécurité",img:"St\u00e9phane MAROIS 55 ans - 3 Mandats - Officier Sapeur-Pompier Professionnel - La grange.jpg"},
-  {nom:"Fabrice AUFFRET",age:47,prof:"Responsable Informatique",mandats:"3 Mandats",hameau:"Le Bourg",role:"Conseiller délégué",pole:"Communication et innovations",img:"Fabrice AUFFRET 47 ans - 3 Mandats - Responsable Informatique - Le Bourg.jpg"},
-  {nom:"Katia COURTOIS",age:53,prof:"Greffier",mandats:"3 Mandats",hameau:"Manthelon",role:"Conseillère municipale",pole:"",img:"Katia COURTOIS 53 ans - 3 Mandats - Greffier - Manthelon.jpg"},
-  {nom:"Christophe DESCHAMPS",age:59,prof:"Agent de maîtrise",mandats:"5 Mandats",hameau:"Rolland",role:"Conseiller délégué",pole:"Convivialité, fêtes et démocratie locale",img:"Christophe DESCHAMPS 59 ans - 5 Mandats - Agent de ma\u00eetrise - Rolland.jpg"},
-  {nom:"Amandine BUREAU",age:42,prof:"Vigneronne",mandats:"1 Mandat",hameau:"Le Buisson",role:"Conseillère municipale",pole:"",img:"Amandine BUREAU 42 ans - Vigneronne - 1 Mandat - Le Buisson.jpg"},
-  {nom:"Bruno MAILLARY",age:65,prof:"Retraité",mandats:"2 Mandats",hameau:"Rolland",role:"Conseiller délégué",pole:"Urbanisme et travaux",img:"Bruno MAILLARY 65 ans - 2 Mandat - Retrait\u00e9 - Rolland.jpg"},
-  {nom:"Caroline BAILLIOT-LEROY",age:46,prof:"Assistante de direction, Secteur Assurance",mandats:"1 Mandat",hameau:"",role:"Conseillère municipale",pole:"",img:"Caroline BAILLOT-LEROY - 46 ans - 1 Mandat - Assistante de direction Secteur Assurance Nuisance.jpg"},
-  {nom:"Élodie FRANÇOIS",age:39,prof:"Ingénieur Paysage et Environnement",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"Elodie FRANCOIS 39 ans - Ing\u00e9nieur Paysage et Environnement - 1 Mandat - Le Br\u00e9au.jpg"},
-  {nom:"Léane FARINA-JAVOY",age:24,prof:"Exploitante Agricole",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"L\u00e9ane FARINA JAVOY 24 ans - Exploitante Agricole - 1 Mandat - Le Br\u00e9au.jpg"},
-  {nom:"Romain LOTHE",age:37,prof:"Chef d'équipe Gros Œuvre",mandats:"1 Mandat",hameau:"Manthelon",role:"Conseiller municipal",pole:"",img:"Romain LOTHE 37 ans - Chef d \u00e9quipe Gros oeuvre - 1 Mandat - Manthelon.jpg"},
-  {nom:"Sarah MARÉCHAL",age:49,prof:"Officiante de cérémonie laïque",mandats:"2 Mandats",hameau:"Rolland",role:"Conseillère déléguée",pole:"Pôle aînés",img:"Sarah MARECHAL 49 ans - 2 Mandats - Officiante de c\u00e9r\u00e9monie la\u00efque - Rolland.jpg"},
+  {nom:"Romuald GENTY",age:43,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"Le Bourg",role:"Maire",pole:"Finances et achats",representations:["3ème vice-président de la Communauté de communes"],img:"romuald-genty"},
+  {nom:"Sandra BARET",age:50,prof:"Directrice d'établissements sociaux et médico-sociaux",mandats:"2 Mandats",hameau:"Manthelon",role:"2ème adjointe",pole:"Pôle Social et Environnement",img:"sandra-baret"},
+  {nom:"Damien BOUGRÉ",age:49,prof:"Chef de service Jeunesse, Réussite et Parentalité",mandats:"2 Mandats",hameau:"Mézières",role:"1er adjoint",pole:"Pôle Vie scolaire / enfance-jeunesse",img:"damien-bougre"},
+  {nom:"Stéphanie GREUIN",age:43,prof:"Hypnothérapeute",mandats:"2 Mandats",hameau:"",role:"4ème adjointe",pole:"Pôle Relation avec les entreprises",img:"stephanie-greuin"},
+  {nom:"Stéphane MAROIS",age:55,prof:"Officier Sapeur-Pompier Professionnel",mandats:"3 Mandats",hameau:"La Grange",role:"3ème adjoint",pole:"Pôle Voirie et Sécurité",img:"stephane-marois"},
+  {nom:"Fabrice AUFFRET",age:47,prof:"Responsable Informatique",mandats:"3 Mandats",hameau:"Le Bourg",role:"Conseiller délégué",pole:"Communication et innovations",img:"fabrice-auffret"},
+  {nom:"Katia COURTOIS",age:53,prof:"Greffier",mandats:"3 Mandats",hameau:"Manthelon",role:"Conseillère municipale",pole:"",img:"katia-courtois"},
+  {nom:"Christophe DESCHAMPS",age:59,prof:"Agent de maîtrise",mandats:"5 Mandats",hameau:"Rolland",role:"Conseiller délégué",pole:"Convivialité, fêtes et démocratie locale",img:"christophe-deschamps"},
+  {nom:"Amandine BUREAU",age:42,prof:"Vigneronne",mandats:"1 Mandat",hameau:"Le Buisson",role:"Conseillère municipale",pole:"",img:"amandine-bureau"},
+  {nom:"Bruno MAILLARY",age:65,prof:"Retraité",mandats:"2 Mandats",hameau:"Rolland",role:"Conseiller délégué",pole:"Urbanisme et travaux",img:"bruno-maillary"},
+  {nom:"Caroline BAILLIOT-LEROY",age:46,prof:"Assistante de direction, Secteur Assurance",mandats:"1 Mandat",hameau:"",role:"Conseillère municipale",pole:"",img:"caroline-bailliot-leroy"},
+  {nom:"Élodie FRANÇOIS",age:39,prof:"Ingénieur Paysage et Environnement",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"elodie-francois"},
+  {nom:"Léane FARINA-JAVOY",age:24,prof:"Exploitante Agricole",mandats:"1 Mandat",hameau:"Le Bréau",role:"Conseillère municipale",pole:"",img:"leane-farina-javoy"},
+  {nom:"Romain LOTHE",age:37,prof:"Chef d'équipe Gros Œuvre",mandats:"1 Mandat",hameau:"Manthelon",role:"Conseiller municipal",pole:"",img:"romain-lothe"},
+  {nom:"Sarah MARÉCHAL",age:49,prof:"Officiante de cérémonie laïque",mandats:"2 Mandats",hameau:"Rolland",role:"Conseillère déléguée",pole:"Pôle aînés",img:"sarah-marechal"},
 ];
 
 const COMMISSION_DATA = [
@@ -61,8 +61,26 @@ function normalizeEluName(v){
     .toLowerCase();
 }
 
-function buildImgSrc(filename){
-  return 'img/' + encodeURIComponent(filename || '').replace(/%20/g,' ');
+/* ── Photos du conseil ────────────────────────────────────────────────
+   Deux fichiers par élu, et c'est délibéré (ADR-0041) :
+     • `<slug>-vignette.webp` — carré 360 px, ~8 Ko. C'est ce que charge la
+       GRILLE, quinze fois. Le cadrage reproduit `object-fit:cover` +
+       `object-position:top` du CSS : le carré du haut du portrait.
+     • `<slug>.webp` — portrait 933 × 1400, ~92 Ko. Chargé uniquement quand
+       on ouvre la fiche d'UNE personne.
+   Avant, la grille servait quinze portraits JPEG pleine taille : 2 037 Ko
+   pour afficher quinze carrés de 120 px. Elle en charge 119.
+
+   ⛔ Le nom de fichier est un IDENTIFIANT (`prenom-nom`), pas une phrase.
+   Les anciens portaient l'âge et le nombre de mandats — « Romuald GENTY 43
+   ans - 2 Mandats… » alors que la fiche disait « 3 Mandats ». Une donnée
+   recopiée dans un nom de fichier ne se met jamais à jour et personne ne
+   la relit. Ne rien remettre d'autre que le nom. */
+function trombiVignette(slug){
+  return 'img/trombi/' + encodeURIComponent(slug || '') + '-vignette.webp';
+}
+function trombiPortrait(slug){
+  return 'img/trombi/' + encodeURIComponent(slug || '') + '.webp';
 }
 
 function ensureCommissionBuckets(elu){
@@ -142,7 +160,7 @@ function buildTrombi(){
     const nomCourt = prenomNom.slice(1).join(' ');
     return `<div class="trombi-item" onclick="openTrombi(${i})" role="button" tabindex="0">`
       + `<div class="trombi-photo-wrap">`
-      + `<img class="trombi-photo" src="${buildImgSrc(e.img)}" alt="${e.nom}" onerror="this.onerror=null;this.src='img/mat-header.webp'">`
+      + `<img class="trombi-photo" src="${trombiVignette(e.img)}" alt="${e.nom}" width="360" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='img/mat-header.webp'">`
       + `<div class="${badgeClass}">${badgeLabel}</div>`
       + `</div>`
       + `<div class="trombi-name" title="${e.nom}">${prenom}<br><span style="font-weight:700;color:var(--muted)">${nomCourt}</span></div>`
@@ -159,7 +177,7 @@ function openTrombi(idx){
   }catch(_){ }
   const modal = document.getElementById('trombi-modal');
   const card = document.getElementById('trombi-card');
-  document.getElementById('trombi-big-img').src = buildImgSrc(e.img);
+  document.getElementById('trombi-big-img').src = trombiPortrait(e.img);
   card.style.maxHeight='min(92vh,760px)';
   card.style.display='flex';
   card.style.flexDirection='column';

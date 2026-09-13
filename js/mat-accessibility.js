@@ -277,7 +277,20 @@ function buildOnboardingDOM() {
   const dots = Array.from({length:total},(_,i)=>`<div id="ob-dot-${i}" style="width:7px;height:7px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,0.35)'};transition:all 0.3s;flex-shrink:0;"></div>`).join('');
   ob.innerHTML = `
     <div id="ob-step-0" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:28px 24px;text-align:center;gap:18px;">
-      <img src="MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.src='MAT et MEL.webp'">
+      <!-- ⛔ DEUX BOGUES TENAIENT SUR CETTE LIGNE, ET AUCUN NE SE VOYAIT.
+           1. Le chemin n'avait pas son dossier : « MAT-explique.webp » au lieu
+              de « img/MAT-explique.webp ». L'illustration d'accueil du parcours
+              guidé — la toute première image qu'un habitant voit — n'a donc
+              JAMAIS pu s'afficher.
+           2. Le repli onerror ne se désarmait pas, et repartait sur un chemin
+              lui aussi sans dossier : 404 → onerror → même 404 → onerror…
+              836 requêtes en 5 secondes, mesurées. Le nombre de requêtes est
+              une entrée du calcul de l'éco-index.
+           Partout ailleurs dans le dépôt, le motif est this.onerror=null;
+           AVANT la réaffectation. C'est ce qui empêche la boucle.
+           ⚠️ Ce bloc est une chaîne gabarit : pas d'accent grave ici, il la
+           terminerait. -->
+      <img src="img/MAT-explique.webp" alt="MAT" style="width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.5));animation:obBounce 2.2s ease infinite;" onerror="this.onerror=null;this.src='img/MAT%20et%20MEL.webp'">
       <div style="color:#fff;font-family:'Grape Nuts',cursive;font-size:2.2rem;">Bienvenue !</div>
       <div style="color:rgba(255,255,255,0.88);font-size:0.88rem;line-height:1.7;max-width:320px;">
         <p style="margin:0 0 1em">Je suis <strong style="color:#c9f0d1;">MAT</strong>, le majordome numérique de <strong style="color:#c9f0d1;">Mézières-lez-Cléry</strong>.</p>

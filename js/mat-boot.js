@@ -131,17 +131,109 @@
   document.head.appendChild(s);
 })();
 
-(function(){
-  var s = document.createElement('script');
-  s.src = 'js/mat-associations.js?v=4.2.4';
-  document.head.appendChild(s);
-})();
+/* ══════════════════════════════════════════════════════════════════════
+   CHARGEMENT À LA DEMANDE — voir ADR-0041
 
-(function(){
-  var s = document.createElement('script');
-  s.src = 'js/mat-entreprises.js?v=1.2.1';
-  document.head.appendChild(s);
-})();
+   Quatre modules ne servent QU'UN écran, et la plupart des habitants ne
+   l'ouvriront jamais. Les injecter au démarrage, c'est les télécharger,
+   les analyser et les exécuter à chaque lancement pour rien : 136 Ko
+   bruts, dont 98 Ko pour la seule carte 3D — plus que tout le reste de
+   l'accueil réuni.
+
+   Le relais ci-dessous prend la place de la fonction d'ouverture. Au
+   premier appel, il charge le module (qui redéfinit la fonction, donc le
+   relais disparaît de lui-même), puis lui passe la main avec ses
+   arguments. Les appels suivants vont directement au vrai code.
+
+   ⛔ NE DIFFÉRER QU'UN MODULE SANS EFFET DE BORD AU CHARGEMENT. Les
+   quatre ci-dessous ne sont que des définitions. `mat-eau8.js` ne l'est
+   PAS et ne doit pas le devenir : il ENVELOPPE `loadMeteoDetail` au
+   chargement, donc son ordre par rapport à `mat-widgets.js` est
+   signifiant — le différer le ferait envelopper une fonction déjà
+   appelée, ou aucune.
+
+   ⚠️ Un module chargé ici arrive APRÈS les autres, dans un ordre qui
+   n'est plus garanti : il ne peut rien tenir pour acquis (ADR-0032).
+
+   ⚠️ Ces fichiers restent dans `PRECACHE_URLS` du service worker : pour
+   un habitant qui a installé l'application, ils sont déjà là et
+   l'ouverture est instantanée, y compris hors connexion. Le gain porte
+   sur la PREMIÈRE visite — celle que mesure l'éco-index, et la seule que
+   connaîtront ceux qui n'installent pas.
+   ══════════════════════════════════════════════════════════════════ */
+
+window._matModules = window._matModules || {};
+
+function matChargerModule(src){
+  if (window._matModules[src]) return window._matModules[src];
+  window._matModules[src] = new Promise(function(ok, ko){
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload  = function(){ ok(); };
+    s.onerror = function(){
+      // On oublie la promesse échouée : une coupure réseau ponctuelle ne
+      // doit pas condamner l'écran pour le reste de la session.
+      delete window._matModules[src];
+      ko(new Error('échec de chargement : ' + src));
+    };
+    document.head.appendChild(s);
+  });
+  return window._matModules[src];
+}
+
+// Pastille « Chargement… » — sans elle, appuyer sur « Mon village en 3D »
+// ne produit RIEN de visible le temps du téléchargement, ce qui se lit
+// comme un bouton mort. `role="status"` pour que ce soit aussi annoncé.
+function matAttente(actif){
+  var el = document.getElementById('mat-attente');
+  if (!actif){ if (el) el.remove(); return; }
+  if (el) return;
+  el = document.createElement('div');
+  el.id = 'mat-attente';
+  el.className = 'mat-attente';
+  el.setAttribute('role', 'status');
+  document.body.appendChild(el);
+  // Le texte est posé APRÈS l'insertion : une zone `role="status"` déjà
+  // remplie à l'insertion n'est pas annoncée de façon fiable.
+  requestAnimationFrame(function(){
+    var e = document.getElementById('mat-attente');
+    if (e) e.textContent = 'Chargement…';
+  });
+}
+
+function matDifferer(src, noms){
+  noms.forEach(function(nom){
+    var relais = function(){
+      var args = arguments, self = this;
+      matAttente(true);
+      matChargerModule(src).then(function(){
+        matAttente(false);
+        var f = window[nom];
+        // `f !== relais` : le module s'est bien chargé mais n'a pas défini la
+        // fonction. Sans ce garde-fou, on se rappellerait soi-même en boucle.
+        if (typeof f === 'function' && f !== relais) return f.apply(self, args);
+        throw new Error(nom + ' non défini après ' + src);
+      }).catch(function(e){
+        matAttente(false);
+        window[nom] = relais;   // réarmement pour une nouvelle tentative
+        console.warn('[mat] ' + e.message);
+        if (typeof alertMAT === 'function') {
+          alertMAT('Cet écran n’a pas pu être chargé. Vérifiez votre connexion, puis réessayez.',
+                   'Chargement impossible', '📶');
+        }
+      });
+    };
+    window[nom] = relais;
+  });
+}
+
+matDifferer('js/mat-associations.js?v=4.2.4',  ['openAssociations', 'openSubvention']);
+matDifferer('js/mat-entreprises.js?v=1.2.1',   ['openEntreprises']);
+matDifferer('js/mat-guide-arrivee.js?v=1.0.8', ['openGuideArrivee']);
+// Carte 3D — le module fait 98 Ko à lui seul. La bibliothèque MapLibre
+// (~1 Mo) reste chargée par le module lui-même, à la première ouverture
+// (ADR-0018) : ce sont deux paliers, pas un seul.
+matDifferer('js/mat-carte3d.js?v=1.9.0',       ['matOuvrirCarte3D']);
 
 (function(){
   var s = document.createElement('script');
@@ -167,18 +259,6 @@
   document.head.appendChild(s);
 })();
 
-(function(){
-  var s = document.createElement('script');
-  s.src = 'js/mat-guide-arrivee.js?v=1.0.8';
-  document.head.appendChild(s);
-})();
-
-// Carte 3D — le module est léger (~29 Ko) et se contente de définir
-// matOuvrirCarte3D. La bibliothèque MapLibre (~1 Mo) n'est PAS chargée ici :
-// le module va la chercher à la première ouverture de la carte seulement.
-// Voir ADR-0018 — c'est la condition pour ne pas dégrader l'éco-index.
-(function(){
-  var s = document.createElement('script');
-  s.src = 'js/mat-carte3d.js?v=1.9.0';
-  document.head.appendChild(s);
-})();
+/* `mat-guide-arrivee.js` et `mat-carte3d.js` étaient injectés ici. Ils sont
+   désormais chargés à la première ouverture de leur écran, par `matDifferer`
+   plus haut. Voir ADR-0041. */
