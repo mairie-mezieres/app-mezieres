@@ -1327,13 +1327,36 @@ Les workflows dans `.github/workflows/` :
 | `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) **+ structure CSS** (`scripts/check-css.js` : équilibre des accolades — une accolade orpheline fait disparaître silencieusement la règle suivante, ADR-0015) |
 | `e2e.yml` | push/PR sur `main`, `claude/**` | Tests Playwright : 4 tests × 2 navigateurs (Desktop Chrome, Pixel 7) |
 | `lighthouse.yml` | push sur `main` + hebdo (cron) | Audit Lighthouse (performance, accessibilité, SEO) |
-| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app |
+| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app — chaque lien rejeté est **re-testé avec des en-têtes de navigateur** avant d'être signalé (ADR-0042) |
 | `sauvegarde-upstash.yml` | hebdomadaire (cron, lundi) | Sauvegarde de la base Redis Upstash |
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
 | `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
+
+### Liens morts : ce que lychee rejette n'est pas forcément mort
+
+⛔ **Un 403 n'est pas un lien mort** : c'est la réponse d'un serveur **à un robot**.
+L'issue #450 comptait trois « erreurs » sur quatre de cette nature — des pages qui
+s'ouvrent parfaitement dans un navigateur — et la seule erreur réelle (une photo
+supprimée, donc un carré vide en production) s'y noyait.
+
+Le workflow enchaîne donc deux étapes :
+
+1. `lychee` produit un rapport **JSON** (`--format json`) ;
+2. `node scripts/verifier-liens-signales.js` rappelle **chaque URL rejetée** avec
+   des en-têtes de navigateur. Ce qui répond sort du rapport (et passe dans un bloc
+   repliable, pour rester consultable) ; ce qui ne répond pas y reste, avec les deux
+   verdicts. Les erreurs non-HTTP (`file://`, chemin local) sont conservées telles quelles.
+
+C'est le nombre de liens **restants** (sortie `restants`) qui ouvre, met à jour ou
+referme l'issue — plus le code de sortie de lychee.
+
+⛔ **Ne pas « corriger » un faux positif en ajoutant un `--exclude`** : un domaine exclu
+n'est plus jamais vérifié, y compris le jour où il meurt pour de bon — ce scan existe
+parce que `valdeloire-fibre.fr`, domaine inexistant, a été annoncé aux habitants pendant
+des mois. Voir ADR-0042.
 
 ### Mémoire de la veille technologique (anti-redondance)
 
