@@ -17,6 +17,15 @@ de la commune qui leur sert de filtre.
   « 🔭 Actions PWA — veille du JJ/MM ». Voir ADR-0005 et
   `docs/guide-technique.md` §10.
 
+## Suivi de la veille — `.github/workflows/veille-suivi.yml` (étage 3)
+
+Ce dossier ne porte **aucun fichier** pour cet étage : il n'écrit que dans les issues
+et les PR déjà ouvertes par les deux premiers (ADR-0042). Il coche ce qu'une PR
+**fusionnée** a traité, referme ce qui est fini, relance une fois ce qui traîne, et
+pose sur chaque brouillon le commit status `veille/controles` que ces PR n'ont pas.
+
+⛔ Il ne crée **jamais** d'issue et ne fusionne **jamais** rien.
+
 ## Veille municipale — `.github/workflows/veille-municipale.yml` (mensuelle)
 
 Destinée aux **élus** : subventions ouvertes, obligations réglementaires

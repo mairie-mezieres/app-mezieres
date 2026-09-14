@@ -283,6 +283,12 @@ jobs:
   # email, mémoire) est déjà terminée quand celui-ci démarre. Qu'il échoue
   # n'enlève rien à ce qui a été livré — ce canal ne doit jamais coûter
   # l'email.
+  #
+  # ⚠️ Ce workflow OUVRE (une issue, des PR draft) et ne referme rien. C'est
+  # `.github/workflows/veille-suivi.yml` — étage 3, ADR-0042 — qui revient
+  # dessus : il se déclenche en `workflow_run` à la fin de CE workflow, coche
+  # ce qu'une PR fusionnée a traité, referme ce qui est fini et pose sur ces
+  # PR le commit status que GitHub ne leur donnera jamais (§5 de l'ADR-0023).
   # ════════════════════════════════════════════════════════════════════
   pr-draft:
     needs: veille

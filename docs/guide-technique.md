@@ -1332,6 +1332,7 @@ Les workflows dans `.github/workflows/` :
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
 | `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
+| `veille-suivi.yml` | après `veille-techno.yml` (`workflow_run`) + quotidien (cron) | **Étage 3** : traite les issues « Actions PWA » et les PR draft ouvertes par la veille — coche ce qu'une PR fusionnée a traité, referme ce qui est fini, rejoue les contrôles et pose la coche verte que ces PR n'ont pas (ADR-0042) |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
 
@@ -1564,6 +1565,53 @@ Quatre points à connaître avant d'y toucher :
 > étages** : deux filtrages divergents publieraient une action dans l'issue sans jamais la
 > reprendre en PR, sans que rien ne le signale. Permissions du job : `contents: write` et
 > `pull-requests: write`.
+
+### Étage 3 : le suivi — `veille-suivi.yml` (ADR-0042)
+
+Les deux premiers étages **ouvrent** et ne referment jamais : une issue datée par
+exécution (52 par an au rythme hebdomadaire) et des brouillons que `main` périme en
+silence. `veille-suivi.yml` est l'étage qui revient dessus. Il se déclenche en
+`workflow_run` juste après *Veille technologique MAT*, plus un **filet quotidien** —
+une PR relue et fusionnée un mercredi doit voir sa case cochée le jeudi.
+
+| Job | Script | Ce qu'il fait |
+|---|---|---|
+| `issues` | `scripts/suivi-veille-issues.js` | Coche les actions dont la PR est **fusionnée**, réécrit un bloc « Suivi automatique », **referme** l'issue entièrement traitée, relance **une fois** celle qui traîne. |
+| `inventaire` | `scripts/suivi-veille-prs.js` | Relance **une fois** un brouillon de plus de 14 j, **referme** celui de plus de 60 j (branche conservée), publie la matrice des PR à vérifier. |
+| `verifier` | — (+ `suivi-veille-pr-etat.js`) | Fusionne `main` dans la branche, rejoue les contrôles du dépôt, tente une remise à niveau par agent si besoin, puis **pose un commit status** `veille/controles`. |
+
+Cinq points à connaître avant d'y toucher :
+
+- **Une case ne se coche que sur une PR FUSIONNÉE.** Une PR ouverte ne prouve rien ;
+  une PR fermée sans fusion prouve le contraire. Le bloc de suivi dit le reste, y
+  compris « aucune PR — à traiter à la main ».
+- **La coche verte est posée par l'API** (`POST /statuses/{sha}`), pas par un workflow :
+  c'est ce qui contourne la limite de l'ADR-0023 §5. ⛔ Elle porte sur les **contrôles
+  du dépôt** (syntaxe, CSS, cache-busting, relink), **pas** sur Playwright ni sur la
+  pertinence du correctif — ne jamais l'élargir en silence.
+- **Un conflit avec `main` n'est jamais résolu automatiquement** : fusion annulée,
+  commentaire, statut rouge. L'agent n'intervient que si la fusion est **propre** et
+  que les contrôles échouent (cas typique : un `?v=` ou un numéro de version que `main`
+  a doublés), avec les outils de l'étage 2 (ni terminal, ni réseau) et **la même
+  barrière** `check-veille-diff.js`. Rien n'est poussé si les contrôles ne passent pas.
+- ⚠️ **Les seuils se comptent depuis `created_at`, jamais `updated_at`** : le job pousse
+  lui-même la fusion de `main`, ce qui rafraîchit `updated_at`. Une PR abandonnée
+  paraîtrait éternellement active.
+- ⚠️ **L'idempotence tient au marqueur HTML** (`<!-- suivi-veille:… -->`) présent dans
+  chaque commentaire, pas à la ressemblance des textes : le workflow repasse tous les
+  jours. Sans marqueur, chaque passage ajouterait une relance de plus.
+
+> Fermer un brouillon ne supprime **pas** sa branche : c'est elle qui empêche l'étage 2
+> de rouvrir la même action (dédoublonnage par URL, ADR-0023 §6) et qui permet de la
+> reprendre à la main.
+>
+> Essai à blanc : `workflow_dispatch` → `dry_run: true` (`SUIVI_DRY_RUN=1`) neutralise
+> toutes les écritures et les journalise. ⚠️ `workflow_run` ne s'active que depuis la
+> version du fichier présente sur la branche **par défaut** : avant fusion dans `main`,
+> seuls le cron et le déclenchement manuel font tourner ce workflow.
+>
+> Permissions : `contents: write`, `issues: write`, `pull-requests: write`,
+> `statuses: write`.
 
 ### Tests Playwright
 
