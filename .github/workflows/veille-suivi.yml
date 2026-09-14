@@ -1,0 +1,302 @@
+name: Suivi de la veille MAT
+
+# ════════════════════════════════════════════════════════════════════
+# ÉTAGE 3 du canal actionnable de la veille (ADR-0042).
+#
+#   étage 1 (ADR-0005) : une issue-checklist par exécution
+#   étage 2 (ADR-0023) : une PR **draft** par action éligible
+#   étage 3 (ici)      : quelqu'un revient dessus
+#
+# Les deux premiers étages ouvrent et ne referment jamais. Au rythme
+# hebdomadaire, cela fait 52 issues par an dont on ignore lesquelles sont
+# traitées, et des brouillons sans coche verte que `main` périme en silence.
+#
+# Ce workflow ne fusionne rien et ne sort aucune PR du brouillon : il constate,
+# annote, referme ce qui est fini — et rejoue les contrôles du dépôt pour poser
+# la coche verte qui manquait à l'étage 2.
+# ════════════════════════════════════════════════════════════════════
+
+on:
+  # Le déclencheur principal : juste après la veille technologique, dont les
+  # deux jobs viennent de créer l'issue et les PR draft.
+  # ⚠️ `workflow_run` ne s'active que depuis la version du fichier présente sur
+  # la branche PAR DÉFAUT : tant que ce workflow n'est pas sur `main`, seuls
+  # `schedule` et `workflow_dispatch` le déclenchent.
+  workflow_run:
+    workflows: ["Veille technologique MAT"]
+    types: [completed]
+  # Filet quotidien : une PR relue et fusionnée un mercredi doit voir sa case
+  # cochée le jeudi, pas le lundi suivant.
+  schedule:
+    - cron: '40 7 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Essai à blanc (aucun commentaire, aucune fermeture, aucun push)"
+        type: boolean
+        required: false
+        default: false
+
+# contents        : fusionner `main` dans une branche de veille et la pousser
+# issues          : cocher, annoter et refermer les issues « Actions PWA »
+# pull-requests   : commenter et refermer les brouillons abandonnés
+# statuses        : poser la coche verte sur le HEAD des PR de veille
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  statuses: write
+
+# Pas de `cancel-in-progress` : ce workflow écrit (commentaires, fermetures,
+# push). Un run interrompu au milieu laisse un état à moitié posé.
+concurrency:
+  group: veille-suivi
+  cancel-in-progress: false
+
+env:
+  SUIVI_DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+
+jobs:
+  # ── 1. Les issues « Actions PWA » ────────────────────────────────
+  issues:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Traiter les issues « Actions PWA »
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/suivi-veille-issues.js
+
+  # ── 2. Inventaire des PR draft de veille ─────────────────────────
+  # Ce job ne touche à aucun fichier : il commente, referme les brouillons
+  # abandonnés et dit lesquels méritent une vérification technique.
+  inventaire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrice: ${{ steps.inventaire.outputs.matrice }}
+      nombre: ${{ steps.inventaire.outputs.nombre }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Inventorier les PR de veille
+        id: inventaire
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/suivi-veille-prs.js
+
+  # ── 3. Vérification d'une PR draft ───────────────────────────────
+  # Un job par PR : on remet la branche à niveau sur `main`, on rejoue les
+  # contrôles du dépôt, et on publie un commit status. C'est ce statut qui
+  # donne enfin une coche verte à ces PR (ADR-0023 §5 : GitHub ne déclenche
+  # aucun workflow pour les événements du `GITHUB_TOKEN`).
+  verifier:
+    needs: inventaire
+    if: needs.inventaire.outputs.nombre != '' && needs.inventaire.outputs.nombre != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false      # un brouillon cassé n'empêche pas d'examiner les autres
+      max-parallel: 1       # une branche à la fois : les push ne se marchent pas dessus
+      matrix: ${{ fromJSON(needs.inventaire.outputs.matrice) }}
+    steps:
+      - name: Checkout de la branche du brouillon
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.branche }}
+          # `check-cache-bust.js` compare la branche à `origin/main` : avec un
+          # clone superficiel il s'ignore en silence, donc ne sert à rien.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Remettre la branche à niveau sur main
+        id: fusion
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          avant="$(git rev-parse HEAD)"
+          if git merge --no-edit origin/main; then
+            apres="$(git rev-parse HEAD)"
+            echo "conflit=false" >> "$GITHUB_OUTPUT"
+            if [ "$avant" = "$apres" ]; then
+              echo "fusionne=false" >> "$GITHUB_OUTPUT"
+              echo "Branche déjà à jour sur main."
+            else
+              echo "fusionne=true" >> "$GITHUB_OUTPUT"
+              echo "main fusionné dans la branche."
+            fi
+          else
+            # ⛔ On ne résout PAS un conflit automatiquement : distinguer ce que
+            # le correctif voulait dire de ce que main a changé depuis n'est pas
+            # une opération mécanique. Un humain tranche.
+            git merge --abort || true
+            echo "conflit=true" >> "$GITHUB_OUTPUT"
+            echo "fusionne=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Suivi veille::PR #${{ matrix.numero }} — conflit avec main."
+          fi
+
+      - name: Contrôles du dépôt
+        id: controles
+        if: steps.fusion.outputs.conflit == 'false'
+        continue-on-error: true
+        env:
+          BASE_REF: origin/main
+        run: |
+          find js/ -name '*.js' | sort | xargs -I{} node --check {}
+          node --check service-worker.js
+          node scripts/check-css.js
+          node scripts/check-cache-bust.js
+          node scripts/check-notify-relink.js
+
+      # Seul cas où un agent intervient : les contrôles échouent APRÈS une
+      # fusion propre — typiquement un `?v=` ou un `CACHE` que main a doublé.
+      # C'est mécanique et vérifiable ; le reste (pertinence, conflit) reste
+      # humain. L'agent n'a ni terminal ni réseau, comme à l'étage 2.
+      - name: Réparer le brouillon (Claude Code)
+        id: reparation
+        if: steps.fusion.outputs.conflit == 'false' && steps.controles.outcome == 'failure'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,Edit,Write"
+          prompt: |
+            Tu remets à niveau une branche de correctif de MAT (Mézières Avec Toi), PWA
+            municipale en JavaScript **vanilla** servie par GitHub Pages. La branche vient
+            d'absorber `main` et ne passe plus les contrôles du dépôt.
+
+            Ta tâche est UNIQUEMENT de faire repasser ces contrôles :
+
+            - `node scripts/check-cache-bust.js` — tout fichier de `js/` ou `css/` modifié
+              par rapport à `main` doit voir son `?v=` incrémenté aux TROIS endroits
+              (`index.html`, `js/mat-boot.js`, `service-worker.js`), le `CACHE` de
+              `service-worker.js` doit avoir bougé (`mat-vX.Y.Z`), et **le numéro affiché
+              doit bouger avec lui** : `<div class="mat-version">` et le bouton « 🆕 v… »
+              d'`index.html`, plus une entrée en tête du changelog (`ov-changelog`
+              d'`index.html` et `CHANGELOG.md`).
+            - `node scripts/check-css.js` — aucune accolade orpheline (ADR-0015).
+            - `node --check` sur `js/**` et `service-worker.js` — syntaxe.
+
+            ⛔ Ne touche à RIEN d'autre. Ne « améliore » pas le correctif déjà présent sur
+            la branche, ne le réécris pas, n'ajoute aucune fonctionnalité, aucune
+            dépendance, aucun script chargé depuis un CDN. Si la remise à niveau demande
+            de comprendre l'intention du correctif ou d'arbitrer un désaccord avec `main`,
+            **n'écris rien** : un humain doit trancher, et ne rien faire est ici un
+            résultat valide.
+
+            Fichiers interdits, sans exception : `.github/**`, `scripts/**`, `veille/**`,
+            `data/**`, `CNAME`, `_headers`, `admin.html`, `LICENSE`, `SECURITY.md`,
+            `CLAUDE.md`. Un contrôle automatique rejette la branche si l'un d'eux est
+            touché. Tu n'as ni terminal ni accès réseau.
+
+      - name: L'agent a-t-il proposé quelque chose ?
+        id: change
+        if: steps.reparation.outcome == 'success' || steps.reparation.outcome == 'failure'
+        run: |
+          if [ -z "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "vide=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "vide=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # La même barrière qu'à l'étage 2 : ce que le prompt interdit, ce script
+      # le refuse. Un prompt est une consigne, pas une barrière.
+      - name: Garde-fou — périmètre de la réparation
+        if: steps.change.outputs.vide == 'false'
+        run: node scripts/check-veille-diff.js
+
+      - name: Committer la réparation
+        if: steps.change.outputs.vide == 'false'
+        run: |
+          git add -A
+          git status --short
+          git commit -m "veille(suivi) : remise à niveau du brouillon sur main" \
+                     -m "Contrôles du dépôt rejoués par le suivi de veille (étage 3, ADR-0042)."
+
+      - name: Contrôles du dépôt (après réparation)
+        id: controles2
+        if: steps.change.outputs.vide == 'false'
+        continue-on-error: true
+        env:
+          BASE_REF: origin/main
+        run: |
+          find js/ -name '*.js' | sort | xargs -I{} node --check {}
+          node --check service-worker.js
+          node scripts/check-css.js
+          node scripts/check-cache-bust.js
+          node scripts/check-notify-relink.js
+
+      # ⛔ On ne pousse JAMAIS une branche qui ne passe pas les contrôles : une
+      # fusion poussée sans correctif rendrait le brouillon plus cassé qu'avant.
+      - name: Pousser la branche
+        id: push
+        if: >-
+          steps.fusion.outputs.conflit == 'false'
+          && (steps.controles.outcome == 'success' || steps.controles2.outcome == 'success')
+          && (steps.fusion.outputs.fusionne == 'true' || steps.change.outputs.vide == 'false')
+          && env.SUIVI_DRY_RUN != '1'
+        env:
+          BRANCHE: ${{ matrix.branche }}
+        run: |
+          for essai in 1 2 3 4; do
+            if git push origin "HEAD:$BRANCHE"; then exit 0; fi
+            echo "Push échoué (tentative $essai) — nouvelle tentative."
+            sleep $((2 ** essai))
+          done
+          echo "::error title=Suivi veille::Push impossible après 4 tentatives."
+          exit 1
+
+      # Le verdict est publié dans tous les cas : c'est lui qui donne à ces PR
+      # la coche verte (ou rouge) qu'aucun workflow ne leur donnera jamais.
+      - name: Préparer le verdict
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUIVI_PR_NUMERO: ${{ matrix.numero }}
+          SUIVI_PR_BRANCHE: ${{ matrix.branche }}
+          BRANCHE: ${{ matrix.branche }}
+          SUIVI_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # ⛔ Le statut se pose sur le HEAD **distant** de la branche, pas sur le
+          # HEAD local : quand les contrôles échouent, la fusion de `main` reste
+          # locale et n'est jamais poussée. Un statut posé sur ce commit-là
+          # viserait un SHA que le dépôt ne connaît pas (422), et la PR resterait
+          # sans coche — l'échec ne se verrait nulle part.
+          if git fetch origin "$BRANCHE" >/dev/null 2>&1; then
+            echo "SUIVI_PR_SHA=$(git rev-parse FETCH_HEAD)" >> "$GITHUB_ENV"
+          else
+            echo "::warning title=Suivi veille::Branche $BRANCHE introuvable — aucun verdict posé."
+          fi
+          if [ "${{ steps.fusion.outputs.conflit }}" = "true" ]; then
+            echo "SUIVI_PR_ETAT=conflit" >> "$GITHUB_ENV"
+            echo "SUIVI_PR_DETAIL=La fusion de main dans cette branche produit des conflits." >> "$GITHUB_ENV"
+          elif [ "${{ steps.controles2.outcome }}" = "success" ]; then
+            echo "SUIVI_PR_ETAT=repare" >> "$GITHUB_ENV"
+            echo "SUIVI_PR_DETAIL=Fusion de main puis remise à niveau automatique (cache-busting, version affichée)." >> "$GITHUB_ENV"
+          elif [ "${{ steps.controles.outcome }}" = "success" ]; then
+            echo "SUIVI_PR_ETAT=ok" >> "$GITHUB_ENV"
+          else
+            echo "SUIVI_PR_ETAT=echec" >> "$GITHUB_ENV"
+            echo "SUIVI_PR_DETAIL=Les contrôles échouent et la remise à niveau automatique n'a pas suffi." >> "$GITHUB_ENV"
+          fi
+
+      - name: Verdict
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUIVI_PR_NUMERO: ${{ matrix.numero }}
+          SUIVI_PR_BRANCHE: ${{ matrix.branche }}
+          SUIVI_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/suivi-veille-pr-etat.js
