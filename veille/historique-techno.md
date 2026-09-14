@@ -1,3 +1,17 @@
+## 2026-09-14
+- Chrome 153.0.8010.36/.37, 7e zero-day V8 actif de 2026, CVE-2026-87491, 230 correctifs (8 sept 2026) — https://thehackernews.com/2026/09/chrome-v8-zero-day-exploited-in-wild.html
+- Mistral AI : levée de 3 Md€ en série D, valorisation >21 Md€, menée par Samsung (8 sept 2026) — https://techcrunch.com/2026/09/08/mistral-raises-e3b-as-sovereign-ai-becomes-big-business/
+- Consultation citoyenne « Vieillir en France, aujourd'hui et demain » (lancée 25 août, jusqu'au 20 sept 2026) — https://www.pour-les-personnes-agees.gouv.fr/actualites/participez-a-la-consultation-citoyenne-vieillir-en-france-aujourd-hui-et-demain
+- Alerte CERT-FR CERTFR-2026-ALE-010 : faille critique Metabase, injection SQL non authentifiée CVE-2026-72898 (10 sept 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-010/
+- Bulletin CERT-FR CERTFR-2026-ACT-038 : JFrog Artifactory, Firefox/Thunderbird, HPE Aruba, Cisco NX-OS/IOS XR (7 sept 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-038/
+- Cyberattaque mairie du Tampon (La Réunion), services perturbés (9 sept 2026) — https://www.cyberattaque.org/le-tampon-une-cyberattaque-frappe-la-mairie-et-perturbe-fortement-les-services-municipaux/
+- Commune de Joigny (Yonne) : 268 795 tentatives d'intrusion bloquées en une semaine, sans incident (9 sept 2026) — https://actu.orange.fr/societe/fait-divers/yonne-cette-commune-a-subi-269-000-cyberattaques-en-une-semaine-magic-CNT000002rQMbg.html
+- [reco] Mettre à jour Chrome vers 153.0.8010.36+ sur les postes d'administration MAT (CVE-2026-87491)
+- [reco] Vérifier/patcher tout outil Metabase utilisé par la mairie ou un prestataire (CERT-FR ALE-010)
+- [reco] Relire les mesures de défense du backend MAT à la lumière du cas de Joigny
+- [reco] Relayer la consultation citoyenne « Vieillir en France » auprès des séniors avant le 20 septembre
+- [reco] Suivre l'impact de la levée de fonds Mistral sur les tarifs/capacités de l'API du chatbot MAT
+
 ## 2026-09-07
 - Chrome 152.0.7977.82/.83, zero-day V8 activement exploité CVE-2026-85046, ajouté au KEV CISA (3-4 sept 2026) — https://thehackernews.com/2026/09/google-releases-chrome-update-to-patch.html
 - GitHub Actions : permission vulnerability-alerts, API de dépréciation des runners (3 sept 2026) — https://github.blog/changelog/2026-09-03-github-actions-early-september-2026-updates/
