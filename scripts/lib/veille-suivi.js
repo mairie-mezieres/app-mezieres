@@ -239,10 +239,52 @@ async function commenterUneFois(numero, nomMarqueur, corps) {
   return ok;
 }
 
+/**
+ * État de la CI sur un commit : `{ etat, echecs }`.
+ *
+ * ⛔ Deux sources, et il faut les deux : les **check runs** (les jobs GitHub
+ * Actions) et les **commit statuses** de l'API — c'est par ce second canal que
+ * l'étage 3 pose `veille/controles`, et il n'apparaît dans aucun check run.
+ * N'en lire qu'une, c'est conclure « verte » sur la moitié des preuves.
+ *
+ * ⚠️ `neutral` et `skipped` ne sont PAS des échecs : un job conditionnel ignoré
+ * est un fonctionnement normal. ⚠️ « aucune » (rien n'a tourné) n'est pas
+ * « verte » : l'appelant décide, et pour une fusion automatique l'absence de
+ * preuve ne vaut pas preuve.
+ */
+async function etatCI(sha) {
+  const echecs = [];
+  let vus = 0;
+  let enCours = false;
+
+  const runs = await gh(`/repos/${REPO}/commits/${sha}/check-runs?per_page=100`);
+  for (const run of (runs.data && runs.data.check_runs) || []) {
+    vus += 1;
+    if (run.status !== 'completed') { enCours = true; continue; }
+    if (['failure', 'timed_out', 'action_required'].includes(run.conclusion)) echecs.push(run.name);
+  }
+
+  const st = await gh(`/repos/${REPO}/commits/${sha}/status`);
+  for (const s of (st.data && st.data.statuses) || []) {
+    vus += 1;
+    if (s.state === 'pending') { enCours = true; continue; }
+    if (s.state === 'failure' || s.state === 'error') echecs.push(s.context);
+  }
+
+  if (echecs.length > 0) return { etat: 'rouge', echecs };
+  if (enCours) return { etat: 'en cours', echecs };
+  return { etat: vus > 0 ? 'verte' : 'aucune', echecs };
+}
+
+/** Pastille lisible pour un tableau de résumé. */
+function pastille(etat) {
+  return { verte: '✅ verte', rouge: '❌ rouge', 'en cours': '⏳ en cours', aucune: '➖ aucune' }[etat] || etat;
+}
+
 module.exports = {
   API, REPO, TOKEN, DRY_RUN,
   PREFIXE_BRANCHE, PREFIXE_ISSUE,
   marqueur, ageJours, gh, ghListe, sortie, resume, abandon, pretOuAbandon,
-  idDepuisBranche, lireActionsIssue, inventairePrVeille, etatPr,
+  idDepuisBranche, lireActionsIssue, inventairePrVeille, etatPr, etatCI, pastille,
   dejaCommente, commenterUneFois,
 };
