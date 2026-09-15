@@ -601,9 +601,9 @@ Une actualité peut porter jusqu'à **6 images** (`MAX_ACTU_PHOTOS`, `lib/actu.j
 `photoPublicId`, qui continuent de porter la **première** image (la couverture).
 ⛔ Ces deux champs ne sont pas un reste historique : la vignette du rendu bureau
 (`js/mat-desktop.js`), la carte « prochaine manifestation », l'image de la
-notification push, la liste de l'admin et les actus venues du **webhook Facebook**
-lisent `photo` et ignorent `photos`. Les actus publiées avant la v4.109 n'ont que
-`photo`. ⛔ **Toute lecture des images d'une actu passe donc par `getActuPhotos`
+notification push et la liste de l'admin lisent `photo` et ignorent `photos`. Les
+actus publiées avant la v4.109 n'ont que `photo`, et celles venues du **webhook
+Facebook** n'en avaient qu'une jusqu'à la v4.115 (voir §9). ⛔ **Toute lecture des images d'une actu passe donc par `getActuPhotos`
 (`js/mat-actus.js`) ou `actuPhotoList` (backend `lib/actu.js`)** — l'enjeu n'est
 pas l'affichage mais la **suppression** : un `publicId` oublié reste sur Cloudinary
 sans plus rien pour le retrouver, et la suppression répond quand même `ok: true`.
@@ -1298,16 +1298,46 @@ Vérification HMAC-SHA256
         ▼
 handleFacebookPublication()
         │
-        ├── fetchAndHostPhoto()
-        │     ├── Graph API → full_picture (haute résolution)
-        │     └── Upload Cloudinary → URL permanente
+        ├── resolvePostImages()  ← TOUTES les images du post
+        │     ├── Graph API → attachments{subattachments{media}}
+        │     ├── ou, à défaut, les URL du corps du webhook
+        │     └── Upload Cloudinary (une par image) → URL permanentes
         │
         ├── Déduplication (postId déjà traité ?)
         │
-        ├── Stockage dans Redis (titre, description, photo, date)
+        ├── Stockage dans Redis (titre, description, photo + photos[], date)
         │
         └── Envoi notification push à tous les abonnés
 ```
+
+### Un post à plusieurs photos donne une actu à plusieurs photos (v4.115)
+
+Le sens sortant (admin → Facebook) existait depuis la v4.109 ; le sens entrant,
+non. Le webhook ne connaissait **qu'une** image par post, et pour deux raisons
+qui se cumulaient :
+
+- `full_picture` (Graph API) ne rend que la **couverture**, jamais les autres ;
+- `change.value.photo` est une **chaîne**, et elle est **absente** d'un post
+  multi-photos — celui-ci porte `change.value.photos`, un **tableau**.
+
+⛔ **La panne était muette** : un post à six photos produisait une actu à une
+image, c'est-à-dire un résultat d'apparence parfaitement normale. Rien, ni dans
+l'app, ni dans les logs, ne distinguait ce cas d'un post réellement mono-photo.
+
+`resolvePostImages` (`routes/webhook.js`, backend) lit donc les images **dans les
+attachements** — `attachments.data[].subattachments.data[].media.image.src` — et
+retombe sur les URL du corps du webhook quand la Graph API ne répond pas (token
+absent ou périmé). `full_picture` ne sert plus que de dernier recours.
+
+⛔ **Les deux sources ne sont JAMAIS fusionnées.** Une même photo n'a pas la même
+URL dans le corps du webhook et dans la Graph API (deux hôtes CDN, deux jeux de
+paramètres signés) : les concaténer publierait chaque image **en double**, sans
+qu'aucune comparaison de chaînes ne s'en aperçoive. On retient celle qui décrit le
+**plus** d'images, la Graph API l'emportant à égalité. Voir **ADR-0046**.
+
+Le reste ne change pas : plafond de 6 images, première image = **couverture**
+(`photo` / `photoPublicId`), image du push = la couverture. Une image dont l'envoi
+Cloudinary échoue retombe sur son URL Facebook directe sans annuler les autres.
 
 ### Configurer le webhook sur Facebook
 
