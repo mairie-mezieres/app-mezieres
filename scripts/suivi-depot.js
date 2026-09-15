@@ -50,7 +50,7 @@
 
 const {
   REPO, DRY_RUN, PREFIXE_BRANCHE, PREFIXE_ISSUE,
-  ageJours, gh, ghListe, resume, pretOuAbandon, commenterUneFois,
+  ageJours, gh, ghListe, resume, pretOuAbandon, commenterUneFois, etatCI, pastille,
 } = require('./lib/veille-suivi');
 
 const RELANCE_JOURS = Math.max(0, Number(process.env.SUIVI_PR_RELANCE_JOURS || 14) || 0);
@@ -69,45 +69,6 @@ function categorie(pr) {
   const ref = (pr.head && pr.head.ref) || '';
   if (ref.startsWith(PREFIXE_BRANCHE)) return 'veille';
   return BRANCHES_AUTO.some((p) => ref.startsWith(p)) ? 'auto' : 'humaine';
-}
-
-/**
- * État de la CI sur la tête d'une PR : `{ etat, echecs }`.
- *
- * Deux sources, et il faut les deux : les **check runs** (les jobs GitHub
- * Actions) et les **commit statuses** de l'API — c'est par ce second canal que
- * l'étage 3 pose `veille/controles`, et il n'apparaît dans aucun check run.
- */
-async function etatCI(sha) {
-  const echecs = [];
-  let vus = 0;
-  let enCours = false;
-
-  const runs = await gh(`/repos/${REPO}/commits/${sha}/check-runs?per_page=100`);
-  const liste = (runs.data && runs.data.check_runs) || [];
-  for (const run of liste) {
-    vus += 1;
-    if (run.status !== 'completed') { enCours = true; continue; }
-    // `neutral` et `skipped` ne sont pas des échecs : un job conditionnel ignoré
-    // est un fonctionnement normal, le compter en rouge rendrait le signal faux.
-    if (['failure', 'timed_out', 'action_required'].includes(run.conclusion)) echecs.push(run.name);
-  }
-
-  const st = await gh(`/repos/${REPO}/commits/${sha}/status`);
-  for (const s of (st.data && st.data.statuses) || []) {
-    vus += 1;
-    if (s.state === 'pending') { enCours = true; continue; }
-    if (s.state === 'failure' || s.state === 'error') echecs.push(s.context);
-  }
-
-  if (echecs.length > 0) return { etat: 'rouge', echecs };
-  if (enCours) return { etat: 'en cours', echecs };
-  return { etat: vus > 0 ? 'verte' : 'aucune', echecs };
-}
-
-/** Pastille lisible pour le tableau du résumé. */
-function pastille(etat) {
-  return { verte: '✅ verte', rouge: '❌ rouge', 'en cours': '⏳ en cours', aucune: '➖ aucune' }[etat] || etat;
 }
 
 async function traiterPr(numero) {

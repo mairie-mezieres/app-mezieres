@@ -1334,6 +1334,7 @@ Les workflows dans `.github/workflows/` :
 | `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
 | `veille-suivi.yml` | après `veille-techno.yml` (`workflow_run`) + quotidien (cron) | **Étage 3** : traite les issues « Actions PWA » et les PR draft ouvertes par la veille — coche ce qu'une PR fusionnée a traité, referme ce qui est fini, rejoue les contrôles et pose la coche verte que ces PR n'ont pas (ADR-0042) |
 | `suivi-depot.yml` | **manuel** (`workflow_dispatch`) + quotidien (cron) | Vérification et traitement de **toutes** les PR et issues ouvertes (Dependabot, agents, humaines) : état de CI, conflits, inactivité. Tableau dans le résumé du run ; commentaire seulement sur une PR **automatique** actionnable ; ⛔ aucune fermeture, aucun commentaire sur une PR humaine (ADR-0043) |
+| `dependabot-auto-merge.yml` | fin de la CI (`workflow_run`) + quotidien + manuel | Fusionne les PR **Dependabot** à faible risque une fois la CI verte : correctif toujours, mineure ≥ 1.0.0, ⛔ **jamais une majeure ni une mineure en 0.x**, et seulement si la PR ne touche que `package.json` / `package-lock.json` (ADR-0045) |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
 
@@ -1669,6 +1670,35 @@ mes issues, maintenant ? ».
 > Un **jumeau** existe dans `chatbot-mairie-mezieres` (`scripts/suivi-depot.js` +
 > `.github/workflows/suivi-depot.yml`), sans la catégorie « veille » — la veille n'y
 > ouvre aucune PR. Toute correction de fond se reporte dans les deux dépôts.
+
+### Fusion automatique Dependabot — `dependabot-auto-merge.yml` (ADR-0045)
+
+Le suivi ne fusionne jamais (ADR-0043). Ce workflow-ci, **séparé**, prend la seule
+décision qui soit mécanique : accepter une mise à jour de version à faible risque dont
+la CI est verte. Six barrières, toutes dans le script :
+
+1. auteur **`dependabot[bot]` lu sur l'API** (un titre, ça s'écrit — une identité d'App, non) ;
+2. la PR ne touche **que** `package.json` / `package-lock.json` ;
+3. **correctif** toujours ; **mineure** seulement **à partir de la 1.0.0** ;
+4. **CI verte**, sur les deux sources (check runs **et** commit statuses) ;
+5. `mergeable_state === 'clean'` ;
+6. plafond de **5** fusions par exécution.
+
+- ⛔ **Jamais une majeure, et jamais une mineure en 0.x.** En pré-1.0, c'est la mineure
+  qui porte les ruptures (semver §4) : `0.124 → 0.125` peut casser autant qu'un 1 → 2.
+- ⛔ **« aucune » n'est pas « verte ».** Si aucun check n'a tourné, le script refuse :
+  pour une fusion, l'absence de preuve ne vaut pas preuve (même erreur qu'ADR-0030).
+- ⚠️ **Pourquoi pas l'`--auto` natif de GitHub** : `main` n'est protégée dans aucun des
+  deux dépôts, et sans règle de protection exigeant des checks, l'auto-merge natif
+  fusionne **immédiatement**. Le script lit donc la CI lui-même.
+- ⚠️ Le déclencheur (`workflow_run` sur « CI » et « E2E ») n'est **qu'un réveil** : la
+  décision se prend sur l'état **global** des checks de la tête, jamais sur la
+  conclusion du seul workflow qui vient de finir.
+- ⚠️ Aucun commentaire sur les PR, même pour un refus : le **résumé du run** dit ce qui
+  a été fusionné, ce qui a été laissé et pourquoi.
+
+> Réglages : `AUTOMERGE_MAX` (défaut 5), `AUTOMERGE_MINEURES=0` pour n'accepter que les
+> correctifs, `SUIVI_DRY_RUN=1` pour un essai à blanc. Jumeau dans le dépôt backend.
 
 ### Tests Playwright
 
