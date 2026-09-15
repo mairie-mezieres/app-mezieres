@@ -58,3 +58,12 @@ jobs:
       # sans le moindre signal, ni côté app ni côté admin. Voir ADR-0034.
       - name: Notification relink check
         run: node scripts/check-notify-relink.js
+
+      # `null == false` est VRAI dans une expression Actions (les deux opérandes
+      # sont castés en nombre). Une entrée `workflow_dispatch` comparée à `false`
+      # se déclenche donc toute seule hors lancement manuel : les mises à jour
+      # mineures de `dependabot-auto-merge.yml` étaient désactivées dans le seul
+      # mode qui compte, et le lancement manuel — le seul qu'on essaie — prenait
+      # le bon chemin. Voir ADR-0045 §8.
+      - name: Workflow inputs check (null == false)
+        run: node scripts/check-workflow-inputs.js
