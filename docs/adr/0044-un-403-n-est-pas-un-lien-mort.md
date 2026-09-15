@@ -87,6 +87,57 @@ ne rendrait verts.
   essais espacés de 2 s, par URL en erreur). Sur quatre erreurs, c'est invisible ;
   le job reste très en deçà de ses 10 minutes.
 
+## Amendement du 15 septembre 2026 — le re-test ne suffit pas non plus
+
+**L'issue #453 a rouvert sur `https://www.xpfibre.com/loiret-thd`** : l'URL même
+qui a motivé ce script, signalée une deuxième fois, avec cette mention —
+`re-test navigateur : HTTP 403`. La page, elle, s'ouvre parfaitement sur un
+téléphone.
+
+La décision ci-dessus reposait sur une hypothèse implicite : *un serveur qui
+refuse un robot accepte des en-têtes de navigateur*. C'est vrai de la plupart
+des sites — ce fut vrai de `chaiamandineetquentin.fr` — et **faux de
+Cloudflare**. Les en-têtes ne sont qu'une partie de ce qu'un serveur voit :
+l'**empreinte TLS** (ordre des ciphers, extensions du ClientHello) et le
+**protocole** trahissent le client bien avant le `User-Agent`. Node parle en
+HTTP/1.1 quand Chrome parle en h2 ; annoncer « Chrome 140 » par-dessus une
+poignée de main qui n'est pas celle de Chrome est même un **signal de robot
+supplémentaire**. Rien de tout cela ne se falsifie depuis `fetch`.
+
+Le script traitait donc « il me refuse encore » comme « la page est morte » — et
+c'est ce glissement qui est faux. Un 403 ne devient pas un constat de décès
+parce qu'on l'a obtenu deux fois.
+
+**Décision : un verdict à trois états**, et un seul ouvre une issue.
+
+| Verdict | Quand | Conséquence |
+|---|---|---|
+| `vivant` | réponse < 400 | faux positif → bloc repliable |
+| `bloque` | **403, 429, 999** persistants | **invérifiable** : listé, re-testé chaque semaine, **non compté** dans `restants` |
+| `casse` | 404, 410, 401, 5xx, DNS, connexion refusée, expiration | reste dans le rapport, ouvre l'issue |
+
+Ce n'est pas `--accept 403` déguisé : l'URL continue d'être **testée à chaque
+scan** et **affichée**, elle cesse seulement de déclencher une alerte. La
+différence tient à ce qu'on écrit dans le rapport — « je ne sais pas » au lieu de
+« c'est cassé ». Un `--exclude`, lui, aurait supprimé la mesure.
+
+Le jeu d'en-têtes a par ailleurs été complété (`sec-ch-ua`, `Sec-Fetch-*`) : leur
+absence est à elle seule un marqueur de robot, et les envoyer récupère les sites
+dont le filtrage s'arrête là.
+
+**Limite assumée** : une page réellement passée en accès interdit sur un site
+protégé par Cloudflare ne sera plus signalée. C'est un risque faible — une page
+supprimée répond **404**, un domaine mort échoue en **DNS**, et ni l'un ni
+l'autre n'entre dans la liste ci-dessus — et il coûte moins cher que l'inverse :
+trois faux positifs sur quatre avaient déjà appris à lire ce rapport en
+diagonale.
+
+⚠️ **Conséquence sur la visibilité** : quand il ne reste que des liens `bloque`,
+`restants=0`, donc aucune issue n'est ouverte — et le rapport n'irait nulle part.
+Le script l'écrit donc aussi dans `$GITHUB_STEP_SUMMARY` (le canal par défaut,
+comme pour le suivi du dépôt, ADR-0043). Une sortie `bloques=<n>` accompagne
+`restants=<n>`.
+
 ## Voir aussi
 
 - `docs/adr/0013-fibre-operateur-d-infrastructure-et-fournisseur-d-acces.md` — pourquoi le lien XpFibre compte
