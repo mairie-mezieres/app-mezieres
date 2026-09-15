@@ -1327,7 +1327,7 @@ Les workflows dans `.github/workflows/` :
 | `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) **+ structure CSS** (`scripts/check-css.js` : équilibre des accolades — une accolade orpheline fait disparaître silencieusement la règle suivante, ADR-0015) |
 | `e2e.yml` | push/PR sur `main`, `claude/**` | Tests Playwright : 4 tests × 2 navigateurs (Desktop Chrome, Pixel 7) |
 | `lighthouse.yml` | push sur `main` + hebdo (cron) | Audit Lighthouse (performance, accessibilité, SEO) |
-| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app — chaque lien rejeté est **re-testé avec des en-têtes de navigateur** avant d'être signalé (ADR-0042) |
+| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app — chaque lien rejeté est **re-testé avec des en-têtes de navigateur** avant d'être signalé (ADR-0044) |
 | `sauvegarde-upstash.yml` | hebdomadaire (cron, lundi) | Sauvegarde de la base Redis Upstash |
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
@@ -1358,7 +1358,7 @@ referme l'issue — plus le code de sortie de lychee.
 ⛔ **Ne pas « corriger » un faux positif en ajoutant un `--exclude`** : un domaine exclu
 n'est plus jamais vérifié, y compris le jour où il meurt pour de bon — ce scan existe
 parce que `valdeloire-fibre.fr`, domaine inexistant, a été annoncé aux habitants pendant
-des mois. Voir ADR-0042.
+des mois. Voir ADR-0044.
 
 ### Mémoire de la veille technologique (anti-redondance)
 

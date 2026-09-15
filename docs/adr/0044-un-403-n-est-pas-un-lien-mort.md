@@ -1,7 +1,11 @@
-# ADR-0042 — Un 403 n'est pas un lien mort : re-tester, plutôt qu'exclure
+# ADR-0044 — Un 403 n'est pas un lien mort : re-tester, plutôt qu'exclure
 
 **Date** : 14 septembre 2026
 **Statut** : accepté
+**Note** : publié d'abord sous le numéro **0042**, déjà pris le même jour par
+« La veille ouvre, personne ne referme » (fusionné quelques heures plus tôt).
+Renuméroté en 0044 le 15 septembre 2026 — un numéro d'ADR désigne une décision
+et une seule, sans quoi « voir l'ADR-0042 » ne désigne plus rien.
 **Portée** : `.github/workflows/liens-morts.yml` (app **et** backend),
 `scripts/verifier-liens-signales.js` (les deux dépôts)
 
