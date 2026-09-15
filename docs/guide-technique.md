@@ -1327,12 +1327,13 @@ Les workflows dans `.github/workflows/` :
 | `ci.yml` | push/PR sur `main`, `claude/**` | Vérification syntaxe JS (`node --check`) **+ structure CSS** (`scripts/check-css.js` : équilibre des accolades — une accolade orpheline fait disparaître silencieusement la règle suivante, ADR-0015) |
 | `e2e.yml` | push/PR sur `main`, `claude/**` | Tests Playwright : 4 tests × 2 navigateurs (Desktop Chrome, Pixel 7) |
 | `lighthouse.yml` | push sur `main` + hebdo (cron) | Audit Lighthouse (performance, accessibilité, SEO) |
-| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app — chaque lien rejeté est **re-testé avec des en-têtes de navigateur** avant d'être signalé (ADR-0042) |
+| `liens-morts.yml` | hebdomadaire (cron, lundi) | Détection de liens morts dans l'app — chaque lien rejeté est **re-testé avec des en-têtes de navigateur** avant d'être signalé (ADR-0044) |
 | `sauvegarde-upstash.yml` | hebdomadaire (cron, lundi) | Sauvegarde de la base Redis Upstash |
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
 | `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
 | `veille-suivi.yml` | après `veille-techno.yml` (`workflow_run`) + quotidien (cron) | **Étage 3** : traite les issues « Actions PWA » et les PR draft ouvertes par la veille — coche ce qu'une PR fusionnée a traité, referme ce qui est fini, rejoue les contrôles et pose la coche verte que ces PR n'ont pas (ADR-0042) |
+| `suivi-depot.yml` | **manuel** (`workflow_dispatch`) + quotidien (cron) | Vérification et traitement de **toutes** les PR et issues ouvertes (Dependabot, agents, humaines) : état de CI, conflits, inactivité. Tableau dans le résumé du run ; commentaire seulement sur une PR **automatique** actionnable ; ⛔ aucune fermeture, aucun commentaire sur une PR humaine (ADR-0043) |
 
 **Concurrence** : chaque workflow annule le run précédent en cours pour le même PR ou la même branche (évite les doublons d'emails).
 
@@ -1357,7 +1358,7 @@ referme l'issue — plus le code de sortie de lychee.
 ⛔ **Ne pas « corriger » un faux positif en ajoutant un `--exclude`** : un domaine exclu
 n'est plus jamais vérifié, y compris le jour où il meurt pour de bon — ce scan existe
 parce que `valdeloire-fibre.fr`, domaine inexistant, a été annoncé aux habitants pendant
-des mois. Voir ADR-0042.
+des mois. Voir ADR-0044.
 
 ### Mémoire de la veille technologique (anti-redondance)
 
@@ -1635,6 +1636,39 @@ Cinq points à connaître avant d'y toucher :
 >
 > Permissions : `contents: write`, `issues: write`, `pull-requests: write`,
 > `statuses: write`.
+
+### Suivi du dépôt — `suivi-depot.yml` (ADR-0043)
+
+L'étage 3 ne regarde que ce que la veille a ouvert. `suivi-depot.yml` regarde **tout
+le reste** : PR Dependabot, PR d'agent, PR humaines, issues. C'est aussi le **point
+d'entrée manuel** — bouton « Run workflow » — pour répondre à « où en sont mes PR et
+mes issues, maintenant ? ».
+
+⛔ **Le principe tient en une ligne : plus une PR est « à nous », plus on agit.**
+
+| Origine de la PR | Ce que fait le suivi |
+|---|---|
+| veille (`claude/veille-…`) | **Rien** — `veille-suivi.yml` est son canal. Deux canaux = deux commentaires pour un même fait. |
+| automatique (`dependabot/`, `claude/`) | Commentaire si **conflit** ou **CI rouge** ; relance unique après 14 j d'inactivité. |
+| humaine (tout le reste) | **Aucun commentaire, jamais.** Elle figure au tableau du résumé. |
+
+- ⛔ **Aucune fermeture, aucun push** : le workflow n'a que `contents: read`. Fermer la
+  PR d'un robot, c'est perdre la mise à jour qu'il proposait — il la rouvrira.
+- ⛔ **Le canal par défaut est le résumé du run** (onglet « Summary »), pas le
+  commentaire : un robot qui commente ce que GitHub affiche déjà en rouge est du bruit,
+  et le bruit fait qu'on cesse de lire le canal.
+- ⚠️ L'état de CI se lit sur **deux** sources — les *check runs* **et** les *commit
+  statuses* : c'est par la seconde que l'étage 3 pose `veille/controles`, et elle
+  n'apparaît dans aucun check run. `neutral`/`skipped` ne sont pas des échecs.
+- ⚠️ `mergeable_state` se lit PR par PR et se calcule de façon asynchrone :
+  `unknown` = « pas encore calculé », **jamais** « en conflit ».
+- ⚠️ Les issues qui ont **déjà un gardien** sont écartées : `liens-morts` (refermée par
+  son propre workflow quand le scan repasse au vert) et « 🔭 Actions PWA » (étage 3).
+  Le rappel d'ancienneté sur les autres est **désactivé par défaut**.
+
+> Un **jumeau** existe dans `chatbot-mairie-mezieres` (`scripts/suivi-depot.js` +
+> `.github/workflows/suivi-depot.yml`), sans la catégorie « veille » — la veille n'y
+> ouvre aucune PR. Toute correction de fond se reporte dans les deux dépôts.
 
 ### Tests Playwright
 
