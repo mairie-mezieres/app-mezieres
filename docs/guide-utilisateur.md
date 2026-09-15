@@ -149,7 +149,9 @@ La rubrique **Actualités** affiche les dernières nouvelles publiées par la ma
   (« 2 / 5 ») indique où vous en êtes, et deux boutons ◀ ▶ juste en dessous
   permettent de naviguer à la souris, au clavier, ou si le balayage vous est
   difficile. La première photo est celle qui apparaît dans la liste et sur la
-  notification.
+  notification. C'est vrai aussi des publications reprises **depuis Facebook** :
+  un album y donne une actualité qui porte toutes ses photos (depuis la v4.115 —
+  avant, une seule était reprise).
 - Les actualités sont mises à jour automatiquement dès qu'une publication est faite sur la page Facebook de la mairie.
 - Les 30 dernières actualités sont conservées.
 

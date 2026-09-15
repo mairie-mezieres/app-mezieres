@@ -5,6 +5,35 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.115] — 15 septembre 2026
+
+### Ajouté
+
+- **Facebook → l'app : un post `#MAT` à plusieurs photos donne une actualité à
+  plusieurs photos.** Le sens sortant (admin → Facebook) existait depuis la
+  v4.109 ; le sens entrant reprenait **une seule** image.
+
+  Deux causes cumulées, côté `chatbot-mairie-mezieres` : `full_picture` (Graph
+  API) ne rend que la **couverture**, et `change.value.photo` — le repli — est une
+  **chaîne absente** d'un post multi-photos, lequel porte `change.value.photos`,
+  un **tableau** que personne ne lisait. `resolvePostImages` lit désormais
+  `attachments{media,subattachments{media}}`.
+
+  ⛔ **Les deux sources ne sont jamais fusionnées** : une même photo n'a pas la
+  même URL dans le corps du webhook et dans la Graph API (deux CDN, deux
+  signatures), donc les concaténer publierait chaque image en double sans qu'aucun
+  dédoublonnage par URL ne s'en aperçoive. On garde celle qui en décrit le plus,
+  la Graph API l'emportant à égalité — ce qui laisse un `PAGE_ACCESS_TOKEN`
+  périmé (qui rend `[]` **sans erreur**) retomber sur le corps du webhook.
+
+  ⚠️ La panne était **muette** : un post à six photos produisait une actu à une
+  image, c'est-à-dire un résultat d'apparence normale. Les logs comptent
+  maintenant les deux côtés (`N image(s) annoncée(s)` → `N photo(s)`).
+
+  Voir **ADR-0046** ; `chatbot-mairie-mezieres/test/webhook-photos.test.js`.
+
+---
+
 ## [4.114] — 15 septembre 2026
 
 ### Corrigé
