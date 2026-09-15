@@ -82,5 +82,45 @@ s'affichait normalement, seule Sentry voyait l'erreur.
 - ⛔ **Ne pas placer un appel à une dépendance externe dans un garde de sortie anticipée**
   (`if (!f()) return;`) sans repli : c'est l'endroit où un plantage emporte le plus de code
   d'un coup.
-- Les tests E2E ne peuvent pas voir cette classe de bug : Playwright bloque le service
-  worker (ADR-0006) et charge donc toujours un lot cohérent. La détection reste Sentry.
+- Les tests E2E ne peuvent pas voir cette classe de bug *spontanément* : Playwright bloque
+  le service worker (ADR-0006) et charge donc toujours un lot cohérent. Ils peuvent en
+  revanche la **simuler** — voir la deuxième occurrence ci-dessous. La détection en
+  production, elle, reste Sentry.
+
+## Deuxième occurrence — 15 septembre 2026 (issue #455)
+
+`ReferenceError: updateAppBadge is not defined`, dans `updateActuBadge`
+(`js/mat-actus.js`) appelé par `refreshActusBadge`. Même mécanisme, mais **hors des
+fichiers injectés** : `mat-actus.js` est un script `defer` ordinaire, chargé par
+`index.html` **après** `mat-accessibility.js` qui définit `updateAppBadge`. L'ordre est
+correct ; c'est le cache partiel qui ne l'est pas. La règle vaut donc pour **tout** appel
+d'une fonction définie dans un autre fichier, injecté ou non.
+
+Deux enseignements nouveaux, et ce sont eux qui ont rendu la panne muette pendant des
+semaines :
+
+1. ⛔ **Un `try/catch` synchrone autour d'un appel `async` ne protège rien.**
+   `refreshActusBadge` est `async` ; ses quatre appelants l'enveloppent tous dans
+   `try{ refreshActusBadge(); }catch(e){}` (`mat-boot.js`, `mat-core.js`, `mat-forms.js`).
+   Une exception levée à l'intérieur ne remonte pas au `catch` : elle devient un **rejet
+   de promesse**. Le garde-fou existait sur le papier, était visible en revue, et
+   n'attrapait rien. Pour protéger un appel `async`, il faut `.catch()` sur la promesse —
+   ou, mieux, ne pas laisser l'exception se produire.
+
+2. ⛔ **La panne s'arrête à la ligne qui lève, et le reste ne se voit pas manquer.**
+   `updateActuBadge` pose le badge rouge **avant** l'appel fautif, et
+   `renderNotifIdeasCallout` — l'encart « 💡 Boîte à idées » — vient **après** dans
+   `refreshActusBadge`. L'écran Notifications gardait donc l'air parfaitement normal :
+   badge correct, encart absent. Personne ne remarque une absence.
+
+**Ce qui a été fait** : la garde `typeof` sur l'appel, et un test E2E qui **simule** le
+cache partiel — `tests/e2e/badge-actus-degrade.spec.js`. ⚠️ Deux pièges de ce test, à
+connaître avant d'en écrire un semblable :
+
+- `delete window.updateAppBadge` **ne supprime rien** : une `function` déclarée au premier
+  niveau d'un script classique pose une propriété globale **non configurable**, et le
+  `delete` échoue en silence. Il faut l'**écraser** (`window.updateAppBadge = undefined`).
+  Sans l'auto-contrôle (« la fonction devait être retirée »), le test aurait été vert
+  tout en ne reproduisant rien — exactement le piège de l'ADR-0030.
+- L'encart se greffe sur `#actu-list`, qui vit dans un écran à **montage paresseux** : sans
+  `openNotifs()` préalable, la boîte n'existe pas et l'assertion ne mesure rien.

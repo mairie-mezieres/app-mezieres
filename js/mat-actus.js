@@ -188,7 +188,13 @@ function updateActuBadge(count, titleTxt){
   el.classList.toggle('show', n>0);
   if(titleTxt) el.title=titleTxt;
   else el.removeAttribute('title');
-  updateAppBadge(n);
+  // ⛔ `updateAppBadge` vit dans `js/mat-accessibility.js` : ne jamais l'appeler
+  // sans garde (ADR-0032). Le cache du service worker peut être partiel, et
+  // l'appelant `refreshActusBadge` est `async` — un ReferenceError y devient un
+  // rejet de promesse, que le `try/catch` de ses appelants N'ATTRAPE PAS. La
+  // ligne suivante de `refreshActusBadge` (l'encart « Boîte à idées ») était
+  // alors sautée sans que rien ne s'affiche. Voir issue #455.
+  try{ if(typeof updateAppBadge==='function') updateAppBadge(n); }catch(e){}
 }
 
 function markActusAsSeen(actus){

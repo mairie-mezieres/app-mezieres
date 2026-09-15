@@ -5,6 +5,25 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.114] — 15 septembre 2026
+
+### Corrigé
+
+- **L'encadré « Boîte à idées » ne s'affichait plus dans l'écran Notifications**,
+  et la pastille de l'icône de l'application restait figée. `updateActuBadge`
+  (`js/mat-actus.js`) appelait `updateAppBadge` — définie dans
+  `js/mat-accessibility.js` — **sans garde `typeof`**, seul appel du fichier dans
+  ce cas. Sur un cache de service worker partiel (ADR-0032), la fonction manque et
+  l'appel lève.
+
+  ⚠️ Deux raisons pour lesquelles la panne était muette : `refreshActusBadge` est
+  **`async`**, donc le `try/catch` **synchrone** de ses quatre appelants n'attrape
+  rien — l'exception devient un rejet de promesse ; et le badge rouge, lui, est posé
+  **avant** l'appel fautif, si bien que l'écran a l'air normal. Seule Sentry le
+  voyait (issue #455).
+
+---
+
 ## [4.112] — 13 septembre 2026
 
 Trois causes distinctes, toutes trouvées **en mesurant**, aucune visible à la
