@@ -96,6 +96,45 @@ lectures divergentes de l'état de CI — un suivi qui annonce « verte » penda
 auto-merge lit « rouge », ou l'inverse — porteraient sur la décision la plus lourde des
 deux.
 
+### 8. ⛔ `null == false` est **vrai** dans une expression Actions
+
+La première version du workflow passait la case à cocher du lancement manuel ainsi :
+
+```yaml
+AUTOMERGE_MINEURES: ${{ inputs.mineures == false && '0' || '1' }}
+```
+
+`inputs.mineures` n'existe **que** sur `workflow_dispatch`. Sur `workflow_run` et sur
+le filet quotidien, il vaut `null`. Or les expressions Actions comparent en **castant
+les deux opérandes en nombre** : `null` → 0, `false` → 0. La comparaison est donc
+vraie, et les mineures se désactivaient **toutes seules à chaque exécution
+automatique** — c'est-à-dire dans le seul mode qui compte.
+
+⚠️ Ce défaut est **invisible à l'essai** : il rend le workflow plus restrictif en
+production qu'en lancement manuel. Un essai à blanc, lancé à la main, prend le chemin
+sain. Il a fallu comparer deux exécutions à quelques minutes d'intervalle sur la même
+PR (`@sentry/node 10.73.0 → 10.74.0`, backend #229) pour le voir : `⏸️ laissée —
+mineures désactivées` sur le déclenchement réel, `✅ fusionnée` sur l'essai manuel.
+
+Correction : garder l'entrée **derrière son événement**.
+
+```yaml
+AUTOMERGE_MINEURES: ${{ (github.event_name == 'workflow_dispatch' && inputs.mineures == false) && '0' || '1' }}
+```
+
+⚠️ `SUIVI_DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}` n'a pas ce problème : `null`
+est simplement **falsy**, donc l'essai à blanc est bien désactivé par défaut. C'est la
+**comparaison explicite à `false`** qui piège, pas la lecture d'une entrée absente. La
+règle générale : dans un workflow à déclencheurs multiples, ne jamais comparer une
+`inputs.*` à `false` sans vérifier d'abord `github.event_name`.
+
+Et comme une règle qui n'est qu'écrite finit par ne plus être suivie,
+`scripts/check-workflow-inputs.js` (dans les deux dépôts, lancé par la CI) refuse
+toute comparaison `inputs.x == false` / `== true` non gardée, dans un workflow qui
+peut se déclencher autrement qu'à la main. Le détecteur a été vérifié **sur la
+version fautive** — un contrôle qui ne mesure rien ne rougit pas, il verdit
+(ADR-0030).
+
 ## Conséquences
 
 **Positives :**

@@ -1696,6 +1696,16 @@ la CI est verte. Six barrières, toutes dans le script :
   conclusion du seul workflow qui vient de finir.
 - ⚠️ Aucun commentaire sur les PR, même pour un refus : le **résumé du run** dit ce qui
   a été fusionné, ce qui a été laissé et pourquoi.
+- ⛔ **`null == false` est VRAI dans une expression Actions.** `inputs.mineures`
+  n'existe que sur `workflow_dispatch` ; ailleurs il vaut `null`, et la comparaison
+  caste les deux opérandes en nombre (`null` → 0, `false` → 0). Écrit
+  `${{ inputs.mineures == false && '0' || '1' }}`, le champ désactivait donc les
+  mineures **à chaque exécution automatique** — le seul mode qui compte — tout en
+  restant correct en lancement manuel, donc **invisible à l'essai à blanc**. D'où la
+  garde `github.event_name == 'workflow_dispatch' &&` en tête de la condition. En
+  revanche `inputs.dry_run && '1' || '0'` est sain : `null` y est simplement *falsy*.
+  C'est la **comparaison explicite à `false`** qui piège. Verrouillé par
+  `node scripts/check-workflow-inputs.js`, lancé par la CI des deux dépôts.
 
 > Réglages : `AUTOMERGE_MAX` (défaut 5), `AUTOMERGE_MINEURES=0` pour n'accepter que les
 > correctifs, `SUIVI_DRY_RUN=1` pour un essai à blanc. Jumeau dans le dépôt backend.
