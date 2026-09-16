@@ -88,6 +88,15 @@ proche. S'il a pris du retard, le bandeau montre la **station la moins chère pa
 relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des cinq
 stations suivies, chacune avec son heure de mise à jour.
 
+Cette liste détaillée suit le **même ordre que le bandeau** : relevé le plus récent
+d'abord, puis, à date égale, du prix le moins cher au plus cher. Une station dont le
+relevé n'a pas de date connue passe en dernier — on ne la suppose jamais fraîche.
+Chaque carte annonce l'âge de son relevé en toutes lettres (« Relevé du jour »,
+« Relevé d'hier », « Relevé d'il y a 4 jours ») **et** grise son fond d'autant plus que
+le prix date : fond normal le jour même, gris clair à un ou deux jours, gris plus soutenu
+au-delà. La couleur n'est qu'un rappel — le texte suffit à comprendre, y compris pour qui
+ne distingue pas ces nuances.
+
 ### Sur ordinateur
 
 Au-dessus de 1024 px de large, l'accueil adopte une mise en page en trois

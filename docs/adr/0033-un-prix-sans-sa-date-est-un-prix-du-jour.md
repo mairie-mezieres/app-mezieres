@@ -61,3 +61,47 @@ date à 320 px de large — la mesure du rendu, pas l'état interne.
   l'habitant qui juge si « 24/08 » lui suffit.
 - **Un seuil d'ancienneté** (« bascule au-delà de N jours ») : un seuil est un réglage de
   plus à défendre. « Le relevé le plus récent » se démontre à partir des données seules.
+
+---
+
+## Suite (v4.116) — la liste détaillée disait le contraire du bandeau
+
+La décision ci-dessus n'avait traité que le bandeau. L'écran détaillé, lui, gardait
+ses cinq stations rangées **par proximité** et se contentait d'un « Mis à jour le … »
+en gris pâle sous chaque prix.
+
+Deux conséquences, invisibles tant qu'on ne regarde qu'un écran à la fois :
+
+1. **La liste contredisait le bandeau.** Celui-ci affiche la moins chère parmi les
+   relevés les plus récents ; l'habitant qui appuie dessus pour « voir les cinq »
+   retrouvait cette station en 3ᵉ ou 4ᵉ position, sous des prix plus bas… mais plus
+   vieux. La règle de choix n'était énoncée nulle part, donc l'écran détaillé se
+   lisait comme un démenti.
+2. **« Mis à jour le 12/09 » ne se compare pas tout seul.** Lire cinq dates et les
+   rapporter à la date du jour est un calcul qu'on demandait à chaque habitant, sur
+   un écran qu'on consulte en marchant vers sa voiture.
+
+**Décision.** Le panneau porte le même ordre que le bandeau — relevé le plus récent
+d'abord, prix croissant à date égale — et chaque carte annonce l'âge de son relevé
+en toutes lettres, avec une teinte de fond qui grise à mesure que le prix vieillit
+(normal le jour même, gris clair à 1-2 jours, gris plus soutenu au-delà).
+
+**Ce qui n'a pas changé :** aucun prix n'est masqué, aucun seuil n'écarte une
+station. C'est toujours l'habitant qui juge si « il y a 4 jours » lui suffit — la
+v4.116 lui évite seulement de faire la soustraction.
+
+### Trois pièges de cette suite
+
+- **Le seuil n'est pas une durée.** L'âge se compte en jours de **calendrier**
+  (`matDaysUntil`, ADR-0031) : un relevé d'hier 23 h divisé par 86 400 000 vaut
+  0,4 — donc « relevé du jour », pour un prix de la veille.
+- **La couleur ne porte jamais l'information.** Le texte dit l'âge ; la teinte le
+  rappelle. Sans quoi le RGAA 1.1 tombe, et avec lui les habitants qui ne
+  distinguent pas deux gris voisins.
+- **Un gris de fond est un fond de texte.** Les premiers essais (#d9d9d9) faisaient
+  chuter le vert des prix à 4,52:1, le seuil au centième près. Les jetons
+  `--fuel-*` de `css/mat.css` sont calculés pour que la pire paire de chaque thème
+  reste au-dessus de 4,5:1 — et le thème sombre les inverse, un gris clair y étant
+  un éclairage, pas un estompage. C'est aussi ce qui a révélé que les prix de ce
+  panneau, écrits en `var(--leaf)` **en style inline**, y étaient noir sur noir
+  depuis toujours : une couleur écrite dans le JS est hors de portée des thèmes.

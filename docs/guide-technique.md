@@ -646,6 +646,47 @@ dès 256 Ko.
 
 Voir `docs/adr/0039-plusieurs-photos-une-couverture-et-un-balayage.md`.
 
+### Prix carburant — le bandeau et le panneau détaillé (v4.101, v4.116)
+
+Tout vit dans `js/mat-widgets.js`, alimenté par `GET /carburant` (backend
+`routes/carburant.js`), qui rend cinq stations avec `sp95`, `gazole`, `maj`
+(chaîne d'affichage « JJ/MM HH:MM », **sans année**) et `majISO` (horodatage
+brut). ⚠️ Seul `majISO` se compare d'une station à l'autre ; `_carburantReleve`
+sait encore dater un payload qui n'a que `maj` — un cache Redis d'une heure peut
+survivre à un déploiement du backend.
+
+**Bandeau d'accueil** — `choisirStationCarburant` : Cléry tant que son relevé est
+le plus récent connu, sinon la **moins chère parmi les relevés les plus récents**,
+avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
+
+**Panneau détaillé** (`renderCarburantPanel`) — depuis la v4.116 :
+
+- `_carburantOrdonner` trie **par âge de relevé croissant, puis par prix
+  croissant** (le gazole, à défaut le SP95 — `_carburantPrix`). Une date inconnue
+  passe en dernier, une station sans aucun prix après celles qui en ont un, et la
+  proximité (`CARBURANT_CLES`) départage les ex æquo. ⛔ Sans ce tri, la liste
+  contredisait le bandeau : la station qu'il met en avant pouvait y figurer en 3ᵉ
+  position.
+- `_carburantAge` donne l'âge en **jours de calendrier**. ⛔ Jamais
+  `(now - date) / 86400000` (ADR-0031) : un relevé d'hier 23 h vaudrait 0,4 jour,
+  donc « du jour ». La source unique est `matDaysUntil` (`js/mat-utils.js`), avec
+  un repli local — un `.js` voisin ne se tient pas pour acquis (ADR-0032).
+- La fraîcheur se lit **en toutes lettres** (« Relevé du jour », « Relevé d'hier »,
+  « Relevé d'il y a N jours ») et la teinte de la carte ne fait que la rappeler :
+  `.fuel-card` (fond normal), `.fuel-card--tiede` (1-2 jours),
+  `.fuel-card--froid` (au-delà, et date inconnue). ⛔ Jamais l'inverse : une
+  information portée par la seule couleur échouerait au RGAA 1.1.
+- ⛔ **Aucune couleur en style inline** dans ce rendu : les jetons `--fuel-*`
+  (`css/mat.css`) sont redéfinis par `theme-sombre` et `high-contrast`. Les prix y
+  étaient écrits en `var(--leaf)` / `var(--forest)` — deux verts foncés en palette
+  claire, mais des **fonds** bleu nuit en thème sombre : noir sur noir. Les gris de
+  fraîcheur sont volontairement doux, pour que l'encre la plus pâle
+  (`--fuel-sp95-ink` sur `--fuel-froid`) reste au-dessus de 4,5:1.
+
+Contrôles : `tests/e2e/carburant-fraicheur.spec.js` (le tri, les libellés, et les
+trois fonds **mesurés sur le rendu** — un test qui n'interroge que le JS ne prouve
+pas qu'une teinte se voit).
+
 ### Documents officiels — pastille « Nouveau » et cache local
 
 L'écran 📁 **Documents officiels** (`ov-docs`, code dans `js/mat-core.js`) agrège deux

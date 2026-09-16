@@ -10,6 +10,11 @@
   --shadow:0 2px 16px rgba(26,61,43,0.10);
   --shadow-lg:0 8px 32px rgba(26,61,43,0.16);
   --r:18px;
+  /* Panneau carburant : teintes de fraîcheur + encres des prix. Des jetons,
+     parce que chaque thème doit pouvoir les redéfinir — un gris clair sur
+     fond sombre serait un fond, pas un estompage. */
+  --fuel-card-bg:#ffffff;--fuel-tiede:#ecedea;--fuel-froid:#dfe0dc;--fuel-maj-ink:#3f5248;
+  --fuel-nom-ink:#2d6a4f;--fuel-sp95-ink:#2d6a4f;--fuel-go-ink:#1a3d2b;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 /* ⚠️ La taille de référence est posée sur `html` SEULEMENT.
@@ -629,6 +634,43 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
   white-space:nowrap;
   margin-top:2px;
 }
+/* ── Panneau « Prix carburant » — les cartes des 5 stations ──
+   Les couleurs vivent ici, PAS en style inline dans le JS : `--leaf` et
+   `--forest` sont des verts foncés en palette claire mais deviennent des
+   FONDS en thème sombre, où ces prix s'écrivaient en noir sur noir.
+   La teinte de fond dit la fraîcheur du relevé — mais seulement en rappel :
+   la carte porte toujours « Relevé du jour », « Relevé d'hier »… en toutes
+   lettres (RGAA 1.1, jamais d'information portée par la seule couleur). */
+.fuel-card-tri{ font-size:.68rem; color:var(--muted); margin:0 0 10px; text-align:center; }
+.fuel-card-list{ display:flex; flex-direction:column; gap:10px; }
+.fuel-card{
+  background:var(--fuel-card-bg);
+  border-radius:14px;
+  padding:14px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+/* ⛔ CONTRASTE (RGAA 3.2) — ces gris sont volontairement DOUX : à #d9d9d9,
+   `--fuel-sp95-ink` tombait à 4,52:1, soit le seuil au dixième près. */
+.fuel-card--tiede{ background:var(--fuel-tiede); }
+.fuel-card--froid{ background:var(--fuel-froid); }
+.fuel-card-nom{
+  font-size:.7rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:var(--fuel-nom-ink);
+  margin-bottom:8px;
+}
+.fuel-card-prix-row{ display:flex; gap:14px; flex-wrap:wrap; }
+.fuel-card-prix{ font-size:.88rem; font-weight:900; }
+.fuel-card-sp95{ color:var(--fuel-sp95-ink); }
+.fuel-card-go{ color:var(--fuel-go-ink); }
+.fuel-card-nd{ color:var(--fuel-maj-ink); font-weight:800; }
+/* ⛔ Pas `--muted` ici : à 4,07:1 sur le gris des relevés anciens, il
+   échouait — et c'est précisément sur ces cartes-là que cette ligne se lit. */
+.fuel-card-maj{ font-size:.64rem; color:var(--fuel-maj-ink); margin-top:4px; }
+
 /* ⛔ Pas de `.fuel-maj` : la date du relevé est écrite DANS la ligne du nom
    (`.fuel-station-name`). La règle qui vivait ici — une 3ᵉ ligne en blanc à
    40 % — n'a jamais servi, et son contraste sur le bandeau vert (≈ 2,3:1)
@@ -841,6 +883,9 @@ html.high-contrast {
   --leaf:   #004d26;
   --mist:   #b8f5cc;
   --shadow: 0 2px 8px rgba(0,0,0,0.25);
+  /* Carburant : même code couleur, encres poussées au maximum. */
+  --fuel-card-bg:#ffffff;--fuel-tiede:#ececec;--fuel-froid:#dcdcdc;--fuel-maj-ink:#000000;
+  --fuel-nom-ink:#003319;--fuel-sp95-ink:#003319;--fuel-go-ink:#000000;
 }
 html.high-contrast .header { background: linear-gradient(160deg,#003319,#004d26); }
 html.high-contrast .card   { border: 2px solid #000 !important; }
@@ -993,6 +1038,10 @@ html.theme-sombre {
   --gold:#d4a843;--amber:#f4a261;--warm:#0f172a;--card:#1e293b;
   --text:#f1f5f9;--muted:#adb9c9;--border:rgba(255,255,255,0.08);--border-champ:rgba(255,255,255,0.5);
   --shadow:0 2px 16px rgba(0,0,0,0.4);
+  /* Carburant : ici l'estompage va vers le GRIS, pas vers le clair — et les
+     encres des prix doivent rester claires (`--leaf` est un fond, ici). */
+  --fuel-card-bg:#263244;--fuel-tiede:#2e3541;--fuel-froid:#3b424d;--fuel-maj-ink:#cbd5e1;
+  --fuel-nom-ink:#6ee7b7;--fuel-sp95-ink:#6ee7b7;--fuel-go-ink:#e2e8f0;
 }
 html.theme-sombre body { background: #0f172a; }
 html.theme-sombre .header { background: linear-gradient(160deg,#111827,#1f2937); }

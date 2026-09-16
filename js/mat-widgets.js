@@ -1383,8 +1383,47 @@ function _carburantReleve(info) {
   var mm = String(d.getMonth() + 1).padStart(2, '0');
   return {
     jour:  d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(),
-    court: jj + '/' + mm
+    court: jj + '/' + mm,
+    date:  d
   };
+}
+
+/* Âge du relevé, en JOURS DE CALENDRIER (0 = aujourd'hui, 1 = hier…).
+   ⛔ Jamais `(now - date) / 86400000` : ce quotient mesure une durée, pas des
+   dates — un relevé d'hier 23 h vaudrait 0,2 jour, donc « aujourd'hui »
+   (ADR-0031). La source unique est `matDaysUntil` (js/mat-utils.js), mais ce
+   fichier est chargé séparément : on ne tient jamais un `.js` voisin pour
+   acquis (ADR-0032), d'où le repli local — même calcul, minuit à minuit. */
+function _carburantAge(releve) {
+  if (!releve || !releve.date) return null;
+  var j;
+  if (typeof matDaysUntil === 'function') {
+    j = matDaysUntil(releve.date);
+  } else {
+    var a = new Date(), b = new Date(releve.date.getTime());
+    a.setHours(0, 0, 0, 0); b.setHours(0, 0, 0, 0);
+    j = Math.round((b - a) / 86400000);
+  }
+  if (isNaN(j)) return null;
+  return Math.max(0, -j);
+}
+
+/* Libellé habitant de l'âge d'un relevé. Le texte dit TOUT : la teinte de la
+   carte n'est qu'un rappel visuel, jamais le seul porteur de l'information
+   (RGAA 1.1). */
+function _carburantAgeLabel(age) {
+  if (age === null) return 'Date de relevé inconnue';
+  if (age === 0) return 'Relevé du jour';
+  if (age === 1) return 'Relevé d\'hier';
+  return 'Relevé d\'il y a ' + age + ' jours';
+}
+
+/* Classe de fraîcheur : rien aujourd'hui, gris clair à 1-2 jours, gris plus
+   soutenu au-delà (et pour une date inconnue, qui n'est pas meilleure). */
+function _carburantFraicheurClasse(age) {
+  if (age === 0) return '';
+  if (age === 1 || age === 2) return ' fuel-card--tiede';
+  return ' fuel-card--froid';
 }
 
 /* Prix de référence pour comparer deux stations : le gazole, à défaut le
@@ -1490,24 +1529,67 @@ function loadCarburantPanel() {
   }
 }
 
+var CARBURANT_EMOJIS = {
+  clery:      '🛒',
+  meung:      '🏪',
+  olivet:     '🏬',
+  beaugency:  '🛒',
+  saintpryve: '🏪'
+};
+
+/* Ordre du panneau : relevé le PLUS RÉCENT d'abord, puis prix CROISSANT à
+   date égale. Le bandeau d'accueil applique déjà cette règle pour choisir la
+   station qu'il montre (ADR-0033) ; la liste détaillée la portait encore par
+   proximité, si bien que la station retenue par le bandeau pouvait apparaître
+   en 3ᵉ position — la liste semblait contredire l'accueil.
+   Une date inconnue passe en dernier : on ne la suppose pas fraîche.
+   À date ET prix égaux, la proximité départage (CARBURANT_CLES). */
+function _carburantOrdonner(d) {
+  return CARBURANT_CLES
+    .filter(function(k) { return d && d[k]; })
+    .map(function(k, i) {
+      var releve = _carburantReleve(d[k]);
+      return {
+        key: k, info: d[k], releve: releve,
+        age: _carburantAge(releve),
+        prix: _carburantPrix(d[k]),
+        rang: i
+      };
+    })
+    .sort(function(a, b) {
+      // Date inconnue en dernier, quel que soit le prix.
+      if ((a.age === null) !== (b.age === null)) return a.age === null ? 1 : -1;
+      if (a.age !== null && a.age !== b.age) return a.age - b.age;
+      // Station sans aucun prix renseigné : après celles qui en ont un.
+      if ((a.prix === null) !== (b.prix === null)) return a.prix === null ? 1 : -1;
+      if (a.prix !== null && a.prix !== b.prix) return a.prix - b.prix;
+      return a.rang - b.rang;
+    });
+}
+
 function renderCarburantPanel(el, d) {
-  var stations = [
-    { key: 'clery',      emoji: '🛒' },
-    { key: 'meung',      emoji: '🏪' },
-    { key: 'olivet',     emoji: '🏬' },
-    { key: 'beaugency',  emoji: '🛒' },
-    { key: 'saintpryve', emoji: '🏪' },
-  ];
-  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
-  stations.forEach(function(s) {
-    var info = d[s.key];
-    if (!info) return;
-    var sp  = info.sp95   != null ? '<span style="font-size:.88rem;font-weight:900;color:var(--leaf)">SP95 ' + parseFloat(info.sp95).toFixed(3)   + ' €</span>' : '';
-    var go  = info.gazole != null ? '<span style="font-size:.88rem;font-weight:900;color:var(--forest)">Diesel ' + parseFloat(info.gazole).toFixed(3) + ' €</span>' : '';
-    var maj = info.maj ? '<div style="font-size:.64rem;color:var(--muted);margin-top:4px">Mis à jour le ' + info.maj + '</div>' : '';
-    html += '<div style="background:white;border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04)">'
-          + '<div style="font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--sage-ink);margin-bottom:8px">' + s.emoji + ' ' + (info.label || s.key) + '</div>'
-          + '<div style="display:flex;gap:14px;flex-wrap:wrap">' + [sp, go].filter(Boolean).join('') + '</div>'
+  var lignes = _carburantOrdonner(d);
+  if (!lignes.length) {
+    el.innerHTML = '<p style="color:var(--muted);text-align:center">Données temporairement indisponibles.</p>';
+    return;
+  }
+  // ⛔ Aucune couleur en style inline ici : une couleur écrite dans le JS est
+  // hors de portée des thèmes (`--leaf` est un vert foncé en palette claire
+  // mais un FOND bleu nuit en thème sombre — ces prix y étaient écrits en
+  // noir sur noir). Tout passe par les classes `.fuel-card*` de css/mat.css.
+  var html = '<p class="fuel-card-tri">Classées par relevé le plus récent, puis par prix croissant.</p>'
+           + '<div class="fuel-card-list">';
+  lignes.forEach(function(s) {
+    var info = s.info;
+    var sp  = info.sp95   != null ? '<span class="fuel-card-prix fuel-card-sp95">SP95 '   + parseFloat(info.sp95).toFixed(3)   + ' €</span>' : '';
+    var go  = info.gazole != null ? '<span class="fuel-card-prix fuel-card-go">Diesel ' + parseFloat(info.gazole).toFixed(3) + ' €</span>' : '';
+    var prix = [sp, go].filter(Boolean).join('');
+    if (!prix) prix = '<span class="fuel-card-prix fuel-card-nd">Prix non communiqué</span>';
+    var maj = '<div class="fuel-card-maj">' + esc(_carburantAgeLabel(s.age))
+            + (info.maj ? ' — ' + esc(info.maj) : '') + '</div>';
+    html += '<div class="fuel-card' + _carburantFraicheurClasse(s.age) + '">'
+          + '<div class="fuel-card-nom">' + (CARBURANT_EMOJIS[s.key] || '⛽') + ' ' + esc(info.label || s.key) + '</div>'
+          + '<div class="fuel-card-prix-row">' + prix + '</div>'
           + maj
           + '</div>';
   });
