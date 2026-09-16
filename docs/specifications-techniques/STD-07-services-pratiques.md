@@ -32,12 +32,13 @@
   station valent le **plus ancien** des relevés affichés — la seule date qui ne mente sur aucun
   des deux prix que montre le bandeau d'accueil. ⚠️ Le repli SP95 → E10 emporte la date du E10.
   ⛔ **Le flux ne porte AUCUNE enseigne** (`id`, `cp`, `adresse`, `ville`, prix) : la
-  correspondance par marque ne matche jamais, c'est `liste[0]` qui désigne les cinq stations —
+  correspondance par marque ne matche jamais, c'est `liste[0]` qui désigne les stations —
   l'avoir restreint a vidé trois cartes sur six en production. Le repli n'est refusé que si
-  **deux de nos stations** partagent le code postal ; là, une station peut être désignée par son
-  **`id`** de jeu de données. ⛔ Un `id` se **relève** (`prix-carburants.gouv.fr/station/<id>`),
-  il ne se déduit pas : le relais du Coudray, ajouté avec un `id` non vérifié, a affiché les prix
-  du Leclerc voisin — il est retiré en attendant. Logique pure dans `lib/carburant.js`, testée
+  **deux de nos stations** partagent le code postal ; là, seul l'**`id`** de jeu de données les
+  départage. ⛔ Un `id` se **relève** (`prix-carburants.gouv.fr/station/<id>`), il ne se déduit
+  pas. Le **45160 en porte deux** (`45160005` E.Leclerc Olivet, `45160006` relais du Coudray) :
+  les renseigner a révélé que `liste[0]` y désignait le **relais**, dont les prix s'affichaient
+  donc sous le nom du Leclerc depuis l'origine. Logique pure dans `lib/carburant.js`, testée
   sans réseau sur la **forme réelle** des enregistrements.
   **La clé Redis change avec la forme du payload** : la faire évoluer en même temps qu'un champ,
   sinon l'app reçoit pendant une heure des relevés à l'ancien format. Voir

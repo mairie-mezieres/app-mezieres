@@ -88,11 +88,16 @@ proche. S'il a pris du retard, le bandeau montre la **station la moins chère pa
 relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des
 stations suivies, chacune avec son heure de mise à jour.
 
-**Cinq stations sont suivies** : Intermarché Cléry-St-André, Super U Meung-sur-Loire,
-E.Leclerc Olivet, E.Leclerc Beaugency et Super U Les Quinze Pierres (Saint-Pryvé).
-⚠️ Le relais TotalEnergies du Coudray (Olivet), annoncé en v4.117, a été **retiré le
-jour même** : il affichait les prix du E.Leclerc voisin. Il reviendra quand les deux
-stations d'Olivet pourront être distinguées à coup sûr.
+**Six stations sont suivies** : Intermarché Cléry-St-André, Super U Meung-sur-Loire,
+E.Leclerc Olivet, le relais TotalEnergies du Coudray (Olivet), E.Leclerc Beaugency et
+Super U Les Quinze Pierres (Saint-Pryvé).
+
+⚠️ **Le relais du Coudray est arrivé en v4.120, et il a corrigé une erreur au passage.**
+Les deux stations d'Olivet partagent le même code postal, et le fichier national ne dit
+pas leur enseigne : l'application prenait la première des deux. C'était le relais — donc
+la carte « E.Leclerc Olivet » affichait en réalité les prix du relais, depuis le début.
+Chaque station est désormais identifiée par son numéro officiel, et les deux cartes
+montrent bien les prix de leur station.
 
 **Chaque station n'affiche que son relevé le plus récent.** Les stations déclarent leurs
 prix carburant par carburant : le SP95 de l'une peut dater d'une semaine quand son gazole

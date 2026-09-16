@@ -281,21 +281,30 @@ test.describe('Panneau carburant — seul le relevé le plus récent s’affiche
     await expect(bandeau.locator('.fuel-station-maj')).toHaveText(' ' + beaugency._courtGazole);
   });
 
-  // ⚠️ Le relais du Coudray a été RETIRÉ du backend en v4.119 (son identifiant
-  // n'était pas vérifiable, et il affichait les prix du Leclerc voisin). Ce cas
-  // reste : il verrouille le fait que le front sait l'afficher dès que le
-  // payload le reportera — `CARBURANT_CLES` garde sa clé pour cette raison.
-  test('le relais du Coudray s’affiche dès que le payload le porte', async ({ page }) => {
+  // ⚠️ Les deux stations du 45160 — E.Leclerc Olivet et le relais du Coudray —
+  // ne sont départagées que par leur identifiant, côté backend (ADR-0047). Ici
+  // on verrouille l'autre moitié : deux cartes DISTINCTES, avec chacune son nom
+  // et son prix. Retiré en v4.119 faute d'identifiant vérifiable, le relais est
+  // revenu en v4.120 ; ce cas a couvert l'intervalle en n'affirmant rien de
+  // plus que ce que le front sait faire.
+  test('les deux stations d’Olivet s’affichent séparément', async ({ page }) => {
     await ouvrirPanneauCarburant(page, {
       clery:   { label: 'Intermarché Cléry-St-André', ...releve(2, 2.239, 2.436) },
+      olivet:  { label: 'E.Leclerc Olivet', ...releve(0, 2.209, 2.379) },
       coudray: { label: 'TotalEnergies Relais du Coudray', ...releve(0, 2.199, 2.359) }
     });
     const noms = await page.locator('#carburant-panel-body .fuel-card-nom').allTextContents();
     expect(noms.map((t) => t.replace(/^\S+\s/, ''))).toEqual([
       'TotalEnergies Relais du Coudray',
+      'E.Leclerc Olivet',
       'Intermarché Cléry-St-André'
     ]);
-    // Et il peut prendre la tête du bandeau d'accueil.
+    // ⛔ Deux cartes, deux prix : un même enregistrement servi deux fois se
+    // verrait ici, et nulle part ailleurs.
+    const corps = page.locator('#carburant-panel-body');
+    await expect(corps).toContainText('2.359');
+    await expect(corps).toContainText('2.379');
+    // Et le relais, plus récent et moins cher, prend la tête du bandeau.
     await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText(/^Total Coudray /);
   });
 });

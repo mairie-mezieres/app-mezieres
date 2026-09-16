@@ -5,6 +5,40 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.120] — 16 septembre 2026
+
+### Ajouté
+
+- **Le relais TotalEnergies du Coudray (Olivet) est suivi** — sixième station du panneau
+  et du bandeau. Ses deux identifiants de jeu de données ont été relevés sur les fiches
+  officielles : `45160005` pour le E.Leclerc Olivet, `45160006` pour le relais.
+
+### Corrigé
+
+- **La carte « E.Leclerc Olivet » affichait les prix du relais du Coudray depuis
+  l'origine.** Les deux stations partagent le 45160, et le flux instantané v2 ne porte
+  aucune enseigne : `liste[0]` désignait la première du code postal — c'était le relais.
+
+  ⚠️ **Ce que l'incident de la veille avait montré sans qu'on le lise ainsi.** Forcé sur
+  `45160006`, le relais avait affiché « Diesel 2.250 € — 16/09 00:01 », au centime et à
+  la minute près la carte « Leclerc » de la veille. Or un `id` renseigné supprime tout
+  repli : ce record était bien `liste[0]`. La preuve était là, prise pour un symptôme.
+
+  ⛔ **Une station absente se voit, une station qui ment sur son nom, non.** C'est ce qui
+  a permis à l'erreur de tenir depuis le premier jour, tests verts et écran d'apparence
+  normale. Désormais, seules les deux stations d'un code postal partagé portent un `id`,
+  et sans lui `pickStationRecord` rend `null` — une carte vide plutôt qu'une carte fausse.
+
+  ⚠️ **Un `id` reste une donnée, pas une déduction** : celui du relais, écrit de mémoire
+  en v4.117, avait dû être retiré le jour même. Ceux-ci viennent des fiches
+  `prix-carburants.gouv.fr/station/<id>`. Trois tests de `test/carburant.test.js` les
+  verrouillent, vérifiés dans les deux sens (les retirer en fait rougir trois).
+
+  Clé Redis `mat:carburant:v10` → **`v11`** : garder la clé, c'est servir une heure de
+  prix attribués à la mauvaise enseigne.
+
+---
+
 ## [4.119] — 16 septembre 2026
 
 ### Corrigé
