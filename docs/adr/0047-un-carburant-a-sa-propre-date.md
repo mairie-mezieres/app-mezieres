@@ -2,7 +2,8 @@
 
 - **Statut** : accepté
 - **Date** : 16 septembre 2026
-- **Version** : v4.117, révisée en v4.118 (§ « Révision »)
+- **Version** : v4.117, révisée en v4.118 (§ « Révision »), **rectifiée le jour même**
+  (§ « Rectificatif »)
 - **Concerne** : `chatbot-mairie-mezieres/lib/carburant.js` (nouveau),
   `routes/carburant.js`, `app-mezieres/js/mat-widgets.js`, `css/mat.css`
 - **Prolonge** : [ADR-0033](0033-un-prix-sans-sa-date-est-un-prix-du-jour.md)
@@ -111,6 +112,41 @@ créé une absence que personne ne remarque.
 ⚠️ Ce que la révision ne change pas : le backend continue d'exposer les dates par
 carburant — c'est ce qui rend le tri possible — et son `maj` / `majISO` reste le plus
 ancien, pour un consommateur qui afficherait tout.
+
+## Rectificatif (16 septembre, même jour) — deux promesses qui ne tenaient pas
+
+Deux heures après la mise en production, la capture d'un écran réel a montré **trois
+cartes sur six** à « Prix non communiqué » (Cléry, Meung, Olivet) et le relais du
+Coudray affichant « Diesel 2.250 € — 16/09 00:01 », c'est-à-dire, au centime et à la
+minute près, ce que le E.Leclerc d'Olivet affichait avant le déploiement.
+
+**Le point 6 était faux.** « Le repli, à défaut, le premier enregistrement » n'était pas
+un confort hérité : le flux instantané v2 **ne porte aucune enseigne** — un
+enregistrement a un `id`, un `cp`, une `adresse`, une `ville` et des prix. La
+correspondance par marque (`intermarch`, `super u`, `leclerc`) ne matchait donc
+**jamais**, et `liste[0]` désignait seul les cinq stations depuis l'origine. Le
+restreindre, c'était couper le seul mécanisme qui fonctionnait. Il est rétabli, et n'est
+refusé que si **deux de nos stations** partagent le code postal.
+
+**Le point 5 portait une donnée inventée.** `45160006` avait été relevé sur un *titre de
+résultat de recherche*, faute de pouvoir interroger le jeu de données. ⛔ Et la promesse
+qui l'accompagnait — « une carte vide, jamais les prix d'une autre » — ne valait pas :
+le garde-fou protège d'un mauvais choix par **marque**, pas d'un `id` recopié de travers.
+Un identifiant est une **donnée** : il se relève sur la fiche
+(`prix-carburants.gouv.fr/station/<id>`), sinon il ne s'écrit pas. Le relais du Coudray
+est retiré en attendant **les deux** identifiants — le sien et celui du Leclerc, qui
+partagent le 45160 et que rien d'autre ne distingue.
+
+⚠️ **Et les douze tests étaient verts pendant la panne.** Ils fabriquaient des
+enregistrements avec un champ `ensigne` que le vrai jeu de données n'a pas : un test qui
+invente ses données ne mesure que l'idée qu'on s'en fait. Le cas ajouté — « chaque
+station suivie ressort d'un lot **sans enseigne** » — a été vérifié dans les deux sens :
+il échoue sur la version fautive, il passe sur le correctif.
+
+⚠️ Ce qui a rendu les deux erreurs possibles : `data.economie.gouv.fr` est **inaccessible
+depuis l'environnement de développement** (proxy). Aucun des deux points n'a donc pu être
+mesuré avant la production. Quand la source ne peut pas être lue, ce qu'on en déduit est
+une hypothèse — et une hypothèse ne s'écrit pas dans une liste de stations.
 
 ## Ce qu'on n'a pas fait
 

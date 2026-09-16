@@ -85,12 +85,14 @@ station **et la date de son relevé** (« Intermarché Cléry 24/08 ») : les pr
 relevé national, que les stations ne mettent pas à jour tous les jours. Tant que le relevé
 de Cléry est le plus récent connu, c'est lui qui s'affiche — c'est la station la plus
 proche. S'il a pris du retard, le bandeau montre la **station la moins chère parmi les
-relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des six
+relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des
 stations suivies, chacune avec son heure de mise à jour.
 
-**Six stations sont suivies** : Intermarché Cléry-St-André, Super U Meung-sur-Loire,
-E.Leclerc Olivet, relais TotalEnergies du Coudray (Olivet), E.Leclerc Beaugency et
-Super U Les Quinze Pierres (Saint-Pryvé).
+**Cinq stations sont suivies** : Intermarché Cléry-St-André, Super U Meung-sur-Loire,
+E.Leclerc Olivet, E.Leclerc Beaugency et Super U Les Quinze Pierres (Saint-Pryvé).
+⚠️ Le relais TotalEnergies du Coudray (Olivet), annoncé en v4.117, a été **retiré le
+jour même** : il affichait les prix du E.Leclerc voisin. Il reviendra quand les deux
+stations d'Olivet pourront être distinguées à coup sûr.
 
 **Chaque station n'affiche que son relevé le plus récent.** Les stations déclarent leurs
 prix carburant par carburant : le SP95 de l'une peut dater d'une semaine quand son gazole
