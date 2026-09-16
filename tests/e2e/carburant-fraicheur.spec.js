@@ -53,17 +53,30 @@ async function ouvrirAvecCarburant(page, payload) {
 }
 
 test.describe('Bandeau carburant — fraîcheur du relevé', () => {
-  test('Cléry à jour : Cléry est affichée, avec la date de son relevé', async ({ page }) => {
+  test('⛔ à date égale, la moins chère gagne — même contre Cléry', async ({ page }) => {
+    // Le 16 septembre 2026, les six stations étaient au 16/09 : Cléry gardait
+    // le bandeau à 2.436 € pendant que le panneau classait trois stations à
+    // 2.369 € avant elle. La proximité ne départage plus qu'à PRIX égal.
+    const olivet = releve(0, 1.649, 1.589);
+    await ouvrirAvecCarburant(page, {
+      clery:  { label: 'Intermarché Cléry-St-André', ...releve(0, 1.719, 1.659) },
+      olivet: { label: 'E.Leclerc Olivet', ...olivet }
+    });
+
+    await expect(page.locator('#fuel-prices .fuel-station-name'))
+      .toHaveText('Leclerc Olivet ' + olivet._court);
+    await expect(page.locator('#fuel-prices')).toContainText('1.589');
+    await expect(page.locator('#fuel-prices')).not.toContainText('1.659');
+  });
+
+  test('Cléry gagne encore à date ET prix égaux (proximité)', async ({ page }) => {
     const clery = releve(0, 1.719, 1.659);
     await ouvrirAvecCarburant(page, {
       clery:  { label: 'Intermarché Cléry-St-André', ...clery },
-      olivet: { label: 'E.Leclerc Olivet', ...releve(0, 1.649, 1.589) }
+      olivet: { label: 'E.Leclerc Olivet', ...releve(0, 1.719, 1.659) }
     });
-
-    const nom = page.locator('#fuel-prices .fuel-station-name');
-    await expect(nom).toHaveText('Intermarché Cléry ' + clery._court);
-    // Cléry n'est pas la moins chère : la proximité prime tant qu'elle est à jour.
-    await expect(page.locator('#fuel-prices')).toContainText('1.719');
+    await expect(page.locator('#fuel-prices .fuel-station-name'))
+      .toHaveText('Intermarché Cléry ' + clery._court);
   });
 
   test('Cléry en retard : la moins chère des stations les plus récentes', async ({ page }) => {
@@ -108,12 +121,14 @@ test.describe('Bandeau carburant — fraîcheur du relevé', () => {
     expect(mesure.sw).toBeLessThanOrEqual(mesure.cw);
   });
 
-  test('sans aucune date, on reste sur Cléry', async ({ page }) => {
+  test('sans aucune date, il ne reste que le prix pour départager', async ({ page }) => {
+    // Aucune fraîcheur à comparer : préférer Cléry serait préférer une station
+    // sans rien pour le justifier.
     await ouvrirAvecCarburant(page, {
       clery:  { label: 'Intermarché Cléry-St-André', sp95: 1.719, gazole: 1.659, maj: null, majISO: null },
       olivet: { label: 'E.Leclerc Olivet', sp95: 1.649, gazole: 1.589, maj: null, majISO: null }
     });
-    await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText('Intermarché Cléry');
+    await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText('Leclerc Olivet');
   });
 
   test('payload de l’ancien backend (sans majISO) : la date « JJ/MM » suffit', async ({ page }) => {
@@ -279,6 +294,30 @@ test.describe('Panneau carburant — seul le relevé le plus récent s’affiche
     await expect(bandeau).toContainText('2.369');
     await expect(bandeau).not.toContainText('2.149');
     await expect(bandeau.locator('.fuel-station-maj')).toHaveText(' ' + beaugency._courtGazole);
+  });
+
+  test('⛔ le bandeau porte TOUJOURS la première carte du panneau', async ({ page }) => {
+    // L'invariant que la v4.120 a violé en production : le bandeau annonçait
+    // Cléry (2.436 €) au-dessus d'un panneau qui classait trois stations
+    // moins chères avant elle, sous le titre « classées par prix croissant ».
+    // Depuis, le bandeau ne choisit plus — il lit `_carburantOrdonner[0]`.
+    // Ce jeu reproduit la journée du 16/09 : tout le monde au même jour,
+    // Cléry la plus chère, et la proximité qui la mettait en tête.
+    await ouvrirPanneauCarburant(page, {
+      clery:      { label: 'Intermarché Cléry-St-André', ...releve(0, 2.239, 2.436) },
+      meung:      { label: 'Super U Meung-sur-Loire',    ...releve(0, 2.259, 2.369) },
+      olivet:     { label: 'E.Leclerc Olivet',           ...releve(0, 2.188, 2.369) },
+      saintpryve: { label: 'Super U Les Quinze Pierres', ...releve(1, 2.219, 2.349) }
+    });
+
+    const premiere = await page.locator('#carburant-panel-body .fuel-card-nom')
+      .first().textContent();
+    // Le libellé du panneau est complet, le bandeau l'abrège : on compare la
+    // clé de station plutôt que le texte — c'est l'identité qui doit coïncider.
+    expect(premiere.replace(/^\S+\s/, '')).toBe('Super U Meung-sur-Loire');
+    await expect(page.locator('#fuel-prices .fuel-station-nom')).toHaveText('Super U Meung');
+    // ⛔ Et surtout : pas Cléry, la plus proche et la plus chère du jour.
+    await expect(page.locator('#fuel-prices')).not.toContainText('2.436');
   });
 
   // ⚠️ Les deux stations du 45160 — E.Leclerc Olivet et le relais du Coudray —

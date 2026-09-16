@@ -5,6 +5,35 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.121] — 16 septembre 2026
+
+### Corrigé
+
+- **Le bandeau d'accueil affichait la station la plus chère du jour.** Les six stations
+  étaient toutes relevées le 16/09 ; l'accueil annonçait Intermarché Cléry à 2.436 €
+  pendant que le panneau, à un doigt en dessous, classait Meung, Olivet et Beaugency à
+  2.369 € **avant** elle — sous le titre « classées par prix croissant ».
+
+  ⛔ **Deux classements séparés sont deux classements qui divergent.** Le bandeau
+  appliquait l'ADR-0033 point 2 (Cléry par défaut tant que son relevé est le plus
+  récent), le panneau appliquait l'ADR-0047 (plus récent, puis moins cher). Chacun était
+  fidèle à sa règle ; ensemble, ils se contredisaient à l'écran. `choisirStationCarburant`
+  ne choisit donc plus rien : il lit le **premier élément de `_carburantOrdonner`**, la
+  fonction qui range déjà le panneau. L'invariant « bandeau = 1ʳᵉ carte » devient vrai par
+  construction, pas par coïncidence.
+
+  ⚠️ **Le privilège de proximité de Cléry est levé, pas supprimé** : elle l'emporte
+  encore à date **et** prix égaux (elle passe en premier dans l'ordre de proximité).
+  Ce qu'elle perd, c'est de gagner en étant plus chère.
+
+  ⚠️ **Sans aucune date connue**, il ne reste que le prix pour départager — préférer
+  Cléry n'y reposerait sur rien.
+
+  Trois cas E2E le verrouillent, vérifiés dans les deux sens (l'ancienne règle en fait
+  rougir trois), dont un qui rejoue la journée du 16/09 en entier.
+
+---
+
 ## [4.120] — 16 septembre 2026
 
 ### Ajouté
