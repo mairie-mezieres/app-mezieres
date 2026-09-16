@@ -82,11 +82,16 @@ Appuyez sur n'importe quelle zone pour ouvrir le panneau détaillé correspondan
 
 **Prix des carburants — lisez la date.** Le bandeau « Carburant » affiche le nom de la
 station **et la date de son relevé** (« Intermarché Cléry 24/08 ») : les prix viennent du
-relevé national, que les stations ne mettent pas à jour tous les jours. Tant que le relevé
-de Cléry est le plus récent connu, c'est lui qui s'affiche — c'est la station la plus
-proche. S'il a pris du retard, le bandeau montre la **station la moins chère parmi les
-relevés les plus récents**, avec son nom et sa date. Un appui ouvre la liste des
-stations suivies, chacune avec son heure de mise à jour.
+relevé national, que les stations ne mettent pas à jour tous les jours. Le bandeau montre
+la **station la moins chère parmi les relevés les plus récents**, avec son nom et sa date :
+un prix plus bas mais relevé la veille ne passe pas devant un prix du jour. Un appui ouvre
+la liste des stations suivies, chacune avec son heure de mise à jour.
+
+⚠️ **Le bandeau affiche toujours la première ligne de cette liste** — depuis la v4.121.
+Jusque-là, l'Intermarché de Cléry avait un privilège de proximité : il s'affichait dès que
+son relevé datait du jour, **même quand trois stations tout aussi à jour étaient moins
+chères**. C'est arrivé le 16 septembre 2026, et l'accueil se trouvait alors en
+contradiction avec la liste qu'il ouvrait. Cléry ne l'emporte plus qu'à prix égal.
 
 **Six stations sont suivies** : Intermarché Cléry-St-André, Super U Meung-sur-Loire,
 E.Leclerc Olivet, le relais TotalEnergies du Coudray (Olivet), E.Leclerc Beaugency et

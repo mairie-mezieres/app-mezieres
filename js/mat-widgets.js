@@ -1454,45 +1454,31 @@ function _carburantPrix(carburants) {
 }
 
 /* Quelle station montrer dans le bandeau d'accueil ?
-   Cléry par défaut — c'est la station de la commune voisine, celle qui
-   intéresse les habitants. Mais le relevé national n'est pas quotidien :
-   celui de Cléry peut dater de plusieurs jours, et rien ne le disait. Si
-   d'autres stations ont un relevé plus récent, on bascule sur la MOINS CHÈRE
-   d'entre elles. Dans tous les cas la date du relevé est affichée, sur la
-   ligne du nom : le bandeau garde ses deux lignes. */
+
+   ⛔ LE BANDEAU NE CHOISIT PLUS : IL PREND LA PREMIÈRE CARTE DU PANNEAU.
+   Jusqu'à la v4.120, Cléry gardait un privilège de proximité — elle était
+   affichée dès que son relevé était du jour, quel que soit son prix. Le
+   16 septembre 2026, les six stations étaient toutes au 16/09 : le bandeau a
+   donc annoncé Cléry à 2.436 € pendant que le panneau, juste en dessous,
+   classait trois stations à 2.369 € AVANT elle sous le titre « classées par
+   prix croissant ». Un écran qui se contredit à un doigt d'intervalle.
+
+   La règle est donc unique et vaut pour les deux rendus : relevé le plus
+   récent d'abord, puis prix croissant, la proximité ne départageant qu'à date
+   ET prix égaux. Elle n'est plus écrite deux fois — `_carburantOrdonner` la
+   porte seule, et le bandeau lit son premier élément. Deux classements
+   séparés, c'est deux classements qui divergent ; c'est ce qui vient
+   d'arriver.
+   ⚠️ On saute les stations sans aucun prix : le panneau les garde (« Prix non
+   communiqué » est une information), le bandeau n'a pas la place de le dire.
+   ⚠️ Sans aucune date connue nulle part, il ne reste que le prix pour
+   départager — c'est ce que fait le tri, et c'est la bonne réponse : rien ne
+   permet alors de préférer une station à une autre sur la fraîcheur. */
 function choisirStationCarburant(d) {
   if (!d) return null;
-  var dispo = CARBURANT_CLES.filter(function(k) {
-    return d[k] && (d[k].sp95 != null || d[k].gazole != null);
-  });
-  if (!dispo.length) return null;
-
-  // Chaque station est réduite à son relevé le plus récent AVANT toute
-  // comparaison : c'est ce qui sera montré, donc c'est ce qui décide.
-  var vus = {}, releves = {};
-  dispo.forEach(function(k) { vus[k] = _carburantAffichage(d[k]); releves[k] = vus[k].releve; });
-
-  var recent = null;
-  dispo.forEach(function(k) {
-    var r = releves[k];
-    if (r && (recent === null || r.jour > recent)) recent = r.jour;
-  });
-
-  var clery = releves['clery'];
-  // Aucune date connue nulle part, ou Cléry est à jour → on reste sur Cléry.
-  if (dispo.indexOf('clery') >= 0 && (recent === null || (clery && clery.jour === recent))) {
-    return { key: 'clery', releve: clery, carburants: vus['clery'].carburants };
-  }
-
-  var candidats = dispo.filter(function(k) { return releves[k] && releves[k].jour === recent; });
-  if (!candidats.length) return { key: dispo[0], releve: releves[dispo[0]], carburants: vus[dispo[0]].carburants };
-
-  var meilleur = candidats[0];
-  candidats.forEach(function(k) {
-    var p = _carburantPrix(vus[k].carburants), best = _carburantPrix(vus[meilleur].carburants);
-    if (p != null && (best == null || p < best)) meilleur = k;
-  });
-  return { key: meilleur, releve: releves[meilleur], carburants: vus[meilleur].carburants };
+  var lignes = _carburantOrdonner(d).filter(function(s) { return s.prix != null; });
+  if (!lignes.length) return null;
+  return { key: lignes[0].key, releve: lignes[0].releve, carburants: lignes[0].carburants };
 }
 
 async function loadCarburant() {

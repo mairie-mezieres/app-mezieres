@@ -2,7 +2,8 @@
 
 - **Statut** : accepté
 - **Date** : 31 août 2026
-- **Version** : v4.101
+- **Version** : v4.101, prolongée en v4.116 (§ « Suite »), **révisée en v4.121**
+  (§ « Révision »)
 - **Concerne** : `js/mat-widgets.js` (bandeau « Carburant » de l'accueil), `css/mat.css`
   (`.fuel-station-name`), `chatbot-mairie-mezieres/routes/carburant.js`
 
@@ -28,6 +29,10 @@ pompe. L'écran détaillé, lui, portait déjà « Mis à jour le … » pour le
    **moins chère parmi les stations au relevé le plus récent**, avec son nom et sa date.
    Un prix frais et comparé vaut mieux qu'un prix familier et périmé ; le nom affiché
    empêche toute confusion, et l'écran détaillé garde les cinq stations.
+   ⛔ **Révisé en v4.121** (§ « Révision » en fin de document) : le privilège de
+   proximité de Cléry est levé. Il la faisait gagner **en étant plus chère** dès que son
+   relevé était du jour — ce qui, le 16 septembre 2026, mettait le bandeau en
+   contradiction directe avec le panneau.
 3. **Le backend expose `majISO`**, l'horodatage brut, à côté du `maj` d'affichage.
 
 ## Conséquences
@@ -105,3 +110,42 @@ v4.116 lui évite seulement de faire la soustraction.
   un éclairage, pas un estompage. C'est aussi ce qui a révélé que les prix de ce
   panneau, écrits en `var(--leaf)` **en style inline**, y étaient noir sur noir
   depuis toujours : une couleur écrite dans le JS est hors de portée des thèmes.
+
+## Révision (v4.121) — le bandeau ne choisit plus, il lit le panneau
+
+Le 16 septembre 2026, les six stations suivies étaient **toutes** relevées le 16/09. Le
+point 2 ci-dessus donnait donc la main à Cléry, « à jour », sans que le prix entre en
+compte : le bandeau d'accueil annonçait **Intermarché Cléry, 2.436 € de gazole**, au-dessus
+d'un panneau qui classait Meung, Olivet et Beaugency à **2.369 €** avant elle — sous le
+titre « classées par relevé le plus récent, puis par prix croissant ».
+
+Le porteur du projet l'a relevé en une phrase :
+
+> « On avait pas dit de mettre dans la tuile initialement la station la moins chère ? »
+
+**Aucun des deux écrans n'était en faute.** Le bandeau appliquait ce point 2, le panneau
+appliquait l'ADR-0047. Chacun était fidèle à sa règle — et c'est précisément le problème :
+**deux classements écrits séparément sont deux classements qui divergent**, et ils avaient
+mis quinze jours à le faire.
+
+### Décision
+
+- **Le privilège de proximité de Cléry est levé.** Elle ne l'emporte plus qu'à date **et**
+  prix égaux, par l'ordre de proximité qui départage déjà les ex æquo. Ce qu'elle perd,
+  c'est de gagner en étant plus chère.
+- **`choisirStationCarburant` ne classe plus rien** : il lit le **premier élément de
+  `_carburantOrdonner`**, la fonction qui range le panneau. L'invariant « le bandeau porte
+  la 1ʳᵉ carte du panneau » devient vrai **par construction**, plus par coïncidence — la
+  seule manière de ne pas refaire diverger deux règles.
+- **Sans aucune date connue nulle part**, il ne reste que le prix : préférer Cléry n'y
+  reposerait sur rien. (Le cas E2E qui l'attendait a donc changé de verdict, à dessein.)
+
+### Ce qui ne change pas
+
+Le repli sur la moins chère **parmi les relevés les plus récents** : la fraîcheur prime
+toujours sur le prix. Une station moins chère mais relevée hier ne remonte pas — c'est le
+premier critère de tri, et c'était déjà la décision de 2026.
+
+⚠️ Trois cas de `tests/e2e/carburant-fraicheur.spec.js` verrouillent la règle, dont un qui
+rejoue la journée du 16/09 (tout le monde au même jour, Cléry la plus chère). Ils ont été
+vérifiés **dans les deux sens** : réintroduire le privilège de Cléry en fait rougir trois.

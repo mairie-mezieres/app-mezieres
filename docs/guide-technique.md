@@ -655,9 +655,20 @@ brut). ⚠️ Seul `majISO` se compare d'une station à l'autre ; `_carburantRel
 sait encore dater un payload qui n'a que `maj` — un cache Redis d'une heure peut
 survivre à un déploiement du backend.
 
-**Bandeau d'accueil** — `choisirStationCarburant` : Cléry tant que son relevé est
-le plus récent connu, sinon la **moins chère parmi les relevés les plus récents**,
-avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
+⛔ **Le bandeau d'accueil ne classe rien : il lit `_carburantOrdonner(d)[0]`**, c'est-à-dire
+la **première carte du panneau** — relevé le plus récent, puis prix croissant, proximité en
+départage à date ET prix égaux. `choisirStationCarburant` n'est plus qu'un accès à cet
+élément (+ le saut des stations sans aucun prix, que le bandeau n'a pas la place d'annoncer).
+
+⚠️ **C'est une correction de v4.121, et la raison vaut d'être retenue.** Le bandeau portait
+sa propre règle (Cléry par défaut tant que son relevé était du jour, ADR-0033 point 2), le
+panneau portait la sienne (ADR-0047). Le 16 septembre 2026, les six stations étaient toutes
+au 16/09 : l'accueil a annoncé Cléry à 2.436 € au-dessus d'un panneau qui classait trois
+stations à 2.369 € **avant** elle, sous le titre « classées par prix croissant ». Chacun
+était fidèle à sa règle — **deux classements écrits séparément sont deux classements qui
+divergent**. L'invariant est désormais vrai par construction, et un cas E2E le rejoue.
+
+Voir ADR-0033 (et le piège de l'ellipse sur la ligne du nom).
 
 ⛔ **Chaque carburant porte SA date** (`sp95Maj`/`sp95MajISO`, `gazoleMaj`/`gazoleMajISO`,
 depuis la v4.117) : les stations déclarent leurs prix carburant par carburant. ⚠️ `maj` /
@@ -697,8 +708,8 @@ sur les prix qu'elle montre. Voir ADR-0047.
   fraîcheur sont volontairement doux, pour que l'encre la plus pâle
   (`--fuel-sp95-ink` sur `--fuel-froid`) reste au-dessus de 4,5:1.
 
-**Cinq stations suivies** (`CARBURANT_CLES`, et `CARBURANT_STATIONS` côté backend) :
-Cléry, Meung, Leclerc Olivet, Beaugency, Saint-Pryvé.
+**Six stations suivies** (`CARBURANT_CLES`, et `CARBURANT_STATIONS` côté backend) :
+Cléry, Meung, Leclerc Olivet, relais du Coudray, Beaugency, Saint-Pryvé.
 
 ⛔ **Le flux instantané v2 ne porte AUCUNE enseigne** — un enregistrement a un `id`, un
 `cp`, une `adresse`, une `ville` et des prix. La correspondance par **marque**
