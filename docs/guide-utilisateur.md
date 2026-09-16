@@ -92,18 +92,20 @@ stations suivies, chacune avec son heure de mise à jour.
 E.Leclerc Olivet, relais TotalEnergies du Coudray (Olivet), E.Leclerc Beaugency et
 Super U Les Quinze Pierres (Saint-Pryvé).
 
-**Chaque carburant a sa propre date.** Les stations déclarent leurs prix carburant par
-carburant : le SP95 d'une station peut dater d'une semaine quand son gazole a été
-réévalué le matin même. Quand les deux dates diffèrent, la carte les affiche toutes les
-deux, sous le prix concerné.
+**Chaque station n'affiche que son relevé le plus récent.** Les stations déclarent leurs
+prix carburant par carburant : le SP95 de l'une peut dater d'une semaine quand son gazole
+a été réévalué le matin même. Dans ce cas, seul le prix du jour est affiché — le prix
+périmé n'apparaît pas, mais la carte précise lequel manque et depuis quand (« SP95 non
+réévalué depuis le 08/09 — non affiché »), pour que vous ne concluiez pas que la station
+ne le vend plus.
 
 Cette liste détaillée suit le **même ordre que le bandeau** : relevé le plus récent
 d'abord, puis, à date égale, du prix le moins cher au plus cher. Une station dont le
 relevé n'a pas de date connue passe en dernier — on ne la suppose jamais fraîche.
 Chaque carte annonce l'âge de son relevé en toutes lettres (« Relevé du jour »,
 « Relevé d'hier », « Relevé d'il y a 4 jours ») **et** grise son fond d'autant plus que
-le prix date — la teinte suivant toujours le **plus ancien** des prix de la carte :
-fond normal le jour même, gris clair à un ou deux jours, gris plus soutenu au-delà.
+le prix date : fond normal le jour même, gris clair à un ou deux jours, gris plus
+soutenu au-delà.
 La couleur n'est qu'un rappel — le texte suffit à comprendre, y compris pour qui ne
 distingue pas ces nuances.
 

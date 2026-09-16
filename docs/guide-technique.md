@@ -660,9 +660,11 @@ le plus récent connu, sinon la **moins chère parmi les relevés les plus réce
 avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
 
 ⛔ **Chaque carburant porte SA date** (`sp95Maj`/`sp95MajISO`, `gazoleMaj`/`gazoleMajISO`,
-depuis la v4.117) : les stations déclarent leurs prix carburant par carburant. `maj` /
-`majISO` au niveau de la station valent le **plus ancien** des relevés affichés — la
-seule date qui ne mente sur aucun des deux prix montrés par le bandeau. Voir ADR-0047.
+depuis la v4.117) : les stations déclarent leurs prix carburant par carburant. ⚠️ `maj` /
+`majISO` au niveau de la station valent le **plus ancien** des relevés — la valeur sûre
+pour un consommateur qui afficherait tout (une version de l'app restée en cache). L'app,
+elle, n'affiche que le relevé le plus récent de chaque station et **recalcule** sa date
+sur les prix qu'elle montre. Voir ADR-0047.
 
 **Panneau détaillé** (`renderCarburantPanel`) — depuis la v4.116 :
 
@@ -676,10 +678,13 @@ seule date qui ne mente sur aucun des deux prix montrés par le bandeau. Voir AD
   `(now - date) / 86400000` (ADR-0031) : un relevé d'hier 23 h vaudrait 0,4 jour,
   donc « du jour ». La source unique est `matDaysUntil` (`js/mat-utils.js`), avec
   un repli local — un `.js` voisin ne se tient pas pour acquis (ADR-0032).
-- **Une date par carburant dès que les deux diffèrent** (`_carburantParCarburant`,
-  `_carburantMemeDate`) ; une seule ligne quand elles coïncident. Le tri et la teinte,
-  eux, suivent la date de la **station** (donc la plus ancienne) : ni le rang ni la
-  couleur ne peuvent être plus optimistes qu'un des prix affichés.
+- ⛔ **Une station n'affiche que son relevé le plus récent** (`_carburantAffichage`) :
+  le SP95 du 08/09 de Beaugency n'est pas montré, sa carte ne porte que le gazole du
+  jour. Date, âge, teinte, prix de classement et choix du bandeau se lisent **tous** sur
+  ce qui reste. ⚠️ Un carburant non daté n'est pas « le plus récent » : il sort dès
+  qu'un autre porte une date ; une station dont aucun carburant n'est daté garde tout.
+  ⛔ Le carburant écarté est **nommé** (`.fuel-card-omis`) : sans cette ligne, « cette
+  station ne vend pas de SP95 » serait une conclusion que rien ne viendrait démentir.
 - La fraîcheur se lit **en toutes lettres** (« Relevé du jour », « Relevé d'hier »,
   « Relevé d'il y a N jours ») et la teinte de la carte ne fait que la rappeler :
   `.fuel-card` (fond normal), `.fuel-card--tiede` (1-2 jours),

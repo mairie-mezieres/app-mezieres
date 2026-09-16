@@ -229,35 +229,56 @@ function releveSepare(sp95, sp95Delta, gazole, gazoleDelta) {
   };
 }
 
-test.describe('Panneau carburant — une date par carburant', () => {
-  test('SP95 et gazole relevés des jours différents : deux dates affichées', async ({ page }) => {
+test.describe('Panneau carburant — seul le relevé le plus récent s’affiche', () => {
+  test('le carburant en retard n’est pas affiché, et son absence est dite', async ({ page }) => {
     const beaugency = releveSepare(2.149, 8, 2.369, 0);
     await ouvrirPanneauCarburant(page, {
       beaugency: { label: 'E.Leclerc Beaugency', ...beaugency }
     });
 
     const carte = page.locator('#carburant-panel-body .fuel-card').first();
-    const dates = await carte.locator('.fuel-fuel .fuel-card-maj').allTextContents();
-    expect(dates).toHaveLength(2);
-    expect(dates[0]).toContain('Relevé d\'il y a 8 jours');
-    expect(dates[0]).toContain(beaugency._courtSp95);
-    expect(dates[1]).toContain('Relevé du jour');
-    expect(dates[1]).toContain(beaugency._courtGazole);
+    // Seul le gazole du jour est montré — le SP95 du 08/09 ne l'est pas.
+    await expect(carte.locator('.fuel-card-prix')).toHaveCount(1);
+    await expect(carte).toContainText('Diesel 2.369');
+    await expect(carte).not.toContainText('2.149');
 
-    // ⛔ La teinte de la carte suit le PLUS ANCIEN des deux : elle ne doit
-    // jamais être plus optimiste qu'un des prix affichés.
-    await expect(carte).toHaveClass(/fuel-card--froid/);
+    // Une seule date, celle des prix montrés, et une carte « du jour ».
+    await expect(carte.locator('.fuel-card-maj')).toHaveCount(1);
+    await expect(carte).toContainText('Relevé du jour');
+    await expect(carte).not.toHaveClass(/fuel-card--/);
+
+    // ⛔ Le carburant écarté est nommé : une absence muette se lirait
+    // « cette station ne vend pas de SP95 ».
+    const omis = carte.locator('.fuel-card-omis');
+    await expect(omis).toHaveCount(1);
+    await expect(omis).toContainText('SP95');
+    await expect(omis).toContainText(beaugency._courtSp95);
+    await expect(omis).toContainText('non affiché');
   });
 
-  test('même date pour les deux : une seule ligne, comme avant', async ({ page }) => {
+  test('même date pour les deux : les deux prix, une seule ligne', async ({ page }) => {
     const clery = releve(0, 2.239, 2.436);
     await ouvrirPanneauCarburant(page, {
       clery: { label: 'Intermarché Cléry-St-André', ...clery }
     });
     const carte = page.locator('#carburant-panel-body .fuel-card').first();
-    await expect(carte.locator('.fuel-fuel .fuel-card-maj')).toHaveCount(0);
-    await expect(carte.locator('> .fuel-card-maj')).toHaveCount(1);
+    await expect(carte.locator('.fuel-card-prix')).toHaveCount(2);
+    await expect(carte.locator('.fuel-card-omis')).toHaveCount(0);
+    await expect(carte.locator('.fuel-card-maj')).toHaveCount(1);
     await expect(carte).toContainText('Relevé du jour');
+  });
+
+  test('le bandeau d’accueil ne montre pas non plus le prix écarté', async ({ page }) => {
+    // ⛔ Le bandeau et le panneau lisent la même règle : un prix écarté là ne
+    // peut pas réapparaître ici, sinon les deux écrans se contredisent.
+    const beaugency = releveSepare(2.149, 8, 2.369, 0);
+    await ouvrirAvecCarburant(page, {
+      beaugency: { label: 'E.Leclerc Beaugency', ...beaugency }
+    });
+    const bandeau = page.locator('#fuel-prices');
+    await expect(bandeau).toContainText('2.369');
+    await expect(bandeau).not.toContainText('2.149');
+    await expect(bandeau.locator('.fuel-station-maj')).toHaveText(' ' + beaugency._courtGazole);
   });
 
   test('le relais du Coudray est suivi comme les autres', async ({ page }) => {
