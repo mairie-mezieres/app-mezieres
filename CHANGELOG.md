@@ -5,6 +5,55 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.119] — 16 septembre 2026
+
+### Corrigé
+
+- **Trois cartes sur six affichaient « Prix non communiqué », et une station montrait
+  les prix de sa voisine.** Deux heures après la v4.117, l'écran réel donnait Cléry,
+  Meung et Olivet vides, et le relais du Coudray à « Diesel 2.250 € — 16/09 00:01 » —
+  au centime et à la minute près ce que le E.Leclerc d'Olivet affichait avant le
+  déploiement.
+
+  ⛔ **Le repli « à défaut, le premier enregistrement du code postal » n'était pas un
+  confort : c'était le seul mécanisme qui fonctionnait.** Le flux instantané v2 ne porte
+  **aucune enseigne** (un `id`, un `cp`, une `adresse`, une `ville`, des prix), donc la
+  correspondance par marque ne matchait **jamais**. L'avoir restreint aux codes postaux
+  à un seul enregistrement a vidé toutes les stations dont le code postal en porte
+  plusieurs. Le repli est rétabli, et n'est refusé que si **deux de nos stations**
+  partagent le code postal.
+
+  ⛔ **Un `id` de station se relève, il ne se déduit pas.** Celui du relais du Coudray
+  avait été pris sur un titre de résultat de recherche, faute de pouvoir interroger le
+  jeu de données. La v4.117 promettait « une carte vide, jamais les prix d'une autre » :
+  c'était faux — le garde-fou protège d'un mauvais choix par *marque*, pas d'un `id`
+  recopié de travers. **Le relais du Coudray est retiré** en attendant les deux
+  identifiants (le sien et celui du Leclerc, qui partagent le 45160).
+
+  ⚠️ Les douze tests étaient **verts pendant la panne** : ils fabriquaient des
+  enregistrements avec un champ `ensigne` que le vrai jeu de données n'a pas. Un test
+  qui invente ses données ne mesure que l'idée qu'on s'en fait. Le cas ajouté — « chaque
+  station suivie ressort d'un lot **sans enseigne** » — échoue sur la version fautive et
+  passe sur le correctif (vérifié dans les deux sens).
+
+### Technique
+
+- **Backend** : clé Redis `mat:carburant:v9` → **`v10`**. La forme du payload ne change
+  pas, mais le cache tient une heure : garder la clé, c'est servir les mauvaises
+  stations jusqu'à expiration et laisser conclure que le correctif ne marche pas.
+- Aucun changement de code côté app — `CARBURANT_CLES` garde la clé `coudray`, sans
+  effet tant que le payload ne la porte pas.
+
+### Documentation
+
+- `docs/adr/0047-…` — section « Rectificatif (16 septembre, même jour) », qui garde la
+  trace des deux affirmations fausses et de ce qui les a rendues possibles :
+  `data.economie.gouv.fr` est **injoignable depuis l'environnement de développement**.
+- `docs/guide-technique.md` §7, `docs/guide-utilisateur.md` §3, `STD-07`, les deux
+  `CLAUDE.md`.
+
+---
+
 ## [4.118] — 16 septembre 2026
 
 ### Modifié

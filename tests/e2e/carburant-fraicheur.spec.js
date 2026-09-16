@@ -281,7 +281,11 @@ test.describe('Panneau carburant — seul le relevé le plus récent s’affiche
     await expect(bandeau.locator('.fuel-station-maj')).toHaveText(' ' + beaugency._courtGazole);
   });
 
-  test('le relais du Coudray est suivi comme les autres', async ({ page }) => {
+  // ⚠️ Le relais du Coudray a été RETIRÉ du backend en v4.119 (son identifiant
+  // n'était pas vérifiable, et il affichait les prix du Leclerc voisin). Ce cas
+  // reste : il verrouille le fait que le front sait l'afficher dès que le
+  // payload le reportera — `CARBURANT_CLES` garde sa clé pour cette raison.
+  test('le relais du Coudray s’affiche dès que le payload le porte', async ({ page }) => {
     await ouvrirPanneauCarburant(page, {
       clery:   { label: 'Intermarché Cléry-St-André', ...releve(2, 2.239, 2.436) },
       coudray: { label: 'TotalEnergies Relais du Coudray', ...releve(0, 2.199, 2.359) }

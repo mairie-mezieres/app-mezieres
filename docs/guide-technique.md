@@ -697,13 +697,26 @@ sur les prix qu'elle montre. Voir ADR-0047.
   fraîcheur sont volontairement doux, pour que l'encre la plus pâle
   (`--fuel-sp95-ink` sur `--fuel-froid`) reste au-dessus de 4,5:1.
 
-**Six stations suivies** (`CARBURANT_CLES`, et `CARBURANT_STATIONS` côté backend) :
-Cléry, Meung, Leclerc Olivet, **relais TotalEnergies du Coudray** (Olivet, depuis la
-v4.117), Beaugency, Saint-Pryvé. ⛔ Olivet porte **deux** stations sur le même code
-postal : celle du Coudray est désignée par son **`id`** de jeu de données (`45160006`),
-et le repli « à défaut, le premier enregistrement du code postal » ne vaut plus que
-lorsqu'il n'y en a qu'un. Sans correspondance, la station n'affiche **rien** — un trou
-se voit, des prix attribués au voisin, non.
+**Cinq stations suivies** (`CARBURANT_CLES`, et `CARBURANT_STATIONS` côté backend) :
+Cléry, Meung, Leclerc Olivet, Beaugency, Saint-Pryvé.
+
+⛔ **Le flux instantané v2 ne porte AUCUNE enseigne** — un enregistrement a un `id`, un
+`cp`, une `adresse`, une `ville` et des prix. La correspondance par **marque**
+(`intermarch`, `super u`, `leclerc`) ne matche donc **jamais** : c'est `liste[0]`, le
+premier enregistrement du code postal, qui désigne les cinq stations depuis l'origine.
+L'avoir restreint aux codes postaux à un seul enregistrement (v4.117) a vidé **trois
+cartes sur six** en production, suite de tests verte — les tests fabriquaient un champ
+`ensigne` que le vrai jeu de données n'a pas. Le repli n'est donc refusé que si **deux
+de nos stations** partagent le code postal.
+
+⛔ **Le relais TotalEnergies du Coudray est retiré**, en attente de son identifiant.
+Ajouté en v4.117 avec un `id` relevé sur un titre de résultat de recherche, il a affiché
+les prix du E.Leclerc d'Olivet sous son nom. ⚠️ Le garde-fou protège d'un mauvais choix
+par marque, **pas** d'un `id` recopié de travers : un identifiant est une donnée, il se
+relève sur `prix-carburants.gouv.fr/station/<id>` ou ne s'écrit pas. Le remettre exige
+**les deux** identifiants, le sien et celui du Leclerc, puisqu'ils partagent le 45160.
+⚠️ `CARBURANT_CLES` garde la clé `coudray` : elle ne coûte rien tant que le payload ne
+la porte pas, et évite un aller-retour le jour où la station revient.
 
 Contrôles : `tests/e2e/carburant-fraicheur.spec.js` (le tri, les libellés, les deux
 dates, et les trois fonds **mesurés sur le rendu** — un test qui n'interroge que le JS
