@@ -5,6 +5,61 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.117] — 16 septembre 2026
+
+### Ajouté
+
+- **Sixième station suivie : le relais TotalEnergies du Coudray** (3091 rue Marcel
+  Belot, Olivet). ⛔ Olivet porte désormais **deux** stations sur le même code
+  postal : celle du Coudray est désignée par son **identifiant de jeu de données**
+  (`45160006`, celui de l'URL `prix-carburants.gouv.fr/station/<id>`), et le repli
+  « à défaut, le premier enregistrement du code postal » ne vaut plus que lorsqu'il
+  n'y en a qu'un. Sans correspondance, la station n'affiche **rien** : un trou se
+  voit, des prix attribués au voisin, non.
+
+### Corrigé
+
+- **Chaque carburant porte SA date de relevé.** Les stations déclarent leurs prix
+  carburant par carburant : le 16 septembre, le E.Leclerc « Beaugency » (en réalité
+  Tavers, 45190) servait un SP95 relevé le **08/09** et un gazole relevé le
+  **16/09**. Le backend ne gardait que la première date trouvée
+  (`sp95_maj || e10_maj || gazole_maj`) : l'app annonçait « relevé d'il y a 8 jours »
+  pour les deux. ⛔ Et la réciproque est pire — une station sans `sp95_maj` faisait
+  dater son SP95 de l'horodatage du gazole, donc un prix d'une semaine affiché
+  « relevé du jour », exactement ce que l'ADR-0033 avait entrepris de corriger.
+
+  `sp95Maj`/`sp95MajISO` et `gazoleMaj`/`gazoleMajISO` s'ajoutent au payload ; le
+  panneau écrit les deux dates dès qu'elles diffèrent, et garde une ligne unique
+  quand elles coïncident. ⚠️ Le repli SP95 → E10 emporte la date **du E10**.
+
+- **La date d'une station est celle du plus ancien de ses prix affichés.** Le bandeau
+  d'accueil montre deux prix sous une seule date : c'est la seule qui ne mente sur
+  aucun des deux. Elle sert aussi de clé de tri et de teinte de carte — ni le rang ni
+  la couleur ne peuvent ainsi être plus optimistes qu'un prix montré.
+
+### Technique
+
+- **Backend** : la logique pure part dans `lib/carburant.js` (liste des stations,
+  désignation de l'enregistrement, extraction des prix et des dates), testable sans
+  réseau. Cache Redis `mat:carburant:v8` → **`v9`**, la clé devant suivre la forme du
+  payload.
+- Le front lit les deux formats : sans date par carburant, il retombe sur celle de la
+  station — ce qui couvre l'heure de TTL Redis qui suit un déploiement.
+
+### Tests
+
+- `chatbot-mairie-mezieres/test/carburant.test.js` — 12 cas, aucun appel réseau.
+- `tests/e2e/carburant-fraicheur.spec.js` — trois cas de plus : deux dates affichées,
+  une seule quand elles coïncident, et le relais du Coudray.
+
+### Documentation
+
+- `docs/adr/0047-un-carburant-a-sa-propre-date.md` (nouveau).
+- `docs/guide-technique.md` §7, `docs/guide-utilisateur.md` §3,
+  `docs/specifications-techniques/STD-07-services-pratiques.md`.
+
+---
+
 ## [4.116] — 16 septembre 2026
 
 ### Modifié

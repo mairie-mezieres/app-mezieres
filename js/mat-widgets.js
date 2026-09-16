@@ -1343,7 +1343,7 @@ function loadBusRemi() {
 var _carburantCache = null;
 
 /* Ordre = proximité de Mézières. Sert aussi de départage à prix égal. */
-var CARBURANT_CLES = ['clery', 'meung', 'olivet', 'beaugency', 'saintpryve'];
+var CARBURANT_CLES = ['clery', 'meung', 'olivet', 'coudray', 'beaugency', 'saintpryve'];
 
 /* Noms courts pour le bandeau d'accueil : les libellés du backend
    (« Intermarché Cléry-St-André ») débordent d'une ligne tronquée à
@@ -1352,6 +1352,7 @@ var CARBURANT_NOMS_COURTS = {
   clery:      'Intermarché Cléry',
   meung:      'Super U Meung',
   olivet:     'Leclerc Olivet',
+  coudray:    'Total Coudray',
   beaugency:  'Leclerc Beaugency',
   saintpryve: 'Super U St-Pryvé'
 };
@@ -1363,14 +1364,23 @@ var CARBURANT_NOMS_COURTS = {
    rapporte à aujourd'hui. Utile tant qu'un payload mis en cache par
    l'ancien backend circule (TTL Redis : 1 h). */
 function _carburantReleve(info) {
-  if (!info) return null;
+  return info ? _carburantReleveDe(info.majISO, info.maj) : null;
+}
+
+/* Le même calcul, à partir d'un horodatage et d'une chaîne d'affichage.
+   ⛔ Depuis la v4.117 le backend date CHAQUE CARBURANT : le SP95 et le gazole
+   d'une même station n'ont pas forcément été relevés le même jour (le Leclerc
+   de Tavers servait un SP95 du 08/09 sous un gazole du 16/09). C'est donc
+   cette fonction-là qu'on appelle par prix, `_carburantReleve` ne traitant
+   plus que le résumé de la station. */
+function _carburantReleveDe(majISO, maj) {
   var d = null;
-  if (info.majISO) {
-    var t = new Date(info.majISO);
+  if (majISO) {
+    var t = new Date(majISO);
     if (!isNaN(t.getTime())) d = t;
   }
-  if (!d && info.maj) {
-    var m = /^(\d{2})\/(\d{2})/.exec(info.maj);
+  if (!d && maj) {
+    var m = /^(\d{2})\/(\d{2})/.exec(maj);
     if (m) {
       var now = new Date();
       d = new Date(now.getFullYear(), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
@@ -1533,9 +1543,49 @@ var CARBURANT_EMOJIS = {
   clery:      '🛒',
   meung:      '🏪',
   olivet:     '🏬',
+  coudray:    '⛽',
   beaugency:  '🛒',
   saintpryve: '🏪'
 };
+
+/* Les carburants d'une station, chacun avec SA date.
+
+   ⛔ Le relevé national date chaque carburant séparément : le 16 septembre
+   2026, le E.Leclerc « Beaugency » (Tavers, 45190) servait un SP95 relevé le
+   08/09 et un gazole relevé le 16/09. Tant que le backend ne datait qu'une
+   fois par station, l'app annonçait « il y a 8 jours » pour les deux — et le
+   jour où l'ordre des champs s'inverse, c'est un SP95 périmé qui passe pour
+   un prix du matin.
+   ⚠️ `sp95Maj*` / `gazoleMaj*` n'existent qu'à partir du backend v9 : le repli
+   sur la date de la station couvre l'heure de cache Redis qui suit un
+   déploiement, et les payloads déjà en mémoire chez l'habitant. */
+function _carburantParCarburant(info) {
+  if (!info) return [];
+  return [
+    { cle: 'sp95',   libelle: 'SP95',   classe: 'fuel-card-sp95', prix: info.sp95,
+      majISO: info.sp95MajISO   || info.majISO, maj: info.sp95Maj   || info.maj },
+    { cle: 'gazole', libelle: 'Diesel', classe: 'fuel-card-go',   prix: info.gazole,
+      majISO: info.gazoleMajISO || info.majISO, maj: info.gazoleMaj || info.maj }
+  ].filter(function(c) {
+    if (c.prix == null) return false;
+    c.prix = parseFloat(c.prix);
+    if (isNaN(c.prix)) return false;
+    c.releve = _carburantReleveDe(c.majISO, c.maj);
+    c.age = _carburantAge(c.releve);
+    return true;
+  });
+}
+
+/* Les carburants affichés ont-ils été relevés le même jour ? Deux prix sans
+   date connue comptent aussi comme « même date » : il n'y a alors rien à
+   distinguer. */
+function _carburantMemeDate(carburants) {
+  if (carburants.length < 2) return true;
+  var ref = carburants[0].releve ? carburants[0].releve.jour : null;
+  return carburants.every(function(c) {
+    return (c.releve ? c.releve.jour : null) === ref;
+  });
+}
 
 /* Ordre du panneau : relevé le PLUS RÉCENT d'abord, puis prix CROISSANT à
    date égale. Le bandeau d'accueil applique déjà cette règle pour choisir la
@@ -1543,7 +1593,11 @@ var CARBURANT_EMOJIS = {
    proximité, si bien que la station retenue par le bandeau pouvait apparaître
    en 3ᵉ position — la liste semblait contredire l'accueil.
    Une date inconnue passe en dernier : on ne la suppose pas fraîche.
-   À date ET prix égaux, la proximité départage (CARBURANT_CLES). */
+   À date ET prix égaux, la proximité départage (CARBURANT_CLES).
+   ⚠️ La date d'une STATION (`majISO`) est celle du PLUS ANCIEN des prix
+   qu'elle affiche : c'est elle qui trie et qui donne sa teinte à la carte,
+   de sorte que ni l'une ni l'autre ne puisse être plus optimiste qu'un des
+   prix montrés. Le détail par carburant, lui, est écrit dans la carte. */
 function _carburantOrdonner(d) {
   return CARBURANT_CLES
     .filter(function(k) { return d && d[k]; })
@@ -1577,16 +1631,33 @@ function renderCarburantPanel(el, d) {
   // hors de portée des thèmes (`--leaf` est un vert foncé en palette claire
   // mais un FOND bleu nuit en thème sombre — ces prix y étaient écrits en
   // noir sur noir). Tout passe par les classes `.fuel-card*` de css/mat.css.
-  var html = '<p class="fuel-card-tri">Classées par relevé le plus récent, puis par prix croissant.</p>'
+  var html = '<p class="fuel-card-tri">Classées par relevé le plus récent, puis par prix croissant. La date est celle déclarée par la station, carburant par carburant.</p>'
            + '<div class="fuel-card-list">';
   lignes.forEach(function(s) {
     var info = s.info;
-    var sp  = info.sp95   != null ? '<span class="fuel-card-prix fuel-card-sp95">SP95 '   + parseFloat(info.sp95).toFixed(3)   + ' €</span>' : '';
-    var go  = info.gazole != null ? '<span class="fuel-card-prix fuel-card-go">Diesel ' + parseFloat(info.gazole).toFixed(3) + ' €</span>' : '';
-    var prix = [sp, go].filter(Boolean).join('');
+    var carburants = _carburantParCarburant(info);
+    var memeDate = _carburantMemeDate(carburants);
+
+    var prix = carburants.map(function(c) {
+      var bloc = '<span class="fuel-card-prix ' + c.classe + '">' + c.libelle + ' ' + c.prix.toFixed(3) + ' €</span>';
+      // Date PAR CARBURANT dès que les deux diffèrent : le relevé national
+      // date chaque carburant séparément, et une seule date pour les deux
+      // faisait passer un gazole du matin pour un prix vieux de huit jours
+      // (ou l'inverse, ce qui est pire).
+      if (!memeDate) {
+        bloc += '<span class="fuel-card-maj">' + esc(_carburantAgeLabel(c.age))
+              + (c.maj ? ' — ' + esc(c.maj) : '') + '</span>';
+      }
+      return '<span class="fuel-fuel">' + bloc + '</span>';
+    }).join('');
     if (!prix) prix = '<span class="fuel-card-prix fuel-card-nd">Prix non communiqué</span>';
-    var maj = '<div class="fuel-card-maj">' + esc(_carburantAgeLabel(s.age))
-            + (info.maj ? ' — ' + esc(info.maj) : '') + '</div>';
+
+    // Une seule ligne de date quand les deux carburants ont été relevés
+    // ensemble — le cas de loin le plus fréquent.
+    var maj = memeDate
+      ? '<div class="fuel-card-maj">' + esc(_carburantAgeLabel(s.age))
+        + (info.maj ? ' — ' + esc(info.maj) : '') + '</div>'
+      : '';
     html += '<div class="fuel-card' + _carburantFraicheurClasse(s.age) + '">'
           + '<div class="fuel-card-nom">' + (CARBURANT_EMOJIS[s.key] || '⛽') + ' ' + esc(info.label || s.key) + '</div>'
           + '<div class="fuel-card-prix-row">' + prix + '</div>'
