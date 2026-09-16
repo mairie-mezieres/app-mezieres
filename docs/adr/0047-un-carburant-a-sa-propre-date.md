@@ -3,7 +3,7 @@
 - **Statut** : accepté
 - **Date** : 16 septembre 2026
 - **Version** : v4.117, révisée en v4.118 (§ « Révision »), **rectifiée le jour même**
-  (§ « Rectificatif »)
+  (§ « Rectificatif »), **résolue en v4.120** (§ « Résolution »)
 - **Concerne** : `chatbot-mairie-mezieres/lib/carburant.js` (nouveau),
   `routes/carburant.js`, `app-mezieres/js/mat-widgets.js`, `css/mat.css`
 - **Prolonge** : [ADR-0033](0033-un-prix-sans-sa-date-est-un-prix-du-jour.md)
@@ -73,7 +73,9 @@ l'écran, qui puisse le trahir.
    ne vend pas de SP95 » est une conclusion que rien ne viendrait démentir.
 5. **Une station peut être désignée par son `id`** — celui du jeu de données, visible
    dans l'URL `prix-carburants.gouv.fr/station/<id>`. Le relais du Coudray porte
-   `45160006`.
+   `45160006`. *(Écrit de mémoire en v4.117, retiré le jour même faute de preuve —
+   voir « Rectificatif » — puis relevé sur la fiche et rétabli en v4.120, avec celui du
+   E.Leclerc voisin : voir « Résolution ».)*
 6. **Le repli « à défaut, le premier enregistrement » ne s'applique plus qu'à un code
    postal qui n'en contient qu'un.** Ailleurs, pas de correspondance = **pas de prix** :
    une station absente se voit, une station aux prix du voisin, non.
@@ -147,6 +149,40 @@ il échoue sur la version fautive, il passe sur le correctif.
 depuis l'environnement de développement** (proxy). Aucun des deux points n'a donc pu être
 mesuré avant la production. Quand la source ne peut pas être lue, ce qu'on en déduit est
 une hypothèse — et une hypothèse ne s'écrit pas dans une liste de stations.
+
+## Résolution (v4.120) — les deux identifiants, et ce qu'ils ont révélé
+
+Le porteur du projet a relevé les deux `id` sur les fiches officielles :
+
+| Station | `id` |
+|---|---|
+| E.Leclerc Olivet (RN 20) | `45160005` |
+| TotalEnergies — relais du Coudray | `45160006` |
+
+Le relais est rétabli. Mais l'apport de ces deux lignes dépasse l'ajout d'une station :
+**elles corrigent une carte qui était fausse depuis l'origine.**
+
+La démonstration tient dans l'incident de la veille. Forcé sur `45160006`, le relais
+avait affiché *Diesel 2.250 € — 16/09 00:01*, au centime et à la minute près ce que la
+carte « E.Leclerc Olivet » montrait avant le déploiement. Or un `id` renseigné supprime
+tout repli : ce record existait donc bien, et c'était **celui que `liste[0]` désignait
+pour le 45160**. Autrement dit, `liste[0]` y pointait sur le **relais** — et l'app
+servait les prix du Coudray sous le nom du Leclerc depuis le premier jour, sans que rien,
+à l'écran, ne puisse le trahir. Une station manquante se voit ; une station qui ment sur
+son nom, non. Ce que le point 6 voulait empêcher avait donc déjà eu lieu, ailleurs qu'on
+ne le cherchait.
+
+⚠️ **Ce que cela dit du garde-fou.** Il fonctionne : `pickStationRecord` refuse le repli
+quand deux de nos stations partagent un code postal, et c'est exactement ce qui rendait
+les deux cartes du 45160 vides avant qu'on relève les `id`. Une carte vide est le bon
+comportement en l'absence de preuve — mais elle ne se répare qu'avec une **donnée**, pas
+avec une hypothèse. Trois tests le verrouillent désormais (`test/carburant.test.js`), et
+ils ont été vérifiés dans les deux sens : retirer les deux `id` en fait rougir trois.
+
+⚠️ **Ce qui reste vrai malgré tout** : `data.economie.gouv.fr` demeure injoignable depuis
+l'environnement de développement. Ces `id` viennent d'une lecture humaine des fiches, pas
+d'une requête — c'est la seule source admissible ici, et elle vaut mieux que la
+déduction, mais elle ne se vérifie toujours qu'en production.
 
 ## Ce qu'on n'a pas fait
 

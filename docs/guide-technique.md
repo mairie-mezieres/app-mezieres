@@ -709,14 +709,21 @@ cartes sur six** en production, suite de tests verte — les tests fabriquaient 
 `ensigne` que le vrai jeu de données n'a pas. Le repli n'est donc refusé que si **deux
 de nos stations** partagent le code postal.
 
-⛔ **Le relais TotalEnergies du Coudray est retiré**, en attente de son identifiant.
-Ajouté en v4.117 avec un `id` relevé sur un titre de résultat de recherche, il a affiché
-les prix du E.Leclerc d'Olivet sous son nom. ⚠️ Le garde-fou protège d'un mauvais choix
-par marque, **pas** d'un `id` recopié de travers : un identifiant est une donnée, il se
-relève sur `prix-carburants.gouv.fr/station/<id>` ou ne s'écrit pas. Le remettre exige
-**les deux** identifiants, le sien et celui du Leclerc, puisqu'ils partagent le 45160.
-⚠️ `CARBURANT_CLES` garde la clé `coudray` : elle ne coûte rien tant que le payload ne
-la porte pas, et évite un aller-retour le jour où la station revient.
+⛔ **Les deux stations du 45160 sont les seules à porter un `id`** : `45160005` pour le
+E.Leclerc Olivet, `45160006` pour le relais TotalEnergies du Coudray (v4.120). Elles
+partagent le code postal, et le flux ne portant aucune enseigne, rien d'autre ne les
+distingue — sans `id`, `pickStationRecord` rend `null` et **les deux** cartes restent
+vides. ⚠️ Un identifiant est une **donnée** : il se relève sur
+`prix-carburants.gouv.fr/station/<id>` ou ne s'écrit pas. Écrit de mémoire en v4.117, il
+avait été retiré le jour même — le garde-fou protège d'un mauvais choix par marque,
+**pas** d'un `id` recopié de travers.
+
+⚠️ **Et c'est en les renseignant qu'on a découvert une carte fausse depuis l'origine.**
+`liste[0]`, pour le 45160, désignait le **relais** : l'app servait ses prix sous le nom
+du E.Leclerc depuis le premier jour. La preuve est l'incident de la v4.117 — forcé sur
+`45160006`, le relais avait affiché *Diesel 2.250 € — 16/09 00:01*, au centime et à la
+minute près la carte « Leclerc » de la veille, alors qu'un `id` renseigné supprime tout
+repli. Une station absente se voit ; une station qui ment sur son nom, non.
 
 Contrôles : `tests/e2e/carburant-fraicheur.spec.js` (le tri, les libellés, les deux
 dates, et les trois fonds **mesurés sur le rendu** — un test qui n'interroge que le JS
