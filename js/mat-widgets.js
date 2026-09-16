@@ -1438,12 +1438,19 @@ function _carburantFraicheurClasse(age) {
 
 /* Prix de référence pour comparer deux stations : le gazole, à défaut le
    SP95. Comparer un gazole à un SP95 n'aurait pas de sens, mais c'est le
-   seul cas où une station n'a qu'un seul carburant renseigné. */
-function _carburantPrix(info) {
-  var p = (info && info.gazole != null) ? info.gazole : (info && info.sp95 != null ? info.sp95 : null);
-  if (p == null) return null;
-  p = parseFloat(p);
-  return isNaN(p) ? null : p;
+   seul cas où une station n'a qu'un seul carburant AFFICHÉ.
+   ⚠️ On compare ce qui est montré, jamais ce qui est masqué : un gazole
+   périmé et écarté ne doit pas décider du classement à la place du SP95
+   du jour qui, lui, s'affiche. */
+function _carburantPrix(carburants) {
+  var liste = carburants || [];
+  var go = null, sp = null;
+  liste.forEach(function(c) {
+    if (c.cle === 'gazole') go = c.prix;
+    if (c.cle === 'sp95')   sp = c.prix;
+  });
+  var p = (go != null) ? go : sp;
+  return (p == null || isNaN(p)) ? null : p;
 }
 
 /* Quelle station montrer dans le bandeau d'accueil ?
@@ -1460,8 +1467,10 @@ function choisirStationCarburant(d) {
   });
   if (!dispo.length) return null;
 
-  var releves = {};
-  dispo.forEach(function(k) { releves[k] = _carburantReleve(d[k]); });
+  // Chaque station est réduite à son relevé le plus récent AVANT toute
+  // comparaison : c'est ce qui sera montré, donc c'est ce qui décide.
+  var vus = {}, releves = {};
+  dispo.forEach(function(k) { vus[k] = _carburantAffichage(d[k]); releves[k] = vus[k].releve; });
 
   var recent = null;
   dispo.forEach(function(k) {
@@ -1472,18 +1481,18 @@ function choisirStationCarburant(d) {
   var clery = releves['clery'];
   // Aucune date connue nulle part, ou Cléry est à jour → on reste sur Cléry.
   if (dispo.indexOf('clery') >= 0 && (recent === null || (clery && clery.jour === recent))) {
-    return { key: 'clery', releve: clery };
+    return { key: 'clery', releve: clery, carburants: vus['clery'].carburants };
   }
 
   var candidats = dispo.filter(function(k) { return releves[k] && releves[k].jour === recent; });
-  if (!candidats.length) return { key: dispo[0], releve: releves[dispo[0]] };
+  if (!candidats.length) return { key: dispo[0], releve: releves[dispo[0]], carburants: vus[dispo[0]].carburants };
 
   var meilleur = candidats[0];
   candidats.forEach(function(k) {
-    var p = _carburantPrix(d[k]), best = _carburantPrix(d[meilleur]);
+    var p = _carburantPrix(vus[k].carburants), best = _carburantPrix(vus[meilleur].carburants);
     if (p != null && (best == null || p < best)) meilleur = k;
   });
-  return { key: meilleur, releve: releves[meilleur] };
+  return { key: meilleur, releve: releves[meilleur], carburants: vus[meilleur].carburants };
 }
 
 async function loadCarburant() {
@@ -1504,9 +1513,12 @@ async function loadCarburant() {
     var s = choix ? d[choix.key] : null;
     var html = '';
     if (s) {
-      var sp  = s.sp95   != null ? '<span class="fuel-val">' + parseFloat(s.sp95).toFixed(3)   + '</span> SP95' : '';
-      var go  = s.gazole != null ? '<span class="fuel-val">' + parseFloat(s.gazole).toFixed(3) + '</span> GO'   : '';
-      var line = [sp, go].filter(Boolean).join('<span class="fuel-sep">·</span>');
+      // Mêmes prix que le panneau : ceux du relevé le plus récent de cette
+      // station. Un carburant écarté là ne peut pas réapparaître ici.
+      var line = (choix.carburants || []).map(function(c) {
+        return '<span class="fuel-val">' + c.prix.toFixed(3) + '</span> '
+             + (c.cle === 'gazole' ? 'GO' : 'SP95');
+      }).join('<span class="fuel-sep">·</span>');
       var nom  = CARBURANT_NOMS_COURTS[choix.key] || s.label || '';
       // La date part dans la MÊME ligne (et le même contraste) que le nom :
       // pas de troisième ligne, et pas de gris pâle sur le bandeau vert.
@@ -1548,6 +1560,51 @@ var CARBURANT_EMOJIS = {
   saintpryve: '🏪'
 };
 
+/* CE QU'UNE STATION AFFICHE : ses carburants au relevé le PLUS RÉCENT, et
+   rien d'autre.
+
+   ⛔ Une station déclare chaque carburant quand elle veut : le E.Leclerc de
+   Tavers servait, le 16 septembre 2026, un gazole du matin même à côté d'un
+   SP95 qui n'avait pas bougé depuis le 08/09. Montrer les deux côte à côte
+   demandait à l'habitant de lire deux dates pour comprendre qu'une seule
+   valait ; on ne garde donc que le relevé le plus récent de CETTE station.
+   ⚠️ Conséquences en chaîne : la date affichée, l'âge qui teinte la carte, le
+   prix qui sert au classement et la station que choisit le bandeau se lisent
+   tous sur ce qui RESTE — jamais sur ce qu'on vient d'écarter.
+   ⚠️ Un carburant sans date connue n'est pas « le plus récent » : il sort dès
+   qu'un autre porte une date. Une station dont AUCUN carburant n'est daté
+   garde tout, faute de pouvoir départager.
+   ⛔ Un prix écarté n'est jamais passé sous silence (`omis`) : une absence ne
+   se remarque pas, et « Beaugency ne vend pas de SP95 » serait faux. */
+function _carburantAffichage(info) {
+  var tous = _carburantParCarburant(info);
+  if (!tous.length) return { carburants: [], omis: [], releve: null, age: null };
+
+  var recent = null;
+  tous.forEach(function(c) {
+    if (c.releve && (recent === null || c.releve.jour > recent)) recent = c.releve.jour;
+  });
+
+  var gardes = (recent === null) ? tous : tous.filter(function(c) {
+    return c.releve && c.releve.jour === recent;
+  });
+  var omis = tous.filter(function(c) { return gardes.indexOf(c) < 0; });
+
+  // Même jour, mais pas forcément la même heure : on affiche la PLUS ANCIENNE
+  // des heures retenues, pour que l'horodatage montré reste vrai de tous les
+  // prix montrés.
+  var releve = null;
+  gardes.forEach(function(c) {
+    if (!c.releve) return;
+    if (!releve || (c.majISO && releve._iso && c.majISO < releve._iso)) {
+      releve = { jour: c.releve.jour, court: c.releve.court, date: c.releve.date, _iso: c.majISO || '', maj: c.maj };
+    }
+  });
+  if (!releve) releve = _carburantReleve(info);
+
+  return { carburants: gardes, omis: omis, releve: releve, age: _carburantAge(releve) };
+}
+
 /* Les carburants d'une station, chacun avec SA date.
 
    ⛔ Le relevé national date chaque carburant séparément : le 16 septembre
@@ -1576,17 +1633,6 @@ function _carburantParCarburant(info) {
   });
 }
 
-/* Les carburants affichés ont-ils été relevés le même jour ? Deux prix sans
-   date connue comptent aussi comme « même date » : il n'y a alors rien à
-   distinguer. */
-function _carburantMemeDate(carburants) {
-  if (carburants.length < 2) return true;
-  var ref = carburants[0].releve ? carburants[0].releve.jour : null;
-  return carburants.every(function(c) {
-    return (c.releve ? c.releve.jour : null) === ref;
-  });
-}
-
 /* Ordre du panneau : relevé le PLUS RÉCENT d'abord, puis prix CROISSANT à
    date égale. Le bandeau d'accueil applique déjà cette règle pour choisir la
    station qu'il montre (ADR-0033) ; la liste détaillée la portait encore par
@@ -1602,11 +1648,12 @@ function _carburantOrdonner(d) {
   return CARBURANT_CLES
     .filter(function(k) { return d && d[k]; })
     .map(function(k, i) {
-      var releve = _carburantReleve(d[k]);
+      var vu = _carburantAffichage(d[k]);
       return {
-        key: k, info: d[k], releve: releve,
-        age: _carburantAge(releve),
-        prix: _carburantPrix(d[k]),
+        key: k, info: d[k], releve: vu.releve,
+        age: vu.age,
+        carburants: vu.carburants, omis: vu.omis,
+        prix: _carburantPrix(vu.carburants),
         rang: i
       };
     })
@@ -1631,37 +1678,33 @@ function renderCarburantPanel(el, d) {
   // hors de portée des thèmes (`--leaf` est un vert foncé en palette claire
   // mais un FOND bleu nuit en thème sombre — ces prix y étaient écrits en
   // noir sur noir). Tout passe par les classes `.fuel-card*` de css/mat.css.
-  var html = '<p class="fuel-card-tri">Classées par relevé le plus récent, puis par prix croissant. La date est celle déclarée par la station, carburant par carburant.</p>'
+  var html = '<p class="fuel-card-tri">Classées par relevé le plus récent, puis par prix croissant. Chaque station n\'affiche que son relevé le plus récent.</p>'
            + '<div class="fuel-card-list">';
   lignes.forEach(function(s) {
-    var info = s.info;
-    var carburants = _carburantParCarburant(info);
-    var memeDate = _carburantMemeDate(carburants);
-
-    var prix = carburants.map(function(c) {
-      var bloc = '<span class="fuel-card-prix ' + c.classe + '">' + c.libelle + ' ' + c.prix.toFixed(3) + ' €</span>';
-      // Date PAR CARBURANT dès que les deux diffèrent : le relevé national
-      // date chaque carburant séparément, et une seule date pour les deux
-      // faisait passer un gazole du matin pour un prix vieux de huit jours
-      // (ou l'inverse, ce qui est pire).
-      if (!memeDate) {
-        bloc += '<span class="fuel-card-maj">' + esc(_carburantAgeLabel(c.age))
-              + (c.maj ? ' — ' + esc(c.maj) : '') + '</span>';
-      }
-      return '<span class="fuel-fuel">' + bloc + '</span>';
+    var prix = s.carburants.map(function(c) {
+      return '<span class="fuel-card-prix ' + c.classe + '">' + c.libelle + ' ' + c.prix.toFixed(3) + ' €</span>';
     }).join('');
     if (!prix) prix = '<span class="fuel-card-prix fuel-card-nd">Prix non communiqué</span>';
 
-    // Une seule ligne de date quand les deux carburants ont été relevés
-    // ensemble — le cas de loin le plus fréquent.
-    var maj = memeDate
-      ? '<div class="fuel-card-maj">' + esc(_carburantAgeLabel(s.age))
-        + (info.maj ? ' — ' + esc(info.maj) : '') + '</div>'
+    // Tous les prix montrés partagent leur jour : une seule ligne de date.
+    var maj = '<div class="fuel-card-maj">' + esc(_carburantAgeLabel(s.age))
+            + (s.releve && s.releve.maj ? ' — ' + esc(s.releve.maj)
+               : (s.info.maj ? ' — ' + esc(s.info.maj) : '')) + '</div>';
+
+    // ⛔ Un carburant écarté se dit. Sans cette ligne, la carte de Beaugency
+    // n'aurait plus qu'un gazole, et « cette station ne vend pas de SP95 »
+    // est une conclusion que personne ne viendrait démentir.
+    var omis = s.omis.length
+      ? '<div class="fuel-card-omis">' + s.omis.map(function(c) {
+          return esc(c.libelle) + ' non réévalué depuis le ' + esc(c.releve ? c.releve.court : '?');
+        }).join(' · ') + ' — non affiché</div>'
       : '';
+
     html += '<div class="fuel-card' + _carburantFraicheurClasse(s.age) + '">'
-          + '<div class="fuel-card-nom">' + (CARBURANT_EMOJIS[s.key] || '⛽') + ' ' + esc(info.label || s.key) + '</div>'
+          + '<div class="fuel-card-nom">' + (CARBURANT_EMOJIS[s.key] || '⛽') + ' ' + esc(s.info.label || s.key) + '</div>'
           + '<div class="fuel-card-prix-row">' + prix + '</div>'
           + maj
+          + omis
           + '</div>';
   });
   html += '</div>';

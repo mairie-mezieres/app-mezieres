@@ -5,6 +5,48 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.118] — 16 septembre 2026
+
+### Modifié
+
+- **Prix carburant : une station n'affiche plus que son relevé le plus récent.** La
+  v4.117 montrait les deux prix avec leurs deux dates ; c'était exact, mais cela
+  demandait à l'habitant de trier lui-même le frais du périmé, sur un écran qu'on
+  consulte en marchant vers sa voiture. Le SP95 du 08/09 de Beaugency n'est donc plus
+  affiché : sa carte ne porte que le gazole du jour.
+
+  Date affichée, âge qui teinte la carte, prix qui sert au classement, station retenue
+  par le bandeau d'accueil : **tout se lit sur ce qui reste**. Un prix écarté ne décide
+  de rien et ne peut pas réapparaître dans le bandeau — les deux écrans ne peuvent plus
+  se contredire. ⚠️ Une station remonte donc au classement dès qu'**un** de ses
+  carburants est réévalué.
+
+  ⚠️ Un carburant sans date connue n'est pas « le plus récent » : il sort dès qu'un
+  autre porte une date. Une station dont aucun carburant n'est daté garde tout, faute de
+  pouvoir départager.
+
+  ⛔ Le carburant écarté est **nommé** (« SP95 non réévalué depuis le 08/09 — non
+  affiché ») : une absence ne se remarque pas, et « cette station ne vend pas de SP95 »
+  serait une conclusion que rien ne viendrait démentir.
+
+  ⛔ Ce n'est **pas** un seuil d'ancienneté (que l'ADR-0033 avait écarté, et qui le
+  reste) : ce qui est masqué ne l'est pas parce qu'il est vieux, mais parce que la
+  **même station** en a déclaré un plus récent. Une station entièrement figée depuis
+  huit jours affiche donc toujours ses deux prix, datés.
+
+### Tests
+
+- `tests/e2e/carburant-fraicheur.spec.js` — le carburant en retard n'est pas affiché et
+  son absence est dite, les deux prix restent quand les dates coïncident, et le bandeau
+  d'accueil ne montre pas non plus le prix écarté.
+
+### Documentation
+
+- `docs/adr/0047-un-carburant-a-sa-propre-date.md` — décision révisée (§ « Révision »).
+- `docs/guide-technique.md` §7, `docs/guide-utilisateur.md` §3, les deux `CLAUDE.md`.
+
+---
+
 ## [4.117] — 16 septembre 2026
 
 ### Ajouté
