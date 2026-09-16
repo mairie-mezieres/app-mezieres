@@ -126,3 +126,81 @@ test.describe('Bandeau carburant — fraîcheur du relevé', () => {
     await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText('Leclerc Olivet ' + olivet._court);
   });
 });
+
+// ── Panneau détaillé (« Voir les 5 stations ») ─────────────────────────
+//
+// Le bandeau choisit la MOINS CHÈRE parmi les relevés les plus récents ; la
+// liste détaillée, elle, restait rangée par proximité. La station mise en
+// avant à l'accueil pouvait donc apparaître en 3ᵉ position — la liste semblait
+// contredire le bandeau. Elle porte désormais le même ordre : relevé le plus
+// récent d'abord, puis prix croissant à date égale.
+//
+// Et la fraîcheur se voit : teinte de fond neutre pour un relevé du jour, gris
+// clair à 1-2 jours, gris plus soutenu au-delà. La couleur n'est qu'un rappel
+// — chaque carte écrit son âge en toutes lettres (RGAA 1.1).
+
+async function ouvrirPanneauCarburant(page, payload) {
+  await ouvrirAvecCarburant(page, payload);
+  await page.evaluate(() => window.openCarburant());
+  await expect(page.locator('#carburant-panel-body .fuel-card').first()).toBeVisible({ timeout: 10000 });
+}
+
+test.describe('Panneau carburant — tri et fraîcheur', () => {
+  test('relevé le plus récent d’abord, puis prix croissant', async ({ page }) => {
+    await ouvrirPanneauCarburant(page, {
+      clery:      { label: 'Intermarché Cléry-St-André', ...releve(4, 1.659, 1.599) },
+      meung:      { label: 'Super U Meung-sur-Loire',    ...releve(0, 1.749, 1.689) },
+      olivet:     { label: 'E.Leclerc Olivet',           ...releve(0, 1.699, 1.629) },
+      beaugency:  { label: 'E.Leclerc Beaugency',        ...releve(2, 1.609, 1.549) },
+      saintpryve: { label: 'Super U Les Quinze Pierres', sp95: 1.679, gazole: 1.619, maj: null, majISO: null }
+    });
+
+    const noms = await page.locator('#carburant-panel-body .fuel-card-nom').allTextContents();
+    expect(noms.map((t) => t.replace(/^\S+\s/, ''))).toEqual([
+      'E.Leclerc Olivet',            // aujourd'hui, gazole 1.629
+      'Super U Meung-sur-Loire',     // aujourd'hui, gazole 1.689
+      'E.Leclerc Beaugency',         // J-2, pourtant la moins chère
+      'Intermarché Cléry-St-André',  // J-4
+      'Super U Les Quinze Pierres'   // date inconnue : jamais supposée fraîche
+    ]);
+  });
+
+  test('l’âge du relevé est écrit, et la teinte le rappelle', async ({ page }) => {
+    await ouvrirPanneauCarburant(page, {
+      clery:     { label: 'Intermarché Cléry-St-André', ...releve(0, 1.719, 1.659) },
+      meung:     { label: 'Super U Meung-sur-Loire',    ...releve(1, 1.729, 1.669) },
+      olivet:    { label: 'E.Leclerc Olivet',           ...releve(5, 1.649, 1.589) }
+    });
+
+    const cartes = page.locator('#carburant-panel-body .fuel-card');
+    await expect(cartes).toHaveCount(3);
+    await expect(cartes.nth(0)).toContainText('Relevé du jour');
+    await expect(cartes.nth(1)).toContainText('Relevé d\'hier');
+    await expect(cartes.nth(2)).toContainText('Relevé d\'il y a 5 jours');
+
+    // ⚠️ La teinte est posée par le CSS : un test qui n'interroge que le JS
+    // ne prouverait pas qu'elle se voit. On mesure le rendu (règle 7 du
+    // CLAUDE.md), et on exige trois fonds DISTINCTS.
+    const fonds = await cartes.evaluateAll((els) =>
+      els.map((e) => getComputedStyle(e).backgroundColor));
+    expect(new Set(fonds).size).toBe(3);
+    await expect(cartes.nth(0)).not.toHaveClass(/fuel-card--/);
+    await expect(cartes.nth(1)).toHaveClass(/fuel-card--tiede/);
+    await expect(cartes.nth(2)).toHaveClass(/fuel-card--froid/);
+  });
+
+  test('un relevé d’hier 23 h reste « hier », pas « du jour »', async ({ page }) => {
+    // ⛔ ADR-0031 : un nombre de jours ne se calcule pas par une division.
+    // À 23 h, l'écart au « maintenant » du matin vaut 0,4 jour — donc 0 si on
+    // divise, donc « relevé du jour » pour un prix de la veille.
+    const n = new Date();
+    const hier = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1, 23, 45, 0);
+    await ouvrirPanneauCarburant(page, {
+      clery: { label: 'Intermarché Cléry-St-André', sp95: 1.719, gazole: 1.659,
+               maj: '—', majISO: hier.toISOString() }
+    });
+    const carte = page.locator('#carburant-panel-body .fuel-card').first();
+    await expect(carte).toContainText('Relevé d\'hier');
+    await expect(carte).toHaveClass(/fuel-card--tiede/);
+  });
+});

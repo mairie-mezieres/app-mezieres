@@ -5,6 +5,57 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.116] — 16 septembre 2026
+
+### Modifié
+
+- **Panneau « Prix carburant » : les cinq stations sont triées par relevé le plus
+  récent, puis par prix croissant.** Le bandeau d'accueil applique cette règle
+  depuis la v4.101 pour choisir la station qu'il montre ; la liste détaillée, elle,
+  restait rangée par proximité — la station mise en avant pouvait y apparaître en
+  3ᵉ position, sous des prix plus bas mais plus vieux. L'écran détaillé se lisait
+  donc comme un démenti du bandeau.
+
+  Une station sans date connue passe en dernier (jamais supposée fraîche), une
+  station sans aucun prix après celles qui en ont un, et la proximité départage les
+  ex æquo.
+
+- **L'âge de chaque relevé est écrit et rappelé par une teinte.** « Relevé du
+  jour », « Relevé d'hier », « Relevé d'il y a N jours » — et le fond de la carte
+  grise à mesure que le prix vieillit : normal le jour même, gris clair à 1-2
+  jours, gris plus soutenu au-delà. ⛔ La couleur ne porte **jamais** seule
+  l'information (RGAA 1.1) : le texte suffit.
+
+  ⛔ L'âge se compte en jours de **calendrier** (`matDaysUntil`, ADR-0031). Un
+  relevé d'hier 23 h divisé par 86 400 000 vaut 0,4 jour, donc « relevé du jour »,
+  pour un prix de la veille.
+
+### Corrigé
+
+- **Thème sombre : les prix du panneau carburant étaient noir sur noir.** Ils
+  étaient écrits `color:var(--leaf)` / `var(--forest)` **en style inline**, donc
+  hors de portée de tout thème — or le thème sombre redéfinit ces deux jetons en
+  **fonds** bleu nuit. Tout passe désormais par les classes `.fuel-card*` et les
+  jetons `--fuel-*` de `css/mat.css`, déclinés pour la palette claire, le thème
+  sombre et le contraste renforcé. Les gris de fraîcheur sont calibrés pour que la
+  pire paire encre/fond de chaque thème reste au-dessus de 4,5:1 (RGAA 3.2).
+
+### Tests
+
+- `tests/e2e/carburant-fraicheur.spec.js` — trois cas de plus : l'ordre des cinq
+  cartes, les libellés d'âge, et le cas « hier 23 h ». ⚠️ Les trois fonds sont
+  mesurés sur le **rendu** (`getComputedStyle`) : un test qui n'interroge que le JS
+  ne prouve pas qu'une teinte se voit.
+
+### Documentation
+
+- `docs/adr/0033-un-prix-sans-sa-date-est-un-prix-du-jour.md` — section « Suite
+  (v4.116) ».
+- `docs/guide-technique.md` §7 — nouvelle section « Prix carburant ».
+- `docs/guide-utilisateur.md` §3 — ordre et code couleur de la liste détaillée.
+
+---
+
 ## [4.115] — 15 septembre 2026
 
 ### Ajouté
