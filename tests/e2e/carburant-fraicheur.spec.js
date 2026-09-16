@@ -204,3 +204,73 @@ test.describe('Panneau carburant — tri et fraîcheur', () => {
     await expect(carte).toHaveClass(/fuel-card--tiede/);
   });
 });
+
+// ── Une date PAR CARBURANT ─────────────────────────────────────────────
+//
+// Le relevé national date chaque carburant séparément. Le 16 septembre 2026,
+// le E.Leclerc « Beaugency » (en réalité Tavers, 45190) servait un SP95 relevé
+// le 08/09 et un gazole relevé le 16/09 — et la carte annonçait « relevé d'il
+// y a 8 jours » pour les deux, parce que le backend ne gardait que la première
+// date trouvée. Un prix du matin passait pour un prix de la semaine passée ;
+// l'ordre des champs inversé, c'est un prix périmé qui passerait pour frais.
+
+function releveSepare(sp95, sp95Delta, gazole, gazoleDelta) {
+  const s = releve(sp95Delta, sp95, null);
+  const g = releve(gazoleDelta, null, gazole);
+  return {
+    sp95, gazole,
+    sp95Maj: s.maj,   sp95MajISO: s.majISO,
+    gazoleMaj: g.maj, gazoleMajISO: g.majISO,
+    // Le backend expose au niveau station le PLUS ANCIEN des deux : la date
+    // annoncée doit rester vraie pour tous les prix montrés.
+    maj: sp95Delta >= gazoleDelta ? s.maj : g.maj,
+    majISO: sp95Delta >= gazoleDelta ? s.majISO : g.majISO,
+    _courtSp95: s._court, _courtGazole: g._court
+  };
+}
+
+test.describe('Panneau carburant — une date par carburant', () => {
+  test('SP95 et gazole relevés des jours différents : deux dates affichées', async ({ page }) => {
+    const beaugency = releveSepare(2.149, 8, 2.369, 0);
+    await ouvrirPanneauCarburant(page, {
+      beaugency: { label: 'E.Leclerc Beaugency', ...beaugency }
+    });
+
+    const carte = page.locator('#carburant-panel-body .fuel-card').first();
+    const dates = await carte.locator('.fuel-fuel .fuel-card-maj').allTextContents();
+    expect(dates).toHaveLength(2);
+    expect(dates[0]).toContain('Relevé d\'il y a 8 jours');
+    expect(dates[0]).toContain(beaugency._courtSp95);
+    expect(dates[1]).toContain('Relevé du jour');
+    expect(dates[1]).toContain(beaugency._courtGazole);
+
+    // ⛔ La teinte de la carte suit le PLUS ANCIEN des deux : elle ne doit
+    // jamais être plus optimiste qu'un des prix affichés.
+    await expect(carte).toHaveClass(/fuel-card--froid/);
+  });
+
+  test('même date pour les deux : une seule ligne, comme avant', async ({ page }) => {
+    const clery = releve(0, 2.239, 2.436);
+    await ouvrirPanneauCarburant(page, {
+      clery: { label: 'Intermarché Cléry-St-André', ...clery }
+    });
+    const carte = page.locator('#carburant-panel-body .fuel-card').first();
+    await expect(carte.locator('.fuel-fuel .fuel-card-maj')).toHaveCount(0);
+    await expect(carte.locator('> .fuel-card-maj')).toHaveCount(1);
+    await expect(carte).toContainText('Relevé du jour');
+  });
+
+  test('le relais du Coudray est suivi comme les autres', async ({ page }) => {
+    await ouvrirPanneauCarburant(page, {
+      clery:   { label: 'Intermarché Cléry-St-André', ...releve(2, 2.239, 2.436) },
+      coudray: { label: 'TotalEnergies Relais du Coudray', ...releve(0, 2.199, 2.359) }
+    });
+    const noms = await page.locator('#carburant-panel-body .fuel-card-nom').allTextContents();
+    expect(noms.map((t) => t.replace(/^\S+\s/, ''))).toEqual([
+      'TotalEnergies Relais du Coudray',
+      'Intermarché Cléry-St-André'
+    ]);
+    // Et il peut prendre la tête du bandeau d'accueil.
+    await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText(/^Total Coudray /);
+  });
+});

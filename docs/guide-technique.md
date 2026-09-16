@@ -659,6 +659,11 @@ survivre à un déploiement du backend.
 le plus récent connu, sinon la **moins chère parmi les relevés les plus récents**,
 avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
 
+⛔ **Chaque carburant porte SA date** (`sp95Maj`/`sp95MajISO`, `gazoleMaj`/`gazoleMajISO`,
+depuis la v4.117) : les stations déclarent leurs prix carburant par carburant. `maj` /
+`majISO` au niveau de la station valent le **plus ancien** des relevés affichés — la
+seule date qui ne mente sur aucun des deux prix montrés par le bandeau. Voir ADR-0047.
+
 **Panneau détaillé** (`renderCarburantPanel`) — depuis la v4.116 :
 
 - `_carburantOrdonner` trie **par âge de relevé croissant, puis par prix
@@ -671,6 +676,10 @@ avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
   `(now - date) / 86400000` (ADR-0031) : un relevé d'hier 23 h vaudrait 0,4 jour,
   donc « du jour ». La source unique est `matDaysUntil` (`js/mat-utils.js`), avec
   un repli local — un `.js` voisin ne se tient pas pour acquis (ADR-0032).
+- **Une date par carburant dès que les deux diffèrent** (`_carburantParCarburant`,
+  `_carburantMemeDate`) ; une seule ligne quand elles coïncident. Le tri et la teinte,
+  eux, suivent la date de la **station** (donc la plus ancienne) : ni le rang ni la
+  couleur ne peuvent être plus optimistes qu'un des prix affichés.
 - La fraîcheur se lit **en toutes lettres** (« Relevé du jour », « Relevé d'hier »,
   « Relevé d'il y a N jours ») et la teinte de la carte ne fait que la rappeler :
   `.fuel-card` (fond normal), `.fuel-card--tiede` (1-2 jours),
@@ -683,9 +692,18 @@ avec la date sur la ligne du nom. Voir ADR-0033 (et le piège de l'ellipse).
   fraîcheur sont volontairement doux, pour que l'encre la plus pâle
   (`--fuel-sp95-ink` sur `--fuel-froid`) reste au-dessus de 4,5:1.
 
-Contrôles : `tests/e2e/carburant-fraicheur.spec.js` (le tri, les libellés, et les
-trois fonds **mesurés sur le rendu** — un test qui n'interroge que le JS ne prouve
-pas qu'une teinte se voit).
+**Six stations suivies** (`CARBURANT_CLES`, et `CARBURANT_STATIONS` côté backend) :
+Cléry, Meung, Leclerc Olivet, **relais TotalEnergies du Coudray** (Olivet, depuis la
+v4.117), Beaugency, Saint-Pryvé. ⛔ Olivet porte **deux** stations sur le même code
+postal : celle du Coudray est désignée par son **`id`** de jeu de données (`45160006`),
+et le repli « à défaut, le premier enregistrement du code postal » ne vaut plus que
+lorsqu'il n'y en a qu'un. Sans correspondance, la station n'affiche **rien** — un trou
+se voit, des prix attribués au voisin, non.
+
+Contrôles : `tests/e2e/carburant-fraicheur.spec.js` (le tri, les libellés, les deux
+dates, et les trois fonds **mesurés sur le rendu** — un test qui n'interroge que le JS
+ne prouve pas qu'une teinte se voit) et, côté backend, `test/carburant.test.js`
+(désignation de la station et datation, sans réseau).
 
 ### Documents officiels — pastille « Nouveau » et cache local
 
