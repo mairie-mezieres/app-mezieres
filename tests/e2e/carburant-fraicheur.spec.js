@@ -12,14 +12,12 @@ const { test, expect } = require('@playwright/test');
 //
 // Les tests tournent sans backend : on sert un payload /carburant fabriqué.
 
-const EXTERNAL_HOSTS = [
-  'googleapis.com', 'gstatic.com', 'clearbit.com',
-  'open-meteo.com', 'facebook.com', 'api-adresse.data.gouv.fr',
-  'apicarto.ign.fr', 'data.geopf.fr', 'cadastre.data.gouv.fr',
-  'geoportail-urbanisme', 'raw.githubusercontent.com', 'res.cloudinary.com',
-  'data.education.gouv.fr', 'ingest.de.sentry.io', 'sentry.io',
-  'tile.openstreetmap.org', 'openstreetmap.org'
-];
+// ⛔ La liste des hôtes coupés vit dans `helpers/reseau.js` — elle était
+// recopiée ici, et la copie avait perdu `'onrender.com'` : ces 30 tests ont
+// appelé le backend de PRODUCTION à chaque exécution de CI depuis le 31 août
+// 2026, ajoutant un « visiteur unique » par test (profil vierge = nouveau
+// `deviceId`). Voir ADR-0048.
+const { couperReseauExterne } = require('./helpers/reseau');
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -38,14 +36,13 @@ function releve(delta, sp95, gazole) {
 
 async function ouvrirAvecCarburant(page, payload) {
   await page.addInitScript(() => { localStorage.setItem('mat_onboarded_v3', '1'); });
-  await page.route('**/*', (route) => {
-    const url = route.request().url();
-    if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
-    return route.continue();
+  // ⚠️ La simulation passe par le crochet, pas par un `page.route` ajouté
+  // après : le dernier inscrit gagne, et un `**/*` posé ensuite l'annulerait.
+  await couperReseauExterne(page, (route, url) => {
+    if (!/\/carburant(\?|$)/.test(url)) return false;
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) });
+    return true;
   });
-  await page.route('**/carburant', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) })
-  );
   await page.goto('/index.html');
   // Présence, pas visibilité : le bandeau est masqué en rendu bureau, qui a
   // sa propre mise en page — le même code le remplit dans les deux cas.

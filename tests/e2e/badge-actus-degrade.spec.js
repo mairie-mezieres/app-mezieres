@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { couperReseauExterne } = require('./helpers/reseau');
 
 /*
  * Le badge des actualités doit survivre à l'absence d'un module voisin.
@@ -22,6 +23,7 @@ const { test, expect } = require('@playwright/test');
  */
 
 test('l’encart « Boîte à idées » s’affiche même si updateAppBadge manque', async ({ page }) => {
+  await couperReseauExterne(page);
   await page.addInitScript(() => localStorage.setItem('mat_onboarded_v3', '1'));
   await page.goto('/');
   await page.waitForFunction(() => typeof window.refreshActusBadge === 'function');

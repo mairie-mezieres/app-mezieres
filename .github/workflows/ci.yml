@@ -67,3 +67,13 @@ jobs:
       # le bon chemin. Voir ADR-0045 §8.
       - name: Workflow inputs check (null == false)
         run: node scripts/check-workflow-inputs.js
+
+      # Une spec E2E qui ne coupe pas `onrender.com` appelle le backend de
+      # PRODUCTION à chaque exécution — et Playwright partant d'un profil
+      # vierge, CHAQUE TEST s'y enregistre comme un visiteur unique de plus.
+      # Six specs étaient dans ce cas, la première depuis le 31 août 2026 : le
+      # tableau de bord de la mairie a affiché jusqu'à ~550 visiteurs par jour.
+      # Aucun test ne peut voir ce défaut — il porte sur ce que les tests
+      # eux-mêmes font. Voir ADR-0048.
+      - name: E2E — aucune spec ne parle à la production
+        run: node scripts/check-e2e-reseau.js

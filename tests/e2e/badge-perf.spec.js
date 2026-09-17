@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const { couperReseauExterne } = require('./helpers/reseau');
 
 /*
  * Badge de performances du pied de page.
@@ -20,6 +21,7 @@ const { test, expect } = require('@playwright/test');
  */
 
 test('le badge n’annonce pas Lighthouse comme une conformité RGAA', async ({ page }) => {
+  await couperReseauExterne(page);
   await page.addInitScript(() => localStorage.setItem('mat_onboarded_v3', '1'));
   await page.goto('/');
 
