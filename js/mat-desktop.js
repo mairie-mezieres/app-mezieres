@@ -1,4 +1,4 @@
-/* mat-desktop.js v4.3.0 — populates desktop panels (≥1024px only) */
+/* mat-desktop.js v4.4.0 — populates desktop panels (≥1024px only) */
 (function(){
 'use strict';
 
@@ -102,7 +102,7 @@ function loadActus(){
         var actuId=encodeURIComponent(a.id||a._id||'');
         // Les actus de l'API exposent description/text (et non contenu/content).
         var excerptTxt=(a.description||a.text||a.contenu||a.content||'').replace(/\s+/g,' ').trim();
-        var excerpt=excerptTxt?'<p class="d-actu-excerpt" style="font-size:.72rem;color:#666;margin:2px 0 0;line-height:1.4">'+escHtml(excerptTxt.substring(0,90))+(excerptTxt.length>90?'…':'')+'</p>':'';
+        var excerpt=excerptTxt?'<p class="d-actu-excerpt">'+escHtml(excerptTxt.substring(0,90))+(excerptTxt.length>90?'…':'')+'</p>':'';
         html+='<div class="d-actu-item" onclick="(typeof openActuDetail===\'function\'?openActuDetail:function(){openNotifs&&openNotifs()})(\''+actuId+'\')" role="button">'+
           (img?'<div class="d-actu-thumb" style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0">'+img+'</div>':'')+
           '<div class="d-actu-body">'+
@@ -268,8 +268,12 @@ function renderFeatured(e){
           '<span class="d-featured-date">'+fmt(d)+'</span>'+
           ' · <span class="d-featured-countdown">'+countdown+'</span>'+
         '</div>'+
-        (e.description?'<p class="d-featured-desc" style="font-size:.78rem;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5">'+nl2br(e.description)+'</p>':'')+
-        '<p style="font-size:.68rem;color:rgba(255,255,255,.45);margin:8px 0 0">Voir l\'agenda complet →</p>'+
+        // ⛔ Plafonnée à trois lignes par `.d-featured-desc` (mat-desktop.css) :
+        // la description vient de l'agenda public, personne ici ne maîtrise sa
+        // longueur, et six paragraphes faisaient une carte de 690 px — plus
+        // haute à elle seule que la colonne de gauche entière.
+        (e.description?'<p class="d-featured-desc">'+nl2br(e.description)+'</p>':'')+
+        '<p class="d-featured-plus">Voir l\'agenda complet →</p>'+
       '</div>'+
     '</div>';
 }

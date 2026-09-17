@@ -85,10 +85,15 @@ test.describe('Carte 3D', () => {
     expect(ordre.j).toBeGreaterThan(ordre.i);
   });
 
-  test('sur ordinateur, la carte est dans « Vous aider » et dans le menu', async ({ page, viewport }) => {
+  test('sur ordinateur, la carte est sur l’accueil et dans le menu', async ({ page, viewport }) => {
     test.skip(!viewport || viewport.width < 1024, 'mise en page ordinateur uniquement');
     await ouvrirAccueil(page);
-    await expect(page.locator('.d-col-right button', { hasText: 'Mon village en 3D' })).toBeVisible();
+    // ⚠️ On n'exige PAS une colonne précise : depuis la v4.122 la carte vit
+    // dans « La mairie au quotidien » (le zonage du PLU, c'est de la mairie) et
+    // non plus dans « Vous aider », parce que les colonnes se répartissent
+    // désormais aussi par POIDS — voir bureau-equilibre.spec.js. Ce qui compte
+    // ici, c'est que le point d'entrée existe sur l'accueil du bureau.
+    await expect(page.locator('.d-main-grid button', { hasText: 'Mon village en 3D' })).toBeVisible();
     await expect(page.locator('.d-nav-links button', { hasText: 'Mon village en 3D' })).toBeVisible();
   });
 
