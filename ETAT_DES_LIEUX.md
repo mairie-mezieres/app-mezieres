@@ -556,6 +556,14 @@ code ne les contient. À récupérer manuellement :
 
 - **Nombre de visiteurs** (jour, mois, total) — compteurs `mat:stats`,
   onglet « Vue d'ensemble » du tableau de bord.
+  > ⛔ **Ne pas citer la période du 31 août au 17 septembre 2026.** Six specs
+  > Playwright appelaient le backend de production à chaque exécution de CI, et
+  > Playwright partant d'un profil vierge, **chaque test s'est enregistré comme
+  > un visiteur unique** : jusqu'à ~550 en une journée, contre 40-90 de ligne de
+  > base, et 234 ouvertures du service « Carburant ». Corrigé le 17 septembre
+  > (ADR-0048), mais l'historique **ne peut pas être nettoyé** — rien ne
+  > distingue après coup un test d'un habitant. Les compteurs *cumulés*
+  > (mois, total) portent donc eux aussi cet excédent.
 - **Nombre d'installations de l'application** — source unique
   `services.installation`, visible dans le badge de l'application, le mail
   quotidien et le tableau de bord.

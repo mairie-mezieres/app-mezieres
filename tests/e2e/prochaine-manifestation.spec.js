@@ -13,14 +13,11 @@ const { test, expect } = require('@playwright/test');
 // Le test sert un agenda iCal fabriqué : les tests tournent sans backend, donc
 // on interceptera l'appel à /calendar-proxy avant de couper le reste.
 
-const EXTERNAL_HOSTS = [
-  'googleapis.com', 'gstatic.com', 'clearbit.com',
-  'open-meteo.com', 'facebook.com', 'api-adresse.data.gouv.fr',
-  'apicarto.ign.fr', 'data.geopf.fr', 'cadastre.data.gouv.fr',
-  'geoportail-urbanisme', 'raw.githubusercontent.com', 'res.cloudinary.com',
-  'data.education.gouv.fr', 'ingest.de.sentry.io', 'sentry.io',
-  'tile.openstreetmap.org', 'openstreetmap.org'
-];
+// ⛔ Cette spec portait sa propre copie de la liste, elle aussi amputée de
+// `'onrender.com'` — et son commentaire affirmait pourtant que la production
+// était coupée. Une protection écrite noir sur blanc, et absente : c'est ce
+// qui l'a rendue invisible à la relecture. Source unique désormais. ADR-0048.
+const { couperReseauExterne } = require('./helpers/reseau');
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -51,18 +48,19 @@ function jour(delta, h, min) {
 
 async function ouvrirAvecAgenda(page, events) {
   await page.addInitScript(() => { localStorage.setItem('mat_onboarded_v3', '1'); });
-  // L'agenda d'abord : /calendar-proxy vit sur onrender.com, que la règle
-  // suivante coupe. L'ordre compte, Playwright applique la dernière route posée.
-  await page.route('**/*', (route) => {
-    const url = route.request().url();
-    if (EXTERNAL_HOSTS.some((h) => url.includes(h))) return route.abort();
-    return route.continue();
+  // ⚠️ `/calendar-proxy` vit sur onrender.com, que la coupure emporte : la
+  // simulation passe donc par le crochet, évalué AVANT elle. C'est bien ce que
+  // l'ancienne rédaction voulait dire — sauf que sa liste ne coupait pas
+  // onrender.com, si bien que tout le reste de l'app parlait à la production.
+  await couperReseauExterne(page, (route, url) => {
+    if (!url.includes('/calendar-proxy')) return false;
+    route.fulfill({
+      status: 200,
+      contentType: 'text/calendar; charset=utf-8',
+      body: ical(events)
+    });
+    return true;
   });
-  await page.route('**/calendar-proxy**', (route) => route.fulfill({
-    status: 200,
-    contentType: 'text/calendar; charset=utf-8',
-    body: ical(events)
-  }));
   await page.goto('/');
 }
 
