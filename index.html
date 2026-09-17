@@ -50,7 +50,7 @@ document.documentElement.style.background = bg;
 })();
 </script>
 <link rel="stylesheet" href="css/mat.css?v=4.14.25">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.5.5">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.6.0">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
      de CSS entre les deux, donc l'ordre de la cascade est INCHANGÉ. -->
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.121 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.122 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -403,6 +403,14 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <main id="main-content">
 <section class="sv-bloc sv-bloc-d d-sv-bandeau" aria-label="Le saviez-vous ? Le fait du jour sur la commune"></section>
 <div class="d-main-grid">
+<!-- ⛔ RÉPARTITION DES CARTES — ce n'est pas un détail de goût : les trois
+     colonnes n'ont pas de fond, donc ce qu'on voit d'elles est la hauteur de
+     leur contenu. En v4.121 la colonne du centre pesait 1 338 px contre 694 et
+     761 : deux colonnes s'arrêtaient à mi-hauteur et laissaient 600 px de blanc
+     sous elles. La cause n'était pas la largeur (elles font 1fr chacune, soit
+     432 px à 1440 px) mais la carte « Prochain évènement », dont la description
+     n'était pas plafonnée. Toute carte ajoutée ici se pèse :
+     `tests/e2e/bureau-equilibre.spec.js` refuse un écart de plus de 25 %. -->
 <div class="d-col d-col-left">
 <div class="d-col-titre">🏛️ La mairie au quotidien</div>
 <div class="d-card" id="dsk-mairie">
@@ -417,37 +425,22 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="d-card-hdr"><span>🗑️ Collectes</span><button onclick="openDechets()">Calendrier →</button></div>
 <div class="d-card-body" id="dsk-collectes-body"><div class="d-loading">Chargement…</div></div>
 </div>
-</div>
-<div class="d-col d-col-center">
-<div class="d-col-titre">📰 La vie de la commune</div>
-<div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
-<div class="d-card" id="dsk-actus">
-<div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
-<div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
-</div>
-<div class="d-card" id="dsk-photos">
-<div class="d-card-hdr"><span>📸 Vos photos</span><button onclick="openPhotos()">Galerie →</button></div>
-<div class="d-card-body">
-<div id="dsk-photos-grid"><div class="d-loading">Chargement…</div></div>
-<button type="button" class="d-diapo-btn" onclick="launchDiapo()">▶ Lancer le diaporama plein écran</button>
-</div>
-</div>
-</div>
-<div class="d-col d-col-right">
-<div class="d-col-titre">🤝 Vous aider</div>
-<button type="button" class="d-guide-card" onclick="openGuideArrivee()">
-<span class="d-guide-ico" aria-hidden="true">📦</span>
-<span class="d-guide-txt">
-<span class="d-guide-title">Je viens d’emménager</span>
-<span class="d-guide-sub">Guide d’arrivée des nouveaux habitants — démarches, écoles, déchets, fibre…</span>
-</span>
-<span class="d-guide-arrow" aria-hidden="true">→</span>
-</button>
 <button type="button" class="d-guide-card" onclick="matOuvrirCarte3D()">
 <span class="d-guide-ico" aria-hidden="true">🏘️</span>
 <span class="d-guide-txt">
 <span class="d-guide-title">Mon village en 3D</span>
 <span class="d-guide-sub">Le bourg en relief avec le zonage du PLU — touchez un bâtiment pour voir ce qu’on a le droit d’y construire.</span>
+</span>
+<span class="d-guide-arrow" aria-hidden="true">→</span>
+</button>
+</div>
+<div class="d-col d-col-center">
+<div class="d-col-titre">🤝 Vous aider &amp; participer</div>
+<button type="button" class="d-guide-card" onclick="openGuideArrivee()">
+<span class="d-guide-ico" aria-hidden="true">📦</span>
+<span class="d-guide-txt">
+<span class="d-guide-title">Je viens d’emménager</span>
+<span class="d-guide-sub">Guide d’arrivée des nouveaux habitants — démarches, écoles, déchets, fibre…</span>
 </span>
 <span class="d-guide-arrow" aria-hidden="true">→</span>
 </button>
@@ -469,12 +462,27 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openSignal()">🌿 Espaces verts</button>
 <button onclick="openSignal()">🗑️ Propreté</button>
 </div>
-<button type="button" onclick="openSuivi('signalements')" style="display:block;width:100%;margin-top:8px;padding:7px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#1e40af;font-size:.75rem;cursor:pointer;font-family:inherit;text-align:center">📋 Suivi des signalements →</button>
+<button type="button" class="d-suivi-btn" onclick="openSuivi('signalements')">📋 Suivi des signalements →</button>
 </div>
 <div class="d-card">
 <div class="d-card-hdr"><span>🏛️ Contacter vos élus</span><button onclick="openConseil()">Voir tous →</button></div>
 <div class="d-card-body" id="dsk-elus-body"><div class="d-loading">Chargement…</div></div>
 </div>
+<div class="d-card" id="dsk-photos">
+<div class="d-card-hdr"><span>📸 Vos photos</span><button onclick="openPhotos()">Galerie →</button></div>
+<div class="d-card-body">
+<div id="dsk-photos-grid"><div class="d-loading">Chargement…</div></div>
+<button type="button" class="d-diapo-btn" onclick="launchDiapo()">▶ Lancer le diaporama plein écran</button>
+</div>
+</div>
+</div>
+<div class="d-col d-col-right">
+<div class="d-col-titre">📰 Actualités &amp; agenda</div>
+<div class="d-card" id="dsk-actus">
+<div class="d-card-hdr"><span>📰 Actualités</span><button onclick="openNotifs()">Toutes →</button></div>
+<div class="d-card-body" id="dsk-actus-list"><div class="d-loading">Chargement…</div></div>
+</div>
+<div id="dsk-featured"><div class="d-loading">Chargement…</div></div>
 </div>
 </div>
 <div class="d-rando-banner">
@@ -520,7 +528,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.121</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.122</button>
 </div>
 </div>
 </div>
@@ -1752,7 +1760,7 @@ et accompagnée des documents suivants :
 </div>
 </template>
 </div>
-<script defer src="js/mat-desktop.js?v=4.3.2"></script>
+<script defer src="js/mat-desktop.js?v=4.4.0"></script>
 <div class="ov" id="ov-photos" onclick="ovClick('photos',event)">
 <template data-lazy-ov>
 <div class="panel">
@@ -1840,6 +1848,15 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 17 septembre 2026 — v4.122</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>La version ordinateur est remise d&rsquo;aplomb.</strong> Les trois colonnes de l&rsquo;accueil s&rsquo;arr&ecirc;taient &agrave; des hauteurs tr&egrave;s diff&eacute;rentes&nbsp;: celle du milieu descendait deux fois plus bas que les autres, qui laissaient un grand vide blanc sous elles</li>
+<li><strong>Les actualit&eacute;s sont remont&eacute;es en t&ecirc;te de la colonne de droite</strong>, visibles sans avoir &agrave; d&eacute;filer. Le prochain &eacute;v&egrave;nement les suit juste dessous</li>
+<li><strong>Trois colonnes, trois th&egrave;mes clairs</strong>&nbsp;: &laquo;&nbsp;La mairie au quotidien&nbsp;&raquo; (horaires, bus, collectes, village en 3D), &laquo;&nbsp;Vous aider &amp; participer&nbsp;&raquo; (guide d&rsquo;arriv&eacute;e, MEL, signalements, &eacute;lus, vos photos) et &laquo;&nbsp;Actualit&eacute;s &amp; agenda&nbsp;&raquo;</li>
+<li>La description du prochain &eacute;v&egrave;nement est r&eacute;sum&eacute;e &agrave; trois lignes sur ordinateur&nbsp;; le texte complet reste dans l&rsquo;agenda</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 16 septembre 2026 — v4.121</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le bandeau carburant de l&rsquo;accueil montre bien la station la moins ch&egrave;re.</strong> Il pr&eacute;f&eacute;rait jusqu&rsquo;ici l&rsquo;Intermarch&eacute; de Cl&eacute;ry &mdash; la plus proche &mdash; d&egrave;s que son relev&eacute; datait du jour, m&ecirc;me quand trois stations tout aussi &agrave; jour &eacute;taient moins ch&egrave;res. L&rsquo;accueil affiche d&eacute;sormais exactement la premi&egrave;re ligne de la liste d&eacute;taill&eacute;e&nbsp;; Cl&eacute;ry ne l&rsquo;emporte plus qu&rsquo;&agrave; prix &eacute;gal</li>

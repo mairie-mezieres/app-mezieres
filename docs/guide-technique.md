@@ -1973,24 +1973,36 @@ Service web Node.js, déploiement automatique à chaque push sur `main` du dép�
   fonctionnalité a besoin de son propre point d'entrée desktop : un bouton de `.d-nav-links`,
   une carte de `.d-main-grid`, ou un lien de `.d-footer-links`.
 - [ ] **Choisir la bonne colonne desktop.** `.d-main-grid` a trois colonnes thématiques de
-  largeur égale, chacune introduite par un `.d-col-titre` :
-  `.d-col-left` = **la mairie au quotidien** (horaires, bus, collectes) · `.d-col-center` =
-  **la vie de la commune** (évènement, actualités, photos) · `.d-col-right` = **vous aider**
-  (guide d'arrivée, MEL, signalement, élus). Placer la carte selon son thème, pas selon la
-  place disponible. Ce qui n'entre dans aucun des trois va en bandeau pleine largeur
-  au-dessus de la grille (voir `.d-sv-bandeau`).
-- [ ] **Vérifier l'équilibre des colonnes après ajout.** Une carte trop haute fait déborder
-  sa colonne — c'est arrivé avec les actualités à 5 articles (583 px, contre 89 à 262 px pour
-  les autres cartes), qui creusaient un écart de 344 px. Les listes desktop sont des
-  **aperçus** : 3 actualités, 4 photos sur une rangée, le reste derrière « Toutes → ».
-  Mesure rapide, en console sur l'accueil ≥ 1024 px :
+  largeur égale, chacune introduite par un `.d-col-titre` (v4.122) :
+  `.d-col-left` = **la mairie au quotidien** (horaires, bus, collectes, village en 3D) ·
+  `.d-col-center` = **vous aider & participer** (guide d'arrivée, MEL, signalement, élus,
+  vos photos) · `.d-col-right` = **actualités & agenda** (actualités **en tête**, puis
+  prochain évènement). Placer la carte selon son thème — mais le thème ne suffit pas, voir
+  le point suivant : la colonne se choisit aussi au **poids**. Ce qui n'entre dans aucun des
+  trois va en bandeau pleine largeur au-dessus de la grille (voir `.d-sv-bandeau`).
+- [ ] **Vérifier l'équilibre des colonnes après ajout — c'est mesuré par la CI.**
+  Les colonnes n'ont **pas de fond** : ce qu'un habitant voit d'elles est la hauteur de leur
+  **contenu**. `1fr 1fr 1fr` garantit la largeur (432 px chacune à 1440 px, mesuré), jamais
+  la hauteur. En v4.121, le centre pesait **1 338 px** contre 694 et 761 : deux colonnes
+  s'arrêtaient à mi-page, 600 px de blanc dessous, et ça se lit comme une page cassée.
+  ⛔ **Une carte dont le texte vient d'ailleurs se plafonne** : la description de « Prochain
+  évènement » vient de l'agenda public, personne ici n'en maîtrise la longueur, et un concert
+  décrit en six paragraphes faisait 690 px à lui seul (`.d-featured-desc`, trois lignes).
+  Les listes desktop sont des **aperçus** : 3 actualités, 4 photos sur une rangée, le reste
+  derrière « Toutes → ».
+  Mesure rapide, en console sur l'accueil ≥ 1024 px — ⚠️ **le bas de la dernière carte, pas
+  `height` de la colonne** : la grille étire les trois à l'identique, donc leur `height` est
+  la même et ne mesure rien.
   ```js
-  [...document.querySelectorAll('.d-col')].map(c => [
-    c.querySelector('.d-col-titre')?.textContent,
-    [...c.children].reduce((s, k) => s + k.getBoundingClientRect().height + 16, 0) | 0
-  ])
+  [...document.querySelectorAll('.d-col')].map(c => {
+    const k = [...c.children].filter(x => x.getBoundingClientRect().height > 0);
+    return [c.querySelector('.d-col-titre')?.textContent,
+            Math.round(k.at(-1).getBoundingClientRect().bottom - c.getBoundingClientRect().top)];
+  })
   ```
-  Viser moins de ~200 px d'écart entre la plus haute et la plus basse.
+  `tests/e2e/bureau-equilibre.spec.js` refait cette mesure avec des données simulées et
+  **refuse plus de 25 % d'écart** (repères v4.122 : 797 / 884 / 938 px, soit 15 %).
+  Voir ADR-0049.
   Vérification rapide de ce qui manque :
   ```bash
   # points d'entrée mobile absents du desktop

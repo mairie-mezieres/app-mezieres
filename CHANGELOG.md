@@ -5,6 +5,52 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.122] — 17 septembre 2026
+
+### Corrigé
+
+- **Trois colonnes de même largeur, et pourtant déséquilibrées.** Sur ordinateur, la
+  colonne du centre de l'accueil descendait 1 338 px quand celles de gauche et de droite
+  s'arrêtaient à 694 et 761 : 600 px de blanc sous deux colonnes sur trois.
+
+  ⛔ **La largeur n'a jamais été le problème** — `grid-template-columns:1fr 1fr 1fr`
+  donne 432 px à chacune sur un écran de 1440 px, et c'est mesuré. Les colonnes n'ayant
+  **pas de fond**, ce qu'un habitant voit d'une colonne, c'est la hauteur de son
+  **contenu**.
+
+  ⛔ **Et la cause n'était pas la répartition des cartes seule.** La carte « Prochain
+  évènement » rend la description de l'agenda public telle quelle : le concert du
+  27 septembre, décrit en six paragraphes, faisait à lui seul **690 px**, plus que toute
+  la colonne de gauche. Personne ici ne maîtrise cette longueur — elle est saisie dans
+  l'agenda de la mairie et change à chaque évènement, donc tout équilibrage « à la main »
+  se défait tout seul au suivant. `.d-featured-desc` est désormais plafonné à trois
+  lignes ; le texte complet reste dans l'agenda.
+
+### Modifié
+
+- **Les actualités ouvrent la colonne de droite** (« 📰 Actualités & agenda »), visibles
+  sans défiler ; le prochain évènement les suit. Elles étaient auparavant sous une carte
+  de 690 px.
+- **Les trois colonnes sont réparties par thème *et* par poids** : « 🏛️ La mairie au
+  quotidien » (horaires, bus, collectes, village en 3D — 797 px) · « 🤝 Vous aider &
+  participer » (guide d'arrivée, MEL, signalement, élus, vos photos — 884 px) ·
+  « 📰 Actualités & agenda » (938 px). Écart : 15 %, contre 48 % en v4.121.
+- Quatre blocs de style **en ligne** passent en CSS (`.d-featured-desc`,
+  `.d-featured-plus`, `.d-actu-excerpt`, `.d-suivi-btn`) : en ligne, leurs couleurs
+  étaient hors de portée du thème sombre — le `#666` de l'extrait d'actualité y restait
+  gris moyen sur fond ardoise.
+
+### Ajouté
+
+- `tests/e2e/bureau-equilibre.spec.js` — sert un agenda et des actualités simulés (dont
+  une description de six paragraphes), mesure les trois colonnes et **refuse plus de
+  25 % d'écart**. ⚠️ Il mesure le bas de la dernière carte, pas `height` de la colonne :
+  la grille étire les trois items à l'identique, donc cette hauteur est la même pour
+  toutes et ne mesure rien. Vérifié rouge sans le plafond (ADR-0030).
+- `docs/adr/0049-trois-colonnes-la-largeur-n-etait-pas-le-probleme.md`
+
+---
+
 ## [4.121] — 16 septembre 2026
 
 ### Corrigé
