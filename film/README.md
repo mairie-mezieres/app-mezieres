@@ -7,11 +7,14 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 | Fichier | Rôle |
 |---|---|
 | `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 51 s, 1080×1920, H.264, sans son |
+| `sortie/mat-presentation-vertical-musique.mp4` | La même, avec la musique posée dessus |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
 | `capturer-ecrans.js` | Capture les onze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
 | `rendre-video.js` | `presentation.html` → MP4 |
+| `ajouter-musique.js` | Pose une piste audio sur le MP4, sans réencoder l'image |
+| `musique/` | La piste fournie par la mairie, et d'où vient sa licence |
 | `qr.svg` | QR code vers `https://mezieres-lez-clery.fr` |
 | `ecrans/carte3d-anim/` | 73 images de la carte 3D, **fournies par la mairie** (voir plus bas) |
 | `ecrans/carte3d-*.webp` | Les deux captures nettes de la carte 3D, même origine |
@@ -96,10 +99,15 @@ diffusion, et à masquer si la personne le demande.
   date de scrutin).
   Deux exceptions, vraies et vérifiables : la réponse de MEL sur les horaires de
   bricolage (arrêté préfectoral du Loiret du 1er mars 1999) et l'adresse de l'app.
-- **Le film n'a pas de son** : les réseaux lisent en sourdine par défaut, tout est
-  écrit à l'écran. Pour l'accessibilité des personnes sourdes et malentendantes,
-  rien à sous-titrer — mais si une voix off était ajoutée un jour, des sous-titres
-  deviendraient indispensables.
+- **Le film muet reste la référence** ; la version musicale s'ajoute à côté
+  (`node film/ajouter-musique.js film/musique/<piste>.mp3`). Les réseaux lisent en
+  sourdine par défaut, donc **tout ce qui compte est écrit à l'écran, et doit le
+  rester** : une musique n'ajoute aucune information, et c'est ce qui la rend sans
+  danger pour l'accessibilité. ⚠️ Une **voix off**, elle, en ajoute — il faudrait
+  alors des sous-titres, relus (les générateurs automatiques écorchent
+  « Mézières-lez-Cléry »).
+- ⛔ **La licence de la musique ne vit pas dans le dépôt** : la mairie garde la
+  preuve dans ses archives. Voir `musique/SOURCE.md`.
 - **Relire le numéro de version** visible dans la capture d'accueil : il vieillit.
   Relancer `capturer-ecrans.js` avant une diffusion importante.
 - ⚠️ **Le fait du jour tourne avec le calendrier.** L'écran « Le saviez-vous ? » est
