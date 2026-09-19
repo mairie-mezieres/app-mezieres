@@ -145,3 +145,34 @@ C'est une **bonne nouvelle sur l'app** (elle dit la panne au lieu de montrer un
 vide) et une **impasse pour le film** : aucune automatisation ne produira cette
 image. Elle doit venir d'un appareil réellement connecté. Le film l'attend ;
 `film/README.md` dit comment l'ajouter le jour où elle existe.
+
+### La carte 3D est finalement dans le film — et elle y restera à la main
+
+La mairie a fourni ce qu'aucun script ne pouvait produire : un enregistrement
+d'écran de 11 s et deux captures, pris sur un téléphone connecté. Le film en
+garde **73 images** (`film/ecrans/carte3d-anim/`, ~2,5 s de vol au-dessus du
+bâti et du zonage) puis les **deux captures nettes** — bâtiments, puis zonage du
+PLU avec les lieux-dits.
+
+⚠️ **C'est le seul plan du film qui ne se régénère pas tout seul.** Tout le reste
+se refait en deux commandes ; celui-ci demande un nouvel enregistrement. Le code
+le dit là où on l'oublierait (`ANIM_3D` dans `presentation.html`), et il tombe
+proprement : sans les images, la scène disparaît, le reste du film tient.
+
+⚠️ Trois détails qui ne se voient qu'au rendu :
+- les images d'un vrai téléphone sont plus **larges** que l'écran du film (0,48
+  et 0,50 contre 0,46) — posées comme les autres, elles laissent une bande crème
+  en bas ou à droite ; d'où la classe `.plein` (`object-fit:cover`), **ancrée à
+  gauche** pour garder les boutons « Zonage du PLU », « Bâtiments », « Le
+  territoire », qui sont précisément ce qu'on veut montrer ;
+- les **73 images sont montées d'avance**, jamais chargées à la volée : changer
+  le `src` d'une seule balise rendrait `filmSeek` asynchrone sans le dire, et le
+  moteur de rendu photographierait des trous — visibles seulement après encodage ;
+- un enchaînement de plans à parts égales donnait à l'animation trois fois trop
+  de vitesse, d'où `poids` dans `SCENES`.
+
+⚠️ **Vie privée.** Ces images portent la bulle « Votre adresse — zone 1AU » et une
+pastille orange à l'endroit du domicile de la personne qui a filmé. À l'échelle du
+village cela ne désigne pas une maison, et la bulle démontre une vraie fonction
+(l'app dit à l'habitant SA zone PLU) — mais c'est un arbitrage à faire tenir par
+la personne concernée, pas par le code. Noté dans `film/README.md`.

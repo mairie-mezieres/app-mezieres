@@ -6,20 +6,22 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 | Fichier | Rôle |
 |---|---|
-| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 48 s, 1080×1920, H.264, sans son |
+| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 51 s, 1080×1920, H.264, sans son |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
 | `capturer-ecrans.js` | Capture les onze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
 | `rendre-video.js` | `presentation.html` → MP4 |
 | `qr.svg` | QR code vers `https://mezieres-lez-clery.fr` |
+| `ecrans/carte3d-anim/` | 73 images de la carte 3D, **fournies par la mairie** (voir plus bas) |
+| `ecrans/carte3d-*.webp` | Les deux captures nettes de la carte 3D, même origine |
 
 ## Régénérer le film
 
 ```bash
 npm i --no-save @playwright/test @ffmpeg-installer/ffmpeg   # une fois
 node film/capturer-ecrans.js     # ~1 min — relance l'app en local et photographie 11 écrans
-node film/rendre-video.js        # ~5 min — 1 434 images puis encodage
+node film/rendre-video.js        # ~6 min — 1 518 images puis encodage
 ```
 
 ⚠️ Il faut un **ffmpeg compilé avec libx264**. Celui qui accompagne Playwright ne
@@ -57,17 +59,33 @@ décision, aucune date dans un titre. Voir les commentaires de `fixtures.js`.
 « gratuite, sans publicité, sans compte ». Les revérifier avant toute
 rediffusion — le taux RGAA et la taille du corpus bougent.
 
-## 🗺️ Ce qui manque : la carte 3D
+## 🗺️ La carte 3D — le seul plan qui ne se régénère pas
 
 La carte 3D du village (`matOuvrirCarte3D`) **ne peut pas être capturée
 automatiquement** : son fond de plan, son bâti et le zonage PLU viennent de l'IGN
 (`data.geopf.fr`, `apicarto.ign.fr`), et la capture coupe tout appel sortant. Sans
 réseau, l'écran affiche honnêtement « Aucun bâtiment chargé — l'IGN n'a pas
-répondu ». La capture porte donc son verdict dans son nom :
+répondu ». Cette capture-là porte son verdict dans son nom :
 `ecrans/carte3d-sans-reseau.png`, **à ne jamais brancher dans le film**.
 
-Pour l'ajouter : poser une image (ou une suite d'images) de la carte 3D réelle dans
-`ecrans/`, l'ajouter à `SCENES` dans `presentation.html`, et rendre à nouveau.
+Les images utilisées viennent donc d'un **téléphone réellement connecté** :
+
+- `ecrans/carte3d-anim/f001..f073.webp` — 73 images extraites d'un enregistrement
+  d'écran, jouées en ~2,5 s (`ANIM_3D` dans `presentation.html`). Pour les
+  refaire : `ffmpeg -ss <début> -t <durée> -i <enregistrement.mp4>
+  -vf "fps=12,crop=340:714:40:38" -c:v libwebp -q:v 76 f%03d.webp`
+  — le `crop` retire la barre d'état et la barre de navigation Android.
+- `ecrans/carte3d-batiments.webp` et `carte3d-plu.webp` — deux captures d'écran
+  recadrées pareil, puis réduites à 780 px de large.
+
+⚠️ Ces images sont plus **larges** que l'écran du film (0,48 et 0,50 contre 0,46) :
+elles portent la classe `.plein` (`object-fit:cover`, ancré à gauche pour garder
+les boutons « Zonage du PLU », « Bâtiments », « Le territoire »).
+
+⚠️ **Vie privée** : ces images montrent la bulle « Votre adresse — zone 1AU » et
+une pastille orange à l'endroit du domicile de la personne qui a filmé. Sur une
+vue large du village, cela ne désigne pas une maison — mais c'est à valider avant
+diffusion, et à masquer si la personne le demande.
 
 ## ⚠️ Avant de publier
 
