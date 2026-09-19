@@ -102,3 +102,46 @@ la réponse de MEL sur les horaires de bricolage (arrêté préfectoral du Loire
   de ce qui est servi à l'habitant ne change. ⚠️ Cela cesse d'être vrai le jour où
   un lien vers le film est ajouté dans l'app — ce serait alors un changement
   visible, avec tout ce que le `CLAUDE.md` impose.
+
+## Deuxième version (19 septembre 2026) — ce que la première a raté
+
+Trois reproches, tous justes, et tous instructifs.
+
+**1. Une actualité inventée est une fausse information, pas un exemple.** L'écran
+« Actualités » montrait « La bibliothèque vous accueille le mercredi », daté
+d'hier, sous le bandeau de la mairie. Dans un film diffusé sur la page de la
+commune, cette phrase **est** une annonce municipale : rien à l'écran ne dit
+qu'elle illustre une mise en page. Les données simulées ne nomment donc plus que
+des **rubriques** (« Compte rendu du conseil municipal ») et du **mécanisme**
+(trois statuts de signalement, une réponse de la mairie) — jamais un horaire, un
+lieu, une décision ou une date dans un titre. Le même raisonnement vaut pour la
+boîte à idées : on n'invente pas la proposition d'un habitant.
+
+⚠️ Corollaire pour le prochain film, quel qu'en soit le sujet : **tout ce qui est
+lisible à l'écran engage la commune**, y compris ce qui n'était là que pour
+remplir une maquette.
+
+**2. Le rythme d'un film n'est pas celui d'une démonstration.** La première
+version tenait 6,5 s par idée, sept scènes, des fondus d'une demi-seconde. Un fil
+d'actualité ne pardonne pas les temps morts : onze scènes, des coupes de 0,3 s,
+une lame de transition sur les changements d'acte, des titres qui arrivent un peu
+trop gros et se calent. Même durée par minute d'information, deux fois plus de
+choses montrées.
+
+**3. Ce qu'on montre doit être ce qui distingue l'app.** Un agenda et une météo,
+toutes les communes en ont. Le suivi **public** des signalements avec la réponse
+de la mairie, l'assistante MEL, le fait du jour sourcé, la boîte à idées votée :
+ça, non. Ces écrans existaient tous et aucun n'était filmé.
+
+### ⛔ Et la carte 3D, la plus spectaculaire, ne se capture pas ici
+
+`matOuvrirCarte3D` construit le village à partir du bâti et du fond de plan de
+l'IGN (`data.geopf.fr`), et le zonage PLU vient d'`apicarto.ign.fr`. La capture
+coupant tout appel sortant — et l'environnement de développement n'ayant de toute
+façon pas accès à ces domaines — l'écran rend exactement ce qu'il doit rendre :
+« Aucun bâtiment chargé — l'IGN n'a pas répondu ».
+
+C'est une **bonne nouvelle sur l'app** (elle dit la panne au lieu de montrer un
+vide) et une **impasse pour le film** : aucune automatisation ne produira cette
+image. Elle doit venir d'un appareil réellement connecté. Le film l'attend ;
+`film/README.md` dit comment l'ajouter le jour où elle existe.

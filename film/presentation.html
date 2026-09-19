@@ -13,7 +13,7 @@
   service worker, ni chargé par `index.html`, ni soumis aux contrôles RGAA de
   l'app : il sert à FABRIQUER un fichier MP4 diffusé ailleurs (Facebook, mail,
   écran de la mairie). Ne jamais l'ajouter à la liste de précache — ce serait
-  imposer 7 captures d'écran à chaque habitant pour une vidéo qu'il ne verra
+  imposer onze captures d'écran à chaque habitant pour une vidéo qu'il ne verra
   jamais dans l'app.
 
   ⛔ AUCUNE ANIMATION CSS NE CADENCE CE FILM, ET C'EST LA DÉCISION CENTRALE.
@@ -28,6 +28,14 @@
   Corollaire : pour ajouter un effet, écrire une fonction de `t`, jamais un
   `@keyframes`.
 
+  ⚠️ CE QUI EST DIT À L'ÉCRAN ENGAGE LA COMMUNE. Les trois affirmations chiffrées
+  du film sont vérifiables dans le dépôt, et se revérifient avant toute
+  rediffusion :
+    • « 180 questions »       → `data/saviez-vous.json` (entrées du corpus)
+    • « 100 % RGAA »          → `docs/accessibilite/audit-rgaa-2026-08-27.md`
+    • « sans compte, sans pub » → aucune inscription, aucune régie dans l'app
+  Tout le reste est du mécanisme, jamais une information communale.
+
   Usage :
     • aperçu   : ouvrir ce fichier dans un navigateur (lecture automatique)
     • rendu    : node film/rendre-video.js   (pilote `filmSeek` frame par frame)
@@ -41,7 +49,7 @@
 
 :root{
   --forest:#1a3d2b; --leaf:#2d6a4f; --sage:#52b788; --mist:#d8f3dc;
-  --gold:#d4a843; --amber:#f4a261; --cream:#faf7f2;
+  --gold:#f0b429; --amber:#f4a261; --cream:#faf7f2;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:#06150d;height:100%;overflow:hidden;}
@@ -52,12 +60,18 @@ body{display:flex;align-items:center;justify-content:center;}
    fenêtre : une capture faite dans une fenêtre plus petite resterait juste. */
 #scene{position:relative;width:1080px;height:1920px;flex:none;overflow:hidden;
   font-family:'Nunito',system-ui,sans-serif;color:#fff;
-  background:linear-gradient(165deg,#0b2417 0%,#1a3d2b 45%,#2d6a4f 100%);}
+  background:linear-gradient(165deg,#07190f 0%,#143122 42%,#2d6a4f 100%);}
 
 /* Halos de fond : deux disques flous déplacés par filmSeek. */
 .halo{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;pointer-events:none;}
-#halo1{width:760px;height:760px;background:#52b788;}
-#halo2{width:620px;height:620px;background:#d4a843;opacity:.30;}
+#halo1{width:780px;height:780px;background:#52b788;}
+#halo2{width:640px;height:640px;background:#f0b429;opacity:.26;}
+
+/* Éclair de transition entre deux actes : une lame blanche qui balaie l'écran.
+   C'est ce qui donne au montage sa nervosité — sans elle, sept fondus
+   enchaînés se ressemblent tous. */
+#lame{position:absolute;inset:-20% -60%;background:linear-gradient(105deg,
+  transparent 42%,rgba(255,255,255,.92) 50%,transparent 58%);opacity:0;pointer-events:none;}
 
 .couche{position:absolute;inset:0;}
 
@@ -75,32 +89,29 @@ body{display:flex;align-items:center;justify-content:center;}
   background:#0a1b12;border-radius:0 0 18px 18px;z-index:5;}
 
 /* ── Blocs de texte ────────────────────────────────────────────────────── */
-.bloc{position:absolute;left:72px;right:72px;will-change:transform,opacity;}
-.kicker{font-size:30px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;
-  color:#9fe6bd;margin-bottom:18px;}
-.titre{font-size:76px;font-weight:900;line-height:1.08;letter-spacing:-.02em;
-  text-shadow:0 6px 30px rgba(0,0,0,.45);}
+.bloc{position:absolute;left:64px;right:64px;will-change:transform,opacity;}
+.kicker{font-size:31px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;
+  color:#8ff0b8;margin-bottom:16px;}
+.titre{font-size:80px;font-weight:900;line-height:1.04;letter-spacing:-.025em;
+  text-shadow:0 6px 30px rgba(0,0,0,.5);}
 .titre .accent{color:var(--gold);}
-.sous{font-size:38px;font-weight:600;line-height:1.45;color:rgba(255,255,255,.88);margin-top:22px;}
+.sous{font-size:37px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.9);margin-top:20px;}
 
-.puces{display:flex;flex-wrap:wrap;gap:16px;}
-.puce{font-size:32px;font-weight:800;padding:16px 26px;border-radius:999px;
-  background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.28);
-  backdrop-filter:blur(6px);white-space:nowrap;will-change:transform,opacity;}
-.puce.or{background:rgba(212,168,67,.22);border-color:rgba(212,168,67,.75);}
+.puces{display:flex;flex-wrap:wrap;gap:15px;}
+.puce{font-size:31px;font-weight:800;padding:15px 25px;border-radius:999px;
+  background:rgba(255,255,255,.13);border:2px solid rgba(255,255,255,.3);
+  white-space:nowrap;will-change:transform,opacity;}
+.puce.or{background:rgba(240,180,41,.22);border-color:rgba(240,180,41,.8);}
 
 /* ── Éléments de scène ─────────────────────────────────────────────────── */
 /* ⚠️ « MAT et MEL.webp », PAS « MAT-explique.webp » : ce dernier porte un damier
    de fausse transparence CUIT DANS LES PIXELS (un export raté, resté tel quel).
    À 130 px dans l'onboarding ça passe inaperçu ; à 480 px sur fond vert, c'est
-   un rectangle blanc quadrillé au milieu de l'écran. */
-#mascotte{position:absolute;left:50%;width:480px;margin-left:-240px;
+   un rectangle blanc quadrillé au milieu de l'écran.
+   ⚠️ Et le détourage de celle-ci laisse un voile blanchâtre : le masque
+   elliptique l'efface. Ne pas le retirer sans regarder une image rendue. */
+#mascotte{position:absolute;left:50%;width:470px;margin-left:-235px;
   filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));will-change:transform,opacity;
-  /* ⚠️ LE DÉTOURAGE DE CETTE IMAGE N'EST PAS PARFAIT : il reste un voile
-     blanchâtre très léger autour des personnages, invisible à 60 px dans le
-     bandeau de l'app, mais qui dessine un RECTANGLE CLAIR bien net à 480 px
-     sur fond vert. Le masque elliptique efface les bords ; ne pas le retirer
-     sans avoir regardé une image rendue du film. */
   -webkit-mask-image:radial-gradient(ellipse 62% 54% at 50% 46%,#000 78%,transparent 100%);
   mask-image:radial-gradient(ellipse 62% 54% at 50% 46%,#000 78%,transparent 100%);}
 #mascotte-outro{position:absolute;right:-40px;bottom:-20px;width:400px;
@@ -108,29 +119,34 @@ body{display:flex;align-items:center;justify-content:center;}
   -webkit-mask-image:radial-gradient(ellipse 66% 58% at 50% 44%,#000 74%,transparent 100%);
   mask-image:radial-gradient(ellipse 66% 58% at 50% 44%,#000 74%,transparent 100%);}
 
-/* Notification poussée, posée par-dessus le téléphone (scène « actualités »). */
-#push{position:absolute;left:96px;width:888px;padding:28px 32px;border-radius:34px;
-  background:rgba(255,255,255,.97);color:#13261c;display:flex;gap:22px;align-items:center;
+/* Notification poussée, posée par-dessus le téléphone. */
+#push{position:absolute;left:90px;width:900px;padding:26px 30px;border-radius:34px;
+  background:rgba(255,255,255,.97);color:#13261c;display:flex;gap:20px;align-items:center;
   box-shadow:0 34px 70px rgba(0,0,0,.45);will-change:transform,opacity;}
-#push .ico{font-size:52px;flex:none;}
+#push .ico{font-size:50px;flex:none;}
 #push .t{font-size:30px;font-weight:900;}
-#push .m{font-size:28px;font-weight:600;color:#3d5a4a;margin-top:6px;}
-#push .h{font-size:24px;font-weight:700;color:#6b8577;flex:none;align-self:flex-start;}
+#push .m{font-size:27px;font-weight:600;color:#3d5a4a;margin-top:5px;}
+#push .h{font-size:23px;font-weight:700;color:#6b8577;flex:none;align-self:flex-start;}
 
-/* Frise « Reçu → En cours → Résolu » (scène « signalement »). */
-#etapes{position:absolute;left:72px;right:72px;display:flex;align-items:center;gap:0;}
+/* Frise « Photo → Envoyé → Traité ». */
+#etapes{position:absolute;left:64px;right:64px;display:flex;align-items:center;}
 #etapes .et{flex:1;text-align:center;will-change:opacity,transform;}
-#etapes .rond{width:88px;height:88px;margin:0 auto 14px;border-radius:50%;
+#etapes .rond{width:86px;height:86px;margin:0 auto 12px;border-radius:50%;
   background:rgba(255,255,255,.14);border:3px solid rgba(255,255,255,.35);
-  display:flex;align-items:center;justify-content:center;font-size:42px;}
+  display:flex;align-items:center;justify-content:center;font-size:40px;}
 #etapes .et.on .rond{background:var(--sage);border-color:#fff;}
-#etapes .lib{font-size:28px;font-weight:800;}
+#etapes .lib{font-size:27px;font-weight:800;}
+
+/* Grand mot du montage final : un service, une seconde. */
+#motcle{position:absolute;left:32px;right:32px;text-align:center;white-space:nowrap;
+  font-size:70px;font-weight:900;letter-spacing:-.02em;will-change:transform,opacity;
+  text-shadow:0 6px 30px rgba(0,0,0,.55);}
 
 /* Cartouche de sortie. */
-#url{font-size:66px;font-weight:900;letter-spacing:-.01em;color:#fff;
+#url{font-size:64px;font-weight:900;letter-spacing:-.01em;color:#fff;
   background:rgba(255,255,255,.12);border:3px solid rgba(255,255,255,.35);
-  border-radius:28px;padding:26px 34px;text-align:center;}
-#qr{width:300px;height:300px;background:#fff;border-radius:28px;padding:18px;
+  border-radius:28px;padding:24px 32px;text-align:center;}
+#qr{width:290px;height:290px;background:#fff;border-radius:28px;padding:18px;
   box-shadow:0 30px 60px rgba(0,0,0,.45);}
 #qr img{width:100%;height:100%;display:block;}
 
@@ -138,7 +154,7 @@ body{display:flex;align-items:center;justify-content:center;}
 #barre{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(255,255,255,.18);}
 #barre i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--gold));}
 
-/* Commande d'aperçu — jamais rendue dans le MP4 (masquée en mode rendu). */
+/* Commande d'aperçu — jamais rendue dans le MP4. */
 #hud{position:fixed;left:16px;bottom:16px;z-index:9;display:flex;gap:10px;
   font-family:'Nunito',sans-serif;}
 #hud button{font:inherit;font-weight:900;font-size:15px;padding:10px 16px;border-radius:12px;
@@ -152,14 +168,12 @@ body.rendu #hud{display:none;}
   <div class="halo" id="halo1"></div>
   <div class="halo" id="halo2"></div>
 
-  <!-- ── 0. Ouverture ────────────────────────────────────────────────── -->
+  <!-- ── 0. Accroche ─────────────────────────────────────────────────── -->
   <div class="couche" data-sc="0">
     <img id="mascotte" src="../img/MAT%20et%20MEL.webp" alt="">
-    <div class="bloc" id="i-titre" style="top:1090px;text-align:center">
-      <div class="kicker" style="margin-bottom:10px">Commune de Mézières-lez-Cléry</div>
-      <div style="font-family:'Grape Nuts',cursive;font-size:112px;line-height:1;margin:14px 0 22px;
-                  text-shadow:0 10px 40px rgba(0,0,0,.5)">Mézières Avec Toi</div>
-      <div class="sous" style="margin-top:0">L'application de votre commune</div>
+    <div class="bloc" id="i-titre" style="top:1060px;text-align:center">
+      <div class="titre" style="font-size:96px">Votre village<br><span class="accent">dans votre poche</span></div>
+      <div style="font-family:'Grape Nuts',cursive;font-size:84px;line-height:1;margin-top:26px;color:#c9f0d1">Mézières Avec Toi</div>
     </div>
     <div class="bloc puces" id="i-puces" style="top:1560px;justify-content:center">
       <span class="puce">Gratuite</span>
@@ -170,61 +184,26 @@ body.rendu #hud{display:none;}
 
   <!-- ── 1. Accueil ──────────────────────────────────────────────────── -->
   <div class="couche" data-sc="1">
-    <div class="bloc" id="a-titre" style="top:120px">
-      <div class="kicker">L'essentiel en un coup d'œil</div>
-      <div class="titre">Tout le village<br><span class="accent">dans votre poche</span></div>
+    <div class="bloc" id="a-titre" style="top:112px">
+      <div class="kicker">Un seul écran</div>
+      <div class="titre">Tout le village,<br><span class="accent">d'un coup d'œil</span></div>
     </div>
-    <div class="bloc puces" id="a-puces" style="top:1640px">
+    <div class="bloc puces" id="a-puces" style="top:1630px">
       <span class="puce">🌤️ Météo</span>
       <span class="puce">🗑️ Déchets</span>
       <span class="puce">🚌 Bus Rémi</span>
       <span class="puce">⛽ Carburant</span>
-      <span class="puce">🏛️ Horaires mairie</span>
+      <span class="puce">🏛️ Mairie</span>
     </div>
   </div>
 
-  <!-- ── 2. Actualités ───────────────────────────────────────────────── -->
+  <!-- ── 2. MEL ──────────────────────────────────────────────────────── -->
   <div class="couche" data-sc="2">
-    <div class="bloc" id="n-titre" style="top:120px">
-      <div class="kicker">Actualités communales</div>
-      <div class="titre">Les infos de la mairie,<br><span class="accent">sans les rater</span></div>
+    <div class="bloc" id="m-titre" style="top:112px">
+      <div class="kicker">Une assistante communale</div>
+      <div class="titre">Posez la question.<br><span class="accent">Réponse immédiate.</span></div>
     </div>
-    <div id="push" style="top:620px">
-      <div class="ico">🔔</div>
-      <div style="flex:1">
-        <div class="t">Mézières Avec Toi</div>
-        <div class="m">Nouvelle actualité publiée par la mairie</div>
-      </div>
-      <div class="h">maintenant</div>
-    </div>
-    <div class="bloc" id="n-sous" style="top:1700px;text-align:center">
-      <div class="sous" style="margin:0">Prévenu au moment de la publication — si vous le souhaitez</div>
-    </div>
-  </div>
-
-  <!-- ── 3. Signalement ──────────────────────────────────────────────── -->
-  <div class="couche" data-sc="3">
-    <div class="bloc" id="s-titre" style="top:120px">
-      <div class="kicker">Signalement citoyen</div>
-      <div class="titre">Un lampadaire en panne&nbsp;?<br><span class="accent">Signalez-le en 30 s</span></div>
-    </div>
-    <div id="etapes" style="top:1645px">
-      <div class="et" data-i="0"><div class="rond">📷</div><div class="lib">Photo</div></div>
-      <div class="et" data-i="1"><div class="rond">📨</div><div class="lib">Envoyé</div></div>
-      <div class="et" data-i="2"><div class="rond">✅</div><div class="lib">Traité</div></div>
-    </div>
-    <div class="bloc" id="s-sous" style="top:1815px;text-align:center">
-      <div class="sous" style="margin:0;font-size:34px">La mairie vous répond — vous recevez sa réponse</div>
-    </div>
-  </div>
-
-  <!-- ── 4. MEL ──────────────────────────────────────────────────────── -->
-  <div class="couche" data-sc="4">
-    <div class="bloc" id="m-titre" style="top:120px">
-      <div class="kicker">MEL, l'assistante communale</div>
-      <div class="titre">Une question&nbsp;?<br><span class="accent">Une réponse, 24 h/24</span></div>
-    </div>
-    <div class="bloc puces" id="m-puces" style="top:1680px;justify-content:center">
+    <div class="bloc puces" id="m-puces" style="top:1660px;justify-content:center">
       <span class="puce">Démarches</span>
       <span class="puce">Urbanisme</span>
       <span class="puce">École</span>
@@ -232,33 +211,101 @@ body.rendu #hud{display:none;}
     </div>
   </div>
 
-  <!-- ── 5. Agenda & hors connexion ──────────────────────────────────── -->
-  <div class="couche" data-sc="5">
-    <div class="bloc" id="g-titre" style="top:120px">
-      <div class="kicker">Agenda &amp; services</div>
-      <div class="titre">Ce qui se passe<br><span class="accent">près de chez vous</span></div>
+  <!-- ── 3. Signalement ──────────────────────────────────────────────── -->
+  <div class="couche" data-sc="3">
+    <div class="bloc" id="s-titre" style="top:112px">
+      <div class="kicker">Signalement citoyen</div>
+      <div class="titre">Un problème ?<br><span class="accent">30 secondes.</span></div>
     </div>
-    <div class="bloc puces" id="g-puces" style="top:1620px;justify-content:center">
+    <div id="etapes" style="top:1660px">
+      <div class="et" data-i="0"><div class="rond">📷</div><div class="lib">Photo</div></div>
+      <div class="et" data-i="1"><div class="rond">📨</div><div class="lib">Envoyé</div></div>
+      <div class="et" data-i="2"><div class="rond">✅</div><div class="lib">Traité</div></div>
+    </div>
+  </div>
+
+  <!-- ── 4. Suivi ────────────────────────────────────────────────────── -->
+  <div class="couche" data-sc="4">
+    <div class="bloc" id="v-titre" style="top:112px">
+      <div class="kicker">Et après ?</div>
+      <div class="titre">La mairie répond.<br><span class="accent">Vous êtes prévenu.</span></div>
+    </div>
+    <div class="bloc" id="v-sous" style="top:1690px;text-align:center">
+      <div class="sous" style="margin:0">Chaque signalement suivi, à la vue de tous</div>
+    </div>
+  </div>
+
+  <!-- ── 5. Actualités ───────────────────────────────────────────────── -->
+  <div class="couche" data-sc="5">
+    <div class="bloc" id="n-titre" style="top:112px">
+      <div class="kicker">Actualités communales</div>
+      <div class="titre">L'info de la mairie<br><span class="accent">arrive chez vous</span></div>
+    </div>
+    <div id="push" style="top:640px">
+      <div class="ico">🔔</div>
+      <div style="flex:1">
+        <div class="t">Mézières Avec Toi</div>
+        <div class="m">Nouvelle publication de la mairie</div>
+      </div>
+      <div class="h">maintenant</div>
+    </div>
+  </div>
+
+  <!-- ── 6. Le saviez-vous ? ─────────────────────────────────────────── -->
+  <div class="couche" data-sc="6">
+    <div class="bloc" id="q-titre" style="top:112px">
+      <div class="kicker">Le saviez-vous ?</div>
+      <div class="titre">Un fait sur le village,<br><span class="accent">chaque jour</span></div>
+    </div>
+    <div class="bloc" id="q-sous" style="top:1680px;text-align:center">
+      <div class="sous" style="margin:0">180 questions — vérifiées et sourcées</div>
+    </div>
+  </div>
+
+  <!-- ── 7. Boîte à idées ────────────────────────────────────────────── -->
+  <div class="couche" data-sc="7">
+    <div class="bloc" id="b-titre" style="top:112px">
+      <div class="kicker">Boîte à idées</div>
+      <div class="titre">Proposez. Votez.<br><span class="accent">La mairie répond.</span></div>
+    </div>
+  </div>
+
+  <!-- ── 8. Montage : et aussi… ──────────────────────────────────────── -->
+  <div class="couche" data-sc="8">
+    <div class="bloc" id="e-titre" style="top:112px;text-align:center">
+      <div class="kicker" style="margin:0">Et aussi</div>
+    </div>
+    <div id="motcle" style="top:1680px"></div>
+  </div>
+
+  <!-- ── 9. Engagements ──────────────────────────────────────────────── -->
+  <div class="couche" data-sc="9">
+    <div class="bloc" id="p-titre" style="top:470px;text-align:center">
+      <div class="titre" style="font-size:88px">Gratuite.<br>Sans publicité.<br><span class="accent">Sans compte.</span></div>
+    </div>
+    <div class="bloc puces" id="p-puces" style="top:1010px;justify-content:center;gap:20px">
       <span class="puce or">📴 Fonctionne hors connexion</span>
+      <span class="puce or">♿ 100 % accessible (RGAA)</span>
       <span class="puce or">🔒 Aucune donnée revendue</span>
     </div>
   </div>
 
-  <!-- ── 6. Sortie ───────────────────────────────────────────────────── -->
-  <div class="couche" data-sc="6">
+  <!-- ── 10. Sortie ──────────────────────────────────────────────────── -->
+  <div class="couche" data-sc="10">
     <img id="mascotte-outro" src="../img/MAT%20et%20MEL.webp" alt="">
     <div class="bloc" id="o-titre" style="top:300px;text-align:center">
-      <div class="titre" style="font-size:86px">Installez-la<br><span class="accent">maintenant</span></div>
+      <div class="titre" style="font-size:92px">Installez-la<br><span class="accent">maintenant</span></div>
     </div>
-    <div class="bloc" id="o-url" style="top:660px">
+    <div class="bloc" id="o-url" style="top:680px">
       <div id="url">mezieres-lez-clery.fr</div>
-      <div class="sous" style="text-align:center;font-size:34px">Ouvrez l'adresse, puis « Ajouter à l'écran d'accueil »</div>
+      <div class="sous" style="text-align:center;font-size:33px">Ouvrez l'adresse, puis « Ajouter à l'écran d'accueil »</div>
     </div>
-    <div class="bloc" id="o-qr" style="top:1000px;display:flex;justify-content:center">
+    <div class="bloc" id="o-qr" style="top:1020px;display:flex;justify-content:center">
       <div id="qr"><img src="qr.svg" alt="QR code vers mezieres-lez-clery.fr"></div>
     </div>
   </div>
 
+  <div id="lame"></div>
   <div id="barre"><i></i></div>
 </div>
 
@@ -277,37 +324,53 @@ body.rendu #hud{display:none;}
    seconde de film. Les deux voient donc exactement la même image.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* Une scène = un identifiant d'écran (ou null) et une durée. La durée totale
-   est la somme : ajouter une scène décale tout le reste, et c'est voulu —
-   aucun instant n'est écrit en dur ailleurs. */
+/* Une scène = une couche, un écran de téléphone (ou plusieurs, qui se
+   succèdent alors à l'intérieur de la scène) et une durée.
+   ⚠️ Les durées SONT le montage : aucun instant n'est écrit en dur ailleurs,
+   donc rallonger une scène décale proprement tout le reste. Elles sont
+   volontairement courtes — un fil d'actualité ne pardonne pas les temps
+   morts, et la première version de ce film tenait 6,5 s par idée. */
 var SCENES = [
-  { sc: 0, ecran: null,          duree: 4.6 },
-  { sc: 1, ecran: "accueil",     duree: 6.4 },
-  { sc: 2, ecran: "actus",       duree: 6.0 },
-  { sc: 3, ecran: "signalement", duree: 6.0 },
-  { sc: 4, ecran: "mel",         duree: 6.2 },
-  { sc: 5, ecran: "agenda",      duree: 5.4 },
-  { sc: 6, ecran: null,          duree: 6.4 }
+  { sc:  0, ecran: null,                                              duree: 3.6 },
+  { sc:  1, ecran: "accueil",                                         duree: 4.6 },
+  { sc:  2, ecran: "mel",                                             duree: 4.8 },
+  { sc:  3, ecran: "signalement",                                     duree: 4.2 },
+  { sc:  4, ecran: "suivi",                                           duree: 4.4 },
+  { sc:  5, ecran: "actus",                                           duree: 4.4 },
+  { sc:  6, ecran: "saviezvous",                                      duree: 4.0 },
+  { sc:  7, ecran: "idees",                                           duree: 3.8 },
+  { sc:  8, ecran: ["agenda", "meteo", "guide", "accessibilite"],     duree: 5.2 },
+  { sc:  9, ecran: null,                                              duree: 3.6 },
+  { sc: 10, ecran: null,                                              duree: 5.2 }
 ];
-var ECRANS = ["accueil", "actus", "signalement", "mel", "agenda"];
+
+/* Les mots du montage, un par écran de la scène 8 — dans le même ordre. */
+/* ⚠️ COURTS, ET SUR UNE SEULE LIGNE. « Le guide des nouveaux habitants » passait
+   sur deux lignes et débordait sur la barre de progression : à 1,3 s par mot,
+   personne n'a le temps de lire une phrase. */
+var MOTS = ["Agenda", "Météo & alertes", "Guide d'arrivée", "Confort de lecture"];
 
 var debuts = [], total = 0;
 SCENES.forEach(function (s) { debuts.push(total); total += s.duree; });
 var DUREE = total;
 
+/* Instants de « lame » : les changements d'acte qu'on veut faire claquer. */
+var LAMES = [debuts[1], debuts[3], debuts[5], debuts[8], debuts[9], debuts[10]];
+
 /* ── Boîte à outils ───────────────────────────────────────────────────── */
 function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
 function prog(t, a, b) { return b <= a ? (t >= b ? 1 : 0) : clamp((t - a) / (b - a), 0, 1); }
 function sortie(x) { return 1 - Math.pow(1 - x, 3); }            // cubic out
-function douce(x) { return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; }
 function ressort(x) {                                            // léger dépassement
   var c = 1.70158 + 1;
   return 1 + c * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
 }
 
-/* Opacité d'un élément présent entre `a` et `b`, avec fondus aux extrémités. */
+/* Opacité d'un élément présent entre `a` et `b`, avec fondus aux extrémités.
+   ⚠️ Les fondus sont COURTS (0,3 s) : c'est ce qui distingue une coupe franche
+   d'un enchaîné mou. Les allonger ramollit tout le film d'un coup. */
 function voile(t, a, b, fIn, fOut) {
-  fIn = fIn == null ? 0.5 : fIn; fOut = fOut == null ? 0.4 : fOut;
+  fIn = fIn == null ? 0.3 : fIn; fOut = fOut == null ? 0.25 : fOut;
   if (t <= a || t >= b) return 0;
   return Math.min(prog(t, a, a + fIn), 1 - prog(t, b - fOut, b));
 }
@@ -319,9 +382,16 @@ function pose(el, opacite, dx, dy, echelle) {
     + (echelle != null ? " scale(" + echelle + ")" : "");
 }
 
+/* Entrée « qui claque » : le bloc arrive un peu trop gros et se cale. */
+function frappe(el, t, depart, duree) {
+  var k = prog(t, depart, depart + (duree || 0.55));
+  var e = 1.10 - 0.10 * ressort(clamp(k, 0, 1));
+  pose(el, sortie(k), 0, 26 * (1 - sortie(k)), e);
+}
+
 var $ = function (s) { return document.querySelector(s); };
 
-/* Le téléphone vit HORS des couches de scène : il traverse les scènes 1 à 5
+/* Le téléphone vit HORS des couches de scène : il traverse les scènes 1 à 8
    sans jamais être remonté, et c'est ce qui donne au film sa continuité.
    ⚠️ Il doit exister AVANT `monterEcrans()`, qui empile les captures dedans. */
 (function monterTelephone() {
@@ -332,13 +402,23 @@ var $ = function (s) { return document.querySelector(s); };
   scene.insertBefore(tel, scene.querySelector('[data-sc="0"]'));
 })();
 
-var couches = {}, imgs = {};
+var couches = {}, imgs = {}, fenetres = {};
 SCENES.forEach(function (s) { couches[s.sc] = document.querySelector('[data-sc="' + s.sc + '"]'); });
 
-/* Les captures sont empilées dans le téléphone ; une seule est opaque. */
+/* Fenêtres d'affichage de chaque capture. Une scène à plusieurs écrans les
+   répartit à parts égales sur sa durée — c'est le montage rapide de la fin. */
+SCENES.forEach(function (s, i) {
+  if (!s.ecran) return;
+  var liste = Array.isArray(s.ecran) ? s.ecran : [s.ecran];
+  var pas = s.duree / liste.length;
+  liste.forEach(function (nom, j) {
+    (fenetres[nom] = fenetres[nom] || []).push([debuts[i] + j * pas, debuts[i] + (j + 1) * pas]);
+  });
+});
+
 (function monterEcrans() {
   var ecran = $("#tel .ecran");
-  ECRANS.forEach(function (nom) {
+  Object.keys(fenetres).forEach(function (nom) {
     var i = document.createElement("img");
     i.src = "ecrans/" + nom + ".png";
     i.alt = "";
@@ -354,127 +434,155 @@ function filmSeek(t) {
 
   // Fond : halos en dérive lente, jamais deux fois au même endroit.
   var h1 = $("#halo1"), h2 = $("#halo2");
-  h1.style.left = (-160 + 180 * Math.sin(t * 0.21)) + "px";
-  h1.style.top  = (180 + 260 * Math.sin(t * 0.13 + 1.2)) + "px";
-  h2.style.left = (560 + 180 * Math.sin(t * 0.17 + 2.4)) + "px";
-  h2.style.top  = (1180 + 220 * Math.sin(t * 0.11)) + "px";
+  h1.style.left = (-170 + 190 * Math.sin(t * 0.23)) + "px";
+  h1.style.top  = (170 + 270 * Math.sin(t * 0.14 + 1.2)) + "px";
+  h2.style.left = (550 + 190 * Math.sin(t * 0.19 + 2.4)) + "px";
+  h2.style.top  = (1150 + 230 * Math.sin(t * 0.12)) + "px";
 
-  // Barre de progression.
   $("#barre i").style.width = (100 * t / DUREE) + "%";
 
-  // Chaque couche : visible pendant sa scène, fondu de part et d'autre.
+  // Lame de transition : 0,22 s, centrée sur le changement d'acte.
+  var lame = $("#lame"), opLame = 0, posLame = 0;
+  LAMES.forEach(function (instant) {
+    var k = prog(t, instant - 0.12, instant + 0.12);
+    if (k > 0 && k < 1) { opLame = Math.sin(k * Math.PI) * 0.5; posLame = -900 + 1800 * k; }
+  });
+  lame.style.opacity = opLame;
+  lame.style.transform = "translate3d(" + posLame + "px,0,0)";
+
+  // Chaque couche : visible pendant sa scène, coupes courtes de part et d'autre.
   SCENES.forEach(function (s, i) {
     var a = debuts[i], b = a + s.duree;
-    couches[s.sc].style.opacity = voile(t, a - 0.35, b + 0.35, 0.5, 0.5);
+    couches[s.sc].style.opacity = voile(t, a - 0.22, b + 0.22, 0.32, 0.32);
   });
 
   var idx = 0;
   for (var i = 0; i < SCENES.length; i++) if (t >= debuts[i]) idx = i;
-  var sc = SCENES[idx], t0 = debuts[idx], k = prog(t, t0, t0 + sc.duree);
+  var sc = SCENES[idx], t0 = debuts[idx];
 
-  /* ── Téléphone : présent des scènes 1 à 5 ───────────────────────────── */
-  var telDebut = debuts[1], telFin = debuts[6];
-  var tel = $("#tel"), opTel = voile(t, telDebut - 0.4, telFin, 0.7, 0.6);
-  // Entrée par le bas, puis très léger flottement (respiration).
-  var monte = sortie(prog(t, telDebut - 0.2, telDebut + 1.1));
-  var flotte = 10 * Math.sin((t - telDebut) * 0.9);
-  var yTel = 430 + (1 - monte) * 420 + flotte;
-  pose(tel, opTel, -280, yTel, 0.98 + 0.02 * monte);
+  /* ── Téléphone : présent des scènes 1 à 8 ───────────────────────────── */
+  var telDebut = debuts[1], telFin = debuts[9];
+  var tel = $("#tel"), opTel = voile(t, telDebut - 0.3, telFin, 0.55, 0.45);
+  var monte = sortie(prog(t, telDebut - 0.2, telDebut + 0.9));
+  var flotte = 9 * Math.sin((t - telDebut) * 1.0);
+  var yTel = 430 + (1 - monte) * 380 + flotte;
+  pose(tel, opTel, -280, yTel, 0.97 + 0.03 * monte);
 
-  // Capture affichée : celle de la scène en cours, en fondu croisé.
-  ECRANS.forEach(function (nom) {
+  // Capture affichée : celle de la fenêtre en cours, en fondu croisé court.
+  Object.keys(fenetres).forEach(function (nom) {
     var op = 0;
-    SCENES.forEach(function (s, i) {
-      if (s.ecran !== nom) return;
-      op = Math.max(op, voile(t, debuts[i] - 0.5, debuts[i] + s.duree + 0.5, 0.6, 0.6));
+    fenetres[nom].forEach(function (f) {
+      op = Math.max(op, voile(t, f[0] - 0.3, f[1] + 0.3, 0.4, 0.4));
     });
-    // Ken Burns : un lent rapprochement, sinon l'image paraît figée.
     var kk = prog(t, telDebut, telFin);
     imgs[nom].style.opacity = op;
     imgs[nom].style.transform = "scale(" + (1.0 + 0.05 * kk) + ")";
     imgs[nom].style.transformOrigin = "50% 18%";
   });
 
-  /* ── 0. Ouverture ───────────────────────────────────────────────────── */
-  if (opacitePositive(couches[0])) {
-    var k0 = prog(t, 0, SCENES[0].duree);
+  /* ── 0. Accroche ────────────────────────────────────────────────────── */
+  if (visible(couches[0])) {
     var m = $("#mascotte");
-    m.style.top = (300 - 34 * sortie(prog(t, 0, 1.6)) + 12 * Math.sin(t * 1.1)) + "px";
-    pose(m, sortie(prog(t, 0.1, 1.0)), 0, 0, 0.88 + 0.12 * sortie(prog(t, 0, 1.2)));
-    pose($("#i-titre"), sortie(prog(t, 0.45, 1.45)), 0, 40 * (1 - sortie(prog(t, 0.45, 1.6))));
-    pucesEchelonnees("#i-puces", t, 1.35, 0.13);
-    void k0;
+    m.style.top = (300 - 30 * sortie(prog(t, 0, 1.2)) + 11 * Math.sin(t * 1.2)) + "px";
+    pose(m, sortie(prog(t, 0.05, 0.7)), 0, 0, 0.9 + 0.1 * sortie(prog(t, 0, 0.9)));
+    frappe($("#i-titre"), t, 0.25, 0.6);
+    puces("#i-puces", t, 1.05, 0.1);
   }
 
   /* ── 1. Accueil ─────────────────────────────────────────────────────── */
-  if (opacitePositive(couches[1])) {
-    var a1 = debuts[1];
-    pose($("#a-titre"), sortie(prog(t, a1 + 0.15, a1 + 1.1)), 0, 44 * (1 - sortie(prog(t, a1 + 0.15, a1 + 1.2))));
-    pucesEchelonnees("#a-puces", t, a1 + 0.9, 0.16);
+  if (visible(couches[1])) {
+    frappe($("#a-titre"), t, debuts[1] + 0.1, 0.55);
+    puces("#a-puces", t, debuts[1] + 0.7, 0.13);
   }
 
-  /* ── 2. Actualités ──────────────────────────────────────────────────── */
-  if (opacitePositive(couches[2])) {
-    var a2 = debuts[2];
-    pose($("#n-titre"), sortie(prog(t, a2 + 0.15, a2 + 1.1)), 0, 44 * (1 - sortie(prog(t, a2 + 0.15, a2 + 1.2))));
-    // La notification tombe comme sur un téléphone : dépassement puis calage.
-    var kp = prog(t, a2 + 1.5, a2 + 2.4);
-    pose($("#push"), voile(t, a2 + 1.4, a2 + sc.duree + 0.4, 0.35, 0.4),
-      0, -180 * (1 - ressort(kp)), 1);
-    pose($("#n-sous"), sortie(prog(t, a2 + 2.6, a2 + 3.4)), 0, 26 * (1 - sortie(prog(t, a2 + 2.6, a2 + 3.5))));
+  /* ── 2. MEL ─────────────────────────────────────────────────────────── */
+  if (visible(couches[2])) {
+    frappe($("#m-titre"), t, debuts[2] + 0.1, 0.55);
+    puces("#m-puces", t, debuts[2] + 1.0, 0.14);
   }
 
   /* ── 3. Signalement ─────────────────────────────────────────────────── */
-  if (opacitePositive(couches[3])) {
+  if (visible(couches[3])) {
     var a3 = debuts[3];
-    pose($("#s-titre"), sortie(prog(t, a3 + 0.15, a3 + 1.1)), 0, 44 * (1 - sortie(prog(t, a3 + 0.15, a3 + 1.2))));
+    frappe($("#s-titre"), t, a3 + 0.1, 0.55);
     var ets = document.querySelectorAll("#etapes .et");
     for (var e = 0; e < ets.length; e++) {
-      var dep = a3 + 1.5 + e * 0.75;
-      var ke = prog(t, dep, dep + 0.55);
-      pose(ets[e], ke, 0, 30 * (1 - sortie(ke)), 0.9 + 0.1 * ressort(clamp(ke, 0, 1)));
-      ets[e].classList.toggle("on", t >= dep + 0.3);
+      var dep = a3 + 0.9 + e * 0.5;
+      var ke = prog(t, dep, dep + 0.4);
+      pose(ets[e], ke, 0, 26 * (1 - sortie(ke)), 0.88 + 0.12 * ressort(clamp(ke, 0, 1)));
+      ets[e].classList.toggle("on", t >= dep + 0.22);
     }
-    pose($("#s-sous"), sortie(prog(t, a3 + 3.6, a3 + 4.3)), 0, 24 * (1 - sortie(prog(t, a3 + 3.6, a3 + 4.4))));
   }
 
-  /* ── 4. MEL ─────────────────────────────────────────────────────────── */
-  if (opacitePositive(couches[4])) {
-    var a4 = debuts[4];
-    pose($("#m-titre"), sortie(prog(t, a4 + 0.15, a4 + 1.1)), 0, 44 * (1 - sortie(prog(t, a4 + 0.15, a4 + 1.2))));
-    pucesEchelonnees("#m-puces", t, a4 + 1.4, 0.18);
+  /* ── 4. Suivi ───────────────────────────────────────────────────────── */
+  if (visible(couches[4])) {
+    frappe($("#v-titre"), t, debuts[4] + 0.1, 0.55);
+    pose($("#v-sous"), sortie(prog(t, debuts[4] + 1.4, debuts[4] + 2.0)), 0, 0);
   }
 
-  /* ── 5. Agenda ──────────────────────────────────────────────────────── */
-  if (opacitePositive(couches[5])) {
+  /* ── 5. Actualités ──────────────────────────────────────────────────── */
+  if (visible(couches[5])) {
     var a5 = debuts[5];
-    pose($("#g-titre"), sortie(prog(t, a5 + 0.15, a5 + 1.1)), 0, 44 * (1 - sortie(prog(t, a5 + 0.15, a5 + 1.2))));
-    pucesEchelonnees("#g-puces", t, a5 + 1.2, 0.22);
+    frappe($("#n-titre"), t, a5 + 0.1, 0.55);
+    // La notification tombe comme sur un téléphone : dépassement puis calage.
+    var kp = prog(t, a5 + 1.1, a5 + 1.8);
+    pose($("#push"), voile(t, a5 + 1.0, a5 + sc.duree + 0.3, 0.25, 0.3),
+      0, -190 * (1 - ressort(clamp(kp, 0, 1))), 1);
   }
 
-  /* ── 6. Sortie ──────────────────────────────────────────────────────── */
-  if (opacitePositive(couches[6])) {
-    var a6 = debuts[6];
-    pose($("#o-titre"), sortie(prog(t, a6 + 0.2, a6 + 1.1)), 0, 46 * (1 - sortie(prog(t, a6 + 0.2, a6 + 1.2))));
-    pose($("#o-url"), sortie(prog(t, a6 + 0.9, a6 + 1.8)), 0, 40 * (1 - sortie(prog(t, a6 + 0.9, a6 + 1.9))));
-    var kq = prog(t, a6 + 1.6, a6 + 2.5);
-    pose($("#o-qr"), kq, 0, 0, 0.82 + 0.18 * ressort(clamp(kq, 0, 1)));
+  /* ── 6. Le saviez-vous ? ────────────────────────────────────────────── */
+  if (visible(couches[6])) {
+    frappe($("#q-titre"), t, debuts[6] + 0.1, 0.55);
+    pose($("#q-sous"), sortie(prog(t, debuts[6] + 1.3, debuts[6] + 1.9)), 0, 0);
+  }
+
+  /* ── 7. Boîte à idées ───────────────────────────────────────────────── */
+  if (visible(couches[7])) {
+    frappe($("#b-titre"), t, debuts[7] + 0.1, 0.55);
+  }
+
+  /* ── 8. Montage ─────────────────────────────────────────────────────── */
+  if (visible(couches[8])) {
+    var a8 = debuts[8], pas = SCENES[8].duree / MOTS.length;
+    var rang = clamp(Math.floor((t - a8) / pas), 0, MOTS.length - 1);
+    var local = (t - a8) - rang * pas;
+    var mot = $("#motcle");
+    mot.textContent = MOTS[rang];
+    // Chaque mot arrive vite, tient, puis s'efface juste avant le suivant.
+    var opMot = Math.min(prog(local, 0, 0.22), 1 - prog(local, pas - 0.22, pas));
+    pose(mot, opMot, 0, 22 * (1 - sortie(prog(local, 0, 0.3))), 0.94 + 0.06 * sortie(prog(local, 0, 0.3)));
+    pose($("#e-titre"), sortie(prog(t, a8 + 0.05, a8 + 0.5)), 0, 0);
+  }
+
+  /* ── 9. Engagements ─────────────────────────────────────────────────── */
+  if (visible(couches[9])) {
+    frappe($("#p-titre"), t, debuts[9] + 0.1, 0.6);
+    puces("#p-puces", t, debuts[9] + 0.9, 0.18);
+  }
+
+  /* ── 10. Sortie ─────────────────────────────────────────────────────── */
+  if (visible(couches[10])) {
+    var a10 = debuts[10];
+    frappe($("#o-titre"), t, a10 + 0.1, 0.6);
+    pose($("#o-url"), sortie(prog(t, a10 + 0.7, a10 + 1.3)), 0, 34 * (1 - sortie(prog(t, a10 + 0.7, a10 + 1.4))));
+    var kq = prog(t, a10 + 1.2, a10 + 1.9);
+    pose($("#o-qr"), kq, 0, 0, 0.84 + 0.16 * ressort(clamp(kq, 0, 1)));
     var mo = $("#mascotte-outro");
-    pose(mo, sortie(prog(t, a6 + 1.1, a6 + 2.2)), 60 * (1 - sortie(prog(t, a6 + 1.1, a6 + 2.3))),
-      10 * Math.sin((t - a6) * 1.0));
+    pose(mo, sortie(prog(t, a10 + 0.9, a10 + 1.7)), 60 * (1 - sortie(prog(t, a10 + 0.9, a10 + 1.8))),
+      9 * Math.sin((t - a10) * 1.1));
   }
 }
 
-function opacitePositive(el) { return el && parseFloat(el.style.opacity || "0") > 0.001; }
+function visible(el) { return el && parseFloat(el.style.opacity || "0") > 0.001; }
 
 /* Les puces d'une rangée apparaissent l'une après l'autre : l'œil les lit,
    au lieu de recevoir cinq mots d'un coup. */
-function pucesEchelonnees(sel, t, depart, pas) {
+function puces(sel, t, depart, pas) {
   var n = document.querySelectorAll(sel + " .puce");
   for (var i = 0; i < n.length; i++) {
     var d = depart + i * pas;
-    var k = prog(t, d, d + 0.5);
-    pose(n[i], k, 0, 26 * (1 - sortie(k)), 0.92 + 0.08 * ressort(clamp(k, 0, 1)));
+    var k = prog(t, d, d + 0.38);
+    pose(n[i], k, 0, 22 * (1 - sortie(k)), 0.9 + 0.1 * ressort(clamp(k, 0, 1)));
   }
 }
 

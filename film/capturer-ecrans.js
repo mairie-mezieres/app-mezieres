@@ -80,6 +80,44 @@ const ECRANS = [
   { nom: "agenda", desc: "Agenda", fn: "openAgenda()" },
   { nom: "meteo", desc: "Météo détaillée", fn: "openMeteo()" },
   {
+    nom: "suivi", desc: "Suivi des signalements", fn: "openSuivi('signalements')",
+    prepare: async (page) => { await delai(900); }
+  },
+  { nom: "idees", desc: "Boîte à idées", fn: "openIdees()", prepare: async () => delai(900) },
+  { nom: "guide", desc: "Guide d'arrivée", fn: "openGuideArrivee()" },
+  { nom: "accessibilite", desc: "Personnalisation / accessibilité", fn: "openAccessibilite()" },
+  {
+    // Le fait du jour n'est pas un overlay : c'est un bloc de l'accueil qui se
+    // déplie. On le centre dans l'écran avant de photographier.
+    // ⚠️ `jours: 9` DÉCALE L'HORLOGE du navigateur. Le fait du jour tourne avec
+    // le calendrier (`_jourDepuisOrigine`), et celui d'aujourd'hui portait sur le
+    // 3114, le numéro national de prévention du suicide : vrai, utile, et
+    // parfaitement déplacé dans un film de promotion. Le 9e jour suivant tombe
+    // sur la carte de Cassini — le village, son nom, son histoire.
+    nom: "saviezvous", desc: "Le saviez-vous ?", jours: 9,
+    prepare: async (page) => {
+      await page.evaluate(() => {
+        if (typeof window.matSaviezVousBascule === "function") window.matSaviezVousBascule();
+      });
+      await delai(700);
+      await page.evaluate(() => {
+        const b = document.querySelector(".sv-bloc");
+        if (b) b.scrollIntoView({ block: "center", behavior: "instant" });
+      });
+      await delai(500);
+    }
+  },
+  {
+    // ⚠️ La carte 3D a besoin des tuiles et du bâti de l'IGN (data.geopf.fr).
+    // Sans réseau elle rend un fond vide : la capture n'est donc PAS utilisable
+    // telle quelle, et le film attend une image fournie par la mairie.
+    // ⚠️ LE NOM DIT L'ÉTAT DU FICHIER. Appelée `carte3d.png`, cette capture
+    // finirait un jour branchée dans le film par quelqu'un qui n'aura pas lu le
+    // README — et le film montrerait « Aucun bâtiment chargé » en grand.
+    nom: "carte3d-sans-reseau", desc: "Carte 3D (⚠️ inutilisable : IGN coupé)", fn: "matOuvrirCarte3D()",
+    prepare: async (page) => { await delai(4000); }
+  },
+  {
     nom: "mel", desc: "MEL — assistante", fn: "openMel()",
     prepare: async (page) => {
       // Arbre de décision → « Autre question » → chat libre.
@@ -108,7 +146,26 @@ const ECRANS = [
   const fx = fixtures(new Date());
 
   const navigateur = await chromium.launch({ headless: true, executablePath: CHROME });
-  const ctx = await navigateur.newContext({
+
+  /* Ouvre une page prête : réseau simulé, onboarding passé, app chargée.
+     `decalageJours` décale l'horloge ET les données simulées ensemble — sinon
+     l'accueil daterait ses cartes d'aujourd'hui sous une horloge de la semaine
+     prochaine. */
+  async function nouvellePage(decalageJours) {
+    const quand = new Date(Date.now() + (decalageJours || 0) * 86400000);
+    const contexte = await navigateur.newContext(OPTIONS_CONTEXTE);
+    const p = await contexte.newPage();
+    if (decalageJours) await p.clock.install({ time: quand });
+    const donnees = decalageJours ? fixtures(quand) : fx;
+    await p.route("**/*", (route) => brancher(route, donnees));
+    await p.addInitScript(PREPARATION);
+    await p.goto(BASE_URL + "/index.html", { waitUntil: "load", timeout: 60000 });
+    await p.waitForFunction(() => document.body.classList.contains("app-ready"), { timeout: 20000 }).catch(() => {});
+    await delai(3500);
+    return p;
+  }
+
+  const OPTIONS_CONTEXTE = {
     viewport: VIEWPORT, deviceScaleFactor: 2, locale: "fr-FR",
     timezoneId: "Europe/Paris", colorScheme: "light",
     // ⚠️ UN ANDROÏD, PAS UN IPHONE. Hors mode « application installée », l'écran
@@ -116,15 +173,15 @@ const ECRANS = [
     // requise » rouge (`js/mat-actus.js` : iOS ≥ 16 sans `standalone`) — vrai, utile
     // dans l'app, et parfaitement hors sujet dans un film de présentation.
     userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36"
-  });
-  const page = await ctx.newPage();
+  };
 
-  await page.route("**/*", (route) => {
+  /* Le branchement des requêtes, partagé par toutes les pages. */
+  function brancher(route, donnees) {
     const url = route.request().url();
     if (url.startsWith(BASE_URL) || url.startsWith("data:") || url.startsWith("blob:")) return route.continue();
     let chemin = "";
     try { chemin = new URL(url).pathname; } catch (_) { return route.abort(); }
-    const trouve = fx.find(([prefixe]) => chemin.startsWith(prefixe));
+    const trouve = donnees.find(([prefixe]) => chemin.startsWith(prefixe));
     if (trouve) {
       const rep = trouve[1];
       return route.fulfill({
@@ -136,35 +193,38 @@ const ECRANS = [
     }
     // Tout le reste (Sentry, cartes, Cloudinary, stats…) : coupé net.
     return route.abort();
-  });
+  }
 
-  await page.addInitScript(() => {
+  const PREPARATION = () => {
     localStorage.setItem("mat_onboarded_v3", "1");
     localStorage.setItem("mat_installed_v3", "dismissed");
     localStorage.setItem("mat_install_tracked", "1");
     localStorage.setItem("mat_stats_optout", "1");
-  });
+  };
 
   console.log("📸 Captures du film — " + BASE_URL);
-  await page.goto(BASE_URL + "/index.html", { waitUntil: "load", timeout: 60000 });
-  await page.waitForFunction(() => document.body.classList.contains("app-ready"), { timeout: 20000 }).catch(() => {});
-  await delai(3500);
+  let page = await nouvellePage(0);
 
   for (const e of ECRANS) {
+    let pageJetable = null;
     try {
-      await page.evaluate(() => document.querySelectorAll(".ov.open").forEach((o) => o.classList.remove("open")));
+      if (e.jours) { pageJetable = await nouvellePage(e.jours); }
+      const cible = pageJetable || page;
+      await cible.evaluate(() => document.querySelectorAll(".ov.open").forEach((o) => o.classList.remove("open")));
       await delai(400);
       if (e.fn) {
-        await page.evaluate((f) => { new Function(f)(); }, e.fn);
+        await cible.evaluate((f) => { new Function(f)(); }, e.fn);
         await delai(1400);
       } else {
-        await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+        await cible.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
       }
-      if (e.prepare) await e.prepare(page);
-      await page.screenshot({ path: path.join(OUT, e.nom + ".png") });
+      if (e.prepare) await e.prepare(cible);
+      await cible.screenshot({ path: path.join(OUT, e.nom + ".png") });
       console.log("   ✅ " + e.nom + ".png — " + e.desc);
     } catch (err) {
       console.error("   ❌ " + e.nom + " : " + err.message);
+    } finally {
+      if (pageJetable) await pageJetable.context().close();
     }
   }
 

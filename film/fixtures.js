@@ -107,32 +107,85 @@ function meteo(now) {
    Cloudinary, que la capture coupe ; y mettre une image du dépôt, c'est illustrer
    « la bibliothèque » avec le logo du comité des fêtes — un contresens que
    personne ne relit une fois le film encodé. Sans photo, la liste montre trois
-   publications au lieu d'une : c'est aussi ce qui se lit le mieux à l'écran. */
+   publications au lieu d'une : c'est aussi ce qui se lit le mieux à l'écran.
+
+   ⛔ ET AUCUNE ANNONCE. La première version de ce film titrait « La bibliothèque
+   vous accueille le mercredi » : une phrase inventée, datée d'hier, signée de la
+   mairie, diffusée à des centaines d'habitants sur Facebook. Un titre de film ne
+   se lit pas comme un exemple — il se lit comme une information de la commune.
+   Ces trois lignes ne nomment donc que des RUBRIQUES, qui n'affirment rien :
+   aucun horaire, aucun lieu, aucune décision, aucune date dans le titre.
+   ⚠️ Si la mairie préfère, remplacer par trois VRAIS titres déjà publiés sur sa
+   page — c'est encore mieux, et c'est sans risque. */
 function actus(now) {
   const dateLisible = (d) => d.getDate() + " " + MOIS[d.getMonth()] + " " + d.getFullYear();
   return {
     actus: [
       {
         id: "film-1",
-        title: "La bibliothèque vous accueille le mercredi",
-        text: "Prêts de livres, coin lecture pour les plus jeunes et accès aux ressources numériques. L'équipe de bénévoles vous renseigne sur place.",
+        title: "Compte rendu du conseil municipal",
+        text: "Les délibérations du conseil, publiées après chaque séance.",
         date: dateLisible(jourDecale(now, -1)),
         likes: 12
       },
       {
         id: "film-2",
-        title: "Le city-stade est ouvert à toutes et tous",
-        text: "Terrain multisports en accès libre à côté de l'école. Merci de respecter le voisinage et de remporter vos déchets.",
+        title: "Travaux et voirie dans la commune",
+        text: "L'avancement des chantiers et les circulations modifiées.",
         date: dateLisible(jourDecale(now, -4)),
         likes: 23
       },
       {
         id: "film-3",
-        title: "Inscriptions aux associations de la commune",
-        text: "Sport, musique, loisirs : retrouvez toutes les associations et leurs contacts dans l'application, rubrique Associations.",
+        title: "Vie associative et manifestations",
+        text: "Ce que préparent les associations de Mézières-lez-Cléry.",
         date: dateLisible(jourDecale(now, -8)),
         likes: 9
       }
+    ]
+  };
+}
+
+/* ── Suivi des signalements ───────────────────────────────────────────────
+   `GET /api/signalements`. On montre le MÉCANISME — trois statuts et une
+   réponse de la mairie — jamais un incident précis : ni rue, ni numéro, ni
+   engagement de délai. */
+function signalements(now) {
+  const j = (n) => jourDecale(now, n).toISOString();
+  return {
+    signalements: [
+      {
+        id: "f1", cat: "💡 Éclairage public", status: "resolved",
+        statusLabel: "Résolu", date: j(-9), desc: "Lampadaire éteint.",
+        comments: [{ date: j(-6), text: "Ampoule remplacée par les services techniques." }]
+      },
+      {
+        id: "f2", cat: "🛣️ Voirie", status: "in_progress",
+        statusLabel: "En cours", date: j(-4), desc: "Nid-de-poule signalé.",
+        comments: [{ date: j(-3), text: "Intervention planifiée." }]
+      },
+      {
+        id: "f3", cat: "🗑️ Propreté", status: "pending",
+        statusLabel: "À traiter", date: j(-1), desc: "Corbeille pleine."
+      }
+    ],
+    bugs: []
+  };
+}
+
+/* ── Boîte à idées ────────────────────────────────────────────────────────
+   Même règle : des idées d'habitants ne s'inventent pas au nom de personne.
+   Celles-ci sont des propositions génériques, sans auteur et sans promesse. */
+function idees(now) {
+  return {
+    idees: [
+      { id: "i1", cat: "Cadre de vie", text: "Installer un banc supplémentaire près de l'aire de jeux.",
+        votes: 34, createdAt: jourDecale(now, -12).toISOString(), status: "studying",
+        adminComment: "Proposition à l'étude par la commission." },
+      { id: "i2", cat: "Mobilité", text: "Un abri à vélos devant la salle communale.",
+        votes: 21, createdAt: jourDecale(now, -20).toISOString() },
+      { id: "i3", cat: "Environnement", text: "Planter des arbres le long du chemin piéton.",
+        votes: 17, createdAt: jourDecale(now, -26).toISOString() }
     ]
   };
 }
@@ -222,7 +275,8 @@ function fixtures(now) {
     ["/info-banner", { json: { active: false } }],
     ["/config/features", { json: {} }],
     ["/config/mascotte", { json: {} }],
-    ["/idees", { json: { idees: [] } }],
+    ["/api/signalements", { json: signalements(d) }],
+    ["/idees", { json: idees(d) }],
     ["/sondages", { json: { sondages: [] } }],
     ["/docs/featured", { json: {} }],
     ["/events-locaux", { json: { events: [] } }],

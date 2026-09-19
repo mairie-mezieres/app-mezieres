@@ -6,10 +6,10 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 | Fichier | Rôle |
 |---|---|
-| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 41 s, 1080×1920, H.264, sans son |
+| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 48 s, 1080×1920, H.264, sans son |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
-| `capturer-ecrans.js` | Capture les vrais écrans de l'app → `ecrans/*.png` |
+| `capturer-ecrans.js` | Capture les onze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
 | `rendre-video.js` | `presentation.html` → MP4 |
 | `qr.svg` | QR code vers `https://mezieres-lez-clery.fr` |
@@ -18,8 +18,8 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 ```bash
 npm i --no-save @playwright/test @ffmpeg-installer/ffmpeg   # une fois
-node film/capturer-ecrans.js     # ~30 s — relance l'app en local et photographie 6 écrans
-node film/rendre-video.js        # ~4 min — 1 230 images puis encodage
+node film/capturer-ecrans.js     # ~1 min — relance l'app en local et photographie 11 écrans
+node film/rendre-video.js        # ~5 min — 1 434 images puis encodage
 ```
 
 ⚠️ Il faut un **ffmpeg compilé avec libx264**. Celui qui accompagne Playwright ne
@@ -42,6 +42,33 @@ Tout se règle dans `presentation.html` :
   `prefers-reduced-motion` — la page resterait figée sur sa première image, sans
   aucune erreur pour le dire.
 
+## ⛔ Ce que le film ne dit pas
+
+**Aucune annonce communale.** La première version titrait une actualité inventée —
+« La bibliothèque vous accueille le mercredi » — datée d'hier et signée de la
+mairie. Dans un film, une phrase pareille ne se lit pas comme un exemple : elle se
+lit comme une information de la commune, et elle est diffusée à des centaines de
+personnes. Les écrans d'actualités, de signalements et d'idées ne montrent donc
+plus que des **rubriques** et du **mécanisme** : aucun horaire, aucun lieu, aucune
+décision, aucune date dans un titre. Voir les commentaires de `fixtures.js`.
+
+**Trois chiffres, et ils sont vrais.** « 180 questions » (`data/saviez-vous.json`),
+« 100 % accessible RGAA » (`docs/accessibilite/audit-rgaa-2026-08-27.md`),
+« gratuite, sans publicité, sans compte ». Les revérifier avant toute
+rediffusion — le taux RGAA et la taille du corpus bougent.
+
+## 🗺️ Ce qui manque : la carte 3D
+
+La carte 3D du village (`matOuvrirCarte3D`) **ne peut pas être capturée
+automatiquement** : son fond de plan, son bâti et le zonage PLU viennent de l'IGN
+(`data.geopf.fr`, `apicarto.ign.fr`), et la capture coupe tout appel sortant. Sans
+réseau, l'écran affiche honnêtement « Aucun bâtiment chargé — l'IGN n'a pas
+répondu ». La capture porte donc son verdict dans son nom :
+`ecrans/carte3d-sans-reseau.png`, **à ne jamais brancher dans le film**.
+
+Pour l'ajouter : poser une image (ou une suite d'images) de la carte 3D réelle dans
+`ecrans/`, l'ajouter à `SCENES` dans `presentation.html`, et rendre à nouveau.
+
 ## ⚠️ Avant de publier
 
 - **Les contenus affichés dans les captures sont des illustrations** (actualités,
@@ -57,6 +84,11 @@ Tout se règle dans `presentation.html` :
   deviendraient indispensables.
 - **Relire le numéro de version** visible dans la capture d'accueil : il vieillit.
   Relancer `capturer-ecrans.js` avant une diffusion importante.
+- ⚠️ **Le fait du jour tourne avec le calendrier.** L'écran « Le saviez-vous ? » est
+  capturé avec l'horloge décalée (`jours: 9` dans `capturer-ecrans.js`) : celui
+  d'aujourd'hui portait sur le 3114, le numéro national de prévention du suicide —
+  vrai, utile, et déplacé dans un film de promotion. Après une mise à jour du
+  corpus, revérifier la question obtenue.
 
 ## Autres formats
 
