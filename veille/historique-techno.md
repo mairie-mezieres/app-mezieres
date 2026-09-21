@@ -1,3 +1,18 @@
+## 2026-09-21
+- GitHub Actions : runner Ubuntu 26.04 en disponibilité générale, bascule ubuntu-latest 19 oct-19 nov 2026 (17 sept 2026) — https://github.blog/changelog/2026-09-17-ubuntu-26-generally-available-and-latest-migration/
+- Render.com : services Workflows décrits dans les Blueprints (16 sept 2026) — https://render.com/changelog
+- API Anthropic Messages : bêta de compaction de conversation à la demande, compact-2026-09-04 (14-15 sept 2026) — https://platform.claude.com/docs/en/build-with-claude/compaction
+- Mistral OCR 4.1 en disponibilité générale (31 août 2026) — https://docs.mistral.ai/models/ocr-4-1
+- iOS/iPadOS 26.7, plus de 80 correctifs de sécurité (14 sept 2026) — https://www.macrumors.com/2026/09/14/apple-releases-ios-26-7/
+- Décret n° 2026-816 du 24 août 2026 modifiant le décret n° 2019-768 (accessibilité numérique, cité par la mention d'accessibilité de MAT) (JO 26 août 2026) — https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054746617
+- Bulletin CERT-FR CERTFR-2026-ACT-039 : Siemens, SAP, Ivanti, Xen, Citrix Workspace, Cisco, Chrome, Adobe, Postfix (14 sept 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-039/
+- Cyberattaque mairie d'Espelette (64), hameçonnage par facture PDF piégée, messagerie compromise (11 sept 2026) — https://www.cyberattaque.org/cyberattaque-a-la-mairie-despelette-un-faux-pdf-infecte-la-messagerie/
+- [reco] Recouper la mention/déclaration d'accessibilité de MAT avec le décret n° 2026-816
+- [reco] Relayer le cas d'Espelette (hameçonnage facture PDF) auprès de la mairie
+- [reco] Tester la PWA MAT sur iOS/iPadOS 26.7
+- [reco] Anticiper la bascule ubuntu-latest vers Ubuntu 26.04 sur les workflows GitHub Actions
+- [reco] Suivre la bêta de compaction de conversation de l'API Messages Anthropic pour le fallback Claude
+
 ## 2026-09-14
 - Chrome 153.0.8010.36/.37, 7e zero-day V8 actif de 2026, CVE-2026-87491, 230 correctifs (8 sept 2026) — https://thehackernews.com/2026/09/chrome-v8-zero-day-exploited-in-wild.html
 - Mistral AI : levée de 3 Md€ en série D, valorisation >21 Md€, menée par Samsung (8 sept 2026) — https://techcrunch.com/2026/09/08/mistral-raises-e3b-as-sovereign-ai-becomes-big-business/
