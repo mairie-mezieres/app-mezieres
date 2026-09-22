@@ -1842,7 +1842,13 @@ html.theme-sombre .content [role="button"]:focus-visible {
    400 px ne montre rien. Les commandes flottent au-dessus du canvas.
    ══════════════════════════════════════════════════════════════ */
 .c3d-panel{max-width:none;width:100%;height:100%;display:flex;flex-direction:column;border-radius:0}
-.c3d-wrap{position:relative;flex:1;min-height:0;overflow:hidden}
+/* ⛔ `overflow:clip`, pas seulement `hidden` : la fiche d'un bâtiment attend
+   HORS champ (`translateY(102%)`), ce qui allonge la zone défilable de ~90 px.
+   Un conteneur `hidden` reste défilable par programme — un clic suffisait à
+   faire glisser toute la carte sous l'en-tête, boutons de zoom compris (relevé
+   par le test du rideau, v4.125). `clip` interdit tout défilement ; `hidden`
+   reste en repli pour les navigateurs qui ne le connaissent pas. */
+.c3d-wrap{position:relative;flex:1;min-height:0;overflow:hidden;overflow:clip}
 #c3d-map{position:absolute;inset:0}
 #c3d-map canvas{outline:none}
 
@@ -1888,9 +1894,6 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .c3d-temps-titre{margin:0;font-size:0.75rem;font-weight:900;text-transform:uppercase;
   letter-spacing:0.07em;color:var(--leaf)}
 .c3d-temps-lu{margin:4px 0 2px;font-size:0.86rem;font-weight:900;line-height:1.3;min-height:1.3em}
-.c3d-temps-curseur{display:block;width:100%;margin:6px 0 4px;accent-color:var(--leaf);min-height:24px}
-.c3d-temps-curseur[hidden]{display:none}
-.c3d-temps-curseur:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .c3d-temps-reperes{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .c3d-temps-reperes button{appearance:none;font-family:inherit;font-size:0.75rem;font-weight:800;
   min-height:28px;padding:4px 10px;border-radius:999px;cursor:pointer;
@@ -1899,11 +1902,34 @@ html.theme-sombre .content [role="button"]:focus-visible {
 .c3d-temps-reperes button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .c3d-temps-etat{margin:6px 0 0;font-size:0.75rem;line-height:1.4;color:var(--muted)}
 .c3d-temps-etat[hidden]{display:none}
+/* Le rideau : la carte du passé est une SECONDE carte, posée sur la première
+   et découpée par `clip-path` (écrit en JS). Elle ne prend aucun geste : tout
+   passe à la carte d'aujourd'hui, qu'elle suit. Seule la poignée est active. */
+/* ⛔ Sélecteur d'IDENTIFIANT, comme `#c3d-map` : MapLibre pose sur son
+   conteneur la classe `.maplibregl-map { position: relative }`, qui l'emporte
+   sur une règle de classe — le calque retombait à 0 px de haut. */
+#c3d-map-temps{position:absolute;inset:0;z-index:1;pointer-events:none}
+#c3d-map-temps[hidden]{display:none}
+/* ⚠️ z-index 1, comme le calque : placé APRÈS lui dans le DOM, le trait passe
+   au-dessus de la carte du passé, mais SOUS les commandes de MapLibre
+   (z-index 2) — à 2, il masquait les boutons de zoom rideau à droite. */
+.c3d-rideau{position:absolute;z-index:1;top:0;bottom:0;left:50%;width:28px;margin-left:-14px;
+  touch-action:none;cursor:ew-resize}
+.c3d-rideau::before{content:'';position:absolute;top:0;bottom:0;left:12px;width:4px;
+  background:#fff;box-shadow:0 0 6px rgba(0,0,0,0.55)}
+.c3d-rideau[hidden]{display:none}
+.c3d-rideau:focus-visible{outline:none}
+.c3d-rideau:focus-visible .c3d-rideau-bouton{outline:3px solid var(--gold);outline-offset:2px}
+/* La pastille est centrée sur le trait ; sa hauteur est posée en JS
+   (`_c3dRideauHauteur`), dans l'espace libre entre le panneau et les boutons. */
+.c3d-rideau-bouton{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(15,32,23,0.92);color:#fff;border:3px solid #fff;
+  font-size:0.75rem;font-weight:900;letter-spacing:-0.05em;box-shadow:var(--shadow-lg);user-select:none}
 /* ⛔ Thème sombre : `--leaf` y est un FOND (#1f2937), presque égal à `--card`.
    En texte il ferait du noir sur noir ; en fond de repère actif, l'état
    « pressé » ne se verrait plus. D'où l'encre `--sage-ink`. */
 html.theme-sombre .c3d-temps-titre{color:var(--sage-ink)}
-html.theme-sombre .c3d-temps-curseur{accent-color:var(--sage-ink)}
 html.theme-sombre .c3d-temps-reperes button[aria-pressed="true"]{background:var(--sage-ink);
   color:#0f172a;border-color:var(--sage-ink)}
 

@@ -1020,8 +1020,15 @@ test.describe('Carte 3D', () => {
   });
 
   test('le bouton de diagnostic est réellement masqué tant qu’il n’a rien à dire', async ({ page }) => {
+    /* ⚠️ Le test mesurait AVANT que l'écran soit construit (« absent » : 2 à
+       5 échecs sur 20 sous charge, `main` compris). Attendre ne suffit pas :
+       les sources étant coupées, le chargement se termine vite et le bouton
+       apparaît, à juste titre. Les requêtes restent donc EN SUSPENS — le
+       chargement ne finit jamais, et « rien à dire » dure le temps du test. */
+    await page.route(/apicarto\.ign\.fr|data\.geopf\.fr|openstreetmap|overpass-api/, () => {});
     await ouvrirAccueil(page);
     await page.evaluate(() => window.matOuvrirCarte3D());
+    await expect(page.locator('#c3d-btn-diag')).toBeAttached({ timeout: 20000 });
     await expect(page.locator('#c3d-btn-diag')).toBeHidden();
     // L'attribut ne suffit pas : c'est le style calculé qui décide.
     const display = await page.evaluate(() => {
@@ -1090,90 +1097,31 @@ async function ouvrirCarte(page) {
 
 test.describe('Carte 3D — Remonter le temps', () => {
 
-  test('le fondu : la plus ancienne en haut, chaque époque s’efface vers la suivante', async ({ page }) => {
-    await ouvrirAccueil(page);
-    await page.evaluate(() => window.matOuvrirCarte3D());
-    await page.waitForFunction(() => typeof window._c3dTempsOpacites === 'function', null, { timeout: 30000 });
-    const r = await page.evaluate(() => ({
-      debut:  window._c3dTempsOpacites(0, 3),
-      milieu: window._c3dTempsOpacites(0.5, 3),
-      e1950:  window._c3dTempsOpacites(2, 3),
-      presque:window._c3dTempsOpacites(2.5, 3),
-      auj:    window._c3dTempsOpacites(3, 3)
-    }));
-    expect(r.debut).toEqual([1, 1, 1]);        // Cassini en haut, entièrement visible
-    expect(r.milieu).toEqual([0.5, 1, 1]);     // Cassini à moitié, l'état-major dessous
-    expect(r.e1950).toEqual([0, 0, 1]);
-    expect(r.presque).toEqual([0, 0, 0.5]);    // 1950 laisse voir aujourd'hui
-    expect(r.auj).toEqual([0, 0, 0]);          // aujourd'hui : aucune époque ne masque le fond
-  });
-
   test('seules les époques qui répondent sont proposées, avec ce que l’IGN a dit', async ({ page }) => {
     await simulerIGNAncien(page, IGN_TROIS_CAS);
     await ouvrirCarte(page);
     await page.locator('#c3d-btn-temps').click();
-    await expect(page.locator('#c3d-temps-reperes button')).toHaveCount(3, { timeout: 20000 });
+    await expect(page.locator('#c3d-temps-reperes button')).toHaveCount(2, { timeout: 20000 });
+    await page.waitForFunction(() => window._c3dMapTemps && window._c3dMapTemps.isStyleLoaded(), null, { timeout: 20000 });
 
     const r = await page.evaluate(() => ({
       dispo: window._c3dTempsDispo.map(e => [e.id, e.format, e.minzoom, e.maxzoom]),
       reperes: [...document.querySelectorAll('#c3d-temps-reperes button')].map(b => b.textContent),
-      sources: ['cassini', 'etatmajor', 'ortho1950'].map(id => !!window._c3dMap.getSource('temps-' + id)),
+      sources: ['cassini', 'etatmajor', 'ortho1950'].map(id => !!window._c3dMapTemps.getSource('temps-' + id)),
+      // ⛔ plus rien sur la carte d'aujourd'hui : le passé vit sur la seconde carte
+      surPrincipale: Object.keys(window._c3dMap.getStyle().sources).filter(k => /^temps-/.test(k)),
       journal: window._c3dJournal.filter(e => /Remonter le temps/.test(e.nom))
                  .map(e => [e.nom, e.ok, e.detail])
     }));
     // Format et zooms RELEVÉS, pas écrits : ce sont ceux que le faux IGN sert.
     expect(r.dispo).toEqual([['cassini', 'image/jpeg', 11, 15], ['ortho1950', 'image/png', 12, 18]]);
-    expect(r.reperes).toEqual(['XVIIIᵉ siècle', '1950-1965', 'Aujourd’hui']);
+    expect(r.reperes).toEqual(['XVIIIᵉ siècle', '1950-1965']);
     expect(r.sources, 'aucune couche pour l’époque muette').toEqual([true, false, true]);
+    expect(r.surPrincipale).toEqual([]);
     const em = r.journal.find(e => /état-major/.test(e[0]));
     expect(em[1], 'l’échec est inscrit au journal').toBe(false);
     expect(em[2], 'avec la phrase du serveur').toContain('Layer inconnue');
     await expect(page.locator('#c3d-btn-diag')).toBeVisible();
-  });
-
-  test('au clavier, une flèche saute d’une époque, et le zonage s’efface sur le passé', async ({ page }) => {
-    await simulerIGNAncien(page, IGN_TROIS_CAS);
-    await ouvrirCarte(page);
-    /* Sans réseau, pas de zonage : `'absent'` passerait pour un succès. On
-       pose donc une couche `zones-fill` vide, pour que le masquage soit
-       réellement mesuré. */
-    await page.evaluate(() => {
-      window._c3dMap.addSource('zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-      window._c3dMap.addLayer({ id: 'zones-fill', type: 'fill', source: 'zones' });
-    });
-    await page.locator('#c3d-btn-temps').click();
-    const curseur = page.locator('#c3d-temps-curseur');
-    await expect(curseur).toBeVisible({ timeout: 20000 });
-    await expect(page.locator('#c3d-temps-lu')).toHaveText('Aujourd’hui — Le fond de carte actuel');
-
-    const etat = () => page.evaluate(() => {
-      const m = window._c3dMap;
-      const op = id => m.getLayer('l-temps-' + id) ? m.getPaintProperty('l-temps-' + id, 'raster-opacity') : null;
-      const z = m.getLayer('zones-fill') ? (m.getLayoutProperty('zones-fill', 'visibility') || 'visible') : 'absent';
-      return { cassini: op('cassini'), e1950: op('ortho1950'), zones: z,
-               texte: document.getElementById('c3d-temps-curseur').getAttribute('aria-valuetext') };
-    });
-
-    await curseur.focus();
-    await page.keyboard.press('ArrowLeft');
-    let e = await etat();
-    expect(e.texte).toBe('1950-1965 — Photographies aériennes');
-    expect(e.e1950).toBe(1);
-    expect(e.cassini).toBe(0);
-    expect(e.zones, 'le zonage s’efface sur le passé').toBe('none');
-
-    await page.keyboard.press('ArrowLeft');
-    e = await etat();
-    expect(e.texte).toBe('XVIIIᵉ siècle — Carte de Cassini');
-    expect(e.cassini).toBe(1);
-
-    // Fermer le panneau ramène à aujourd'hui : rien ne reste masqué.
-    await page.locator('#c3d-btn-temps').click();
-    e = await etat();
-    expect(e.cassini).toBe(0);
-    expect(e.e1950).toBe(0);
-    expect(e.zones, 'et revient à aujourd’hui').toBe('visible');
-    await expect(page.locator('#c3d-temps')).toBeHidden();
   });
 
   /* Relevé en production le 22 septembre 2026 : sous son nom court, Cassini
@@ -1197,62 +1145,173 @@ test.describe('Carte 3D — Remonter le temps', () => {
     expect(r.motif).toContain('indisponible');
   });
 
-  test('IGN muet : aucune époque inventée, et on le dit', async ({ page }) => {
+  /* ⛔ Le fondu de la v4.124 est retiré : à mi-course, une carte à moitié
+     transparente sur la photo actuelle — « ça fait à moitié une fondue ».
+     Le rideau montre chaque époque ENTIÈRE et OPAQUE d'un côté, aujourd'hui de
+     l'autre. On l'asserte sur ce qui est RENDU : le `clip-path` calculé du
+     calque, pas une variable JS (leçon des étoiles invisibles, ADR-0015). */
+  test('le rideau : le passé à gauche, entier, découpé à la poignée', async ({ page }) => {
+    await simulerIGNAncien(page, IGN_TROIS_CAS);
+    await ouvrirCarte(page);
+    await page.locator('#c3d-btn-temps').click();
+    const rideau = page.locator('#c3d-rideau');
+    await expect(rideau).toBeVisible({ timeout: 20000 });
+    await page.waitForFunction(() => window._c3dMapTemps && window._c3dMapTemps.isStyleLoaded(), null, { timeout: 20000 });
+    const lire = () => page.evaluate(() => {
+      const m = window._c3dMapTemps;
+      const vis = id => m.getLayoutProperty('l-temps-' + id, 'visibility') || 'visible';
+      return {
+        clip: getComputedStyle(document.getElementById('c3d-map-temps')).clipPath,
+        valeur: document.getElementById('c3d-rideau').getAttribute('aria-valuenow'),
+        texte: document.getElementById('c3d-rideau').getAttribute('aria-valuetext'),
+        cassini: vis('cassini'), e1950: vis('ortho1950'),
+        // aucune transparence nulle part : l'époque choisie est opaque
+        opacite: m.getPaintProperty('l-temps-cassini', 'raster-opacity'),
+        // un canevas de 0 × 0 ne montre rien : la carte naissait dans un conteneur masqué
+        canevas: [m.getCanvas().clientWidth, m.getCanvas().clientHeight],
+        calque: [document.getElementById('c3d-map-temps').clientWidth, document.getElementById('c3d-map-temps').clientHeight],
+        lu: document.getElementById('c3d-temps-lu').textContent
+      };
+    });
+
+    let e = await lire();
+    expect(e.clip).toBe('inset(0px 50% 0px 0px)');
+    expect(e.cassini, 'la plus ancienne d’abord').toBe('visible');
+    expect(e.e1950).toBe('none');
+    expect(e.opacite === undefined || e.opacite === 1, 'jamais de fondu').toBe(true);
+    expect(e.lu).toContain('XVIIIᵉ siècle');
+    expect(e.canevas[0], 'la carte du passé a une taille').toBeGreaterThan(0);
+    expect(e.canevas, 'celle de son calque').toEqual(e.calque);
+
+    await rideau.focus();
+    await page.keyboard.press('ArrowRight');
+    e = await lire();
+    expect(e.valeur).toBe('55');
+    expect(e.clip).toBe('inset(0px 45% 0px 0px)');
+    expect(e.texte).toContain('XVIIIᵉ siècle');
+    await page.keyboard.press('End');
+    expect((await lire()).clip).toBe('inset(0px 0% 0px 0px)');
+
+    await page.locator('#c3d-temps-reperes button', { hasText: '1950-1965' }).click();
+    e = await lire();
+    expect(e.cassini).toBe('none');
+    expect(e.e1950).toBe('visible');
+    expect(e.lu).toContain('1950-1965');
+  });
+
+  test('la carte du passé suit la caméra d’aujourd’hui', async ({ page }) => {
+    await simulerIGNAncien(page, IGN_TROIS_CAS);
+    await ouvrirCarte(page);
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
+    const r = await page.evaluate(() => {
+      window._c3dMap.jumpTo({ center: [1.80, 47.82], zoom: 16.3, bearing: 40, pitch: 30 });
+      const a = window._c3dMap, b = window._c3dMapTemps;
+      return { z: [a.getZoom(), b.getZoom()], be: [a.getBearing(), b.getBearing()],
+               p: [a.getPitch(), b.getPitch()], c: [a.getCenter().lng, b.getCenter().lng] };
+    });
+    expect(r.z[1]).toBeCloseTo(r.z[0], 5);
+    expect(r.be[1]).toBeCloseTo(r.be[0], 5);
+    expect(r.p[1]).toBeCloseTo(r.p[0], 5);
+    expect(r.c[1]).toBeCloseTo(r.c[0], 6);
+  });
+
+  test('fermer le rideau détruit la seconde carte et rend l’écran à aujourd’hui', async ({ page }) => {
+    await simulerIGNAncien(page, IGN_TROIS_CAS);
+    await ouvrirCarte(page);
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-temps')).toBeHidden();
+    await expect(page.locator('#c3d-rideau')).toBeHidden();
+    const r = await page.evaluate(() => ({
+      carte: window._c3dMapTemps,
+      calque: getComputedStyle(document.getElementById('c3d-map-temps')).display
+    }));
+    expect(r.carte, 'le contexte WebGL est libéré').toBeNull();
+    expect(r.calque).toBe('none');
+    // Et on peut rouvrir.
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
+  });
+
+  test('IGN muet : aucune époque inventée, pas de rideau, et on le dit', async ({ page }) => {
     await ouvrirCarte(page);                  // data.geopf.fr coupé par le beforeEach
     await page.locator('#c3d-btn-temps').click();
     await expect(page.locator('#c3d-temps-etat')).toContainText('n’ont pas répondu', { timeout: 20000 });
     const r = await page.evaluate(() => ({
       dispo: window._c3dTempsDispo.length,
-      sources: Object.keys(window._c3dMap.getStyle().sources).filter(s => /^temps-/.test(s)),
-      curseur: getComputedStyle(document.getElementById('c3d-temps-curseur')).display,
+      carte: window._c3dMapTemps,
+      rideau: getComputedStyle(document.getElementById('c3d-rideau')).display,
       echecs: window._c3dJournal.filter(e => /Remonter le temps/.test(e.nom) && !e.ok).length
     }));
     expect(r.dispo).toBe(0);
-    expect(r.sources).toEqual([]);
-    expect(r.curseur, 'style calculé, pas seulement l’attribut').toBe('none');
+    expect(r.carte).toBeNull();
+    expect(r.rideau, 'style calculé, pas seulement l’attribut').toBe('none');
     expect(r.echecs, 'les trois époques sont inscrites en échec').toBe(3);
   });
 
-  test('le panneau ne recouvre ni un bouton, ni le zoom, ni le bandeau d’état', async ({ page }) => {
+  /* Le trait du rideau balaie tout l'écran : il passe forcément derrière des
+     boutons. Ce qui compte, c'est qu'il passe DESSOUS — qu'un doigt posé sur un
+     bouton touche le bouton. On le mesure avec `elementFromPoint`, à gauche,
+     au centre et à droite ; et le panneau, lui, ne recouvre rien. */
+  test('le rideau passe sous les boutons, et le panneau ne recouvre rien', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 640 });
     await simulerIGNAncien(page, IGN_TROIS_CAS);
     await ouvrirCarte(page);
     await page.locator('#c3d-btn-temps').click();
-    await expect(page.locator('#c3d-temps-reperes button')).toHaveCount(3, { timeout: 20000 });
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
     await page.waitForTimeout(300);
     const heurts = await page.evaluate(() => {
-      const pan = document.getElementById('c3d-temps').getBoundingClientRect();
-      const coupe = r => !(r.right <= pan.left || r.left >= pan.right || r.bottom <= pan.top || r.top >= pan.bottom);
       const out = [];
-      document.querySelectorAll('.c3d-btn, .maplibregl-ctrl-group button, #c3d-statut').forEach((el) => {
-        if (el.hidden || getComputedStyle(el).display === 'none') return;
-        if (coupe(el.getBoundingClientRect())) out.push(el.id || el.className || el.textContent.trim());
-      });
-      return out;
+      const coupe = (a, r) => !(r.right <= a.left || r.left >= a.right || r.bottom <= a.top || r.top >= a.bottom);
+      const cibles = [...document.querySelectorAll('.c3d-btn, .maplibregl-ctrl-group button, #c3d-statut')]
+        .filter(el => !el.hidden && getComputedStyle(el).display !== 'none');
+      const pan = document.getElementById('c3d-temps').getBoundingClientRect();
+      cibles.forEach(el => { if (coupe(pan, el.getBoundingClientRect())) out.push('panneau sur ' + (el.id || el.textContent.trim())); });
+      for (const part of [0.08, 0.5, 0.92]) {
+        window._c3dRideauPoser(part);
+        const bou = document.getElementById('c3d-rideau-bouton').getBoundingClientRect();
+        if (coupe(pan, bou)) out.push('pastille sous le panneau à ' + part);
+        cibles.filter(el => el.tagName === 'BUTTON').forEach(el => {
+          const r = el.getBoundingClientRect();
+          const x = r.left + r.width / 2, y = r.top + r.height / 2;
+          // et, si le trait traverse le bouton, le point du bouton sous le trait
+          const trait = document.getElementById('c3d-rideau').getBoundingClientRect();
+          const xt = trait.left + trait.width / 2;
+          const points = xt > r.left + 6 && xt < r.right - 6 ? [x, xt] : [x];
+          points.forEach(px => {
+            const touche = document.elementFromPoint(px, y);
+            if (!touche || !el.contains(touche)) out.push((el.id || el.getAttribute('aria-label') || el.textContent.trim()) + ' masqué à ' + part + ' par ' + (touche ? touche.tagName + '#' + touche.id + '.' + touche.className : 'rien'));
+          });
+        });
+      }
+      // ⛔ la carte ne doit jamais avoir défilé sous l'en-tête (overflow:clip)
+      const w = document.querySelector('.c3d-wrap');
+      if (w.scrollTop !== 0) out.push('la carte a défilé de ' + w.scrollTop + ' px');
+      return [...new Set(out)];
     });
-    expect(heurts, 'éléments recouverts : ' + heurts.join(' / ')).toEqual([]);
+    expect(heurts, heurts.join(' / ')).toEqual([]);
   });
 
-  test('vue territoire : le bouton se retire et le passé se referme', async ({ page }) => {
+  test('vue territoire : le rideau se referme et le bouton se retire', async ({ page }) => {
     await simulerIGNAncien(page, IGN_TROIS_CAS);
     await ouvrirCarte(page);
     await page.locator('#c3d-btn-temps').click();
-    await expect(page.locator('#c3d-temps-curseur')).toBeVisible({ timeout: 20000 });
-    await page.locator('#c3d-temps-curseur').focus();
-    await page.keyboard.press('ArrowLeft');
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
     await page.locator('#c3d-btn-terr').click();
     await expect(page.locator('#c3d-btn-temps')).toBeHidden();
     await expect(page.locator('#c3d-temps')).toBeHidden();
-    const op = await page.evaluate(() => window._c3dMap.getPaintProperty('l-temps-ortho1950', 'raster-opacity'));
-    expect(op).toBe(0);
+    await expect(page.locator('#c3d-rideau')).toBeHidden();
+    expect(await page.evaluate(() => window._c3dMapTemps)).toBeNull();
   });
 
-  test('aucune violation d’accessibilité sérieuse, panneau ouvert', async ({ page }) => {
+  test('aucune violation d’accessibilité sérieuse, rideau ouvert', async ({ page }) => {
     await simulerIGNAncien(page, IGN_TROIS_CAS);
     await ouvrirCarte(page);
     await page.locator('#c3d-btn-temps').click();
-    await expect(page.locator('#c3d-temps-reperes button')).toHaveCount(3, { timeout: 20000 });
-    const res = await new AxeBuilder({ page }).include('#c3d-temps').analyze();
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
+    const res = await new AxeBuilder({ page }).include('#c3d-temps').include('#c3d-rideau').analyze();
     const graves = res.violations.filter(v => ['serious', 'critical'].includes(v.impact || ''));
     expect(graves, JSON.stringify(graves.map(v => v.id))).toEqual([]);
   });

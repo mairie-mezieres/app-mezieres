@@ -49,7 +49,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.26">
+<link rel="stylesheet" href="css/mat.css?v=4.14.27">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.6.0">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -88,7 +88,7 @@ document.documentElement.style.background = bg;
      Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
      module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
 <script defer src="js/mat-jeu.js?v=2.0.0"></script>
-<script defer src="js/mat-boot.js?v=4.13.2"></script>
+<script defer src="js/mat-boot.js?v=4.13.3"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.124.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.125 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -528,7 +528,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.124.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.125</button>
 </div>
 </div>
 </div>
@@ -1588,11 +1588,12 @@ style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--ca
 </div>
 <div class="c3d-wrap">
 <div id="c3d-map" role="application" aria-label="Vue en trois dimensions de Mézières-lez-Cléry avec le zonage du plan local d’urbanisme"></div>
+<div id="c3d-map-temps" class="c3d-map-temps" aria-hidden="true" hidden></div>
+<div id="c3d-rideau" class="c3d-rideau" role="slider" tabindex="0" aria-label="Rideau entre la carte ancienne, à gauche, et aujourd’hui, à droite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden><span class="c3d-rideau-bouton" id="c3d-rideau-bouton" aria-hidden="true">◀▶</span></div>
 <p id="c3d-statut" class="c3d-statut" aria-live="polite">Chargement…</p>
 <section class="c3d-temps" id="c3d-temps" aria-labelledby="c3d-temps-titre" hidden>
 <h3 class="c3d-temps-titre" id="c3d-temps-titre">🕰️ Remonter le temps</h3>
 <p class="c3d-temps-lu" id="c3d-temps-lu" aria-live="polite"></p>
-<input type="range" class="c3d-temps-curseur" id="c3d-temps-curseur" min="0" max="100" step="1" value="100" aria-labelledby="c3d-temps-titre" hidden>
 <ol class="c3d-temps-reperes" id="c3d-temps-reperes"></ol>
 <p class="c3d-temps-etat" id="c3d-temps-etat"></p>
 <p class="c3d-temps-etat" id="c3d-temps-zoom" hidden>Rapprochez-vous : cette carte ne s’affiche qu’à partir d’un zoom plus fort.</p>
@@ -1857,6 +1858,14 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 22 septembre 2026 — v4.125</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>&laquo;&nbsp;Remonter le temps&nbsp;&raquo; devient un rideau.</strong> La carte est coup&eacute;e en deux&nbsp;: <strong>&agrave; gauche une carte ancienne</strong>, nette et enti&egrave;re, <strong>&agrave; droite aujourd&rsquo;hui</strong>. Faites glisser la poign&eacute;e &#9664;&#9654; sur votre rue pour voir ce qui a chang&eacute;, et choisissez l&rsquo;&eacute;poque dans le panneau</li>
+<li>Le fondu de la version pr&eacute;c&eacute;dente, qui m&eacute;langeait les deux cartes, est retir&eacute;</li>
+<li>Correction&nbsp;: sur petit &eacute;cran, un appui pouvait faire glisser toute la carte 3D sous l&rsquo;en-t&ecirc;te, boutons de zoom compris</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 22 septembre 2026 — v4.124.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>La carte de Cassini arrive dans &laquo;&nbsp;Remonter le temps&nbsp;&raquo;.</strong> Elle &eacute;tait demand&eacute;e &agrave; l&rsquo;IGN sous un nom qu&rsquo;il ne sert pas, et restait donc absente du curseur. C&rsquo;est l&rsquo;exemplaire de la Biblioth&egrave;que nationale de France</li>

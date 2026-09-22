@@ -245,7 +245,7 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   d'une maison semblerait nommer la maison — et un marqueur HTML n'étant jamais occulté par
   le bâti, un nom lointain flotterait sur les maisons du premier plan.
 - **RG-17.31 — « Remonter le temps » : une époque se relève, elle ne se suppose pas.**
-  Un curseur fait défiler, en fondu, trois documents de l'IGN puis le fond actuel :
+  Un **rideau** compare trois documents de l'IGN au fond actuel :
   `BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI` (XVIIIᵉ siècle — ⚠️ préfixe BnF obligatoire, le
   nom court répond HTTP 400), `GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40`
   (XIXᵉ siècle) et `ORTHOIMAGERY.ORTHOPHOTOS.1950-1965`. Seuls ces **identifiants** sont
@@ -257,20 +257,34 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   une **image** (un 200 en XML n'en est pas une).
   ⛔ **Une époque qui ne répond pas n'est pas proposée** : aucun repère, aucune couche. Elle
   est inscrite au « 🔎 Détail des sources » avec la phrase du serveur (RG-17.3, RG-17.4).
-  Si aucune ne répond, le panneau le dit et le curseur est retiré.
+  Si aucune ne répond, le panneau le dit et aucun rideau n'est posé.
   ⚠️ **Les dates sont celles des documents, à la précision où on peut les affirmer** :
   « XVIIIᵉ siècle » et non une année — la carte de Cassini a été levée sur plusieurs
   décennies, et l'année de la feuille de Mézières n'est pas connue ici.
-  ⚠️ **Le fondu exige un empilement précis** : couches d'époque juste au-dessus du fond,
-  la plus ancienne en haut ; l'époque k a pour opacité `k + 1 − v` bornée à [0, 1]
-  (`_c3dTempsOpacites`). Tant qu'on regarde le passé, **le zonage s'efface** (il brouille
-  une carte ancienne) et revient à « Aujourd'hui » si le bouton « Zonage du PLU » est
-  toujours actif — ce bouton reste le seul maître. Sous le zoom minimal relevé d'une
-  époque, un avertissement le dit : sinon le fond actuel s'afficherait sous l'étiquette
-  « XVIIIᵉ siècle ». En **vue territoire**, le bouton est retiré et le curseur revient à
-  aujourd'hui (les cartes anciennes ne descendent pas à cette échelle).
-  Au clavier, une flèche saute **d'une époque entière** ; le libellé lu (`aria-valuetext`,
-  région `aria-live`) ne change qu'avec l'époque la plus proche, pas à chaque pixel.
+  ⛔ **Pas de fondu, un rideau** (v4.125). Le fondu de la v4.124 superposait les époques
+  par transparence : à mi-course, une carte à moitié effacée sur la photo actuelle, où l'on
+  ne compare rien (retour du terrain le jour même). L'écran est désormais coupé en deux :
+  **à gauche l'époque choisie, entière et opaque ; à droite aujourd'hui**, bâti en relief
+  compris. Une poignée verticale déplace la limite ; des boutons choisissent l'époque, la
+  plus ancienne étant montrée d'abord.
+  **Mise en œuvre** : une **seconde carte** MapLibre (`_c3dMapTemps`, couche d'époque +
+  contour communal), posée sur la première et découpée par `clip-path`. Elle ne reçoit
+  aucun geste et **recopie la caméra** de la carte principale à chaque image. Elle est
+  **détruite** à la fermeture (contexte WebGL libéré).
+  ⚠️ Trois pièges rencontrés, tous verrouillés par un test : la carte créée dans un
+  conteneur **masqué** mesure 0 × 0 et dessine un canevas vide ; la classe
+  `.maplibregl-map { position: relative }` écrase une règle de **classe** (d'où le
+  sélecteur d'identifiant `#c3d-map-temps`) ; un `setLayoutProperty` avant la fin du
+  chargement du style ne fait rien (l'époque est donc écrite dans le style de départ).
+  Le **trait** du rideau passe **sous** les boutons et sous les commandes de MapLibre
+  (z-index 1 < 2) : un doigt posé sur un bouton touche toujours le bouton, vérifié par
+  `elementFromPoint` à gauche, au centre et à droite. `.c3d-wrap` est en
+  **`overflow:clip`** : en `hidden`, la fiche d'un bâtiment attendant hors champ
+  (`translateY(102%)`) allongeait la zone défilable, et un clic faisait glisser toute la
+  carte de 89 px sous l'en-tête. Sous le zoom minimal relevé d'une époque, un
+  avertissement le dit. En **vue territoire**, le rideau se referme et le bouton est
+  retiré (les cartes anciennes ne descendent pas à cette échelle).
+  Au clavier, la poignée est un `role="slider"` : flèches ± 5 %, Page ± 25 %, Début/Fin.
   Le panneau ne recouvre ni un bouton, ni le zoom de MapLibre, ni le bandeau d'état, qu'il
   repousse sous lui (prolongement de RG-17.27). Voir ADR-0051.
 

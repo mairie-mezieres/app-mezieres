@@ -233,7 +233,7 @@ matDifferer('js/mat-guide-arrivee.js?v=1.0.8', ['openGuideArrivee']);
 // Carte 3D — le module fait 98 Ko à lui seul. La bibliothèque MapLibre
 // (~1 Mo) reste chargée par le module lui-même, à la première ouverture
 // (ADR-0018) : ce sont deux paliers, pas un seul.
-matDifferer('js/mat-carte3d.js?v=1.10.1',       ['matOuvrirCarte3D']);
+matDifferer('js/mat-carte3d.js?v=1.11.0',       ['matOuvrirCarte3D']);
 
 (function(){
   var s = document.createElement('script');
