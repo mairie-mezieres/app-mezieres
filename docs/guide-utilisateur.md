@@ -62,6 +62,8 @@ L'installation est facultative mais recommandée : vous retrouvez MAT sur l'écr
 
 L'icône MAT apparaît sur votre écran d'accueil. L'application se comporte ensuite comme une application native.
 
+**Raccourcis** : un appui long sur l'icône MAT (Android, et ordinateur via clic droit) propose d'ouvrir directement **MEL**, **Signalement**, **Météo** ou **Agenda**. Sur Android, la fenêtre d'installation affiche aussi quelques captures de l'application.
+
 ---
 
 ## 3. L'écran d'accueil
@@ -788,6 +790,16 @@ votre téléphone**, elle n'est transmise ni à la mairie ni à personne.
 sont volontairement estompées : on voit du premier coup d'œil où s'arrête Mézières. Les
 chiffres annoncés en haut de l'écran (nombre de bâtiments, nombre de zones) ne comptent que
 ce qui est **dans la commune**.
+
+**🕰️ Remonter le temps** *(septembre 2026)*. Le bouton du même nom ouvre un curseur :
+glissez-le vers la gauche et le village remonte les époques, en fondu — les
+**photographies aériennes de 1950-1965**, la **carte de l'état-major** (XIXᵉ siècle), la
+**carte de Cassini** (XVIIIᵉ siècle). Cherchez votre maison : en 1955, c'était peut-être
+un champ. Les bâtiments d'aujourd'hui restent en relief par-dessus, ce qui montre d'un
+coup d'œil ce qui a été construit depuis ; le zonage, lui, s'efface le temps de regarder
+le passé. Au clavier, les flèches passent d'une époque à l'autre. Ces cartes viennent de
+l'IGN : si l'une ne répond pas, elle n'est pas proposée, et « 🔎 Détail des sources » dit
+pourquoi. Elles ne s'affichent pas en vue « Le territoire », à l'échelle des 25 communes.
 
 **Depuis MEL.** Dans « Urbanisme & Construction », une fois votre adresse saisie et votre
 zone trouvée, un bouton **« 🏘️ Voir ma zone sur la carte 3D »** ouvre la carte centrée sur

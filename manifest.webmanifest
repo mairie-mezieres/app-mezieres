@@ -11,11 +11,18 @@
   "lang": "fr",
   "categories": ["government","lifestyle"],
   "prefer_related_applications": false,
+  "launch_handler": { "client_mode": ["navigate-existing", "auto"] },
   "icons": [
     { "src":"icon-192.png", "sizes":"192x192", "type":"image/png", "purpose":"any" },
     { "src":"icon-512.png", "sizes":"512x512", "type":"image/png", "purpose":"any" },
     { "src":"icon-192.png", "sizes":"192x192", "type":"image/png", "purpose":"maskable" },
     { "src":"icon-512.png", "sizes":"512x512", "type":"image/png", "purpose":"maskable" }
+  ],
+  "screenshots": [
+    { "src":"img/screenshots/carte3d.webp", "sizes":"780x1547", "type":"image/webp", "form_factor":"narrow", "label":"Mon village en 3D, avec le zonage du PLU" },
+    { "src":"img/screenshots/mel.webp", "sizes":"780x1688", "type":"image/webp", "form_factor":"narrow", "label":"MEL répond à vos questions sur les démarches" },
+    { "src":"img/screenshots/meteo.webp", "sizes":"780x1688", "type":"image/webp", "form_factor":"narrow", "label":"La météo de la commune et les alertes" },
+    { "src":"img/screenshots/guide.webp", "sizes":"780x1688", "type":"image/webp", "form_factor":"narrow", "label":"Le guide d'arrivée des nouveaux habitants" }
   ],
   "share_target": {
     "action": "./share-target",
@@ -30,6 +37,8 @@
   },
   "shortcuts": [
     { "name":"MEL — Assistante", "short_name":"MEL", "url":"./#mel", "icons":[{"src":"icon-192.png","sizes":"192x192"}] },
-    { "name":"Signalement", "short_name":"Signal", "url":"./#signal", "icons":[{"src":"icon-192.png","sizes":"192x192"}] }
+    { "name":"Signalement", "short_name":"Signal", "url":"./#signal", "icons":[{"src":"icon-192.png","sizes":"192x192"}] },
+    { "name":"Météo", "short_name":"Météo", "url":"./#meteo", "icons":[{"src":"icon-192.png","sizes":"192x192"}] },
+    { "name":"Agenda", "short_name":"Agenda", "url":"./#agenda", "icons":[{"src":"icon-192.png","sizes":"192x192"}] }
   ]
 }

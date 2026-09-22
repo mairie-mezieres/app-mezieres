@@ -1884,6 +1884,7 @@ function _c3dBrancher(){
     ['zones-fill','zones-line'].forEach(function(l){
       if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
     });
+    _c3dZonesSelonTemps();
     var lg = document.getElementById('c3d-legende');
     if (lg) lg.hidden = !(on && _c3dZones);
   });
@@ -1897,8 +1898,19 @@ function _c3dBrancher(){
   bascule('c3d-btn-terr', function(on){
     var t = document.querySelector('#c3d-btn-terr span');
     if (t) t.textContent = on ? 'Revenir au village' : 'Le territoire';
+    /* Les cartes anciennes ne descendent pas à l'échelle des 25 communes :
+       le curseur afficherait « XVIIIᵉ siècle » au-dessus du fond actuel. On
+       revient à aujourd'hui et on retire le bouton le temps de la visite. */
+    var bt = document.getElementById('c3d-btn-temps');
+    if (on && bt && bt.getAttribute('aria-pressed') === 'true'){
+      bt.setAttribute('aria-pressed', 'false');
+      _c3dTempsOuvrir(false);
+    }
+    if (bt) bt.hidden = on;
     _c3dVoirTerritoire(on);
   });
+  bascule('c3d-btn-temps', _c3dTempsOuvrir);
+  _c3dMap.on('zoomend', _c3dTempsAvertirZoom);
   bascule('c3d-btn-fond', function(on){
     _c3dMap.setLayoutProperty('l-ortho', 'visibility', on ? 'visible' : 'none');
     _c3dMap.setLayoutProperty('l-plan',  'visibility', on ? 'none' : 'visible');
@@ -1911,6 +1923,272 @@ function _c3dBrancher(){
   if (d) d.onclick = _c3dOuvrirDiag;
   var x = document.getElementById('c3d-fiche-fermer');
   if (x) x.onclick = _c3dFermerFiche;
+}
+
+/* ── Remonter le temps ──────────────────────────────────────────────────
+   Un curseur fait défiler les époques du village, des plus anciennes à
+   aujourd'hui, en fondu : on voit apparaître les lotissements sur les champs
+   de 1950, et la forêt bouger depuis Cassini.
+
+   ⛔ AUCUNE ÉPOQUE N'EST SUPPOSÉE DISPONIBLE. Les identifiants de couche
+   ci-dessous sont ceux du Géoportail, mais leur format d'image et leurs
+   niveaux de zoom ne sont PAS vérifiables depuis l'environnement de
+   développement (data.geopf.fr y est bloqué). On ne les écrit donc pas : la
+   carte les RELÈVE elle-même, en demandant une tuile au-dessus du village
+   (`_c3dSonderEpoque`). Une époque qui ne répond pas n'est pas proposée — et
+   elle est inscrite au « 🔎 Détail des sources » avec le motif, comme les
+   autres sources (RG-17.3, RG-17.4). Voir RG-17.31.
+
+   ⚠️ Les dates sont celles des DOCUMENTS, à l'échelle où on peut les
+   affirmer : la carte de Cassini a été levée sur plusieurs décennies du
+   XVIIIᵉ siècle, et on ne sait pas d'ici en quelle année la feuille de
+   Mézières l'a été. « XVIIIᵉ siècle » est vrai ; une année serait inventée. */
+/* Attributions COURTES : la ligne de crédits de MapLibre s'étale au pied de
+   la carte, sous « 🔎 Détail des sources » ; les allonger la fait chevaucher.
+   MapLibre fusionne les mentions identiques, « © IGN » ne s'écrit qu'une fois. */
+var C3D_EPOQUES = [
+  { id:'cassini',   couche:'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+    quand:'XVIIIᵉ siècle', titre:'Carte de Cassini',
+    attribution:'© IGN, BnF' },
+  { id:'etatmajor', couche:'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
+    quand:'XIXᵉ siècle',   titre:'Carte de l’état-major',
+    attribution:'© IGN' },
+  { id:'ortho1950', couche:'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965',
+    quand:'1950-1965',     titre:'Photographies aériennes',
+    attribution:'© IGN' }
+];
+var C3D_AUJOURDHUI = { id:'aujourdhui', quand:'Aujourd’hui', titre:'Le fond de carte actuel' };
+var C3D_TEMPS_FORMATS = ['image/jpeg', 'image/png'];
+var C3D_TEMPS_REF = 14;                              // zoom de la tuile témoin
+var C3D_TEMPS_ZOOMS = [11, 12, 13, 14, 15, 16, 17, 18];
+var C3D_TEMPS_PAS = 100;                             // unités de curseur par époque
+
+var _c3dTempsSonde = null;     // promesse mémorisée : un seul sondage par session
+var _c3dTempsDispo = [];       // époques relevées, de la plus ancienne à la plus récente
+var _c3dTempsPos = null;       // position du curseur ; null = aujourd'hui
+
+function _c3dWmts(couche, format, z, x, y){
+  return 'https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile'
+       + '&LAYER=' + couche + '&STYLE=normal&TILEMATRIXSET=PM'
+       + '&TILEMATRIX=' + z + '&TILEROW=' + y + '&TILECOL=' + x
+       + '&FORMAT=' + format;
+}
+
+/* Tuile Web Mercator qui contient le centre du village, au zoom z. */
+function _c3dTuileCentre(z){
+  var n = Math.pow(2, z), lat = C3D_CENTRE[1] * Math.PI / 180;
+  return {
+    x: Math.floor((C3D_CENTRE[0] + 180) / 360 * n),
+    y: Math.floor((1 - Math.log(Math.tan(lat) + 1 / Math.cos(lat)) / Math.PI) / 2 * n)
+  };
+}
+
+/* Une tuile « répond » si le serveur renvoie une IMAGE. Un serveur OGC
+   renvoie ses refus en XML avec un statut d'erreur — mais on ne se fie pas au
+   seul statut : un 200 qui n'est pas une image n'est pas une tuile. */
+function _c3dSonderTuile(url){
+  return fetch(url).then(function(r){
+    var t = (r.headers && r.headers.get('content-type')) || '';
+    if (r.ok && /^image\//i.test(t)) return { ok:true };
+    return (r.ok ? Promise.resolve('HTTP ' + r.status + ' — ' + (t || 'type inconnu'))
+                 : _c3dLireErreur(r)).then(function(d){ return { ok:false, motif:d }; });
+  }).catch(function(e){ return { ok:false, motif:(e && e.message) || 'injoignable' }; });
+}
+
+/* Relève le format et la plage de zoom d'une époque. Deux temps : trouver le
+   format qui répond au zoom témoin, puis borner les zooms autour de lui — une
+   plage CONTIGUË, un trou arrête la plage (MapLibre ne sait pas en sauter). */
+function _c3dSonderEpoque(ep){
+  var t = _c3dTuileCentre(C3D_TEMPS_REF);
+  return Promise.all(C3D_TEMPS_FORMATS.map(function(f){
+    return _c3dSonderTuile(_c3dWmts(ep.couche, f, C3D_TEMPS_REF, t.x, t.y));
+  })).then(function(rs){
+    var i = -1;
+    for (var k = 0; k < rs.length; k++) if (rs[k].ok){ i = k; break; }
+    if (i < 0) return { ok:false, motif:rs.map(function(r){ return r.motif; }).join(' / ') };
+    var fmt = C3D_TEMPS_FORMATS[i];
+    return Promise.all(C3D_TEMPS_ZOOMS.map(function(z){
+      if (z === C3D_TEMPS_REF) return { ok:true };
+      var tz = _c3dTuileCentre(z);
+      return _c3dSonderTuile(_c3dWmts(ep.couche, fmt, z, tz.x, tz.y));
+    })).then(function(zs){
+      var ref = C3D_TEMPS_ZOOMS.indexOf(C3D_TEMPS_REF), lo = ref, hi = ref;
+      while (lo > 0 && zs[lo - 1].ok) lo--;
+      while (hi < zs.length - 1 && zs[hi + 1].ok) hi++;
+      return { ok:true, format:fmt, minzoom:C3D_TEMPS_ZOOMS[lo], maxzoom:C3D_TEMPS_ZOOMS[hi] };
+    });
+  });
+}
+
+function _c3dTempsSonder(){
+  if (_c3dTempsSonde) return _c3dTempsSonde;
+  _c3dTempsSonde = Promise.all(C3D_EPOQUES.map(function(ep){
+    return _c3dSonderEpoque(ep).then(function(r){
+      _c3dNoter('Remonter le temps — ' + ep.titre, r.ok,
+                r.ok ? ep.quand + ' · ' + r.format + ' · zoom ' + r.minzoom + ' à ' + r.maxzoom
+                     : r.motif, r.ok ? 1 : 0);
+      return r.ok ? Object.assign({}, ep, r) : null;
+    });
+  })).then(function(rs){
+    _c3dTempsDispo = rs.filter(Boolean);
+    return _c3dTempsDispo;
+  });
+  return _c3dTempsSonde;
+}
+
+/* Les couches d'époque vont juste au-dessus du fond (photo ou plan), donc
+   SOUS le zonage, le bâti et les noms. Ajoutées de la plus récente à la plus
+   ancienne devant la même couche : la plus ancienne finit au-dessus. C'est
+   l'ordre qu'exige le fondu de `_c3dTempsOpacites`. */
+function _c3dTempsPoserCouches(){
+  if (!_c3dMap) return;
+  var couches = (_c3dMap.getStyle().layers || []).map(function(l){ return l.id; });
+  var devant = couches[couches.indexOf('l-ortho') + 1];
+  _c3dTempsDispo.slice().reverse().forEach(function(ep){
+    var src = 'temps-' + ep.id;
+    if (_c3dMap.getSource(src)) return;
+    _c3dMap.addSource(src, { type:'raster', tileSize:256,
+      tiles:[_c3dWmts(ep.couche, ep.format, '{z}', '{x}', '{y}')],
+      minzoom:ep.minzoom, maxzoom:ep.maxzoom, attribution:ep.attribution });
+    _c3dMap.addLayer({ id:'l-' + src, type:'raster', source:src,
+      paint:{ 'raster-opacity':0, 'raster-fade-duration':0 } }, devant);
+  });
+}
+
+/* Fondu entre deux époques voisines. Époques empilées, la plus ancienne en
+   haut : à la position v (0 = la plus ancienne, n = aujourd'hui), l'époque k
+   a pour opacité k + 1 − v bornée à [0, 1]. Entre k et k+1, l'époque k
+   s'efface et laisse voir k+1, entièrement opaque en dessous ; les plus
+   anciennes sont à 0, les plus récentes à 1 mais cachées. */
+function _c3dTempsOpacites(v, n){
+  var out = [];
+  for (var k = 0; k < n; k++) out.push(Math.max(0, Math.min(1, k + 1 - v)));
+  return out;
+}
+
+/* L'époque « lue » à une position : la plus proche. C'est elle qu'on annonce,
+   et elle seule — pas chaque pixel du glissement. */
+function _c3dTempsEpoqueA(v){
+  var n = _c3dTempsDispo.length, i = Math.round(v);
+  return i >= n ? C3D_AUJOURDHUI : _c3dTempsDispo[Math.max(0, i)];
+}
+
+function _c3dTempsAppliquer(pas){
+  var n = _c3dTempsDispo.length;
+  var v = Math.max(0, Math.min(n, pas / C3D_TEMPS_PAS));
+  _c3dTempsPos = v >= n ? null : v;
+  var op = _c3dTempsOpacites(v, n);
+  _c3dTempsDispo.forEach(function(ep, k){
+    var l = 'l-temps-' + ep.id;
+    if (_c3dMap && _c3dMap.getLayer(l)) _c3dMap.setPaintProperty(l, 'raster-opacity', op[k]);
+  });
+  _c3dZonesSelonTemps();
+  var ep = _c3dTempsEpoqueA(v);
+  var c = document.getElementById('c3d-temps-curseur');
+  if (c) c.setAttribute('aria-valuetext', ep.quand + ' — ' + ep.titre);
+  var lu = document.getElementById('c3d-temps-lu');
+  var txt = ep.quand + ' — ' + ep.titre;
+  if (lu && lu.textContent !== txt) lu.textContent = txt;   // pas d'annonce à chaque pixel
+  document.querySelectorAll('#c3d-temps-reperes button').forEach(function(b){
+    b.setAttribute('aria-pressed', String(b.getAttribute('data-id') === ep.id));
+  });
+  _c3dTempsAvertirZoom();
+}
+
+/* Sur une carte ancienne, le zonage coloré brouille tout : il s'efface tant
+   qu'on regarde le passé, et revient à « aujourd'hui » — si l'habitant ne l'a
+   pas éteint lui-même. Le bouton « Zonage du PLU » reste le seul maître. */
+function _c3dZonesSelonTemps(){
+  var b = document.getElementById('c3d-btn-zones');
+  var voulu = !b || b.getAttribute('aria-pressed') === 'true';
+  var vis = voulu && _c3dTempsPos === null && !_c3dTerrActif;
+  ['zones-fill','zones-line'].forEach(function(l){
+    if (_c3dMap && _c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', vis ? 'visible' : 'none');
+  });
+}
+
+/* En dessous de son zoom minimal, une époque ne se dessine pas : on verrait
+   le fond actuel sous l'étiquette « XVIIIᵉ siècle ». On le dit. */
+function _c3dTempsAvertirZoom(){
+  var w = document.getElementById('c3d-temps-zoom');
+  if (!w || !_c3dMap) return;
+  var ep = _c3dTempsPos === null ? null : _c3dTempsEpoqueA(_c3dTempsPos);
+  w.hidden = !(ep && ep.minzoom && _c3dMap.getZoom() < ep.minzoom);
+}
+
+function _c3dTempsConstruire(){
+  var n = _c3dTempsDispo.length;
+  var c = document.getElementById('c3d-temps-curseur');
+  var rep = document.getElementById('c3d-temps-reperes');
+  var etat = document.getElementById('c3d-temps-etat');
+  if (!n){
+    if (c) c.hidden = true;
+    if (rep) rep.innerHTML = '';
+    if (etat) etat.innerHTML = 'Les cartes anciennes de l’IGN n’ont pas répondu. '
+      + 'Touchez « 🔎 Détail des sources » pour savoir pourquoi.';
+    return;
+  }
+  if (etat) etat.textContent = 'Glissez vers la gauche pour remonter le temps.';
+  c.hidden = false;
+  c.max = String(n * C3D_TEMPS_PAS);
+  c.value = String(n * C3D_TEMPS_PAS);
+  rep.innerHTML = _c3dTempsDispo.concat([C3D_AUJOURDHUI]).map(function(ep, k){
+    return '<li><button type="button" data-id="' + ep.id + '" data-pas="' + (k * C3D_TEMPS_PAS)
+         + '" aria-pressed="false">' + _c3dEsc(ep.quand) + '</button></li>';
+  }).join('');
+  rep.querySelectorAll('button').forEach(function(b){
+    b.onclick = function(){
+      c.value = b.getAttribute('data-pas');
+      _c3dTempsAppliquer(Number(c.value));
+    };
+  });
+  c.oninput = function(){ _c3dTempsAppliquer(Number(c.value)); };
+  /* Au clavier, une flèche saute d'une époque entière : 1 unité sur 300,
+     c'est une touche qu'on enfonce trente fois pour ne rien voir changer. */
+  c.onkeydown = function(e){
+    var d = { ArrowLeft:-1, ArrowDown:-1, PageDown:-1, ArrowRight:1, ArrowUp:1, PageUp:1 }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    var cible = (Math.round(Number(c.value) / C3D_TEMPS_PAS) + d) * C3D_TEMPS_PAS;
+    c.value = String(Math.max(0, Math.min(n * C3D_TEMPS_PAS, cible)));
+    _c3dTempsAppliquer(Number(c.value));
+  };
+  _c3dTempsAppliquer(n * C3D_TEMPS_PAS);
+}
+
+/* Le bandeau d'état passe SOUS le panneau tant qu'il est ouvert : aucun
+   panneau ne recouvre un message (même règle que RG-17.27 pour les boutons). */
+function _c3dTempsPlacerStatut(ouvert){
+  var p = document.getElementById('c3d-temps'), s = document.getElementById('c3d-statut');
+  if (!s) return;
+  s.style.top = ouvert && p ? (p.offsetTop + p.offsetHeight + 8) + 'px' : '';
+}
+
+function _c3dTempsOuvrir(on){
+  var p = document.getElementById('c3d-temps');
+  if (!p) return;
+  if (!on){
+    p.hidden = true;
+    var c = document.getElementById('c3d-temps-curseur');
+    if (c && _c3dTempsDispo.length){ c.value = c.max; _c3dTempsAppliquer(Number(c.max)); }
+    _c3dTempsPlacerStatut(false);
+    return;
+  }
+  p.hidden = false;
+  var etat = document.getElementById('c3d-temps-etat');
+  if (!_c3dTempsDispo.length && etat) etat.textContent = 'Recherche des cartes anciennes de l’IGN…';
+  _c3dTempsPlacerStatut(true);
+  _c3dTempsSonder().then(function(){
+    _c3dTempsPoserCouches();
+    _c3dTempsConstruire();
+    var d = document.getElementById('c3d-btn-diag');
+    if (d) d.hidden = false;
+    _c3dTempsPlacerStatut(!p.hidden);
+    /* Le zonage se referme sur le passé : on recadre sur le bourg, où les
+       trois époques se comparent le mieux, sauf si l'habitant est déjà près. */
+    if (_c3dMap && _c3dMap.getZoom() < 14 && _c3dTempsDispo.length)
+      _c3dMap.easeTo({ center:C3D_CENTRE, zoom:15, duration:1200 });
+  });
 }
 
 /* Trois clignotements à l'ouverture, puis plus rien. Le bouton ne se

@@ -5,6 +5,37 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.124] — 22 septembre 2026
+
+### Ajouté
+
+- **« Remonter le temps »** dans la carte 3D (`js/mat-carte3d.js`, RG-17.31, ADR-0051) :
+  curseur en fondu entre Cassini (XVIIIᵉ), l'état-major (XIXᵉ), les photos aériennes
+  1950-1965 et le fond actuel. ⛔ Format et zooms de chaque couche **relevés à
+  l'exécution** par une tuile témoin, jamais écrits — une époque muette n'est pas
+  proposée et s'inscrit au « Détail des sources ». Sept tests dans `carte3d.spec.js`,
+  sur un IGN simulé qui répond de trois façons.
+
+---
+
+## [4.123] — 22 septembre 2026
+
+### Corrigé
+
+- **Le raccourci « Signalement » ouvrait l'accueil.** `./#signal` était déclaré au
+  manifeste sans être routé par `handleMatHashRoute`. Routé, avec `#agenda`.
+  Verrouillé par `tests/e2e/manifeste-raccourcis.spec.js`, qui ouvre chaque raccourci.
+
+### Ajouté
+
+- Raccourcis **Météo** et **Agenda** sur l'icône.
+- `screenshots` au manifeste (4 captures WebP, `img/screenshots/`) : fiche
+  d'installation enrichie sur Chrome Android. L'accueil du film est écarté (annonce
+  fabriquée).
+- `launch_handler: navigate-existing` : réutilisation de la fenêtre ouverte.
+
+---
+
 ## [4.122] — 17 septembre 2026
 
 ### Corrigé
