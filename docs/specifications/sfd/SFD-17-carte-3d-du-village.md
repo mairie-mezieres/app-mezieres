@@ -244,6 +244,34 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   même statut que les toits en pente de RG-17.15. Sans lui, un nom posé au ras du sol à côté
   d'une maison semblerait nommer la maison — et un marqueur HTML n'étant jamais occulté par
   le bâti, un nom lointain flotterait sur les maisons du premier plan.
+- **RG-17.31 — « Remonter le temps » : une époque se relève, elle ne se suppose pas.**
+  Un curseur fait défiler, en fondu, trois documents de l'IGN puis le fond actuel :
+  `GEOGRAPHICALGRIDSYSTEMS.CASSINI` (XVIIIᵉ siècle), `GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40`
+  (XIXᵉ siècle) et `ORTHOIMAGERY.ORTHOPHOTOS.1950-1965`. Seuls ces **identifiants** sont
+  écrits dans le code. Leur **format d'image** et leur **plage de zoom** ne le sont pas :
+  `data.geopf.fr` est bloqué depuis l'environnement de développement, ils ne pouvaient donc
+  pas être vérifiés. La carte les **relève** à la première ouverture du panneau
+  (`_c3dSonderEpoque`) : une tuile témoin au zoom 14 au-dessus du bourg dans chaque format,
+  puis les zooms voisins, en plage **contiguë**. Une réponse n'est une tuile que si c'est
+  une **image** (un 200 en XML n'en est pas une).
+  ⛔ **Une époque qui ne répond pas n'est pas proposée** : aucun repère, aucune couche. Elle
+  est inscrite au « 🔎 Détail des sources » avec la phrase du serveur (RG-17.3, RG-17.4).
+  Si aucune ne répond, le panneau le dit et le curseur est retiré.
+  ⚠️ **Les dates sont celles des documents, à la précision où on peut les affirmer** :
+  « XVIIIᵉ siècle » et non une année — la carte de Cassini a été levée sur plusieurs
+  décennies, et l'année de la feuille de Mézières n'est pas connue ici.
+  ⚠️ **Le fondu exige un empilement précis** : couches d'époque juste au-dessus du fond,
+  la plus ancienne en haut ; l'époque k a pour opacité `k + 1 − v` bornée à [0, 1]
+  (`_c3dTempsOpacites`). Tant qu'on regarde le passé, **le zonage s'efface** (il brouille
+  une carte ancienne) et revient à « Aujourd'hui » si le bouton « Zonage du PLU » est
+  toujours actif — ce bouton reste le seul maître. Sous le zoom minimal relevé d'une
+  époque, un avertissement le dit : sinon le fond actuel s'afficherait sous l'étiquette
+  « XVIIIᵉ siècle ». En **vue territoire**, le bouton est retiré et le curseur revient à
+  aujourd'hui (les cartes anciennes ne descendent pas à cette échelle).
+  Au clavier, une flèche saute **d'une époque entière** ; le libellé lu (`aria-valuetext`,
+  région `aria-live`) ne change qu'avec l'époque la plus proche, pas à chaque pixel.
+  Le panneau ne recouvre ni un bouton, ni le zoom de MapLibre, ni le bandeau d'état, qu'il
+  repousse sous lui (prolongement de RG-17.27). Voir ADR-0051.
 
 ## 5. Parcours
 

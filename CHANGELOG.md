@@ -5,6 +5,19 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.124] — 22 septembre 2026
+
+### Ajouté
+
+- **« Remonter le temps »** dans la carte 3D (`js/mat-carte3d.js`, RG-17.31, ADR-0051) :
+  curseur en fondu entre Cassini (XVIIIᵉ), l'état-major (XIXᵉ), les photos aériennes
+  1950-1965 et le fond actuel. ⛔ Format et zooms de chaque couche **relevés à
+  l'exécution** par une tuile témoin, jamais écrits — une époque muette n'est pas
+  proposée et s'inscrit au « Détail des sources ». Sept tests dans `carte3d.spec.js`,
+  sur un IGN simulé qui répond de trois façons.
+
+---
+
 ## [4.123] — 22 septembre 2026
 
 ### Corrigé

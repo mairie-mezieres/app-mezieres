@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.123.0';
+const CACHE = 'mat-v4.124.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -26,7 +26,7 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.25',
+  './css/mat.css?v=4.14.26',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
   './js/mat-core.js?v=4.4.2'
@@ -37,7 +37,7 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.25',
+  './css/mat.css?v=4.14.26',
   './css/mat-desktop.css?v=4.6.0',
   './css/fonts.css?v=2',
   './js/mat-config.js?v=1',
@@ -52,7 +52,7 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.5.1',
   './js/mat-trombi.js?v=4.3.0',
   './js/mat-mel.js?v=4.5.3',
-  './js/mat-boot.js?v=4.13.0',
+  './js/mat-boot.js?v=4.13.1',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -73,7 +73,7 @@ const PRECACHE_URLS = [
   // instantanée ; le chargement à la demande sert la première visite, qui
   // n'a pas encore de service worker. Retirer cette ligne ne gagnerait rien
   // au premier chargement et rendrait la carte plus lente ensuite.
-  './js/mat-carte3d.js?v=1.9.0',
+  './js/mat-carte3d.js?v=1.10.0',
   './js/mat-guide-arrivee.js?v=1.0.8',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.5.0',
