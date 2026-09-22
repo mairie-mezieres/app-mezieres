@@ -2,7 +2,7 @@
 
 - **Date** : 22 septembre 2026
 - **Statut** : accepté
-- **Concerne** : `js/mat-carte3d.js` (`_c3dSonderEpoque`, `_c3dTempsOpacites`), `SFD-17` §RG-17.31
+- **Concerne** : `js/mat-carte3d.js` (`_c3dSonderEpoque`, `_c3dRideauCreer`, `_c3dRideauPoser`), `SFD-17` §RG-17.31
 
 ## Contexte
 
@@ -67,10 +67,10 @@ opaque dessous. Un simple mélange des opacités laisserait transparaître le fo
 ## Conséquences
 
 - ✅ Si l'IGN change un format ou ajoute des niveaux, la carte suit sans modification.
-- ✅ Le bâti 3D d'aujourd'hui reste en relief par-dessus les cartes anciennes : on voit
-  d'un coup d'œil ce qui a été construit depuis. Le zonage, lui, s'efface tant qu'on
-  regarde le passé, car il brouille une carte ancienne. Il revient à « Aujourd'hui » si le
-  bouton « Zonage du PLU » est toujours actif.
+- ✅ *(v4.125, rideau)* La moitié « passé » ne montre que la carte ancienne et le
+  contour communal ; le bâti 3D et le zonage restent du côté « aujourd'hui », sous le
+  contrôle de leurs boutons. *(En v4.124, avec le fondu, le bâti restait par-dessus les
+  cartes anciennes et le zonage s'effaçait : abandonné avec lui.)*
 - ⚠️ **Rien de ceci n'a pu être vu sur les vraies tuiles depuis le développement.** Les
   tests (`carte3d.spec.js`, section « Remonter le temps ») simulent un IGN qui répond de
   trois façons : une époque en JPEG, une en PNG sur d'autres zooms, une qui refuse. La
