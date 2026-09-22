@@ -5,6 +5,20 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.124.1] — 22 septembre 2026
+
+### Corrigé
+
+- **Cassini absente de « Remonter le temps ».** Premier passage en production : le
+  « Détail des sources » a relevé l'état-major (`image/jpeg`, z11-15) et les photos
+  1950-1965 (`image/png`, z11-18), mais Cassini répondait « HTTP 400 / HTTP 400 ».
+  L'identifiant servi par le WMTS est `BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI`
+  (exemplaire BnF), pas le nom court. Le relevé a fonctionné comme prévu : l'époque en
+  échec n'a jamais été proposée. Voir ADR-0051 §« Premier passage en production ».
+- Un refus sans `ExceptionText` affiche désormais le début du corps de la réponse.
+
+---
+
 ## [4.124] — 22 septembre 2026
 
 ### Ajouté
