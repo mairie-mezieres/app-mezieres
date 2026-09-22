@@ -1884,7 +1884,6 @@ function _c3dBrancher(){
     ['zones-fill','zones-line'].forEach(function(l){
       if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
     });
-    _c3dZonesSelonTemps();
     var lg = document.getElementById('c3d-legende');
     if (lg) lg.hidden = !(on && _c3dZones);
   });
@@ -1899,8 +1898,8 @@ function _c3dBrancher(){
     var t = document.querySelector('#c3d-btn-terr span');
     if (t) t.textContent = on ? 'Revenir au village' : 'Le territoire';
     /* Les cartes anciennes ne descendent pas à l'échelle des 25 communes :
-       le curseur afficherait « XVIIIᵉ siècle » au-dessus du fond actuel. On
-       revient à aujourd'hui et on retire le bouton le temps de la visite. */
+       la moitié « passé » serait un aplat sous l'étiquette « XVIIIᵉ siècle ».
+       On referme le rideau et on retire le bouton le temps de la visite. */
     var bt = document.getElementById('c3d-btn-temps');
     if (on && bt && bt.getAttribute('aria-pressed') === 'true'){
       bt.setAttribute('aria-pressed', 'false');
@@ -1926,9 +1925,10 @@ function _c3dBrancher(){
 }
 
 /* ── Remonter le temps ──────────────────────────────────────────────────
-   Un curseur fait défiler les époques du village, des plus anciennes à
-   aujourd'hui, en fondu : on voit apparaître les lotissements sur les champs
-   de 1950, et la forêt bouger depuis Cassini.
+   Un rideau coupe l'écran en deux : à gauche une époque ancienne, à droite
+   aujourd'hui. On voit apparaître les lotissements sur les champs de 1950,
+   et la forêt bouger depuis Cassini. (Le fondu de la v4.124 a été retiré :
+   voir « Le rideau » plus bas.)
 
    ⛔ AUCUNE ÉPOQUE N'EST SUPPOSÉE DISPONIBLE. Les identifiants de couche
    ci-dessous sont ceux du Géoportail, mais leur format d'image et leurs
@@ -1961,15 +1961,12 @@ var C3D_EPOQUES = [
     quand:'1950-1965',     titre:'Photographies aériennes',
     attribution:'© IGN' }
 ];
-var C3D_AUJOURDHUI = { id:'aujourdhui', quand:'Aujourd’hui', titre:'Le fond de carte actuel' };
 var C3D_TEMPS_FORMATS = ['image/jpeg', 'image/png'];
 var C3D_TEMPS_REF = 14;                              // zoom de la tuile témoin
 var C3D_TEMPS_ZOOMS = [11, 12, 13, 14, 15, 16, 17, 18];
-var C3D_TEMPS_PAS = 100;                             // unités de curseur par époque
 
 var _c3dTempsSonde = null;     // promesse mémorisée : un seul sondage par session
 var _c3dTempsDispo = [];       // époques relevées, de la plus ancienne à la plus récente
-var _c3dTempsPos = null;       // position du curseur ; null = aujourd'hui
 
 function _c3dWmts(couche, format, z, x, y){
   return 'https://data.geopf.fr/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile'
@@ -2047,124 +2044,201 @@ function _c3dTempsSonder(){
   return _c3dTempsSonde;
 }
 
-/* Les couches d'époque vont juste au-dessus du fond (photo ou plan), donc
-   SOUS le zonage, le bâti et les noms. Ajoutées de la plus récente à la plus
-   ancienne devant la même couche : la plus ancienne finit au-dessus. C'est
-   l'ordre qu'exige le fondu de `_c3dTempsOpacites`. */
-function _c3dTempsPoserCouches(){
-  if (!_c3dMap) return;
-  var couches = (_c3dMap.getStyle().layers || []).map(function(l){ return l.id; });
-  var devant = couches[couches.indexOf('l-ortho') + 1];
-  _c3dTempsDispo.slice().reverse().forEach(function(ep){
-    var src = 'temps-' + ep.id;
-    if (_c3dMap.getSource(src)) return;
-    _c3dMap.addSource(src, { type:'raster', tileSize:256,
+/* ── Le rideau ─────────────────────────────────────────────────────────
+   ⛔ PAS DE FONDU. La v4.124 superposait les époques par transparence :
+   à mi-course, on voyait une carte ancienne à moitié effacée sur la photo
+   d'aujourd'hui — un flou où l'on ne compare rien. Retour du terrain le jour
+   même : « ça fait à moitié une fondue, c'est pas fou ».
+
+   On coupe donc l'écran en deux : à GAUCHE l'époque choisie, entière et
+   opaque ; à DROITE aujourd'hui, avec le bâti en relief. Une poignée
+   verticale déplace la limite. C'est le geste des comparateurs « avant /
+   après » de l'IGN.
+
+   Mise en œuvre : une SECONDE carte MapLibre (`_c3dMapTemps`), réduite à la
+   couche d'époque et au contour communal, posée par-dessus la première et
+   découpée par `clip-path`. Elle ne reçoit aucun geste (`pointer-events:none`,
+   `interactive:false`) : c'est la carte principale qui bouge, et la seconde
+   RECOPIE sa caméra à chaque image (`_c3dRideauSuivre`). Une couche MapLibre
+   ne sait pas se découper sur une moitié d'écran ; deux cartes, si.
+   ⚠️ Elle est DÉTRUITE à la fermeture (`remove()`) : un contexte WebGL de plus,
+   c'est de la mémoire que le téléphone ne rend pas tout seul. */
+var _c3dMapTemps = null;       // la carte du passé, vivante seulement rideau ouvert
+var _c3dTempsChoix = null;     // id de l'époque montrée à gauche
+var _c3dRideau = 0.5;          // part de l'écran donnée au passé (0 à 1)
+
+function _c3dTempsEpoque(id){
+  for (var i = 0; i < _c3dTempsDispo.length; i++) if (_c3dTempsDispo[i].id === id) return _c3dTempsDispo[i];
+  return null;
+}
+
+function _c3dRideauSuivre(){
+  if (!_c3dMapTemps || !_c3dMap) return;
+  _c3dMapTemps.jumpTo({ center:_c3dMap.getCenter(), zoom:_c3dMap.getZoom(),
+                        bearing:_c3dMap.getBearing(), pitch:_c3dMap.getPitch() });
+}
+
+/* ⚠️ L'époque montrée est écrite DANS le style de départ : un
+   `setLayoutProperty` avant la fin du chargement du style ne fait rien, et la
+   moitié gauche restait vide (relevé par les tests). */
+function _c3dRideauCreer(choix){
+  if (_c3dMapTemps || !window.maplibregl) return;
+  var sources = {}, couches = [{ id:'fond', type:'background', paint:{ 'background-color':'#e9dfc7' } }];
+  _c3dTempsDispo.forEach(function(ep){
+    sources['temps-' + ep.id] = { type:'raster', tileSize:256,
       tiles:[_c3dWmts(ep.couche, ep.format, '{z}', '{x}', '{y}')],
-      minzoom:ep.minzoom, maxzoom:ep.maxzoom, attribution:ep.attribution });
-    _c3dMap.addLayer({ id:'l-' + src, type:'raster', source:src,
-      paint:{ 'raster-opacity':0, 'raster-fade-duration':0 } }, devant);
+      minzoom:ep.minzoom, maxzoom:ep.maxzoom, attribution:ep.attribution };
+    couches.push({ id:'l-temps-' + ep.id, type:'raster', source:'temps-' + ep.id,
+                   layout:{ visibility: ep.id === choix ? 'visible' : 'none' } });
+  });
+  if (_c3dContour){
+    sources.contour = { type:'geojson', data:{ type:'Feature', properties:{}, geometry:_c3dContour } };
+    couches.push({ id:'contour-ligne', type:'line', source:'contour',
+      paint:{ 'line-color':'#7a1f1f', 'line-width':2.4, 'line-opacity':0.8, 'line-dasharray':[2, 1.4] } });
+  }
+  _c3dMapTemps = new maplibregl.Map({
+    container:'c3d-map-temps', interactive:false, attributionControl:false,
+    center:_c3dMap.getCenter(), zoom:_c3dMap.getZoom(),
+    bearing:_c3dMap.getBearing(), pitch:_c3dMap.getPitch(), maxPitch:80,
+    style:{ version:8, sources:sources, layers:couches }
+  });
+  if (_c3dMapTemps.setSky) _c3dMapTemps.on('load', function(){
+    _c3dMapTemps.setSky({ 'sky-color':'#8fb8dd', 'horizon-color':'#e8eef2', 'fog-color':'#eef2f0',
+      'sky-horizon-blend':0.6, 'horizon-fog-blend':0.5, 'fog-ground-blend':0.15 });
+  });
+  _c3dMap.on('move', _c3dRideauSuivre);
+}
+
+function _c3dRideauDetruire(){
+  if (!_c3dMapTemps) return;
+  if (_c3dMap) _c3dMap.off('move', _c3dRideauSuivre);
+  _c3dMapTemps.remove();
+  _c3dMapTemps = null;
+}
+
+/* La part du passé se pose en `clip-path` sur la carte du dessus, et la
+   poignée suit. La pastille se place à mi-hauteur de l'espace LIBRE entre le
+   panneau et la colonne de boutons ; et le trait passe SOUS les boutons
+   (z-index), qui restent donc toujours atteignables (RG-17.27). */
+function _c3dRideauPoser(part){
+  _c3dRideau = Math.max(0, Math.min(1, part));
+  var calque = document.getElementById('c3d-map-temps');
+  var poignee = document.getElementById('c3d-rideau');
+  if (!calque || !poignee) return;
+  var pct = Math.round(_c3dRideau * 1000) / 10;
+  calque.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
+  poignee.style.left = pct + '%';
+  poignee.setAttribute('aria-valuenow', String(Math.round(pct)));
+  var ep = _c3dTempsEpoque(_c3dTempsChoix);
+  poignee.setAttribute('aria-valuetext', Math.round(pct) + ' % de l’écran pour '
+    + (ep ? ep.quand + ' — ' + ep.titre : 'le passé'));
+}
+
+function _c3dRideauHauteur(){
+  var wrap = document.querySelector('.c3d-wrap'), bouton = document.getElementById('c3d-rideau-bouton');
+  var p = document.getElementById('c3d-temps'), outils = document.querySelector('.c3d-outils');
+  if (!wrap || !bouton) return;
+  var h = wrap.clientHeight;
+  var haut = p && !p.hidden ? p.offsetTop + p.offsetHeight : 0;
+  var bas = outils ? outils.offsetTop : h;
+  var s = document.getElementById('c3d-statut');
+  if (s && !s.hidden && s.textContent) haut = Math.max(haut, s.offsetTop + s.offsetHeight);
+  bouton.style.top = Math.round(Math.max(haut + 30, (haut + bas) / 2)) + 'px';
+}
+
+function _c3dRideauGestes(){
+  var poignee = document.getElementById('c3d-rideau');
+  var wrap = document.querySelector('.c3d-wrap');
+  if (!poignee || !wrap || poignee.dataset.lie) return;
+  poignee.dataset.lie = '1';
+  var tire = false;
+  function versPart(e){
+    var r = wrap.getBoundingClientRect();
+    _c3dRideauPoser((e.clientX - r.left) / r.width);
+  }
+  /* Le trait entier se saisit (bande de 28 px), pas seulement la pastille :
+     sur un petit écran, la pastille peut passer sous les boutons. */
+  poignee.addEventListener('pointerdown', function(e){
+    tire = true; poignee.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  poignee.addEventListener('pointermove', function(e){ if (tire) versPart(e); });
+  poignee.addEventListener('pointerup', function(){ tire = false; });
+  poignee.addEventListener('pointercancel', function(){ tire = false; });
+  poignee.addEventListener('keydown', function(e){
+    var d = { ArrowLeft:-0.05, ArrowDown:-0.05, ArrowRight:0.05, ArrowUp:0.05,
+              PageDown:-0.25, PageUp:0.25 }[e.key];
+    if (e.key === 'Home') d = -1;
+    if (e.key === 'End') d = 1;
+    if (!d) return;
+    e.preventDefault();
+    _c3dRideauPoser(_c3dRideau + d);
   });
 }
 
-/* Fondu entre deux époques voisines. Époques empilées, la plus ancienne en
-   haut : à la position v (0 = la plus ancienne, n = aujourd'hui), l'époque k
-   a pour opacité k + 1 − v bornée à [0, 1]. Entre k et k+1, l'époque k
-   s'efface et laisse voir k+1, entièrement opaque en dessous ; les plus
-   anciennes sont à 0, les plus récentes à 1 mais cachées. */
-function _c3dTempsOpacites(v, n){
-  var out = [];
-  for (var k = 0; k < n; k++) out.push(Math.max(0, Math.min(1, k + 1 - v)));
-  return out;
-}
-
-/* L'époque « lue » à une position : la plus proche. C'est elle qu'on annonce,
-   et elle seule — pas chaque pixel du glissement. */
-function _c3dTempsEpoqueA(v){
-  var n = _c3dTempsDispo.length, i = Math.round(v);
-  return i >= n ? C3D_AUJOURDHUI : _c3dTempsDispo[Math.max(0, i)];
-}
-
-function _c3dTempsAppliquer(pas){
-  var n = _c3dTempsDispo.length;
-  var v = Math.max(0, Math.min(n, pas / C3D_TEMPS_PAS));
-  _c3dTempsPos = v >= n ? null : v;
-  var op = _c3dTempsOpacites(v, n);
-  _c3dTempsDispo.forEach(function(ep, k){
-    var l = 'l-temps-' + ep.id;
-    if (_c3dMap && _c3dMap.getLayer(l)) _c3dMap.setPaintProperty(l, 'raster-opacity', op[k]);
+function _c3dTempsMontrer(){
+  if (!_c3dMapTemps) return;
+  if (!_c3dMapTemps.isStyleLoaded()){ _c3dMapTemps.once('load', _c3dTempsMontrer); return; }
+  _c3dTempsDispo.forEach(function(e){
+    var l = 'l-temps-' + e.id;
+    if (_c3dMapTemps.getLayer(l))
+      _c3dMapTemps.setLayoutProperty(l, 'visibility', e.id === _c3dTempsChoix ? 'visible' : 'none');
   });
-  _c3dZonesSelonTemps();
-  var ep = _c3dTempsEpoqueA(v);
-  var c = document.getElementById('c3d-temps-curseur');
-  if (c) c.setAttribute('aria-valuetext', ep.quand + ' — ' + ep.titre);
-  var lu = document.getElementById('c3d-temps-lu');
-  var txt = ep.quand + ' — ' + ep.titre;
-  if (lu && lu.textContent !== txt) lu.textContent = txt;   // pas d'annonce à chaque pixel
+}
+
+function _c3dTempsChoisir(id){
+  var ep = _c3dTempsEpoque(id);
+  if (!ep || !_c3dMapTemps) return;
+  _c3dTempsChoix = id;
+  _c3dTempsMontrer();
   document.querySelectorAll('#c3d-temps-reperes button').forEach(function(b){
-    b.setAttribute('aria-pressed', String(b.getAttribute('data-id') === ep.id));
+    b.setAttribute('aria-pressed', String(b.getAttribute('data-id') === id));
   });
+  var lu = document.getElementById('c3d-temps-lu');
+  if (lu) lu.textContent = 'À gauche : ' + ep.quand + ' — ' + ep.titre + ' · à droite : aujourd’hui';
+  _c3dRideauPoser(_c3dRideau);
   _c3dTempsAvertirZoom();
 }
 
-/* Sur une carte ancienne, le zonage coloré brouille tout : il s'efface tant
-   qu'on regarde le passé, et revient à « aujourd'hui » — si l'habitant ne l'a
-   pas éteint lui-même. Le bouton « Zonage du PLU » reste le seul maître. */
-function _c3dZonesSelonTemps(){
-  var b = document.getElementById('c3d-btn-zones');
-  var voulu = !b || b.getAttribute('aria-pressed') === 'true';
-  var vis = voulu && _c3dTempsPos === null && !_c3dTerrActif;
-  ['zones-fill','zones-line'].forEach(function(l){
-    if (_c3dMap && _c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', vis ? 'visible' : 'none');
-  });
-}
-
-/* En dessous de son zoom minimal, une époque ne se dessine pas : on verrait
-   le fond actuel sous l'étiquette « XVIIIᵉ siècle ». On le dit. */
+/* En dessous de son zoom minimal, une époque ne se dessine pas : la moitié
+   gauche montrerait un aplat sous l'étiquette « XVIIIᵉ siècle ». On le dit. */
 function _c3dTempsAvertirZoom(){
   var w = document.getElementById('c3d-temps-zoom');
   if (!w || !_c3dMap) return;
-  var ep = _c3dTempsPos === null ? null : _c3dTempsEpoqueA(_c3dTempsPos);
+  var ep = _c3dMapTemps ? _c3dTempsEpoque(_c3dTempsChoix) : null;
   w.hidden = !(ep && ep.minzoom && _c3dMap.getZoom() < ep.minzoom);
 }
 
 function _c3dTempsConstruire(){
-  var n = _c3dTempsDispo.length;
-  var c = document.getElementById('c3d-temps-curseur');
   var rep = document.getElementById('c3d-temps-reperes');
   var etat = document.getElementById('c3d-temps-etat');
-  if (!n){
-    if (c) c.hidden = true;
+  var lu = document.getElementById('c3d-temps-lu');
+  if (!_c3dTempsDispo.length){
     if (rep) rep.innerHTML = '';
+    if (lu) lu.textContent = '';
     if (etat) etat.innerHTML = 'Les cartes anciennes de l’IGN n’ont pas répondu. '
       + 'Touchez « 🔎 Détail des sources » pour savoir pourquoi.';
     return;
   }
-  if (etat) etat.textContent = 'Glissez vers la gauche pour remonter le temps.';
-  c.hidden = false;
-  c.max = String(n * C3D_TEMPS_PAS);
-  c.value = String(n * C3D_TEMPS_PAS);
-  rep.innerHTML = _c3dTempsDispo.concat([C3D_AUJOURDHUI]).map(function(ep, k){
-    return '<li><button type="button" data-id="' + ep.id + '" data-pas="' + (k * C3D_TEMPS_PAS)
-         + '" aria-pressed="false">' + _c3dEsc(ep.quand) + '</button></li>';
+  if (etat) etat.textContent = 'Faites glisser la poignée pour comparer avec aujourd’hui.';
+  rep.innerHTML = _c3dTempsDispo.map(function(ep){
+    return '<li><button type="button" data-id="' + ep.id + '" aria-pressed="false">'
+         + _c3dEsc(ep.quand) + '</button></li>';
   }).join('');
   rep.querySelectorAll('button').forEach(function(b){
-    b.onclick = function(){
-      c.value = b.getAttribute('data-pas');
-      _c3dTempsAppliquer(Number(c.value));
-    };
+    b.onclick = function(){ _c3dTempsChoisir(b.getAttribute('data-id')); };
   });
-  c.oninput = function(){ _c3dTempsAppliquer(Number(c.value)); };
-  /* Au clavier, une flèche saute d'une époque entière : 1 unité sur 300,
-     c'est une touche qu'on enfonce trente fois pour ne rien voir changer. */
-  c.onkeydown = function(e){
-    var d = { ArrowLeft:-1, ArrowDown:-1, PageDown:-1, ArrowRight:1, ArrowUp:1, PageUp:1 }[e.key];
-    if (!d) return;
-    e.preventDefault();
-    var cible = (Math.round(Number(c.value) / C3D_TEMPS_PAS) + d) * C3D_TEMPS_PAS;
-    c.value = String(Math.max(0, Math.min(n * C3D_TEMPS_PAS, cible)));
-    _c3dTempsAppliquer(Number(c.value));
-  };
-  _c3dTempsAppliquer(n * C3D_TEMPS_PAS);
+  /* La plus ancienne d'abord : c'est l'écart le plus spectaculaire. */
+  var choix = _c3dTempsChoix && _c3dTempsEpoque(_c3dTempsChoix) ? _c3dTempsChoix : _c3dTempsDispo[0].id;
+  /* ⛔ Le calque s'affiche AVANT que la carte y naisse : créée dans un
+     conteneur masqué, MapLibre mesure 0 × 0 et dessine un canevas vide. Tout
+     le reste fonctionnait — couches, découpe, caméra — et la moitié gauche
+     montrait… aujourd'hui. Vu sur une capture, pas par les tests. */
+  document.getElementById('c3d-map-temps').hidden = false;
+  document.getElementById('c3d-rideau').hidden = false;
+  _c3dRideauCreer(choix);
+  _c3dRideauGestes();
+  _c3dTempsChoisir(choix);
+  _c3dRideauHauteur();
 }
 
 /* Le bandeau d'état passe SOUS le panneau tant qu'il est ouvert : aucun
@@ -2180,8 +2254,11 @@ function _c3dTempsOuvrir(on){
   if (!p) return;
   if (!on){
     p.hidden = true;
-    var c = document.getElementById('c3d-temps-curseur');
-    if (c && _c3dTempsDispo.length){ c.value = c.max; _c3dTempsAppliquer(Number(c.max)); }
+    var calque = document.getElementById('c3d-map-temps'), poignee = document.getElementById('c3d-rideau');
+    if (calque) calque.hidden = true;
+    if (poignee) poignee.hidden = true;
+    _c3dRideauDetruire();
+    _c3dTempsAvertirZoom();
     _c3dTempsPlacerStatut(false);
     return;
   }
@@ -2190,13 +2267,14 @@ function _c3dTempsOuvrir(on){
   if (!_c3dTempsDispo.length && etat) etat.textContent = 'Recherche des cartes anciennes de l’IGN…';
   _c3dTempsPlacerStatut(true);
   _c3dTempsSonder().then(function(){
-    _c3dTempsPoserCouches();
+    if (p.hidden) return;                 // refermé pendant le relevé
     _c3dTempsConstruire();
     var d = document.getElementById('c3d-btn-diag');
     if (d) d.hidden = false;
-    _c3dTempsPlacerStatut(!p.hidden);
-    /* Le zonage se referme sur le passé : on recadre sur le bourg, où les
-       trois époques se comparent le mieux, sauf si l'habitant est déjà près. */
+    _c3dTempsPlacerStatut(true);
+    _c3dRideauHauteur();
+    /* Recadrage sur le bourg, où les époques se comparent le mieux, sauf si
+       l'habitant est déjà près. */
     if (_c3dMap && _c3dMap.getZoom() < 14 && _c3dTempsDispo.length)
       _c3dMap.easeTo({ center:C3D_CENTRE, zoom:15, duration:1200 });
   });

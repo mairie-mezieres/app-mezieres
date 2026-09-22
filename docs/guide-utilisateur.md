@@ -791,13 +791,13 @@ sont volontairement estompées : on voit du premier coup d'œil où s'arrête M�
 chiffres annoncés en haut de l'écran (nombre de bâtiments, nombre de zones) ne comptent que
 ce qui est **dans la commune**.
 
-**🕰️ Remonter le temps** *(septembre 2026)*. Le bouton du même nom ouvre un curseur :
-glissez-le vers la gauche et le village remonte les époques, en fondu — les
-**photographies aériennes de 1950-1965**, la **carte de l'état-major** (XIXᵉ siècle), la
-**carte de Cassini** (XVIIIᵉ siècle). Cherchez votre maison : en 1955, c'était peut-être
-un champ. Les bâtiments d'aujourd'hui restent en relief par-dessus, ce qui montre d'un
-coup d'œil ce qui a été construit depuis ; le zonage, lui, s'efface le temps de regarder
-le passé. Au clavier, les flèches passent d'une époque à l'autre. Ces cartes viennent de
+**🕰️ Remonter le temps** *(septembre 2026)*. Le bouton du même nom coupe la carte en
+deux : **à gauche une carte ancienne, à droite aujourd'hui**. Faites glisser la poignée
+◀▶ pour déplacer la limite, et choisissez l'époque dans le panneau — la **carte de
+Cassini** (XVIIIᵉ siècle), la **carte de l'état-major** (XIXᵉ siècle), les
+**photographies aériennes de 1950-1965**. Posez la poignée sur votre rue : en 1955,
+votre maison était peut-être un champ. Au clavier, la poignée se déplace avec les
+flèches. Ces cartes viennent de
 l'IGN : si l'une ne répond pas, elle n'est pas proposée, et « 🔎 Détail des sources » dit
 pourquoi. Elles ne s'affichent pas en vue « Le territoire », à l'échelle des 25 communes.
 

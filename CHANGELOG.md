@@ -5,6 +5,32 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.125] — 22 septembre 2026
+
+### Modifié
+
+- **« Remonter le temps » : un rideau remplace le fondu.** Retour du terrain sur la
+  v4.124 : à mi-course, une carte à moitié transparente sur la photo actuelle, « ça fait
+  à moitié une fondue ». L'écran est coupé en deux, l'époque choisie **entière et
+  opaque** à gauche, aujourd'hui à droite, avec une poignée (`role="slider"`). Seconde
+  carte MapLibre (`_c3dMapTemps`) découpée par `clip-path`, qui recopie la caméra et est
+  détruite à la fermeture. ADR-0051 §« Le fondu remplacé par un rideau », RG-17.31.
+
+### Corrigé
+
+- **Tests verts, moitié gauche vide.** La seconde carte, créée dans un conteneur masqué,
+  mesurait 0 × 0, et `.maplibregl-map{position:relative}` écrasait la règle de classe du
+  calque. Vu sur une capture : le test mesure désormais la taille du canevas.
+- Le trait du rideau masquait les boutons de zoom (z-index 2 → 1).
+- **Préexistant** : `.c3d-wrap` en `overflow:hidden` restait défilable (la fiche du
+  bâtiment attend hors champ) ; un clic faisait glisser la carte de 89 px sous l'en-tête.
+  Passé en `overflow:clip`.
+- **Test instable préexistant** : « le bouton de diagnostic est réellement masqué »
+  mesurait parfois avant la construction de l'écran (2 à 5 échecs sur 20 sous charge,
+  `main` compris). Requêtes IGN tenues en suspens, attente de l'élément.
+
+---
+
 ## [4.124.1] — 22 septembre 2026
 
 ### Corrigé

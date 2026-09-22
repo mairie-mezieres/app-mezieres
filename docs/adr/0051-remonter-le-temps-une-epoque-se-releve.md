@@ -2,7 +2,7 @@
 
 - **Date** : 22 septembre 2026
 - **Statut** : accepté
-- **Concerne** : `js/mat-carte3d.js` (`_c3dSonderEpoque`, `_c3dTempsOpacites`), `SFD-17` §RG-17.31
+- **Concerne** : `js/mat-carte3d.js` (`_c3dSonderEpoque`, `_c3dRideauCreer`, `_c3dRideauPoser`), `SFD-17` §RG-17.31
 
 ## Contexte
 
@@ -55,7 +55,7 @@ les photos, qui est le nom même de la couche. Pas d'année : la carte de Cassin
 levée sur plusieurs décennies, et l'année de la feuille de Mézières n'est pas connue ici.
 Une année précise serait **inventée**, au sens exact d'ADR-0018.
 
-### 4. Le fondu repose sur un empilement, pas sur une superposition à parts égales
+### 4. ~~Le fondu repose sur un empilement~~ — abandonné en v4.125, voir « Le fondu remplacé par un rideau »
 
 Les couches d'époque sont posées juste au-dessus du fond et sous tout le reste (zonage,
 bâti, noms). La **plus ancienne est en haut**. À la position `v` du curseur (0 = la plus
@@ -67,10 +67,10 @@ opaque dessous. Un simple mélange des opacités laisserait transparaître le fo
 ## Conséquences
 
 - ✅ Si l'IGN change un format ou ajoute des niveaux, la carte suit sans modification.
-- ✅ Le bâti 3D d'aujourd'hui reste en relief par-dessus les cartes anciennes : on voit
-  d'un coup d'œil ce qui a été construit depuis. Le zonage, lui, s'efface tant qu'on
-  regarde le passé, car il brouille une carte ancienne. Il revient à « Aujourd'hui » si le
-  bouton « Zonage du PLU » est toujours actif.
+- ✅ *(v4.125, rideau)* La moitié « passé » ne montre que la carte ancienne et le
+  contour communal ; le bâti 3D et le zonage restent du côté « aujourd'hui », sous le
+  contrôle de leurs boutons. *(En v4.124, avec le fondu, le bâti restait par-dessus les
+  cartes anciennes et le zonage s'effaçait : abandonné avec lui.)*
 - ⚠️ **Rien de ceci n'a pu être vu sur les vraies tuiles depuis le développement.** Les
   tests (`carte3d.spec.js`, section « Remonter le temps ») simulent un IGN qui répond de
   trois façons : une époque en JPEG, une en PNG sur d'autres zooms, une qui refuse. La
@@ -101,3 +101,49 @@ Géoportail, n'est pas servi par le WMTS. Corrigé en v4.124.1.
 `ExceptionText` OGC. Depuis la v4.124.1, faute d'`ExceptionText`, le début du corps de la
 réponse est affiché, balises retirées. Leçon générale : **un identifiant relevé sur une
 page de visualisation n'est pas forcément celui du service de tuiles**.
+
+## Le fondu remplacé par un rideau (v4.125)
+
+Le §4 ci-dessus est **abandonné**. En production, le fondu s'est révélé décevant : à
+mi-course, une carte ancienne à moitié transparente sur la photo actuelle. On ne voit
+ni l'une ni l'autre, et donc on ne compare rien. Retour du terrain : « ça fait à moitié
+une fondue ».
+
+**Décision** : un rideau. L'écran est coupé en deux, l'époque choisie **entière et
+opaque** à gauche, aujourd'hui à droite. Une poignée déplace la limite, des boutons
+choisissent l'époque. Aucune transparence nulle part.
+
+Une couche MapLibre ne sait pas se découper sur une moitié d'écran. On pose donc une
+**seconde carte** (`_c3dMapTemps`), réduite à la couche d'époque et au contour, découpée
+par `clip-path`, sans aucun geste, et qui recopie la caméra de la première à chaque
+image. Elle est détruite à la fermeture : un contexte WebGL de plus, c'est de la mémoire
+que le téléphone ne rend pas tout seul.
+
+Le relevé des époques (§1 à §3) est **inchangé** : il a fait ses preuves en production.
+
+### Ce que les tests n'avaient pas vu, et ce qu'une capture a montré
+
+Tous les tests passaient, **et la moitié gauche montrait aujourd'hui**. Deux causes
+empilées, invisibles à des assertions qui interrogeaient les couches, la découpe et la
+caméra :
+
+1. La carte était créée dans un conteneur **encore masqué** : MapLibre mesure 0 × 0.
+2. La classe `.maplibregl-map { position: relative }`, posée par MapLibre, écrasait la
+   règle de **classe** `.c3d-map-temps { position: absolute; inset: 0 }` : le calque
+   retombait à 0 px de haut. La carte principale y échappait parce que sa règle vise un
+   **identifiant**.
+
+Le test mesure désormais la **taille réelle du canevas**, égale à celle du calque. Il
+échoue si l'on remet l'ancien ordre. C'est la règle 7 du CLAUDE.md (« un test qui
+n'interroge que le JS ne prouve pas qu'un effet est visible »), qui s'applique aussi aux
+cartes.
+
+Deux défauts voisins, trouvés par le test d'accessibilité des commandes :
+
+- à `z-index: 2`, le trait du rideau passait **par-dessus** les boutons de zoom de
+  MapLibre dès qu'il était à droite ; il est à 1, **sous** eux ;
+- `.c3d-wrap` était en `overflow:hidden`. La fiche d'un bâtiment attend hors champ
+  (`translateY(102%)`), ce qui allonge la zone défilable de ~90 px, et un clic faisait
+  glisser toute la carte sous l'en-tête. **Préexistant**, rendu visible par ce test.
+  Passé en `overflow:clip`, qui interdit tout défilement.
+
