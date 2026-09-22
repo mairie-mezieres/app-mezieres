@@ -855,6 +855,11 @@ function handleMatHashRoute(){
     if(h==='#signalements'){ setTimeout(function(){ if(typeof openSuivi==='function') openSuivi('signals'); }, 180); return; }
     if(h==='#bugs'){ setTimeout(function(){ if(typeof openSuivi==='function') openSuivi('bugs'); }, 180); return; }
     if(h==='#contact'){ setTimeout(function(){ if(typeof openContact==='function') openContact(); }, 180); return; }
+    // #signal et #agenda : cibles des raccourcis du manifeste (appui long sur
+    // l'icône). #signal y figurait depuis l'origine sans être routé ici : le
+    // raccourci « Signalement » ouvrait l'accueil, sans rien dire.
+    if(h==='#signal'){ setTimeout(function(){ if(typeof openSignal==='function') openSignal(); }, 180); return; }
+    if(h==='#agenda'){ setTimeout(function(){ if(typeof openAgenda==='function') openAgenda(); }, 180); return; }
     if(h==='#meteo'){ setTimeout(function(){ if(typeof openMeteo==='function') openMeteo(); }, 180); return; }
     if(h==='#dechets'){ setTimeout(function(){ if(typeof openDechets==='function') openDechets(); }, 180); return; }
     if(h==='#mel'){ setTimeout(function(){ openMel(); }, 180); return; }

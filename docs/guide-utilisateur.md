@@ -62,6 +62,8 @@ L'installation est facultative mais recommandée : vous retrouvez MAT sur l'écr
 
 L'icône MAT apparaît sur votre écran d'accueil. L'application se comporte ensuite comme une application native.
 
+**Raccourcis** : un appui long sur l'icône MAT (Android, et ordinateur via clic droit) propose d'ouvrir directement **MEL**, **Signalement**, **Météo** ou **Agenda**. Sur Android, la fenêtre d'installation affiche aussi quelques captures de l'application.
+
 ---
 
 ## 3. L'écran d'accueil

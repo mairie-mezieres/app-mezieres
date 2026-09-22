@@ -5,6 +5,24 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.123] — 22 septembre 2026
+
+### Corrigé
+
+- **Le raccourci « Signalement » ouvrait l'accueil.** `./#signal` était déclaré au
+  manifeste sans être routé par `handleMatHashRoute`. Routé, avec `#agenda`.
+  Verrouillé par `tests/e2e/manifeste-raccourcis.spec.js`, qui ouvre chaque raccourci.
+
+### Ajouté
+
+- Raccourcis **Météo** et **Agenda** sur l'icône.
+- `screenshots` au manifeste (4 captures WebP, `img/screenshots/`) : fiche
+  d'installation enrichie sur Chrome Android. L'accueil du film est écarté (annonce
+  fabriquée).
+- `launch_handler: navigate-existing` : réutilisation de la fenêtre ouverte.
+
+---
+
 ## [4.122] — 17 septembre 2026
 
 ### Corrigé

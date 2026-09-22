@@ -894,6 +894,24 @@ service.
 `manifest.webmanifest` définit le nom, les icônes, la couleur de thème et l'orientation.  
 Vérifier la cohérence avec `<meta name="theme-color">` dans `index.html`.
 
+**Raccourcis (`shortcuts`, v4.123)** — MEL, Signalement, Météo, Agenda. ⛔ **Un raccourci
+n'est rien tant que son hash n'est pas routé** par `handleMatHashRoute` (`js/mat-core.js`) :
+`./#signal` figurait au manifeste depuis l'origine sans être routé, et le raccourci ouvrait
+l'accueil sans rien dire. `tests/e2e/manifeste-raccourcis.spec.js` ouvre chaque raccourci
+déclaré et exige son écran — en ajouter un, c'est aussi l'ajouter à la table `ECRAN` du test.
+
+**Captures (`screenshots`, v4.123)** — `img/screenshots/*.webp`, fiche d'installation
+enrichie de Chrome Android (`form_factor: narrow` ; aucune capture `wide`, donc pas de fiche
+enrichie sur ordinateur). Tirées des écrans du film (`film/ecrans/`). ⛔ **Aucune capture
+ne montre d'annonce communale** : l'accueil du film affiche une « Brocante de la commune »
+fabriquée, qui se lirait comme une information de la mairie — il est donc écarté (même
+règle que `film/README.md`). ⚠️ Chrome **ignore sans erreur** une capture non conforme
+(taille déclarée ≠ réelle, côté < 320 ou > 3840 px, ratio > 2,3) : le test le vérifie. Ces
+images ne sont **pas précachées** — seul le navigateur les lit, à l'installation.
+
+**`launch_handler: navigate-existing`** — un raccourci ou un lien capturé réutilise la
+fenêtre déjà ouverte : c'est une navigation de fragment, donc `hashchange` → même routage.
+
 ### 🎨 Aperçu des ambiances (outil mairie, v4.51)
 
 Pour visualiser une ambiance sans attendre la météo ou la saison correspondante :
