@@ -1068,6 +1068,7 @@ async function simulerIGNAncien(page, reponses) {
     const f = u.searchParams.get('FORMAT');
     if (r.format === f && z >= r.min && z <= r.max)
       return route.fulfill({ status: 200, contentType: f, body: PNG_1PX });
+    if (r.corpsBrut) return route.fulfill({ status: 400, contentType: 'application/json', body: r.corpsBrut });
     return route.fulfill({ status: 400, contentType: 'application/xml',
       body: '<ExceptionReport><Exception><ExceptionText>' + (r.refus || 'TileMatrix hors limites')
           + '</ExceptionText></Exception></ExceptionReport>' });
@@ -1075,7 +1076,7 @@ async function simulerIGNAncien(page, reponses) {
 }
 
 const IGN_TROIS_CAS = {
-  'GEOGRAPHICALGRIDSYSTEMS.CASSINI':      { format: 'image/jpeg', min: 11, max: 15 },
+  'BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI': { format: 'image/jpeg', min: 11, max: 15 },
   'ORTHOIMAGERY.ORTHOPHOTOS.1950-1965':   { format: 'image/png',  min: 12, max: 18 },
   'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40':  { format: 'image/aucun', min: 0, max: 0,
                                             refus: 'Layer inconnue' }
@@ -1173,6 +1174,27 @@ test.describe('Carte 3D — Remonter le temps', () => {
     expect(e.e1950).toBe(0);
     expect(e.zones, 'et revient à aujourd’hui').toBe('visible');
     await expect(page.locator('#c3d-temps')).toBeHidden();
+  });
+
+  /* Relevé en production le 22 septembre 2026 : sous son nom court, Cassini
+     répondait « HTTP 400 / HTTP 400 », et rien d'autre. Le bon identifiant
+     porte le préfixe de la BnF — et un refus doit dire ce que le serveur a
+     écrit, même sans `ExceptionText`. */
+  test('Cassini se demande sous son identifiant BnF, et un refus nu dit ce que le serveur a écrit', async ({ page }) => {
+    await simulerIGNAncien(page, {
+      'BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI': { format: 'image/aucun', min: 0, max: 0,
+        corpsBrut: '{"error":{"message":"Layer BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI indisponible"}}' }
+    });
+    await ouvrirCarte(page);
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-temps-etat')).toContainText('n’ont pas répondu', { timeout: 20000 });
+    const r = await page.evaluate(() => ({
+      couche: window.C3D_EPOQUES.find(e => e.id === 'cassini').couche,
+      motif: (window._c3dJournal.find(e => /Cassini/.test(e.nom)) || {}).detail
+    }));
+    expect(r.couche).toBe('BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI');
+    expect(r.motif).toContain('HTTP 400 — ');
+    expect(r.motif).toContain('indisponible');
   });
 
   test('IGN muet : aucune époque inventée, et on le dit', async ({ page }) => {

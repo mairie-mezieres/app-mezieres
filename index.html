@@ -88,7 +88,7 @@ document.documentElement.style.background = bg;
      Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
      module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
 <script defer src="js/mat-jeu.js?v=2.0.0"></script>
-<script defer src="js/mat-boot.js?v=4.13.1"></script>
+<script defer src="js/mat-boot.js?v=4.13.2"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.124 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.124.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -528,7 +528,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.124</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.124.1</button>
 </div>
 </div>
 </div>
@@ -1857,6 +1857,13 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 22 septembre 2026 — v4.124.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>La carte de Cassini arrive dans &laquo;&nbsp;Remonter le temps&nbsp;&raquo;.</strong> Elle &eacute;tait demand&eacute;e &agrave; l&rsquo;IGN sous un nom qu&rsquo;il ne sert pas, et restait donc absente du curseur. C&rsquo;est l&rsquo;exemplaire de la Biblioth&egrave;que nationale de France</li>
+<li>Quand une carte ancienne ne r&eacute;pond pas, le &laquo;&nbsp;D&eacute;tail des sources&nbsp;&raquo; affiche d&eacute;sormais la r&eacute;ponse de l&rsquo;IGN, et plus seulement un code d&rsquo;erreur</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 22 septembre 2026 — v4.124</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>🕰️ Remonter le temps</strong> dans &laquo;&nbsp;Mon village en 3D&nbsp;&raquo;&nbsp;: un curseur fait d&eacute;filer les &eacute;poques du village, en fondu, jusqu&rsquo;&agrave; aujourd&rsquo;hui&nbsp;&mdash; la <strong>carte de Cassini</strong> (XVIII<sup>e</sup>&nbsp;si&egrave;cle), la <strong>carte de l&rsquo;&eacute;tat-major</strong> (XIX<sup>e</sup>&nbsp;si&egrave;cle) et les <strong>photographies a&eacute;riennes de 1950-1965</strong>. Cherchez votre maison&nbsp;: &eacute;tait-elle un champ&nbsp;?</li>

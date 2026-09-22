@@ -9,7 +9,7 @@
 La carte 3D gagne un curseur qui fait défiler les époques du village en fondu :
 carte de Cassini (XVIIIᵉ siècle), carte de l'état-major (XIXᵉ siècle), photographies
 aériennes de 1950-1965, puis le fond actuel. L'IGN diffuse ces trois documents sur la
-Géoplateforme, et le Géoportail les nomme `GEOGRAPHICALGRIDSYSTEMS.CASSINI`,
+Géoplateforme, et le Géoportail les nomme `BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI`,
 `GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40` et `ORTHOIMAGERY.ORTHOPHOTOS.1950-1965`.
 
 Une tuile WMTS se demande avec ces **trois** paramètres : la couche, le **format d'image**
@@ -79,3 +79,25 @@ opaque dessous. Un simple mélange des opacités laisserait transparaître le fo
 - ❌ Le cadastre napoléonien n'est pas proposé. Il est conservé par les archives
   départementales et n'est pas diffusé en tuiles sur la Géoplateforme : le brancher
   supposerait une source qu'on n'a pas vérifiée.
+
+## Premier passage en production (22 septembre 2026, v4.124)
+
+Le relevé a fait exactement ce pour quoi il existe. Le « 🔎 Détail des sources » a
+affiché :
+
+- état-major : `image/jpeg`, zoom 11 à 15 ;
+- photographies 1950-1965 : `image/png`, zoom 11 à 18 ;
+- Cassini : **échec, « HTTP 400 / HTTP 400 »**.
+
+Deux formats différents, deux plages différentes : écrits à la main, ils auraient été
+faux pour l'une des deux couches au moins. Et Cassini, en échec, **n'a pas été
+proposée** : aucun fond actuel sous l'étiquette « XVIIIᵉ siècle ».
+
+La cause était l'**identifiant** : l'exemplaire diffusé est celui de la BnF, sous
+`BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI`. Le nom court, relevé sur une page du
+Géoportail, n'est pas servi par le WMTS. Corrigé en v4.124.1.
+
+⚠️ Le motif « HTTP 400 » seul ne disait rien de cela : le serveur ne répondait pas par un
+`ExceptionText` OGC. Depuis la v4.124.1, faute d'`ExceptionText`, le début du corps de la
+réponse est affiché, balises retirées. Leçon générale : **un identifiant relevé sur une
+page de visualisation n'est pas forcément celui du service de tuiles**.

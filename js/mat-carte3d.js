@@ -1947,7 +1947,11 @@ function _c3dBrancher(){
    la carte, sous « 🔎 Détail des sources » ; les allonger la fait chevaucher.
    MapLibre fusionne les mentions identiques, « © IGN » ne s'écrit qu'une fois. */
 var C3D_EPOQUES = [
-  { id:'cassini',   couche:'GEOGRAPHICALGRIDSYSTEMS.CASSINI',
+  /* ⚠️ Préfixe `BNF-IGNF_` OBLIGATOIRE : c'est l'exemplaire de la BnF. Le nom
+     court `GEOGRAPHICALGRIDSYSTEMS.CASSINI` (celui qu'affichent certaines
+     pages du Géoportail) répond HTTP 400 dans les deux formats — relevé en
+     production le 22 septembre 2026, au « Détail des sources ». */
+  { id:'cassini',   couche:'BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI',
     quand:'XVIIIᵉ siècle', titre:'Carte de Cassini',
     attribution:'© IGN, BnF' },
   { id:'etatmajor', couche:'GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40',
@@ -1990,8 +1994,15 @@ function _c3dSonderTuile(url){
   return fetch(url).then(function(r){
     var t = (r.headers && r.headers.get('content-type')) || '';
     if (r.ok && /^image\//i.test(t)) return { ok:true };
-    return (r.ok ? Promise.resolve('HTTP ' + r.status + ' — ' + (t || 'type inconnu'))
-                 : _c3dLireErreur(r)).then(function(d){ return { ok:false, motif:d }; });
+    if (r.ok) return { ok:false, motif:'HTTP ' + r.status + ' — ' + (t || 'type inconnu') };
+    /* « HTTP 400 » seul n'explique rien : c'est tout ce que le panneau a montré
+       quand l'identifiant de Cassini était faux. Faute d'`ExceptionText`, on
+       montre le début du corps, balises retirées. */
+    return r.text().then(function(corps){
+      var m = corps.match(/<(?:ows:)?ExceptionText[^>]*>([\s\S]*?)<\//i);
+      var dit = (m ? m[1] : corps.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim().slice(0, 140);
+      return { ok:false, motif:'HTTP ' + r.status + (dit ? ' — ' + dit : '') };
+    }, function(){ return { ok:false, motif:'HTTP ' + r.status }; });
   }).catch(function(e){ return { ok:false, motif:(e && e.message) || 'injoignable' }; });
 }
 

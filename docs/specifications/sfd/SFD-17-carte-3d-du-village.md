@@ -246,7 +246,8 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   le bâti, un nom lointain flotterait sur les maisons du premier plan.
 - **RG-17.31 — « Remonter le temps » : une époque se relève, elle ne se suppose pas.**
   Un curseur fait défiler, en fondu, trois documents de l'IGN puis le fond actuel :
-  `GEOGRAPHICALGRIDSYSTEMS.CASSINI` (XVIIIᵉ siècle), `GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40`
+  `BNF-IGNF_GEOGRAPHICALGRIDSYSTEMS.CASSINI` (XVIIIᵉ siècle — ⚠️ préfixe BnF obligatoire, le
+  nom court répond HTTP 400), `GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40`
   (XIXᵉ siècle) et `ORTHOIMAGERY.ORTHOPHOTOS.1950-1965`. Seuls ces **identifiants** sont
   écrits dans le code. Leur **format d'image** et leur **plage de zoom** ne le sont pas :
   `data.geopf.fr` est bloqué depuis l'environnement de développement, ils ne pouvaient donc
