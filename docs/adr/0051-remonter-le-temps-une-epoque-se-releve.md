@@ -147,3 +147,22 @@ Deux défauts voisins, trouvés par le test d'accessibilité des commandes :
   glisser toute la carte sous l'en-tête. **Préexistant**, rendu visible par ce test.
   Passé en `overflow:clip`, qui interdit tout défilement.
 
+## L'ouverture sur la plus détaillée (v4.125.1)
+
+Deuxième retour du terrain, sur le rideau : « les cartes ne sont pas en haute
+définition et on retrouve à peu près les mêmes informations ». C'est la nature des
+sources : Cassini (1/86 400) et l'état-major (1/40 000) s'arrêtent au zoom 15 et
+disent surtout routes, bois et hameaux. **Aucun réglage ne les rend nettes.** Seules
+les photographies de 1950-1965 descendent au zoom 18, au niveau des maisons.
+
+Or la v4.125 ouvrait sur la **plus ancienne**, donc la plus floue. L'ouverture montre
+désormais l'époque au **zoom maximal relevé le plus élevé** (à égalité, la plus
+récente), et la caméra s'approche du bourg jusqu'à ce zoom (plafonné à 17). Le choix se
+fait sur la mesure, pas sur un identifiant : si l'IGN sert un jour une série plus fine,
+elle passera devant d'elle-même (`_c3dTempsParDefaut`).
+
+⚠️ **Piste non branchée** : d'autres séries de photographies aériennes (décennies plus
+récentes) existent peut-être sur la Géoplateforme et feraient une vraie frise de photo en
+photo. Leurs identifiants n'ont pas pu être vérifiés depuis le développement ; le relevé
+les écarterait sans risque, mais on ne branche pas une couche sur une supposition.
+

@@ -265,8 +265,14 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   par transparence : à mi-course, une carte à moitié effacée sur la photo actuelle, où l'on
   ne compare rien (retour du terrain le jour même). L'écran est désormais coupé en deux :
   **à gauche l'époque choisie, entière et opaque ; à droite aujourd'hui**, bâti en relief
-  compris. Une poignée verticale déplace la limite ; des boutons choisissent l'époque, la
-  plus ancienne étant montrée d'abord.
+  compris. Une poignée verticale déplace la limite ; des boutons choisissent l'époque.
+  ⚠️ **L'ouverture montre l'époque la plus DÉTAILLÉE, pas la plus ancienne** (v4.125.1) :
+  celle dont le zoom maximal **relevé** est le plus élevé (à égalité, la plus récente),
+  puis la caméra s'approche du bourg jusqu'à ce zoom (plafonné à 17). Ouvrir sur Cassini
+  (1/86 400, zoom 15 au mieux) montrait une carte floue qui redit routes et bois :
+  « pas en haute définition, on retrouve à peu près les mêmes informations ». Aucun id
+  n'est écrit : une série plus fine servie un jour par l'IGN passerait devant d'elle-même
+  (`_c3dTempsParDefaut`).
   **Mise en œuvre** : une **seconde carte** MapLibre (`_c3dMapTemps`, couche d'époque +
   contour communal), posée sur la première et découpée par `clip-path`. Elle ne reçoit
   aucun geste et **recopie la caméra** de la carte principale à chaque image. Elle est
