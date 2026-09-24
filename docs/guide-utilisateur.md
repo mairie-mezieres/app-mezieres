@@ -792,10 +792,11 @@ chiffres annoncés en haut de l'écran (nombre de bâtiments, nombre de zones) n
 ce qui est **dans la commune**.
 
 **🕰️ Remonter le temps** *(septembre 2026)*. Le bouton du même nom coupe la carte en
-deux : **à gauche une carte ancienne, à droite aujourd'hui**. Faites glisser la poignée
-◀▶ pour déplacer la limite, et choisissez l'époque dans le panneau — la **carte de
-Cassini** (XVIIIᵉ siècle), la **carte de l'état-major** (XIXᵉ siècle), les
-**photographies aériennes de 1950-1965**. Posez la poignée sur votre rue : en 1955,
+deux : **à gauche une image ancienne, à droite aujourd'hui**. Elle s'ouvre sur les
+**photographies aériennes de 1950-1965**, les plus détaillées, et s'approche du bourg.
+Faites glisser la poignée ◀▶ pour déplacer la limite, et choisissez une autre époque
+dans le panneau — la **carte de l'état-major** (XIXᵉ siècle) ou la **carte de Cassini**
+(XVIIIᵉ siècle), plus anciennes mais moins précises. Posez la poignée sur votre rue : en 1955,
 votre maison était peut-être un champ. Au clavier, la poignée se déplace avec les
 flèches. Ces cartes viennent de
 l'IGN : si l'une ne répond pas, elle n'est pas proposée, et « 🔎 Détail des sources » dit

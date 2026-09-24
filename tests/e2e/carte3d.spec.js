@@ -1176,10 +1176,11 @@ test.describe('Carte 3D — Remonter le temps', () => {
 
     let e = await lire();
     expect(e.clip).toBe('inset(0px 50% 0px 0px)');
-    expect(e.cassini, 'la plus ancienne d’abord').toBe('visible');
-    expect(e.e1950).toBe('none');
+    // la plus DÉTAILLÉE d'abord (zoom max relevé 18 contre 15), pas la plus ancienne
+    expect(e.e1950, 'la plus détaillée d’abord').toBe('visible');
+    expect(e.cassini).toBe('none');
     expect(e.opacite === undefined || e.opacite === 1, 'jamais de fondu').toBe(true);
-    expect(e.lu).toContain('XVIIIᵉ siècle');
+    expect(e.lu).toContain('1950-1965');
     expect(e.canevas[0], 'la carte du passé a une taille').toBeGreaterThan(0);
     expect(e.canevas, 'celle de son calque').toEqual(e.calque);
 
@@ -1188,15 +1189,39 @@ test.describe('Carte 3D — Remonter le temps', () => {
     e = await lire();
     expect(e.valeur).toBe('55');
     expect(e.clip).toBe('inset(0px 45% 0px 0px)');
-    expect(e.texte).toContain('XVIIIᵉ siècle');
+    expect(e.texte).toContain('1950-1965');
     await page.keyboard.press('End');
     expect((await lire()).clip).toBe('inset(0px 0% 0px 0px)');
 
-    await page.locator('#c3d-temps-reperes button', { hasText: '1950-1965' }).click();
+    await page.locator('#c3d-temps-reperes button', { hasText: 'XVIIIᵉ siècle' }).click();
     e = await lire();
-    expect(e.cassini).toBe('none');
-    expect(e.e1950).toBe('visible');
-    expect(e.lu).toContain('1950-1965');
+    expect(e.cassini).toBe('visible');
+    expect(e.e1950).toBe('none');
+    expect(e.lu).toContain('XVIIIᵉ siècle');
+  });
+
+  /* Retour du terrain sur la v4.125 : ouvrir sur Cassini, c'était ouvrir sur la
+     carte la plus floue. L'époque d'ouverture se choisit sur le zoom maximal
+     RELEVÉ — donc sans id écrit en dur —, et la caméra s'approche jusque-là. */
+  test('l’ouverture montre l’époque la plus détaillée, et s’en approche', async ({ page }) => {
+    await simulerIGNAncien(page, IGN_TROIS_CAS);
+    await ouvrirCarte(page);
+    const r0 = await page.evaluate(() => {
+      const garde = window._c3dTempsDispo;
+      const essai = (dispo) => { window._c3dTempsDispo = dispo; return window._c3dTempsParDefaut(); };
+      const res = {
+        plusFine: essai([{ id: 'a', maxzoom: 15 }, { id: 'b', maxzoom: 18 }, { id: 'c', maxzoom: 16 }]),
+        egalite: essai([{ id: 'a', maxzoom: 17 }, { id: 'b', maxzoom: 17 }])
+      };
+      window._c3dTempsDispo = garde;
+      return res;
+    });
+    expect(r0.plusFine).toBe('b');
+    expect(r0.egalite, 'à égalité, la plus récente').toBe('b');
+
+    await page.locator('#c3d-btn-temps').click();
+    await expect(page.locator('#c3d-rideau')).toBeVisible({ timeout: 20000 });
+    await page.waitForFunction(() => Math.abs(window._c3dMap.getZoom() - 17) < 0.05, null, { timeout: 10000 });
   });
 
   test('la carte du passé suit la caméra d’aujourd’hui', async ({ page }) => {

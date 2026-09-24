@@ -189,3 +189,19 @@ Suite complète : 119 passés, 17 sautés, 0 échec.
   habitants. Priorité basse, audience différente.
 - **Remontée du contenu réellement lu vers 14–16 px** : à décider après retour
   sur téléphones réels, zone par zone, et non par passe globale.
+
+## Le décor n'est pas du texte (24 septembre 2026)
+
+Le relevé comptait les émojis du décor saisonnier (`.header-amb`, `js/mat-ambiance.js`) :
+feuilles 🍂, flocons, fanions, de 0,55 à 1 rem. Le test a rougi le **24 septembre**, sur
+des feuilles de 9,8 à 11,6 px, et **seulement du 23 au 25 septembre** : le décor
+d'automne ne vit que ces trois jours. Il a fait échouer une PR qui n'y touchait pas.
+
+Ce calque est `aria-hidden="true"` : ce sont des images écrites en émoji, pas du texte à
+lire. Le relevé ignore désormais tout texte sous `[aria-hidden="true"]`. Un test pose le
+décor d'automne **sans attendre la date**, vérifie qu'il contient bien des glyphes sous
+12 px (sinon il ne prouverait rien), qu'ils sont ignorés, et qu'un vrai texte de 9 px
+posé à côté est toujours détecté.
+
+⚠️ Leçon : **un contrôle qui dépend du calendrier ne se voit pas à l'écriture.** Les
+décors de Noël (15-30 décembre) et d'Halloween auraient fait la même chose.

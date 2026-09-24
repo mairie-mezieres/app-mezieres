@@ -5,6 +5,17 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.125.1] — 24 septembre 2026
+
+### Modifié
+
+- **« Remonter le temps » s'ouvre sur l'époque la plus détaillée** (photos 1950-1965,
+  zoom 18) au lieu de la plus ancienne (Cassini, zoom 15), et la caméra s'approche du
+  bourg. Choix sur le zoom maximal **relevé**, sans id en dur (`_c3dTempsParDefaut`).
+  ADR-0051 §« L'ouverture sur la plus détaillée ».
+
+---
+
 ## [4.125] — 22 septembre 2026
 
 ### Modifié

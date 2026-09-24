@@ -2208,6 +2208,20 @@ function _c3dTempsAvertirZoom(){
   w.hidden = !(ep && ep.minzoom && _c3dMap.getZoom() < ep.minzoom);
 }
 
+/* L'époque montrée à l'ouverture : la plus DÉTAILLÉE, pas la plus ancienne.
+   La v4.125 ouvrait sur Cassini (1/86 400, zoom 15 au mieux) : une carte floue
+   qui redit les routes et les bois qu'on connaît — retour du terrain : « pas en
+   haute définition, on retrouve à peu près les mêmes informations ». Seules les
+   photos aériennes descendent au niveau des maisons ; c'est là que le rideau
+   montre quelque chose. Choisie sur le zoom maximal RELEVÉ, jamais sur un id :
+   si l'IGN sert un jour une série plus fine, elle passera devant d'elle-même.
+   À égalité, la plus récente. */
+function _c3dTempsParDefaut(){
+  var meilleure = _c3dTempsDispo[0];
+  _c3dTempsDispo.forEach(function(ep){ if (ep.maxzoom >= meilleure.maxzoom) meilleure = ep; });
+  return meilleure.id;
+}
+
 function _c3dTempsConstruire(){
   var rep = document.getElementById('c3d-temps-reperes');
   var etat = document.getElementById('c3d-temps-etat');
@@ -2227,8 +2241,7 @@ function _c3dTempsConstruire(){
   rep.querySelectorAll('button').forEach(function(b){
     b.onclick = function(){ _c3dTempsChoisir(b.getAttribute('data-id')); };
   });
-  /* La plus ancienne d'abord : c'est l'écart le plus spectaculaire. */
-  var choix = _c3dTempsChoix && _c3dTempsEpoque(_c3dTempsChoix) ? _c3dTempsChoix : _c3dTempsDispo[0].id;
+  var choix = _c3dTempsChoix && _c3dTempsEpoque(_c3dTempsChoix) ? _c3dTempsChoix : _c3dTempsParDefaut();
   /* ⛔ Le calque s'affiche AVANT que la carte y naisse : créée dans un
      conteneur masqué, MapLibre mesure 0 × 0 et dessine un canevas vide. Tout
      le reste fonctionnait — couches, découpe, caméra — et la moitié gauche
@@ -2273,10 +2286,13 @@ function _c3dTempsOuvrir(on){
     if (d) d.hidden = false;
     _c3dTempsPlacerStatut(true);
     _c3dRideauHauteur();
-    /* Recadrage sur le bourg, où les époques se comparent le mieux, sauf si
-       l'habitant est déjà près. */
-    if (_c3dMap && _c3dMap.getZoom() < 14 && _c3dTempsDispo.length)
-      _c3dMap.easeTo({ center:C3D_CENTRE, zoom:15, duration:1200 });
+    /* On s'approche du bourg, jusqu'au détail que l'époque montrée sait
+       rendre (plafonné à 17 : au-delà, on ne voit plus le quartier). Rien ne
+       bouge si l'habitant est déjà aussi près. */
+    var ep = _c3dTempsEpoque(_c3dTempsChoix);
+    var cible = ep ? Math.min(17, ep.maxzoom) : 15;
+    if (_c3dMap && ep && _c3dMap.getZoom() < cible)
+      _c3dMap.easeTo({ center:C3D_CENTRE, zoom:cible, duration:1400 });
   });
 }
 

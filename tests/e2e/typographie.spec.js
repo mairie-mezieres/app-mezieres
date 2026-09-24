@@ -37,6 +37,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await page.waitForSelector('body.app-ready', { timeout: 15000 });
   await page.waitForTimeout(500);
+  await page.evaluate(`window.__releve = ${RELEVE.toString()}`);
 });
 
 // ⚠️ PORTÉE : écran mobile/PWA uniquement.
@@ -56,6 +57,15 @@ async function mobileSeulement(page) {
 }
 
 // Relève chaque nœud de texte réellement peint, avec sa taille calculée.
+//
+// ⚠️ Un texte sous `aria-hidden="true"` n'est pas du texte à lire : ce sont les
+// feuilles 🍂, flocons ❄ et fanions du décor saisonnier (`.header-amb`,
+// js/mat-ambiance.js), des IMAGES écrites en émoji. Le test les comptait : il a
+// rougi le 24 septembre 2026 sur des feuilles de 9,8 à 11,6 px — et seulement
+// du 23 au 25 septembre, le décor d'automne ne vivant que ces trois jours. Un
+// contrôle qui dépend du calendrier ne se voit pas à l'écriture : il échoue un
+// jour par hasard, sur une PR qui n'y est pour rien. D'où l'exclusion, et le
+// test « décor saisonnier » plus bas, qui FORCE l'automne au lieu d'attendre.
 const RELEVE = (plancher) => {
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   const fautifs = [];
@@ -65,6 +75,7 @@ const RELEVE = (plancher) => {
     if (!t) continue;
     const el = n.parentElement;
     if (!el) continue;
+    if (el.closest('[aria-hidden="true"]')) continue;   // décor, pas du texte
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') continue;
     const r = el.getBoundingClientRect();
@@ -79,6 +90,32 @@ const RELEVE = (plancher) => {
   }
   return { fautifs: [...new Set(fautifs)], total, sousPlancher };
 };
+
+/* Le décor saisonnier est posé SANS attendre la date : on appelle le même rendu
+   que l'application. Deux vérifications : les feuilles sont bien là et bien
+   petites (sinon le test ne prouverait rien), et le relevé les ignore — mais
+   il attrape toujours un vrai texte trop petit posé à côté (auto-contrôle). */
+test('décor saisonnier : ignoré par le relevé, qui voit encore un vrai texte trop petit', async ({ page }) => {
+  await mobileSeulement(page);
+  const r = await page.evaluate((plancher) => {
+    const header = document.querySelector('.header');
+    window._ambRenderParticles(header, 'automne');
+    const feuilles = [...header.querySelectorAll('.header-amb .amb-leaf')];
+    const petites = feuilles.filter((f) => parseFloat(getComputedStyle(f).fontSize) < plancher).length;
+    const avecDecor = window.__releve(plancher).fautifs.length;
+    const temoin = document.createElement('span');
+    temoin.textContent = 'témoin';
+    temoin.style.fontSize = '9px';
+    document.querySelector('.content').prepend(temoin);
+    const avecTemoin = window.__releve(plancher).fautifs;
+    temoin.remove();
+    return { feuilles: feuilles.length, petites, avecDecor, avecTemoin };
+  }, PLANCHER_PX);
+  expect(r.feuilles, 'le décor d’automne est posé').toBeGreaterThan(0);
+  expect(r.petites, 'et il contient bien des glyphes sous 12 px').toBeGreaterThan(0);
+  expect(r.avecDecor, 'que le relevé ignore').toBe(0);
+  expect(r.avecTemoin.some((f) => f.includes('témoin')), 'mais un vrai texte de 9 px est vu').toBe(true);
+});
 
 test('accueil : aucun texte peint sous 12 px', async ({ page }) => {
   await mobileSeulement(page);
