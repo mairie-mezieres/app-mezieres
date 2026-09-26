@@ -473,8 +473,50 @@
   }
 
   /* ── Bandeau d'accueil ────────────────────────────────────────
-     Rempli à l'étape « accueil : bandeau dernier conseil ». */
-  function _peindreBandeau() {}
+     Deux conteneurs .cm-bandeau (zone sombre mobile, haut de <main> au
+     bureau). Deux états — « Nouveau » (liseré or + pastille, tant que la
+     séance n'a pas été consultée) et « Vu » (style neutre) — au MÊME
+     emplacement. Données indisponibles → masqué via classList. */
+  function _bandeaux() {
+    return Array.prototype.slice.call(document.querySelectorAll('.cm-bandeau'));
+  }
+  function _estNouveau(seance) {
+    return seance && _lsGet(CLE_VU, '') !== seance.id;
+  }
+  function _peindreBandeau() {
+    var conts = _bandeaux();
+    var s = _derniereSeance();
+    if (_echec || !s) {
+      conts.forEach(function (el) { el.classList.remove('cm-visible'); el.innerHTML = ''; });
+      _peindreBadgeBureau(false);
+      return;
+    }
+    var decs = _dedoublonner(s.decisions, 'décision').length;
+    var texte = '🏛️ Conseil du ' + _dateJourMois(s.date) + ' : ' + decs + ' décision' + (decs > 1 ? 's' : '');
+    var nouveau = _estNouveau(s);
+    var aria = 'Conseil du ' + _dateJourMois(s.date) + ' : ' + decs + ' décision' + (decs > 1 ? 's' : '')
+      + (nouveau ? ' — nouveau' : '') + '. Voir les décisions.';
+    var html = '<button type="button" class="cm-ligne' + (nouveau ? ' is-nouveau' : '') + '"'
+      + ' data-conseil-action="bandeau" aria-label="' + _esc(aria) + '">'
+      + '<span class="cm-ligne-txt">' + _esc(texte) + '</span>'
+      + (nouveau ? '<span class="cm-ligne-new">Nouveau</span>' : '')
+      + '<span class="cm-ligne-chev" aria-hidden="true">›</span>'
+      + '</button>';
+    conts.forEach(function (el) { el.innerHTML = html; el.classList.add('cm-visible'); });
+    _peindreBadgeBureau(nouveau);
+  }
+  /* Pastille « Nouveau » du bouton 🏛️ Conseil de la navigation bureau —
+     même règle que le bandeau, même idiome que docs-badge-desktop. */
+  function _peindreBadgeBureau(on) {
+    var el = document.getElementById('conseil-badge-desktop');
+    if (el) el.style.display = on ? 'inline-flex' : 'none';
+  }
+  function _marquerVue() {
+    var s = _derniereSeance();
+    if (!s) return;
+    _lsSet(CLE_VU, s.id);
+    _peindreBandeau();
+  }
 
   /* ── Délégation d'événements ──────────────────────────────────
      AUCUN texte utilisateur dans un onclick : tout passe par data-*. */
@@ -529,6 +571,12 @@
   }
   function _action(action) {
     if (action === 'elus') { window.matConseilOnglet('elus'); return; }
+    if (action === 'bandeau') {
+      /* ADR-0032 : openConseil vit dans mat-core, jamais tenu pour acquis. */
+      if (typeof openConseil === 'function') openConseil('decisions');
+      _marquerVue();
+      return;
+    }
     if (action === 'ecouter') {
       if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking) {
         if (typeof ttsStop === 'function') ttsStop();

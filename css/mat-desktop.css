@@ -396,3 +396,17 @@ html.theme-sombre .d-sv-bandeau .sv-source,
 html.theme-sombre .d-sv-bandeau .sv-vide{color:#94a3b8}
 html.theme-sombre .d-sv-bandeau .sv-source a,
 html.theme-sombre .d-sv-bandeau .sv-part{color:#34d399}
+
+/* ── Bandeau « dernier conseil » au bureau ──
+   Le conteneur .cm-bandeau-d vit dans <main> : masqué sur mobile (les deux
+   sélecteurs pour battre .cm-visible à spécificité égale, ce fichier étant
+   chargé après mat.css), affiché à ≥ 1024 px comme .d-sv-bandeau. */
+.cm-bandeau-d,.cm-bandeau-d.cm-visible{display:none}
+@media(min-width:1024px){
+  .cm-bandeau-d.cm-visible{display:block;max-width:1400px;margin:20px auto 0;padding:0 32px}
+  .cm-bandeau-d .cm-ligne{background:#fff;border:1px solid var(--border,#e8f0ea);box-shadow:0 2px 8px rgba(26,61,43,.05);color:var(--forest)}
+  .cm-bandeau-d .cm-ligne.is-nouveau{box-shadow:0 2px 8px rgba(26,61,43,.05),inset 0 0 0 2px var(--gold)}
+  .cm-bandeau-d .cm-ligne-txt{font-size:.92rem}
+  .cm-bandeau-d .cm-ligne:focus-visible{outline:3px solid var(--sage-ink,#2d6a4f)}
+}
+html.theme-sombre .cm-bandeau-d .cm-ligne{background:#1e293b;border-color:rgba(255,255,255,.08);color:#f1f5f9}

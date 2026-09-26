@@ -2198,3 +2198,32 @@ html.theme-sombre .conseil-tabs{background:#1e293b;}
 .conseil-rail-lien.is-fait{background:var(--sage-ink);opacity:.9;}
 .conseil-rail-lib{margin-top:6px;font-size:0.9rem;font-weight:900;color:var(--text);}
 .conseil-projet-echeance{margin-top:8px;font-size:0.9rem;font-weight:800;color:var(--text);}
+
+/* ── Bandeau d'accueil « dernier conseil » ──
+   Même composant visuel que la ligne « Le saviez-vous ? » (hauteur, rayon,
+   typo). Deux états au même emplacement : Nouveau (liseré or + pastille)
+   et Vu (neutre). Masqué via classList tant que les données manquent. */
+.cm-bandeau{display:none;}
+.cm-bandeau.cm-visible{display:block;margin-top:8px;}
+.cm-ligne{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:9px 12px;border:none;border-radius:12px;cursor:pointer;
+  background:rgba(0,0,0,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  font-family:'Nunito',sans-serif;color:var(--cream);text-align:left;
+  min-height:44px;-webkit-tap-highlight-color:transparent;
+}
+.cm-ligne:active{transform:scale(.99);}
+.cm-ligne:focus-visible{outline:3px solid #a7f3d0;outline-offset:2px;}
+.cm-ligne-txt{flex:1;min-width:0;font-size:.78rem;font-weight:900;letter-spacing:.01em;}
+.cm-ligne-chev{font-size:1.1rem;font-weight:900;opacity:.7;flex-shrink:0;line-height:1;}
+.cm-ligne.is-nouveau{box-shadow:inset 0 0 0 2px var(--gold);}
+/* Encre sombre en dur sur fond or : var(--text) devient claire en thème
+   sombre et ne contrasterait plus (même choix que .ib-x). */
+.cm-ligne-new{
+  flex-shrink:0;background:var(--gold);color:#3d2000;border-radius:999px;
+  padding:3px 10px;font-size:.75rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:.05em;
+}
+/* Le bandeau suit « Le saviez-vous ? » : masqué par « Masquer l'en-tête »,
+   PAS par « Masquer la météo & transports » (il vit hors .header-bottom-grid). */
+html.no-header .cm-bandeau{display:none !important;}
