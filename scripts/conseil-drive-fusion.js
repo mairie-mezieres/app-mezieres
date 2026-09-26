@@ -180,7 +180,6 @@ function lire(f) { return JSON.parse(fs.readFileSync(f, 'utf8')); }
 function stop(m) { console.error('✗ ' + m); process.exit(1); }
 
 const conseil = lire(path.join(RACINE, 'data/conseil.json'));
-const etat = lire(path.join(RACINE, 'data/conseil-drive-etat.json'));
 const nouveaux = fs.existsSync(path.join(DIR, 'nouveaux.json')) ? lire(path.join(DIR, 'nouveaux.json')) : [];
 const chProp = path.join(DIR, 'proposition.json');
 if (!fs.existsSync(chProp)) stop('conseil-drive/proposition.json absent : l’agent n’a rien produit — échec, pas un « rien de nouveau ».');
@@ -191,25 +190,35 @@ if (fautes.length) stop('proposition refusée :\n  - ' + fautes.join('\n  - '));
 
 const journal = fusionner(conseil, prop);
 
-/* État des drive_id : ceux consommés par une séance, ceux écartés par l'agent
-   (avant-mandat, illisible, pas un compte rendu). Un fichier téléchargé que la
-   proposition ne mentionne NULLE PART n'est pas marqué : il sera retenté, et
-   le résumé de PR le dit — une absence ne se remarque pas toute seule. */
-const consommes = new Map();
-(prop.seances || []).forEach((s) => { if (s.drive_id) consommes.set(s.drive_id, s.id); });
+/* Deux mémoires, deux chemins — et c'est ce qui évite tout conflit :
+   - un fichier CONSOMMÉ (devenu séance) est mémorisé par son `drive_id` dans
+     data/conseil.json, qui voyage dans la PR draft : si la mairie refuse la
+     PR, le fichier sera re-proposé, ce qui est le bon comportement ;
+   - un fichier ÉCARTÉ (avant-mandat, illisible, pas un CR) est mémorisé dans
+     data/conseil-drive-etat.json, commité DIRECTEMENT sur main par le
+     workflow (comme la mémoire de veille, ADR-0027). Sans ça, un run sans
+     changement n'enregistrait rien : les 40 PDF du premier run réel auraient
+     été retéléchargés et relus par l'agent chaque mardi, à ~0,73 $ l'unité,
+     sans fin (ADR-0053 §7).
+   Un fichier que la proposition ne mentionne NULLE PART n'est ni l'un ni
+   l'autre : retenté, et nommé dans le résumé — une absence ne se remarque pas. */
+const consommes = new Set();
+(prop.seances || []).forEach((s) => { if (s.drive_id) consommes.add(s.drive_id); });
 const ecartes = new Map((prop.ecartes || []).map((e) => [e.driveId, e]));
+const aMemoriser = {};
 const oublies = [];
 nouveaux.forEach(({ driveId, nom }) => {
-  if (consommes.has(driveId)) etat.traites[driveId] = { seance: consommes.get(driveId), nom };
-  else if (ecartes.has(driveId)) etat.traites[driveId] = { ecarte: ecartes.get(driveId).raison || 'ecarte', nom };
-  else oublies.push(nom + ' (' + driveId + ')');
+  if (consommes.has(driveId)) return;
+  if (ecartes.has(driveId)) {
+    aMemoriser[driveId] = { ecarte: ecartes.get(driveId).raison || 'ecarte', nom, le: new Date().toISOString().slice(0, 10) };
+  } else oublies.push(nom + ' (' + driveId + ')');
 });
+fs.writeFileSync(path.join(DIR, 'ecartes.json'), JSON.stringify(aMemoriser, null, 2) + '\n');
 
 conseil.maj = new Date().toISOString().slice(0, 10);
 const jsonConseil = JSON.stringify(conseil, null, 2) + '\n';
 if (jsonConseil.length > 1024 * 1024) stop('data/conseil.json dépasserait 1 Mo : fusion suspecte, on n’écrit pas (ADR-0009).');
 fs.writeFileSync(path.join(RACINE, 'data/conseil.json'), jsonConseil);
-fs.writeFileSync(path.join(RACINE, 'data/conseil-drive-etat.json'), JSON.stringify(etat, null, 2) + '\n');
 
 const md = ['## Fusion du ' + conseil.maj, '', ...journal.map((l) => '- ' + l)];
 if (ecartes.size) { md.push('', '### Fichiers écartés'); ecartes.forEach((e) => md.push('- `' + e.driveId + '` — ' + (e.raison || 'écarté') + (e.detail ? ' : ' + String(e.detail).slice(0, 200) : ''))); }
@@ -217,5 +226,8 @@ if (oublies.length) { md.push('', '### ⚠️ Fichiers téléchargés mais ni in
 fs.writeFileSync(path.join(DIR, 'resume-pr.md'), md.join('\n') + '\n');
 
 const changements = journal.some((l) => !l.startsWith('⛔'));
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changements=' + (changements ? 'true' : 'false') + '\n');
+if (process.env.GITHUB_OUTPUT) {
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changements=' + (changements ? 'true' : 'false') + '\n'
+    + 'ecartes=' + Object.keys(aMemoriser).length + '\n');
+}
 console.log(journal.length ? journal.join('\n') : 'Aucun changement.');

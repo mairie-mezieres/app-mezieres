@@ -80,6 +80,42 @@ données ne bumpe ni le SW ni la version. La notification, c'est la PR
 elle-même (et les notifications GitHub qui vont avec) ; le push habitant
 « nouveau conseil » reste hors périmètre, comme au cahier des charges.
 
+### 7. ⛔ Premier run réel : un run sans changement ne retenait rien
+
+Le 26 septembre 2026, le premier run a relevé **41 fichiers** (le dossier
+porte tout l'historique, 2020 → 2026) et en a téléchargé 40. L'agent les a
+tous écartés, correctement — mais la mémoire des écartés ne voyageait que
+dans la PR, et sans changement il n'y a pas de PR : **rien n'était
+enregistré**. Chaque mardi, les mêmes 40 PDF auraient été retéléchargés et
+relus par l'agent, à ~0,73 $ le run, sans fin et sans signal.
+
+D'où **deux mémoires, deux chemins** :
+- un fichier devenu séance se mémorise par son `drive_id` dans
+  `data/conseil.json`, qui passe par la PR draft (refuser la PR, c'est
+  accepter qu'il soit re-proposé) ;
+- un fichier écarté se mémorise dans `data/conseil-drive-etat.json`,
+  **commité directement sur `main`** par le workflow, comme la mémoire de
+  veille (ADR-0027), depuis un checkout propre de `main`.
+Deux fichiers distincts : le commit direct et la PR ne peuvent pas entrer
+en conflit. Pour forcer la relecture d'un fichier écarté, supprimer son
+entrée de l'état.
+
+Et un **sous-dossier** (« Archives ») est ignoré au relevé : son
+téléchargement rendait HTTP 500, retenté chaque semaine.
+
+### 8. ⛔ Les PDF du Drive sont des SCANS : OCR en repli
+
+Au même run, `pdftotext` rendait **1 à 4 octets** par fichier — tous des
+scans, y compris le PV du 31 août 2026. D'où un repli OCR : sous 200
+caractères non blancs, la page est rasterisée (`pdftoppm`, 300 dpi, niveaux
+de gris) et lue par `tesseract` en français. Mesuré sur un scan simulé :
+texte complet en 1 s, avec **une erreur typique : « O contre » pour
+« 0 contre »**. Un fichier OCRisé porte donc un témoin `<id>.ocr`, et le
+prompt impose à l'agent de n'écrire un nombre (vote, montant, n° de
+délibération, date) que s'il est non ambigu — sinon `null`. La relecture
+humaine des `en_clair` face au PDF, avant de sortir la PR du brouillon,
+reste le dernier garde-fou.
+
 ## Conséquences
 
 - Quand le PDF du 31/08 sera déposé, la séance existante gagnera son

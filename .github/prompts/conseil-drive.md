@@ -65,8 +65,19 @@ Règles NON NÉGOCIABLES (la fusion refusera la proposition sinon) :
   trombinoscope mis à part), on désigne des fonctions (ADR-0038). Pas de
   tarif périscolaire recopié.
 - Typographie : apostrophe ’ (U+2019) partout, JAMAIS l'apostrophe ASCII.
-- Un texte quasi vide (PDF scanné sans couche texte) : `ecartes`, raison
+- TEXTE OCR : si `conseil-drive/texte/<driveId>.ocr` existe, le texte vient
+  d'une reconnaissance optique sur un SCAN. Il contient des erreurs typiques :
+  « O » pour « 0 », « l » pour « 1 », « S » pour « 5 », accents perdus, mots
+  coupés. Un nombre (vote, montant, numéro de délibération, date) ne s'écrit
+  que s'il est NON AMBIGU dans le texte — recoupe-le (un total de votes égal
+  au nombre de présents, une somme HT/TTC cohérente) ; au moindre doute, `null`.
+  Corrige l'orthographe des mots courants, jamais les noms propres ni les
+  chiffres.
+- Un texte quasi vide ou inexploitable même après OCR : `ecartes`, raison
   `illisible` — n'essaie pas de deviner le contenu.
+- Lis la date de séance dans le TEXTE : le Drive contient tout l'historique
+  (2020 → aujourd'hui) ; tout ce qui précède le 1er avril 2026 s'écarte
+  `avant-mandat` sans autre analyse — inutile de le résumer.
 
 Vérifie ton JSON avant de terminer : il doit passer `JSON.parse`, chaque
 `driveId` de `nouveaux.json` doit apparaître exactement une fois (dans une
