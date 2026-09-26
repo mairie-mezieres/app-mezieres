@@ -797,6 +797,37 @@ et seule la pastille du menu est peinte. Deux conséquences pour qui écrit un t
   pastille est donc calculée `inline-flex` sur mobile et `flex` sur ordinateur. La question
   utile est « allumée ou éteinte », d'où un `not.toHaveCSS('display', 'none')`.
 
+### Conseil municipal — onglets Décisions/Projets et bandeau (v4.126)
+
+`js/mat-conseil.js` (injecté par `mat-boot`, replis ADR-0032) anime les onglets
+« 🗳️ Décisions » et « 🏗️ Projets » de `#ov-conseil` et le bandeau d'accueil
+« 🏛️ Conseil du 31 août : 8 décisions ». Points à connaître avant d'y toucher —
+le détail est dans l'**ADR-0052** :
+
+- **données** : `data/conseil.json`, statique et versionné (aucune IA, pas de
+  Redis, rien d'inventé — un champ `null` n'affiche rien). Servi **réseau
+  d'abord** par le SW, précaché **sans `?v=`**, comme `jeux/jeux.json` ;
+- **visibilité calculée** : séance = `publie` + `date ≥ depuis` (mandat en
+  cours) ; projet = `publie` + une séance source visible ; doublon d'`id` =
+  première occurrence + `console.warn` ;
+- `openConseil(onglet)` accepte `'elus'` (défaut), `'decisions'`, `'projets'`.
+  ⚠️ L'enveloppe stats de `mat-core.js` **doit transmettre l'argument** — sans
+  lui, le bandeau retombe sur « Les élus ». Les onglets ne créent **aucune
+  entrée d'historique** ;
+- ⛔ `mat_conseil_vu` et `mat_conseil_tampon` sont des **chaînes brutes**
+  (`localStorage` direct) : `matStore.get` JSON-parse et **détruit** une clé
+  dont la valeur est un id nu comme `2026-08-31` (ADR-0052 §4) ;
+- consulter l'onglet Décisions **marque la séance vue** (bandeau et pastille
+  bureau s'éteignent sur cette seule règle) ;
+- le sceau est un SVG décoratif (pas le tampon officiel) ; l'animation tampon
+  joue une fois par séance, jamais sous `prefers-reduced-motion` ; les
+  couleurs des thèmes du JSON restent des **accents** (liseré), jamais du
+  texte ;
+- au bureau, **seul `#ov-conseil`** passe à 960 px (les autres overlays
+  restent des volets de 520 px).
+
+Tests : `tests/e2e/conseil.spec.js`.
+
 ### « Le saviez-vous ? » — aucune IA à l'exécution
 
 `js/mat-saviez-vous.js` affiche un fait par jour sur la commune. **Le contenu ne provient

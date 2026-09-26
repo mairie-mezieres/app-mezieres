@@ -265,7 +265,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openAssociations()">🤝 Associations</button>
 <button onclick="openEntreprises()">🛠️ Entreprises</button>
 <button onclick="openDocs()" style="position:relative">📄 Documents officiels<span id="docs-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
-<button onclick="openConseil('decisions')" style="position:relative">🏛️ Conseil<span id="conseil-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
+<!-- ⛔ CONTRASTE — pastille visible dès le chargement (contrairement à celle
+     des Documents, éteinte par défaut) : le #ef4444 des autres badges donne
+     3,76:1 pour du blanc en 9,6 px, axe la refuse. #b91c1c : 6,3:1. -->
+<button onclick="openConseil('decisions')" style="position:relative">🏛️ Conseil<span id="conseil-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#b91c1c;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
 <button onclick="openPlui()" style="position:relative">🗺️ PLUi-H-D<span id="plui-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>

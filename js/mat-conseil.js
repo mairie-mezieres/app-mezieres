@@ -189,6 +189,10 @@
     if (!_data) return; // encore en chargement : « Chargement… » du gabarit
     pan.innerHTML = _htmlDecisions();
     _apresRenduDecisions(pan);
+    /* Consulter les décisions marque la séance comme vue, quel que soit le
+       chemin (bandeau, bouton bureau, MEL demain) : bandeau et pastille
+       « Nouveau » s'éteignent sur la même règle. */
+    _marquerVue();
   }
   function _peindreProjets() {
     var pan = document.getElementById('conseil-panel-projets');
