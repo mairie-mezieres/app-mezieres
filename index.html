@@ -1287,8 +1287,24 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <button class="panel-close" aria-label="Fermer" onclick="closeOv('conseil')">✕</button>
 </div>
 <div class="panel-body">
+<!-- Onglets Conseil (v4.126) — la barre est collante en haut de .panel-body ;
+     les panneaux sont pilotés par classList (jamais de display inline), et le
+     changement d'onglet ne crée AUCUNE entrée d'historique. Le contenu des
+     onglets Décisions/Projets est rendu par js/mat-conseil.js (injecté par
+     mat-boot) à partir de data/conseil.json. -->
+<div class="conseil-tabs" role="tablist" aria-label="Rubriques du conseil municipal">
+<button type="button" class="conseil-tab is-active" id="conseil-tab-elus" role="tab" aria-selected="true" aria-controls="conseil-panel-elus" data-conseil-tab="elus">👥 Les élus</button>
+<button type="button" class="conseil-tab" id="conseil-tab-decisions" role="tab" aria-selected="false" tabindex="-1" aria-controls="conseil-panel-decisions" data-conseil-tab="decisions">🗳️ Décisions</button>
+<button type="button" class="conseil-tab" id="conseil-tab-projets" role="tab" aria-selected="false" tabindex="-1" aria-controls="conseil-panel-projets" data-conseil-tab="projets">🏗️ Projets</button>
+</div>
+<div class="conseil-panel is-active" id="conseil-panel-elus" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-elus">
+<!-- Trombinoscope existant, STRICTEMENT inchangé (mêmes ids, même modale) —
+     seul déplacement : il est enveloppé dans le panneau de l'onglet. -->
 <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--mist);border-radius:10px">👆 Cliquez sur une photo pour voir le détail</div>
 <div class="trombi-grid" id="trombi-grid"></div>
+</div>
+<div class="conseil-panel" id="conseil-panel-decisions" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-decisions"><div class="conseil-attente">Chargement…</div></div>
+<div class="conseil-panel" id="conseil-panel-projets" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-projets"><div class="conseil-attente">Chargement…</div></div>
 </div>
 </div>
 </template>

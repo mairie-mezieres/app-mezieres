@@ -2060,3 +2060,27 @@ html.theme-sombre .c3d-temps-reperes button[aria-pressed="true"]{background:var(
    blanc y contraste partout. Un jeton clair y deviendrait illisible en
    thème sombre — c'est le piège décrit dans CLAUDE.md. */
 .mat-attente{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;background:var(--forest);color:#fff;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);pointer-events:none;}
+
+/* ══ Conseil municipal — onglets, décisions, projets (v4.126) ══
+   Libellés d'onglet ≥ 1rem et cibles ≥ 44px (public senior) ; les panneaux
+   sont pilotés par classList uniquement. Couleurs par variables : en thème
+   sombre, --forest/--leaf sont des FONDS — jamais en color: ici. */
+.conseil-tabs{
+  position:sticky;top:-16px;z-index:5;
+  display:flex;gap:6px;margin:-16px -16px 14px;padding:10px 12px;
+  background:var(--warm);border-bottom:1px solid var(--border);
+}
+.conseil-tab{
+  flex:1;min-height:44px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;
+  background:none;color:var(--text);padding:8px 6px;
+  -webkit-tap-highlight-color:transparent;
+}
+.conseil-tab.is-active{background:var(--mist);color:var(--text);font-weight:900;box-shadow:inset 0 0 0 2px var(--sage-ink);}
+.conseil-tab:focus-visible{outline:3px solid var(--sage-ink);outline-offset:2px;}
+.conseil-panel{display:none;}
+.conseil-panel.is-active{display:block;}
+.conseil-attente{font-size:1rem;color:var(--muted);text-align:center;padding:24px 0;}
+.conseil-echec{font-size:1rem;color:var(--text);text-align:center;padding:20px 8px;line-height:1.6;}
+.conseil-echec a{color:var(--sage-ink);font-weight:900;}
+html.theme-sombre .conseil-tabs{background:#1e293b;}
