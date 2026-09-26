@@ -410,3 +410,24 @@ html.theme-sombre .d-sv-bandeau .sv-part{color:#34d399}
   .cm-bandeau-d .cm-ligne:focus-visible{outline:3px solid var(--sage-ink,#2d6a4f)}
 }
 html.theme-sombre .cm-bandeau-d .cm-ligne{background:#1e293b;border-color:rgba(255,255,255,.08);color:#f1f5f9}
+
+/* ── Overlay Conseil sur grand écran ──
+   Point validé n° 3 : les overlays de l'app restent des volets bas de
+   520 px — SEUL #ov-conseil est élargi et centré à ≥ 1024 px, une grille
+   de décisions sur 2 colonnes ne tenant pas dans 520 px. Lignes de texte
+   plafonnées (~80 caractères) par max-width sur les blocs de texte. */
+@media(min-width:1024px){
+  #ov-conseil{align-items:center;padding:28px}
+  #ov-conseil .panel{max-width:960px;border-radius:24px;max-height:90vh;animation:none}
+  /* Carte « Dernier compte rendu » en 2 colonnes : sceau | texte. */
+  #ov-conseil .conseil-cr{flex-direction:row;text-align:left;align-items:center;gap:22px;padding:22px 24px}
+  #ov-conseil .conseil-sceau{width:150px;height:150px}
+  #ov-conseil .conseil-cr-txt{flex:1;min-width:0;max-width:72ch}
+  /* Décisions : 2 colonnes ; projets : 2 à 3 colonnes. */
+  #ov-conseil .conseil-seance-corps{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  #ov-conseil .conseil-groupe-cartes{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-items:start}
+  #ov-conseil .conseil-dec-clair,#ov-conseil .conseil-cr-resume{max-width:72ch}
+  /* Survol discret, focus toujours visible (règles focus déjà posées). */
+  #ov-conseil .conseil-dec:hover,#ov-conseil .conseil-projet:hover{box-shadow:0 4px 14px rgba(26,61,43,.12)}
+  #ov-conseil .conseil-tab:hover{background:var(--mist,#d8f3dc)}
+}
