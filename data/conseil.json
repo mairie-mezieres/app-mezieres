@@ -4,19 +4,43 @@
   "prochaine_seance": "2026-10-05",
   "depuis": "2026-04-01",
   "themes": {
-    "ecole": { "label": "École et jeunesse", "ico": "🎒", "couleur": "#2E86C1" },
-    "travaux": { "label": "Travaux et urbanisme", "ico": "🚧", "couleur": "#F5A623" },
-    "environnement": { "label": "Environnement", "ico": "🌿", "couleur": "#7CB342" },
-    "vie_locale": { "label": "Fêtes et vie locale", "ico": "🎉", "couleur": "#8B5CF6" },
-    "solidarite": { "label": "Solidarité et aînés", "ico": "🤝", "couleur": "#C0392B" },
-    "mairie": { "label": "Mairie et intercommunalité", "ico": "🏛️", "couleur": "#1A3D2B" }
+    "ecole": {
+      "label": "École et jeunesse",
+      "ico": "🎒",
+      "couleur": "#2E86C1"
+    },
+    "travaux": {
+      "label": "Travaux et urbanisme",
+      "ico": "🚧",
+      "couleur": "#F5A623"
+    },
+    "environnement": {
+      "label": "Environnement",
+      "ico": "🌿",
+      "couleur": "#7CB342"
+    },
+    "vie_locale": {
+      "label": "Fêtes et vie locale",
+      "ico": "🎉",
+      "couleur": "#8B5CF6"
+    },
+    "solidarite": {
+      "label": "Solidarité et aînés",
+      "ico": "🤝",
+      "couleur": "#C0392B"
+    },
+    "mairie": {
+      "label": "Mairie et intercommunalité",
+      "ico": "🏛️",
+      "couleur": "#1A3D2B"
+    }
   },
   "seances": [
     {
       "id": "2026-08-31",
       "date": "2026-08-31",
       "document": "pv",
-      "drive_id": null,
+      "drive_id": "1T5tmnChZPytrzqPKtUjSUOGaZ2Cz0rNC",
       "publie": true,
       "resume": "Rentrée scolaire, repas des agents à la cantine, ateliers climat à l’école et dialogue avec la communauté de communes.",
       "decisions": [
@@ -28,7 +52,11 @@
           "en_clair": "Pour la rentrée, un poste d’animateur à 27 heures par semaine est créé et un ancien poste, libéré par une promotion, est supprimé. La commune emploie 11 agents, soit 9,26 équivalents temps plein.",
           "resultat": "adopte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         },
         {
@@ -39,7 +67,11 @@
           "en_clair": "Les agents qui le souhaitent peuvent déjeuner gratuitement à la cantine, faute de pouvoir rentrer chez eux pendant leur pause de 45 minutes. Comme la loi l’exige, ce repas est déclaré comme avantage en nature (5,50 € par repas en 2026).",
           "resultat": "adopte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         },
         {
@@ -50,7 +82,11 @@
           "en_clair": "Le règlement de l’école et des activités périscolaires est mis à jour pour la rentrée. Les tarifs restent les mêmes que l’an dernier.",
           "resultat": "adopte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         },
         {
@@ -61,8 +97,15 @@
           "en_clair": "Un tarif de 6,11 € le repas est créé pour les adultes extérieurs qui déjeunent à la cantine. Il s’applique aux 3 ouvriers qui ont refait toute la toiture de l’école du 29 juin au 3 juillet : 91,65 € sont refacturés à leur entreprise.",
           "resultat": "adopte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
-          "montant": { "valeur": 91.65, "nature": "recette" }
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
+          "montant": {
+            "valeur": 91.65,
+            "nature": "recette"
+          }
         },
         {
           "id": "2026/33",
@@ -72,8 +115,15 @@
           "en_clair": "Deux classes de l’école de la Forêt suivront 3 ateliers pour comprendre les enjeux de l’énergie et du climat. Le programme coûte 1 700 € HT, financé à 80 % par les certificats d’économies d’énergie : il reste 408 € TTC à la charge de la commune.",
           "resultat": "adopte",
           "unanimite": false,
-          "vote": { "pour": 13, "contre": 0, "abstention": 2 },
-          "montant": { "valeur": 408, "nature": "depense" }
+          "vote": {
+            "pour": 13,
+            "contre": 0,
+            "abstention": 2
+          },
+          "montant": {
+            "valeur": 408,
+            "nature": "depense"
+          }
         },
         {
           "id": "2026/34",
@@ -83,7 +133,11 @@
           "en_clair": "M. Fouad Eddazi, maître de conférences en droit public à l’Université d’Orléans, est reconduit pour 7 ans à partir du 1er octobre 2026. Ce juriste indépendant conseille les élus qui le sollicitent sur le respect de la charte de l’élu local. Il est rémunéré par dossier traité.",
           "resultat": "adopte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         },
         {
@@ -94,7 +148,11 @@
           "en_clair": "Le conseil a pris connaissance du rapport d’activité 2025 de la Communauté de communes des Terres du Val de Loire (CCTVL).",
           "resultat": "prise_acte",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         },
         {
@@ -105,30 +163,94 @@
           "en_clair": "Avis favorable au pacte qui organise le dialogue entre la CCTVL et ses communes : réunions de bureau ouvertes aux maires, conférence des maires, commissions, et accès des conseillers municipaux aux ordres du jour et comptes rendus de la CCTVL.",
           "resultat": "avis_favorable",
           "unanimite": true,
-          "vote": { "pour": 15, "contre": 0, "abstention": 0 },
+          "vote": {
+            "pour": 15,
+            "contre": 0,
+            "abstention": 0
+          },
           "montant": null
         }
       ],
       "decisions_maire": [
-        { "date": "2026-08-20", "theme": "ecole", "objet": "Achat d’une éplucheuse", "montant": 3956.52 },
-        { "date": "2026-08-19", "theme": "mairie", "objet": "Mise au rebut de matériels usagés : 12 talkies-walkies, un barnum, une tente et deux tondeuses", "montant": null },
-        { "date": "2026-08-12", "theme": "ecole", "objet": "Remplacement des siphons d’urinoirs de l’école", "montant": 1264.06 },
-        { "date": "2026-08-12", "theme": "ecole", "objet": "Fournitures scolaires", "montant": 130 },
-        { "date": "2026-07-30", "theme": "mairie", "objet": "Électrodes pédiatriques pour le défibrillateur", "montant": 133 },
-        { "date": "2026-07-17", "theme": "mairie", "objet": "Fabrication d’un panneau au format A0", "montant": 180 },
-        { "date": "2026-07-17", "theme": "ecole", "objet": "Installation électrique de la climatisation de l’école", "montant": 3266.4 },
-        { "date": "2026-07-11", "theme": "ecole", "objet": "Installation de la climatisation de l’école", "montant": 11472 },
-        { "date": "2026-07-09", "theme": "ecole", "objet": "Manuels scolaires", "montant": 338.7 },
-        { "date": "2026-06-18", "theme": "travaux", "objet": "Contrôle des installations électriques après le remplacement du tableau général de la mairie", "montant": 216 },
-        { "date": "2026-06-17", "theme": "ecole", "objet": "Fournitures scolaires", "montant": 373.76 },
-        { "date": "2026-06-17", "theme": "mairie", "objet": "Achat de 3 cylindres de serrure pour la mairie", "montant": 277.16 }
+        {
+          "date": "2026-08-20",
+          "theme": "ecole",
+          "objet": "Achat d’une éplucheuse",
+          "montant": 3956.52
+        },
+        {
+          "date": "2026-08-19",
+          "theme": "mairie",
+          "objet": "Mise au rebut de matériels usagés : 12 talkies-walkies, un barnum, une tente et deux tondeuses",
+          "montant": null
+        },
+        {
+          "date": "2026-08-12",
+          "theme": "ecole",
+          "objet": "Remplacement des siphons d’urinoirs de l’école",
+          "montant": 1264.06
+        },
+        {
+          "date": "2026-08-12",
+          "theme": "ecole",
+          "objet": "Fournitures scolaires",
+          "montant": 130
+        },
+        {
+          "date": "2026-07-30",
+          "theme": "mairie",
+          "objet": "Électrodes pédiatriques pour le défibrillateur",
+          "montant": 133
+        },
+        {
+          "date": "2026-07-17",
+          "theme": "mairie",
+          "objet": "Fabrication d’un panneau au format A0",
+          "montant": 180
+        },
+        {
+          "date": "2026-07-17",
+          "theme": "ecole",
+          "objet": "Installation électrique de la climatisation de l’école",
+          "montant": 3266.4
+        },
+        {
+          "date": "2026-07-11",
+          "theme": "ecole",
+          "objet": "Installation de la climatisation de l’école",
+          "montant": 11472
+        },
+        {
+          "date": "2026-07-09",
+          "theme": "ecole",
+          "objet": "Manuels scolaires",
+          "montant": 338.7
+        },
+        {
+          "date": "2026-06-18",
+          "theme": "travaux",
+          "objet": "Contrôle des installations électriques après le remplacement du tableau général de la mairie",
+          "montant": 216
+        },
+        {
+          "date": "2026-06-17",
+          "theme": "ecole",
+          "objet": "Fournitures scolaires",
+          "montant": 373.76
+        },
+        {
+          "date": "2026-06-17",
+          "theme": "mairie",
+          "objet": "Achat de 3 cylindres de serrure pour la mairie",
+          "montant": 277.16
+        }
       ]
     },
     {
       "id": "2026-06-15",
       "date": "2026-06-15",
       "document": "cr_partiel",
-      "drive_id": null,
+      "drive_id": "1G0JmEypDmfgwDDNc2KyISX2Oo9ED5G0i",
       "publie": true,
       "resume": "Délégations au Maire, représentants de Mézières à la communauté de communes, subventions aux associations et fonds de solidarité.",
       "decisions": [
@@ -164,7 +286,10 @@
           "resultat": "avis_favorable",
           "unanimite": true,
           "vote": null,
-          "montant": { "valeur": 4842, "nature": "subvention" }
+          "montant": {
+            "valeur": 4842,
+            "nature": "subvention"
+          }
         },
         {
           "id": "2026/28",
@@ -175,7 +300,10 @@
           "resultat": "adopte",
           "unanimite": true,
           "vote": null,
-          "montant": { "valeur": 894.96, "nature": "depense" }
+          "montant": {
+            "valeur": 894.96,
+            "nature": "depense"
+          }
         }
       ],
       "decisions_maire": []
@@ -184,7 +312,7 @@
       "id": "2026-04-08",
       "date": "2026-04-08",
       "document": "cr_partiel",
-      "drive_id": null,
+      "drive_id": "1z43_VMbWUbMZuatKjMtz4UjxWjT7Fcjm",
       "publie": true,
       "resume": "Installation des commissions municipales, désignation des représentants de la commune et avis sur la publicité intercommunale.",
       "decisions": [
@@ -221,7 +349,10 @@
           "resultat": "adopte",
           "unanimite": true,
           "vote": null,
-          "montant": { "valeur": 98, "nature": "depense" }
+          "montant": {
+            "valeur": 98,
+            "nature": "depense"
+          }
         },
         {
           "id": "2026/23",
@@ -250,20 +381,215 @@
     }
   ],
   "projets": [
-    { "id": "climatisation-ecole", "titre": "Climatisation de l’école", "theme": "ecole", "statut": "decide", "en_clair": "Installation de la climatisation à l’école, commandée cet été (matériel et installation électrique).", "montant": 14738.4, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": true },
-    { "id": "toiture-ecole", "titre": "Toiture de l’école refaite", "theme": "ecole", "statut": "termine", "en_clair": "La totalité de la toiture de l’école de la Forêt a été refaite du 29 juin au 3 juillet 2026.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": true },
-    { "id": "ecopousse", "titre": "Ateliers énergie-climat pour 2 classes", "theme": "environnement", "statut": "decide", "en_clair": "Programme Ecopousse : 3 ateliers par classe sur les enjeux de l’énergie et du climat.", "montant": 408, "echeance": "Année scolaire 2026-2027", "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": true },
-    { "id": "parcelles-chateau", "titre": "Reprise de 2 parcelles au lotissement du Château", "theme": "travaux", "statut": "decide", "en_clair": "Acquisition pour 1 € symbolique, qui doit être officialisée par un acte notarié.", "montant": null, "echeance": null, "maj": "2026-04-08", "sources": ["2026-04-08"], "publie": true },
-    { "id": "tableau-electrique-mairie", "titre": "Nouveau tableau électrique à la mairie", "theme": "travaux", "statut": "termine", "en_clair": "Le tableau électrique général de la mairie a été remplacé ; un contrôle de conformité a été commandé.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": true },
-    { "id": "pedt", "titre": "Projet éducatif territorial (PEDT)", "theme": "ecole", "statut": "termine", "en_clair": "Le projet éducatif de la commune a été construit avec l’école et l’association des parents d’élèves.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "poteau-incendie-breau", "titre": "Poteau incendie rue du Bréau", "theme": "travaux", "statut": "decide", "en_clair": "Création d’un poteau incendie ; l’entreprise doit être relancée.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "eaux-pluviales-route-clery", "titre": "Écoulement des eaux de pluie route de Cléry-Saint-André", "theme": "travaux", "statut": "en_cours", "en_clair": "La communauté de communes arase les bas-côtés pour faciliter l’écoulement des eaux de pluie.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "cavurnes-cimetiere", "titre": "Cavurnes au cimetière", "theme": "travaux", "statut": "etude", "en_clair": "Recherche d’un nouvel emplacement pour les cavurnes, petits caveaux destinés aux urnes funéraires.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "liste-proximite", "titre": "Liste de proximité des personnes vulnérables", "theme": "solidarite", "statut": "etude", "en_clair": "Après l’été caniculaire, la commune prépare une liste pour appeler les personnes susceptibles d’être vulnérables, sans qu’elles aient besoin de s’inscrire en mairie. L’âge retenu reste à fixer.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "arbre-naissances-2025", "titre": "Arbre des naissances 2025", "theme": "vie_locale", "statut": "decide", "en_clair": "L’arbre des naissances des enfants nés en 2025 sera programmé à l’automne.", "montant": null, "echeance": "Automne 2026", "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "feu-artifice", "titre": "Feu d’artifice à reprogrammer", "theme": "vie_locale", "statut": "etude", "en_clair": "Les festivités du 13 juillet ont eu lieu ; seul le feu d’artifice doit être reprogrammé.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "marche-noel", "titre": "Marché de Noël", "theme": "vie_locale", "statut": "etude", "en_clair": "La date est à fixer avec le comité des fêtes.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "repas-aines", "titre": "Repas des aînés", "theme": "solidarite", "statut": "en_cours", "en_clair": "La liste des aînés est mise à jour pour envoyer les invitations.", "montant": null, "echeance": null, "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false },
-    { "id": "concert-19-decembre", "titre": "Concert du samedi 19 décembre", "theme": "solidarite", "statut": "decide", "en_clair": "Les places assises seront limitées : les modalités d’inscription sont à l’étude.", "montant": null, "echeance": "19 décembre 2026", "maj": "2026-08-31", "sources": ["2026-08-31"], "publie": false }
+    {
+      "id": "climatisation-ecole",
+      "titre": "Climatisation de l’école",
+      "theme": "ecole",
+      "statut": "decide",
+      "en_clair": "Installation de la climatisation à l’école, commandée cet été (matériel et installation électrique).",
+      "montant": 14738.4,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": true
+    },
+    {
+      "id": "toiture-ecole",
+      "titre": "Toiture de l’école refaite",
+      "theme": "ecole",
+      "statut": "termine",
+      "en_clair": "La totalité de la toiture de l’école de la Forêt a été refaite du 29 juin au 3 juillet 2026.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": true
+    },
+    {
+      "id": "ecopousse",
+      "titre": "Ateliers énergie-climat pour 2 classes",
+      "theme": "environnement",
+      "statut": "decide",
+      "en_clair": "Programme Ecopousse : 3 ateliers par classe sur les enjeux de l’énergie et du climat.",
+      "montant": 408,
+      "echeance": "Année scolaire 2026-2027",
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": true
+    },
+    {
+      "id": "parcelles-chateau",
+      "titre": "Reprise de 2 parcelles au lotissement du Château",
+      "theme": "travaux",
+      "statut": "decide",
+      "en_clair": "Acquisition pour 1 € symbolique, qui doit être officialisée par un acte notarié.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-04-08",
+      "sources": [
+        "2026-04-08"
+      ],
+      "publie": true
+    },
+    {
+      "id": "tableau-electrique-mairie",
+      "titre": "Nouveau tableau électrique à la mairie",
+      "theme": "travaux",
+      "statut": "termine",
+      "en_clair": "Le tableau électrique général de la mairie a été remplacé ; un contrôle de conformité a été commandé.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": true
+    },
+    {
+      "id": "pedt",
+      "titre": "Projet éducatif territorial (PEDT)",
+      "theme": "ecole",
+      "statut": "termine",
+      "en_clair": "Le projet éducatif de la commune a été construit avec l’école et l’association des parents d’élèves.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "poteau-incendie-breau",
+      "titre": "Poteau incendie rue du Bréau",
+      "theme": "travaux",
+      "statut": "decide",
+      "en_clair": "Création d’un poteau incendie ; l’entreprise doit être relancée.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "eaux-pluviales-route-clery",
+      "titre": "Écoulement des eaux de pluie route de Cléry-Saint-André",
+      "theme": "travaux",
+      "statut": "en_cours",
+      "en_clair": "La communauté de communes arase les bas-côtés pour faciliter l’écoulement des eaux de pluie.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "cavurnes-cimetiere",
+      "titre": "Cavurnes au cimetière",
+      "theme": "travaux",
+      "statut": "etude",
+      "en_clair": "Recherche d’un nouvel emplacement pour les cavurnes, petits caveaux destinés aux urnes funéraires.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "liste-proximite",
+      "titre": "Liste de proximité des personnes vulnérables",
+      "theme": "solidarite",
+      "statut": "etude",
+      "en_clair": "Après l’été caniculaire, la commune prépare une liste pour appeler les personnes susceptibles d’être vulnérables, sans qu’elles aient besoin de s’inscrire en mairie. L’âge retenu reste à fixer.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "arbre-naissances-2025",
+      "titre": "Arbre des naissances 2025",
+      "theme": "vie_locale",
+      "statut": "decide",
+      "en_clair": "L’arbre des naissances des enfants nés en 2025 sera programmé à l’automne.",
+      "montant": null,
+      "echeance": "Automne 2026",
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "feu-artifice",
+      "titre": "Feu d’artifice à reprogrammer",
+      "theme": "vie_locale",
+      "statut": "etude",
+      "en_clair": "Les festivités du 13 juillet ont eu lieu ; seul le feu d’artifice doit être reprogrammé.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "marche-noel",
+      "titre": "Marché de Noël",
+      "theme": "vie_locale",
+      "statut": "etude",
+      "en_clair": "La date est à fixer avec le comité des fêtes.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "repas-aines",
+      "titre": "Repas des aînés",
+      "theme": "solidarite",
+      "statut": "en_cours",
+      "en_clair": "La liste des aînés est mise à jour pour envoyer les invitations.",
+      "montant": null,
+      "echeance": null,
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    },
+    {
+      "id": "concert-19-decembre",
+      "titre": "Concert du samedi 19 décembre",
+      "theme": "solidarite",
+      "statut": "decide",
+      "en_clair": "Les places assises seront limitées : les modalités d’inscription sont à l’étude.",
+      "montant": null,
+      "echeance": "19 décembre 2026",
+      "maj": "2026-08-31",
+      "sources": [
+        "2026-08-31"
+      ],
+      "publie": false
+    }
   ]
 }
