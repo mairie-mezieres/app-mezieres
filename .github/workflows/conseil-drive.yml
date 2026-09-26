@@ -174,8 +174,12 @@ jobs:
       # retenait rien, et les mêmes PDF étaient relus (et payés) chaque mardi.
       # Checkout PROPRE de main : la mémoire ne doit jamais emporter le
       # conseil.json proposé, qui ne passe que par la PR draft.
+      # `always()` + garde sur la FUSION : la mémoire ne dépend pas du sort de
+      # l'étape PR. Au 2e run réel, un 403 à l'ouverture de la PR a fait
+      # sauter cette étape — et les ~37 fichiers écartés auraient été relus
+      # (et payés) au run suivant.
       - name: Mémoriser les fichiers écartés (main)
-        if: steps.liste.outputs.nouveaux != '0' && steps.fusion.outputs.ecartes != '0'
+        if: always() && steps.fusion.outcome == 'success' && steps.fusion.outputs.ecartes != '0'
         run: |
           git config user.name "conseil-drive[bot]"
           git config user.email "conseil-drive@users.noreply.github.com"

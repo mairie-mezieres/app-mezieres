@@ -116,6 +116,28 @@ délibération, date) que s'il est non ambigu — sinon `null`. La relecture
 humaine des `en_clair` face au PDF, avant de sortir la PR du brouillon,
 reste le dernier garde-fou.
 
+### 9. Deuxième run réel : ce qu'il a prouvé, ce qu'il a cassé
+
+Avec l'OCR, le run du 26/09 a lu tous les scans et reconnu **les trois
+séances du mandat déjà saisies** (08/04, 15/06, 31/08) : il leur a posé leur
+`drive_id`, **sans aucun doublon** — l'anti-doublon validé en réel — et a
+écarté tout le reste (avant-mandat). Trois défauts sont apparus :
+
+- **403 à l'ouverture de la PR** : « GitHub Actions is not permitted to
+  create or approve pull requests » (réglage du dépôt, qui bloque aussi les
+  PR draft de la veille). `conseil-drive-pr.js` ne fait plus échouer le job :
+  avertissement + lien d'ouverture manuelle dans le résumé du run. Le réglage
+  à cocher : Settings → Actions → General → Workflow permissions → « Allow
+  GitHub Actions to create and approve pull requests ».
+- **La mémoire des écartés a sauté** avec l'étape PR : elle est désormais en
+  `always()`, gardée par le seul succès de la fusion.
+- **Un diff de 424 lignes pour trois `drive_id`** : la fusion réécrit le JSON
+  au format de `JSON.stringify(…, null, 2)`, l'annexe B était compacte.
+  `data/conseil.json` est donc normalisé une fois pour toutes à ce format
+  (contenu vérifié identique) : un diff de PR ne montre plus que ce qui
+  change — trois lignes ici. Une relecture humaine noyée n'est plus une
+  relecture.
+
 ## Conséquences
 
 - Quand le PDF du 31/08 sera déposé, la séance existante gagnera son
