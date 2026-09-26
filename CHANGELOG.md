@@ -5,6 +5,21 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [non publié]
+
+### Ajouté
+
+- **Pipeline conseil-drive** (`.github/workflows/conseil-drive.yml`,
+  hebdomadaire) : relevé du dossier Drive public des comptes rendus,
+  extraction `pdftotext`, proposition rédigée par un agent (Read/Write
+  seulement), fusion **par le code** dans `data/conseil.json`
+  (anti-doublon du cahier des charges, rejoué en CI par
+  `scripts/check-conseil-drive.js`) et PR **draft** sur la branche fixe
+  `conseil/maj-drive` — la sortir du brouillon est la validation humaine.
+  État des fichiers traités dans `data/conseil-drive-etat.json`.
+  Voir ADR-0053. Aucun impact habitant tant que la PR n'est pas fusionnée
+  (pas de bump : `conseil.json` est servi réseau d'abord).
+
 ## [4.126] — 26 septembre 2026
 
 ### Ajouté
