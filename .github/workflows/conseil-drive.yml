@@ -32,7 +32,8 @@ concurrency:
 jobs:
   conseil-drive:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # 45 : le premier passage OCRise tout l'historique du Drive (~40 scans).
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -52,21 +53,35 @@ jobs:
         if: steps.liste.outputs.nouveaux == '0'
         run: echo "Aucun fichier nouveau sur le Drive — rien à faire." >> "$GITHUB_STEP_SUMMARY"
 
-      # pdftotext (poppler) plutôt qu'une dépendance npm : présent dans les
-      # dépôts Ubuntu, déterministe, et le texte extrait suffit à un CR de
-      # conseil. Un PDF scanné sans couche texte rend un fichier quasi vide :
-      # l'agent doit alors l'ÉCARTER (raison « illisible »), jamais inventer.
-      - name: Extraire le texte des PDF
+      # pdftotext (poppler) d'abord, puis OCR en REPLI (tesseract, français).
+      # ⛔ Au premier run réel, les 40 PDF du Drive étaient des SCANS : pdftotext
+      # rendait 1 à 4 octets par fichier, l'agent les a tous écartés
+      # « illisible » — correctement, mais le pipeline ne servait à rien.
+      # Seuil : moins de 200 caractères non blancs = pas de couche texte.
+      # Un fichier OCRisé porte un témoin `<id>.ocr` : l'agent sait que ses
+      # chiffres peuvent être faux (« O » pour « 0 », mesuré en test).
+      - name: Extraire le texte des PDF (OCR si scan)
         if: steps.liste.outputs.nouveaux != '0'
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils
-          mkdir -p conseil-drive/texte
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-fra
+          mkdir -p conseil-drive/texte conseil-drive/pages
           for f in conseil-drive/pdf/*.pdf; do
             id=$(basename "$f" .pdf)
-            pdftotext -layout "$f" "conseil-drive/texte/$id.txt" || echo "pdftotext a échoué sur $id"
+            out="conseil-drive/texte/$id.txt"
+            pdftotext -layout "$f" "$out" 2>/dev/null || : > "$out"
+            if [ "$(tr -d '[:space:]' < "$out" | wc -c)" -lt 200 ]; then
+              rm -f conseil-drive/pages/*
+              if pdftoppm -r 300 -gray -png "$f" "conseil-drive/pages/p"; then
+                : > "$out"
+                for p in conseil-drive/pages/p*.png; do
+                  tesseract "$p" - -l fra --psm 1 2>/dev/null >> "$out" || true
+                done
+                touch "conseil-drive/texte/$id.ocr"
+              fi
+            fi
+            echo "$id : $(wc -c < "$out") octets$( [ -f "conseil-drive/texte/$id.ocr" ] && echo ' (OCR)')"
           done
-          wc -c conseil-drive/texte/*.txt || true
 
       - name: Préparer le prompt
         if: steps.liste.outputs.nouveaux != '0'
@@ -145,12 +160,35 @@ jobs:
           # Branche FIXE repartie de main : une seule PR vivante, un nouveau
           # run la met à jour. Elle n'appartient qu'au robot → force possible.
           git checkout -B conseil/maj-drive origin/main
-          git add data/conseil.json data/conseil-drive-etat.json
+          # conseil.json SEUL : les écartés vont sur main par l'étape suivante
+          # (deux fichiers, deux chemins → aucun conflit, ADR-0053 §7).
+          git add data/conseil.json
           git diff --stat --cached
           git commit -m "data: conseil.json — mise à jour depuis le Drive ($(date -u +%Y-%m-%d))"
           git push -f origin conseil/maj-drive
           node scripts/conseil-drive-pr.js
           cat conseil-drive/resume-pr.md >> "$GITHUB_STEP_SUMMARY"
+
+      # Mémoire des ÉCARTÉS, commitée directement sur main — même règle que la
+      # mémoire de veille (ADR-0027). Sans elle, un run sans changement ne
+      # retenait rien, et les mêmes PDF étaient relus (et payés) chaque mardi.
+      # Checkout PROPRE de main : la mémoire ne doit jamais emporter le
+      # conseil.json proposé, qui ne passe que par la PR draft.
+      - name: Mémoriser les fichiers écartés (main)
+        if: steps.liste.outputs.nouveaux != '0' && steps.fusion.outputs.ecartes != '0'
+        run: |
+          git config user.name "conseil-drive[bot]"
+          git config user.email "conseil-drive@users.noreply.github.com"
+          for essai in 1 2 3; do
+            git fetch -q origin main
+            git checkout -q -f -B memoire-conseil-drive origin/main
+            node scripts/conseil-drive-memoire.js
+            git add data/conseil-drive-etat.json
+            git diff --cached --quiet && { echo "Mémoire déjà à jour."; break; }
+            git commit -q -m "data: mémoire conseil-drive — fichiers écartés ($(date -u +%Y-%m-%d))"
+            git push -q origin HEAD:main && break
+            echo "Push refusé (main a bougé) — nouvel essai $essai/3"
+          done
 
       - name: Proposition sans changement
         if: steps.liste.outputs.nouveaux != '0' && steps.fusion.outputs.changements != 'true'

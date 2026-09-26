@@ -79,9 +79,15 @@ function parserDossier(html) {
       + 'Relever le nouveau format avant de relancer.');
   }
   const entrees = new Map();
-  const motifEntree = /id="entry-([-\w]{10,})"[\s\S]{0,2000}?flip-entry-title">([^<]+)</g;
+  const motifEntree = /id="entry-([-\w]{10,})"([\s\S]{0,2000}?)flip-entry-title">([^<]+)</g;
   let m;
-  while ((m = motifEntree.exec(html)) !== null) entrees.set(m[1], m[2].trim());
+  while ((m = motifEntree.exec(html)) !== null) {
+    // Un SOUS-DOSSIER (« Archives » au premier run réel) pointe vers
+    // /drive/folders/ : le télécharger rendait HTTP 500, retenté chaque
+    // semaine. On ne descend pas dedans — le dossier des CR est plat.
+    if (/\/folders\//.test(m[2])) { console.log('  ⤷ sous-dossier ignoré : ' + m[3].trim()); continue; }
+    entrees.set(m[1], m[3].trim());
+  }
   if (entrees.size === 0) {
     const motifLien = /\/file\/d\/([-\w]{10,})\//g;
     while ((m = motifLien.exec(html)) !== null) {

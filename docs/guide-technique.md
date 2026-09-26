@@ -1827,8 +1827,17 @@ branche fixe `conseil/maj-drive`. Points à connaître :
   n° de délibération, décision du Maire par date+objet normalisé+montant,
   projet existant mis à jour — **jamais créé** par le pipeline ;
 - ⛔ un fichier ni intégré ni écarté n'est PAS marqué traité : retenté au run
-  suivant et nommé dans le résumé de PR ; l'état vit dans
-  `data/conseil-drive-etat.json` ;
+  suivant et nommé dans le résumé de PR ;
+- ⛔ **deux mémoires, deux chemins** (ADR-0053 §7) : un fichier devenu séance
+  est mémorisé par son `drive_id` dans `data/conseil.json` (PR draft) ; un
+  fichier **écarté** l'est dans `data/conseil-drive-etat.json`, **commité
+  directement sur `main`** (`scripts/conseil-drive-memoire.js`) — sans quoi
+  un run sans changement ne retenait rien et relisait (et payait) les mêmes
+  PDF chaque mardi. Pour forcer une relecture, supprimer l'entrée de l'état ;
+- ⛔ les PDF du Drive sont des **scans** : `pdftotext` d'abord, **OCR
+  `tesseract` (fra) en repli** sous 200 caractères ; un témoin `<id>.ocr`
+  prévient l'agent que les chiffres peuvent être faux (« O » pour « 0 ») ;
+  les sous-dossiers du Drive sont ignorés ;
 - ⛔ la vue Drive doit porter son marqueur structurel, sinon **échec du job**
   (un parseur qui ne mesure rien verdit, ADR-0030) — `drive.google.com` est
   injoignable depuis l'environnement de dev, le format se relève en CI ;
