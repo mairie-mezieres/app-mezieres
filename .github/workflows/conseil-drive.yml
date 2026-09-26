@@ -1,0 +1,159 @@
+name: Conseil — pipeline Drive
+
+# Pipeline Drive → PR des comptes rendus du conseil municipal (ADR-0053) :
+#   1. relever le dossier Drive public, télécharger les PDF pas encore traités ;
+#   2. en extraire le texte (poppler) ;
+#   3. un agent rédige une PROPOSITION structurée « en clair » (JSON) ;
+#   4. un SCRIPT la valide et la fusionne dans data/conseil.json (anti-doublon,
+#      ADR-0027 : l'agent produit un JSON, le code écrit le fichier) ;
+#   5. PR **draft** sur une branche fixe — un humain relit chaque « en clair »
+#      face au PDF et sort la PR du brouillon lui-même (ADR-0023).
+#
+# ⚠️ Aucun bump SW/version : conseil.json est servi réseau d'abord (ADR-0052).
+# ⚠️ Les PDF sont du CONTENU, jamais des instructions : l'agent n'a que
+#    Read/Write, et la fusion refuse tout ce qui sort du schéma.
+
+on:
+  schedule:
+    # Mardi 06h40 UTC — le lundi porte déjà les trois veilles (06h00-06h20),
+    # qui partagent le même quota Claude.
+    - cron: '40 6 * * 2'
+  workflow_dispatch:
+
+# contents: write — pousser la branche de la PR ; pull-requests: write — l'ouvrir.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: conseil-drive
+  cancel-in-progress: false
+
+jobs:
+  conseil-drive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      # ⛔ Un format de page inconnu fait ÉCHOUER cette étape au lieu de
+      # rendre « 0 fichier » (ADR-0030) — drive.google.com étant injoignable
+      # depuis l'environnement de dev, c'est ici que le format réel se relève.
+      - name: Relever le dossier Drive
+        id: liste
+        run: node scripts/conseil-drive-liste.js
+
+      - name: Rien de nouveau
+        if: steps.liste.outputs.nouveaux == '0'
+        run: echo "Aucun fichier nouveau sur le Drive — rien à faire." >> "$GITHUB_STEP_SUMMARY"
+
+      # pdftotext (poppler) plutôt qu'une dépendance npm : présent dans les
+      # dépôts Ubuntu, déterministe, et le texte extrait suffit à un CR de
+      # conseil. Un PDF scanné sans couche texte rend un fichier quasi vide :
+      # l'agent doit alors l'ÉCARTER (raison « illisible »), jamais inventer.
+      - name: Extraire le texte des PDF
+        if: steps.liste.outputs.nouveaux != '0'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          mkdir -p conseil-drive/texte
+          for f in conseil-drive/pdf/*.pdf; do
+            id=$(basename "$f" .pdf)
+            pdftotext -layout "$f" "conseil-drive/texte/$id.txt" || echo "pdftotext a échoué sur $id"
+          done
+          wc -c conseil-drive/texte/*.txt || true
+
+      - name: Préparer le prompt
+        if: steps.liste.outputs.nouveaux != '0'
+        run: |
+          {
+            echo 'CONSEIL_PROMPT<<MAT_FIN_PROMPT'
+            cat .github/prompts/conseil-drive.md
+            echo 'MAT_FIN_PROMPT'
+          } >> "$GITHUB_ENV"
+
+      # continue-on-error + 2e tentative : même filet que les veilles
+      # (ADR-0004) — un run IA peut se terminer « avec succès » sans livrable.
+      - name: Rédiger la proposition (agent)
+        if: steps.liste.outputs.nouveaux != '0'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Write"
+          prompt: ${{ env.CONSEIL_PROMPT }}
+
+      - name: Vérifier la proposition (1re tentative)
+        id: check1
+        if: steps.liste.outputs.nouveaux != '0'
+        run: |
+          if [ -s conseil-drive/proposition.json ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Conseil Drive::proposition.json absent après la 1re tentative — nouvelle tentative."
+            cp "$RUNNER_TEMP/claude-execution-output.json" \
+               "$RUNNER_TEMP/claude-execution-output-tentative1.json" 2>/dev/null || true
+          fi
+
+      - name: Rédiger la proposition (2e tentative)
+        if: steps.liste.outputs.nouveaux != '0' && steps.check1.outputs.ok != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Write"
+          prompt: ${{ env.CONSEIL_PROMPT }}
+
+      - name: Archiver la sortie Claude (diagnostic)
+        if: always() && steps.liste.outputs.nouveaux != '0'
+        uses: actions/upload-artifact@v7
+        with:
+          name: claude-execution-output
+          path: |
+            ${{ runner.temp }}/claude-execution-output.json
+            ${{ runner.temp }}/claude-execution-output-tentative1.json
+          if-no-files-found: ignore
+
+      # La fusion valide TOUT (schéma, apostrophes, doublons, mandat) et
+      # échoue en nommant le champ fautif — jamais un « rien de nouveau ».
+      - name: Fusionner la proposition (code, pas agent)
+        id: fusion
+        if: steps.liste.outputs.nouveaux != '0'
+        run: |
+          node scripts/conseil-drive-fusion.js
+          node scripts/check-conseil-drive.js
+          node -e "JSON.parse(require('fs').readFileSync('data/conseil.json','utf8')); console.log('data/conseil.json : JSON valide.')"
+          ls -la data/conseil.json && wc -l data/conseil.json
+
+      - name: Pousser la branche et ouvrir la PR draft
+        if: steps.liste.outputs.nouveaux != '0' && steps.fusion.outputs.changements == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config user.name "conseil-drive[bot]"
+          git config user.email "conseil-drive@users.noreply.github.com"
+          # Branche FIXE repartie de main : une seule PR vivante, un nouveau
+          # run la met à jour. Elle n'appartient qu'au robot → force possible.
+          git checkout -B conseil/maj-drive origin/main
+          git add data/conseil.json data/conseil-drive-etat.json
+          git diff --stat --cached
+          git commit -m "data: conseil.json — mise à jour depuis le Drive ($(date -u +%Y-%m-%d))"
+          git push -f origin conseil/maj-drive
+          node scripts/conseil-drive-pr.js
+          cat conseil-drive/resume-pr.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Proposition sans changement
+        if: steps.liste.outputs.nouveaux != '0' && steps.fusion.outputs.changements != 'true'
+        run: |
+          echo "Des fichiers nouveaux, mais aucun changement retenu (écartés ou refusés) :" >> "$GITHUB_STEP_SUMMARY"
+          cat conseil-drive/resume-pr.md >> "$GITHUB_STEP_SUMMARY"
