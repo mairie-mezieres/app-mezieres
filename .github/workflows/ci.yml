@@ -68,6 +68,13 @@ jobs:
       - name: Workflow inputs check (null == false)
         run: node scripts/check-workflow-inputs.js
 
+      # Les règles anti-doublon du pipeline conseil-drive (ADR-0053) ne
+      # s'exécutent qu'en workflow, sur des PDF qui n'existent pas encore :
+      # aucun test E2E ne peut les voir, et un doublon de séance ne se
+      # verrait qu'au conseil suivant, en production.
+      - name: Fusion conseil-drive (anti-doublon)
+        run: node scripts/check-conseil-drive.js
+
       # Une spec E2E qui ne coupe pas `onrender.com` appelle le backend de
       # PRODUCTION à chaque exécution — et Playwright partant d'un profil
       # vierge, CHAQUE TEST s'y enregistre comme un visiteur unique de plus.

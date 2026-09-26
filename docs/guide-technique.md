@@ -1812,6 +1812,31 @@ Cinq points à connaître avant d'y toucher :
 > Permissions : `contents: write`, `issues: write`, `pull-requests: write`,
 > `statuses: write`.
 
+### Conseil municipal — pipeline Drive → PR (`conseil-drive.yml`, ADR-0053)
+
+Hebdomadaire (mardi 06h40 UTC) + manuel. Relève le dossier Drive public des
+comptes rendus, extrait le texte (`pdftotext`), fait rédiger une **proposition**
+JSON par un agent (Read/Write seulement — le texte des PDF est du contenu,
+jamais des instructions), puis **le code fusionne** dans `data/conseil.json`
+(`scripts/conseil-drive-fusion.js`, ADR-0027) et ouvre une PR **draft** sur la
+branche fixe `conseil/maj-drive`. Points à connaître :
+
+- ⛔ anti-doublon en code testé (`scripts/check-conseil-drive.js`, lancé par
+  `ci.yml`) : séance par `id`=date (une séance saisie par anticipation est
+  complétée, pas doublée), `cr_partiel → pv` jamais l'inverse, décision par
+  n° de délibération, décision du Maire par date+objet normalisé+montant,
+  projet existant mis à jour — **jamais créé** par le pipeline ;
+- ⛔ un fichier ni intégré ni écarté n'est PAS marqué traité : retenté au run
+  suivant et nommé dans le résumé de PR ; l'état vit dans
+  `data/conseil-drive-etat.json` ;
+- ⛔ la vue Drive doit porter son marqueur structurel, sinon **échec du job**
+  (un parseur qui ne mesure rien verdit, ADR-0030) — `drive.google.com` est
+  injoignable depuis l'environnement de dev, le format se relève en CI ;
+- ⚠️ ces PR n'ont pas de coche verte (`GITHUB_TOKEN`, ADR-0023) : les
+  contrôles tournent dans le run, et **sortir la PR du brouillon après
+  relecture des `en_clair` face aux PDF est le geste de validation humaine** ;
+- pas de bump SW/version : `conseil.json` est servi réseau d'abord (ADR-0052).
+
 ### Suivi du dépôt — `suivi-depot.yml` (ADR-0043)
 
 L'étage 3 ne regarde que ce que la veille a ouvert. `suivi-depot.yml` regarde **tout
