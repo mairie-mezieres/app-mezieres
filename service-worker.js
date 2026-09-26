@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.125.1';
+const CACHE = 'mat-v4.126.0';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -26,10 +26,10 @@ const MAT_API = 'https://chatbot-mairie-mezieres.onrender.com';
 const CRITICAL_PRECACHE = [
   './index.html',
   './offline.html',
-  './css/mat.css?v=4.14.27',
+  './css/mat.css?v=4.15.0',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
-  './js/mat-core.js?v=4.4.2'
+  './js/mat-core.js?v=4.4.3'
 ];
 
 // Fichiers critiques précachés à l'installation
@@ -37,12 +37,12 @@ const PRECACHE_URLS = [
   './index.html',
   './offline.html',
   './partager.html',
-  './css/mat.css?v=4.14.27',
-  './css/mat-desktop.css?v=4.6.0',
+  './css/mat.css?v=4.15.0',
+  './css/mat-desktop.css?v=4.7.0',
   './css/fonts.css?v=2',
   './js/mat-config.js?v=1',
   './js/mat-utils.js?v=4.3.9',
-  './js/mat-core.js?v=4.4.2',
+  './js/mat-core.js?v=4.4.3',
   './js/mat-accessibility.js?v=4.3.11',
   './js/mat-widgets.js?v=4.5.11',
   './js/mat-ambiance.js?v=1.8.0',
@@ -52,7 +52,7 @@ const PRECACHE_URLS = [
   './js/mat-actus.js?v=4.5.1',
   './js/mat-trombi.js?v=4.3.0',
   './js/mat-mel.js?v=4.5.3',
-  './js/mat-boot.js?v=4.13.4',
+  './js/mat-boot.js?v=4.14.0',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -77,6 +77,11 @@ const PRECACHE_URLS = [
   './js/mat-guide-arrivee.js?v=1.0.8',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.5.0',
+  './js/mat-conseil.js?v=1.0.0',
+  // ⚠️ Sans ?v= : servi en RÉSEAU D'ABORD (voir fetch), le cache n'est
+  // que le secours hors connexion — le ?v= n'apporterait rien et
+  // désynchroniserait l'URL du fetch de mat-conseil.js.
+  './data/conseil.json',
   './data/plu-data.json?v=4.2.3',
   './data/mel-tree.json?v=3.7.6',
   './data/saviez-vous.json?v=1.5.0',
@@ -228,6 +233,28 @@ self.addEventListener('fetch', e => {
       } catch (_) { /* hors ligne : on retombe sur le cache */ }
       return (await caches.match(e.request))
         || (await caches.match('./jeux/jeux.json'))
+        || Response.error();
+    })());
+    return;
+  }
+
+  // ── Décisions du conseil : RÉSEAU D'ABORD, cache en secours ────────
+  // Même raison que le manifeste des jeux : servi en stale-while-revalidate,
+  // un compte rendu fraîchement publié n'apparaîtrait qu'au lancement
+  // suivant, et le bandeau « Nouveau » annoncerait une séance en retard.
+  // Le fichier est petit (~17 Ko) ; hors connexion, le cache prend le relais.
+  if (url.includes('/data/conseil.json')) {
+    e.respondWith((async () => {
+      try {
+        const res = await fetch(e.request);
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone)).catch(() => {});
+          return res;
+        }
+      } catch (_) { /* hors ligne : on retombe sur le cache */ }
+      return (await caches.match(e.request))
+        || (await caches.match('./data/conseil.json'))
         || Response.error();
     })());
     return;
