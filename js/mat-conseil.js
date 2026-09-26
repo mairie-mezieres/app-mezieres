@@ -397,7 +397,80 @@
     if (_filtre !== 'tout') _appliquerFiltre(_filtre);
   }
 
-  function _htmlProjets() { return '<div class="conseil-attente">Chargement…</div>'; }
+  /* ── Onglet Projets — volontairement calme : aucun compteur animé. ── */
+  var STATUTS = [
+    { cle: 'en_cours', label: 'En cours',  ico: '🚧', etape: 3 },
+    { cle: 'decide',   label: 'Décidé',    ico: '✅', etape: 2 },
+    { cle: 'etude',    label: 'À l’étude', ico: '🔍', etape: 1 },
+    { cle: 'termine',  label: 'Terminé',   ico: '🎉', etape: 4 }
+  ];
+  var RAIL = ['🔍 À l’étude', '✅ Décidé', '🚧 En cours', '🎉 Terminé'];
+
+  function _libelleCompte(n, statut) {
+    if (statut.cle === 'etude') return n + ' à l’étude';
+    if (statut.cle === 'en_cours') return n + ' en cours';
+    var base = statut.cle === 'decide' ? 'décidé' : 'terminé';
+    return n + ' ' + base + (n > 1 ? 's' : '');
+  }
+
+  function _railHtml(etape) {
+    var statut = STATUTS.filter(function (s) { return s.etape === etape; })[0];
+    var h = '<div class="conseil-rail" role="img" aria-label="Étape ' + etape + ' sur 4 : '
+      + (statut ? statut.label.toLowerCase() : '') + '">';
+    RAIL.forEach(function (lib, i) {
+      var n = i + 1;
+      h += '<span class="conseil-rail-pt' + (n < etape ? ' is-fait' : '') + (n === etape ? ' is-actuel' : '') + '" aria-hidden="true">'
+        + lib.split(' ')[0] + '</span>';
+      if (n < RAIL.length) h += '<span class="conseil-rail-lien' + (n < etape ? ' is-fait' : '') + '" aria-hidden="true"></span>';
+    });
+    /* La couleur ne porte jamais seule l'information : l'étape courante est
+       aussi écrite en toutes lettres. */
+    h += '</div><div class="conseil-rail-lib">'
+      + (statut ? _esc(statut.ico + ' ' + statut.label) : '') + '</div>';
+    return h;
+  }
+
+  function _carteProjet(p) {
+    var statut = STATUTS.filter(function (s) { return s.cle === p.statut; })[0];
+    var accent = _accent(p.theme);
+    var h = '<article class="conseil-projet" data-theme="' + _esc(p.theme || '') + '"'
+      + (accent ? ' style="border-left-color:' + accent + '"' : '') + '>'
+      + '<div class="conseil-dec-tete"><span class="conseil-dec-ico" aria-hidden="true">' + _themeIco(p.theme) + '</span>'
+      + '<h4 class="conseil-dec-titre">' + _esc(p.titre) + '</h4></div>';
+    if (p.en_clair) h += '<p class="conseil-dec-clair">' + _esc(p.en_clair) + '</p>';
+    if (statut) h += _railHtml(statut.etape);
+    if (typeof p.montant === 'number') {
+      h += '<div class="conseil-dec-montant">💶 ' + _euro(p.montant) + '</div>';
+    }
+    if (p.echeance) h += '<div class="conseil-projet-echeance">📅 Échéance : ' + _esc(p.echeance) + '</div>';
+    if (p.maj) h += '<div class="conseil-dec-num">Mis à jour le ' + _dateJourMoisAnnee(p.maj) + '</div>';
+    return h + '</article>';
+  }
+
+  function _htmlProjets() {
+    var projets = _projetsVisibles();
+    if (!projets.length) {
+      return '<div class="conseil-echec"><p>Aucun projet publié pour le moment.</p></div>' + _htmlPied();
+    }
+    /* Ligne de synthèse sobre, calculée, dans l'ordre des groupes. */
+    var morceaux = [];
+    STATUTS.forEach(function (s) {
+      var n = projets.filter(function (p) { return p.statut === s.cle; }).length;
+      if (n) morceaux.push(_libelleCompte(n, s));
+    });
+    var h = '<div class="conseil-synthese">' + _esc(morceaux.join(', ')) + '</div>';
+
+    /* Cartes groupées par statut : En cours, Décidé, À l'étude, Terminé. */
+    STATUTS.forEach(function (s) {
+      var groupe = projets.filter(function (p) { return p.statut === s.cle; });
+      if (!groupe.length) return;
+      h += '<div class="conseil-projets-groupe">'
+        + '<h4 class="conseil-groupe-titre">' + s.ico + ' ' + _esc(s.label) + '</h4>'
+        + '<div class="conseil-groupe-cartes">' + groupe.map(_carteProjet).join('') + '</div>'
+        + '</div>';
+    });
+    return h + _htmlPied();
+  }
 
   /* ── Bandeau d'accueil ────────────────────────────────────────
      Rempli à l'étape « accueil : bandeau dernier conseil ». */

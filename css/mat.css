@@ -2178,3 +2178,23 @@ html.theme-sombre .conseil-tabs{background:#1e293b;}
 .conseil-pied{margin-top:6px;padding:12px 4px 4px;text-align:center;}
 .conseil-pied p{margin:0 0 8px;font-size:0.78rem;color:var(--muted);line-height:1.5;}
 .conseil-pied a{font-size:0.9rem;font-weight:900;color:var(--sage-ink);}
+
+/* ── Conseil : onglet Projets (calme — aucun compteur animé) ── */
+.conseil-synthese{font-size:1rem;font-weight:900;color:var(--text);background:var(--mist);border-radius:12px;padding:10px 14px;margin-bottom:14px;text-align:center;}
+.conseil-projets-groupe{margin-bottom:16px;}
+.conseil-groupe-titre{margin:0 0 8px;font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.conseil-groupe-cartes{display:flex;flex-direction:column;gap:10px;}
+.conseil-projet{background:var(--card);border:1px solid var(--border);border-left:5px solid var(--sage);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);}
+.conseil-rail{display:flex;align-items:center;gap:4px;margin-top:12px;}
+.conseil-rail-pt{
+  flex-shrink:0;width:34px;height:34px;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;font-size:0.95rem;
+  background:var(--warm);box-shadow:inset 0 0 0 1.5px var(--border-champ);
+  filter:grayscale(1);opacity:.55;
+}
+.conseil-rail-pt.is-fait{filter:none;opacity:.9;box-shadow:inset 0 0 0 1.5px var(--sage-ink);}
+.conseil-rail-pt.is-actuel{filter:none;opacity:1;background:var(--mist);box-shadow:inset 0 0 0 2.5px var(--sage-ink);}
+.conseil-rail-lien{flex:1;height:3px;border-radius:2px;background:var(--border-champ);opacity:.35;}
+.conseil-rail-lien.is-fait{background:var(--sage-ink);opacity:.9;}
+.conseil-rail-lib{margin-top:6px;font-size:0.9rem;font-weight:900;color:var(--text);}
+.conseil-projet-echeance{margin-top:8px;font-size:0.9rem;font-weight:800;color:var(--text);}
