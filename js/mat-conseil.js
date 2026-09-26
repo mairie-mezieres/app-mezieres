@@ -33,12 +33,16 @@
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
+  /* ⛔ PAS matStore ici. matStore.get fait JSON.parse de ce qu'il relit et
+     SUPPRIME la clé si le parse échoue — or nos valeurs sont des ids nus
+     (« 2026-08-31 »), qui ne sont pas du JSON valide : écrite par matStore.set
+     (brute) puis relue par matStore.get, la clé s'auto-détruisait à la
+     première lecture, et « Nouveau » ne s'éteignait jamais. Chaîne brute,
+     avec les mêmes garde-fous try/catch (mode privé Safari, quota). */
   function _lsGet(cle, dflt) {
-    if (typeof matStore !== 'undefined' && matStore.get) return matStore.get(cle, dflt);
-    try { return localStorage.getItem(cle) || dflt; } catch (_) { return dflt; }
+    try { var v = localStorage.getItem(cle); return v == null ? dflt : v; } catch (_) { return dflt; }
   }
   function _lsSet(cle, val) {
-    if (typeof matStore !== 'undefined' && matStore.set) { matStore.set(cle, val); return; }
     try { localStorage.setItem(cle, val); } catch (_) {}
   }
 
