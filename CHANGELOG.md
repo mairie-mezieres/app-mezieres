@@ -5,6 +5,36 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ---
 
+## [4.126] — 26 septembre 2026
+
+### Ajouté
+
+- **Conseil municipal : onglets « 🗳️ Décisions » et « 🏗️ Projets »** dans
+  l'overlay `#ov-conseil`, aux côtés du trombinoscope (inchangé). Données
+  statiques versionnées dans `data/conseil.json` (mandat en cours, visibilité
+  calculée, anti-doublon par id), carte « Dernier compte rendu » avec sceau
+  civique SVG et animation « coup de tampon » (une fois par séance, jamais
+  sous `prefers-reduced-motion`), filtre par thème, décisions « en clair »
+  avec badges de résultat et montants `Intl.NumberFormat`, bloc « Décisions
+  du Maire » sans total, rail d'avancement en 4 étapes pour les projets.
+  Lecture vocale du résumé via `ttsRead`. Voir ADR-0052.
+- **Bandeau d'accueil « 🏛️ Conseil du 31 août : 8 décisions »** juste
+  au-dessus de « Le saviez-vous ? » (et en haut de page au bureau), avec état
+  « Nouveau » (liseré or + pastille) jusqu'à consultation ; bouton
+  « 🏛️ Conseil » dans la navigation bureau avec la même pastille.
+- `data/conseil.json` servi **réseau d'abord** par le service worker (repli
+  cache hors connexion), précaché sans `?v=`.
+- Tests E2E `tests/e2e/conseil.spec.js` (visibilité, doublons, badges,
+  bandeau, échec de chargement, historique, bureau 1280 px).
+
+### Corrigé
+
+- L'enveloppe statistiques d'`openConseil` transmettait aucun argument : tout
+  appel `openConseil('decisions')` serait retombé sur « Les élus ».
+- Les clés `mat_conseil_*` sont stockées en chaîne brute : `matStore.get`
+  détruisait une clé dont la valeur (un id nu, `2026-08-31`) n'est pas du
+  JSON valide (ADR-0052 §4).
+
 ## [4.125.1] — 24 septembre 2026
 
 ### Modifié

@@ -259,6 +259,17 @@ matDifferer('js/mat-carte3d.js?v=1.11.1',       ['matOuvrirCarte3D']);
   document.head.appendChild(s);
 })();
 
+// Conseil municipal — onglets « Décisions »/« Projets » de #ov-conseil et
+// bandeau d'accueil. Injecté (pas matDifferer) : le bandeau doit se peindre
+// au démarrage, pas à la première ouverture de l'overlay. Sans ce module,
+// l'overlay reste fonctionnel sur l'onglet « Les élus » (ADR-0032).
+(function(){
+  var s = document.createElement('script');
+  s.src = 'js/mat-conseil.js?v=1.0.0';
+  s.onload = function(){ try { if (typeof matConseilInit === 'function') matConseilInit(); } catch(e){} };
+  document.head.appendChild(s);
+})();
+
 /* `mat-guide-arrivee.js` et `mat-carte3d.js` étaient injectés ici. Ils sont
    désormais chargés à la première ouverture de leur écran, par `matDifferer`
    plus haut. Voir ADR-0041. */

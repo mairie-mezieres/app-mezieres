@@ -49,8 +49,8 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.14.27">
-<link rel="stylesheet" href="css/mat-desktop.css?v=4.6.0">
+<link rel="stylesheet" href="css/mat.css?v=4.15.0">
+<link rel="stylesheet" href="css/mat-desktop.css?v=4.7.0">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
      de CSS entre les deux, donc l'ordre de la cascade est INCHANGÉ. -->
@@ -71,7 +71,7 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.9"></script>
-<script defer src="js/mat-core.js?v=4.4.2"></script>
+<script defer src="js/mat-core.js?v=4.4.3"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.11"></script>
 <script defer src="js/mat-widgets.js?v=4.5.11"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
@@ -88,7 +88,7 @@ document.documentElement.style.background = bg;
      Chargé ici plutôt qu'injecté par mat-boot.js : il ne dépend d'aucun autre
      module MAT, et la tuile ne doit pas attendre la fin de l'amorçage. -->
 <script defer src="js/mat-jeu.js?v=2.0.0"></script>
-<script defer src="js/mat-boot.js?v=4.13.4"></script>
+<script defer src="js/mat-boot.js?v=4.14.0"></script>
 <!-- Sentry — remplacez la chaîne vide par votre DSN pour activer le suivi d'erreurs
      Créez un projet sur https://sentry.io puis collez le DSN ici -->
 <script>
@@ -173,7 +173,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.125.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.126 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -233,6 +233,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button class="header-tool-btn urgent" onclick="openNums()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#b91c1c,#dc2626);box-shadow:0 3px 10px rgba(185,28,28,0.45);border:none;"><span style="font-size:1.1rem;filter:drop-shadow(0 0 3px rgba(255,255,255,0.7))">📞</span><span>Urgences</span></button>
 <button class="acc-btn" onclick="openAccessibilite()" title="Accessibilité & Personnalisation">♿ Personnalisation</button>
 </div>
+<!-- Bandeau « dernier conseil » — rempli par js/mat-conseil.js, masqué via
+     classList (cm-visible) tant que les données ne sont pas là. Même
+     composant visuel que « Le saviez-vous ? », placé juste au-dessus. -->
+<section class="cm-bandeau" aria-label="Conseil municipal — dernière séance"></section>
 <section class="sv-bloc" aria-label="Le saviez-vous ? Le fait du jour sur la commune"></section>
 </div>
 <div class="d-hero">
@@ -261,6 +265,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openAssociations()">🤝 Associations</button>
 <button onclick="openEntreprises()">🛠️ Entreprises</button>
 <button onclick="openDocs()" style="position:relative">📄 Documents officiels<span id="docs-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
+<!-- ⛔ CONTRASTE — pastille visible dès le chargement (contrairement à celle
+     des Documents, éteinte par défaut) : le #ef4444 des autres badges donne
+     3,76:1 pour du blanc en 9,6 px, axe la refuse. #b91c1c : 6,3:1. -->
+<button onclick="openConseil('decisions')" style="position:relative">🏛️ Conseil<span id="conseil-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#b91c1c;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
 <button onclick="openIdees()">💡 Idées</button>
 <button onclick="openSondages()">📊 Sondages citoyens</button>
 <button onclick="openPlui()" style="position:relative">🗺️ PLUi-H-D<span id="plui-badge-desktop" style="display:none;align-items:center;justify-content:center;margin-left:6px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:900;padding:2px 7px;border-radius:999px;line-height:1.4">Nouveau</span></button>
@@ -401,6 +409,10 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 </div>
 </div>
 <main id="main-content">
+<!-- Bureau : la zone sombre n'existe pas à ≥ 1024 px (.header masqué) —
+     le bandeau conseil prend l'emplacement équivalent le plus visible,
+     sous .d-hero, avant la première section de contenu. -->
+<section class="cm-bandeau cm-bandeau-d" aria-label="Conseil municipal — dernière séance"></section>
 <section class="sv-bloc sv-bloc-d d-sv-bandeau" aria-label="Le saviez-vous ? Le fait du jour sur la commune"></section>
 <div class="d-main-grid">
 <!-- ⛔ RÉPARTITION DES CARTES — ce n'est pas un détail de goût : les trois
@@ -528,7 +540,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.125.1</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.126</button>
 </div>
 </div>
 </div>
@@ -1287,8 +1299,24 @@ Vous n'avez pas Facebook ? Utilisez le formulaire ci-dessous pour envoyer votre 
 <button class="panel-close" aria-label="Fermer" onclick="closeOv('conseil')">✕</button>
 </div>
 <div class="panel-body">
+<!-- Onglets Conseil (v4.126) — la barre est collante en haut de .panel-body ;
+     les panneaux sont pilotés par classList (jamais de display inline), et le
+     changement d'onglet ne crée AUCUNE entrée d'historique. Le contenu des
+     onglets Décisions/Projets est rendu par js/mat-conseil.js (injecté par
+     mat-boot) à partir de data/conseil.json. -->
+<div class="conseil-tabs" role="tablist" aria-label="Rubriques du conseil municipal">
+<button type="button" class="conseil-tab is-active" id="conseil-tab-elus" role="tab" aria-selected="true" aria-controls="conseil-panel-elus" data-conseil-tab="elus">👥 Les élus</button>
+<button type="button" class="conseil-tab" id="conseil-tab-decisions" role="tab" aria-selected="false" tabindex="-1" aria-controls="conseil-panel-decisions" data-conseil-tab="decisions">🗳️ Décisions</button>
+<button type="button" class="conseil-tab" id="conseil-tab-projets" role="tab" aria-selected="false" tabindex="-1" aria-controls="conseil-panel-projets" data-conseil-tab="projets">🏗️ Projets</button>
+</div>
+<div class="conseil-panel is-active" id="conseil-panel-elus" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-elus">
+<!-- Trombinoscope existant, STRICTEMENT inchangé (mêmes ids, même modale) —
+     seul déplacement : il est enveloppé dans le panneau de l'onglet. -->
 <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px 10px;background:var(--mist);border-radius:10px">👆 Cliquez sur une photo pour voir le détail</div>
 <div class="trombi-grid" id="trombi-grid"></div>
+</div>
+<div class="conseil-panel" id="conseil-panel-decisions" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-decisions"><div class="conseil-attente">Chargement…</div></div>
+<div class="conseil-panel" id="conseil-panel-projets" role="tabpanel" tabindex="0" aria-labelledby="conseil-tab-projets"><div class="conseil-attente">Chargement…</div></div>
 </div>
 </div>
 </template>
@@ -1858,6 +1886,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 26 septembre 2026 — v4.126</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Conseil municipal&nbsp;: les d&eacute;cisions et les projets de la commune, expliqu&eacute;s simplement.</strong> Deux nouveaux onglets aux c&ocirc;t&eacute;s du trombinoscope&nbsp;&mdash; chaque d&eacute;cision en clair avec son r&eacute;sultat de vote et son montant, chaque projet avec son avancement en 4 &eacute;tapes&nbsp;&mdash; et un bandeau d&rsquo;accueil qui annonce le dernier compte rendu</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 24 septembre 2026 — v4.125.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>&laquo;&nbsp;Remonter le temps&nbsp;&raquo; s&rsquo;ouvre sur les photos a&eacute;riennes de 1950-1965</strong>, les plus d&eacute;taill&eacute;es, et s&rsquo;approche du bourg&nbsp;: on y distingue les champs, les haies et les maisons d&rsquo;alors. Les cartes de Cassini et de l&rsquo;&eacute;tat-major restent &agrave; un appui, dans le panneau</li>

@@ -2060,3 +2060,170 @@ html.theme-sombre .c3d-temps-reperes button[aria-pressed="true"]{background:var(
    blanc y contraste partout. Un jeton clair y deviendrait illisible en
    thème sombre — c'est le piège décrit dans CLAUDE.md. */
 .mat-attente{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;background:var(--forest);color:#fff;font-family:'Nunito',sans-serif;font-size:0.8rem;font-weight:800;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,0.25);pointer-events:none;}
+
+/* ══ Conseil municipal — onglets, décisions, projets (v4.126) ══
+   Libellés d'onglet ≥ 1rem et cibles ≥ 44px (public senior) ; les panneaux
+   sont pilotés par classList uniquement. Couleurs par variables : en thème
+   sombre, --forest/--leaf sont des FONDS — jamais en color: ici. */
+.conseil-tabs{
+  position:sticky;top:-16px;z-index:5;
+  display:flex;gap:6px;margin:-16px -16px 14px;padding:10px 12px;
+  background:var(--warm);border-bottom:1px solid var(--border);
+}
+.conseil-tab{
+  flex:1;min-height:44px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;
+  background:none;color:var(--text);padding:8px 6px;
+  -webkit-tap-highlight-color:transparent;
+}
+.conseil-tab.is-active{background:var(--mist);color:var(--text);font-weight:900;box-shadow:inset 0 0 0 2px var(--sage-ink);}
+.conseil-tab:focus-visible{outline:3px solid var(--sage-ink);outline-offset:2px;}
+.conseil-panel{display:none;}
+.conseil-panel.is-active{display:block;}
+.conseil-attente{font-size:1rem;color:var(--muted);text-align:center;padding:24px 0;}
+.conseil-echec{font-size:1rem;color:var(--text);text-align:center;padding:20px 8px;line-height:1.6;}
+.conseil-echec a{color:var(--sage-ink);font-weight:900;}
+html.theme-sombre .conseil-tabs{background:#1e293b;}
+
+/* ── Conseil : onglet Décisions ── */
+.conseil-cr{
+  display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
+  background:linear-gradient(135deg,var(--forest),var(--leaf));border-radius:18px;
+  padding:20px 16px;color:#fff;box-shadow:var(--shadow-lg);margin-bottom:14px;
+}
+.conseil-sceau{width:118px;height:118px;display:block;}
+.conseil-sceau-wrap{flex-shrink:0;line-height:0;}
+/* « Coup de tampon » : ~300 ms, échelle + légère rotation. Jouée une seule
+   fois par nouvelle séance (mat_conseil_tampon), jamais si l'habitant a
+   demandé moins d'animations. */
+.conseil-tampon-anim{animation:conseilTampon .3s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes conseilTampon{
+  0%{transform:scale(1.7) rotate(-7deg);opacity:0;}
+  60%{transform:scale(.94) rotate(1.5deg);opacity:1;}
+  100%{transform:scale(1) rotate(0deg);opacity:1;}
+}
+@media (prefers-reduced-motion:reduce){.conseil-tampon-anim{animation:none;}}
+.conseil-cr-sur{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#a7f3d0;}
+.conseil-cr-date{font-size:1.3rem;font-weight:900;margin-top:4px;}
+.conseil-cr-resume{font-size:1rem;line-height:1.55;color:rgba(255,255,255,.94);margin:8px 0 0;}
+.conseil-cr-nb{margin-top:8px;font-size:1rem;font-weight:900;color:#ffe9a8;}
+.conseil-cr-prochain{margin-top:8px;font-size:0.85rem;font-weight:800;line-height:1.5;color:#a7f3d0;}
+.conseil-ecouter{
+  margin-top:12px;min-height:44px;border:none;border-radius:12px;cursor:pointer;
+  background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4);
+  color:#fff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;padding:9px 18px;
+}
+.conseil-ecouter:focus-visible{outline:3px solid #a7f3d0;outline-offset:2px;}
+.conseil-filtres{
+  display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin-bottom:10px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.conseil-filtres::-webkit-scrollbar{display:none;}
+.conseil-filtre{
+  flex-shrink:0;min-height:44px;border:1.5px solid var(--border-champ);border-radius:999px;
+  background:var(--card);color:var(--text);cursor:pointer;padding:8px 14px;
+  font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;white-space:nowrap;
+}
+.conseil-filtre.is-active{background:var(--mist);border-color:var(--sage-ink);box-shadow:inset 0 0 0 1px var(--sage-ink);font-weight:900;}
+.conseil-filtre:focus-visible{outline:3px solid var(--sage-ink);outline-offset:2px;}
+.conseil-hors-filtre{display:none !important;}
+.conseil-seance{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;
+}
+.conseil-seance-titre{
+  display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;
+  padding:14px;font-size:1.05rem;font-weight:900;color:var(--text);min-height:44px;
+}
+.conseil-seance-titre::-webkit-details-marker{display:none;}
+.conseil-seance-titre>span:first-child{flex:1;min-width:0;}
+.conseil-seance-partiel{
+  font-size:0.75rem;font-weight:900;color:var(--text);background:var(--mist);
+  border-radius:999px;padding:3px 10px;flex-shrink:0;
+}
+.conseil-seance-chev{font-size:1.2rem;font-weight:900;color:var(--muted);transform:rotate(90deg);transition:transform .15s ease;flex-shrink:0;}
+.conseil-seance:not([open]) .conseil-seance-chev{transform:none;}
+.conseil-seance-titre:focus-visible{outline:3px solid var(--sage-ink);outline-offset:-3px;}
+.conseil-seance-corps{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px;}
+.conseil-dec{
+  background:var(--warm);border:1px solid var(--border);border-left:5px solid var(--sage);
+  border-radius:12px;padding:12px 14px;
+}
+.conseil-dec-tete{display:flex;align-items:flex-start;gap:8px;}
+.conseil-dec-ico{font-size:1.15rem;flex-shrink:0;line-height:1.3;}
+.conseil-dec-titre{margin:0;font-size:1rem;font-weight:900;color:var(--text);line-height:1.35;}
+.conseil-dec-clair{margin:8px 0 0;font-size:1rem;line-height:1.6;color:var(--text);}
+.conseil-dec-badge{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:10px;
+  background:var(--mist);border-radius:10px;padding:6px 10px;
+  font-size:0.9rem;font-weight:900;color:var(--text);line-height:1.4;
+}
+.conseil-dec-votes{font-weight:800;color:var(--muted);font-size:0.85rem;}
+.conseil-dec-montant{margin-top:8px;font-size:0.95rem;font-weight:900;color:var(--text);}
+.conseil-dec-elus{
+  margin-top:10px;min-height:44px;border:1.5px solid var(--border-champ);border-radius:12px;
+  background:var(--card);color:var(--text);cursor:pointer;padding:8px 14px;
+  font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;
+}
+.conseil-dec-elus:focus-visible{outline:3px solid var(--sage-ink);outline-offset:2px;}
+.conseil-dec-num{margin-top:8px;font-size:0.75rem;font-weight:800;color:var(--muted);}
+.conseil-dm{margin:0 12px 12px;background:var(--mist);border-radius:12px;padding:12px 14px;}
+.conseil-dm-titre{font-size:0.95rem;font-weight:900;color:var(--text);}
+.conseil-dm-sous{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-top:2px;}
+.conseil-dm-liste{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.conseil-dm-liste li{display:flex;align-items:baseline;gap:8px;font-size:0.9rem;line-height:1.45;color:var(--text);}
+.conseil-dm-date{flex-shrink:0;font-weight:900;color:var(--muted);min-width:74px;font-size:0.85rem;}
+.conseil-dm-objet{flex:1;min-width:0;}
+.conseil-dm-montant{flex-shrink:0;font-weight:900;}
+.conseil-pied{margin-top:6px;padding:12px 4px 4px;text-align:center;}
+.conseil-pied p{margin:0 0 8px;font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.conseil-pied a{font-size:0.9rem;font-weight:900;color:var(--sage-ink);}
+
+/* ── Conseil : onglet Projets (calme — aucun compteur animé) ── */
+.conseil-synthese{font-size:1rem;font-weight:900;color:var(--text);background:var(--mist);border-radius:12px;padding:10px 14px;margin-bottom:14px;text-align:center;}
+.conseil-projets-groupe{margin-bottom:16px;}
+.conseil-groupe-titre{margin:0 0 8px;font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.conseil-groupe-cartes{display:flex;flex-direction:column;gap:10px;}
+.conseil-projet{background:var(--card);border:1px solid var(--border);border-left:5px solid var(--sage);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);}
+.conseil-rail{display:flex;align-items:center;gap:4px;margin-top:12px;}
+.conseil-rail-pt{
+  flex-shrink:0;width:34px;height:34px;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;font-size:0.95rem;
+  background:var(--warm);box-shadow:inset 0 0 0 1.5px var(--border-champ);
+  filter:grayscale(1);opacity:.55;
+}
+.conseil-rail-pt.is-fait{filter:none;opacity:.9;box-shadow:inset 0 0 0 1.5px var(--sage-ink);}
+.conseil-rail-pt.is-actuel{filter:none;opacity:1;background:var(--mist);box-shadow:inset 0 0 0 2.5px var(--sage-ink);}
+.conseil-rail-lien{flex:1;height:3px;border-radius:2px;background:var(--border-champ);opacity:.35;}
+.conseil-rail-lien.is-fait{background:var(--sage-ink);opacity:.9;}
+.conseil-rail-lib{margin-top:6px;font-size:0.9rem;font-weight:900;color:var(--text);}
+.conseil-projet-echeance{margin-top:8px;font-size:0.9rem;font-weight:800;color:var(--text);}
+
+/* ── Bandeau d'accueil « dernier conseil » ──
+   Même composant visuel que la ligne « Le saviez-vous ? » (hauteur, rayon,
+   typo). Deux états au même emplacement : Nouveau (liseré or + pastille)
+   et Vu (neutre). Masqué via classList tant que les données manquent. */
+.cm-bandeau{display:none;}
+.cm-bandeau.cm-visible{display:block;margin-top:8px;}
+.cm-ligne{
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:9px 12px;border:none;border-radius:12px;cursor:pointer;
+  background:rgba(0,0,0,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  font-family:'Nunito',sans-serif;color:var(--cream);text-align:left;
+  min-height:44px;-webkit-tap-highlight-color:transparent;
+}
+.cm-ligne:active{transform:scale(.99);}
+.cm-ligne:focus-visible{outline:3px solid #a7f3d0;outline-offset:2px;}
+.cm-ligne-txt{flex:1;min-width:0;font-size:.78rem;font-weight:900;letter-spacing:.01em;}
+.cm-ligne-chev{font-size:1.1rem;font-weight:900;opacity:.7;flex-shrink:0;line-height:1;}
+.cm-ligne.is-nouveau{box-shadow:inset 0 0 0 2px var(--gold);}
+/* Encre sombre en dur sur fond or : var(--text) devient claire en thème
+   sombre et ne contrasterait plus (même choix que .ib-x). */
+.cm-ligne-new{
+  flex-shrink:0;background:var(--gold);color:#3d2000;border-radius:999px;
+  padding:3px 10px;font-size:.75rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:.05em;
+}
+/* Le bandeau suit « Le saviez-vous ? » : masqué par « Masquer l'en-tête »,
+   PAS par « Masquer la météo & transports » (il vit hors .header-bottom-grid). */
+html.no-header .cm-bandeau{display:none !important;}

@@ -869,6 +869,35 @@ dois-je faire ? » — elle répond avec la même liste.
 
 ---
 
+## 17 bis. Le conseil municipal — décisions et projets en clair
+
+Sur l'accueil, juste au-dessus de « Le saviez-vous ? », un bandeau annonce le
+dernier compte rendu : **🏛️ Conseil du 31 août : 8 décisions**. Tant que vous
+ne l'avez pas consulté, il porte un liseré doré et une pastille « Nouveau » ;
+ensuite il reprend un style neutre, sans changer de place. Sur ordinateur, le
+bandeau est en haut de page et un bouton **🏛️ Conseil** vit dans la barre de
+navigation.
+
+Un appui ouvre l'écran **Conseil municipal**, qui a désormais trois onglets :
+
+- **👥 Les élus** — le trombinoscope, inchangé ;
+- **🗳️ Décisions** — le dernier compte rendu (avec son sceau et, si elle est
+  connue, la date du prochain conseil : les séances sont publiques), un filtre
+  par thème, puis chaque séance du mandat en cours. Chaque décision est
+  expliquée **en clair**, avec son résultat (« ✅ Adopté à l'unanimité »,
+  « 13 pour · 2 abstentions »…), son montant quand il y en a un, et son numéro
+  de délibération. Les **Décisions du Maire**, prises par délégation,
+  sont listées sous chaque séance. Un bouton **🔊 Écouter** lit le résumé à
+  voix haute ;
+- **🏗️ Projets** — chaque projet de la commune avec son avancement en
+  4 étapes : 🔍 À l'étude → ✅ Décidé → 🚧 En cours → 🎉 Terminé.
+
+Ces pages sont un **résumé des comptes rendus officiels** : seuls les
+documents officiels font foi, et un lien en pied d'écran y mène. Rien n'est
+inventé : ce qui n'est pas dans le compte rendu n'est pas affiché.
+
+---
+
 ## 18. « Le saviez-vous ? » — le fait du jour
 
 Sous les boutons **Urgences** et **Personnalisation**, une ligne discrète vous attend

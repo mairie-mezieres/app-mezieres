@@ -305,7 +305,17 @@ function submitSignal(){}
 function submitContact(){}
 function submitBug(){}
 function openMajordome(){ openOv('majordome'); }
-function openConseil(){ openOv('conseil'); buildTrombi(); }
+/* `onglet` (facultatif) : 'elus' (défaut), 'decisions' ou 'projets'.
+   Tous les appels historiques (bouton « Voir », [SHOW_ELUS] de MEL, plan du
+   site…) restent sans argument → l'onglet « Les élus » s'ouvre, comme avant.
+   ADR-0032 : mat-conseil.js est injecté par mat-boot — il peut manquer
+   (cache partiel du SW) : typeof avant l'appel, et le trombinoscope reste
+   fonctionnel sans lui. */
+function openConseil(onglet){
+  openOv('conseil');
+  buildTrombi();
+  if(typeof matConseilOnglet === 'function') matConseilOnglet(onglet || 'elus');
+}
 function openMel(){
   openOv('mel');
   renderContextHelp('mel');
@@ -572,7 +582,9 @@ function _track(service, extra){
   window.openSondages     = () => { _track('sondages');      _origOpenSondages(); };
   window.openDocs         = () => { _track('docs');          _origOpenDocs(); };
   window.openNums         = () => { _track('nums');          _origOpenNums(); };
-  window.openConseil      = () => { _track('conseil');       _origOpenConseil(); };
+  // ⚠️ `onglet` DOIT être transmis : sans lui, openConseil('decisions')
+  // (bandeau d'accueil, bouton bureau) retomberait toujours sur « Les élus ».
+  window.openConseil      = (onglet) => { _track('conseil');  _origOpenConseil(onglet); };
 })();
 
 // ── Bouton install / bug ──────────────────────────────────────
