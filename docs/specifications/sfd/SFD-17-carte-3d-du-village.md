@@ -293,6 +293,18 @@ Choix d'architecture : [ADR-0018](../../adr/0018-carte-3d-chargement-a-la-demand
   Au clavier, la poignée est un `role="slider"` : flèches ± 5 %, Page ± 25 %, Début/Fin.
   Le panneau ne recouvre ni un bouton, ni le zoom de MapLibre, ni le bandeau d'état, qu'il
   repousse sous lui (prolongement de RG-17.27). Voir ADR-0051.
+- **RG-17.32 — `_c3dMap` non nul ne veut pas dire « carte utilisable ».** Quand le
+  téléphone retire le contexte WebGL (application en arrière-plan, mémoire saturée),
+  MapLibre détruit le style et pose `map.style = null` jusqu'à la restauration :
+  `getLayer`, `getSource`, `addLayer` lèvent alors. Le chargement du territoire
+  (26 requêtes) se terminait souvent dans cet état — issue #479, remontée par Sentry.
+  Toute écriture **différée** (promesse, clic) passe par `_c3dCarteVive()` et par
+  `_c3dVisibilite()` ; à la restauration (`webglcontextrestored` puis `style.load`),
+  `_c3dApresRestauration()` repose les couches du territoire et rejoue le mode en cours
+  (le style restauré est celui **du moment de la perte**). Les bascules « Zonage » /
+  « Bâtiments » de l'habitant, déjà dans ce style, ne sont pas rallumées d'office.
+  Testé par une vraie perte de contexte (`WEBGL_lose_context`) dans
+  `tests/e2e/carte3d.spec.js`.
 
 ## 5. Parcours
 

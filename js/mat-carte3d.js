@@ -39,6 +39,18 @@ var C3D_DEFAUT = '#9aa5a0';
 var _c3dMap = null, _c3dPlu = null, _c3dZones = null, _c3dCommune = '';
 var _c3dJournal = [], _c3dDiag = '', _c3dPret = false, _c3dLibPromise = null;
 var _c3dMarqueur = null;
+
+/* ⚠️ `_c3dMap` non nul ne veut PAS dire « carte utilisable ». Quand le
+   téléphone retire son contexte WebGL (application en arrière-plan, mémoire
+   saturée), MapLibre détruit le style et pose `map.style = null` jusqu'à la
+   restauration : `getLayer`, `getSource`, `addLayer` lèvent alors
+   « Cannot read properties of null (reading 'getLayer') » (issue #479) —
+   typiquement au retour du chargement du territoire, 26 requêtes plus tard.
+   Toute écriture différée (promesse, clic) passe donc par cette garde, et
+   `_c3dApresRestauration` remet la carte dans le mode en cours. */
+function _c3dCarteVive(){
+  return !!(_c3dMap && _c3dMap.style);
+}
 /* Contour de la commune, renvoyé par l'appel `municipality`. Sert à ne
    compter et à ne draper QUE ce qui est à Mézières : l'emprise interrogée
    fait 7 km sur 6,7 km et déborde largement sur Cléry, Mareau et Dry. */
@@ -550,6 +562,9 @@ function _c3dCreerCarte(){
   });
   _c3dMap.addControl(new maplibregl.NavigationControl({ visualizePitch:true }), 'top-right');
   _c3dMap.touchZoomRotate.enableRotation();
+  _c3dMap.on('webglcontextrestored', function(){
+    _c3dMap.once('style.load', _c3dApresRestauration);
+  });
   return _c3dMap;
 }
 
@@ -1191,7 +1206,7 @@ function _c3dTerrCharger(){
         i += 4;
         return Promise.all(lot.map(_c3dTerrZonesDe)).then(function(res){
           res.forEach(function(zs){ _c3dTerrZones.features.push.apply(_c3dTerrZones.features, zs); });
-          var s = _c3dMap && _c3dMap.getSource('terr-zones');
+          var s = _c3dCarteVive() && _c3dMap.getSource('terr-zones');
           if (s) s.setData(_c3dTerrZones);
           _c3dTerrPanneau();
           _c3dStatut('Territoire — ' + Math.min(i, _c3dTerr.length) + '/' + _c3dTerr.length
@@ -1246,7 +1261,7 @@ function _c3dTerrCharger(){
 }
 
 function _c3dPoserTerritoire(){
-  if (!_c3dMap || _c3dMap.getSource('terr-zones')) return;
+  if (!_c3dCarteVive() || _c3dMap.getSource('terr-zones')) return;
 
   _c3dMap.addSource('terr-communes', { type:'geojson', data:{ type:'FeatureCollection',
     features: _c3dTerr.map(function(c){
@@ -1585,14 +1600,8 @@ function _c3dVoirTerritoire(on){
   var lg = document.getElementById('c3d-legende');
   if (lg) lg.hidden = on || !_c3dZones;
 
-  function vis(ids, montrer){
-    ids.forEach(function(l){
-      if (_c3dMap && _c3dMap.getLayer(l))
-        _c3dMap.setLayoutProperty(l, 'visibility', montrer ? 'visible' : 'none');
-    });
-  }
-  vis(C3D_COUCHES_VILLAGE, !on);
-  vis(C3D_COUCHES_TERR, on);
+  _c3dVisibilite(C3D_COUCHES_VILLAGE, !on);
+  _c3dVisibilite(C3D_COUCHES_TERR, on);
   /* Les étiquettes sont des éléments HTML, pas une couche : `setLayoutProperty`
      ne les atteint pas. Sans ces deux lignes, les noms des 25 communes
      resteraient affichés par-dessus le village au retour — et les lieux-dits
@@ -1617,9 +1626,36 @@ function _c3dVoirTerritoire(on){
      dès que les contours sont là. */
   _c3dMap.easeTo({ center:C3D_CENTRE, zoom:9.6, pitch:0, bearing:0, duration:1600 });
   return _c3dTerrCharger().then(function(){
-    vis(C3D_COUCHES_TERR, true);
+    /* Le territoire a pu être refermé pendant les 26 requêtes. */
+    if (!_c3dTerrActif) return;
+    _c3dVisibilite(C3D_COUCHES_TERR, true);
     _c3dCadrerTerritoire();
   });
+}
+
+function _c3dVisibilite(ids, montrer){
+  if (!_c3dCarteVive()) return;
+  ids.forEach(function(l){
+    if (_c3dMap.getLayer(l))
+      _c3dMap.setLayoutProperty(l, 'visibility', montrer ? 'visible' : 'none');
+  });
+}
+
+/* Après une perte de contexte WebGL, MapLibre recharge le style tel qu'il
+   était AU MOMENT de la perte : ce qui a été posé ou basculé entre-temps
+   (couches du territoire, visibilités) a été sauté par `_c3dCarteVive`.
+   On le rejoue une fois le style rechargé. */
+function _c3dApresRestauration(){
+  if (!_c3dCarteVive()) return;
+  if (_c3dTerr && _c3dTerr.length){
+    _c3dPoserTerritoire();
+    var s = _c3dMap.getSource('terr-zones');
+    if (s && _c3dTerrZones) s.setData(_c3dTerrZones);
+  }
+  /* Les couches du village ne sont rallumées par personne ici : le style
+     restauré porte déjà les bascules « Zonage » / « Bâtiments » de l'habitant. */
+  if (_c3dTerrActif) _c3dVisibilite(C3D_COUCHES_VILLAGE, false);
+  _c3dVisibilite(C3D_COUCHES_TERR, _c3dTerrActif);
 }
 
 function _c3dPoserLegende(){
@@ -1821,7 +1857,7 @@ function _c3dOuvrirDiag(){
 function _c3dClicTerritoire(lngLat, point){
   /* 1. Une zone de PLU sous le doigt : c'est le plus précis.
      Le test du contour, lui, ne dépend pas de la carte — d'où la garde. */
-  if (_c3dMap && _c3dMap.getLayer('terr-fill')){
+  if (_c3dCarteVive() && _c3dMap.getLayer('terr-fill')){
     var t = _c3dMap.queryRenderedFeatures(point, { layers:['terr-fill'] })[0];
     if (t){
       var tz = t.properties.mat_tz;
@@ -1862,7 +1898,7 @@ function _c3dBrancher(){
       _c3dClicTerritoire([e.lngLat.lng, e.lngLat.lat], e.point);
       return;
     }
-    if (!_c3dMap.getLayer('bati')) return;
+    if (!_c3dCarteVive() || !_c3dMap.getLayer('bati')) return;
     var f = _c3dMap.queryRenderedFeatures(e.point, { layers:['bati'] })[0];
     if (!f) return;
     _c3dOuvrirFiche(_c3dZoneSous([e.lngLat.lng, e.lngLat.lat]),
@@ -1881,16 +1917,12 @@ function _c3dBrancher(){
     };
   }
   bascule('c3d-btn-zones', function(on){
-    ['zones-fill','zones-line'].forEach(function(l){
-      if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
-    });
+    _c3dVisibilite(['zones-fill','zones-line'], on);
     var lg = document.getElementById('c3d-legende');
     if (lg) lg.hidden = !(on && _c3dZones);
   });
   bascule('c3d-btn-bati', function(on){
-    ['bati','bati-toit','bati-toit-plat','bati-contour'].forEach(function(l){
-      if (_c3dMap.getLayer(l)) _c3dMap.setLayoutProperty(l, 'visibility', on ? 'visible' : 'none');
-    });
+    _c3dVisibilite(['bati','bati-toit','bati-toit-plat','bati-contour'], on);
   });
   /* Le territoire est FERMÉ par défaut (aria-pressed="false") : c'est une vue
      supplémentaire, et son chargement coûte 26 requêtes. On ne l'impose pas. */

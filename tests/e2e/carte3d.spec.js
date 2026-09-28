@@ -599,6 +599,45 @@ test.describe('Carte 3D', () => {
   });
 
   /*
+   * Issue #479 (Sentry) : « Cannot read properties of null (reading 'getLayer') ».
+   * Quand le téléphone retire le contexte WebGL (appli en arrière-plan),
+   * MapLibre pose `map.style = null` : `_c3dMap` existe toujours, mais tout
+   * `getLayer` lève. Le chargement du territoire (26 requêtes) se terminait
+   * dans cet état et appelait `getLayer` sur un style détruit.
+   */
+  test('perte du contexte WebGL : la bascule territoire ne lève pas, et la carte se remet', async ({ page }) => {
+    const erreurs = [];
+    page.on('pageerror', (e) => erreurs.push(e.message));
+    await ouvrirAccueil(page);
+    await page.evaluate(() => window.matOuvrirCarte3D());
+    await page.waitForFunction(() => window._c3dMap && window._c3dMap.loaded(), null, { timeout: 30000 });
+
+    const perte = await page.evaluate(() => {
+      const ext = window._c3dMap.getCanvas().getContext('webgl2')
+               || window._c3dMap.getCanvas().getContext('webgl');
+      const lose = ext && ext.getExtension('WEBGL_lose_context');
+      if (!lose) return null;
+      window.__c3dLose = lose;
+      lose.loseContext();
+      return true;
+    });
+    test.skip(!perte, 'WEBGL_lose_context indisponible dans ce navigateur');
+    await page.waitForFunction(() => window._c3dMap.style === null, null, { timeout: 10000 });
+
+    // Territoire ouvert puis refermé pendant la perte : aucune exception.
+    await page.evaluate(async () => {
+      await window._c3dVoirTerritoire(true).catch(() => {});
+      await window._c3dVoirTerritoire(false);
+    });
+    expect(erreurs.filter(e => /getLayer|getSource|reading/.test(e))).toEqual([]);
+
+    // Contexte rendu : le style revient, et `_c3dCarteVive` le voit.
+    await page.evaluate(() => window.__c3dLose.restoreContext());
+    await page.waitForFunction(() => window._c3dCarteVive(), null, { timeout: 10000 });
+    expect(erreurs.filter(e => /getLayer|getSource|reading/.test(e))).toEqual([]);
+  });
+
+  /*
    * ── Le nom des 25 communes ──────────────────────────────────────────────
    * Les contours étaient anonymes. Ces quatre tests tiennent les quatre
    * promesses des étiquettes : le nom vient du service et de nulle part
