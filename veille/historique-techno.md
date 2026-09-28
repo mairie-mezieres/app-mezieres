@@ -1,3 +1,18 @@
+## 2026-09-28
+- Chrome 153.0.8010.47/.48, 42 correctifs dont 3 failles critiques use-after-free (17 sept 2026) — https://cybersecuritynews.com/google-chrome-fixes-42-flaws/
+- Claude Opus 5.5 en disponibilité générale, contexte 1M tokens, coût -40% vs Opus 5 (22 sept 2026) — https://platform.claude.com/docs/en/release-notes/overview
+- Numspot et Mistral AI lancent une IA managée sur cloud souverain (15 sept 2026) — https://numspot.com/2026/09/15/numspot-mistral-proposent-la-premiere-offre-ia-managee-francaise-sur-infrastructure-cloud-souveraine/
+- Conférence nationale du handicap 2026 : seulement 12% des 250 démarches essentielles totalement conformes RGAA (4 sept 2026) — https://collectifhandicap54.org/2026/09/04/conference-nationale-du-handicap-2026-entre-ambitions-renouvelees-et-persistance-des-inegalites-territoriales/
+- Alerte CERT-FR CERTFR-2026-ALE-011 : failles critiques Citrix NetScaler ADC/Gateway, RCE non authentifiée activement exploitée (28 sept 2026) — https://www.cert.ssi.gouv.fr/alerte/CERTFR-2026-ALE-011/
+- Bulletin CERT-FR CERTFR-2026-ACT-040 : Cisco ISE, Oracle WebLogic, Apple macOS activement exploitées (21 sept 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-040/
+- Bulletin CERT-FR CERTFR-2026-ACT-041 : Check Point Security Management, F5 BIG-IP, WordPress activement exploitées (28 sept 2026) — https://www.cert.ssi.gouv.fr/actualite/CERTFR-2026-ACT-041/
+- Cyberattaque mairie de Mortagne-au-Perche (Orne), rançongiciel, serveur principal et serveur de sauvegarde chiffrés (18 sept 2026) — https://frenchbreaches.com/alertes/mairie-de-mortagne-au-perche-muhiffjbw9vo6wzaqt
+- [reco] Mettre à jour Chrome vers 153.0.8010.47+ sur les postes d'administration MAT et vérifier la PWA
+- [reco] Revérifier que la sauvegarde du backend/Redis de MAT est isolée du réseau de production (cas Mortagne-au-Perche)
+- [reco] Évaluer Claude Opus 5.5 comme piste d'évolution du fallback IA du chatbot
+- [reco] Vérifier qu'aucun prestataire de la mairie n'utilise un boîtier Citrix NetScaler vulnérable (CERTFR-ALE-011)
+- [reco] Se renseigner sur l'offre IA managée souveraine Numspot × Mistral
+
 ## 2026-09-21
 - GitHub Actions : runner Ubuntu 26.04 en disponibilité générale, bascule ubuntu-latest 19 oct-19 nov 2026 (17 sept 2026) — https://github.blog/changelog/2026-09-17-ubuntu-26-generally-available-and-latest-migration/
 - Render.com : services Workflows décrits dans les Blueprints (16 sept 2026) — https://render.com/changelog
