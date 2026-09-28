@@ -341,6 +341,6 @@ test.describe('Panneau carburant — seul le relevé le plus récent s’affiche
     await expect(corps).toContainText('2.359');
     await expect(corps).toContainText('2.379');
     // Et le relais, plus récent et moins cher, prend la tête du bandeau.
-    await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText(/^Total Coudray /);
+    await expect(page.locator('#fuel-prices .fuel-station-name')).toHaveText(/^Total Olivet /);
   });
 });

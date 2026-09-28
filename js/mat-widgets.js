@@ -1352,7 +1352,7 @@ var CARBURANT_NOMS_COURTS = {
   clery:      'Intermarché Cléry',
   meung:      'Super U Meung',
   olivet:     'Leclerc Olivet',
-  coudray:    'Total Coudray',
+  coudray:    'Total Olivet',
   beaugency:  'Leclerc Beaugency',
   saintpryve: 'Super U St-Pryvé'
 };
