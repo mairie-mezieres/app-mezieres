@@ -1,3 +1,11 @@
+## 2026-10-05
+- Chrome 154.0.8037.97/.98 en canal stable (1er oct 2026) — https://chromereleases.googleblog.com/2026/10/stable-channel-update-for-desktop.html
+- Cyberattaque Atexo et Docaposte (région Hauts-de-France), données de 700 000 personnes revendiquées (3 oct 2026) — https://france3-regions.franceinfo.fr/hauts-de-france/nord-0/la-region-hauts-de-france-victime-d-une-cyberattaque-des-noms-prenoms-adresses-electroniques-et-potentiellement-des-rib-parmi-les-donnees-volees-3427614.html
+- Avis CERT-FR du 2 oct 2026 dont Fortinet FortiMail CERTFR-2026-AVI-1257 — https://www.cert.ssi.gouv.fr/avis/
+- [reco] Mettre à jour Chrome vers 154.0.8037.97+ sur les postes d'administration MAT
+- [reco] Vérifier qu'aucun prestataire n'utilise un FortiMail vulnérable
+- [reco] Recenser les données confiées aux prestataires de MAT et leur plan de crise
+
 ## 2026-09-28
 - Chrome 153.0.8010.47/.48, 42 correctifs dont 3 failles critiques use-after-free (17 sept 2026) — https://cybersecuritynews.com/google-chrome-fixes-42-flaws/
 - Claude Opus 5.5 en disponibilité générale, contexte 1M tokens, coût -40% vs Opus 5 (22 sept 2026) — https://platform.claude.com/docs/en/release-notes/overview
@@ -134,39 +142,6 @@
 ## 2026-07-13
 - Node.js security release 18 juin 2026 (12 CVE, 2 haute sévérité) — https://nodejs.org/en/blog/vulnerability/june-2026-security-releases
 - npm v12 bloque les scripts d'installation par défaut (8 juillet 2026) — https://thehackernews.com/2026/07/npm-12-disables-install-scripts-by.html
-- GitHub Actions actions/checkout v7 protection anti pwn-request (18 juin 2026, backport 16 juillet) — https://thehackernews.com/2026/06/github-updates-actionscheckout-to-block.html
-- Playwright 1.61 / 1.61.1 (15 et 23 juin 2026) — https://github.com/microsoft/playwright/releases
-- Sentry détection spans faible valeur (8 juillet 2026) — https://sentry.io/changelog/
-- Mistral OCR 4 lancé fin juin 2026 — https://www.techtimes.com/articles/318978/20260624/mistral-ocr-4-ships-structure-aware-document-ai-runs-your-own-infrastructure.htm
-- Anthropic Claude Sonnet 5 lancé (30 juin 2026), hausse limites débit (26 juin), expiration clés API (8 juillet) — https://platform.claude.com/docs/en/release-notes/overview
-- Render Node.js 24.14.1 par défaut, CLI amélioré (juillet 2026) — https://render.com/changelog
-- Webinaire Décider Ensemble prospective citoyenne Brette-les-Pins / Montpellier (1er juillet 2026) — https://www.deciderensemble.com/les-prix
-- Lancement INEDI, groupe solutions numériques secteur public (1er juillet 2026) — https://www.inedi.fr/articles/une-application-locale-pour-ma-commune-pour-quoi-faire
-- Rapport Cour des comptes : non-conformité généralisée accessibilité numérique publique (18 juin 2026) — https://next.ink/243475/accessibilite-du-numerique-public-une-non-conformite-generalisee/
-- Ransomware MedusaLocker sur mairie de Thiverval-Grignon (constaté 1er juillet 2026) — https://ransomware.live/id/TWFpcmllIFRoaXZlcnZhbCBHcmlnbm9uQG1lZHVzYWxvY2tlcg==
-- Bulletin CERT-FR CERTFR-2026-ACT-029 (6 juillet 2026) — https://www.cert.ssi.gouv.fr/actualite/
-- Avis CERT-FR noyaux Linux multi-éditeurs, CPython, Suricata (10 juillet 2026) — https://www.cert.ssi.gouv.fr/avis/
-- Anthropic retrait définitif Claude Sonnet 4 / Opus 4 sur l'API (15 juin 2026) — https://platform.claude.com/docs/en/release-notes/overview
-- Render.com connection pooling PgBouncer intégré pour Postgres (1er juillet 2026) — https://render.com/changelog
-- GitHub Actions : Copilot CLI utilisable sans PAT longue durée (2 juillet 2026) — https://github.blog/changelog/2026-07-02-copilot-cli-no-longer-needs-a-personal-access-token-in-github-actions/
-- Mistral AI : nouveaux contrôles admin sur les Connectors (24 juin 2026) — https://mistral.ai/news/more-control-over-connectors/
-- iOS/iPadOS 26.5.2 correctif sécurité WebKit ~29 failles (29 juin 2026) — https://support.apple.com/en-us/127594
-- Chrome 150 : migration d'origine PWA transparente (1er juillet 2026) — https://developer.chrome.com/release-notes/150
-- Sentry JavaScript 10.63.0, support React Router v8 (1er juillet 2026) — https://github.com/getsentry/sentry-javascript/releases
-- Plan « Notre IA » et création de la DIAN à Bercy (16 juin 2026) — https://www.economie.gouv.fr/actualites/video-le-plan-notre-ia-pour-les-services-publics-devoile
-- Baromètre 2026 Data Publica collectivités/données/IA, enquête jusqu'au 17 juillet 2026 — https://www.lagazettedescommunes.com/numerique/donnees-intelligence-artificielle-ou-en-sont-les-collectivites-participez-au-barometre-de-lobservatoire-data-publica.ZVOZBCA44NBD3FBGPWU2CM4D3U.html
-- Mise en demeure Arcom impots.gouv.fr pour non-conformité RGAA (24 juin / publié 6 juillet 2026) — https://www.arcom.fr/se-documenter/espace-juridique/decisions/decision-du-24-juin-2026-mettant-en-demeure-le-ministere-de-laction-et-des-comptes-publics
-- Report de la Conférence nationale du handicap au 4 septembre 2026 (annoncé 23 juin 2026) — https://handicap.gouv.fr/canicule-conference-nationale-du-handicap-reportee
-- Outil gratuit « Simplificateur FALC » (3 juillet 2026) — https://lesbases.anct.gouv.fr/ressources/simplificateur-falc-transformer-un-texte-en-facile-a-lire-et-a-comprendre
-- Ransomware Qilin sur commune d'Eyguières (19 juin 2026) — https://www.ransomware.live/id/Q29tbXVuZSBkJ0V5Z3VpcmVzQHFpbGlu
-- Ransomware Payload sur commune de Castries (9 juillet 2026) — https://www.ransomware.live/id/VGhlIGNvbW11bmUgb2YgQ2FzdHJpZXNAcGF5bG9hZA
 - [reco] Mettre à jour Node.js vers versions patchées (22.23.0/24.17.0/26.3.1)
 - [reco] Vérifier compatibilité npm v12 (scripts d'installation bloqués)
 - [reco] Passer actions/checkout à v7
-- [reco] Configurer expiration des clés API Mistral/Anthropic
-- [reco] Sensibiliser les agents municipaux au risque ransomware (cas Thiverval-Grignon)
-- [reco] Vérifier absence de modèles Claude retirés (Sonnet 4/Opus 4) dans le code du fallback IA
-- [reco] Renforcer vigilance ransomware suite vague Eyguières/Castries
-- [reco] Tester la PWA MAT sur iOS 26.5.2
-- [reco] Répondre au Baromètre Data Publica 2026 avant le 17 juillet
-- [reco] Tester le Simplificateur FALC sur les contenus séniors
