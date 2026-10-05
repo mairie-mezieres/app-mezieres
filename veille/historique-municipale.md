@@ -17,6 +17,12 @@ une ligne que l'on souhaite voir re-signaler le mois suivant.
 
 <!-- Les sections datées sont ajoutées ci-dessous, la plus récente en tête. -->
 
+## 2026-10-05
+
+- [action] Département du Loiret — Soutien aux classes de découvertes (formulaire ouvert du 1er au 31 octobre 2026) — https://www.loiret.fr/aide/soutien-aux-classes-de-decouvertes
+- [surveiller] Second « méga-décret » de simplification pour les collectivités (publié le 28/07/2026) — https://www.ecologie.gouv.fr/presse/publication-dun-deuxieme-mega-decret-simplification-collectivites-territoriales
+- [surveiller] DETR/DSIL — campagne 2027 dans le Loiret (calendrier à confirmer) — https://www.loiret.gouv.fr/Demarches/Demander-une-subvention-DETR-DSIL/DETR-DSIL
+
 ## 2026-09-07
 
 - [action] Fonds vert 2026 — rénovation énergétique des bâtiments publics locaux — https://demarche.numerique.gouv.fr/commencer/fonds-vert-1-renovation-batiments-publics
