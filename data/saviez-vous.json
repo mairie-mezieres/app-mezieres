@@ -142,7 +142,7 @@
       "id": "dechetterie-horaires",
       "question": "La déchetterie de Cléry-Saint-André ouvre-t-elle plus tôt en été qu’en hiver ?",
       "reponse": true,
-      "explication": "Oui : 9 h en été (avril-septembre) contre 10 h en hiver (octobre-mars). Elle ferme à 18 h l’été et 17 h l’hiver, et reste fermée les jours fériés.",
+      "explication": "Oui : 9 h en été (avril-septembre) contre 10 h en hiver (octobre-mars). Elle ferme à 18 h l’été et 17 h l’hiver, et reste fermée le mardi, le dimanche et les jours fériés.",
       "source": "Communauté de communes des Terres du Val de Loire",
       "url": "https://www.ccterresduvaldeloire.fr",
       "categorie": "dechets"

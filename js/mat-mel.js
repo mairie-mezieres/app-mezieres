@@ -613,7 +613,7 @@ const _MEL_TREE_FALLBACK = {
           links:[{label:"🗓️ Mon calendrier de collecte",action:"openDechets()"}]}
       },
       {id:"dechetterie",ico:"♻️",label:"Déchetterie — horaires & inscription",
-        directAnswer:{text:"La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lun-sam sauf jours fériés. Une inscription vaut pour tous les sites CCTVL.",
+        directAnswer:{text:"La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lundi, mercredi, jeudi, vendredi et samedi — fermée le mardi, le dimanche et les jours fériés. Une inscription vaut pour tous les sites CCTVL.",
           links:[{label:"🌐 S'inscrire à la déchetterie",url:"https://portail-usagers.ccterresduvaldeloire.fr"},{label:"📞 CCTVL : 02 38 44 59 35",tel:"0238445935"}]}
       },
       {id:"encombrants",ico:"🛋️",label:"Encombrants / objets volumineux",
@@ -671,7 +671,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.6';
+  const V = '3.7.7';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,

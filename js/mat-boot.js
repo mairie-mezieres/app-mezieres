@@ -254,7 +254,7 @@ matDifferer('js/mat-carte3d.js?v=1.11.2',       ['matOuvrirCarte3D']);
 // de conteneur .sv-bloc ou si le corpus est indisponible.
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-saviez-vous.js?v=1.5.0';
+  s.src = 'js/mat-saviez-vous.js?v=1.5.1';
   s.onload = function(){ try { if (typeof matSaviezVousInit === 'function') matSaviezVousInit(); } catch(e){} };
   document.head.appendChild(s);
 })();

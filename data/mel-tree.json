@@ -551,7 +551,7 @@
         "ico": "♻️",
         "label": "Déchetterie — horaires & inscription",
         "directAnswer": {
-          "text": "La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lun-sam sauf jours fériés. Une inscription vaut pour tous les sites CCTVL.",
+          "text": "La déchetterie de Cléry-Saint-André est la plus proche. Inscription OBLIGATOIRE (lecture automatique de plaque). Enregistrez vos plaques SANS tiret (ex : AA123BB). Horaires : hiver (oct-mars) 10h-12h / 14h-17h, été (avr-sep) 9h-12h / 14h-18h, lundi, mercredi, jeudi, vendredi et samedi — fermée le mardi, le dimanche et les jours fériés. Une inscription vaut pour tous les sites CCTVL.",
           "links": [
             {
               "label": "🌐 S'inscrire à la déchetterie",
