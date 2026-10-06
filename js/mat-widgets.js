@@ -1148,19 +1148,23 @@ function loadDechets(){
   const iso=annee+'-'+String(moisP).padStart(2,'0')+'-'+String(jour).padStart(2,'0');
   const ferie=FERIES_FIXES.includes(mmdd)||FERIES_DATES.includes(iso);
   const isH=moisP>=10||moisP<=3, matO=isH?10:9, apF=isH?17:18;
-  const isJourOuv=dowP>=1&&dowP<=6&&!ferie;
+  // Déchetterie de Cléry : lundi, mercredi, jeudi, vendredi, samedi — fermée le
+  // dimanche ET le mardi. Le prochain jour d'ouverture se calcule, il ne se suppose pas.
+  const D_OUV=[1,3,4,5,6], D_NOMS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const isJourOuv=D_OUV.includes(dowP)&&!ferie;
+  const dProchain=function(){for(let k=1;k<=7;k++){const d=(dowP+k)%7;if(D_OUV.includes(d))return k===1?'demain':D_NOMS[d];}};
   let dTxt='',dOuv=false;
   const _dExc=_matHoraireActive('dechetterie');
   if(_dExc && _dExc.type==='closed'){dTxt=_dExc.message||'Déchetterie fermée (exceptionnel)';dOuv=false;}
   else if(_dExc && _dExc.type==='hours' && _dExc.ranges && _dExc.ranges.length && isJourOuv){
     const _ds=_matRangeStatus(_dExc.ranges,hP*60+minP);
     dOuv=_ds.open;dTxt='Déchetterie '+(_ds.open?'ouverte':'fermée')+' — '+_ds.sub+' (except.)';}
-  else if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée (ouvre lundi à '+matO+'h)';}
+  else if(!isJourOuv){dTxt=ferie?'Déchetterie fermée (jour férié)':'Déchetterie fermée le '+D_NOMS[dowP]+' (ouvre '+dProchain()+' à '+matO+'h)';}
   else if(hP<matO){dTxt='Déchetterie fermée — ouvre à '+matO+'h';}
   else if(hP<12){dOuv=true;dTxt='Déchetterie ouverte — ferme à 12h';}
   else if(hP<14){dTxt='Déchetterie fermée — ouvre à 14h';}
   else if(hP<apF){dOuv=true;dTxt='Déchetterie ouverte — ferme à '+apF+'h';}
-  else{dTxt='Déchetterie fermée — ouvre '+(dowP<6?'demain':'lundi')+' à '+matO+'h';}
+  else{dTxt='Déchetterie fermée — ouvre '+dProchain()+' à '+matO+'h';}
   const dEl=document.getElementById('dechetterie-text'), dIco=document.getElementById('dech-ico');
   // ⛔ CONTRASTE (RGAA 3.2) — un style INLINE écrase la feuille de style :
   // ces deux teintes échappaient donc à toute relecture de mat.css. Elles
@@ -1187,7 +1191,7 @@ function loadDechetsDetail(){
     +'</div>'
     +'<div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);margin-bottom:12px">'
     +'<div style="font-size:0.86rem;font-weight:900;color:var(--forest);margin-bottom:8px">🏭 Réseau des déchetteries</div>'
-    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi au samedi (sauf jours fériés)<br>'
+    +'<div style="font-size:0.78rem;color:var(--muted);line-height:1.7">Déchetterie de Cléry-Saint-André — lundi, mercredi, jeudi, vendredi et samedi (<strong>fermée le mardi</strong>, le dimanche et les jours fériés)<br>'
     +'🕐 <strong>Hiver (oct-mars)</strong> : 10h-12h et 14h-17h<br>'
     +'🕐 <strong>Été (avr-sep)</strong> : 9h-12h et 14h-18h</div>'
     +'<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">'
