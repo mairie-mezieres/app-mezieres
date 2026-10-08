@@ -797,6 +797,24 @@ et seule la pastille du menu est peinte. Deux conséquences pour qui écrit un t
   pastille est donc calculée `inline-flex` sur mobile et `flex` sur ordinateur. La question
   utile est « allumée ou éteinte », d'où un `not.toHaveCSS('display', 'none')`.
 
+### Badge « Territoria d’Or 2026 » de l'accueil (v4.127)
+
+- **Deux badges dans le HTML**, un par mise en page : `.territoria-mobile` sous le `h1`
+  de l'en-tête, `.territoria-bureau` dans `.d-hero-text` (affiché à partir de 1024 px).
+  Le libellé est **écrit dans `index.html`** : il s'affiche même si aucun script ne charge.
+- ⛔ Libellé avec l'apostrophe **typographique** (`’`, U+2019), jamais l'apostrophe droite.
+- **Lecture vocale / lecteur d'écran** : l'emoji 🏆 est `aria-hidden`, seul « Territoria
+  d’Or 2026 » est lu.
+- **Contraste** : fond **opaque** or `#fcd34d` et encre `#3d2400`, déclarés ensemble
+  (RGAA 10.5), 10:1. Pas de fond translucide : le badge est posé sur l'en-tête animé et sur
+  la photo du hero bureau, où un contraste ne se mesure pas.
+- **Animation** (`.territoria-anim`, posée par `js/mat-widgets.js`) : une seule fois par
+  appareil, clé `mat_territoria_vu` en **chaîne brute** (lue en `localStorage` direct,
+  comme `mat_conseil_tampon`), jamais sous `prefers-reduced-motion` — la clé est posée
+  quand même. Échelle + reflet, **aucune variation d'opacité** : le badge est lisible à
+  chaque image.
+- Verrouillé par `tests/e2e/territoria.spec.js`.
+
 ### Conseil municipal — onglets Décisions/Projets et bandeau (v4.126)
 
 `js/mat-conseil.js` (injecté par `mat-boot`, replis ADR-0032) anime les onglets

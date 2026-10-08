@@ -2227,3 +2227,43 @@ html.theme-sombre .conseil-tabs{background:#1e293b;}
 /* Le bandeau suit « Le saviez-vous ? » : masqué par « Masquer l'en-tête »,
    PAS par « Masquer la météo & transports » (il vit hors .header-bottom-grid). */
 html.no-header .cm-bandeau{display:none !important;}
+
+/* ── Territoria d’Or 2026 — badge de fierté sur l'accueil ──
+   Fond OPAQUE et couleurs déclarées ensemble (RGAA 10.5) : le badge est posé
+   sur l'en-tête animé (dégradé, ambiance météo) et sur la photo du hero
+   bureau, où aucun contraste ne se mesure. Encre #3d2400 sur or #fcd34d :
+   10:1 (AA demande 4,5:1), identique dans les cinq thèmes.
+   L'emoji est aria-hidden : la lecture vocale ne lit que le libellé.
+   L'animation n'est jouée qu'à la PREMIÈRE ouverture (classe posée par
+   mat-widgets.js, clé mat_territoria_vu), jamais sous « Réduire les
+   animations ». Elle ne touche pas à l'opacité : le badge est lisible à
+   chaque image de l'animation. */
+.territoria{
+  display:inline-flex;align-items:center;gap:6px;margin:6px 0 2px;
+  padding:4px 11px 4px 9px;border-radius:999px;
+  background:#fcd34d;color:#3d2400;border:1px solid #b45309;
+  font-size:0.8rem;font-weight:900;line-height:1.3;letter-spacing:0.01em;
+  box-shadow:0 2px 8px rgba(0,0,0,.22);
+  position:relative;overflow:hidden;
+}
+.territoria-ico{font-size:0.95rem;line-height:1;}
+.territoria-bureau{display:none;}
+@media(min-width:1024px){
+  .territoria-bureau{display:inline-flex;margin:0 8px 14px 0;vertical-align:top;font-size:.8rem;}
+}
+.territoria-anim{animation:territoriaPose .7s cubic-bezier(.34,1.4,.64,1) .3s both;}
+.territoria-anim::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);
+  transform:translateX(-120%);animation:territoriaReflet 1.1s ease-out 1s both;
+}
+@keyframes territoriaPose{
+  0%{transform:scale(.7);}
+  70%{transform:scale(1.06);}
+  100%{transform:scale(1);}
+}
+@keyframes territoriaReflet{to{transform:translateX(120%);}}
+@media (prefers-reduced-motion:reduce){
+  .territoria-anim,.territoria-anim::after{animation:none;}
+  .territoria-anim::after{display:none;}
+}

@@ -49,7 +49,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.15.0">
+<link rel="stylesheet" href="css/mat.css?v=4.15.1">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.7.0">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -73,7 +73,7 @@ document.documentElement.style.background = bg;
 <script defer src="js/mat-utils.js?v=4.3.9"></script>
 <script defer src="js/mat-core.js?v=4.4.3"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.11"></script>
-<script defer src="js/mat-widgets.js?v=4.5.13"></script>
+<script defer src="js/mat-widgets.js?v=4.5.14"></script>
 <script defer src="js/mat-ambiance.js?v=1.8.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.5"></script>
 <script defer src="js/mat-forms.js?v=4.6.9"></script>
@@ -173,7 +173,8 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div style="height:1.8em"></div>
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.126.2 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<p class="territoria territoria-mobile"><span class="territoria-ico" aria-hidden="true">🏆</span><span class="territoria-txt">Territoria d’Or 2026</span></p>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.127 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -243,6 +244,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="d-hero-bg" style="background-image:url('img/mezieres-site.jpg')"></div>
 <div class="d-hero-inner">
 <div class="d-hero-text">
+<p class="territoria territoria-bureau"><span class="territoria-ico" aria-hidden="true">🏆</span><span class="territoria-txt">Territoria d’Or 2026</span></p>
 <div class="d-hero-badge">🌿 Commune rurale · Loiret · Val de Loire</div>
 <h1 class="d-hero-title">Bienvenue à<br><em>Mézières-lez-Cléry</em></h1>
 <p class="d-hero-desc">Retrouvez toutes les informations de votre commune, les événements, les services municipaux et posez vos questions directement à MEL, votre assistante numérique.</p>
@@ -540,7 +542,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.126.2</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.127</button>
 </div>
 </div>
 </div>
@@ -1886,6 +1888,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 8 octobre 2026 — v4.127</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>🏆 Territoria d&rsquo;Or 2026.</strong> Un badge sur l&rsquo;accueil, sous le titre de l&rsquo;application et en haut de la page sur ordinateur. Il s&rsquo;anime une seule fois, &agrave; la premi&egrave;re ouverture, et reste immobile si votre t&eacute;l&eacute;phone est r&eacute;gl&eacute; sur &laquo;&nbsp;R&eacute;duire les animations&nbsp;&raquo;</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 6 octobre 2026 — v4.126.2</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>D&eacute;chetterie&nbsp;: ferm&eacute;e le mardi.</strong> L&rsquo;accueil l&rsquo;annon&ccedil;ait ouverte du lundi au samedi&nbsp;; elle est d&eacute;sormais indiqu&eacute;e ferm&eacute;e le mardi, et le lundi soir annonce la r&eacute;ouverture du mercredi. Horaires corrig&eacute;s aussi dans l&rsquo;&eacute;cran D&eacute;chets et dans les r&eacute;ponses de MEL</li>
