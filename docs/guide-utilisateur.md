@@ -72,6 +72,7 @@ L'écran d'accueil affiche en un coup d'œil les informations les plus utiles :
 
 | Zone | Contenu |
 |------|---------|
+| **Badge « Territoria d’Or 2026 »** | Sous le titre « Mézières Avec Toi » (en haut de la page sur ordinateur). Il s'anime une seule fois, à la première ouverture, et reste immobile si le téléphone est réglé sur « Réduire les animations » |
 | **En-tête** | Statut de la mairie (ouverte / fermée), météo locale, prochain ramassage des poubelles, prochain événement, passage du bus Rémi (ligne 8), prix des carburants |
 | **« Le saviez-vous ? »** | Sous les boutons Urgences et Personnalisation : le fait du jour sur la commune, sourcé, avec une question à laquelle répondre (voir §18) |
 | **Grand dossier PLUi-H-D** | Bandeau mis en avant menant à la page de suivi du Plan Local d'Urbanisme intercommunal (voir §16) |

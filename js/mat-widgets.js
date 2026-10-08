@@ -1878,3 +1878,24 @@ async function loadEvents(){
     document.getElementById('next-event-days').textContent = offline?'Reconnectez-vous':'Réessayez plus tard';
   }
 }
+// ── Territoria d’Or 2026 — animation de la première ouverture ──
+// Le badge lui-même est écrit dans index.html : il s'affiche même si ce
+// script ne se charge pas. Ici, on ne fait que jouer l'animation, UNE fois
+// par appareil (mat_territoria_vu, chaîne brute lue en localStorage direct —
+// matStore.get détruirait une valeur qui n'est pas du JSON), et jamais sous
+// « Réduire les animations ». La clé est posée même dans ce cas : l'habitant
+// qui réactiverait les animations ne verrait pas l'effet rejoué des semaines
+// plus tard.
+(function territoriaPremiereOuverture(){
+  var CLE = 'mat_territoria_vu';
+  var vu = null;
+  try { vu = localStorage.getItem(CLE); } catch (_) { return; }
+  if (vu) return;
+  var reduit = false;
+  try { reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) {}
+  if (!reduit) {
+    var badges = document.querySelectorAll('.territoria');
+    for (var i = 0; i < badges.length; i++) badges[i].classList.add('territoria-anim');
+  }
+  try { localStorage.setItem(CLE, '1'); } catch (_) {}
+})();
