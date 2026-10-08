@@ -116,6 +116,32 @@ diffusion, et à masquer si la personne le demande.
   vrai, utile, et déplacé dans un film de promotion. Après une mise à jour du
   corpus, revérifier la question obtenue.
 
+## 🏅 Film « TERRITORIA Or 2026 »
+
+Annonce du prix (catégorie Transformation numérique) : palmarès dévoilé du
+Bronze à l'Or, puis MAT, les chiffres du palmarès et la cérémonie.
+
+| Fichier | Rôle |
+|---|---|
+| `territoria.html` | Le film (même principe : tout est fonction de `t`, confettis à graine fixe) |
+| `territoria/jury.webp` | Photo officielle du jury, fournie par la mairie |
+| `sortie/mat-territoria-or.mp4` | 42 s, 1080×1920, muet |
+| `sortie/mat-territoria-or-musique.mp4` | Même film avec `musique/funk-down-mk2.mp3` |
+| `sortie/mat-territoria-or-affiche.jpg` | Vignette (médaille d'or, nom en place) |
+
+```bash
+PAGE=territoria.html NOM=mat-territoria-or node film/rendre-video.js
+FILM=film/sortie/mat-territoria-or.mp4 SORTIE=film/sortie/mat-territoria-or-musique.mp4 \
+  node film/ajouter-musique.js film/musique/funk-down-mk2.mp3
+```
+
+⛔ **Chaque phrase vient du courrier officiel du Prix TERRITORIA** (palmarès,
+jury, 49 lauréats = 17 Or + 19 Argent + 13 Bronze, cérémonie le mardi
+10 novembre 2026 à 13 h à l'Assemblée nationale) — rien d'autre n'est affirmé.
+⚠️ **Avant diffusion** : vérifier que la photo du jury peut être reprise (ses
+droits appartiennent à l'organisateur) ; après le 10 novembre, la scène
+« Rendez-vous à Paris » est périmée.
+
 ## Autres formats
 
 `rendre-video.js` lit `LARGEUR`, `HAUTEUR`, `FPS` et `NOM`. Mais la mise en page est

@@ -34,6 +34,9 @@ const LARGEUR = Number(process.env.LARGEUR || 1080);
 const HAUTEUR = Number(process.env.HAUTEUR || 1920);
 const SORTIE = path.resolve(process.env.SORTIE || path.join(__dirname, "sortie"));
 const NOM = process.env.NOM || "mat-presentation-vertical";
+// Page source du film (dans `film/`) : `presentation.html` par défaut,
+// `territoria.html` pour l'annonce du prix.
+const PAGE = process.env.PAGE || "presentation.html";
 const CHROME = process.env.CHROME_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
 function trouverFfmpeg() {
@@ -68,7 +71,7 @@ function trouverFfmpeg() {
     return route.abort();
   });
 
-  const url = "file://" + path.join(__dirname, "presentation.html") + "?rendu=1";
+  const url = "file://" + path.join(__dirname, PAGE) + "?rendu=1";
   await page.goto(url, { waitUntil: "load" });
   await page.waitForFunction(() => window.filmPret === true, { timeout: 30000 });
 
@@ -78,7 +81,7 @@ function trouverFfmpeg() {
     + LARGEUR + "×" + HAUTEUR + " @" + FPS + " i/s");
 
   // Affiche (vignette du post) : prise pendant l'ouverture, titre en place.
-  await page.evaluate(() => window.filmSeek(2.4));
+  await page.evaluate(() => window.filmSeek(window.filmAffiche || 2.4));
   await page.screenshot({ path: path.join(SORTIE, NOM + "-affiche.jpg"), type: "jpeg", quality: 92 });
 
   const args = [
