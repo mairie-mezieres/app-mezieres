@@ -2,6 +2,8 @@
 
 Ce document permet à n'importe quelle commune ou administration de créer sa propre application ou son site municipal (et son chatbot facultatif) en partant d'une feuille blanche, à l'aide d'une intelligence artificielle conversationnelle. Il est inspiré de l'application « MAT — Mézières Avec Toi », partagée gratuitement par la commune de Mézières-lez-Cléry.
 
+> **🤝 Besoin d'aide ?** Le site [MAT · entraide entre communes](https://mairie-mezieres.github.io/mat-communes/) rassemble une FAQ, un guide pas à pas et un espace où les communes s'entraident.
+
 > **🎯 Canal recommandé : ouvrez d'abord `partager.html`** — un questionnaire visuel en 3 étapes génère votre prompt personnalisé, affiche le coût mensuel estimé (fourchette min–max) et alerte sur les paliers gratuits → payants. Ce document `.md` reste utile comme référence auditable et version manuelle pour les profils techniques.
 
 ---
@@ -80,10 +82,10 @@ Les coûts indiqués sont des **estimations médianes prudentes** (mairie de 1 0
 **Coût total mensuel estimé** : faites la somme des cases cochées en ajoutant les lignes 0, 100 et 101 si applicables. Le simulateur `partager.html` calcule cette fourchette automatiquement.
 
 **Attention paliers gratuits → payants** :
-- Render Free : tombe en veille après 15 min d'inactivité (cold-start 30–60 s) → inadapté à un service public. Préférer Render Starter (~7 €/mois). ⚠️ **Migration auto des plans légacy vers les nouveaux plans le 1er août 2026.**
+- Render Free : tombe en veille après 15 min d'inactivité (cold-start 30–60 s) → inadapté à un service public. Préférer Render Starter (~7 €/mois). ⚠️ **Render avait annoncé la migration automatique de ses plans légacy vers ses nouveaux plans au 1er août 2026 : vérifiez les tarifs en vigueur sur render.com.**
 - Netlify / Vercel free : 100 Go de bande passante/mois — suffit pour 95 % des mairies, mais surveillez les pics (élections, événements viraux).
 - Cloudinary free : 25 Go — au-delà ~5 €/mois.
-- Upstash Redis free : 10 000 commandes/jour — au-delà ~10 €/mois.
+- Upstash Redis free : 500 000 commandes/mois (formule mensuelle depuis mars 2025, qui remplace l'ancien plafond de 10 000 commandes/jour) — au-delà ~10 €/mois.
 - LLM (chatbot) : ~5 €/mois pour ~50 questions/jour, peut monter à 200 €+/mois en cas de viralisation. Un rate limiting est indispensable.
 
 > 💡 **Conseil** : aucun hébergeur n'est réellement « gratuit » dès qu'on a besoin d'un service citoyen sérieux. Un site municipal qui fonctionne bien coûte typiquement **20 à 45 €/mois tout compris** (hébergement + domaine + assistance IA pour la maintenance). Mieux vaut le savoir d'entrée que le découvrir après.
@@ -233,7 +235,7 @@ Architecture recommandée (à ne proposer **que pour le profil intermédiaire**)
 - Pas d'embeddings ni de base vectorielle au démarrage : injecter les pages du site dans le prompt système (RAG syntaxique).
 - Rate limiting : 5 questions / jour / appareil pour maîtriser les coûts.
 - Détection d'injection prompt basique (regex sur patterns connus).
-- Stockage cache : **Upstash Redis** (gratuit jusqu'à 10 000 requêtes/jour).
+- Stockage cache : **Upstash Redis** (gratuit jusqu'à 500 000 commandes/mois).
 - Code de référence open-source : https://github.com/mairie-mezieres/chatbot-mairie-mezieres
 
 Pour le profil débutant : propose plutôt un lien direct vers Claude (claude.ai) avec un prompt système pré-rempli — zéro infrastructure à gérer.

@@ -19,6 +19,22 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
   État des fichiers traités dans `data/conseil-drive-etat.json`.
   Voir ADR-0053. Aucun impact habitant tant que la PR n'est pas fusionnée
   (pas de bump : `conseil.json` est servi réseau d'abord).
+- **Lien « Votre commune veut MAT ? »** (v4.127.2) dans les deux pieds de page
+  (mobile et bureau), vers le site d'entraide entre communes `mat-communes`.
+
+### Corrigé
+
+- **`docs/DEPLOIEMENT.md`** : une commune qui suivait le guide n'avait **aucune
+  notification** — la clé publique `VAPID_PUB` de `js/mat-utils.js` restait
+  celle de Mézières, et le §5.F annonçait « le seul réglage de code » à trois
+  endroits. Ajoutés : `VAPID_PUB`, le DSN Sentry (`index.html`, `admin.html`),
+  le fichier `CNAME` à retirer (§5.E), §9 « Personnaliser pour votre commune »,
+  §10 « Tâches automatiques ». Quota Upstash corrigé (500 000 commandes/mois,
+  plus 10 000/jour) ici et dans `REPLICATION.md`.
+- **`partager.html`** : le lien de téléchargement de `REPLICATION.md` pointe
+  vers GitHub : GitHub Pages fait passer les fichiers Markdown par Jekyll, le
+  `.md` risquait de ne pas être servi tel quel (non vérifiable depuis
+  l'environnement de développement) ; le lien GitHub fonctionne dans tous les cas.
 
 ## [4.126] — 26 septembre 2026
 

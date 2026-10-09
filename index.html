@@ -174,7 +174,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
 <p class="territoria territoria-mobile"><span class="territoria-ico" aria-hidden="true">🏆</span><span class="territoria-txt">Territoria d’Or 2026</span></p>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.127.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.127.2 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -544,7 +544,8 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.127.1</button>
+<a href="https://mairie-mezieres.github.io/mat-communes/" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Site d’entraide entre communes : questions fréquentes, guide pas à pas, entraide">🤝 Votre commune veut MAT&nbsp;?</a>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.127.2</button>
 </div>
 </div>
 </div>
@@ -771,6 +772,7 @@ Horaires mairie : lun 14h-17h30 · ven 8h30-11h30
 <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;row-gap:4px">
 <button onclick="openPlanSite()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🗺️ Plan du site</button>
 <a href="partager.html" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;letter-spacing:0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
+<a href="https://mairie-mezieres.github.io/mat-communes/" style="color:var(--sage);text-decoration:none;font-weight:700;white-space:nowrap;letter-spacing:0" title="Site d’entraide entre communes : questions fréquentes, guide pas à pas, entraide">🤝 Votre commune veut MAT&nbsp;?</a>
 <button onclick="openRgpd()" style="background:none;border:none;color:var(--sage);font-size:inherit;font-family:inherit;font-weight:700;cursor:pointer;padding:0;white-space:nowrap">🔒 RGPD</button>
 <!-- ⛔ MENTION OBLIGATOIRE — décret n° 2019-768, art. 3 : la mention
      « Accessibilité : totalement conforme » doit figurer sur la page d'accueil
@@ -1890,6 +1892,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 octobre 2026 — v4.127.2</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>🤝 &laquo;&nbsp;Votre commune veut MAT&nbsp;?&nbsp;&raquo;</strong> Un nouveau lien en pied de page ouvre le site d&rsquo;entraide entre communes&nbsp;: questions fr&eacute;quentes, guide pas &agrave; pas pour reprendre l&rsquo;application, espace d&rsquo;entraide et webinaire mensuel</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 octobre 2026 — v4.127.1</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>Le jeu du moment&nbsp;: une manette 🎮 sur la tuile.</strong> Elle affichait encore une grappe de raisin apr&egrave;s le changement de jeu&nbsp;; l&rsquo;ic&ocirc;ne ne d&eacute;pend plus du jeu en cours</li>

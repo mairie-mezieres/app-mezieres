@@ -4,6 +4,12 @@ Ce guide explique **pas à pas** comment mettre MAT en ligne pour une nouvelle
 commune, **sans compétence technique avancée**. Comptez **1 à 2 heures** la
 première fois (l'essentiel, c'est créer les comptes et copier-coller des clés).
 
+> 🤝 **Pas à pas, pour les non-techniciens** : le site d'entraide
+> [MAT · entraide entre communes](https://mairie-mezieres.github.io/mat-communes/)
+> reprend ce guide un écran à la fois, avec un carnet de route à imprimer, une
+> FAQ et un espace où les communes s'entraident. Ce fichier-ci reste la source
+> technique de référence.
+
 > 💡 Deux façons de répliquer :
 > - **Assistée par IA** : le [kit de réplication](REPLICATION.md) génère un site
 >   personnalisé via un prompt Claude. Idéal pour partir d'une page blanche.
@@ -73,8 +79,10 @@ Tout est **gratuit pour démarrer**. Points d'attention :
   Pour l'éviter, passez au plan *Starter* (~7 €/mois) ou ajoutez un « ping »
   externe (cron-job.org) toutes les 10 min.
 - **Anthropic / Mistral** : à l'usage (quelques euros/mois pour un petit village).
-- **Upstash Free** : 10 000 commandes/jour (largement suffisant ; au-delà, l'app
-  passe en mode dégradé automatiquement).
+- **Upstash Free** : 500 000 commandes/mois, 256 Mo, environ 10 Go de bande
+  passante (formule mensuelle depuis mars 2025 : l'ancien plafond de « 10 000
+  commandes/jour » n'existe plus). Largement suffisant ; au-delà, l'app passe en
+  mode dégradé automatiquement.
 
 ---
 
@@ -117,14 +125,19 @@ Copiez la **Public Key** dans `VAPID_PUBLIC_KEY` et la **Private Key** dans
    **`main`**, dossier = **`/ (root)`**. Le site est statique : aucun build.
 3. GitHub publie le site (en quelques minutes) à
    `https://VOTRE-COMPTE.github.io/app-mezieres/`.
-4. *(Optionnel)* **Nom de domaine perso** : saisissez-le dans le champ *Custom
+4. ⚠️ **Le fichier `CNAME` de votre copie porte le domaine de Mézières**
+   (`mezieres-lez-clery.fr`). Supprimez-le, ou remplacez son contenu par votre
+   propre domaine : il ne doit jamais désigner celui d'une autre commune.
+5. *(Optionnel)* **Nom de domaine perso** : saisissez-le dans le champ *Custom
    domain* (ex. `mezieres-lez-clery.fr`). GitHub crée alors un fichier `CNAME`
    dans le dépôt ; configurez ensuite les enregistrements DNS chez votre
    registrar comme indiqué par GitHub.
 
-### F. Brancher le front sur votre back ⚙️
-C'est **le seul réglage de code**. Dans le dépôt `app-mezieres`, modifiez l'URL
-du backend (celle notée à l'étape B) à **3 endroits balisés** :
+### F. Brancher le front sur votre back
+Ce sont **les seuls réglages de code** de la mise en ligne. Dans le dépôt
+`app-mezieres` :
+
+**L'URL du backend** (notée à l'étape B), à **3 endroits balisés** `⚙️ RÉPLICATION` :
 1. `js/mat-config.js` → la valeur de `window.MAT_API`.
 2. `service-worker.js` → la constante `MAT_API` en tête (le service worker ne
    peut pas lire le fichier de config, il garde sa propre copie).
@@ -134,8 +147,25 @@ du backend (celle notée à l'étape B) à **3 endroits balisés** :
 > Avant la centralisation, cette URL était codée en dur ~60 fois. Désormais ce
 > sont **ces 3 endroits**, tous commentés `⚙️ RÉPLICATION`.
 
+**La clé publique de notification** (étape C) :
+
+4. `js/mat-utils.js` → la constante `VAPID_PUB`, en tête : collez-y **la même
+   valeur** que `VAPID_PUBLIC_KEY` côté Render. ⚠️ Sans ce remplacement, le
+   téléphone de l'habitant s'abonne avec la clé de Mézières et votre serveur ne
+   peut rien lui envoyer : **aucune notification n'arrive**, sans message
+   d'erreur visible. (La clé publique n'est pas un secret : elle a sa place dans
+   le code. La clé **privée**, jamais.)
+
+**Le suivi d'erreurs Sentry** :
+
+5. `index.html` **et** `admin.html` → la variable `dsn` du bloc « Sentry » :
+   collez le DSN de **votre** projet Sentry, ou une chaîne vide `''` pour
+   désactiver le suivi. ⚠️ Laissé tel quel, il envoie les erreurs de **votre**
+   application dans le tableau de bord de Mézières.
+
 Commitez : GitHub Pages redéploie automatiquement à chaque push sur `main`.
-**C'est en ligne. 🎉**
+**C'est en ligne. 🎉** Reste à l'adapter à votre commune (§9) et à décider des
+tâches automatiques (§10).
 
 ---
 
@@ -145,6 +175,7 @@ Commitez : GitHub Pages redéploie automatiquement à chaque push sur `main`.
 |---|---|---|
 | Secrets du **backend** (API keys, tokens, mots de passe) | **Render** → service → **Environment** | une variable par clé (ou via `render.yaml` à la création) |
 | URL du **backend** côté front | **Code** `app-mezieres` | `js/mat-config.js` + `service-worker.js` (§5.F) |
+| Clé **publique** de notification côté front | **Code** `app-mezieres` | `js/mat-utils.js` → `VAPID_PUB` (§5.F) — la clé privée, jamais |
 | Secrets des **GitHub Actions** (sauvegarde, veille) | **GitHub** → dépôt → **Settings → Secrets and variables → Actions** | ex. `CRON_SECRET` (même valeur que Render), `RESEND_API_KEY` |
 
 > ⚠️ Les secrets ne vont **jamais** dans le code/dépôt — uniquement dans les
@@ -199,12 +230,69 @@ Créez une clé API → `RESEND_API_KEY`. Sans domaine vérifié, l'expéditeur 
 | L'app charge mais « Serveur très sollicité » | Backend en réveil à froid (plan Free). Patientez ; envisagez le ping anti-veille ou le plan Starter. |
 | Les appels API échouent (front) | L'URL `window.MAT_API` (§5.F) ne pointe pas sur votre back, ou le service worker garde l'ancienne (videz le cache / réinstallez la PWA). |
 | L'admin renvoie 401 | `ADMIN_PASSWORD` non défini côté Render. |
-| Pas de notifications push | `VAPID_*` manquantes/incohérentes (régénérez et recollez les deux). |
+| Pas de notifications push | `VAPID_*` manquantes/incohérentes (régénérez et recollez les deux), ou `VAPID_PUB` de `js/mat-utils.js` resté sur la clé de Mézières (§5.F, point 4). Après un changement de clés, chaque habitant doit réactiver les notifications. |
 | Une publication Facebook échoue | Token de Page expiré, ou `PAGE_ACCESS_TOKEN` / `FACEBOOK_PAGE_ID` incorrects. |
 
 Diagnostic intégré : l'admin de votre back propose un onglet **Diagnostic des
 services** qui teste chaque intégration et signale les variables manquantes. Voir
 aussi `chatbot-mairie-mezieres/GUIDE-ADMIN.md`.
+
+---
+
+## 9. Personnaliser pour votre commune
+
+Votre copie fonctionne, mais **parle encore de Mézières-lez-Cléry** : élus,
+coordonnées de la mairie, informations locales, connaissances de l'assistante MEL.
+Ces contenus sont répartis dans les deux dépôts ; la liste ci-dessous indique les
+principaux, **sans prétendre être exhaustive**.
+
+**Pour tout repérer**, cherchez dans chaque dépôt (sur GitHub : touche `/`, puis
+*Search in this repository*) : `Mézières`, `Cléry`, `45204` (code INSEE),
+`47.822` (latitude du bourg), `CCTVL` (communauté de communes), `02 38 45 61 76`
+(téléphone de la mairie) et `mezieres-lez-clery.fr`.
+
+| Où | Ce qui est propre à Mézières |
+|---|---|
+| `manifest.webmanifest`, `index.html`, `admin.html` | Nom de l'application, titres, textes d'accueil, coordonnées |
+| `js/mat-trombi.js`, `img/trombi/` | Élus et leurs portraits |
+| `js/mat-carte3d.js`, `js/mat-eau8.js`, `js/mat-forms.js`, `js/mat-saviez-vous.js` | Coordonnées du bourg, code INSEE |
+| `js/mat-mel.js` et `data/mel-tree.json` | Arbre de décision de l'assistante (deux copies à garder en phase) |
+| `js/mat-guide-arrivee.js` | Guide d'arrivée des nouveaux habitants |
+| `js/mat-widgets.js` | Stations du bandeau carburant |
+| `data/conseil.json`, `data/plu-data.json`, `data/saviez-vous.json` | Conseil municipal, urbanisme, « Le saviez-vous ? » |
+| Backend : variables `OPEN_METEO_LAT`, `OPEN_METEO_LON`, `VIGIEAU_COMMUNE_INSEE`, `DAILY_STATS_EMAIL` | Valeurs par défaut de Mézières dans `config.js` : renseignez-les sur Render |
+| Backend : `config.js` → `VAPID_EMAIL` | Adresse de contact des notifications, écrite en dur |
+| Backend : `lib/mel.js` | Connaissances de MEL (`SYSTEM_PROMPT`, `DIRECT_RULES`, `ASSOCIATIONS`, `SOURCES`) et coordonnées de la mairie dans le message de secours |
+| Backend : `lib/carburant.js` | Stations suivies |
+
+> ⚠️ **Une information fausse coûte plus cher qu'une information absente** :
+> l'assistante MEL répond avec assurance à partir de ce qu'elle trouve. Avant de
+> l'ouvrir aux habitants, retirez ce qui concerne Mézières plutôt que de le
+> laisser « en attendant ».
+>
+> ⚠️ Une fois l'application ouverte aux habitants, **modifier un fichier `js/…`
+> impose d'incrémenter son `?v=`** et le cache du service worker, sans quoi la
+> modification n'arrive jamais sur les téléphones : voir le `CLAUDE.md` du dépôt,
+> § Service Worker.
+
+---
+
+## 10. Tâches automatiques (GitHub Actions)
+
+Le dépôt `app-mezieres` contient des tâches automatiques (`.github/workflows/`).
+**Sur une copie (fork), GitHub les désactive** jusqu'à ce que vous les activiez
+dans l'onglet *Actions*. Activez-les **une par une**, en connaissance de cause :
+
+| Tâche | À activer ? | Ce qu'il lui faut |
+|---|---|---|
+| `ci.yml`, `e2e.yml`, `validite-html.yml`, `liens-morts.yml` | Oui : contrôles du code, sans secret | Rien |
+| `lighthouse.yml` | Après avoir remplacé l'adresse `mezieres-lez-clery.fr` qu'elle audite | Rien |
+| `sauvegarde-upstash.yml` | Après avoir remplacé l'adresse du backend de Mézières, **écrite dans le fichier** | Secret `CRON_SECRET` (même valeur que sur Render) |
+| `suivi-depot.yml`, `dependabot-auto-merge.yml` | Facultatif (entretien du dépôt) | Rien (`GITHUB_TOKEN` est fourni par GitHub) |
+| `veille-techno.yml`, `veille-bulletin.yml`, `veille-municipale.yml`, `veille-suivi.yml` | Facultatif ; la veille municipale décrit Mézières (`veille/commune.yml`) | `CLAUDE_CODE_OAUTH_TOKEN`, `RESEND_API_KEY`, `RESEND_FROM`, `VEILLE_EMAIL_TO` (+ `VEILLE_MUNICIPALE_EMAIL_TO`) |
+| `conseil-drive.yml` | **Non** : relève le dossier Drive du conseil municipal de Mézières | — |
+
+Les secrets se saisissent dans *Settings → Secrets and variables → Actions* (§6).
 
 ---
 
