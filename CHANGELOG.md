@@ -24,6 +24,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ### Corrigé
 
+- **Simulateur de coût de `partager.html`** (v4.127.3, `js/mat-partager.js?v=3.4.1`) :
+  il comparait le trafic estimé à l'ancien palier gratuit Upstash de **10 000
+  commandes/jour** (`REDIS_FREE_CMD_DAY`) ; le palier est **mensuel** depuis mars 2025,
+  **500 000 commandes/mois** (`REDIS_FREE_CMD_MONTH`). Le dépassement était annoncé dès
+  ~1 700 habitants, au lieu de ~2 800. Le bandeau de trafic affiche désormais des
+  commandes par mois. Textes du prompt, `partager.html`, `STD-00` et `architecture.md`
+  alignés.
 - **`docs/DEPLOIEMENT.md`** : une commune qui suivait le guide n'avait **aucune
   notification** — la clé publique `VAPID_PUB` de `js/mat-utils.js` restait
   celle de Mézières, et le §5.F annonçait « le seul réglage de code » à trois

@@ -57,8 +57,9 @@ documents de domaine).
   génération de parcours **25 s**, Open-Meteo / Météo-France **15 s**, proxy iCal **10 s**, IGN PLU
   **8 s**, Overpass **30 s**, création de carte Trello **15 s**, pièce jointe Trello **30 s**
   (corps ≤ 10 Mo), Upstash Redis **8 s**.
-- **RT-12 — Quotas Redis (Upstash) & mode dégradé.** Quota **10 000 commandes/jour** (et 500 000/mois,
-  suivis au tableau de bord). Sur réponse **429** d'Upstash, le backend bascule en **mode dégradé
+- **RT-12 — Quotas Redis (Upstash) & mode dégradé.** Quota **500 000 commandes/mois** (formule
+  mensuelle depuis mars 2025 : l'ancien plafond de 10 000 commandes/jour n'existe plus ; suivi au
+  tableau de bord). Sur réponse **429** d'Upstash, le backend bascule en **mode dégradé
   jusqu'à minuit UTC** : les opérations de Set (déduplication votes/réactions) sont court-circuitées
   et les réactions/votes renvoient `503 { error: "Réactions désactivées" }`. Le quota MEL bascule sur
   un compteur **mémoire** (flush vers Redis toutes les 2 min et à l'arrêt). `GET /health` expose

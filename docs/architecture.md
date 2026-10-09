@@ -126,7 +126,7 @@ flowchart TB
     end
 
     subgraph upstash["Upstash (EU)"]
-        db[("Redis REST<br/>10 000 req/jour")]
+        db[("Redis REST<br/>500 000 cmd/mois")]
     end
 
     subgraph saas["Services externes"]
