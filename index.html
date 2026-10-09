@@ -174,7 +174,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
 <p class="territoria territoria-mobile"><span class="territoria-ico" aria-hidden="true">🏆</span><span class="territoria-txt">Territoria d’Or 2026</span></p>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.127 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" aria-label="Voir les nouveautés de l’application" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.127.1 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em">🏘️ <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -350,7 +350,9 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
      ⛔ Le nom du jeu n'est écrit NULLE PART ici : titre et saison sont lus dans
      jeux/jeux.json par js/mat-jeu.js. Changer de jeu ne doit toucher aucun code. -->
 <li><a class="card simple-card jeu-tuile" href="jeu/" data-jeu-tuile aria-label="Le jeu du moment">
-<span class="ico ico-jeu" aria-hidden="true">🍇</span>
+<!-- ⚠️ Icône NEUTRE (manette), jamais celle d'un jeu : la tuile ne nomme pas le jeu,
+     et une icône en dur survit à la bascule (🍇 est restée après la fin des vendanges). -->
+<span class="ico ico-jeu" aria-hidden="true">🎮</span>
 <span class="ct">
 <!-- ⚠️ La pastille est DANS le flux, avant le libellé — pas en position absolue
      dans un coin. Dans une tuile de demi-largeur, un « NOUVEAU » posé en haut à
@@ -542,7 +544,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openDeclarationA11y()" title="Voir la déclaration d’accessibilité">♿ Accessibilité&nbsp;: totalement conforme</button>
 <button onclick="openPlanSite()">🗺️ Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune">🏛️ Créer la vôtre</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.127</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0">🆕 v4.127.1</button>
 </div>
 </div>
 </div>
@@ -1888,6 +1890,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 9 octobre 2026 — v4.127.1</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li><strong>Le jeu du moment&nbsp;: une manette 🎮 sur la tuile.</strong> Elle affichait encore une grappe de raisin apr&egrave;s le changement de jeu&nbsp;; l&rsquo;ic&ocirc;ne ne d&eacute;pend plus du jeu en cours</li>
+</ul>
+</div>
+<div style="border-radius:12px;padding:12px 14px;border:1px solid var(--border)">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 8 octobre 2026 — v4.127</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li><strong>🏆 Territoria d&rsquo;Or 2026.</strong> Un badge sur l&rsquo;accueil, sous le titre de l&rsquo;application et en haut de la page sur ordinateur. Il s&rsquo;anime une seule fois, &agrave; la premi&egrave;re ouverture, et reste immobile si votre t&eacute;l&eacute;phone est r&eacute;gl&eacute; sur &laquo;&nbsp;R&eacute;duire les animations&nbsp;&raquo;</li>

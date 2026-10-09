@@ -947,7 +947,7 @@ pas question de prendre le moindre risque d'erreur.
 ## 19. « Le jeu du moment »
 
 Un petit jeu communal, qui **change tout seul au fil des saisons** — personne n'a rien à
-faire le jour de la bascule. On y accède depuis la tuile 🍇 **Le jeu du moment** sur
+faire le jour de la bascule. On y accède depuis la tuile 🎮 **Le jeu du moment** sur
 l'écran d'accueil — qui ne dit volontairement pas de quel jeu il s'agit : on le découvre
 en l'ouvrant — ou directement à l'adresse
 **mezieres-lez-clery.fr/jeu** — celle qui est imprimée sur les affiches et les QR codes
