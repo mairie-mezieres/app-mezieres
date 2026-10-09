@@ -345,7 +345,7 @@ Carte Leaflet centrée sur la commune :
 - Pas d’embeddings ni de base vectorielle au démarrage : injecter directement les pages du site dans le prompt système (RAG syntaxique simple).
 - **Rate limiting** : 5 questions/jour/appareil (empreinte hash) pour maîtriser les coûts.
 - **Détection d’injection prompt** basique : regex sur patterns connus (ignore previous, bypass, override).
-- **Stockage cache** des réponses fréquentes via Upstash Redis (gratuit jusqu’à 10 000 commandes/jour).
+- **Stockage cache** des réponses fréquentes via Upstash Redis (gratuit jusqu’à 500 000 commandes/mois).
 - **Garde-fous métier** : sur les sujets sensibles (urbanisme, droit), ajouter automatiquement une mention "informations indicatives, vérifier en mairie".
 - **Anonymisation** : ne jamais associer une question à un compte utilisateur.
 - Code de référence open-source : https://github.com/mairie-mezieres/chatbot-mairie-mezieres
@@ -561,7 +561,10 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
   const COST_PER_LLM_Q_MIN  = 0.0004;       // €/question (cache chaud + Mistral Small)
   const COST_PER_LLM_Q_MAX  = 0.0010;       // €/question (prompt long, cache froid)
   const REDIS_CMD_PER_DAU   = 30;           // commandes Redis/visiteur actif/jour
-  const REDIS_FREE_CMD_DAY  = 10000;        // palier gratuit Upstash Redis (10 000 cmd/jour)
+  // Palier gratuit Upstash Redis : 500 000 commandes/MOIS (formule mensuelle depuis
+  // mars 2025 ; l'ancien plafond de 10 000 commandes/jour n'existe plus — il faisait
+  // annoncer un « palier gratuit dépassé » dès ~1 700 habitants au lieu de ~2 800).
+  const REDIS_FREE_CMD_MONTH = 500000;
   const REDIS_COST_PER_100K = 0.18;         // €/100 000 commandes au-delà du gratuit (~0,20 $)
 
   function estimateTraffic() {
@@ -577,15 +580,18 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
     // Commandes Redis/jour = visiteurs actifs × 30
     const redisPerDayMin = dauMin * REDIS_CMD_PER_DAU;
     const redisPerDayMax = dauMax * REDIS_CMD_PER_DAU;
+    // Le palier gratuit est MENSUEL : on compare le volume du mois (30 jours)
+    const redisPerMonthMin = redisPerDayMin * 30;
+    const redisPerMonthMax = redisPerDayMax * 30;
     // Coût Redis : 0 sous le palier gratuit, sinon ~0,18 €/100k commandes
-    const overMin = Math.max(0, redisPerDayMin - REDIS_FREE_CMD_DAY) * 30;
-    const overMax = Math.max(0, redisPerDayMax - REDIS_FREE_CMD_DAY) * 30;
+    const overMin = Math.max(0, redisPerMonthMin - REDIS_FREE_CMD_MONTH);
+    const overMax = Math.max(0, redisPerMonthMax - REDIS_FREE_CMD_MONTH);
     const redisMin = +(overMin / 100000 * REDIS_COST_PER_100K).toFixed(2);
     const redisMax = +(overMax / 100000 * REDIS_COST_PER_100K).toFixed(2);
-    const redisFree = redisPerDayMax <= REDIS_FREE_CMD_DAY;
+    const redisFree = redisPerMonthMax <= REDIS_FREE_CMD_MONTH;
     return {
       pop, dauMin, dauMax, llmPerMonth, chatMin, chatMax,
-      redisPerDayMin, redisPerDayMax, redisMin, redisMax, redisFree
+      redisPerDayMin, redisPerDayMax, redisPerMonthMax, redisMin, redisMax, redisFree
     };
   }
 
@@ -672,8 +678,8 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
           parts.push('~' + traffic.llmPerMonth.toLocaleString('fr-FR') + ' questions IA/mois');
         }
         if (needsBackend) {
-          parts.push('~' + traffic.redisPerDayMax.toLocaleString('fr-FR') + ' cmd Redis/jour'
-            + (traffic.redisFree ? '' : ' ⚠️ palier gratuit dépassé'));
+          parts.push('~' + traffic.redisPerMonthMax.toLocaleString('fr-FR') + ' cmd Redis/mois'
+            + (traffic.redisFree ? ' (palier gratuit : 500 000)' : ' ⚠️ palier gratuit (500 000/mois) dépassé'));
         }
         let html = parts.join(' · ');
         html += '<br><span style="color:rgba(216,243,220,.55)">Modèle calibré sur MAT : ~40 questions IA/mois ≈ 0,02 €/mois pour 900 hab. (les règles directes interceptent le reste).</span>';
@@ -1113,7 +1119,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       accounts.push('- **Render** (https://dashboard.render.com/register) : backend Node.js pour le chatbot, les notifications push et les signalements citoyens. Gratuit (limites free tier).');
     }
     if (hasBackend || hasPush) {
-      accounts.push('- **Upstash** (https://console.upstash.com/) : base de données Redis pour le cache et les notifications push. Gratuit jusqu’à 10 000 commandes/jour.');
+      accounts.push('- **Upstash** (https://console.upstash.com/) : base de données Redis pour le cache et les notifications push. Gratuit jusqu’à 500 000 commandes/mois.');
     }
     if (hasChatbot) {
       accounts.push(state.sovereign
