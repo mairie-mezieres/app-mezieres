@@ -48,6 +48,7 @@ Engagements **vérifiables** (et non simplement déclaratifs) de l'application :
 | [Spécifications techniques (STD)](docs/specifications-techniques/README.md) | Développeurs · intégrateurs | Contrat de chaque endpoint : validations, codes HTTP, messages d'erreur, limites |
 | [Guide de déploiement](docs/DEPLOIEMENT.md) | Autres communes | Mise en ligne « de zéro » : checklist des comptes, déploiement 1-clic, où coller chaque clé |
 | [Kit de réplication](docs/REPLICATION.md) | Autres communes | Prompt Claude pour générer un site similaire |
+| [Entraide entre communes](https://mairie-mezieres.github.io/mat-communes/) | Autres communes | FAQ, guide pas à pas pour non-techniciens, espace d'entraide, webinaire |
 | [Politique de sécurité](SECURITY.md) | Tous | Divulgation responsable, périmètre |
 
 ---
