@@ -15,7 +15,11 @@ function fmt(d){
   return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
 }
 function fmtShort(d){
-  var dt=d instanceof Date?d:new Date(d);
+  // ⛔ Les actus portent `date` au format FR « JJ/MM/AAAA » (toLocaleDateString
+  // côté backend). `new Date('12/10/2026')` le lit en MM/JJ : le 12 octobre
+  // s'affichait « 10 déc », le 9 « 10 sept ». On découpe donc à la main.
+  var m=typeof d==='string'&&d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  var dt=d instanceof Date?d:m?new Date(+m[3],+m[2]-1,+m[1]):new Date(d);
   if(isNaN(dt.getTime()))return '';
   return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}).replace('.',' ');
 }

@@ -24,6 +24,10 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ### Corrigé
 
+- **Dates des actualités sur le bureau** (v4.127.5, `js/mat-desktop.js?v=4.4.1`) :
+  `fmtShort` passait la date FR « JJ/MM/AAAA » du backend à `new Date()`, qui la
+  lit en MM/JJ — le 12 octobre s'affichait « 10 déc », le 9 « 10 sept ». Découpe
+  explicite du format JJ/MM/AAAA.
 - **Simulateur de coût de `partager.html`** (v4.127.3, `js/mat-partager.js?v=3.4.1`) :
   il comparait le trafic estimé à l'ancien palier gratuit Upstash de **10 000
   commandes/jour** (`REDIS_FREE_CMD_DAY`) ; le palier est **mensuel** depuis mars 2025,

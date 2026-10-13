@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.127.4';
+const CACHE = 'mat-v4.127.5';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -58,7 +58,7 @@ const PRECACHE_URLS = [
   './js/mat-jours-feries.js?v=4.2.3',
   './js/mat-sondages.js?v=4.3.1',
   './js/mat-associations.js?v=4.2.4',
-  './js/mat-desktop.js?v=4.4.0',
+  './js/mat-desktop.js?v=4.4.1',
   './js/mat-eau8.js?v=4.3.0',
   './js/mat-plui.js?v=1.2.1',
   './js/mat-plan-site.js?v=1.2.0',
