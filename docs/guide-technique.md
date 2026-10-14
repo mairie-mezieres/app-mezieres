@@ -1524,6 +1524,7 @@ Les workflows dans `.github/workflows/` :
 | `veille-techno.yml` | hebdomadaire (cron, lundi) | Veille technologique par IA (Claude Code + recherche web), rapport HTML envoyé par email (Resend) |
 | `veille-bulletin.yml` | mensuel (1er lundi) | Veille éditoriale : idées d'articles pour le bulletin municipal, par email |
 | `veille-municipale.yml` | mensuel (1er lundi) | Veille pour les **élus** : subventions ouvertes, obligations réglementaires nouvelles, bonnes pratiques applicables — par email (ADR-0025) |
+| `veille-presse.yml` | quotidien (cron, 18h40 UTC) + manuel | « Ils parlent de MAT » : presse, sites, réseaux. Les **nouveautés** (filtrées contre `veille/presse-vues.json` par du code) partent au backend et rejoignent le **mail de stats de 22 h** ; aucun mail à part (ADR-0054) |
 | `veille-suivi.yml` | après `veille-techno.yml` (`workflow_run`) + quotidien (cron) | **Étage 3** : traite les issues « Actions PWA » et les PR draft ouvertes par la veille — coche ce qu'une PR fusionnée a traité, referme ce qui est fini, rejoue les contrôles et pose la coche verte que ces PR n'ont pas (ADR-0042) |
 | `suivi-depot.yml` | **manuel** (`workflow_dispatch`) + quotidien (cron) | Vérification et traitement de **toutes** les PR et issues ouvertes (Dependabot, agents, humaines) : état de CI, conflits, inactivité. Tableau dans le résumé du run ; commentaire seulement sur une PR **automatique** actionnable ; ⛔ aucune fermeture, aucun commentaire sur une PR humaine (ADR-0043) |
 | `dependabot-auto-merge.yml` | fin de la CI (`workflow_run`) + quotidien + manuel | Fusionne les PR **Dependabot** à faible risque une fois la CI verte : correctif toujours, mineure ≥ 1.0.0, ⛔ **jamais une majeure ni une mineure en 0.x**, et seulement si la PR ne touche que `package.json` / `package-lock.json` (ADR-0045) |
@@ -1701,6 +1702,22 @@ Resend rejette en 403.
 `veille-municipale.yml` refuse d'envoyer au conseil si `RESEND_FROM` est vide, avec un
 `::error` explicite : Resend répondrait 403 avec un message obscur, et l'échec serait
 attribué au mauvais endroit.
+
+### Veille presse — « Ils parlent de MAT » (ADR-0054)
+
+`veille-presse.yml` (chaque jour, 18h40 UTC) : l'agent écrit `veille/items-presse.json`,
+`node scripts/veille-presse.js filtrer` écarte ce qui est **déjà dans
+`veille/presse-vues.json`**, nos propres canaux et les doublons, puis les nouveautés
+sont POSTées à `POST /cron/veille-presse` (en-tête `X-Cron-Key` = secret `CRON_SECRET`).
+Le backend les garde en file (`mat:veille:presse`) jusqu'au mail de 22 h, qui les
+affiche puis vide la file **après** un envoi réussi.
+
+- ⛔ La mémoire n'est committée qu'après le `200` du backend (`memoriser`) : sinon un
+  lien mémorisé mais jamais reçu ne serait plus jamais proposé.
+- ⛔ `items-presse.json` absent = run **rouge** — jamais « aucune mention ».
+- ⚠️ `normaliserUrl` existe en double (ici et `lib/veille-presse.js` du backend) :
+  `scripts/check-veille-presse.js` (CI) et `test/veille-presse.test.js` partagent leurs cas.
+- Laisser revenir un lien : retirer son entrée de `veille/presse-vues.json`.
 
 ### Robustesse des veilles IA (retry + diagnostic)
 

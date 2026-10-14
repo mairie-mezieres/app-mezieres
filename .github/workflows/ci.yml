@@ -75,6 +75,11 @@ jobs:
       - name: Fusion conseil-drive (anti-doublon)
         run: node scripts/check-conseil-drive.js
 
+      # « Un lien déjà envoyé ne revient jamais » : la promesse de la veille
+      # presse tient dans son filtre, qui ne tourne qu'en workflow (ADR-0054).
+      - name: Filtre de la veille presse (mémoire anti-répétition)
+        run: node scripts/check-veille-presse.js
+
       # Une spec E2E qui ne coupe pas `onrender.com` appelle le backend de
       # PRODUCTION à chaque exécution — et Playwright partant d'un profil
       # vierge, CHAQUE TEST s'y enregistre comme un visiteur unique de plus.
