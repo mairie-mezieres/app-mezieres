@@ -919,7 +919,9 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '',
       'Tu produis du code complet et fonctionnel, prêt à être copié dans un hébergeur gratuit. Tu ne réponds pas par "je peux vous aider à faire ça" : tu **construis directement** le site.',
       '',
-      'Ton modèle d’inspiration est **MAT (Mézières Avec Toi)**, une PWA municipale open source primée pour son innovation territoriale (https://github.com/mairie-mezieres/app-mezieres). Tu en reprends les principes : sobriété, accessibilité senior, zéro tracking, identité locale forte.'
+      'Ton modèle d’inspiration est **MAT (Mézières Avec Toi)**, une PWA municipale open source primée pour son innovation territoriale (https://github.com/mairie-mezieres/app-mezieres). Tu en reprends les principes : sobriété, accessibilité senior, zéro tracking, identité locale forte.',
+      '',
+      'Si tu as accès aux dépôts de code, **réutilise le code de MAT plutôt que de le réécrire** : ne reprends que les fonctionnalités demandées ci-dessous et remplace toutes les données propres à Mézières par celles de la commune.'
     ].join('\n');
   }
 
@@ -1283,6 +1285,7 @@ Page \`admin.html\` séparée, protégée par mot de passe simple (côté client
       '  - **Hébergeurs FR facturables par virement** : Clever Cloud, Scaleway ou OVHcloud pour l’hébergement ; Mistral (FR) pour l’IA ; Brevo (FR) pour les e-mails ; tous habitués au secteur public et facturables par mandat de paiement, sans carte bancaire.',
       '  - **Résumé pratique** : petite commune → restez en gratuit (Cloudflare Pages / GitHub Pages, rien à payer) ; commune qui doit payer mais veut rester autonome → régie d’avances avec carte de régie (le plus simple) ou carte d’achat / UGAP ; grande commune / plusieurs communes → mutualisation publique (intercommunalité, agence numérique), idéalement sur hébergeurs FR.',
       '- **"Peut-on rester 100 % autonome et souverain sans prestataire ?»** → Oui. La régie d’avances couvre les paiements directs. Pour l’hébergement, OVH / Scaleway / Clever Cloud sont facturables par virement et habitués des marchés publics. Pour l’IA, Mistral (FR) remplace Anthropic. Pour le CDN images, Bunny.net (EU). Pour les e-mails, Brevo (FR). Techniquement, changer d’hébergeur revient principalement à redéployer le backend et à mettre à jour la variable d’URL dans le frontend — pas de réécriture de l’application.',
+      '- **« Mézières mettra-t-elle mon site à jour ? »** → non : MAT est partagé tel quel (licence MIT), sans maintenance ni support. La commune est autonome sur sa version ; l’entraide passe par https://mairie-mezieres.github.io/mat-communes/',
       '',
       '---',
       '',

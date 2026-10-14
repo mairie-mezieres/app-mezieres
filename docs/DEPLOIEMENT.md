@@ -93,6 +93,8 @@ Tout est **gratuit pour démarrer**. Points d'attention :
 2. **Forkez** (ou copiez) les deux dépôts dans votre compte/organisation :
    `app-mezieres` et `chatbot-mairie-mezieres`.
 
+> ⚠️ **Votre copie est indépendante.** Mézières n’en assure ni la maintenance ni les mises à jour. N’utilisez pas le bouton « Sync fork » sans comprendre ce qu’il importe : il récupère toutes les modifications de Mézières, y compris celles qui ne vous concernent pas.
+
 ### B. Backend sur Render (déploiement « 1-clic »)
 1. Sur **Render** → **New +** → **Blueprint**.
 2. Connectez votre dépôt **`chatbot-mairie-mezieres`**. Render détecte le fichier
