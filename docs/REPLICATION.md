@@ -4,6 +4,8 @@ Ce document permet à n'importe quelle commune ou administration de créer sa pr
 
 > **🤝 Besoin d'aide ?** Le site [MAT · entraide entre communes](https://mairie-mezieres.github.io/mat-communes/) rassemble une FAQ, un guide pas à pas et un espace où les communes s'entraident.
 
+> **📜 Partagé tel quel.** MAT est diffusé librement sous licence MIT. La commune de Mézières-lez-Cléry ne fournit ni maintenance, ni mises à jour, ni support pour votre version : une fois copiée ou recréée, l’application est la vôtre et vous en assurez le suivi. Pour l’entraide entre communes : https://mairie-mezieres.github.io/mat-communes/
+
 > **🎯 Canal recommandé : ouvrez d'abord `partager.html`** — un questionnaire visuel en 3 étapes génère votre prompt personnalisé, affiche le coût mensuel estimé (fourchette min–max) et alerte sur les paliers gratuits → payants. Ce document `.md` reste utile comme référence auditable et version manuelle pour les profils techniques.
 
 ---
@@ -151,6 +153,7 @@ Tu intègres uniquement les fonctionnalités cochées `[x]` dans la section « C
 
 ### Si l'utilisateur a coché « Intermédiaire » :
 
+- **Réutilise le code existant plutôt que de le réécrire.** Si tu as accès aux dépôts (Claude Code, outil de code Mistral…), pars de https://github.com/mairie-mezieres/app-mezieres (front) et https://github.com/mairie-mezieres/chatbot-mairie-mezieres (back). Ne reprends **que** les modules cochés en section 3, retire proprement les autres (écran, tuile d’accueil, plan du site, version bureau, précache du service worker), et remplace toutes les données propres à Mézières (élus, coordonnées, code INSEE, domaine) par celles de la commune. Les données manquantes restent en `[À COMPLÉTER]`.
 - Produis une structure de projet inspirée de **MAT — Mézières Avec Toi** (https://github.com/mairie-mezieres/app-mezieres) :
   - `index.html` à la racine
   - `css/main.css`
@@ -321,6 +324,9 @@ Oui, librement. Le projet original est diffusé sous **licence MIT** : https://g
 
 **Q : Comment citer le projet d'origine ?**
 Un simple lien en pied de page suffit : « Inspiré de MAT — Mairie de Mézières-lez-Cléry ».
+
+**Q : Recevrai-je les évolutions de MAT ?**
+Non. Votre version est indépendante dès sa création : Mézières ne la met pas à jour et ne peut pas en garantir le fonctionnement. Rien ne vous empêche de consulter les dépôts pour vous inspirer de nouveautés et les faire adapter par votre IA.
 
 ---
 

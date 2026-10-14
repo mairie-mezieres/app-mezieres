@@ -9,6 +9,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ### Ajouté
 
+- **Kit « Partager » — partagé tel quel** (v4.127.6) : `docs/REPLICATION.md`
+  (§1 encadré « Partagé tel quel », §6 consigne de réutilisation du code pour
+  le profil Intermédiaire, §11 FAQ « Recevrai-je les évolutions de MAT ? »),
+  `docs/DEPLOIEMENT.md` §5.A (copie indépendante, prudence sur « Sync fork »),
+  prompt généré par `js/mat-partager.js` (réutiliser le code de MAT, FAQ
+  maintenance) et mention visible dans `partager.html`. Mézières ne fournit ni
+  maintenance, ni mises à jour, ni support pour la version d’une autre commune.
+  `mat-partager.js?v=3.4.2`, cache SW `mat-v4.127.6`.
+
 - **Pipeline conseil-drive** (`.github/workflows/conseil-drive.yml`,
   hebdomadaire) : relevé du dossier Drive public des comptes rendus,
   extraction `pdftotext`, proposition rédigée par un agent (Read/Write
