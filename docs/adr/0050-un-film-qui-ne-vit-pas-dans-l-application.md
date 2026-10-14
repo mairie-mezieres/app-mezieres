@@ -320,3 +320,62 @@ venait l'image.
 ⚠️ Détail de fabrication, invisible jusqu'au rendu : le logo fourni avait un fond
 à **254,254,254**, soit un rectangle gris pâle sur le cartouche blanc du film. Le
 point blanc est normalisé à la conversion.
+
+## Cinquième version (14 octobre 2026) — deux minutes, parce qu'un discours en dure deux
+
+Le film n'accompagne plus un fil d'actualité ni un écran de hall : il accompagne
+un **discours de deux minutes**. Sa durée cesse d'être un plafond pour devenir
+une **cible** : 120,0 s exactement, vérifiées sur le total de `SCENES`.
+
+### Ce qu'on ajoute quand il faut tenir plus longtemps
+
+⛔ **On n'étire pas ce qui existe, on montre plus de choses.** Ralentir encore
+des scènes déjà ralenties aurait donné un film qui traîne. Deux écrans entrent
+donc au montage, tous deux déjà dans l'application :
+
+- **Prix des carburants** — six stations, et la règle que l'app applique
+  (ADR-0033/0047) : chaque prix porte **sa** date, un carburant non réévalué est
+  nommé plutôt que masqué. C'est ce que la puce « Daté, jamais deviné » annonce.
+- **Conseil municipal, onglet Décisions** — compte rendu, délibérations, projets.
+  ⚠️ `openConseil()` **sans argument** ouvre « Les élus » : l'onglet se passe en
+  paramètre (`openConseil('decisions')`), sinon la capture montre le
+  trombinoscope sous un titre qui parle de décisions.
+
+Et **la dernière page tient 14 s** : c'est là que la salle sort son téléphone
+pour le QR code. Allonger la fin coûte moins cher que d'accélérer le reste.
+
+### MEL est nommée et montrée
+
+Dans l'application, l'avatar de MEL est l'émoji **👩** d'une bulle de
+conversation. Illisible projeté, et il ne dit pas qui elle est. Le film la
+présente comme on présente quelqu'un — visage, nom, fonction — avant de montrer
+ce qu'elle répond. ⚠️ L'image est un **recadrage du fichier de l'app**
+(`img/MAT et MEL.webp`), pas un nouveau dessin : si les mascottes changent, le
+recadrage est à refaire, sinon le film montre une MEL que personne ne reconnaît.
+
+### Une icône n'est pas du texte
+
+Les icônes sont passées dans un `<span class="ico">` à l'intérieur de chaque
+puce. ⛔ Grossir la puce entière aurait grossi **le texte**, qui était déjà à la
+bonne taille ; seule l'icône devait grandir. ⚠️ `vertical-align` la recale sur la
+ligne de base — sans lui, une puce plus haute que ses voisines décale toute la
+rangée, et ça ne se voit qu'au rendu.
+
+### « Elle ne s'est pas faite toute seule » → « Merci à nos soutiens »
+
+La formule précédente parlait de l'application ; la carte parle de **ceux qu'on
+remercie**. Le titre le dit maintenant directement.
+
+### Et le format décide désormais de la qualité d'encodage
+
+À 120 s, `crf 23` donnait **17,4 Mio** pour le vertical : au-dessus des ~16 Mo
+qu'accepte un envoi WhatsApp. Plutôt qu'une valeur unique arbitrée au pire cas,
+l'encodage suit **la façon dont chaque fichier voyage** :
+
+| | part par | plafond | encodage | poids |
+|---|---|---|---|---|
+| vertical | message, Facebook | ~16 Mo | `crf 25` | 13,4 Mio |
+| 16:9 | câble, clé USB | aucun | `crf 23` | 16,9 Mio |
+
+⛔ Ne pas aligner les deux « pour faire propre » : dégrader le paysage
+n'économise rien (il ne s'envoie pas) et c'est lui qu'on verra en grand.

@@ -86,6 +86,16 @@ const ECRANS = [
     }
   },
   { nom: "agenda", desc: "Agenda", fn: "openAgenda()" },
+  {
+    nom: "carburant", desc: "Prix des carburants", fn: "openCarburant()",
+    prepare: async (page) => { await delai(1200); }
+  },
+  {
+    // ⚠️ L'onglet se passe EN ARGUMENT : `openConseil()` sans rien ouvre les
+    // élus, et c'est « Décisions » qu'on veut montrer.
+    nom: "conseil", desc: "Conseil municipal — décisions", fn: "openConseil('decisions')",
+    prepare: async (page) => { await delai(1400); }
+  },
   { nom: "meteo", desc: "Météo détaillée", fn: "openMeteo()" },
   {
     nom: "suivi", desc: "Suivi des signalements", fn: "openSuivi('signalements')",

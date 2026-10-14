@@ -6,11 +6,12 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 | Fichier | Rôle |
 |---|---|
-| `sortie/mat-presentation-vertical.mp4` | **Réseaux sociaux** — 84 s, 1080×1920, H.264, **sans son** |
-| `sortie/mat-presentation-16x9.mp4` | **Projection** (grand écran, salle) — 84 s, 1920×1080 |
+| `sortie/mat-presentation-vertical.mp4` | **Réseaux sociaux** — 120 s, 1080×1920, H.264, **sans son** |
+| `sortie/mat-presentation-16x9.mp4` | **Projection** (grand écran, salle) — 120 s, 1920×1080 |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
 | `sortie/mat-presentation-16x9-affiche.jpg` | La même, en paysage |
 | `logos/` | Les logos de tiers, et l'accord qui autorise chacun |
+| `mel-avatar.webp` | Le visage de MEL, recadré depuis `img/MAT et MEL.webp` |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
 | `capturer-ecrans.js` | Capture les quinze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
@@ -33,23 +34,36 @@ publie sur Facebook, on l'envoie par message. Le **16:9** est fait pour une
 salle : il a été demandé pour une projection sur grand écran, ses textes sont
 plus gros, le téléphone passe à droite et le texte occupe une colonne à gauche.
 
-⏱️ **Plafond : 2 minutes.** Au-delà, le film n'est plus lu jusqu'au bout sur un
-fil d'actualité — et le QR code de fin, qui est l'appel à l'action, n'est jamais
-vu. Le total des durées de `SCENES` est la seule chose à surveiller.
+⏱️ **Durée : exactement 2 minutes**, et ce n'est plus seulement un plafond. Le
+film **accompagne un discours de deux minutes** : il doit tenir tout le propos
+sans le dépasser. Le total des durées de `SCENES` vaut donc 120,0 s **pile** —
+le vérifier après chaque retouche.
+
+⚠️ **La dernière page tient 14 s**, et c'est voulu : c'est là que la salle sort
+son téléphone pour le QR code. Allonger la fin coûte moins cher que d'accélérer
+le reste.
 
 ⚖️ **Et un second plafond, moins visible : ~16 Mo.** C'est la limite d'un envoi
-WhatsApp. À `crf 20`, les 63 s pesaient **16,1 Mio** et ne partaient plus ;
-`rendre-video.js` encode donc en **`crf 23`** (`CRF=20 node film/rendre-video.js`
-pour forcer). Après chaque rallonge, vérifier le **poids**, pas seulement la
-durée.
+WhatsApp. ⛔ **Le format décide de la qualité d'encodage**, parce que les deux
+fichiers ne voyagent pas pareil :
+
+| | part par | plafond | encodage | poids |
+|---|---|---|---|---|
+| vertical | message, Facebook | ~16 Mo | `crf 25` | 13,4 Mio |
+| 16:9 | câble, clé USB | aucun | `crf 23` | 16,9 Mio |
+
+À `crf 20`, les 63 s de la v3 pesaient déjà 16,1 Mio ; à `crf 23`, les 120 s du
+vertical pesaient 17,4 Mio — film terminé, correct, et impossible à envoyer.
+`CRF=20 node film/rendre-video.js` force une autre valeur. Après chaque
+rallonge, vérifier le **poids**, pas seulement la durée.
 
 ## Régénérer le film
 
 ```bash
 npm i --no-save @playwright/test @ffmpeg-installer/ffmpeg   # une fois
-node film/capturer-ecrans.js             # ~2 min — relance l'app en local et photographie 15 écrans
-node film/rendre-video.js                # ~12 min — 2 523 images puis encodage (vertical)
-FORMAT=16x9 node film/rendre-video.js    # ~12 min — la version projetée
+node film/capturer-ecrans.js             # ~2 min — relance l'app en local et photographie 17 écrans
+node film/rendre-video.js                # ~18 min — 3 600 images puis encodage (vertical)
+FORMAT=16x9 node film/rendre-video.js    # ~18 min — la version projetée
 ```
 
 ⛔ **Les deux formats sortent du MÊME fichier** (`?format=16x9`), et c'est la
@@ -210,3 +224,28 @@ diffusion, et à masquer si la personne le demande.
 `rendre-video.js` lit `LARGEUR`, `HAUTEUR`, `FPS` et `NOM`. Mais la mise en page est
 dessinée pour du 1080×1920 : changer les dimensions **recadre**, cela ne réorganise
 rien. Un format carré ou 16:9 demande de reprendre les positions dans le HTML.
+
+## 👩 MEL est nommée et montrée
+
+Dans l'application, l'avatar de MEL est l'émoji **👩** d'une bulle de
+conversation : illisible à distance, et il ne dit pas qui elle est. Le film la
+présente donc comme on présente quelqu'un — **son visage, son nom, sa fonction**
+(`film/mel-avatar.webp`, recadré depuis `img/MAT et MEL.webp`, le dessin des deux
+mascottes) — avant de montrer ce qu'elle répond.
+
+⚠️ C'est un **recadrage du fichier de l'app**, pas une nouvelle image : si les
+mascottes changent, refaire le recadrage, sinon le film montrera une MEL que
+personne ne reconnaît.
+
+```bash
+ffmpeg -i "img/MAT et MEL.webp" -vf "crop=132:132:176:118,scale=440:440:flags=lanczos" \
+  -pix_fmt yuva420p -c:v libwebp -q:v 90 film/mel-avatar.webp
+```
+
+## 🔤 Les icônes ont leur propre taille
+
+Chaque puce porte son icône dans un `<span class="ico">` : la projection demande
+des icônes plus grandes que le texte, et **grossir la puce entière grossirait le
+texte**, qui est déjà à la bonne taille. ⚠️ `vertical-align` recale l'icône sur
+la ligne de base — sans lui, une puce plus haute que ses voisines décale toute
+la rangée.

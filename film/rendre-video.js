@@ -42,11 +42,16 @@ const SORTIE = path.resolve(process.env.SORTIE || path.join(__dirname, "sortie")
 const NOM = process.env.NOM || (PAYSAGE ? "mat-presentation-16x9" : "mat-presentation-vertical");
 // ⚠️ LE POIDS DU FICHIER EST UNE CONTRAINTE DE DIFFUSION, pas un détail de
 // qualité. WhatsApp refuse une vidéo au-delà de ~16 Mo : à `crf 20`, le film de
-// 63 s pesait 16,1 Mio et ne partait plus. `crf 23` le ramène sous 11 Mio sans
-// différence visible sur ce contenu (aplats, texte, captures d'écran).
-// Un film plus long rapproche d'autant du plafond : vérifier le poids après
-// chaque rallonge, et non seulement la durée.
-const CRF = process.env.CRF || "23";
+// 63 s pesait 16,1 Mio et ne partait plus.
+//
+// ⛔ ET LE FORMAT DÉCIDE, parce que les deux fichiers ne voyagent pas pareil :
+//   • le VERTICAL part par message et par Facebook → il doit rester sous les
+//     ~16 Mo, donc `crf 25` (à 23, les 120 s pesaient 17,4 Mio) ;
+//   • le PAYSAGE se projette depuis un ordinateur, par câble → aucun plafond
+//     d'envoi, et c'est le fichier qu'on verra en grand : `crf 23`.
+// Un film plus long rapproche d'autant du plafond : après chaque rallonge,
+// vérifier le POIDS, pas seulement la durée.
+const CRF = process.env.CRF || (PAYSAGE ? "23" : "25");
 const CHROME = process.env.CHROME_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
 function trouverFfmpeg() {
