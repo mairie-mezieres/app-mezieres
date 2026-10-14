@@ -44,6 +44,27 @@ d'abonnement, pas de coût API) et une mémoire versionnée dans `veille/`.
 - **…une mémoire par domaine** : un même média qui publie un second article doit être
   signalé. La règle porte sur la **page**.
 
+## Amendement du 14 octobre 2026 — « rien trouvé » doit se mériter
+
+Le **premier passage réel** s'est terminé vert en 39 secondes sur `[]`. Or MAT figurait
+au **palmarès officiel Territoria 2026** (Territoria Or, catégorie Transformation
+numérique), publié le 8 octobre par L'Inspiration politique — mais **seulement dans le
+PDF joint** à l'article. Une recherche « Territoria 2026 Mézières » ne le trouve pas : le
+moteur ne relie pas la commune à une page qui ne la cite que dans une pièce jointe.
+
+Trois parades, la dernière étant celle qui compte :
+
+1. **Sources suivies** (`veille/presse-sources.json`) : pages relues à **chaque**
+   passage, PDF liés compris. Ajouter une page = éditer ce fichier, sans code.
+2. **Requêtes sur l'événement**, sans le nom de la commune (« palmarès Territoria
+   2026 »), puis lecture des résultats.
+3. **Journal obligatoire** (`veille/journal-presse.json` : recherches lancées, pages
+   lues). Moins de 8 recherches ⇒ **run rouge** (dernière étape, après l'envoi des
+   éventuelles nouveautés) ; une source suivie non relue ⇒ avertissement. Recherches
+   et pages lues s'affichent dans le **résumé du run** : un « 0 mention » se lit enfin
+   à côté de l'effort fourni. Un agent peut toujours mentir dans son journal ; il ne
+   peut plus, en revanche, conclure en silence sans avoir rien déclaré.
+
 ## Pièges
 
 - ⛔ **Un JSON absent fait échouer le run** (rouge). Une recherche qui n'a pas abouti

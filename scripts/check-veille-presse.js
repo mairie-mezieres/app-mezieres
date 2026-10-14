@@ -14,7 +14,7 @@
 'use strict';
 
 const assert = require('assert');
-const { normaliserUrl, estNotreCanal, filtrer, memoriser, MAX_PAR_JOUR } = require('./veille-presse');
+const { normaliserUrl, estNotreCanal, filtrer, memoriser, verifierJournal, MAX_PAR_JOUR, MIN_RECHERCHES } = require('./veille-presse');
 
 let n = 0;
 const ok = (nom, f) => { f(); n++; console.log(`✓ ${nom}`); };
@@ -72,6 +72,27 @@ ok('memoriser ajoute sans écraser la première date vue, clés triées', () => 
   assert.deepStrictEqual(Object.keys(m), ['https://a.fr', 'https://b.fr']);
   assert.strictEqual(m['https://b.fr'].vu, '2026-01-01');
   assert.strictEqual(m['https://a.fr'].vu, '2026-10-14');
+});
+
+ok('journal : une recherche bâclée est une erreur, pas « aucune mention »', () => {
+  // Le 1er passage réel : 39 s, `[]`, alors que MAT figurait au palmarès Territoria 2026.
+  assert.match(verifierJournal(null, []).erreur, /absent/);
+  assert.match(verifierJournal({ recherches: ['a', 'b'], pages_lues: [] }, []).erreur, /bâclée/);
+  const assez = Array.from({ length: MIN_RECHERCHES }, (_, i) => `requête ${i}`);
+  assert.strictEqual(verifierJournal({ recherches: assez, pages_lues: [] }, []).erreur, '');
+});
+
+ok('journal : une source suivie non relue est signalée, même sous un autre habit', () => {
+  const sources = [{ url: 'https://www.a.fr/palmares/' }, { url: 'https://b.fr/x' }];
+  const recherches = Array.from({ length: MIN_RECHERCHES }, (_, i) => `r${i}`);
+  const r = verifierJournal({ recherches, pages_lues: ['https://a.fr/palmares?utm_source=x'] }, sources);
+  assert.deepStrictEqual(r.avertissements, ['source suivie non relue : https://b.fr/x']);
+});
+
+ok('les sources suivies sont des URL https valides', () => {
+  const sources = require('../veille/presse-sources.json');
+  assert.ok(Array.isArray(sources) && sources.length > 0);
+  for (const s of sources) assert.ok(/^https:\/\//.test(s.url) && normaliserUrl(s.url) && s.pourquoi, s.url);
 });
 
 console.log(`\n${n} contrôle(s) de la veille presse : OK.`);

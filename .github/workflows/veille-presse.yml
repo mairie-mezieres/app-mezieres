@@ -50,10 +50,14 @@ jobs:
           savoir qui parle de MAT et du projet — presse, sites web, publications
           publiques de réseaux sociaux — sans jamais recevoir deux fois le même lien.
 
-          ⚠️ UN SEUL LIVRABLE, OBLIGATOIRE : `veille/items-presse.json`. Écris-le
-          AVANT DE TERMINER, quoi qu'il arrive — `[]` si tu n'as rien trouvé. Sans ce
-          fichier, le workflow échoue : une recherche muette ne doit pas passer pour
-          « personne n'a parlé de MAT ».
+          ⚠️ DEUX LIVRABLES OBLIGATOIRES, à écrire AVANT DE TERMINER quoi qu'il arrive :
+            1. `veille/items-presse.json` — les mentions trouvées (`[]` si aucune) ;
+            2. `veille/journal-presse.json` — CE QUE TU AS FAIT :
+               { "recherches": ["requête 1", …], "pages_lues": ["https://…", …] }
+          Sans eux, ou avec moins de 8 recherches, le workflow ÉCHOUE : une recherche
+          bâclée ne doit pas passer pour « personne n'a parlé de MAT ». Le premier
+          passage s'est arrêté en 39 secondes sur `[]` alors que MAT figurait au
+          palmarès Territoria 2026 — c'est exactement ce que ce journal empêche.
 
           ── ÉTAPE 1 — LIRE LA MÉMOIRE ──
           Lis `veille/presse-vues.json` (s'il existe) : ses clés sont les liens DÉJÀ
@@ -61,8 +65,23 @@ jobs:
           sous une autre adresse (repris par un agrégateur, version AMP, mobile…).
           Un filtre en code les écarterait de toute façon : ne perds pas ton temps dessus.
 
+          ── ÉTAPE 1 bis — RELIRE LES SOURCES SUIVIES ──
+          Lis `veille/presse-sources.json` et ouvre CHAQUE URL (WebFetch), toutes, à
+          chaque passage. Sur chaque page, cherche « Mézières », « MAT », « Mézières
+          Avec Toi ». ⚠️ Une mention peut ne figurer QUE dans un document lié (PDF de
+          palmarès, dossier de presse) : ouvre les PDF et pièces jointes liés depuis ces
+          pages et cherche-y aussi. Suis aussi les articles récents de ces sites qui
+          reviennent sur des lauréats. Ajoute chaque URL ouverte à `pages_lues`.
+
           ── ÉTAPE 2 — CHERCHER ──
+          ⚠️ Le moteur ne relie pas forcément « Mézières » à une page qui ne le cite que
+          dans un PDF : cherche AUSSI les événements eux-mêmes, sans le nom de la
+          commune, puis ouvre les résultats pour y trouver Mézières.
           Requêtes à faire (WebSearch), toutes :
+            - palmarès Territoria 2026          - lauréats prix Territoria 2026
+            - Territoria Or 2026 transformation numérique
+            - "écosystème numérique accessible à tous"
+            - prix innovation collectivités 2026 lauréats commune Loiret
             - "Mézières Avec Toi"          - "MAT" "Mézières-lez-Cléry" application
             - "Mézières-lez-Cléry" application citoyenne
             - "Mézières-lez-Cléry" appli mairie
@@ -103,7 +122,11 @@ jobs:
               "type":   "presse" | "site" | "reseau" | "institution" | "autre",
               "resume": "une phrase : ce qui est dit de MAT (≤ 300 caractères)"
             }
-          N'utilise Write QUE pour ce fichier. Ne modifie rien d'autre, ne committe rien.
+          ── ÉTAPE 5 — ÉCRIRE `veille/journal-presse.json` ──
+          Chaque requête WebSearch réellement lancée dans `recherches`, chaque URL
+          réellement ouverte dans `pages_lues`. N'y mets rien que tu n'as pas fait.
+
+          N'utilise Write QUE pour ces deux fichiers. Ne modifie rien d'autre, ne committe rien.
           PROMPT_TXT
           echo 'PRESSE_PROMPT_EOF'
           } >> "$GITHUB_ENV"
@@ -126,6 +149,7 @@ jobs:
           path: |
             ${{ runner.temp }}/claude-execution-output.json
             veille/items-presse.json
+            veille/journal-presse.json
           if-no-files-found: ignore
           retention-days: 14
 
@@ -170,3 +194,13 @@ jobs:
           git commit -m "chore(veille): mémoire veille presse ${{ steps.now.outputs.iso }} [skip ci]"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
+
+      # En DERNIER : les nouveautés éventuelles sont déjà parties et mémorisées.
+      # Un run vert doit vouloir dire « on a vraiment cherché ».
+      - name: Recherche bâclée ?
+        if: steps.filtre.outputs.bacle != ''
+        env:
+          BACLE: ${{ steps.filtre.outputs.bacle }}
+        run: |
+          echo "::error title=Veille presse::$BACLE Voir le résumé du run (recherches et pages lues)."
+          exit 1
