@@ -56,11 +56,19 @@ function servir() {
   });
 }
 
-/* Les écrans du film. `prepare` reçoit la page une fois l'overlay ouvert. */
+/* Les écrans du film. `prepare` reçoit la page une fois l'overlay ouvert.
+   Trois formes :
+     • `fn`  — une fonction de l'app à appeler (overlay de `index.html`) ;
+     • `url` — une PAGE à part, chargée dans son propre contexte ;
+     • ni l'un ni l'autre — l'accueil, tel qu'il s'ouvre. */
 const ECRANS = [
   { nom: "accueil", desc: "Accueil" },
   {
-    nom: "actus", desc: "Actualités", fn: "openNotifs()",
+    // ⚠️ Cette capture-là n'est PAS celle du film. Les actualités du film
+    // viennent d'un vrai téléphone (`ecrans/actus-photos.webp`) : les fixtures
+    // ne portent aucune photo, et une page d'actualités sans image ne montre
+    // pas ce qu'elle sait faire — carrousel, pastille, bouton d'alerte.
+    nom: "actus", desc: "Actualités (sans photo — voir actus-photos.webp)", fn: "openNotifs()",
     prepare: async (page) => { await delai(1200); }
   },
   {
@@ -78,6 +86,16 @@ const ECRANS = [
     }
   },
   { nom: "agenda", desc: "Agenda", fn: "openAgenda()" },
+  {
+    nom: "carburant", desc: "Prix des carburants", fn: "openCarburant()",
+    prepare: async (page) => { await delai(1200); }
+  },
+  {
+    // ⚠️ L'onglet se passe EN ARGUMENT : `openConseil()` sans rien ouvre les
+    // élus, et c'est « Décisions » qu'on veut montrer.
+    nom: "conseil", desc: "Conseil municipal — décisions", fn: "openConseil('decisions')",
+    prepare: async (page) => { await delai(1400); }
+  },
   { nom: "meteo", desc: "Météo détaillée", fn: "openMeteo()" },
   {
     nom: "suivi", desc: "Suivi des signalements", fn: "openSuivi('signalements')",
@@ -137,6 +155,70 @@ const ECRANS = [
       });
       await delai(400);
     }
+  },
+
+  /* ── Kit de réplication (`partager.html`) ─────────────────────────────────
+     ⚠️ CE N'EST PAS UN ÉCRAN DE L'APP mais une PAGE à part : elle se charge par
+     `url`, elle ne s'ouvre pas par une fonction. Elle ne pose pas `app-ready`
+     et n'a ni service worker ni onboarding — `nouvellePage` ne l'attend donc
+     pas (sans quoi chaque capture coûterait 20 s de timeout).
+     ⚠️ Les trois captures viennent de TROIS PAGES distinctes : l'étape 3 écrase
+     l'étape 2 dans le DOM (`goTo` masque les sections), et photographier la
+     même page trois fois donnerait trois fois le dernier état. */
+  {
+    nom: "partager-profil", desc: "Kit — 1. profil de la commune", url: "/partager.html",
+    prepare: async (page) => {
+      await page.evaluate(() => {
+        const c = document.getElementById("f-commune");
+        // Le libellé d'exemple du formulaire lui-même : aucune commune réelle
+        // n'est nommée, et personne ne peut lire la capture comme un déploiement
+        // annoncé ailleurs.
+        if (c) c.value = "Mairie de Saint-Exemple";
+        const p = document.getElementById("f-pop"); if (p) p.value = "1250";
+        const s = document.getElementById("f-sovereign");
+        if (s && !s.checked) s.click();       // mode « 100 % français » déplié
+      });
+      await delai(600);
+      // Haut de page : le bandeau « Osez la vôtre » et la première étape. C'est
+      // le plan d'ouverture de la scène — ce que voit un élu qui arrive.
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+      await delai(400);
+    }
+  },
+  {
+    nom: "partager-cout", desc: "Kit — 2. fonctionnalités et coût estimé", url: "/partager.html",
+    prepare: async (page) => {
+      await page.evaluate(() => { if (window.goTo) window.goTo(2); });
+      await delai(900);
+      await page.evaluate(() => {
+        const c = document.querySelector("#step-2 .cost-bar");
+        if (c) c.scrollIntoView({ block: "center", behavior: "instant" });
+        // Remonter de 150 px : centrée, la carte du coût laisse entrer la fiche
+        // de l'auteur en bas de capture, qui n'a rien à faire dans le film.
+        window.scrollBy(0, -150);
+      });
+      await delai(500);
+    }
+  },
+  {
+    nom: "partager-prompt", desc: "Kit — 3. prompt personnalisé", url: "/partager.html",
+    prepare: async (page) => {
+      await page.evaluate(() => {
+        const c = document.getElementById("f-commune");
+        if (c) c.value = "Mairie de Saint-Exemple";
+        if (window.goTo) window.goTo(2);
+      });
+      await delai(600);
+      await page.evaluate(() => { if (window.generate) window.generate(); });
+      await delai(1200);
+      // Sur le prompt lui-même : c'est le livrable du kit, pas le bandeau (déjà
+      // vu au premier plan de la scène).
+      await page.evaluate(() => {
+        const b = document.querySelector("#step-3 .prompt-box");
+        if (b) b.scrollIntoView({ block: "center", behavior: "instant" });
+      });
+      await delai(400);
+    }
   }
 ];
 
@@ -151,7 +233,7 @@ const ECRANS = [
      `decalageJours` décale l'horloge ET les données simulées ensemble — sinon
      l'accueil daterait ses cartes d'aujourd'hui sous une horloge de la semaine
      prochaine. */
-  async function nouvellePage(decalageJours) {
+  async function nouvellePage(decalageJours, chemin) {
     const quand = new Date(Date.now() + (decalageJours || 0) * 86400000);
     const contexte = await navigateur.newContext(OPTIONS_CONTEXTE);
     const p = await contexte.newPage();
@@ -159,9 +241,15 @@ const ECRANS = [
     const donnees = decalageJours ? fixtures(quand) : fx;
     await p.route("**/*", (route) => brancher(route, donnees));
     await p.addInitScript(PREPARATION);
-    await p.goto(BASE_URL + "/index.html", { waitUntil: "load", timeout: 60000 });
-    await p.waitForFunction(() => document.body.classList.contains("app-ready"), { timeout: 20000 }).catch(() => {});
-    await delai(3500);
+    await p.goto(BASE_URL + (chemin || "/index.html"), { waitUntil: "load", timeout: 60000 });
+    // `app-ready` n'est posé que par l'application : une page autonome
+    // (`partager.html`) ne le pose jamais, et l'attendre coûterait 20 s.
+    if (!chemin) {
+      await p.waitForFunction(() => document.body.classList.contains("app-ready"), { timeout: 20000 }).catch(() => {});
+      await delai(3500);
+    } else {
+      await delai(1200);
+    }
     return p;
   }
 
@@ -205,13 +293,20 @@ const ECRANS = [
   console.log("📸 Captures du film — " + BASE_URL);
   let page = await nouvellePage(0);
 
+  // Mise au point d'un seul plan : FILM_ECRANS=partager-cout,mel node film/…
+  // (sans la variable, tout est repris — c'est ce que fait une régénération.)
+  const filtre = (process.env.FILM_ECRANS || "").split(",").map((s) => s.trim()).filter(Boolean);
+
   for (const e of ECRANS) {
+    if (filtre.length && !filtre.includes(e.nom)) continue;
     let pageJetable = null;
     try {
-      if (e.jours) { pageJetable = await nouvellePage(e.jours); }
+      if (e.jours || e.url) { pageJetable = await nouvellePage(e.jours || 0, e.url); }
       const cible = pageJetable || page;
-      await cible.evaluate(() => document.querySelectorAll(".ov.open").forEach((o) => o.classList.remove("open")));
-      await delai(400);
+      if (!e.url) {
+        await cible.evaluate(() => document.querySelectorAll(".ov.open").forEach((o) => o.classList.remove("open")));
+        await delai(400);
+      }
       if (e.fn) {
         await cible.evaluate((f) => { new Function(f)(); }, e.fn);
         await delai(1400);

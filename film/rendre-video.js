@@ -30,10 +30,28 @@ const { spawn } = require("child_process");
 const { chromium } = require("@playwright/test");
 
 const FPS = Number(process.env.FPS || 30);
-const LARGEUR = Number(process.env.LARGEUR || 1080);
-const HAUTEUR = Number(process.env.HAUTEUR || 1920);
+// ⚠️ DEUX FORMATS, UNE SEULE SOURCE : `FORMAT=16x9` passe `presentation.html`
+// en 1920×1080 (projection sur grand écran) ; sans lui, c'est le 1080×1920 des
+// réseaux. La bascule se fait DANS la page (`?format=16x9`) : changer seulement
+// les dimensions du navigateur recadrerait le film au lieu de le remettre en
+// page — on verrait un montage vertical avec les bords coupés.
+const PAYSAGE = process.env.FORMAT === "16x9";
+const LARGEUR = Number(process.env.LARGEUR || (PAYSAGE ? 1920 : 1080));
+const HAUTEUR = Number(process.env.HAUTEUR || (PAYSAGE ? 1080 : 1920));
 const SORTIE = path.resolve(process.env.SORTIE || path.join(__dirname, "sortie"));
-const NOM = process.env.NOM || "mat-presentation-vertical";
+const NOM = process.env.NOM || (PAYSAGE ? "mat-presentation-16x9" : "mat-presentation-vertical");
+// ⚠️ LE POIDS DU FICHIER EST UNE CONTRAINTE DE DIFFUSION, pas un détail de
+// qualité. WhatsApp refuse une vidéo au-delà de ~16 Mo : à `crf 20`, le film de
+// 63 s pesait 16,1 Mio et ne partait plus.
+//
+// ⛔ ET LE FORMAT DÉCIDE, parce que les deux fichiers ne voyagent pas pareil :
+//   • le VERTICAL part par message et par Facebook → il doit rester sous les
+//     ~16 Mo, donc `crf 25` (à 23, les 120 s pesaient 17,4 Mio) ;
+//   • le PAYSAGE se projette depuis un ordinateur, par câble → aucun plafond
+//     d'envoi, et c'est le fichier qu'on verra en grand : `crf 23`.
+// Un film plus long rapproche d'autant du plafond : après chaque rallonge,
+// vérifier le POIDS, pas seulement la durée.
+const CRF = process.env.CRF || (PAYSAGE ? "23" : "25");
 const CHROME = process.env.CHROME_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
 function trouverFfmpeg() {
@@ -68,7 +86,8 @@ function trouverFfmpeg() {
     return route.abort();
   });
 
-  const url = "file://" + path.join(__dirname, "presentation.html") + "?rendu=1";
+  const url = "file://" + path.join(__dirname, "presentation.html") + "?rendu=1"
+    + (PAYSAGE ? "&format=16x9" : "");
   await page.goto(url, { waitUntil: "load" });
   await page.waitForFunction(() => window.filmPret === true, { timeout: 30000 });
 
@@ -84,7 +103,7 @@ function trouverFfmpeg() {
   const args = [
     "-y", "-f", "image2pipe", "-framerate", String(FPS), "-i", "-",
     "-an",
-    "-c:v", "libx264", "-preset", "slow", "-crf", "20",
+    "-c:v", "libx264", "-preset", "slow", "-crf", CRF,
     // `yuv420p` n'est pas un détail : sans lui, le fichier ne s'ouvre pas sur
     // la moitié des téléphones et QuickTime affiche un écran noir.
     "-pix_fmt", "yuv420p",
