@@ -30,10 +30,16 @@ const { spawn } = require("child_process");
 const { chromium } = require("@playwright/test");
 
 const FPS = Number(process.env.FPS || 30);
-const LARGEUR = Number(process.env.LARGEUR || 1080);
-const HAUTEUR = Number(process.env.HAUTEUR || 1920);
+// ⚠️ DEUX FORMATS, UNE SEULE SOURCE : `FORMAT=16x9` passe `presentation.html`
+// en 1920×1080 (projection sur grand écran) ; sans lui, c'est le 1080×1920 des
+// réseaux. La bascule se fait DANS la page (`?format=16x9`) : changer seulement
+// les dimensions du navigateur recadrerait le film au lieu de le remettre en
+// page — on verrait un montage vertical avec les bords coupés.
+const PAYSAGE = process.env.FORMAT === "16x9";
+const LARGEUR = Number(process.env.LARGEUR || (PAYSAGE ? 1920 : 1080));
+const HAUTEUR = Number(process.env.HAUTEUR || (PAYSAGE ? 1080 : 1920));
 const SORTIE = path.resolve(process.env.SORTIE || path.join(__dirname, "sortie"));
-const NOM = process.env.NOM || "mat-presentation-vertical";
+const NOM = process.env.NOM || (PAYSAGE ? "mat-presentation-16x9" : "mat-presentation-vertical");
 // ⚠️ LE POIDS DU FICHIER EST UNE CONTRAINTE DE DIFFUSION, pas un détail de
 // qualité. WhatsApp refuse une vidéo au-delà de ~16 Mo : à `crf 20`, le film de
 // 63 s pesait 16,1 Mio et ne partait plus. `crf 23` le ramène sous 11 Mio sans
@@ -75,7 +81,8 @@ function trouverFfmpeg() {
     return route.abort();
   });
 
-  const url = "file://" + path.join(__dirname, "presentation.html") + "?rendu=1";
+  const url = "file://" + path.join(__dirname, "presentation.html") + "?rendu=1"
+    + (PAYSAGE ? "&format=16x9" : "");
   await page.goto(url, { waitUntil: "load" });
   await page.waitForFunction(() => window.filmPret === true, { timeout: 30000 });
 

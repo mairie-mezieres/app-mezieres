@@ -259,3 +259,64 @@ WhatsApp refuse une vidéo au-delà de ~16 Mo. À `crf 20`, les 63 s pesaient
 encode donc en `crf 23` (ajustable par `CRF=`), ce qui le ramène sous 11 Mio sans
 différence visible sur ce contenu (aplats, texte, captures d'écran).
 **Après chaque rallonge, vérifier le poids, pas seulement la durée.**
+
+## Quatrième version (14 octobre 2026) — une salle, un logo, et le temps de lire
+
+Le film quitte le fil d'actualité : il sera **projeté sur grand écran**. Trois
+conséquences, et une seule d'entre elles était évidente.
+
+### 1. Un second format, sans un second fichier
+
+⛔ **`presentation.html` n'a pas été dupliqué.** Le 1920×1080 est obtenu par
+`?format=16x9` : mêmes scènes, mêmes durées, mêmes textes, même `filmSeek`. Tout
+ce qui diffère est la **géométrie**, rassemblée dans une table (`PAYSAGE`) et
+quelques règles CSS `.paysage`.
+
+La raison tient en une phrase : deux fichiers, c'est deux films à corriger — et
+un jour de hâte, un seul des deux le sera. C'est exactement ce que le dépôt
+reproche partout ailleurs à une double source (associations, arbre de décision
+de MEL, tarifs…).
+
+⚠️ **Le portrait garde ses positions en style en ligne**, le paysage les reçoit
+de la table au chargement : ajouter un bloc au paysage ne peut donc pas casser
+le format par défaut, celui qui part sur les réseaux.
+
+⚠️ **Changer `LARGEUR`/`HAUTEUR` ne change pas de format** : ça recadre la page,
+ça ne la remet pas en page. Le rendu passe donc le format à la **page**, pas
+seulement au navigateur (`FORMAT=16x9 node film/rendre-video.js`).
+
+⚠️ Et une largeur de bloc en style en ligne (`#push`) rend `right` inopérant :
+la carte serait sortie de l'écran par la droite, hors champ. Le placement remet
+donc `width:auto`.
+
+### 2. On projette, donc on grossit — et on ralentit
+
+Un film vertical se regarde à trente centimètres, celui-ci se lit au fond d'une
+salle. Les tailles ne sont pas « adaptées » au paysage, elles sont **augmentées**
+(titres, puces, cartouches, QR code), et les deux scènes qui n'avaient qu'un
+titre dans leur colonne le reçoivent **plus gros et à mi-hauteur**, au lieu de
+laisser 600 px de vide.
+
+⏱️ **Les durées augmentent d'un tiers** (62,6 s → **84,1 s**). Un spectateur assis
+n'a pas le pouce sur la pause : il lui faut le temps de finir une phrase avant la
+coupe. Le plafond de 2 minutes tient toujours.
+
+### 3. Le logo de Mistral AI — ce que l'accord permet exactement
+
+La v3 écrivait « Propulsée par Mistral AI » **sans logo**, faute d'accord. La
+mairie a obtenu cet accord : Mistral AI autorise l'usage de son logo **dans le
+contexte où l'application utilise Mistral**. Le logo est donc affiché, et la
+phrase ne change pas.
+
+⛔ **Un accord d'usage n'est pas un label.** Il permet de dire « nous les
+utilisons », pas « ils nous approuvent » : ni « labellisé », ni « certifié », ni
+« partenaire officiel ». La nuance tient en deux mots et elle est juridique.
+
+⛔ Et comme pour la musique : **la preuve ne vit pas dans le dépôt**. Le dépôt
+garde le fichier, la mairie garde l'échange (`film/logos/SOURCE.md`). C'est lui
+qu'on produira des mois plus tard, quand plus personne ne se souviendra d'où
+venait l'image.
+
+⚠️ Détail de fabrication, invisible jusqu'au rendu : le logo fourni avait un fond
+à **254,254,254**, soit un rectangle gris pâle sur le cartouche blanc du film. Le
+point blanc est normalisé à la conversion.

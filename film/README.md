@@ -6,8 +6,11 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 | Fichier | Rôle |
 |---|---|
-| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 63 s, 1080×1920, H.264, **sans son** |
+| `sortie/mat-presentation-vertical.mp4` | **Réseaux sociaux** — 84 s, 1080×1920, H.264, **sans son** |
+| `sortie/mat-presentation-16x9.mp4` | **Projection** (grand écran, salle) — 84 s, 1920×1080 |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
+| `sortie/mat-presentation-16x9-affiche.jpg` | La même, en paysage |
+| `logos/` | Les logos de tiers, et l'accord qui autorise chacun |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
 | `capturer-ecrans.js` | Capture les quinze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
@@ -25,6 +28,11 @@ là pour le jour où elle en redemandera une, mais **aucun fichier sonore n'est
 publié** : une version musicale qui traîne à côté finit par être envoyée à la
 place de l'autre, et elle ne correspond plus au montage dès que celui-ci bouge.
 
+🖥️ **Deux formats, deux usages.** Le **vertical** est fait pour un pouce : on le
+publie sur Facebook, on l'envoie par message. Le **16:9** est fait pour une
+salle : il a été demandé pour une projection sur grand écran, ses textes sont
+plus gros, le téléphone passe à droite et le texte occupe une colonne à gauche.
+
 ⏱️ **Plafond : 2 minutes.** Au-delà, le film n'est plus lu jusqu'au bout sur un
 fil d'actualité — et le QR code de fin, qui est l'appel à l'action, n'est jamais
 vu. Le total des durées de `SCENES` est la seule chose à surveiller.
@@ -39,9 +47,19 @@ durée.
 
 ```bash
 npm i --no-save @playwright/test @ffmpeg-installer/ffmpeg   # une fois
-node film/capturer-ecrans.js     # ~2 min — relance l'app en local et photographie 15 écrans
-node film/rendre-video.js        # ~8 min — 1 878 images puis encodage
+node film/capturer-ecrans.js             # ~2 min — relance l'app en local et photographie 15 écrans
+node film/rendre-video.js                # ~12 min — 2 523 images puis encodage (vertical)
+FORMAT=16x9 node film/rendre-video.js    # ~12 min — la version projetée
 ```
+
+⛔ **Les deux formats sortent du MÊME fichier** (`?format=16x9`), et c'est la
+seule chose à ne pas défaire : dupliquer `presentation.html` pour le paysage,
+c'est se condamner à corriger deux films — et à n'en corriger qu'un, un jour de
+hâte. Les scènes, les durées et les textes sont communs ; seule la **géométrie**
+change (table `PAYSAGE` en tête du script, et les règles `.paysage` du CSS).
+
+⚠️ `LARGEUR=`/`HAUTEUR=` ne suffisent PAS à changer de format : elles recadrent
+la page, elles ne la remettent pas en page. Passer par `FORMAT=16x9`.
 
 Pour mettre au point un seul plan sans tout reprendre :
 
@@ -79,15 +97,17 @@ personnes. Les écrans d'actualités, de signalements et d'idées ne montrent do
 plus que des **rubriques** et du **mécanisme** : aucun horaire, aucun lieu, aucune
 décision, aucune date dans un titre. Voir les commentaires de `fixtures.js`.
 
-**Aucune approbation d'un tiers.** Le film nomme deux tiers, et chaque mot y est
-pesé :
+**Deux tiers sont nommés, et chaque mot y est pesé :**
 
-- **« Propulsée par Mistral AI »** décrit un fait technique vérifiable — les
-  réponses libres de MEL sont produites par un modèle Mistral (`MISTRAL_MODEL`,
-  `lib/mel.js` du backend, repli Anthropic). ⛔ Ne jamais écrire « approuvé par »,
-  « labellisé » ou « partenaire », et **ne jamais poser de logo Mistral** : un
-  logo de tiers dans un film communal se lit comme un soutien officiel, et un
-  soutien officiel se demande par écrit avant d'être affiché.
+- **« Propulsée par Mistral AI »**, avec leur logo. C'est un fait technique
+  vérifiable — les réponses libres de MEL sont produites par un modèle Mistral
+  (`MISTRAL_MODEL`, `lib/mel.js` du backend, repli Anthropic) — et **Mistral AI a
+  donné son accord écrit** pour l'usage du logo dans ce contexte précis : dire
+  qu'on les utilise. ⛔ Cet accord ne fait pas de la commune un partenaire : ne
+  jamais écrire « labellisé », « certifié » ou « partenaire officiel ».
+  ⛔ **Aucun autre logo de tiers sans le même accord, archivé de la même façon** —
+  un logo dans un film communal se lit comme un soutien officiel. Voir
+  `logos/SOURCE.md`.
 - **« Observatoire de l'innovation publique TERRITORIA »** est un remerciement, et
   rien d'autre : **le prix n'est pas nommé** (demande expresse de la mairie). Le
   badge « Territoria d'Or 2026 », lui, vit dans l'application — pas ici.
