@@ -52,7 +52,22 @@ nouvelles, bonnes pratiques applicables. Voir ADR-0025.
   valide (mois calme) ; un fichier absent déclenche un `::warning` et une section
   portant la mention de l'anomalie.
 
-## Règle commune aux deux veilles
+## Veille presse — `.github/workflows/veille-presse.yml` (quotidienne)
+
+« Ils parlent de MAT » : presse, sites et publications publiques de réseaux
+sociaux. Pas de mail à part : les nouveautés rejoignent le **mail de stats
+quotidien** du backend (section « 🗞️ Ils parlent de MAT »). Voir ADR-0054.
+
+- `presse-vues.json` — **mémoire**, écrite par `scripts/veille-presse.js`
+  (jamais par l'agent) : un objet `URL normalisée → {titre, source, vu}`. Un lien
+  qui y figure **ne revient jamais**, même sous un autre habit (`utm_*`, `www.`,
+  barre finale, fragment). Sans purge : quelques liens par semaine au plus.
+  Committée **après** l'accusé de réception du backend.
+  Retirer une entrée à la main = la laisser revenir.
+- `items-presse.json` — **éphémère, non committé** : les candidats de l'agent.
+  Absent = run **rouge** (une recherche muette n'est pas « aucune mention »).
+
+## Règle commune aux veilles techno et municipale
 
 L'agent lit son fichier d'historique **avant** ses recherches pour ne pas
 re-signaler une information déjà rapportée (anti-redondance), puis le met à
