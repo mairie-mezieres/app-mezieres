@@ -91,6 +91,7 @@ body{display:flex;align-items:center;justify-content:center;}
    `object-position` garde le bord gauche — là où vivent les boutons
    « Zonage du PLU », « Bâtiments », « Le territoire ». */
 #tel .ecran img.plein{width:100%;height:100%;object-fit:cover;object-position:30% 50%;}
+#tel .ecran img.plein-actus{object-position:50% 50%;}
 #tel .encoche{position:absolute;left:50%;top:22px;width:136px;height:28px;margin-left:-68px;
   background:#0a1b12;border-radius:0 0 18px 18px;z-index:5;}
 
@@ -147,6 +148,16 @@ body{display:flex;align-items:center;justify-content:center;}
 #motcle{position:absolute;left:32px;right:32px;text-align:center;white-space:nowrap;
   font-size:70px;font-weight:900;letter-spacing:-.02em;will-change:transform,opacity;
   text-shadow:0 6px 30px rgba(0,0,0,.55);}
+
+/* Cartouches de remerciement (scène 12). Fond OPAQUE : ces deux lignes sont
+   lues en diagonale sur un fil d'actualité, et un voile translucide sur un
+   dégradé mouvant ne garantit aucun contraste. */
+.credit{display:flex;gap:28px;align-items:center;background:rgba(255,255,255,.96);
+  color:#13261c;border-radius:34px;padding:30px 34px;
+  box-shadow:0 30px 60px rgba(0,0,0,.4);will-change:transform,opacity;}
+.credit-ico{font-size:66px;flex:none;line-height:1;}
+.credit-t{font-size:41px;font-weight:900;line-height:1.15;letter-spacing:-.01em;}
+.credit-s{font-size:30px;font-weight:600;color:#3d5a4a;margin-top:8px;line-height:1.3;}
 
 /* Cartouche de sortie. */
 #url{font-size:64px;font-weight:900;letter-spacing:-.01em;color:#fff;
@@ -297,8 +308,24 @@ body.rendu #hud{display:none;}
     <div id="motcle" style="top:1680px"></div>
   </div>
 
-  <!-- ── 10. Engagements ──────────────────────────────────────────────── -->
+  <!-- ── 10. Kit de réplication ───────────────────────────────────────── -->
   <div class="couche" data-sc="10">
+    <div class="bloc" id="k-titre" style="top:112px">
+      <div class="kicker">Et pour les autres communes</div>
+      <div class="titre">Créez la vôtre,<br><span class="accent">en 3 étapes.</span></div>
+    </div>
+    <!-- ⚠️ TROIS PUCES COURTES, SUR UNE SEULE LIGNE. La rangée fait 952 px :
+         « 📝 Un questionnaire » (le premier essai) la faisait passer à deux
+         lignes, et la seconde débordait sur la barre de progression. -->
+    <div class="bloc puces" id="k-puces" style="top:1650px">
+      <span class="puce">📝 Sans coder</span>
+      <span class="puce">💶 Coût estimé</span>
+      <span class="puce or">🤖 Prompt prêt</span>
+    </div>
+  </div>
+
+  <!-- ── 11. Engagements ──────────────────────────────────────────────── -->
+  <div class="couche" data-sc="11">
     <div class="bloc" id="p-titre" style="top:470px;text-align:center">
       <div class="titre" style="font-size:88px">Gratuite.<br>Sans publicité.<br><span class="accent">Sans compte.</span></div>
     </div>
@@ -309,8 +336,43 @@ body.rendu #hud{display:none;}
     </div>
   </div>
 
-  <!-- ── 11. Sortie ──────────────────────────────────────────────────── -->
-  <div class="couche" data-sc="11">
+  <!-- ── 12. Remerciements ────────────────────────────────────────────── -->
+  <!-- ⛔ CE QUI EST ÉCRIT ICI ENGAGE DEUX TIERS, pas seulement la commune.
+       • « Propulsée par Mistral AI » est un fait vérifiable : les réponses
+         libres de MEL sont produites par un modèle Mistral (`MISTRAL_MODEL`,
+         `lib/mel.js` du backend, repli Anthropic). Ce n'est PAS une approbation :
+         n'écrire ni « approuvé », ni « labellisé », ni « partenaire », et ne
+         jamais poser ici un logo de Mistral AI — un logo de tiers dans un film
+         communal se lit comme un soutien officiel, qui se demande par écrit.
+       • Le remerciement à TERRITORIA est un remerciement, et rien d'autre : le
+         prix n'est pas nommé (demande expresse de la mairie). -->
+  <div class="couche" data-sc="12">
+    <div class="bloc" id="r-titre" style="top:420px;text-align:center">
+      <div class="kicker" style="margin-bottom:10px">Merci</div>
+      <div class="titre" style="font-size:76px">Elle ne s'est pas<br><span class="accent">faite toute seule.</span></div>
+    </div>
+    <div class="bloc" id="r-c1" style="top:880px">
+      <div class="credit">
+        <div class="credit-ico" aria-hidden="true">🇫🇷</div>
+        <div>
+          <div class="credit-t">Propulsée par Mistral AI</div>
+          <div class="credit-s">L'assistante MEL répond avec une IA française</div>
+        </div>
+      </div>
+    </div>
+    <div class="bloc" id="r-c2" style="top:1230px">
+      <div class="credit">
+        <div class="credit-ico" aria-hidden="true">🤝</div>
+        <div>
+          <div class="credit-t">Observatoire de l'innovation publique TERRITORIA</div>
+          <div class="credit-s">Merci pour son attention portée aux communes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 13. Sortie ──────────────────────────────────────────────────── -->
+  <div class="couche" data-sc="13">
     <img id="mascotte-outro" src="../img/MAT%20et%20MEL.webp" alt="">
     <div class="bloc" id="o-titre" style="top:300px;text-align:center">
       <div class="titre" style="font-size:92px">Installez-la<br><span class="accent">maintenant</span></div>
@@ -359,12 +421,21 @@ var SCENES = [
   { sc:  3, ecran: "mel",                                             duree: 4.6 },
   { sc:  4, ecran: "signalement",                                     duree: 4.0 },
   { sc:  5, ecran: "suivi",                                           duree: 4.2 },
-  { sc:  6, ecran: "actus",                                           duree: 4.0 },
+  // ⚠️ « actus-photos » VIENT D'UN TÉLÉPHONE, pas du script de capture : les
+  //    réponses simulées ne portent aucune photo (elles ne nomment que des
+  //    rubriques), et une page d'actualités sans image ne montre ni le
+  //    carrousel ni ce à quoi ressemble vraiment une publication de la mairie.
+  { sc:  6, ecran: "actus-photos",                                    duree: 4.4 },
   { sc:  7, ecran: "saviezvous",                                      duree: 3.6 },
   { sc:  8, ecran: "idees",                                           duree: 3.4 },
   { sc:  9, ecran: ["agenda", "meteo", "guide", "accessibilite"],     duree: 4.8 },
-  { sc: 10, ecran: null,                                              duree: 3.4 },
-  { sc: 11, ecran: null,                                              duree: 5.0 }
+  // Le kit de réplication : trois plans, et le dernier (le prompt) tient le
+  // plus longtemps — c'est le livrable, et il y a du texte à voir arriver.
+  { sc: 10, ecran: ["partager-profil", "partager-cout", "partager-prompt"],
+    poids: [1, 1, 1.2],                                               duree: 7.0 },
+  { sc: 11, ecran: null,                                              duree: 3.4 },
+  { sc: 12, ecran: null,                                              duree: 4.6 },
+  { sc: 13, ecran: null,                                              duree: 5.0 }
 ];
 
 /* ⚠️ « @3d » N'EST PAS UNE CAPTURE mais une SUITE d'images (film/ecrans/
@@ -385,8 +456,11 @@ var debuts = [], total = 0;
 SCENES.forEach(function (s) { debuts.push(total); total += s.duree; });
 var DUREE = total;
 
-/* Instants de « lame » : les changements d'acte qu'on veut faire claquer. */
-var LAMES = [debuts[1], debuts[2], debuts[4], debuts[6], debuts[9], debuts[10], debuts[11]];
+/* Instants de « lame » : les changements d'acte qu'on veut faire claquer.
+   ⚠️ La scène 12 (remerciements) n'en a pas : on sort des promesses pour dire
+   merci, et une lame y claquerait comme une nouvelle annonce. */
+var LAMES = [debuts[1], debuts[2], debuts[4], debuts[6], debuts[9], debuts[10],
+  debuts[11], debuts[13]];
 
 /* ── Boîte à outils ───────────────────────────────────────────────────── */
 function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
@@ -453,10 +527,15 @@ SCENES.forEach(function (s, i) {
   });
 });
 
-/* Les captures de la carte 3D viennent d'un téléphone (webp), les autres du
-   script de capture (png). L'extension se lit donc sur le nom. */
+/* Deux provenances, et c'est tout ce qui les distingue ici : un VRAI téléphone
+   (webp, rapport d'écran plus large → classe `.plein`) ou le script de capture
+   (png, déjà au rapport du film).
+   ⛔ Ne pas revenir à un test sur le préfixe du nom : « actus-photos » ne
+   commence pas par « carte3d » et serait demandé en .png — une image manquante,
+   donc un écran blanc dans le téléphone, visible seulement après encodage. */
+var DU_TELEPHONE = ["carte3d-batiments", "carte3d-plu", "actus-photos"];
 function _source(nom) {
-  return "ecrans/" + nom + (nom.indexOf("carte3d") === 0 ? ".webp" : ".png");
+  return "ecrans/" + nom + (DU_TELEPHONE.indexOf(nom) >= 0 ? ".webp" : ".png");
 }
 
 var anim3d = [];
@@ -469,7 +548,10 @@ var anim3d = [];
     i.src = _source(nom);
     i.alt = "";
     i.style.opacity = "0";
-    if (nom.indexOf("carte3d") === 0) i.className = "plein";
+    // `.plein-actus` recadre au centre : la capture du téléphone est plus large
+    // que l'écran du film, et c'est la photo de l'actualité qu'on veut au milieu,
+    // pas le bord gauche comme sur la carte 3D.
+    if (DU_TELEPHONE.indexOf(nom) >= 0) i.className = (nom === "actus-photos") ? "plein plein-actus" : "plein";
     ecran.appendChild(i);
     imgs[nom] = i;
   });
@@ -523,8 +605,8 @@ function filmSeek(t) {
   for (var i = 0; i < SCENES.length; i++) if (t >= debuts[i]) idx = i;
   var sc = SCENES[idx], t0 = debuts[idx];
 
-  /* ── Téléphone : présent des scènes 1 à 8 ───────────────────────────── */
-  var telDebut = debuts[1], telFin = debuts[10];
+  /* ── Téléphone : présent de la scène 1 au kit de réplication ────────── */
+  var telDebut = debuts[1], telFin = debuts[11];
   var tel = $("#tel"), opTel = voile(t, telDebut - 0.3, telFin, 0.55, 0.45);
   var monte = sortie(prog(t, telDebut - 0.2, telDebut + 0.9));
   var flotte = 9 * Math.sin((t - telDebut) * 1.0);
@@ -635,15 +717,33 @@ function filmSeek(t) {
     pose($("#e-titre"), sortie(prog(t, a8 + 0.05, a8 + 0.5)), 0, 0);
   }
 
-  /* ── 10. Engagements ─────────────────────────────────────────────────── */
+  /* ── 10. Kit de réplication ──────────────────────────────────────────── */
   if (visible(couches[10])) {
-    frappe($("#p-titre"), t, debuts[10] + 0.1, 0.6);
-    puces("#p-puces", t, debuts[10] + 0.9, 0.18);
+    frappe($("#k-titre"), t, debuts[10] + 0.1, 0.55);
+    puces("#k-puces", t, debuts[10] + 0.8, 0.16);
   }
 
-  /* ── 11. Sortie ─────────────────────────────────────────────────────── */
+  /* ── 11. Engagements ─────────────────────────────────────────────────── */
   if (visible(couches[11])) {
-    var a10 = debuts[11];
+    frappe($("#p-titre"), t, debuts[11] + 0.1, 0.6);
+    puces("#p-puces", t, debuts[11] + 0.9, 0.18);
+  }
+
+  /* ── 12. Remerciements ───────────────────────────────────────────────── */
+  if (visible(couches[12])) {
+    var a11 = debuts[12];
+    frappe($("#r-titre"), t, a11 + 0.1, 0.6);
+    // Les deux cartouches arrivent l'une après l'autre, par la gauche : on les
+    // lit, au lieu d'en recevoir deux d'un coup.
+    [["#r-c1", 0.75], ["#r-c2", 1.25]].forEach(function (p) {
+      var k = sortie(prog(t, a11 + p[1], a11 + p[1] + 0.6));
+      pose($(p[0]), k, -70 * (1 - k), 0, 0.96 + 0.04 * k);
+    });
+  }
+
+  /* ── 13. Sortie ─────────────────────────────────────────────────────── */
+  if (visible(couches[13])) {
+    var a10 = debuts[13];
     frappe($("#o-titre"), t, a10 + 0.1, 0.6);
     pose($("#o-url"), sortie(prog(t, a10 + 0.7, a10 + 1.3)), 0, 34 * (1 - sortie(prog(t, a10 + 0.7, a10 + 1.4))));
     var kq = prog(t, a10 + 1.2, a10 + 1.9);

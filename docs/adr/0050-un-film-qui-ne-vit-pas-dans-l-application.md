@@ -176,3 +176,86 @@ pastille orange à l'endroit du domicile de la personne qui a filmé. À l'éche
 village cela ne désigne pas une maison, et la bulle démontre une vraie fonction
 (l'app dit à l'habitant SA zone PLU) — mais c'est un arbitrage à faire tenir par
 la personne concernée, pas par le code. Noté dans `film/README.md`.
+
+## Troisième version (14 octobre 2026) — le kit, les mercis, et une actualité qui a des photos
+
+Quatre demandes de la mairie, et une contrainte chiffrée : **2 minutes maximum**.
+Le montage passe de 50,6 s à **62,6 s**, quatorze scènes.
+
+### 1. Le kit de réplication entre dans le film
+
+`partager.html` — « Osez la vôtre » — est la seule partie de MAT qui ne
+s'adresse **pas** aux habitants de Mézières mais aux autres communes. Trois
+plans : le profil, le coût mensuel estimé, le prompt généré.
+
+⚠️ **Ce n'est pas un écran de l'application mais une page à part.** Le script de
+capture ne savait qu'ouvrir des overlays d'`index.html` (`fn:`) ; il accepte
+désormais une `url:`, chargée dans son propre contexte — sans attendre
+`app-ready`, que cette page ne pose jamais (20 s de timeout par capture, sinon).
+
+⚠️ **Trois pages distinctes pour trois captures.** `goTo()` masque l'étape
+précédente dans le DOM : photographier la même page trois fois aurait donné trois
+fois le dernier état, sans erreur et sans que rien ne le signale.
+
+⚠️ Le formulaire est rempli avec **le nom d'exemple du formulaire lui-même**
+(« Mairie de Saint-Exemple ») : aucune commune réelle n'est nommée, et aucune
+capture ne peut se lire comme l'annonce d'un déploiement ailleurs.
+
+### 2. Deux tiers sont nommés — et c'est là qu'on pèse les mots
+
+La mairie demandait « un logo *approuvé par Mistral* » et un remerciement à
+l'Observatoire de l'innovation publique TERRITORIA.
+
+⛔ **« Approuvé par » n'a pas été écrit, et aucun logo de tiers n'a été posé.**
+Ce qui est vrai et vérifiable, c'est que les réponses libres de MEL sont
+produites par un modèle Mistral (`MISTRAL_MODEL`, `lib/mel.js` du backend, repli
+Anthropic) : le film écrit donc **« Propulsée par Mistral AI »**. Un logo ou le
+mot « approuvé » affirmeraient un **soutien officiel** — quelque chose qui se
+demande par écrit, et qu'une commune ne peut pas se donner elle-même. La
+différence tient en deux mots et elle est juridique, pas stylistique.
+
+⚠️ **TERRITORIA est remercié sans que le prix soit nommé** (demande expresse).
+Le badge « Territoria d'Or 2026 » vit dans l'application ; le film, lui, dit
+seulement merci.
+
+### 3. Une actualité sans photo ne montre pas les actualités
+
+Les données simulées ne portent **aucune image** — c'est la règle posée à la
+deuxième version (aucune annonce communale inventée), et elle ne bouge pas. Mais
+une page d'actualités sans photo ne montre ni le carrousel, ni la mise en page,
+ni ce à quoi ressemble vraiment une publication de la mairie.
+
+La sortie est la même que pour la carte 3D : **une capture d'un vrai téléphone**,
+sur une actualité **réellement publiée** (`ecrans/actus-photos.webp`). Rien n'y
+est inventé, puisque rien n'y est fabriqué.
+
+⚠️ **Elle porte sa date de publication**, donc elle vieillit — contrairement à
+tout le reste du film. C'est le prix d'une image vraie, et il est noté dans
+`film/README.md`.
+
+⛔ Et un piège de code : `_source()` déduisait l'extension du **préfixe** du nom
+(`carte3d…` → `.webp`, sinon `.png`). « actus-photos » serait parti chercher un
+`.png` inexistant — donc un écran blanc dans le téléphone, visible seulement
+après encodage. La provenance est désormais une **liste explicite**
+(`DU_TELEPHONE`).
+
+### 4. Sans le son
+
+La version musicale est retirée : la mairie veut un film muet. `ajouter-musique.js`
+reste dans le dépôt pour le jour où elle en redemandera une, mais **aucun fichier
+sonore n'est publié** — une version musicale qui traîne à côté finit par être
+envoyée à la place de l'autre, et elle cesse de correspondre au montage dès que
+celui-ci bouge.
+
+### 5. Deux plafonds, et le second ne se voit pas
+
+La mairie a fixé **2 minutes maximum** : au-delà, un fil d'actualité ne lit pas
+le film jusqu'au bout, et le QR code de fin — le seul appel à l'action — n'est
+jamais vu. Le total des durées de `SCENES` suffit à le surveiller.
+
+⚖️ Le second plafond est **le poids du fichier**, et rien à l'écran ne l'annonce :
+WhatsApp refuse une vidéo au-delà de ~16 Mo. À `crf 20`, les 63 s pesaient
+**16,1 Mio** — le film était terminé, correct, et impossible à envoyer. Le rendu
+encode donc en `crf 23` (ajustable par `CRF=`), ce qui le ramène sous 11 Mio sans
+différence visible sur ce contenu (aplats, texte, captures d'écran).
+**Après chaque rallonge, vérifier le poids, pas seulement la durée.**

@@ -6,25 +6,47 @@ par elle — voir `docs/adr/0050-un-film-qui-ne-vit-pas-dans-l-application.md`.
 
 | Fichier | Rôle |
 |---|---|
-| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 51 s, 1080×1920, H.264, sans son |
-| `sortie/mat-presentation-vertical-musique.mp4` | La même, avec la musique posée dessus |
+| `sortie/mat-presentation-vertical.mp4` | **Le livrable** — 63 s, 1080×1920, H.264, **sans son** |
 | `sortie/mat-presentation-vertical-affiche.jpg` | Vignette à joindre au post |
 | `presentation.html` | Le film lui-même (à ouvrir dans un navigateur pour l'aperçu) |
-| `capturer-ecrans.js` | Capture les onze vrais écrans de l'app → `ecrans/*.png` |
+| `capturer-ecrans.js` | Capture les quinze vrais écrans de l'app → `ecrans/*.png` |
 | `fixtures.js` | Réponses simulées du backend, pour ces captures |
 | `rendre-video.js` | `presentation.html` → MP4 |
-| `ajouter-musique.js` | Pose une piste audio sur le MP4, sans réencoder l'image |
+| `ajouter-musique.js` | Pose une piste audio sur le MP4, sans réencoder l'image (**non utilisé** : le film est muet) |
 | `musique/` | La piste fournie par la mairie, et d'où vient sa licence |
 | `qr.svg` | QR code vers `https://mezieres-lez-clery.fr` |
 | `ecrans/carte3d-anim/` | 73 images de la carte 3D, **fournies par la mairie** (voir plus bas) |
 | `ecrans/carte3d-*.webp` | Les deux captures nettes de la carte 3D, même origine |
+| `ecrans/actus-photos.webp` | L'écran Actualités **photographié sur un téléphone** (voir plus bas) |
+| `ecrans/partager-*.png` | Le kit de réplication (`partager.html`), trois étapes |
+
+⛔ **Le film est muet, et c'est un choix de la mairie.** `ajouter-musique.js` reste
+là pour le jour où elle en redemandera une, mais **aucun fichier sonore n'est
+publié** : une version musicale qui traîne à côté finit par être envoyée à la
+place de l'autre, et elle ne correspond plus au montage dès que celui-ci bouge.
+
+⏱️ **Plafond : 2 minutes.** Au-delà, le film n'est plus lu jusqu'au bout sur un
+fil d'actualité — et le QR code de fin, qui est l'appel à l'action, n'est jamais
+vu. Le total des durées de `SCENES` est la seule chose à surveiller.
+
+⚖️ **Et un second plafond, moins visible : ~16 Mo.** C'est la limite d'un envoi
+WhatsApp. À `crf 20`, les 63 s pesaient **16,1 Mio** et ne partaient plus ;
+`rendre-video.js` encode donc en **`crf 23`** (`CRF=20 node film/rendre-video.js`
+pour forcer). Après chaque rallonge, vérifier le **poids**, pas seulement la
+durée.
 
 ## Régénérer le film
 
 ```bash
 npm i --no-save @playwright/test @ffmpeg-installer/ffmpeg   # une fois
-node film/capturer-ecrans.js     # ~1 min — relance l'app en local et photographie 11 écrans
-node film/rendre-video.js        # ~6 min — 1 518 images puis encodage
+node film/capturer-ecrans.js     # ~2 min — relance l'app en local et photographie 15 écrans
+node film/rendre-video.js        # ~8 min — 1 878 images puis encodage
+```
+
+Pour mettre au point un seul plan sans tout reprendre :
+
+```bash
+FILM_ECRANS=partager-cout,mel node film/capturer-ecrans.js
 ```
 
 ⚠️ Il faut un **ffmpeg compilé avec libx264**. Celui qui accompagne Playwright ne
@@ -57,10 +79,56 @@ personnes. Les écrans d'actualités, de signalements et d'idées ne montrent do
 plus que des **rubriques** et du **mécanisme** : aucun horaire, aucun lieu, aucune
 décision, aucune date dans un titre. Voir les commentaires de `fixtures.js`.
 
+**Aucune approbation d'un tiers.** Le film nomme deux tiers, et chaque mot y est
+pesé :
+
+- **« Propulsée par Mistral AI »** décrit un fait technique vérifiable — les
+  réponses libres de MEL sont produites par un modèle Mistral (`MISTRAL_MODEL`,
+  `lib/mel.js` du backend, repli Anthropic). ⛔ Ne jamais écrire « approuvé par »,
+  « labellisé » ou « partenaire », et **ne jamais poser de logo Mistral** : un
+  logo de tiers dans un film communal se lit comme un soutien officiel, et un
+  soutien officiel se demande par écrit avant d'être affiché.
+- **« Observatoire de l'innovation publique TERRITORIA »** est un remerciement, et
+  rien d'autre : **le prix n'est pas nommé** (demande expresse de la mairie). Le
+  badge « Territoria d'Or 2026 », lui, vit dans l'application — pas ici.
+
 **Trois chiffres, et ils sont vrais.** « 180 questions » (`data/saviez-vous.json`),
 « 100 % accessible RGAA » (`docs/accessibilite/audit-rgaa-2026-08-27.md`),
 « gratuite, sans publicité, sans compte ». Les revérifier avant toute
 rediffusion — le taux RGAA et la taille du corpus bougent.
+
+## 📰 L'écran Actualités vient d'un téléphone, lui aussi
+
+`fixtures.js` ne fabrique **aucune photo** : les actualités simulées ne portent
+que des rubriques (voir ci-dessus). Une page d'actualités sans image ne montre
+donc ni le carrousel, ni la pastille, ni ce à quoi ressemble vraiment une
+publication de la mairie — c'est-à-dire exactement ce qu'on voulait montrer.
+
+Le film utilise donc `ecrans/actus-photos.webp` : une **capture d'écran d'une
+actualité réellement publiée**, prise sur un téléphone, recadrée pour retirer la
+barre d'état et la barre de navigation Android :
+
+```bash
+ffmpeg -i <capture.jpg> -vf "crop=1220:2425:0:152,scale=780:-2" -q:v 82 actus-photos.webp
+```
+
+⚠️ **Elle porte une date de publication** (« Publié 14/10/2026 »), donc elle
+vieillit avec le film. Avant une rediffusion lointaine, refaire la capture sur
+une actualité récente — ou choisir une publication sans enjeu de fraîcheur.
+⚠️ La capture automatique `ecrans/actus.png` existe toujours, **elle n'est pas
+branchée** : son nom et sa description (`capturer-ecrans.js`) le disent.
+
+## 🏛️ Le kit de réplication (`partager.html`)
+
+Trois captures, prises sur **trois pages distinctes** (`url:` dans
+`capturer-ecrans.js`, pas `fn:` — ce n'est pas un écran de l'app mais une page à
+part) : le profil, le coût estimé, le prompt généré. ⚠️ Trois pages et non trois
+captures d'une même page : `goTo()` masque l'étape précédente, photographier la
+même page trois fois donnerait trois fois le dernier état.
+
+⚠️ Le formulaire est rempli avec **le nom d'exemple du formulaire lui-même**
+(« Mairie de Saint-Exemple ») : aucune commune réelle n'est nommée, et personne
+ne peut lire la capture comme l'annonce d'un déploiement ailleurs.
 
 ## 🗺️ La carte 3D — le seul plan qui ne se régénère pas
 
@@ -99,15 +167,16 @@ diffusion, et à masquer si la personne le demande.
   date de scrutin).
   Deux exceptions, vraies et vérifiables : la réponse de MEL sur les horaires de
   bricolage (arrêté préfectoral du Loiret du 1er mars 1999) et l'adresse de l'app.
-- **Le film muet reste la référence** ; la version musicale s'ajoute à côté
-  (`node film/ajouter-musique.js film/musique/<piste>.mp3`). Les réseaux lisent en
-  sourdine par défaut, donc **tout ce qui compte est écrit à l'écran, et doit le
-  rester** : une musique n'ajoute aucune information, et c'est ce qui la rend sans
-  danger pour l'accessibilité. ⚠️ Une **voix off**, elle, en ajoute — il faudrait
-  alors des sous-titres, relus (les générateurs automatiques écorchent
-  « Mézières-lez-Cléry »).
-- ⛔ **La licence de la musique ne vit pas dans le dépôt** : la mairie garde la
-  preuve dans ses archives. Voir `musique/SOURCE.md`.
+- **Le film est muet**, et le reste tant que la mairie ne redemande pas de
+  musique. Les réseaux lisent en sourdine par défaut, donc **tout ce qui compte
+  est écrit à l'écran, et doit le rester** : une musique n'ajoute aucune
+  information, et c'est ce qui la rendait sans danger pour l'accessibilité.
+  ⚠️ Une **voix off**, elle, en ajoute — il faudrait alors des sous-titres, relus
+  (les générateurs automatiques écorchent « Mézières-lez-Cléry »).
+- ⛔ Si une version sonore revient un jour
+  (`node film/ajouter-musique.js film/musique/<piste>.mp3`) : **la licence de la
+  musique ne vit pas dans le dépôt**, la mairie garde la preuve dans ses
+  archives. Voir `musique/SOURCE.md`.
 - **Relire le numéro de version** visible dans la capture d'accueil : il vieillit.
   Relancer `capturer-ecrans.js` avant une diffusion importante.
 - ⚠️ **Le fait du jour tourne avec le calendrier.** L'écran « Le saviez-vous ? » est

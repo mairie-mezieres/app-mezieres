@@ -34,6 +34,13 @@ const LARGEUR = Number(process.env.LARGEUR || 1080);
 const HAUTEUR = Number(process.env.HAUTEUR || 1920);
 const SORTIE = path.resolve(process.env.SORTIE || path.join(__dirname, "sortie"));
 const NOM = process.env.NOM || "mat-presentation-vertical";
+// ⚠️ LE POIDS DU FICHIER EST UNE CONTRAINTE DE DIFFUSION, pas un détail de
+// qualité. WhatsApp refuse une vidéo au-delà de ~16 Mo : à `crf 20`, le film de
+// 63 s pesait 16,1 Mio et ne partait plus. `crf 23` le ramène sous 11 Mio sans
+// différence visible sur ce contenu (aplats, texte, captures d'écran).
+// Un film plus long rapproche d'autant du plafond : vérifier le poids après
+// chaque rallonge, et non seulement la durée.
+const CRF = process.env.CRF || "23";
 const CHROME = process.env.CHROME_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
 function trouverFfmpeg() {
@@ -84,7 +91,7 @@ function trouverFfmpeg() {
   const args = [
     "-y", "-f", "image2pipe", "-framerate", String(FPS), "-i", "-",
     "-an",
-    "-c:v", "libx264", "-preset", "slow", "-crf", "20",
+    "-c:v", "libx264", "-preset", "slow", "-crf", CRF,
     // `yuv420p` n'est pas un détail : sans lui, le fichier ne s'ouvre pas sur
     // la moitié des téléphones et QuickTime affiche un écran noir.
     "-pix_fmt", "yuv420p",
