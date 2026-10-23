@@ -646,8 +646,9 @@ const _MEL_TREE_FALLBACK = {
       // Aide ASP aux travaux en domaine privé : l'habitant dépose, pas la mairie.
       // ⛔ Ni montant, ni plafond, ni date limite (dispositif temporaire, déjà modifié).
       {id:"aide_raccordement",ico:"💶",label:"Aide de l'État au raccordement fibre",
-        directAnswer:{text:"Si votre opérateur ne peut pas terminer le raccordement parce que des travaux sont nécessaires sur votre terrain (fourreau absent ou bouché, tranchée…), il vous remet une « attestation d'échec de raccordement ». Elle ouvre droit à une aide forfaitaire de l'État, dont le montant dépend de l'ampleur des travaux. Elle s'adresse aux particuliers (maison individuelle, résidence principale, sous conditions de ressources) et aux très petites entreprises.\n\n1️⃣ C'est vous qui déposez la demande, en ligne, auprès de l'Agence de services et de paiement (ASP), avec l'attestation de votre opérateur.\n\n2️⃣ Vous faites réaliser les travaux par l'entreprise de votre choix ; c'est elle qui demande ensuite le paiement de l'aide à l'ASP.\n\n⚠️ La mairie n'instruit pas ce dossier et ne le dépose pas à votre place : le dispositif relève de l'État. En appartement, les travaux relèvent de la copropriété.\n\nLe dispositif est temporaire : montants, conditions de ressources et date limite de dépôt sont indiqués par l'ASP et dans la FAQ officielle.",
-          links:[{label:"📝 Demander l'aide — ASP",url:"https://www.asp.gouv.fr/aides/fibre-optique-aide-au-raccordement"},
+        directAnswer:{text:"Si vous avez souscrit un abonnement fibre mais que votre opérateur n'a pas pu vous raccorder parce que des travaux sont nécessaires sur votre propriété (fourreau absent ou bouché, tranchée…), il vous remet une « attestation d'échec de raccordement ». Elle ouvre droit à une aide forfaitaire de l'État, dont le montant dépend de l'ampleur des travaux.\n\n👤 Particuliers : propriétaire ou locataire, pour votre résidence principale, sous condition de quotient familial, et sans avoir déjà reçu une aide pour ces travaux.\n🏪 Très petites entreprises : local professionnel individuel, moins de 10 salariés, activité depuis au moins un an.\n\n1️⃣ C'est vous qui déposez la demande, en ligne, sur le portail de l'Agence de services et de paiement (ASP), avec l'attestation de votre opérateur.\n\n2️⃣ Vous faites réaliser les travaux par l'entreprise de votre choix ; c'est elle qui demande ensuite le paiement de l'aide à l'ASP.\n\n⚠️ La mairie n'instruit pas ce dossier et ne le dépose pas à votre place : le dispositif relève de l'État.\n\nLe dispositif est temporaire : plafond de ressources, montants et dates sont indiqués par l'ASP et dans la FAQ officielle.",
+          links:[{label:"📝 Déposer la demande — portail ASP",url:"https://puma.asp-public.fr/puma/aide/rcf-dpc"},
+                 {label:"ℹ️ Conditions de l'aide — ASP",url:"https://www.asp.gouv.fr/aides/fibre-optique-aide-au-raccordement"},
                  {label:"❓ FAQ officielle de l'aide",url:"https://www.economie.gouv.fr/treshautdebit/faq-aide-la-realisation-des-travaux-en-domaine-prive-pour-le-raccordement-un-reseau-en-fibre-optique"}]}
       },
       {id:"thd",ico:"📶",label:"Questions fibre (raccordement, éligibilité…)",
@@ -678,7 +679,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.8';
+  const V = '3.7.9';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,
