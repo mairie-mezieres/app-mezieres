@@ -643,6 +643,13 @@ const _MEL_TREE_FALLBACK = {
                  {label:"🌐 Lysséo — site officiel",url:"https://lysseo.fr"},
                  {label:"🏛️ Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
+      // Aide ASP aux travaux en domaine privé : l'habitant dépose, pas la mairie.
+      // ⛔ Ni montant, ni plafond, ni date limite (dispositif temporaire, déjà modifié).
+      {id:"aide_raccordement",ico:"💶",label:"Aide de l'État au raccordement fibre",
+        directAnswer:{text:"Si votre opérateur ne peut pas terminer le raccordement parce que des travaux sont nécessaires sur votre terrain (fourreau absent ou bouché, tranchée…), il vous remet une « attestation d'échec de raccordement ». Elle ouvre droit à une aide forfaitaire de l'État, dont le montant dépend de l'ampleur des travaux. Elle s'adresse aux particuliers (maison individuelle, résidence principale, sous conditions de ressources) et aux très petites entreprises.\n\n1️⃣ C'est vous qui déposez la demande, en ligne, auprès de l'Agence de services et de paiement (ASP), avec l'attestation de votre opérateur.\n\n2️⃣ Vous faites réaliser les travaux par l'entreprise de votre choix ; c'est elle qui demande ensuite le paiement de l'aide à l'ASP.\n\n⚠️ La mairie n'instruit pas ce dossier et ne le dépose pas à votre place : le dispositif relève de l'État. En appartement, les travaux relèvent de la copropriété.\n\nLe dispositif est temporaire : montants, conditions de ressources et date limite de dépôt sont indiqués par l'ASP et dans la FAQ officielle.",
+          links:[{label:"📝 Demander l'aide — ASP",url:"https://www.asp.gouv.fr/aides/fibre-optique-aide-au-raccordement"},
+                 {label:"❓ FAQ officielle de l'aide",url:"https://www.economie.gouv.fr/treshautdebit/faq-aide-la-realisation-des-travaux-en-domaine-prive-pour-le-raccordement-un-reseau-en-fibre-optique"}]}
+      },
       {id:"thd",ico:"📶",label:"Questions fibre (raccordement, éligibilité…)",
         directAnswer:{text:"Pour une question portant sur le réseau lui-même — adresse raccordable, avancement du déploiement, point de branchement — écrivez à Lysséo via son formulaire de contact.\n\n⚠️ Lysséo ne commercialise aucune offre : pour un abonnement, une facture, un rendez-vous d'installation ou une panne de votre ligne, votre interlocuteur est votre opérateur (Orange, SFR, Bouygues, Free…).",
           links:[{label:"🌐 Lysséo — site officiel",url:"https://lysseo.fr"}]}
@@ -671,7 +678,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.7';
+  const V = '3.7.8';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,
