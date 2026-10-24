@@ -74,6 +74,11 @@ jobs:
       - name: Workflow inputs check (null == false)
         run: node scripts/check-workflow-inputs.js
 
+      # La règle de fusion Dependabot (ADR-0045) ne tourne qu'en workflow :
+      # un groupe mal lu fusionnerait une majeure sans qu'aucun test le voie.
+      - name: Règle de fusion Dependabot (PR simples et groupes)
+        run: node scripts/check-dependabot-auto-merge.js
+
       # Les règles anti-doublon du pipeline conseil-drive (ADR-0053) ne
       # s'exécutent qu'en workflow, sur des PDF qui n'existent pas encore :
       # aucun test E2E ne peut les voir, et un doublon de séance ne se
