@@ -89,13 +89,19 @@ test('aucun élément cliquable n’est hors de portée du clavier', async ({ pa
 
 // Un tabindex sans role ni libellé laisse le lecteur d'écran annoncer
 // « groupe » : l'utilisateur entend qu'il y a quelque chose, sans savoir quoi.
+// Un role=button tire aussi son nom de son CONTENU : les cartes de l'accueil
+// (mairie, météo, déchets…) n'ont plus d'aria-label depuis axe 4.14, qui
+// exige que le nom contienne le texte affiché (WCAG 2.5.3) — impossible avec
+// un libellé fixe sur un contenu qui change. Leur action est dite par un
+// <span class="sr-only"> en fin de carte.
 test('chaque cliquable focusable annonce son rôle et son intitulé', async ({ page }) => {
   const muets = await page.evaluate(() =>
     Array.from(document.querySelectorAll('[onclick][tabindex]'))
       .filter((el) => {
         const natif = ['A', 'BUTTON'].includes(el.tagName);
         const role = natif || el.getAttribute('role') === 'button';
-        const nom = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby');
+        const nom = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby')
+          || (el.getAttribute('role') === 'button' && el.textContent.trim());
         return !role || !nom;
       })
       .map((el) => (el.id ? '#' + el.id : el.className))

@@ -1,6 +1,8 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
 const { couperReseauExterne } = require('./helpers/reseau');
+const fs = require('fs');
+const path = require('path');
 
 /*
  * Conseil municipal — onglets « Décisions » / « Projets » et bandeau d'accueil.
@@ -21,9 +23,17 @@ const { couperReseauExterne } = require('./helpers/reseau');
  *    d'historique, le retour ferme l'overlay sans toucher à #ov-contact.
  */
 
+// Jeu de données FIGÉ : `data/conseil.json` s'enrichit à chaque passage du
+// pipeline Drive (ADR-0053), et des assertions écrites sur lui rougissaient la
+// CI de `main` à la première séance ajoutée (5 octobre 2026, PR #498).
+const FIXTURE_CONSEIL = fs.readFileSync(path.join(__dirname, 'fixtures', 'conseil.json'), 'utf8');
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('mat_onboarded_v3', '1'));
   await couperReseauExterne(page);
+  // Les tests qui posent leur propre route le font APRÈS : la dernière gagne.
+  await page.route('**/data/conseil.json*', (route) =>
+    route.fulfill({ contentType: 'application/json', body: FIXTURE_CONSEIL }));
 });
 
 async function allerAccueil(page) {
