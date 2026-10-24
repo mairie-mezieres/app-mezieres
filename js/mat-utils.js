@@ -558,7 +558,10 @@ function formatMelText(text) {
   });
 
   // 2. www.xxx sans http
-  result = result.replace(/(?<![":\/\w])(www\.[a-zA-Z0-9-]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi, (url) => {
+  // ⛔ Pas de « regard en arrière » (lookbehind) : Safari < 16.4 refuse le fichier
+  // ENTIER à la lecture (ADR-0055). Le caractère précédent se teste à la main.
+  result = result.replace(/(www\.[a-zA-Z0-9-]+\.[a-z]{2,}(?:\/[^\s<>"]*)?)/gi, (url, _u, off, str) => {
+    if (off > 0 && /[":\/\w]/.test(str[off - 1])) return url;
     const href = 'https://' + url;
     return `<a href="${href}" target="_blank" style="${linkStyle}">${urlToLabel(href)}</a>`;
   });
@@ -566,15 +569,17 @@ function formatMelText(text) {
   // 3. Domaines connus
   for (const domain of KNOWN_DOMAINS) {
     const esc2 = domain.replace(/\./g,'\\.');
-    const re = new RegExp('(?<![":\/\.\w@])(' + esc2 + '(?:\/[^\s<>"]*)?)', 'gi');
-    result = result.replace(re, (url) => {
+    const re = new RegExp('(' + esc2 + '(?:\/[^\s<>"]*)?)', 'gi');
+    result = result.replace(re, (url, _u, off, str) => {
+      if (off > 0 && /[":\/.\w@]/.test(str[off - 1])) return url;
       const href = 'https://' + url;
       return `<a href="${href}" target="_blank" style="${linkStyle}">${urlToLabel(href)}</a>`;
     });
   }
 
   // 4. Numéros de téléphone français
-  result = result.replace(/(?<![\d@\/])(0[1-9](?:[\s\.\-]?\d{2}){4})(?![\d])/g, (num) => {
+  result = result.replace(/(0[1-9](?:[\s\.\-]?\d{2}){4})(?![\d])/g, (num, _n, off, str) => {
+    if (off > 0 && /[\d@\/]/.test(str[off - 1])) return num;
     const tel = formatPhone(num);
     return `<a href="tel:${tel}" style="${linkStyle}">📞 ${num}</a>`;
   });

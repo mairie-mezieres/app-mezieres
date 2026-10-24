@@ -14,7 +14,7 @@
 //         l'installation, lus dans jeux/jeux.json. Aucun nom de jeu n'est écrit
 //         ici : le jeu bascule seul à date fixe, et la bascule doit fonctionner
 //         hors connexion le jour venu. Voir ADR-0037.
-const CACHE = 'mat-v4.127.7';
+const CACHE = 'mat-v4.127.8';
 
 // ⚙️ Adresse du backend MAT. Le service worker ne peut pas lire js/mat-config.js
 // (contexte worker, pas de window) : il garde sa propre copie. RÉPLICATION :
@@ -28,7 +28,7 @@ const CRITICAL_PRECACHE = [
   './offline.html',
   './css/mat.css?v=4.15.2',
   './js/mat-config.js?v=1',
-  './js/mat-utils.js?v=4.3.9',
+  './js/mat-utils.js?v=4.3.10',
   './js/mat-core.js?v=4.4.3'
 ];
 
@@ -41,7 +41,7 @@ const PRECACHE_URLS = [
   './css/mat-desktop.css?v=4.7.0',
   './css/fonts.css?v=2',
   './js/mat-config.js?v=1',
-  './js/mat-utils.js?v=4.3.9',
+  './js/mat-utils.js?v=4.3.10',
   './js/mat-core.js?v=4.4.3',
   './js/mat-accessibility.js?v=4.3.11',
   './js/mat-widgets.js?v=4.5.14',
@@ -51,8 +51,8 @@ const PRECACHE_URLS = [
   './js/mat-photos.js?v=1.3.6',
   './js/mat-actus.js?v=4.5.1',
   './js/mat-trombi.js?v=4.3.0',
-  './js/mat-mel.js?v=4.5.6',
-  './js/mat-boot.js?v=4.14.2',
+  './js/mat-mel.js?v=4.5.7',
+  './js/mat-boot.js?v=4.14.3',
   './js/mat-pwa-notif.js?v=4.3.0',
   './js/mat-dechets-notif.js?v=4.3.1',
   './js/mat-jours-feries.js?v=4.2.3',
@@ -77,7 +77,7 @@ const PRECACHE_URLS = [
   './js/mat-guide-arrivee.js?v=1.0.8',
   './js/mat-entreprises.js?v=1.2.1',
   './js/mat-saviez-vous.js?v=1.5.1',
-  './js/mat-conseil.js?v=1.0.0',
+  './js/mat-conseil.js?v=1.0.1',
   // ⚠️ Sans ?v= : servi en RÉSEAU D'ABORD (voir fetch), le cache n'est
   // que le secours hors connexion — le ?v= n'apporterait rien et
   // désynchroniserait l'URL du fetch de mat-conseil.js.
@@ -95,7 +95,7 @@ const PRECACHE_URLS = [
   // listés ici : ils sont ajoutés à l'installation d'après le manifeste (voir
   // plus bas). C'est ce qui permet d'ajouter un jeu sans toucher au code.
   './css/mat-jeu.css?v=1.1.0',
-  './js/mat-jeu.js?v=2.0.0',
+  './js/mat-jeu.js?v=2.0.1',
   './jeu/index.html',
   './jeu/archives/index.html',
   './jeux/jeux.json'
