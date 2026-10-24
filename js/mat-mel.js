@@ -1166,13 +1166,19 @@ function pluSwitchTab(btn, tabId){
 const _MEL_LIEN = new RegExp(
   '(https?:\\/\\/[^\\s<>]+)'                                        // 1. URL complète
   + '|([a-z0-9._%+-]+@(?:[a-z0-9-]+\\.)+[a-z]{2,})'                 // 2. courriel
-  + '|(?<![\\w@.\\-\\/])(www\\.[^\\s<>]+)'                          // 3. www.…
-  + '|(?<![\\w@.\\-\\/])((?:[a-z0-9-]+\\.)+(?:gouv\\.fr|fr|com|org|eu)(?:\\/[^\\s<>]*)?)', // 4. domaine nu
+  + '|(www\\.[^\\s<>]+)'                                         // 3. www.…
+  + '|((?:[a-z0-9-]+\\.)+(?:gouv\\.fr|fr|com|org|eu)(?:\\/[^\\s<>]*)?)', // 4. domaine nu
   'gi'
 );
 
+// ⛔ Pas de « regard en arrière » (lookbehind) dans ces motifs : Safari < 16.4
+// refuse le fichier ENTIER (ADR-0055). Pour 3 et 4, le caractère qui précède
+// se teste ici : collé à un mot, un courriel ou un chemin, ce n'est pas un lien.
+const _MEL_AVANT_NU = /[\w@.\-\/]/;
+
 function _melLinkify(texte){
-  return String(texte==null?'':texte).replace(_MEL_LIEN, function(m, url, mail){
+  return String(texte==null?'':texte).replace(_MEL_LIEN, function(m, url, mail, www, nu, off, str){
+    if((www||nu) && off>0 && _MEL_AVANT_NU.test(str[off-1])) return m;
     // La ponctuation qui suit l'adresse n'en fait pas partie. Le motif d'URL
     // est volontairement large (`[^\s<>]+`) pour accepter les chemins et les
     // paramètres ; sans ce rognage, « (voir https://example.com) » produisait
@@ -1193,7 +1199,10 @@ function _renderDirectAnswer(answer){
   if(typeof answer==='string'){
     // Transformer URLs, courriels et tél en liens cliquables
     let t=_melLinkify(answer.replace(/\n/g,'<br>'))
-      .replace(/(?<!\d)(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,'<a href="tel:$1" style="color:var(--leaf);font-weight:700;">📞 $1</a>');
+      .replace(/(0[1-9](?:[\s\.\-]?\d{2}){4})(?!\d)/g,function(n,_n,off,str){
+        if(off>0 && /\d/.test(str[off-1])) return n;
+        return '<a href="tel:'+n+'" style="color:var(--leaf);font-weight:700;">📞 '+n+'</a>';
+      });
     return '<p style="margin:0 0 8px;line-height:1.6;">'+t+'</p>';
   }
   // Format objet

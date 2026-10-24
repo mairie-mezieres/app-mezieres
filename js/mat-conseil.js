@@ -502,12 +502,15 @@
     var decs = _dedoublonner(s.decisions, 'décision').length;
     var texte = '🏛️ Conseil du ' + _dateJourMois(s.date) + ' : ' + decs + ' décision' + (decs > 1 ? 's' : '');
     var nouveau = _estNouveau(s);
+    // WCAG 2.5.3 : le nom accessible CONTIENT le texte affiché, dans l'ordre
+    // (« … décisions Nouveau »), d'où l'espace entre les deux <span> : collés,
+    // axe lisait « décisionsnouveau » et ne le retrouvait pas dans le nom.
     var aria = 'Conseil du ' + _dateJourMois(s.date) + ' : ' + decs + ' décision' + (decs > 1 ? 's' : '')
-      + (nouveau ? ' — nouveau' : '') + '. Voir les décisions.';
+      + (nouveau ? ', nouveau' : '') + ' — voir les décisions';
     var html = '<button type="button" class="cm-ligne' + (nouveau ? ' is-nouveau' : '') + '"'
       + ' data-conseil-action="bandeau" aria-label="' + _esc(aria) + '">'
       + '<span class="cm-ligne-txt">' + _esc(texte) + '</span>'
-      + (nouveau ? '<span class="cm-ligne-new">Nouveau</span>' : '')
+      + (nouveau ? ' <span class="cm-ligne-new">Nouveau</span>' : '')
       + '<span class="cm-ligne-chev" aria-hidden="true">›</span>'
       + '</button>';
     conts.forEach(function (el) { el.innerHTML = html; el.classList.add('cm-visible'); });
