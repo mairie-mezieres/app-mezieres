@@ -265,7 +265,7 @@ matDifferer('js/mat-carte3d.js?v=1.11.2',       ['matOuvrirCarte3D']);
 // l'overlay reste fonctionnel sur l'onglet « Les élus » (ADR-0032).
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-conseil.js?v=1.0.0';
+  s.src = 'js/mat-conseil.js?v=1.0.1';
   s.onload = function(){ try { if (typeof matConseilInit === 'function') matConseilInit(); } catch(e){} };
   document.head.appendChild(s);
 })();

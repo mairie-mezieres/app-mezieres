@@ -239,8 +239,10 @@
     // La pastille est un renfort visuel ; l'information, elle, est dans le nom
     // accessible du lien. Un habitant qui n'y voit pas — ou qui ne distingue
     // pas le rouge — apprend la nouveauté de la même façon que les autres.
+    // WCAG 2.5.3 : le nom commence par le texte affiché, pastille comprise
+    // (« Nouveau Le jeu du moment ») — axe 4.14 refusait l'ordre inverse.
     lien.setAttribute('aria-label',
-      'Le jeu du moment' + (neuf ? '. Nouveau jeu disponible' : ''));
+      neuf ? 'Nouveau — Le jeu du moment. Nouveau jeu disponible' : 'Le jeu du moment');
 
     lien.setAttribute('data-jeu-pret', '1');
   }

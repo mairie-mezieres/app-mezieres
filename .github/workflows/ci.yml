@@ -42,6 +42,12 @@ jobs:
       - name: Structure check (css/)
         run: node scripts/check-css.js
 
+      # Une regex « regard en arrière » fait refuser le fichier ENTIER par
+      # Safari < 16.4 : aucune fonction n'existe, l'app plante ailleurs. Ni
+      # `node --check` ni Playwright (Chromium récent) ne le voient. ADR-0055.
+      - name: Regex compat check (Safari < 16.4)
+        run: node scripts/check-regex-compat.js
+
       # Le service worker sert la copie en cache tant que l'URL est identique.
       # `mat-boot.js` a été modifié trois fois sans que son `?v=` bouge : les
       # habitants ont reçu l'ancien module pendant deux versions, avec un
@@ -67,6 +73,11 @@ jobs:
       # le bon chemin. Voir ADR-0045 §8.
       - name: Workflow inputs check (null == false)
         run: node scripts/check-workflow-inputs.js
+
+      # La règle de fusion Dependabot (ADR-0045) ne tourne qu'en workflow :
+      # un groupe mal lu fusionnerait une majeure sans qu'aucun test le voie.
+      - name: Règle de fusion Dependabot (PR simples et groupes)
+        run: node scripts/check-dependabot-auto-merge.js
 
       # Les règles anti-doublon du pipeline conseil-drive (ADR-0053) ne
       # s'exécutent qu'en workflow, sur des PDF qui n'existent pas encore :

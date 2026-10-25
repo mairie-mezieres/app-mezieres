@@ -7,6 +7,23 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ## [non publié]
 
+### Corrigé
+
+- **Safari < 16.4 : `mat-utils.js` et `mat-mel.js` refusés à la lecture**
+  (v4.127.8, issues #500 et #501) — des expressions régulières à « regard en
+  arrière » faisaient rejeter les deux fichiers entiers (« Can't find variable:
+  matAbortTimeout »). Le caractère précédent se teste désormais dans la fonction
+  de remplacement. Le contrôle `scripts/check-regex-compat.js` est lancé par la CI. ADR-0055.
+- **Nom accessible des cartes de l'accueil (WCAG 2.5.3)** — relevé par
+  `@axe-core/playwright` 4.14 (PR #496) : l'`aria-label` fixe des cartes
+  (mairie, météo, déchets, manifestation, bus, carburant, photos, version) ne
+  contenait pas le texte affiché. Le nom vient maintenant du contenu, et un
+  suffixe `.sr-only` dit l'action. Le bandeau du conseil et la tuile du jeu ont
+  été reformulés. `tests/e2e/conseil.spec.js` lit un jeu de données figé
+  (`tests/e2e/fixtures/conseil.json`) : la séance du 5 octobre avait rendu `main` rouge.
+  `mat-utils.js?v=4.3.10`, `mat-mel.js?v=4.5.7`, `mat-conseil.js?v=1.0.1`,
+  `mat-jeu.js?v=2.0.1`, `mat-boot.js?v=4.14.3`, cache SW `mat-v4.127.8`.
+
 ### Ajouté
 
 - **Kit « Partager » — partagé tel quel** (v4.127.6) : `docs/REPLICATION.md`

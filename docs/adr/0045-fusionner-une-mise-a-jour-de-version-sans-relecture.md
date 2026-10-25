@@ -135,11 +135,28 @@ peut se déclencher autrement qu'à la main. Le détecteur a été vérifié **s
 version fautive** — un contrôle qui ne mesure rien ne rougit pas, il verdit
 (ADR-0030).
 
+### 9. Un groupe se juge paquet par paquet (24 octobre 2026)
+
+Les PR **groupées** de Dependabot (« bump the backend group … with 3 updates ») ne
+portent pas `from X to Y` dans leur titre : le script les refusait toutes
+(« versions illisibles »). Or ce sont justement elles qui regroupent les correctifs
+de sécurité. `chatbot-mairie-mezieres#256` (express 5.3, quatre CVE corrigées) est
+restée ouverte dix jours pour cette seule raison.
+
+Désormais, chaque paquet est lu sur une ligne `Updates \`pkg\` from A to B` du corps
+(en **début** de ligne, pour ne pas lire une phrase des notes de version), et la règle
+du §3 s'applique à **chacun**. Il suffit d'un paquet refusé pour que tout le groupe
+attende. ⛔ Le script doit lire **exactement** le nombre de paquets annoncé par le titre
+(« with N updates ») : un corps tronqué ne doit pas faire passer un groupe dont on
+n'aurait vu qu'une partie. Les cas sont verrouillés par
+`chatbot-mairie-mezieres/test/dependabot-auto-merge.test.js` et son jumeau
+`app-mezieres/scripts/check-dependabot-auto-merge.js`, tous deux lancés par la CI.
+
 ## Conséquences
 
 **Positives :**
 - Les correctifs de version se prennent tout seuls, CI verte à l'appui.
-- Ce qui demande un jugement (majeure, 0.x, groupe, fichier inattendu) arrive à un
+- Ce qui demande un jugement (majeure, 0.x, fichier inattendu, groupe qui en contient) arrive à un
   humain **sans être noyé** dans ce qui n'en demandait pas.
 - Le refus est expliqué, pas silencieux.
 
