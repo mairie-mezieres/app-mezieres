@@ -229,9 +229,9 @@ test('nuit d’équinoxe d’automne → étoiles à la place des feuilles', asy
   expect(k).toBe('stars');
 });
 
-test('jour d’équinoxe d’automne → feuilles, pas d’étoiles', async ({ page }) => {
+test('jour d’équinoxe d’automne → soleil ET feuilles, pas d’étoiles', async ({ page }) => {
   const k = await ambianceLe(page, '2026-09-24', '2026-09-23', '14:00', '+02:00', '07:35', '19:50', 0);
-  expect(k).toBe('automne');
+  expect(k).toBe('sun+automne');
 });
 
 // Hors des fenêtres de 3 jours, plus aucun décor : le 10 novembre est nu.
@@ -240,21 +240,21 @@ test('hors fenêtre de saison → aucun décor, seulement le ciel', async ({ pag
   expect(k).toBe('sun');
 });
 
-// L'annonce du solstice (21-23 déc) est incluse dans Noël (15-30 déc) : sans
-// priorité explicite, elle ne s'afficherait jamais.
-test('solstice d’hiver → givre, prioritaire sur Noël', async ({ page }) => {
+// L'annonce du solstice (21-23 déc) est incluse dans Noël (15-30 déc) : les
+// deux décors se cumulent.
+test('solstice d’hiver → givre ET guirlande de Noël', async ({ page }) => {
   const k = await ambianceLe(page, '2026-12-22', '2026-12-21', '14:00', '+01:00', '08:40', '16:55', 0);
-  expect(k).toBe('hiver');
+  expect(k).toBe('sun+hiver+noel');
 });
 
-test('solstice d’été → poussière de lumière', async ({ page }) => {
+test('solstice d’été → soleil ET papillons', async ({ page }) => {
   const k = await ambianceLe(page, '2026-06-22', '2026-06-21', '14:00', '+02:00', '05:50', '21:55', 0);
-  expect(k).toBe('ete');
+  expect(k).toBe('sun+ete');
 });
 
-test('nuit de décembre sous la pluie → gouttes seules', async ({ page }) => {
+test('nuit de décembre sous la pluie → gouttes ET guirlande, sans étoiles', async ({ page }) => {
   const k = await ambianceLe(page, '2026-12-17', '2026-12-16', '18:00', '+01:00', '08:37', '16:55', 61);
-  expect(k).toBe('rain');
+  expect(k).toBe('rain+noel');
 });
 
 // ── Aperçu des ambiances (outil mairie) ──────────────────────────────────────
@@ -305,7 +305,9 @@ test.describe('aperçu des ambiances', () => {
     // Neige + nuit, quelle que soit la météo réelle
     await page.selectOption('#amb-ap-meteo', '73');
     await page.selectOption('#amb-ap-moment', 'night');
-    expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toBe('snow');
+    // La date réelle peut tomber dans une fenêtre festive (décor cumulé) : on
+    // vérifie la météo en tête de clé, pas l'égalité stricte.
+    expect(await page.evaluate(() => document.querySelector('.header-amb').dataset.kind)).toMatch(/^snow(\+|$)/);
 
     // Ciel dégagé + nuit + Noël → superposition
     await page.selectOption('#amb-ap-meteo', '0');
