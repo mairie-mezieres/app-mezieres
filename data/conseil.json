@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "maj": "2026-09-26",
+  "maj": "2026-10-20",
   "prochaine_seance": "2026-10-05",
   "depuis": "2026-04-01",
   "themes": {
@@ -36,6 +36,61 @@
     }
   },
   "seances": [
+    {
+      "id": "2026-10-05",
+      "date": "2026-10-05",
+      "document": "cr_partiel",
+      "drive_id": "1X8EJz7DlULhq3dDE1qa511cwnGvWz5Bl",
+      "publie": true,
+      "resume": "Fin de la location de barnums aux particuliers, tarifs du cimetière, règlement du Pass’Jeune et avis sur la publicité intercommunale.",
+      "decisions": [
+        {
+          "id": "2026/37",
+          "num": "2026/37",
+          "theme": "vie_locale",
+          "titre": "Location des barnums, tables et chaises",
+          "en_clair": "Depuis le 5 octobre 2026, les barnums ne sont plus loués aux particuliers, qui peuvent toujours louer tables et chaises (2,50 € pour 1 table et 4 chaises). Les barnums sont prêtés gratuitement aux associations locales de Mézières-lez-Cléry, Mareau-aux-Prés et Cléry-Saint-André, avec une caution de 2 chèques de 500 €. Un retard de restitution coûte 100 € par jour.",
+          "resultat": "adopte",
+          "unanimite": false,
+          "vote": null,
+          "montant": null
+        },
+        {
+          "id": "2026/38",
+          "num": "2026/38",
+          "theme": "mairie",
+          "titre": "Tarifs du cimetière et durée des concessions",
+          "en_clair": "Les tarifs du cimetière sont fixés : concession de 20 ans à 150 €, de 30 ans à 300 €, cavurne de 15 ans à 200 € et de 30 ans à 400 €. La gravure sur la stèle du jardin du souvenir coûte 90 €.",
+          "resultat": "adopte",
+          "unanimite": true,
+          "vote": null,
+          "montant": null
+        },
+        {
+          "id": "2026/39",
+          "num": "2026/39",
+          "theme": "ecole",
+          "titre": "Règlement intérieur et convention du Pass’Jeune",
+          "en_clair": "Le règlement de l’accueil de jeunes Pass’Jeune, ouvert pendant les vacances scolaires, est adopté. Le Maire peut signer la convention qui s’y rapporte.",
+          "resultat": "adopte",
+          "unanimite": true,
+          "vote": null,
+          "montant": null
+        },
+        {
+          "id": "2026/40",
+          "num": "2026/40",
+          "theme": "travaux",
+          "titre": "Règlement local de publicité d’Orléans Métropole",
+          "en_clair": "Avis favorable au projet de règlement local de publicité métropolitain d’Orléans Métropole, qui encadre les panneaux publicitaires et les enseignes.",
+          "resultat": "avis_favorable",
+          "unanimite": true,
+          "vote": null,
+          "montant": null
+        }
+      ],
+      "decisions_maire": []
+    },
     {
       "id": "2026-08-31",
       "date": "2026-08-31",
