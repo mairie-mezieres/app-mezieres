@@ -32,6 +32,11 @@
 const fs = require('fs');
 
 const ITEMS_PATH = 'veille/items-presse.json';
+const JOURNAL_PATH = 'veille/journal-presse.json';
+const SOURCES_PATH = 'veille/presse-sources.json';
+// En dessous, la recherche est bâclée : le 1er passage réel (14/10/2026) s'est
+// arrêté en 39 s sur `[]`, alors que MAT figurait au palmarès Territoria 2026.
+const MIN_RECHERCHES = 8;
 const MEMOIRE_PATH = 'veille/presse-vues.json';
 const NOUVEAUX_PATH = 'veille-presse-nouveaux.json';
 const DATE_ISO = (process.env.VEILLE_DATE || new Date().toISOString().slice(0, 10)).trim();
@@ -108,6 +113,33 @@ function filtrer(brut, memoire) {
   return { items: out, ecartes };
 }
 
+/**
+ * Contrôle que l'agent a réellement cherché. Renvoie { erreur, avertissements, recherches, pages }.
+ * `erreur` non vide = le run doit échouer : « rien trouvé » n'a de sens qu'après avoir cherché.
+ */
+function verifierJournal(journal, sources) {
+  const avertissements = [];
+  if (!journal || typeof journal !== 'object' || Array.isArray(journal)) {
+    return { erreur: `${JOURNAL_PATH} absent ou illisible — impossible de savoir ce que l'agent a cherché.`, avertissements, recherches: [], pages: [] };
+  }
+  const recherches = (Array.isArray(journal.recherches) ? journal.recherches : []).map(r => propre(r, 200)).filter(Boolean);
+  const pages = (Array.isArray(journal.pages_lues) ? journal.pages_lues : []).map(u => propre(u, 500)).filter(Boolean);
+  const lues = new Set(pages.map(normaliserUrl).filter(Boolean));
+  for (const src of Array.isArray(sources) ? sources : []) {
+    const cle = normaliserUrl(src && src.url);
+    if (cle && !lues.has(cle)) avertissements.push(`source suivie non relue : ${src.url}`);
+  }
+  const erreur = recherches.length < MIN_RECHERCHES
+    ? `seulement ${recherches.length} recherche(s) déclarée(s) (minimum ${MIN_RECHERCHES}) — recherche bâclée, résultat non fiable.`
+    : '';
+  return { erreur, avertissements, recherches, pages };
+}
+
+function lireJson(chemin) {
+  if (!fs.existsSync(chemin)) return null;
+  try { return JSON.parse(fs.readFileSync(chemin, 'utf8')); } catch { return null; }
+}
+
 /** Ajoute les items à la mémoire ; clés triées pour des diffs lisibles. */
 function memoriser(memoire, items, date) {
   const m = { ...memoire };
@@ -134,10 +166,30 @@ function main(cmd) {
       process.exit(1);
     }
     const { items, ecartes } = filtrer(brut, lireMemoire());
+    const j = verifierJournal(lireJson(JOURNAL_PATH), lireJson(SOURCES_PATH));
     fs.writeFileSync(NOUVEAUX_PATH, JSON.stringify({ items }, null, 2) + '\n');
     console.log(`Proposés par l'agent : ${brut.length} — nouveaux : ${items.length} — écartés : ${JSON.stringify(ecartes)}`);
+    console.log(`Recherches : ${j.recherches.length} — pages lues : ${j.pages.length}`);
     if (ecartes.invalides) console.log(`::warning title=Veille presse::${ecartes.invalides} item(s) sans titre ou sans URL http(s) écarté(s).`);
+    for (const a of j.avertissements) console.log(`::warning title=Veille presse::${a}`);
+    // Le résumé du run dit ce qui a été cherché : « 0 mention » se lit enfin à côté de l'effort fourni.
+    if (process.env.GITHUB_STEP_SUMMARY) {
+      const l = [`## Veille presse — ${DATE_ISO}`, '',
+        `**${items.length} nouveauté(s)** sur ${brut.length} proposée(s) — écartées : ${JSON.stringify(ecartes)}`, '',
+        ...items.map(i => `- [${i.titre}](${i.url})${i.source ? ` — ${i.source}` : ''}`), '',
+        `### Recherches (${j.recherches.length})`, ...j.recherches.map(r => `- ${r}`), '',
+        `### Pages lues (${j.pages.length})`, ...j.pages.map(u => `- ${u}`),
+        ...(j.avertissements.length ? ['', '### ⚠️ Avertissements', ...j.avertissements.map(a => `- ${a}`)] : [])];
+      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, l.join('\n') + '\n');
+    }
     if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `nouveaux=${items.length}\n`);
+    // Recherche bâclée : les nouveautés trouvées partent quand même (seule
+    // l'affirmation « rien d'autre » est douteuse). Ce script sort donc en 0 et
+    // pose `bacle` ; c'est la DERNIÈRE étape du workflow qui fait échouer le run.
+    if (j.erreur) {
+      console.log(`::error title=Veille presse::${j.erreur}`);
+      if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `bacle=${j.erreur}\n`);
+    }
     return;
   }
   if (cmd === 'memoriser') {
@@ -153,4 +205,4 @@ function main(cmd) {
 
 if (require.main === module) main(process.argv[2]);
 
-module.exports = { normaliserUrl, estNotreCanal, filtrer, memoriser, MAX_PAR_JOUR };
+module.exports = { normaliserUrl, estNotreCanal, filtrer, memoriser, verifierJournal, MAX_PAR_JOUR, MIN_RECHERCHES };

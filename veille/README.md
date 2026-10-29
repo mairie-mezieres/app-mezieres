@@ -66,6 +66,11 @@ quotidien** du backend (section « 🗞️ Ils parlent de MAT »). Voir ADR-0054
   Retirer une entrée à la main = la laisser revenir.
 - `items-presse.json` — **éphémère, non committé** : les candidats de l'agent.
   Absent = run **rouge** (une recherche muette n'est pas « aucune mention »).
+- `presse-sources.json` — **sources suivies**, relues à chaque passage, PDF liés
+  compris (une mention peut ne vivre que dans un PDF de palmarès). **À éditer à la
+  main** : `{url, pourquoi}`.
+- `journal-presse.json` — **éphémère** : recherches lancées et pages lues par l'agent.
+  Moins de 8 recherches = run **rouge** ; affiché dans le résumé du run.
 
 ## Règle commune aux veilles techno et municipale
 

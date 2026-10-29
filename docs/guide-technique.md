@@ -1718,6 +1718,11 @@ affiche puis vide la file **après** un envoi réussi.
 - ⚠️ `normaliserUrl` existe en double (ici et `lib/veille-presse.js` du backend) :
   `scripts/check-veille-presse.js` (CI) et `test/veille-presse.test.js` partagent leurs cas.
 - Laisser revenir un lien : retirer son entrée de `veille/presse-vues.json`.
+- Faire relire une page à chaque passage (palmarès, média) : l'ajouter à
+  `veille/presse-sources.json`. Le **journal** de l'agent (`journal-presse.json`) doit
+  déclarer au moins 8 recherches, sinon le run finit **rouge** — après l'envoi des
+  nouveautés éventuelles (amendement de l'ADR-0054 : un premier passage avait conclu
+  « rien » en 39 s, MAT étant au palmarès Territoria 2026, cité dans un PDF seulement).
 
 ### Robustesse des veilles IA (retry + diagnostic)
 
