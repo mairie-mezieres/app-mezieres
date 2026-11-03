@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   MAT — Ambiance v1.8.0
+   MAT — Ambiance v1.9.0
    Header météo vivant + calendrier festif + confettis
    Copyright (c) 2024-2026 Commune de Mézières-lez-Cléry — Licence MIT
    ════════════════════════════════════════════════════════════ */
@@ -60,13 +60,14 @@ function _ambDayPhase(daily){
 //   • les FÊTES, sur leur durée propre ;
 //   • les SAISONS, sur 3 jours seulement : il s'agit d'ANNONCER un début, pas
 //     d'habiller des semaines entières.
-// La météo réelle (pluie/neige/orage/brouillard/nuages) garde TOUJOURS la
-// priorité sur ces décors.
+// La météo réelle (pluie/neige/orage/brouillard/nuages) se CUMULE avec ces
+// décors ; seuls soleil et étoiles s'effacent sous elle.
 //
-// Ordre = priorité (premier trouvé l'emporte). Deux chevauchements voulus :
-//   • Pâques est testé avant tout, sa fenêtre étant mobile ;
-//   • l'hiver (21-23 déc) l'emporte sur Noël (15-30 déc) : sans cela l'annonce
-//     de saison, entièrement contenue dans Noël, ne s'afficherait jamais.
+// Les périodes SE CUMULENT quand leurs fenêtres se recouvrent (aucune
+// contre-indication visuelle) ; l'ordre de la liste est l'ordre de peinture :
+//   • Pâques peut tomber dès le 20 mars (avec le printemps) ;
+//   • l'hiver (21-23 déc) est contenu dans Noël (15-30 déc) : guirlande et givre
+//     s'affichent ensemble.
 // Pâques s'appuie sur _getFeriesForYear (mat-jours-feries.js, chargé au boot
 // par mat-boot.js) ; si le script n'est pas encore là, la période est
 // simplement ignorée jusqu'à la prochaine ré-évaluation (10 min).
@@ -74,27 +75,27 @@ function _ambDayPhase(daily){
 // Les dates d'équinoxe et de solstice varient d'un jour selon les années ; on
 // retient les dates usuelles, la fenêtre de 3 jours absorbant l'écart.
 function _ambFestive(now){
-  var m = now.getMonth() + 1, d = now.getDate();
+  var m = now.getMonth() + 1, d = now.getDate(), out = [];
   try{
     if(typeof _getFeriesForYear === 'function'){
       var lundi = _getFeriesForYear(now.getFullYear()).find(function(f){ return f.n === 'Lundi de Pâques'; });
       if(lundi){
         var diff = (new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(lundi.d.getFullYear(), lundi.d.getMonth(), lundi.d.getDate())) / 86400000;
-        if(diff >= -2 && diff <= 0) return 'paques'; // samedi → lundi de Pâques
+        if(diff >= -2 && diff <= 0) out.push('paques'); // samedi → lundi de Pâques
       }
     }
   }catch(_){}
   // Saisons — 3 jours d'annonce
-  if(m === 3  && d >= 20 && d <= 22) return 'printemps'; // équinoxe de printemps
-  if(m === 6  && d >= 21 && d <= 23) return 'ete';       // solstice d'été
-  if(m === 9  && d >= 23 && d <= 25) return 'automne';   // équinoxe d'automne
-  if(m === 12 && d >= 21 && d <= 23) return 'hiver';     // solstice d'hiver
+  if(m === 3  && d >= 20 && d <= 22) out.push('printemps'); // équinoxe de printemps
+  if(m === 6  && d >= 21 && d <= 23) out.push('ete');       // solstice d'été
+  if(m === 9  && d >= 23 && d <= 25) out.push('automne');   // équinoxe d'automne
+  if(m === 12 && d >= 21 && d <= 23) out.push('hiver');     // solstice d'hiver
   // Fêtes
-  if(m === 12 && d >= 15 && d <= 30) return 'noel';
-  if((m === 12 && d === 31) || (m === 1 && d <= 2)) return 'nouvelan';
-  if(m === 7 && (d === 13 || d === 14)) return 'juillet14';
-  if(m === 10 && d >= 29) return 'halloween';
-  return '';
+  if(m === 12 && d >= 15 && d <= 30) out.push('noel');
+  if((m === 12 && d === 31) || (m === 1 && d <= 2)) out.push('nouvelan');
+  if(m === 7 && (d === 13 || d === 14)) out.push('juillet14');
+  if(m === 10 && d >= 29) out.push('halloween');
+  return out;
 }
 
 // Ciel dégagé (codes WMO 0-1) : reflet de soleil en plein jour, étoiles
@@ -118,15 +119,15 @@ function _ambClearSky(code, phase){
 var _AMB_FEST_NOCTURNES = ['noel', 'nouvelan', 'juillet14', 'halloween', 'hiver'];
 
 // Compose la liste des effets à peindre, par ordre de superposition.
-function _ambCompose(fam, fest, clear, phase){
-  if(fam) return [fam];                      // météo active : elle seule (pas d'étoiles sous les nuages)
+// Tout se cumule — météo, ciel, saisons et fêtes — sauf deux vraies
+// contre-indications : pas de soleil ni d'étoiles sous la météo (le ciel est
+// couvert : `clear` est alors vide), et pas de décor diurne dans le noir.
+function _ambCompose(fam, fests, clear, phase){
   var sombre = (phase === 'night' || phase === 'dusk' || phase === 'dawn');
-  if(fest){
-    if(!sombre) return [fest];               // en journée, le décor festif prime sur le soleil
-    if(_AMB_FEST_NOCTURNES.indexOf(fest) >= 0) return [clear, fest].filter(Boolean);
-    return [clear || fest];                  // décor diurne la nuit → étoiles à la place
-  }
-  return [clear].filter(Boolean);
+  var decors = (fests || []).filter(function(f){
+    return !sombre || _AMB_FEST_NOCTURNES.indexOf(f) >= 0;
+  });
+  return [fam || clear].concat(decors).filter(Boolean);
 }
 
 var _AMB_CLASSES = ['amb-rain','amb-snow','amb-storm','amb-fog','amb-cloudy','amb-overcast','amb-dawn','amb-dusk','amb-night','amb-sunny'];

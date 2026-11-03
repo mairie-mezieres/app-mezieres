@@ -1197,18 +1197,20 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   sans scintillement — invisibles. Les tests d'ambiance passaient tous, car ils
   n'assertaient que `dataset.kind` (la composition), jamais le rendu. Depuis :
   `scripts/check-css.js` en CI + un test E2E sur le style calculé. Voir **ADR-0015**.
-- **Composition des effets** (`_ambCompose()`, v4.50) — la couche peut désormais
-  superposer plusieurs effets, sa clé est leur jointure (`dataset.kind` =
-  `"stars+noel"`). Règles :
-  1. **Météo active** (pluie/neige/orage/brouillard/nuages) → **elle seule**.
-     Pas d'étoiles sous les nuages : c'est ce qui rend le rendu crédible.
-  2. **Journée + décor festif** → le décor prime sur le reflet de soleil (une
-     guirlande de Noël ne disparaît pas parce qu'il fait beau).
-  3. **Nuit/aube/crépuscule + décor festif** → les décors **du soir** de
-     `_AMB_FEST_NOCTURNES` (Noël, Nouvel An, 14 Juillet, Halloween, hiver) se
-     **superposent** aux étoiles ; les décors **diurnes** (pétales, feuilles,
-     œufs) leur **cèdent la place** — des feuilles qui tombent à 19 h dans le
-     noir de novembre n'évoquent rien.
+- **Composition des effets** (`_ambCompose()`, v4.50 ; **tout se cumule** depuis la
+  v4.127.9) — la couche superpose plusieurs effets, sa clé est leur jointure
+  (`dataset.kind` = `"stars+noel"`, `"rain+noel"`, `"sun+hiver+noel"`). Ordre de
+  peinture : ciel ou météo, puis décors (saisons, fêtes). Seules **deux vraies
+  contre-indications** subsistent :
+  1. **Pas de soleil ni d'étoiles sous la météo** (pluie/neige/orage/brouillard/
+     nuages) : le ciel est couvert, c'est ce qui rend le rendu crédible. Les
+     décors, eux, restent (guirlande sous la pluie).
+  2. **Nuit/aube/crépuscule** : seuls les décors **du soir** de
+     `_AMB_FEST_NOCTURNES` (Noël, Nouvel An, 14 Juillet, Halloween, hiver) sont
+     peints ; les décors **diurnes** (pétales, feuilles, œufs) s'effacent — des
+     feuilles qui tombent à 19 h dans le noir de novembre n'évoquent rien.
+  Avant la v4.127.9, la météo excluait tout décor, un décor excluait le soleil et
+  une seule période festive était retenue : rien n'y obligeait visuellement.
   Conséquence voulue en hiver : le soleil se couchant vers 16 h 55, les étoiles
   occupent une grande partie de la soirée — c'est la réalité du ciel.
   ⚠️ Deux contraintes issues du terrain, à ne pas défaire : la source est en
@@ -1238,12 +1240,12 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   semaines entières. Les dates d'équinoxe et de solstice varient d'un jour
   selon les années ; la fenêtre de 3 jours absorbe l'écart.
 
-  Ordre = priorité, avec deux chevauchements voulus : **Pâques** est testé en
-  premier (fenêtre mobile, calculée via `_getFeriesForYear` de
+  `_ambFestive()` renvoie la **liste** des périodes actives (et non plus la
+  première) : **Pâques** (fenêtre mobile, calculée via `_getFeriesForYear` de
   `mat-jours-feries.js` avec garde `typeof` : chargé en async par mat-boot, il
-  peut arriver après la 1re évaluation), et **l'hiver l'emporte sur Noël** du 21
-  au 23 déc — sans quoi cette annonce, entièrement contenue dans la fenêtre de
-  Noël, ne s'afficherait jamais.
+  peut arriver après la 1re évaluation) peut coïncider avec le printemps, et
+  l'**hiver** (21-23 déc) est contenu dans **Noël** : givre et guirlande
+  s'affichent ensemble.
 
   Choix de rendu issus du terrain, à ne pas défaire sans raison : la guirlande
   de Noël est **festonnée** (`.amb-cordon` + `.amb-ampoule` le long d'une courbe
@@ -1257,7 +1259,7 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   17 fanions et 5 éclosions décalées de 0,9 s — avec 3 éclosions à 2,6 s
   d'intervalle, l'effet paraissait totalement figé.
 
-  **La météo réelle garde toujours la priorité** sur les particules festives ;
+  Météo, saisons et fêtes se **cumulent** (voir *Composition des effets*) ;
   mêmes règles d'accessibilité (aria-hidden, `prefers-reduced-motion`).
 - **View Transitions** (`_ovVisual()` dans `js/mat-core.js`) : l'ouverture/fermeture
   des overlays passe par `document.startViewTransition` quand l'API existe.
