@@ -36,9 +36,20 @@
     • « sans compte, sans pub » → aucune inscription, aucune régie dans l'app
   Tout le reste est du mécanisme, jamais une information communale.
 
+  ⚠️ DEUX FORMATS, UNE SEULE SOURCE. `?format=16x9` bascule la scène en
+  1920×1080 (projection sur grand écran) ; sans lui, c'est le 1080×1920 des
+  réseaux. ⛔ Les deux ne diffèrent QUE par la géométrie : mêmes scènes, mêmes
+  durées, mêmes textes. Dupliquer ce fichier pour le paysage, c'est se condamner
+  à corriger deux films — et à n'en corriger qu'un, un jour de hâte.
+  Le portrait garde ses positions **en style en ligne** dans le HTML ; le paysage
+  les reçoit de la table `PAYSAGE` au chargement. Une seule table à relire, et
+  le format par défaut ne peut pas régresser.
+
   Usage :
     • aperçu   : ouvrir ce fichier dans un navigateur (lecture automatique)
+                 (ajouter `?format=16x9` pour l'aperçu paysage)
     • rendu    : node film/rendre-video.js   (pilote `filmSeek` frame par frame)
+                 FORMAT=16x9 node film/rendre-video.js
 -->
 <style>
 /* Polices auto-hébergées de l'app — aucune requête vers Google (RGPD). */
@@ -61,6 +72,9 @@ body{display:flex;align-items:center;justify-content:center;}
 #scene{position:relative;width:1080px;height:1920px;flex:none;overflow:hidden;
   font-family:'Nunito',system-ui,sans-serif;color:#fff;
   background:linear-gradient(165deg,#07190f 0%,#143122 42%,#2d6a4f 100%);}
+/* Paysage : la salle, pas le téléphone. Même scène, autre géométrie. */
+#scene.paysage{width:1920px;height:1080px;
+  background:linear-gradient(130deg,#07190f 0%,#143122 46%,#2d6a4f 100%);}
 
 /* Halos de fond : deux disques flous déplacés par filmSeek. */
 .halo{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;pointer-events:none;}
@@ -91,6 +105,7 @@ body{display:flex;align-items:center;justify-content:center;}
    `object-position` garde le bord gauche — là où vivent les boutons
    « Zonage du PLU », « Bâtiments », « Le territoire ». */
 #tel .ecran img.plein{width:100%;height:100%;object-fit:cover;object-position:30% 50%;}
+#tel .ecran img.plein-actus{object-position:50% 50%;}
 #tel .encoche{position:absolute;left:50%;top:22px;width:136px;height:28px;margin-left:-68px;
   background:#0a1b12;border-radius:0 0 18px 18px;z-index:5;}
 
@@ -104,10 +119,15 @@ body{display:flex;align-items:center;justify-content:center;}
 .sous{font-size:37px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.9);margin-top:20px;}
 
 .puces{display:flex;flex-wrap:wrap;gap:15px;}
-.puce{font-size:31px;font-weight:800;padding:15px 25px;border-radius:999px;
+.puce{font-size:31px;font-weight:800;padding:14px 25px;border-radius:999px;
   background:rgba(255,255,255,.13);border:2px solid rgba(255,255,255,.3);
   white-space:nowrap;will-change:transform,opacity;}
 .puce.or{background:rgba(240,180,41,.22);border-color:rgba(240,180,41,.8);}
+/* ⚠️ L'ICÔNE A SA PROPRE TAILLE, et c'est pour ça qu'elle est dans un `<span>` :
+   grossir la puce entière grossirait le texte, qui est déjà à la bonne taille.
+   `vertical-align` la recale sur la ligne de base — sans lui, une puce plus
+   haute que ses voisines décale toute la rangée. */
+.puce .ico{font-size:1.45em;vertical-align:-.12em;margin-right:4px;line-height:1;}
 
 /* ── Éléments de scène ─────────────────────────────────────────────────── */
 /* ⚠️ « MAT et MEL.webp », PAS « MAT-explique.webp » : ce dernier porte un damier
@@ -129,7 +149,7 @@ body{display:flex;align-items:center;justify-content:center;}
 #push{position:absolute;left:90px;width:900px;padding:26px 30px;border-radius:34px;
   background:rgba(255,255,255,.97);color:#13261c;display:flex;gap:20px;align-items:center;
   box-shadow:0 34px 70px rgba(0,0,0,.45);will-change:transform,opacity;}
-#push .ico{font-size:50px;flex:none;}
+#push .ico{font-size:66px;flex:none;}
 #push .t{font-size:30px;font-weight:900;}
 #push .m{font-size:27px;font-weight:600;color:#3d5a4a;margin-top:5px;}
 #push .h{font-size:23px;font-weight:700;color:#6b8577;flex:none;align-self:flex-start;}
@@ -137,9 +157,9 @@ body{display:flex;align-items:center;justify-content:center;}
 /* Frise « Photo → Envoyé → Traité ». */
 #etapes{position:absolute;left:64px;right:64px;display:flex;align-items:center;}
 #etapes .et{flex:1;text-align:center;will-change:opacity,transform;}
-#etapes .rond{width:86px;height:86px;margin:0 auto 12px;border-radius:50%;
+#etapes .rond{width:108px;height:108px;margin:0 auto 14px;border-radius:50%;
   background:rgba(255,255,255,.14);border:3px solid rgba(255,255,255,.35);
-  display:flex;align-items:center;justify-content:center;font-size:40px;}
+  display:flex;align-items:center;justify-content:center;font-size:54px;}
 #etapes .et.on .rond{background:var(--sage);border-color:#fff;}
 #etapes .lib{font-size:27px;font-weight:800;}
 
@@ -147,6 +167,30 @@ body{display:flex;align-items:center;justify-content:center;}
 #motcle{position:absolute;left:32px;right:32px;text-align:center;white-space:nowrap;
   font-size:70px;font-weight:900;letter-spacing:-.02em;will-change:transform,opacity;
   text-shadow:0 6px 30px rgba(0,0,0,.55);}
+
+/* Cartouches de remerciement (scène 12). Fond BLANC OPAQUE, et pas un voile :
+   ces deux lignes sont lues en diagonale, un translucide sur un dégradé mouvant
+   ne garantit aucun contraste — et le logo de Mistral AI, qui est fourni sur
+   fond blanc, s'y pose sans halo. */
+.credit{display:flex;gap:28px;align-items:center;background:#fff;
+  color:#13261c;border-radius:34px;padding:30px 34px;
+  box-shadow:0 30px 60px rgba(0,0,0,.4);will-change:transform,opacity;}
+.credit-ico{font-size:84px;flex:none;line-height:1;}
+
+/* Fiche d'une personne : son visage, son nom, sa fonction. Sert à présenter
+   MEL — l'app ne la montre qu'en émoji 👩 dans une bulle, illisible de loin. */
+.perso{display:flex;align-items:center;gap:26px;margin-bottom:26px;}
+.perso-ava{width:168px;height:168px;flex:none;border-radius:50%;object-fit:cover;
+  object-position:44% 38%;background:var(--mist);border:6px solid rgba(255,255,255,.92);
+  box-shadow:0 20px 44px rgba(0,0,0,.45);}
+.perso-nom{font-size:60px;font-weight:900;letter-spacing:-.01em;line-height:1;
+  color:var(--gold);}
+.perso-role{font-size:31px;font-weight:700;color:rgba(255,255,255,.9);margin-top:8px;}
+/* ⚠️ Logo de tiers : autorisé par écrit, et seulement pour dire qu'on les
+   utilise. Voir `film/logos/SOURCE.md` avant d'en ajouter un autre. */
+.credit-logo{width:300px;flex:none;display:block;}
+.credit-t{font-size:41px;font-weight:900;line-height:1.15;letter-spacing:-.01em;}
+.credit-s{font-size:30px;font-weight:600;color:#3d5a4a;margin-top:8px;line-height:1.3;}
 
 /* Cartouche de sortie. */
 #url{font-size:64px;font-weight:900;letter-spacing:-.01em;color:#fff;
@@ -159,6 +203,36 @@ body{display:flex;align-items:center;justify-content:center;}
 /* Barre de progression : sur un fil d'actualité, elle dit « c'est court ». */
 #barre{position:absolute;left:0;right:0;bottom:0;height:8px;background:rgba(255,255,255,.18);}
 #barre i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--gold));}
+
+/* ── Paysage : tout grossit ─────────────────────────────────────────────────
+   Un film vertical se regarde à 30 cm, celui-ci se projette au fond d'une
+   salle. Les tailles ne sont donc pas « adaptées », elles sont augmentées —
+   et les scènes sans téléphone, qui respiraient trop, se remplissent. */
+.paysage .kicker{font-size:36px;}
+.paysage .titre{font-size:88px;}
+.paysage .sous{font-size:44px;}
+.paysage .puce{font-size:35px;padding:16px 29px;}
+.paysage #etapes .rond{width:124px;height:124px;font-size:62px;}
+.paysage #etapes .lib{font-size:33px;}
+.paysage .perso{gap:30px;margin-bottom:30px;}
+.paysage .perso-ava{width:196px;height:196px;}
+.paysage .perso-nom{font-size:68px;}
+.paysage .perso-role{font-size:35px;}
+.paysage #motcle{font-size:92px;text-align:left;}
+.paysage #url{font-size:72px;}
+.paysage #qr{width:320px;height:320px;}
+.paysage .credit{gap:34px;padding:34px 40px;border-radius:38px;}
+.paysage .credit-ico{font-size:96px;}
+.paysage .credit-t{font-size:48px;}
+.paysage .credit-s{font-size:35px;}
+.paysage .credit-logo{width:360px;}
+.paysage #push{padding:30px 36px;}
+.paysage #push .t{font-size:34px;}
+.paysage #push .m{font-size:31px;}
+.paysage #push .h{font-size:26px;}
+/* La mascotte d'ouverture passe à gauche, le texte prenant la droite. */
+.paysage #mascotte{left:33%;width:560px;margin-left:-280px;}
+.paysage #mascotte-outro{width:430px;right:-30px;bottom:-40px;}
 
 /* Commande d'aperçu — jamais rendue dans le MP4. */
 #hud{position:fixed;left:16px;bottom:16px;z-index:9;display:flex;gap:10px;
@@ -178,7 +252,10 @@ body.rendu #hud{display:none;}
   <div class="couche" data-sc="0">
     <img id="mascotte" src="../img/MAT%20et%20MEL.webp" alt="">
     <div class="bloc" id="i-titre" style="top:1060px;text-align:center">
-      <div class="titre" style="font-size:96px">Votre village<br><span class="accent">dans votre poche</span></div>
+      <!-- ⚠️ « COMMUNE », PAS « VILLAGE » : ce premier écran est le seul que
+           voient des élus d'ailleurs — bourgs, petites villes, intercommunalités.
+           « Village » les exclut dès la première seconde. -->
+      <div class="titre" style="font-size:96px">Votre commune<br><span class="accent">dans votre poche</span></div>
       <div style="font-family:'Grape Nuts',cursive;font-size:84px;line-height:1;margin-top:26px;color:#c9f0d1">Mézières Avec Toi</div>
     </div>
     <div class="bloc puces" id="i-puces" style="top:1560px;justify-content:center">
@@ -195,11 +272,11 @@ body.rendu #hud{display:none;}
       <div class="titre">Tout le village,<br><span class="accent">d'un coup d'œil</span></div>
     </div>
     <div class="bloc puces" id="a-puces" style="top:1630px">
-      <span class="puce">🌤️ Météo</span>
-      <span class="puce">🗑️ Déchets</span>
-      <span class="puce">🚌 Bus Rémi</span>
-      <span class="puce">⛽ Carburant</span>
-      <span class="puce">🏛️ Mairie</span>
+      <span class="puce"><span class="ico">🌤️</span> Météo</span>
+      <span class="puce"><span class="ico">🗑️</span> Déchets</span>
+      <span class="puce"><span class="ico">🚌</span> Bus Rémi</span>
+      <span class="puce"><span class="ico">⛽</span> Carburant</span>
+      <span class="puce"><span class="ico">🏛️</span> Mairie</span>
     </div>
   </div>
 
@@ -210,17 +287,27 @@ body.rendu #hud{display:none;}
       <div class="titre">Votre commune<br><span class="accent">en relief</span></div>
     </div>
     <div class="bloc puces" id="c-puces" style="top:1640px">
-      <span class="puce">🏘️ Bâtiments</span>
-      <span class="puce">🗺️ Zonage du PLU</span>
-      <span class="puce">📍 Votre zone</span>
+      <span class="puce"><span class="ico">🏘️</span> Bâtiments</span>
+      <span class="puce"><span class="ico">🗺️</span> Zonage du PLU</span>
+      <span class="puce"><span class="ico">📍</span> Votre zone</span>
     </div>
   </div>
 
   <!-- ── 3. MEL ──────────────────────────────────────────────────────── -->
   <div class="couche" data-sc="3">
-    <div class="bloc" id="m-titre" style="top:112px">
-      <div class="kicker">Une assistante communale</div>
-      <div class="titre">Posez la question.<br><span class="accent">Réponse immédiate.</span></div>
+    <!-- ⚠️ MEL EST NOMMÉE ET MONTRÉE. Dans l'app, son avatar est l'émoji 👩 d'une
+         bulle de conversation : illisible à distance, et il ne dit pas qui elle
+         est. Le film la présente donc comme on présente quelqu'un — son visage,
+         son nom, sa fonction — avant de montrer ce qu'elle répond. -->
+    <div class="bloc" id="m-titre" style="top:100px">
+      <div class="perso">
+        <img class="perso-ava" src="mel-avatar.webp" alt="">
+        <div>
+          <div class="perso-nom">MEL</div>
+          <div class="perso-role">L'assistante de la commune</div>
+        </div>
+      </div>
+      <div class="titre" style="font-size:66px">Posez la question.<br><span class="accent">Réponse immédiate.</span></div>
     </div>
     <div class="bloc puces" id="m-puces" style="top:1660px;justify-content:center">
       <span class="puce">Démarches</span>
@@ -289,28 +376,106 @@ body.rendu #hud{display:none;}
     </div>
   </div>
 
-  <!-- ── 9. Montage : et aussi… ──────────────────────────────────────── -->
+  <!-- ── 9. Prix des carburants ──────────────────────────────────────── -->
   <div class="couche" data-sc="9">
+    <div class="bloc" id="f-titre" style="top:112px">
+      <div class="kicker">Prix des carburants</div>
+      <div class="titre">Le plein le moins cher,<br><span class="accent">près de chez vous.</span></div>
+    </div>
+    <!-- ⚠️ « Daté » n'est pas un ornement : un prix sans sa date se lit comme un
+         prix du jour (ADR-0033), et l'écran l'affiche justement station par
+         station. Le dire à l'écran, c'est annoncer ce qu'on montre. -->
+    <div class="bloc puces" id="f-puces" style="top:1650px">
+      <span class="puce"><span class="ico">⛽</span> 6 stations</span>
+      <span class="puce"><span class="ico">📅</span> Daté, jamais deviné</span>
+    </div>
+  </div>
+
+  <!-- ── 10. Conseil municipal ───────────────────────────────────────── -->
+  <div class="couche" data-sc="10">
+    <div class="bloc" id="j-titre" style="top:112px">
+      <div class="kicker">Conseil municipal</div>
+      <div class="titre">Les décisions,<br><span class="accent">expliquées.</span></div>
+    </div>
+    <div class="bloc" id="j-sous" style="top:1680px;text-align:center">
+      <div class="sous" style="margin:0">Compte rendu, délibérations, projets en cours</div>
+    </div>
+  </div>
+
+  <!-- ── 11. Montage : et aussi… ─────────────────────────────────────── -->
+  <div class="couche" data-sc="11">
     <div class="bloc" id="e-titre" style="top:112px;text-align:center">
       <div class="kicker" style="margin:0">Et aussi</div>
     </div>
     <div id="motcle" style="top:1680px"></div>
   </div>
 
-  <!-- ── 10. Engagements ──────────────────────────────────────────────── -->
-  <div class="couche" data-sc="10">
+  <!-- ── 12. Kit de réplication ───────────────────────────────────────── -->
+  <div class="couche" data-sc="12">
+    <div class="bloc" id="k-titre" style="top:112px">
+      <div class="kicker">Et pour les autres communes</div>
+      <div class="titre">Créez la vôtre,<br><span class="accent">en 3 étapes.</span></div>
+    </div>
+    <!-- ⚠️ TROIS PUCES COURTES, SUR UNE SEULE LIGNE. La rangée fait 952 px :
+         « 📝 Un questionnaire » (le premier essai) la faisait passer à deux
+         lignes, et la seconde débordait sur la barre de progression. -->
+    <div class="bloc puces" id="k-puces" style="top:1650px">
+      <span class="puce"><span class="ico">📝</span> Sans coder</span>
+      <span class="puce"><span class="ico">💶</span> Coût estimé</span>
+      <span class="puce or"><span class="ico">🤖</span> Prompt prêt</span>
+    </div>
+  </div>
+
+  <!-- ── 13. Engagements ──────────────────────────────────────────────── -->
+  <div class="couche" data-sc="13">
     <div class="bloc" id="p-titre" style="top:470px;text-align:center">
       <div class="titre" style="font-size:88px">Gratuite.<br>Sans publicité.<br><span class="accent">Sans compte.</span></div>
     </div>
     <div class="bloc puces" id="p-puces" style="top:1010px;justify-content:center;gap:20px">
-      <span class="puce or">📴 Fonctionne hors connexion</span>
-      <span class="puce or">♿ 100 % accessible (RGAA)</span>
-      <span class="puce or">🔒 Aucune donnée revendue</span>
+      <span class="puce or"><span class="ico">📴</span> Fonctionne hors connexion</span>
+      <span class="puce or"><span class="ico">♿</span> 100 % accessible (RGAA)</span>
+      <span class="puce or"><span class="ico">🔒</span> Aucune donnée revendue</span>
     </div>
   </div>
 
-  <!-- ── 11. Sortie ──────────────────────────────────────────────────── -->
-  <div class="couche" data-sc="11">
+  <!-- ── 14. Remerciements ────────────────────────────────────────────── -->
+  <!-- ⛔ CE QUI EST ÉCRIT ICI ENGAGE DEUX TIERS, pas seulement la commune.
+       • « Propulsée par Mistral AI » est un fait vérifiable : les réponses
+         libres de MEL sont produites par un modèle Mistral (`MISTRAL_MODEL`,
+         `lib/mel.js` du backend, repli Anthropic). Le logo est affiché avec
+         l'accord écrit de Mistral AI (14 octobre 2026), et cet accord porte
+         exactement sur cet usage-là : **dire qu'on les utilise**. Il ne fait pas
+         de la commune un partenaire — ⛔ ne jamais écrire « labellisé »,
+         « certifié » ou « partenaire officiel ». Voir `film/logos/SOURCE.md`.
+       • Le remerciement à TERRITORIA est un remerciement, et rien d'autre : le
+         prix n'est pas nommé (demande expresse de la mairie). -->
+  <div class="couche" data-sc="14">
+    <div class="bloc" id="r-titre" style="top:420px;text-align:center">
+      <div class="kicker" style="margin-bottom:10px">Remerciements</div>
+      <div class="titre" style="font-size:76px">Merci à<br><span class="accent">nos soutiens</span></div>
+    </div>
+    <div class="bloc" id="r-c1" style="top:880px">
+      <div class="credit">
+        <img class="credit-logo" src="logos/mistral-ai.png" alt="Mistral AI">
+        <div>
+          <div class="credit-t">Propulsée par Mistral AI</div>
+          <div class="credit-s">L'assistante MEL répond avec une IA française</div>
+        </div>
+      </div>
+    </div>
+    <div class="bloc" id="r-c2" style="top:1230px">
+      <div class="credit">
+        <div class="credit-ico" aria-hidden="true">🤝</div>
+        <div>
+          <div class="credit-t">Observatoire de l'innovation publique TERRITORIA</div>
+          <div class="credit-s">Merci pour son attention portée aux communes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 15. Sortie ──────────────────────────────────────────────────── -->
+  <div class="couche" data-sc="15">
     <img id="mascotte-outro" src="../img/MAT%20et%20MEL.webp" alt="">
     <div class="bloc" id="o-titre" style="top:300px;text-align:center">
       <div class="titre" style="font-size:92px">Installez-la<br><span class="accent">maintenant</span></div>
@@ -349,22 +514,49 @@ body.rendu #hud{display:none;}
    donc rallonger une scène décale proprement tout le reste. Elles sont
    volontairement courtes — un fil d'actualité ne pardonne pas les temps
    morts, et la première version de ce film tenait 6,5 s par idée. */
+/* ── Format ───────────────────────────────────────────────────────────────
+   `?format=16x9` → 1920×1080 (projection) ; sinon 1080×1920 (réseaux).
+   ⛔ Le format ne change QUE la géométrie : mêmes scènes, mêmes durées, mêmes
+   textes, même `filmSeek`. Tout ce qui diffère est rassemblé ici et dans la
+   table `PAYSAGE` — nulle part ailleurs. */
+var PAYSAGE_ACTIF = /[?&]format=16x9/.test(location.search);
+var SCENE_L = PAYSAGE_ACTIF ? 1920 : 1080;
+var SCENE_H = PAYSAGE_ACTIF ? 1080 : 1920;
+
+/* ⚠️ LES DURÉES ONT ÉTÉ RALLONGÉES D'UN TIERS (v3.1) : le film se projette
+   désormais sur grand écran, où l'on LIT au lieu de défiler. Un spectateur assis
+   n'a pas le pouce sur la pause ; il lui faut le temps de finir une phrase avant
+   la coupe. Plafond : 2 minutes — on est à 84 s. */
 var SCENES = [
-  { sc:  0, ecran: null,                                              duree: 3.4 },
-  { sc:  1, ecran: "accueil",                                         duree: 4.2 },
+  { sc:  0, ecran: null,                                              duree: 5.5 },
+  { sc:  1, ecran: "accueil",                                         duree: 6.0 },
   // ⚠️ Trois plans dans une seule scène : l'animation d'abord (c'est le
   //    mouvement qui rend la 3D crédible), puis deux captures nettes.
   { sc:  2, ecran: ["@3d", "carte3d-batiments", "carte3d-plu"],
-    poids: [1.5, 0.8, 0.7],                                           duree: 6.0 },
-  { sc:  3, ecran: "mel",                                             duree: 4.6 },
-  { sc:  4, ecran: "signalement",                                     duree: 4.0 },
-  { sc:  5, ecran: "suivi",                                           duree: 4.2 },
-  { sc:  6, ecran: "actus",                                           duree: 4.0 },
-  { sc:  7, ecran: "saviezvous",                                      duree: 3.6 },
-  { sc:  8, ecran: "idees",                                           duree: 3.4 },
-  { sc:  9, ecran: ["agenda", "meteo", "guide", "accessibilite"],     duree: 4.8 },
-  { sc: 10, ecran: null,                                              duree: 3.4 },
-  { sc: 11, ecran: null,                                              duree: 5.0 }
+    poids: [1.5, 0.8, 0.7],                                           duree: 9.5 },
+  { sc:  3, ecran: "mel",                                             duree: 8.5 },
+  { sc:  4, ecran: "signalement",                                     duree: 6.5 },
+  { sc:  5, ecran: "suivi",                                           duree: 6.5 },
+  // ⚠️ « actus-photos » VIENT D'UN TÉLÉPHONE, pas du script de capture : les
+  //    réponses simulées ne portent aucune photo (elles ne nomment que des
+  //    rubriques), et une page d'actualités sans image ne montre ni le
+  //    carrousel ni ce à quoi ressemble vraiment une publication de la mairie.
+  { sc:  6, ecran: "actus-photos",                                    duree: 7.0 },
+  { sc:  7, ecran: "saviezvous",                                      duree: 5.5 },
+  { sc:  8, ecran: "idees",                                           duree: 5.0 },
+  { sc:  9, ecran: "carburant",                                       duree: 6.5 },
+  { sc: 10, ecran: "conseil",                                         duree: 6.5 },
+  { sc: 11, ecran: ["agenda", "meteo", "guide", "accessibilite"],     duree: 7.5 },
+  // Le kit de réplication : trois plans, et le dernier (le prompt) tient le
+  // plus longtemps — c'est le livrable, et il y a du texte à voir arriver.
+  { sc: 12, ecran: ["partager-profil", "partager-cout", "partager-prompt"],
+    poids: [1, 1, 1.2],                                               duree: 10.0 },
+  { sc: 13, ecran: null,                                              duree: 7.5 },
+  { sc: 14, ecran: null,                                              duree: 8.0 },
+  // ⚠️ LA DERNIÈRE PAGE TIENT 14 s, ET C'EST VOULU : le film accompagne un
+  //    discours de deux minutes, et c'est sur cet écran — adresse et QR code —
+  //    que la salle a le temps de sortir son téléphone.
+  { sc: 15, ecran: null,                                              duree: 14.0 }
 ];
 
 /* ⚠️ « @3d » N'EST PAS UNE CAPTURE mais une SUITE d'images (film/ecrans/
@@ -385,8 +577,11 @@ var debuts = [], total = 0;
 SCENES.forEach(function (s) { debuts.push(total); total += s.duree; });
 var DUREE = total;
 
-/* Instants de « lame » : les changements d'acte qu'on veut faire claquer. */
-var LAMES = [debuts[1], debuts[2], debuts[4], debuts[6], debuts[9], debuts[10], debuts[11]];
+/* Instants de « lame » : les changements d'acte qu'on veut faire claquer.
+   ⚠️ La scène 12 (remerciements) n'en a pas : on sort des promesses pour dire
+   merci, et une lame y claquerait comme une nouvelle annonce. */
+var LAMES = [debuts[1], debuts[2], debuts[4], debuts[6], debuts[9], debuts[11],
+  debuts[12], debuts[13], debuts[15]];
 
 /* ── Boîte à outils ───────────────────────────────────────────────────── */
 function clamp(x, a, b) { return x < a ? a : (x > b ? b : x); }
@@ -453,10 +648,15 @@ SCENES.forEach(function (s, i) {
   });
 });
 
-/* Les captures de la carte 3D viennent d'un téléphone (webp), les autres du
-   script de capture (png). L'extension se lit donc sur le nom. */
+/* Deux provenances, et c'est tout ce qui les distingue ici : un VRAI téléphone
+   (webp, rapport d'écran plus large → classe `.plein`) ou le script de capture
+   (png, déjà au rapport du film).
+   ⛔ Ne pas revenir à un test sur le préfixe du nom : « actus-photos » ne
+   commence pas par « carte3d » et serait demandé en .png — une image manquante,
+   donc un écran blanc dans le téléphone, visible seulement après encodage. */
+var DU_TELEPHONE = ["carte3d-batiments", "carte3d-plu", "actus-photos"];
 function _source(nom) {
-  return "ecrans/" + nom + (nom.indexOf("carte3d") === 0 ? ".webp" : ".png");
+  return "ecrans/" + nom + (DU_TELEPHONE.indexOf(nom) >= 0 ? ".webp" : ".png");
 }
 
 var anim3d = [];
@@ -469,7 +669,10 @@ var anim3d = [];
     i.src = _source(nom);
     i.alt = "";
     i.style.opacity = "0";
-    if (nom.indexOf("carte3d") === 0) i.className = "plein";
+    // `.plein-actus` recadre au centre : la capture du téléphone est plus large
+    // que l'écran du film, et c'est la photo de l'actualité qu'on veut au milieu,
+    // pas le bord gauche comme sur la carte 3D.
+    if (DU_TELEPHONE.indexOf(nom) >= 0) i.className = (nom === "actus-photos") ? "plein plein-actus" : "plein";
     ecran.appendChild(i);
     imgs[nom] = i;
   });
@@ -491,16 +694,91 @@ var anim3d = [];
   }
 })();
 
+/* ── Géométrie du paysage ─────────────────────────────────────────────────
+   En 1920×1080, le téléphone part à DROITE et le texte occupe une colonne à
+   GAUCHE. Chaque bloc déplacé est listé ici — et seulement ici.
+     top / left / right : en px dans la scène ;
+     centre            : `true` → texte centré, `false` → aligné à gauche ;
+     taille            : remplace la taille de police du `.titre` du bloc
+                         (les scènes sans téléphone ont de la place : on grossit,
+                          au lieu de laisser respirer du vide).
+   ⚠️ Le portrait, lui, garde ses positions en style en ligne dans le HTML :
+   ajouter un bloc ici ne peut donc pas le casser. */
+var COL_G = 110, COL_D = 760;                 // colonne de texte, téléphone à droite
+var PAYSAGE = {
+  // 0. Accroche — mascotte à gauche (CSS), texte à droite.
+  "i-titre": { top: 300, left: 960, right: 80, centre: false, taille: 92 },
+  "i-puces": { top: 810, left: 960, right: 80, centre: false },
+  // Scènes avec téléphone : titre haut de colonne, reste à mi-hauteur.
+  "a-titre": { top: 250 }, "a-puces": { top: 680 },
+  "c-titre": { top: 250 }, "c-puces": { top: 700 },
+  "m-titre": { top: 250 }, "m-puces": { top: 700, centre: false },
+  "s-titre": { top: 250 }, "etapes":  { top: 700 },
+  "v-titre": { top: 250 }, "v-sous":  { top: 720, centre: false },
+  // Deux scènes n'ont QUE leur titre dans la colonne : on le descend au milieu
+  // et on le grossit, plutôt que de laisser 600 px de vide sous trois mots.
+  "n-titre": { top: 380, taille: 96 },
+  // La notification tombe SUR le téléphone : elle part donc à droite, elle aussi.
+  "push":    { top: 150, left: 1010, right: 60 },
+  "q-titre": { top: 250 }, "q-sous":  { top: 720, centre: false },
+  "b-titre": { top: 380, taille: 96 },
+  "f-titre": { top: 250 }, "f-puces": { top: 700 },
+  "j-titre": { top: 250 }, "j-sous":  { top: 720, centre: false },
+  "e-titre": { top: 250, centre: false }, "motcle": { top: 650, left: 110, right: 760 },
+  "k-titre": { top: 250 }, "k-puces": { top: 700 },
+  // Scènes sans téléphone : pleine largeur, tout grossit, tout se centre.
+  "p-titre": { top: 300, left: 110, right: 110, taille: 100 },
+  "p-puces": { top: 730, left: 110, right: 110 },
+  "r-titre": { top: 120, left: 110, right: 110, taille: 86 },
+  "r-c1":    { top: 450, left: 300, right: 300 },
+  "r-c2":    { top: 740, left: 300, right: 300 },
+  "o-titre": { top: 250, left: 110, right: 900, taille: 100 },
+  "o-url":   { top: 600, left: 110, right: 900 },
+  "o-qr":    { top: 330, left: 1180, right: 420 }
+};
+
+if (PAYSAGE_ACTIF) (function placerPaysage() {
+  document.getElementById("scene").classList.add("paysage");
+  Object.keys(PAYSAGE).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;                       // un bloc retiré ne casse pas le film
+    var p = PAYSAGE[id];
+    el.style.top = p.top + "px";
+    el.style.left = (p.left == null ? COL_G : p.left) + "px";
+    el.style.right = (p.right == null ? COL_D : p.right) + "px";
+    // ⚠️ `#push` porte une largeur en style en ligne : sans ça, `right` ne
+    // ferait rien et la carte déborderait de la scène, à droite, hors champ.
+    el.style.width = "auto";
+    if (p.centre != null) el.style.textAlign = p.centre ? "center" : "left";
+    if (p.centre === false && el.classList.contains("puces")) el.style.justifyContent = "flex-start";
+    if (p.taille) {
+      var h = el.querySelector(".titre");
+      if (h) h.style.fontSize = p.taille + "px";
+    }
+  });
+})();
+
+/* Le téléphone et les halos : deux géométries, une seule logique.
+   ⚠️ `montee` est la hauteur dont le téléphone monte à son entrée — plus courte
+   en paysage, où la scène n'a que 1080 px de haut. */
+var TEL = PAYSAGE_ACTIF
+  ? { x: 190, y: -60, echelle: 0.84, montee: 230 }
+  : { x: -280, y: 430, echelle: 0.97, montee: 380 };
+var HALOS = PAYSAGE_ACTIF
+  ? { x1: 120, y1: -120, x2: 1180, y2: 560 }
+  : { x1: -170, y1: 170, x2: 550, y2: 1150 };
+var MASCOTTE_TOP = PAYSAGE_ACTIF ? 150 : 300;
+
 /* ── Le cœur ──────────────────────────────────────────────────────────── */
 function filmSeek(t) {
   t = clamp(t, 0, DUREE);
 
   // Fond : halos en dérive lente, jamais deux fois au même endroit.
   var h1 = $("#halo1"), h2 = $("#halo2");
-  h1.style.left = (-170 + 190 * Math.sin(t * 0.23)) + "px";
-  h1.style.top  = (170 + 270 * Math.sin(t * 0.14 + 1.2)) + "px";
-  h2.style.left = (550 + 190 * Math.sin(t * 0.19 + 2.4)) + "px";
-  h2.style.top  = (1150 + 230 * Math.sin(t * 0.12)) + "px";
+  h1.style.left = (HALOS.x1 + 190 * Math.sin(t * 0.23)) + "px";
+  h1.style.top  = (HALOS.y1 + 270 * Math.sin(t * 0.14 + 1.2)) + "px";
+  h2.style.left = (HALOS.x2 + 190 * Math.sin(t * 0.19 + 2.4)) + "px";
+  h2.style.top  = (HALOS.y2 + 230 * Math.sin(t * 0.12)) + "px";
 
   $("#barre i").style.width = (100 * t / DUREE) + "%";
 
@@ -523,13 +801,13 @@ function filmSeek(t) {
   for (var i = 0; i < SCENES.length; i++) if (t >= debuts[i]) idx = i;
   var sc = SCENES[idx], t0 = debuts[idx];
 
-  /* ── Téléphone : présent des scènes 1 à 8 ───────────────────────────── */
-  var telDebut = debuts[1], telFin = debuts[10];
+  /* ── Téléphone : présent de la scène 1 au kit de réplication ────────── */
+  var telDebut = debuts[1], telFin = debuts[13];
   var tel = $("#tel"), opTel = voile(t, telDebut - 0.3, telFin, 0.55, 0.45);
   var monte = sortie(prog(t, telDebut - 0.2, telDebut + 0.9));
   var flotte = 9 * Math.sin((t - telDebut) * 1.0);
-  var yTel = 430 + (1 - monte) * 380 + flotte;
-  pose(tel, opTel, -280, yTel, 0.97 + 0.03 * monte);
+  var yTel = TEL.y + (1 - monte) * TEL.montee + flotte;
+  pose(tel, opTel, TEL.x, yTel, TEL.echelle + 0.03 * monte);
 
   // Capture affichée : celle de la fenêtre en cours, en fondu croisé court.
   Object.keys(fenetres).forEach(function (nom) {
@@ -558,7 +836,7 @@ function filmSeek(t) {
   /* ── 0. Accroche ────────────────────────────────────────────────────── */
   if (visible(couches[0])) {
     var m = $("#mascotte");
-    m.style.top = (300 - 30 * sortie(prog(t, 0, 1.2)) + 11 * Math.sin(t * 1.2)) + "px";
+    m.style.top = (MASCOTTE_TOP - 30 * sortie(prog(t, 0, 1.2)) + 11 * Math.sin(t * 1.2)) + "px";
     pose(m, sortie(prog(t, 0.05, 0.7)), 0, 0, 0.9 + 0.1 * sortie(prog(t, 0, 0.9)));
     frappe($("#i-titre"), t, 0.25, 0.6);
     puces("#i-puces", t, 1.05, 0.1);
@@ -622,9 +900,21 @@ function filmSeek(t) {
     frappe($("#b-titre"), t, debuts[8] + 0.1, 0.55);
   }
 
-  /* ── 9. Montage ─────────────────────────────────────────────────────── */
+  /* ── 9. Carburant ───────────────────────────────────────────────────── */
   if (visible(couches[9])) {
-    var a8 = debuts[9], pas = SCENES[9].duree / MOTS.length;
+    frappe($("#f-titre"), t, debuts[9] + 0.1, 0.55);
+    puces("#f-puces", t, debuts[9] + 0.9, 0.16);
+  }
+
+  /* ── 10. Conseil municipal ──────────────────────────────────────────── */
+  if (visible(couches[10])) {
+    frappe($("#j-titre"), t, debuts[10] + 0.1, 0.55);
+    pose($("#j-sous"), sortie(prog(t, debuts[10] + 1.4, debuts[10] + 2.0)), 0, 0);
+  }
+
+  /* ── 11. Montage ────────────────────────────────────────────────────── */
+  if (visible(couches[11])) {
+    var a8 = debuts[11], pas = SCENES[11].duree / MOTS.length;
     var rang = clamp(Math.floor((t - a8) / pas), 0, MOTS.length - 1);
     var local = (t - a8) - rang * pas;
     var mot = $("#motcle");
@@ -635,15 +925,33 @@ function filmSeek(t) {
     pose($("#e-titre"), sortie(prog(t, a8 + 0.05, a8 + 0.5)), 0, 0);
   }
 
-  /* ── 10. Engagements ─────────────────────────────────────────────────── */
-  if (visible(couches[10])) {
-    frappe($("#p-titre"), t, debuts[10] + 0.1, 0.6);
-    puces("#p-puces", t, debuts[10] + 0.9, 0.18);
+  /* ── 12. Kit de réplication ──────────────────────────────────────────── */
+  if (visible(couches[12])) {
+    frappe($("#k-titre"), t, debuts[12] + 0.1, 0.55);
+    puces("#k-puces", t, debuts[12] + 0.8, 0.16);
   }
 
-  /* ── 11. Sortie ─────────────────────────────────────────────────────── */
-  if (visible(couches[11])) {
-    var a10 = debuts[11];
+  /* ── 13. Engagements ─────────────────────────────────────────────────── */
+  if (visible(couches[13])) {
+    frappe($("#p-titre"), t, debuts[13] + 0.1, 0.6);
+    puces("#p-puces", t, debuts[13] + 0.9, 0.18);
+  }
+
+  /* ── 14. Remerciements ───────────────────────────────────────────────── */
+  if (visible(couches[14])) {
+    var a11 = debuts[14];
+    frappe($("#r-titre"), t, a11 + 0.1, 0.6);
+    // Les deux cartouches arrivent l'une après l'autre, par la gauche : on les
+    // lit, au lieu d'en recevoir deux d'un coup.
+    [["#r-c1", 0.75], ["#r-c2", 1.25]].forEach(function (p) {
+      var k = sortie(prog(t, a11 + p[1], a11 + p[1] + 0.6));
+      pose($(p[0]), k, -70 * (1 - k), 0, 0.96 + 0.04 * k);
+    });
+  }
+
+  /* ── 15. Sortie ─────────────────────────────────────────────────────── */
+  if (visible(couches[15])) {
+    var a10 = debuts[15];
     frappe($("#o-titre"), t, a10 + 0.1, 0.6);
     pose($("#o-url"), sortie(prog(t, a10 + 0.7, a10 + 1.3)), 0, 34 * (1 - sortie(prog(t, a10 + 0.7, a10 + 1.4))));
     var kq = prog(t, a10 + 1.2, a10 + 1.9);
@@ -670,12 +978,12 @@ function puces(sel, t, depart, pas) {
 /* ── Mise à l'échelle pour l'aperçu ───────────────────────────────────── */
 var RENDU = /[?&]rendu=1/.test(location.search);
 function ajuster() {
-  var s = RENDU ? 1 : Math.min(window.innerWidth / 1080, window.innerHeight / 1920);
+  var s = RENDU ? 1 : Math.min(window.innerWidth / SCENE_L, window.innerHeight / SCENE_H);
   var el = $("#scene");
   el.style.transform = "scale(" + s + ")";
   el.style.transformOrigin = "50% 50%";
-  document.body.style.width = RENDU ? "1080px" : "";
-  document.body.style.height = RENDU ? "1920px" : "";
+  document.body.style.width = RENDU ? SCENE_L + "px" : "";
+  document.body.style.height = RENDU ? SCENE_H + "px" : "";
 }
 window.addEventListener("resize", ajuster);
 ajuster();
