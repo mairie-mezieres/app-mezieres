@@ -464,11 +464,11 @@
           "links": [
             {
               "label": "📄 Formulaire d'inscription (cerfa 12669)",
-              "url": "https://www.service-public.fr/particuliers/vosdroits/R16024"
+              "url": "https://www.service-public.gouv.fr/particuliers/vosdroits/R16024"
             },
             {
               "label": "🌐 Inscription en ligne",
-              "url": "https://www.service-public.gouv.fr"
+              "url": "https://inscription-auth.elections.interieur.gouv.fr/login"
             },
             {
               "label": "📞 Mairie : 02 38 45 61 76",

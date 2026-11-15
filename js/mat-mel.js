@@ -592,7 +592,7 @@ const _MEL_TREE_FALLBACK = {
       },
       {id:"vote",ico:"🗳️",label:"Inscription sur les listes électorales",
         directAnswer:{text:"Pour voter, vous devez être inscrit sur les listes électorales. Inscription en mairie ou en ligne sur service-public.gouv.fr. Documents à prévoir : pièce d'identité et justificatif de domicile.",
-          links:[{label:"📄 Formulaire d'inscription (cerfa 12669)",url:"https://www.service-public.gouv.fr/particuliers/vosdroits/R16024"},{label:"🌐 Inscription en ligne",url:"https://www.service-public.gouv.fr"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
+          links:[{label:"📄 Formulaire d'inscription (cerfa 12669)",url:"https://www.service-public.gouv.fr/particuliers/vosdroits/R16024"},{label:"🌐 Inscription en ligne",url:"https://inscription-auth.elections.interieur.gouv.fr/login"},{label:"📞 Mairie : 02 38 45 61 76",tel:"0238456176"}]}
       },
       {id:"assainissement",ico:"🚰",label:"Assainissement (fosse, raccordement, SPANC)",
         directAnswer:{text:"L'assainissement collectif et le SPANC (Service Public d'Assainissement Non Collectif, ANC) sont gérés par la CCTVL depuis 2018. Pour un raccordement, un contrôle de fosse ou toute question, contactez directement la CCTVL. La facturation est accessible sur le portail usagers.",
@@ -679,7 +679,7 @@ let MEL_TREE = _MEL_TREE_FALLBACK;
 let _melDataLoaded = false;  // true dès que les JSON externes sont chargés (info debug)
 
 async function loadMelData() {
-  const V = '3.7.9';
+  const V = '3.7.10';
 
   try {
     // allSettled : un fetch qui timeout/échoue n'invalide pas les deux autres,

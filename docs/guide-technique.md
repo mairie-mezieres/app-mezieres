@@ -1198,7 +1198,7 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
   n'assertaient que `dataset.kind` (la composition), jamais le rendu. Depuis :
   `scripts/check-css.js` en CI + un test E2E sur le style calculé. Voir **ADR-0015**.
 - **Composition des effets** (`_ambCompose()`, v4.50 ; **tout se cumule** depuis la
-  v4.127.9) — la couche superpose plusieurs effets, sa clé est leur jointure
+  v4.128) — la couche superpose plusieurs effets, sa clé est leur jointure
   (`dataset.kind` = `"stars+noel"`, `"rain+noel"`, `"sun+hiver+noel"`). Ordre de
   peinture : ciel ou météo, puis décors (saisons, fêtes). Seules **deux vraies
   contre-indications** subsistent :
@@ -1209,7 +1209,7 @@ Trois effets « vitrine » introduits en v4.44, tous en **amélioration progress
      `_AMB_FEST_NOCTURNES` (Noël, Nouvel An, 14 Juillet, Halloween, hiver) sont
      peints ; les décors **diurnes** (pétales, feuilles, œufs) s'effacent — des
      feuilles qui tombent à 19 h dans le noir de novembre n'évoquent rien.
-  Avant la v4.127.9, la météo excluait tout décor, un décor excluait le soleil et
+  Avant la v4.128, la météo excluait tout décor, un décor excluait le soleil et
   une seule période festive était retenue : rien n'y obligeait visuellement.
   Conséquence voulue en hiver : le soleil se couchant vers 16 h 55, les étoiles
   occupent une grande partie de la soirée — c'est la réalité du ciel.

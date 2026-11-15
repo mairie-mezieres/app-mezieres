@@ -17,6 +17,11 @@ une ligne que l'on souhaite voir re-signaler le mois suivant.
 
 <!-- Les sections datées sont ajoutées ci-dessous, la plus récente en tête. -->
 
+## 2026-11-02
+
+- [action] Plan communal de sauvegarde (PCS) — échéance loi Matras 26/11/2026 (mise à jour) — https://www.loiret.gouv.fr/Actions-de-l-Etat/Securite-et-risques/Securite-civile-risques-et-protection-des-populations/Prevention-et-gestion-des-risques/Plans-communaux-et-intercommunaux-de-sauvegarde-PCS-et-PiCS
+- [action] Fonds vert 2026 — rénovation énergétique des bâtiments publics, échéance 31/12/2026 (mise à jour) — https://aides-territoires.beta.gouv.fr/programmes/fonds-vert/
+
 ## 2026-10-05
 
 - [action] Département du Loiret — Soutien aux classes de découvertes (formulaire ouvert du 1er au 31 octobre 2026) — https://www.loiret.fr/aide/soutien-aux-classes-de-decouvertes
