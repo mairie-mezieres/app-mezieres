@@ -1,3 +1,13 @@
+## 2026-11-16
+- Node.js : versions de sécurité 22/24/26, gravité HIGH (4-11 nov 2026) — https://www.openwall.com/lists/oss-security/2026/11/11/25
+- Chrome 157 stable, 213 correctifs dont 7 critiques (3 nov 2026) — https://smartscope.blog/en/blog/chrome-157-stable-released-213-security-fixes-7-2026/
+- Cyberattaque mairie de Chambourcy (Yvelines) (7-8 nov 2026) — https://www.infosyvelines.fr/articles/yvelines-ce-quil-faut-savoir-11-novembre-2026
+- CERTFR-2026-ALE-013 : Ivanti Connect Secure exploitée (2 nov 2026) — https://ayinedjimi-consultants.fr/news/ivanti-connect-secure-certfr-2026-ale-013
+- [reco] Mettre à jour Node.js du backend vers la dernière version de sécurité
+- [reco] Mettre à jour Chrome 157 sur les postes d'administration
+- [reco] Vérifier qu'aucun prestataire n'utilise Ivanti Connect Secure
+- [reco] Relayer le cas Chambourcy à la mairie
+
 ## 2026-10-05
 - Chrome 154.0.8037.97/.98 en canal stable (1er oct 2026) — https://chromereleases.googleblog.com/2026/10/stable-channel-update-for-desktop.html
 - Cyberattaque Atexo et Docaposte (région Hauts-de-France), données de 700 000 personnes revendiquées (3 oct 2026) — https://france3-regions.franceinfo.fr/hauts-de-france/nord-0/la-region-hauts-de-france-victime-d-une-cyberattaque-des-noms-prenoms-adresses-electroniques-et-potentiellement-des-rib-parmi-les-donnees-volees-3427614.html
@@ -145,3 +155,4 @@
 - [reco] Mettre à jour Node.js vers versions patchées (22.23.0/24.17.0/26.3.1)
 - [reco] Vérifier compatibilité npm v12 (scripts d'installation bloqués)
 - [reco] Passer actions/checkout à v7
+
