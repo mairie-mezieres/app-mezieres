@@ -1665,12 +1665,30 @@ function _c3dPoserLegende(){
   if (_c3dZones) _c3dZones.features.forEach(function(f){ vues[f.properties.mat_code] = true; });
   var cles = Object.keys(C3D_COULEURS).filter(function(k){ return !_c3dZones || vues[k]; });
   if (!cles.length) cles = Object.keys(C3D_COULEURS);
+  /* RGAA 7.3 / 13.10 — ALTERNATIVE AU CLIC SUR UN BÂTIMENT. La fiche « ce que
+     vous avez le droit de construire » ne s'ouvrait qu'en touchant le bâti 3D :
+     inatteignable au clavier comme au lecteur d'écran. Chaque zone de la
+     légende est donc un bouton qui ouvre la MÊME fiche, sans hauteur de
+     bâtiment (aucune n'est choisie). Le rendu 3D n'est pas touché. */
   ul.innerHTML = cles.map(function(k){
     var lib = _c3dPlu && _c3dPlu.zones && _c3dPlu.zones[k]
             ? (_c3dPlu.zones[k].label.split('–')[1] || '').trim() : '';
-    return '<li><i style="background:' + C3D_COULEURS[k] + '"></i><span>' + _c3dEsc(k)
-         + (lib ? ' <span>' + _c3dEsc(lib) + '</span>' : '') + '</span></li>';
+    return '<li><button type="button" class="c3d-leg-zone" data-zone="' + _c3dEsc(k) + '"'
+         + ' aria-label="Règles de la zone ' + _c3dEsc(k) + (lib ? ' — ' + _c3dEsc(lib) : '') + '">'
+         + '<i aria-hidden="true" style="background:' + C3D_COULEURS[k] + '"></i><span>' + _c3dEsc(k)
+         + (lib ? ' <span>' + _c3dEsc(lib) + '</span>' : '') + '</span></button></li>';
   }).join('');
+  if (!ul.dataset.clavier){
+    ul.dataset.clavier = '1';
+    ul.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('.c3d-leg-zone') : null;
+      if (!b) return;
+      _c3dLegRetour = b;
+      _c3dOuvrirFiche(b.getAttribute('data-zone'), null, null);
+      var x = document.getElementById('c3d-fiche-fermer');
+      try { if (x) x.focus({ preventScroll: true }); } catch(_){}
+    });
+  }
   var l = document.getElementById('c3d-legende');
   if (l) l.hidden = !_c3dZones;
 }
@@ -1699,8 +1717,10 @@ function _c3dOuvrirFiche(code, h, src){
   document.getElementById('c3d-fiche-zone').textContent = code || '?';
   document.getElementById('c3d-fiche-titre').textContent =
     z ? (z.label.split('–').slice(1).join('–').trim()) : 'Zone non déterminée';
-  document.getElementById('c3d-fiche-sous').textContent =
-    'Bâtiment de ' + h.toFixed(1) + ' m · hauteur ' + (src === 'IGN' ? 'BD TOPO IGN' : 'OpenStreetMap');
+  // h === null : fiche ouverte depuis la légende (clavier), pas depuis un bâtiment.
+  document.getElementById('c3d-fiche-sous').textContent = (h == null)
+    ? 'Règles de la zone, ouvertes depuis la légende'
+    : 'Bâtiment de ' + h.toFixed(1) + ' m · hauteur ' + (src === 'IGN' ? 'BD TOPO IGN' : 'OpenStreetMap');
 
   var out = '';
   if (z){
@@ -1735,9 +1755,15 @@ function _c3dOuvrirFiche(code, h, src){
   document.getElementById('c3d-fiche').classList.add('on');
 }
 
+var _c3dLegRetour = null;   // bouton de légende qui a ouvert la fiche (focus rendu)
 function _c3dFermerFiche(){
   var f = document.getElementById('c3d-fiche');
+  var rendre = f && _c3dLegRetour && f.contains(document.activeElement);
   if (f) f.classList.remove('on');
+  if (rendre && document.contains(_c3dLegRetour)){
+    try { _c3dLegRetour.focus({ preventScroll: true }); } catch(_){}
+  }
+  _c3dLegRetour = null;
 }
 
 /* ── Panneau « détail des sources » ────────────────────────────── */

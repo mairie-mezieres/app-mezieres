@@ -84,27 +84,34 @@ function _sondageBack() {
   _renderSondagesList();
 }
 
+// RGAA 11.1 / 11.5 / 11.6 / 7.3 — chaque champ a une étiquette, les choix
+// sont regroupés (fieldset + légende = question), et la notation se fait au
+// clavier : les étoiles étaient des <span onclick>, inatteignables sans souris.
 function _renderSondageForm(s) {
   _selectedStar = 0;
   var html = '';
   if (s.type === 'texte_libre') {
-    html += '<textarea id="sond-input-' + s.id + '" placeholder="Votre réponse…" rows="4" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-size:0.84rem;resize:vertical;box-sizing:border-box"></textarea>';
+    html += '<textarea id="sond-input-' + s.id + '" aria-label="Votre réponse : ' + esc(s.titre) + '" placeholder="Votre réponse…" rows="4" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:Nunito,sans-serif;font-size:0.84rem;resize:vertical;box-sizing:border-box"></textarea>';
   } else if (s.type === 'choix_unique') {
-    html += '<div style="display:flex;flex-direction:column;gap:8px">' + (s.options||[]).map(function(opt) {
+    html += '<fieldset style="border:0;margin:0;padding:0;min-width:0"><legend class="sr-only">' + esc(s.titre) + '</legend><div style="display:flex;flex-direction:column;gap:8px">' + (s.options||[]).map(function(opt) {
       return '<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.84rem">'
         + '<input type="radio" name="sond-' + s.id + '" value="' + esc(opt) + '"> ' + esc(opt) + '</label>';
-    }).join('') + '</div>';
+    }).join('') + '</div></fieldset>';
   } else if (s.type === 'choix_multiple') {
-    html += '<div style="display:flex;flex-direction:column;gap:8px">' + (s.options||[]).map(function(opt) {
+    html += '<fieldset style="border:0;margin:0;padding:0;min-width:0"><legend class="sr-only">' + esc(s.titre) + '</legend><div style="display:flex;flex-direction:column;gap:8px">' + (s.options||[]).map(function(opt) {
       return '<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.84rem">'
         + '<input type="checkbox" name="sond-' + s.id + '" value="' + esc(opt) + '"> ' + esc(opt) + '</label>';
-    }).join('') + '</div>';
+    }).join('') + '</div></fieldset>';
   } else if (s.type === 'notation_etoiles') {
-    html += '<div id="sond-stars-' + s.id + '" style="display:flex;gap:8px;font-size:2rem;cursor:pointer">'
-      + [1,2,3,4,5].map(function(n){ return '<span onclick="_selectStar(' + n + ',' + s.id + ')" style="transition:transform .1s">☆</span>'; }).join('')
-      + '</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px" id="sond-star-label-' + s.id + '">Touchez une étoile</div>';
+    // Boutons à bascule (aria-pressed) : même rendu qu'avant — étoile seule,
+    // sans fond ni bordure —, mais atteignables au clavier et nommés.
+    html += '<div id="sond-stars-' + s.id + '" role="group" aria-label="Votre note : ' + esc(s.titre) + '" style="display:flex;gap:8px;font-size:2rem;cursor:pointer">'
+      + [1,2,3,4,5].map(function(n){ return '<button type="button" class="sond-star" aria-pressed="false" aria-label="' + n + (n > 1 ? ' étoiles' : ' étoile') + ' sur 5" onclick="_selectStar(' + n + ',' + s.id + ')" style="transition:transform .1s;background:none;border:0;padding:0 2px;margin:0;font:inherit;line-height:1;color:inherit;cursor:pointer;min-width:24px;min-height:24px"><span aria-hidden="true">☆</span></button>'; }).join('')
+      + '</div><div style="font-size:0.75rem;color:var(--muted);margin-top:4px" id="sond-star-label-' + s.id + '" aria-live="polite">Touchez une étoile</div>';
   }
-  html += '<div id="sond-submit-status-' + s.id + '" style="font-size:0.78rem;min-height:1.2em;margin-top:10px"></div>';
+  // RGAA 7.5 — « Envoi… », « Sélectionnez une option », l'erreur réseau : des
+  // messages de statut, que rien n'annonçait.
+  html += '<div id="sond-submit-status-' + s.id + '" role="status" aria-live="polite" style="font-size:0.78rem;min-height:1.2em;margin-top:10px"></div>';
   html += '<button onclick="_submitSondage(' + s.id + ')" style="margin-top:12px;width:100%;background:linear-gradient(135deg,var(--forest),var(--leaf));color:white;border:none;border-radius:10px;padding:12px;font-family:Nunito,sans-serif;font-size:0.86rem;font-weight:900;cursor:pointer">Envoyer ma réponse</button>';
   return html;
 }
@@ -114,10 +121,12 @@ function _selectStar(n, sondId) {
   var starsEl = document.getElementById('sond-stars-' + sondId);
   var labelEl = document.getElementById('sond-star-label-' + sondId);
   if (starsEl) {
-    starsEl.querySelectorAll('span').forEach(function(sp, i) {
+    starsEl.querySelectorAll('.sond-star').forEach(function(b, i) {
+      var sp = b.querySelector('span') || b;
       sp.textContent = i < n ? '★' : '☆';
-      sp.style.color = i < n ? '#f59e0b' : '';
-      sp.style.transform = i === n-1 ? 'scale(1.2)' : '';
+      b.style.color = i < n ? '#f59e0b' : '';
+      b.style.transform = i === n-1 ? 'scale(1.2)' : '';
+      b.setAttribute('aria-pressed', i === n-1 ? 'true' : 'false');
     });
   }
   var labels = ['','Échec total','Insuffisant','Moyen','Satisfaisant','Excellent'];
@@ -220,7 +229,11 @@ function refreshSondagesBadge() {
     return !localStorage.getItem('mat_voted_' + s.id) && !localStorage.getItem('mat_seen_sondage_' + s.id);
   }).length;
   if (count > 0) {
-    badge.textContent = count > 9 ? '9+' : String(count);
+    // RGAA 1.1 / 3.1 — le chiffre seul ne dit rien à un lecteur d'écran :
+    // il est masqué, et une phrase le remplace (texte réservé, rien ne bouge à l'écran).
+    var nb = count > 9 ? '9+' : String(count);
+    badge.innerHTML = '<span aria-hidden="true">' + nb + '</span><span class="sr-only">'
+      + (count > 1 ? nb + ' nouveaux sondages' : '1 nouveau sondage') + '</span>';
     badge.style.display = 'flex';
   } else {
     badge.style.display = 'none';

@@ -340,6 +340,17 @@ Overlay nommé (`aria-label`), commandes avec `aria-pressed`, légende repliable
 clavier, bandeau d'état en `aria-live`, respect de `prefers-reduced-motion`. Audit
 axe-core sans violation sérieuse ni critique (`tests/e2e/carte3d.spec.js`).
 
+**Alternative au clic sur un bâtiment (v4.129, RGAA 7.3).** La fiche « ce que vous avez
+le droit de construire » ne s'ouvrait qu'en **touchant le bâti 3D** : inatteignable au
+clavier et au lecteur d'écran. Chaque zone de la légende « Zones du PLU » est désormais
+un **bouton** (`.c3d-leg-zone`, nommé « Règles de la zone Ub — … ») qui ouvre la **même
+fiche** par `_c3dOuvrirFiche(code, null, null)` — `h === null` remplace la ligne « Bâtiment
+de N m » par « Règles de la zone, ouvertes depuis la légende ». Le focus va sur ✕, et
+revient au bouton de légende à la fermeture. Le rendu 3D n'est pas touché ; l'aspect de la
+légende est inchangé (pas de fond, cible ≥ 24 px). ⚠️ Le bouton ✕ de la fiche n'est câblé
+qu'une fois la carte chargée (`_c3dBrancher`) : hors réseau, un test doit appeler
+`_c3dFermerFiche()` lui-même.
+
 La carte reste, par nature, un contenu visuel. **Elle ne remplace pas MEL** : la même
 information est accessible en texte, par l'assistante et par l'arbre de décision.
 

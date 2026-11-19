@@ -107,7 +107,7 @@ function loadActus(){
         // Les actus de l'API exposent description/text (et non contenu/content).
         var excerptTxt=(a.description||a.text||a.contenu||a.content||'').replace(/\s+/g,' ').trim();
         var excerpt=excerptTxt?'<p class="d-actu-excerpt">'+escHtml(excerptTxt.substring(0,90))+(excerptTxt.length>90?'…':'')+'</p>':'';
-        html+='<div class="d-actu-item" onclick="(typeof openActuDetail===\'function\'?openActuDetail:function(){openNotifs&&openNotifs()})(\''+actuId+'\')" role="button">'+
+        html+='<div class="d-actu-item" onclick="(typeof openActuDetail===\'function\'?openActuDetail:function(){openNotifs&&openNotifs()})(\''+actuId+'\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">'+
           (img?'<div class="d-actu-thumb" style="width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0">'+img+'</div>':'')+
           '<div class="d-actu-body">'+
             (dateStr?'<span class="d-actu-date">'+dateStr+'</span>':'')+
