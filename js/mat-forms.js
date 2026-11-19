@@ -7,8 +7,10 @@
 // ── Signalement → Trello ───────────────────────────────────────
 let sigCat='',sigLat='',sigLon='';
 function selCat(btn,cat){
-  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); sigCat=cat;
+  // RGAA 7.1 / 3.1 — la sélection n'était portée que par la couleur (.on) :
+  // aria-pressed la fait annoncer (« activé ») aux lecteurs d'écran.
+  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>{b.classList.remove('on');b.setAttribute('aria-pressed','false');});
+  btn.classList.add('on'); btn.setAttribute('aria-pressed','true'); sigCat=cat;
 }
 function _previewImageFromInput(inputId, previewId, actionsId, removeBtnId, resetInputIds){
   const input=document.getElementById(inputId);
@@ -216,7 +218,7 @@ function resetSignal(){
   document.getElementById('signal-success').style.display='none';
   document.getElementById('signal-desc').value='';
   removeSignalPhoto();
-  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#signal-cats .cat-btn').forEach(b=>{b.classList.remove('on');b.setAttribute('aria-pressed','false');});
   sigCat='';sigLat='';sigLon='';
   document.getElementById('loc-btn').textContent='📍 Utiliser ma position GPS';
   document.getElementById('loc-btn').classList.remove('on');
@@ -473,7 +475,7 @@ function resetContact(){
 
 // ── Bug report ───────────────────────────────────────────────
 let bugService='';
-function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');bugService=val;}
+function selBugService(btn,val){document.querySelectorAll('#bug-services .cat-btn').forEach(b=>{b.classList.remove('on');b.setAttribute('aria-pressed','false');});btn.classList.add('on');btn.setAttribute('aria-pressed','true');bugService=val;}
 function previewBugPhoto(source){
   const inputId = source==='camera' ? 'bug-photo-camera-input' : 'bug-photo-input';
   _previewImageFromInput(inputId,'bug-photo-preview','bug-photo-actions','bug-photo-remove',['bug-photo-camera-input','bug-photo-input']);
@@ -536,7 +538,7 @@ function resetBug(){
   document.getElementById('bug-desc').value='';
   removeBugPhoto();
   bugService='';
-  document.querySelectorAll('#bug-services .cat-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#bug-services .cat-btn').forEach(b=>{b.classList.remove('on');b.setAttribute('aria-pressed','false');});
   restoreBugFormState();
   closeOv('bug');
 }

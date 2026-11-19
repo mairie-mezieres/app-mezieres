@@ -742,6 +742,38 @@ version ouvrira ici.
 
 ---
 
+### Douzième passe — contre-vérification après un test externe (v4.129, 19 novembre 2026)
+
+Un consultant a passé la page d'accueil à un outil automatique (score **79 %** —
+un score d'outil, **pas** un taux RGAA). Chaque défaut annoncé a été recherché dans le
+code ; **plusieurs critères cochés `C` ici ne l'étaient pas en réalité**. Tous ont été
+corrigés dans la même version ; le taux de 100 % s'entend **après** ces corrections.
+
+| Critère | Défaut réel trouvé | Correction |
+|---|---|---|
+| **12.6 / 12.7** | `<main>` ne contenait sur téléphone que des éléments en `display:none` : le lien d'évitement menait à une zone vide | `<main>` englobe les tuiles (ADR-0056) |
+| **12.6** | pied de page bureau sans `contentinfo` | rôle posé |
+| **7.1 / 7.3 / 12.9** | modale MAT, fiche d'un élu, proposition d'alertes, présentation guidée : ni piège à focus, ni nom (3 sur 4), Échap fermant l'overlay du dessous | `matDialogue()` (`js/mat-utils.js`) |
+| **7.3** | vignettes des élus (pas d'Entrée), actualités du bureau (ni focus ni Entrée), étoiles des sondages (`<span onclick>`) | `tabindex` + Entrée/Espace ; boutons |
+| **7.3 / 13.10** | carte 3D : fiche des règles accessible seulement au toucher d'un bâtiment — le « se pilote entièrement aux boutons » de la cinquième passe était faux pour cette fonction | zones de la légende = boutons (SFD-17 §7) |
+| **11.1 / 11.5 / 11.6** | sondages : réponse libre sans étiquette, choix sans `fieldset`/légende ; partage de photo : deux champs sans étiquette ; « Catégorie » et « Service concerné » : `<label>` orphelins | `aria-label`, `fieldset` + légende, `role="group"` |
+| **3.1** | catégorie choisie signalée par la seule couleur ; pastilles « ! » muettes (`aria-hidden`) ou lues « ! » | `aria-pressed` ; texte réservé |
+| **7.5** | statut d'envoi d'un sondage non annoncé | `role="status"` |
+
+Améliorations sans changement de verdict : `title` plus explicite, emojis décoratifs de
+l'accueil en `aria-hidden`, `alt=""` sur deux images redondantes avec le texte voisin,
+noms contextualisés des « Toutes → », « Voir tous → »…, apostrophes typographiques dans
+les libellés d'`index.html`.
+
+**Non confirmés** : `lang` (présent), boutons ✕/⏸/⏹ des overlays (déjà nommés), deux
+`h1` (un seul rendu par mise en page), « ● En ligne » (le texte existe), déchetterie
+🔴/🟢 (le texte dit « ouverte »/« fermée »), contrastes (aucun échec : 29 écrans × 5
+rendus mesurés à chaque exécution). **Non appliqué** : `aria-live` sur les encarts de
+chargement de l'accueil — voir ADR-0056.
+
+Verrouillé par `tests/e2e/accessibilite-accueil.spec.js` (20 tests, dont 18 échouent sur
+la v4.128).
+
 ## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable

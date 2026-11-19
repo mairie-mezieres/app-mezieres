@@ -1947,6 +1947,13 @@ html.theme-sombre .c3d-temps-reperes button[aria-pressed="true"]{background:var(
 .c3d-legende li{display:flex;align-items:center;gap:7px;font-size:0.75rem;font-weight:800;line-height:1.2}
 .c3d-legende i{width:12px;height:12px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(0,0,0,0.15)}
 .c3d-legende li span span{color:var(--muted);font-weight:600}
+/* RGAA 7.3 — les zones de la légende sont des boutons (alternative clavier au
+   clic sur un bâtiment). Même aspect que l'ancienne ligne de légende : pas de
+   fond, pas de bordure ; cible ≥ 24 px (WCAG 2.5.8). */
+.c3d-legende .c3d-leg-zone{display:flex;align-items:center;gap:7px;width:100%;min-height:24px;margin:0;padding:2px 4px;
+  background:none;border:0;border-radius:6px;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.c3d-legende .c3d-leg-zone:hover{background:rgba(0,0,0,0.05)}
+.c3d-legende .c3d-leg-zone:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
 
 /* Panneau du territoire : 25 communes, donc plus large que la légende du PLU
    et défilable. ⚠️ Plancher typographique de 12 px (0.75rem) — ADR-0017 :

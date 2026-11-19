@@ -104,7 +104,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-pwa-notif.js?v=4.3.0';
+  s.src = 'js/mat-pwa-notif.js?v=4.3.1';
   document.head.appendChild(s);
 })();
 
@@ -122,7 +122,7 @@
 
 (function(){
   var s = document.createElement('script');
-  s.src = 'js/mat-sondages.js?v=4.3.1';
+  s.src = 'js/mat-sondages.js?v=4.3.2';
   s.onload = function() {
     setTimeout(function() {
       try { if (typeof loadSondages === 'function') loadSondages(); } catch(e) {}
@@ -233,7 +233,7 @@ matDifferer('js/mat-guide-arrivee.js?v=1.0.8', ['openGuideArrivee']);
 // Carte 3D — le module fait 98 Ko à lui seul. La bibliothèque MapLibre
 // (~1 Mo) reste chargée par le module lui-même, à la première ouverture
 // (ADR-0018) : ce sont deux paliers, pas un seul.
-matDifferer('js/mat-carte3d.js?v=1.11.2',       ['matOuvrirCarte3D']);
+matDifferer('js/mat-carte3d.js?v=1.11.3',       ['matOuvrirCarte3D']);
 
 (function(){
   var s = document.createElement('script');

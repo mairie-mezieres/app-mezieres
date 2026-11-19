@@ -251,6 +251,23 @@ const OB_FEATURES = [
 let _obStep = 0;
 let _obDrawToken = 0;       // invalidé à chaque changement d'étape (stoppe les repositionnements obsolètes)
 let _obReposition = null;   // handler de repositionnement actif (pour cleanup)
+let _obLiberer = null;      // piège à focus de la présentation (matDialogue)
+
+// RGAA 7.1 / 12.9 — la présentation recouvre tout l'écran : c'est une fenêtre
+// modale. Rôle et nom, focus sur « Découvrir l'appli », Tab qui y reste, Échap
+// qui la passe (comme le bouton « Passer »). ⛔ ADR-0032 : matDialogue vit
+// dans mat-utils.js — garde typeof, la présentation marche sans lui.
+function _obClavier() {
+  const ob = document.getElementById('mat-onboarding');
+  if (!ob) return;
+  ob.setAttribute('role', 'dialog');
+  ob.setAttribute('aria-modal', 'true');
+  ob.setAttribute('aria-label', 'Présentation de l’application MAT');
+  if (_obLiberer) _obLiberer(false);
+  _obLiberer = (typeof matDialogue === 'function') ? matDialogue(ob, obSkip) : null;
+  const premier = ob.querySelector('#ob-step-0 button');
+  try { if (premier) premier.focus({ preventScroll: true }); } catch (_) {}
+}
 
 function initOnboarding() {
   if (localStorage.getItem(OB_KEY)) return;
@@ -260,6 +277,7 @@ function initOnboarding() {
   buildOnboardingDOM();
   document.getElementById('mat-onboarding').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  _obClavier();
 }
 
 function relancerOnboarding() {
@@ -268,6 +286,7 @@ function relancerOnboarding() {
   buildOnboardingDOM();
   document.getElementById('mat-onboarding').style.display = 'flex';
   document.body.style.overflow = 'hidden';
+  _obClavier();
 }
 
 function buildOnboardingDOM() {
@@ -301,10 +320,10 @@ function buildOnboardingDOM() {
       <button onclick="obSkip()" style="background:none;border:none;color:rgba(255,255,255,0.45);font-family:'Nunito',sans-serif;font-size:0.78rem;cursor:pointer;padding:4px 12px;text-decoration:underline;text-underline-offset:3px;">Passer</button>
     </div>
     <div id="ob-feature-card" style="display:none;position:fixed;bottom:0;left:0;right:0;padding:18px 20px calc(20px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,rgba(13,43,26,0.97) 70%,transparent);z-index:10002;text-align:center;">
-      <div id="ob-feat-ico" style="font-size:2.8rem;margin-bottom:8px;"></div>
+      <div id="ob-feat-ico" aria-hidden="true" style="font-size:2.8rem;margin-bottom:8px;"></div>
       <div id="ob-feat-title" style="color:#fff;font-size:1.05rem;font-weight:900;font-family:'Nunito',sans-serif;margin-bottom:6px;"></div>
       <div id="ob-feat-desc" style="color:rgba(255,255,255,0.8);font-size:0.82rem;line-height:1.6;margin-bottom:16px;max-width:340px;margin-left:auto;margin-right:auto;"></div>
-      <button id="ob-next-btn" onclick="obNext()" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:14px;padding:13px 30px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.3);">Suivant →</button>
+      <button id="ob-next-btn" onclick="obNext()" aria-describedby="ob-feat-title ob-feat-desc" style="background:linear-gradient(135deg,var(--leaf,#16a34a),var(--sage,#22c55e));color:#fff;border:none;border-radius:14px;padding:13px 30px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.3);">Suivant →</button>
     </div>
     <div id="ob-overlay-dark" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:10001;">
       <svg id="ob-svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;"></svg>
@@ -369,6 +388,9 @@ async function showObFeature(idx) {
   document.getElementById('ob-feat-desc').textContent = f.desc;
   const btn = document.getElementById('ob-next-btn');
   if (btn) btn.textContent = idx < OB_FEATURES.length - 1 ? 'Suivant →' : 'Terminer ✓';
+  // Le bouton de l'accueil vient d'être masqué : sans ceci, le focus tombe
+  // hors de la fenêtre. Sa description (titre + texte de l'étape) est lue.
+  try { if (btn) btn.focus({ preventScroll: true }); } catch (_) {}
   card.style.transform = 'translateY(28px)'; card.style.opacity = '0';
   card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease';
   requestAnimationFrame(() => requestAnimationFrame(() => { card.style.transform = 'translateY(0)'; card.style.opacity = '1'; }));
@@ -461,6 +483,7 @@ function obDrawSpotlight(el, f) {
 function obSkip() { obFinish(); }
 function obFinish() {
   localStorage.setItem(OB_KEY, '1');
+  if (_obLiberer) { const l = _obLiberer; _obLiberer = null; l(); }
   // Stopper tout repositionnement en cours et détacher ses écouteurs.
   _obDrawToken++;
   if (_obReposition) {

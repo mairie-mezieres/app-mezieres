@@ -184,7 +184,11 @@ function updateActuBadge(count, titleTxt){
   const el=document.getElementById('notif-unread-badge');
   if(!el) return;
   const n=Number(count)||0;
-  el.textContent=n>99?'99+':String(n);
+  // RGAA 1.1 / 3.1 — un nombre isolé, lu avant « Actualités », ne dit pas ce
+  // qu'il compte : il est doublé d'une phrase réservée aux lecteurs d'écran.
+  const nb=n>99?'99+':String(n);
+  el.innerHTML='<span aria-hidden="true">'+nb+'</span><span class="sr-only">'
+    +(n>1?nb+' actualités non lues':n===1?'1 actualité non lue':'')+'</span>';
   el.classList.toggle('show', n>0);
   if(titleTxt) el.title=titleTxt;
   else el.removeAttribute('title');

@@ -158,7 +158,7 @@ function buildTrombi(){
     const prenomNom = e.nom.split(' ');
     const prenom = prenomNom[0];
     const nomCourt = prenomNom.slice(1).join(' ');
-    return `<div class="trombi-item" onclick="openTrombi(${i})" role="button" tabindex="0">`
+    return `<div class="trombi-item" onclick="openTrombi(${i})" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTrombi(${i});}">`
       + `<div class="trombi-photo-wrap">`
       + `<img class="trombi-photo" src="${trombiVignette(e.img)}" alt="${e.nom}" width="360" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='img/mat-header.webp'">`
       + `<div class="${badgeClass}">${badgeLabel}</div>`
@@ -230,15 +230,23 @@ function openTrombi(idx){
       card.style.opacity='1';
     });
   });
+  // RGAA 7.1 / 12.9 — fiche d'élu = fenêtre modale : le focus y entre, y reste
+  // (Tab), Échap la ferme et le focus revient à la vignette d'origine.
+  if(_trombiLiberer) _trombiLiberer(false);
+  _trombiLiberer = (typeof matDialogue === 'function') ? matDialogue(card, closeTrombiBtn) : null;
+  const fermer = card.querySelector('button[onclick="closeTrombiBtn()"]');
+  try { (fermer || card).focus({ preventScroll:true }); } catch(_){}
   const img = document.getElementById('trombi-big-img');
   img.style.filter='brightness(1.2) saturate(1.4)';
   setTimeout(()=>{ img.style.transition='filter 0.8s ease'; img.style.filter='brightness(1) saturate(1)'; },250);
 }
 
+let _trombiLiberer = null;
 function closeTrombi(e){
   if(e.target === document.getElementById('trombi-modal')) closeTrombiBtn();
 }
 function closeTrombiBtn(){
+  if(_trombiLiberer){ const l = _trombiLiberer; _trombiLiberer = null; l(); }
   const card = document.getElementById('trombi-card');
   card.style.transform='scale(0.8)';
   card.style.opacity='0';

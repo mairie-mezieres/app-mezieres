@@ -327,7 +327,48 @@ function trackAppOpenOncePerDay(){
   trackStat('app_open');
 }
 
+// ── Clavier d'une fenêtre modale hors overlay ───────────────
+// RGAA 7.1 / 7.3 / 12.9 — les overlays passent par openOv() (mat-core.js), qui
+// porte déjà le piège à focus et Échap. QUATRE fenêtres n'y passaient pas : la
+// modale MAT ci-dessous, la fiche d'un élu (trombinoscope), la proposition
+// d'activer les alertes et la présentation guidée. Au clavier, Tab en sortait
+// vers la page masquée, et Échap fermait… l'overlay du DESSOUS (le gestionnaire
+// de mat-core.js ne connaît que sa pile).
+// Écoute en phase de CAPTURE et arrête la propagation : tant que la fenêtre est
+// ouverte, c'est elle seule qui reçoit Tab et Échap.
+// Renvoie `liberer(rendreFocus)` : à appeler à la fermeture.
+function matDialogue(el, fermer){
+  const retour = document.activeElement;
+  const sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function focusables(){
+    return Array.prototype.filter.call(el.querySelectorAll(sel), function(n){ return n.offsetParent !== null; });
+  }
+  function onKey(e){
+    if (e.key === 'Escape'){
+      e.preventDefault(); e.stopImmediatePropagation();
+      try { fermer(); } catch(_) {}
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    e.stopImmediatePropagation();
+    const f = focusables();
+    if (!f.length){ e.preventDefault(); return; }
+    const first = f[0], last = f[f.length - 1], a = document.activeElement;
+    const dehors = !el.contains(a);
+    if (e.shiftKey && (a === first || dehors)){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (a === last || dehors)){ e.preventDefault(); first.focus(); }
+  }
+  document.addEventListener('keydown', onKey, true);
+  return function liberer(rendreFocus){
+    document.removeEventListener('keydown', onKey, true);
+    if (rendreFocus !== false && retour && document.contains(retour) && typeof retour.focus === 'function'){
+      try { retour.focus({ preventScroll: true }); } catch(_) {}
+    }
+  };
+}
+
 // ── Modale MAT (remplace alert/confirm natifs) ──────────────
+let _matModalLiberer = null;
 let _matModalResolver = null;
 let _matModalRetour = null;   // élément à qui rendre le focus à la fermeture
 function openMatModal(opts){
@@ -342,7 +383,7 @@ function openMatModal(opts){
       + '<div class="mat-modal-head">'
       + '<div class="mat-modal-ico" id="mat-modal-ico"></div>'
       + '<div class="mat-modal-title" id="mat-modal-title">MAT</div>'
-      + '<button class="mat-modal-close" type="button" onclick="closeMatModal(false)">✕</button>'
+      + '<button class="mat-modal-close" type="button" aria-label="Fermer" onclick="closeMatModal(false)">✕</button>'
       + '</div>'
       + '<div class="mat-modal-body">'
       + '<div class="mat-modal-text" id="mat-modal-text"></div>'
@@ -377,12 +418,16 @@ function openMatModal(opts){
   _matModalRetour = document.activeElement;
   modal.classList.add('open');
   document.body.style.overflow='hidden';
+  // Piège à focus + Échap (le retour du focus reste géré par closeMatModal).
+  if (_matModalLiberer) _matModalLiberer(false);
+  _matModalLiberer = matDialogue(modal, function(){ closeMatModal(false); });
   try { ok.focus({ preventScroll: true }); } catch (_) {}
   return new Promise(resolve => { _matModalResolver = resolve; });
 }
 function closeMatModal(value){
   const modal = document.getElementById('mat-modal');
   if(modal) modal.classList.remove('open');
+  if(_matModalLiberer){ _matModalLiberer(false); _matModalLiberer = null; }
   if(typeof _ovStack !== 'undefined' && _ovStack.length === 0) document.body.style.overflow='';
   // RGAA 12.9 — rendre le focus à l'élément d'où l'on venait, sinon il repart
   // au début du document et l'habitant doit tout re-parcourir.

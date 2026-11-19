@@ -9,6 +9,16 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ### Corrigé
 
+- **Accessibilité de l'accueil — contre-vérification RGAA** (v4.129) — `<main>`
+  englobe désormais les tuiles du téléphone (le lien d'évitement menait à une zone
+  vide) ; `contentinfo` au bureau ; piège à focus et Échap pour la modale MAT, la
+  fiche d'un élu, la proposition d'alertes et la présentation guidée
+  (`matDialogue`, `js/mat-utils.js`) ; vignettes d'élus et actualités du bureau
+  activables au clavier ; sondages (étoiles au clavier, `fieldset`, statut annoncé) ;
+  zones de la légende 3D ouvrant la fiche des règles ; pastilles « ! », catégories
+  sélectionnées, emojis décoratifs, noms des « Toutes → »… ; apostrophes
+  typographiques dans `index.html`. ADR-0056, `tests/e2e/accessibilite-accueil.spec.js`.
+
 - **Safari < 16.4 : `mat-utils.js` et `mat-mel.js` refusés à la lecture**
   (v4.127.8, issues #500 et #501) — des expressions régulières à « regard en
   arrière » faisaient rejeter les deux fichiers entiers (« Can't find variable:
