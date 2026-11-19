@@ -176,3 +176,206 @@ pastille orange à l'endroit du domicile de la personne qui a filmé. À l'éche
 village cela ne désigne pas une maison, et la bulle démontre une vraie fonction
 (l'app dit à l'habitant SA zone PLU) — mais c'est un arbitrage à faire tenir par
 la personne concernée, pas par le code. Noté dans `film/README.md`.
+
+## Troisième version (14 octobre 2026) — le kit, les mercis, et une actualité qui a des photos
+
+Quatre demandes de la mairie, et une contrainte chiffrée : **2 minutes maximum**.
+Le montage passe de 50,6 s à **62,6 s**, quatorze scènes.
+
+### 1. Le kit de réplication entre dans le film
+
+`partager.html` — « Osez la vôtre » — est la seule partie de MAT qui ne
+s'adresse **pas** aux habitants de Mézières mais aux autres communes. Trois
+plans : le profil, le coût mensuel estimé, le prompt généré.
+
+⚠️ **Ce n'est pas un écran de l'application mais une page à part.** Le script de
+capture ne savait qu'ouvrir des overlays d'`index.html` (`fn:`) ; il accepte
+désormais une `url:`, chargée dans son propre contexte — sans attendre
+`app-ready`, que cette page ne pose jamais (20 s de timeout par capture, sinon).
+
+⚠️ **Trois pages distinctes pour trois captures.** `goTo()` masque l'étape
+précédente dans le DOM : photographier la même page trois fois aurait donné trois
+fois le dernier état, sans erreur et sans que rien ne le signale.
+
+⚠️ Le formulaire est rempli avec **le nom d'exemple du formulaire lui-même**
+(« Mairie de Saint-Exemple ») : aucune commune réelle n'est nommée, et aucune
+capture ne peut se lire comme l'annonce d'un déploiement ailleurs.
+
+### 2. Deux tiers sont nommés — et c'est là qu'on pèse les mots
+
+La mairie demandait « un logo *approuvé par Mistral* » et un remerciement à
+l'Observatoire de l'innovation publique TERRITORIA.
+
+⛔ **« Approuvé par » n'a pas été écrit, et aucun logo de tiers n'a été posé.**
+Ce qui est vrai et vérifiable, c'est que les réponses libres de MEL sont
+produites par un modèle Mistral (`MISTRAL_MODEL`, `lib/mel.js` du backend, repli
+Anthropic) : le film écrit donc **« Propulsée par Mistral AI »**. Un logo ou le
+mot « approuvé » affirmeraient un **soutien officiel** — quelque chose qui se
+demande par écrit, et qu'une commune ne peut pas se donner elle-même. La
+différence tient en deux mots et elle est juridique, pas stylistique.
+
+⚠️ **TERRITORIA est remercié sans que le prix soit nommé** (demande expresse).
+Le badge « Territoria d'Or 2026 » vit dans l'application ; le film, lui, dit
+seulement merci.
+
+### 3. Une actualité sans photo ne montre pas les actualités
+
+Les données simulées ne portent **aucune image** — c'est la règle posée à la
+deuxième version (aucune annonce communale inventée), et elle ne bouge pas. Mais
+une page d'actualités sans photo ne montre ni le carrousel, ni la mise en page,
+ni ce à quoi ressemble vraiment une publication de la mairie.
+
+La sortie est la même que pour la carte 3D : **une capture d'un vrai téléphone**,
+sur une actualité **réellement publiée** (`ecrans/actus-photos.webp`). Rien n'y
+est inventé, puisque rien n'y est fabriqué.
+
+⚠️ **Elle porte sa date de publication**, donc elle vieillit — contrairement à
+tout le reste du film. C'est le prix d'une image vraie, et il est noté dans
+`film/README.md`.
+
+⛔ Et un piège de code : `_source()` déduisait l'extension du **préfixe** du nom
+(`carte3d…` → `.webp`, sinon `.png`). « actus-photos » serait parti chercher un
+`.png` inexistant — donc un écran blanc dans le téléphone, visible seulement
+après encodage. La provenance est désormais une **liste explicite**
+(`DU_TELEPHONE`).
+
+### 4. Sans le son
+
+La version musicale est retirée : la mairie veut un film muet. `ajouter-musique.js`
+reste dans le dépôt pour le jour où elle en redemandera une, mais **aucun fichier
+sonore n'est publié** — une version musicale qui traîne à côté finit par être
+envoyée à la place de l'autre, et elle cesse de correspondre au montage dès que
+celui-ci bouge.
+
+### 5. Deux plafonds, et le second ne se voit pas
+
+La mairie a fixé **2 minutes maximum** : au-delà, un fil d'actualité ne lit pas
+le film jusqu'au bout, et le QR code de fin — le seul appel à l'action — n'est
+jamais vu. Le total des durées de `SCENES` suffit à le surveiller.
+
+⚖️ Le second plafond est **le poids du fichier**, et rien à l'écran ne l'annonce :
+WhatsApp refuse une vidéo au-delà de ~16 Mo. À `crf 20`, les 63 s pesaient
+**16,1 Mio** — le film était terminé, correct, et impossible à envoyer. Le rendu
+encode donc en `crf 23` (ajustable par `CRF=`), ce qui le ramène sous 11 Mio sans
+différence visible sur ce contenu (aplats, texte, captures d'écran).
+**Après chaque rallonge, vérifier le poids, pas seulement la durée.**
+
+## Quatrième version (14 octobre 2026) — une salle, un logo, et le temps de lire
+
+Le film quitte le fil d'actualité : il sera **projeté sur grand écran**. Trois
+conséquences, et une seule d'entre elles était évidente.
+
+### 1. Un second format, sans un second fichier
+
+⛔ **`presentation.html` n'a pas été dupliqué.** Le 1920×1080 est obtenu par
+`?format=16x9` : mêmes scènes, mêmes durées, mêmes textes, même `filmSeek`. Tout
+ce qui diffère est la **géométrie**, rassemblée dans une table (`PAYSAGE`) et
+quelques règles CSS `.paysage`.
+
+La raison tient en une phrase : deux fichiers, c'est deux films à corriger — et
+un jour de hâte, un seul des deux le sera. C'est exactement ce que le dépôt
+reproche partout ailleurs à une double source (associations, arbre de décision
+de MEL, tarifs…).
+
+⚠️ **Le portrait garde ses positions en style en ligne**, le paysage les reçoit
+de la table au chargement : ajouter un bloc au paysage ne peut donc pas casser
+le format par défaut, celui qui part sur les réseaux.
+
+⚠️ **Changer `LARGEUR`/`HAUTEUR` ne change pas de format** : ça recadre la page,
+ça ne la remet pas en page. Le rendu passe donc le format à la **page**, pas
+seulement au navigateur (`FORMAT=16x9 node film/rendre-video.js`).
+
+⚠️ Et une largeur de bloc en style en ligne (`#push`) rend `right` inopérant :
+la carte serait sortie de l'écran par la droite, hors champ. Le placement remet
+donc `width:auto`.
+
+### 2. On projette, donc on grossit — et on ralentit
+
+Un film vertical se regarde à trente centimètres, celui-ci se lit au fond d'une
+salle. Les tailles ne sont pas « adaptées » au paysage, elles sont **augmentées**
+(titres, puces, cartouches, QR code), et les deux scènes qui n'avaient qu'un
+titre dans leur colonne le reçoivent **plus gros et à mi-hauteur**, au lieu de
+laisser 600 px de vide.
+
+⏱️ **Les durées augmentent d'un tiers** (62,6 s → **84,1 s**). Un spectateur assis
+n'a pas le pouce sur la pause : il lui faut le temps de finir une phrase avant la
+coupe. Le plafond de 2 minutes tient toujours.
+
+### 3. Le logo de Mistral AI — ce que l'accord permet exactement
+
+La v3 écrivait « Propulsée par Mistral AI » **sans logo**, faute d'accord. La
+mairie a obtenu cet accord : Mistral AI autorise l'usage de son logo **dans le
+contexte où l'application utilise Mistral**. Le logo est donc affiché, et la
+phrase ne change pas.
+
+⛔ **Un accord d'usage n'est pas un label.** Il permet de dire « nous les
+utilisons », pas « ils nous approuvent » : ni « labellisé », ni « certifié », ni
+« partenaire officiel ». La nuance tient en deux mots et elle est juridique.
+
+⛔ Et comme pour la musique : **la preuve ne vit pas dans le dépôt**. Le dépôt
+garde le fichier, la mairie garde l'échange (`film/logos/SOURCE.md`). C'est lui
+qu'on produira des mois plus tard, quand plus personne ne se souviendra d'où
+venait l'image.
+
+⚠️ Détail de fabrication, invisible jusqu'au rendu : le logo fourni avait un fond
+à **254,254,254**, soit un rectangle gris pâle sur le cartouche blanc du film. Le
+point blanc est normalisé à la conversion.
+
+## Cinquième version (14 octobre 2026) — deux minutes, parce qu'un discours en dure deux
+
+Le film n'accompagne plus un fil d'actualité ni un écran de hall : il accompagne
+un **discours de deux minutes**. Sa durée cesse d'être un plafond pour devenir
+une **cible** : 120,0 s exactement, vérifiées sur le total de `SCENES`.
+
+### Ce qu'on ajoute quand il faut tenir plus longtemps
+
+⛔ **On n'étire pas ce qui existe, on montre plus de choses.** Ralentir encore
+des scènes déjà ralenties aurait donné un film qui traîne. Deux écrans entrent
+donc au montage, tous deux déjà dans l'application :
+
+- **Prix des carburants** — six stations, et la règle que l'app applique
+  (ADR-0033/0047) : chaque prix porte **sa** date, un carburant non réévalué est
+  nommé plutôt que masqué. C'est ce que la puce « Daté, jamais deviné » annonce.
+- **Conseil municipal, onglet Décisions** — compte rendu, délibérations, projets.
+  ⚠️ `openConseil()` **sans argument** ouvre « Les élus » : l'onglet se passe en
+  paramètre (`openConseil('decisions')`), sinon la capture montre le
+  trombinoscope sous un titre qui parle de décisions.
+
+Et **la dernière page tient 14 s** : c'est là que la salle sort son téléphone
+pour le QR code. Allonger la fin coûte moins cher que d'accélérer le reste.
+
+### MEL est nommée et montrée
+
+Dans l'application, l'avatar de MEL est l'émoji **👩** d'une bulle de
+conversation. Illisible projeté, et il ne dit pas qui elle est. Le film la
+présente comme on présente quelqu'un — visage, nom, fonction — avant de montrer
+ce qu'elle répond. ⚠️ L'image est un **recadrage du fichier de l'app**
+(`img/MAT et MEL.webp`), pas un nouveau dessin : si les mascottes changent, le
+recadrage est à refaire, sinon le film montre une MEL que personne ne reconnaît.
+
+### Une icône n'est pas du texte
+
+Les icônes sont passées dans un `<span class="ico">` à l'intérieur de chaque
+puce. ⛔ Grossir la puce entière aurait grossi **le texte**, qui était déjà à la
+bonne taille ; seule l'icône devait grandir. ⚠️ `vertical-align` la recale sur la
+ligne de base — sans lui, une puce plus haute que ses voisines décale toute la
+rangée, et ça ne se voit qu'au rendu.
+
+### « Elle ne s'est pas faite toute seule » → « Merci à nos soutiens »
+
+La formule précédente parlait de l'application ; la carte parle de **ceux qu'on
+remercie**. Le titre le dit maintenant directement.
+
+### Et le format décide désormais de la qualité d'encodage
+
+À 120 s, `crf 23` donnait **17,4 Mio** pour le vertical : au-dessus des ~16 Mo
+qu'accepte un envoi WhatsApp. Plutôt qu'une valeur unique arbitrée au pire cas,
+l'encodage suit **la façon dont chaque fichier voyage** :
+
+| | part par | plafond | encodage | poids |
+|---|---|---|---|---|
+| vertical | message, Facebook | ~16 Mo | `crf 25` | 13,4 Mio |
+| 16:9 | câble, clé USB | aucun | `crf 23` | 16,9 Mio |
+
+⛔ Ne pas aligner les deux « pour faire propre » : dégrader le paysage
+n'économise rien (il ne s'envoie pas) et c'est lui qu'on verra en grand.
