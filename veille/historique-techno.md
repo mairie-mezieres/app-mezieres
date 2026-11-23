@@ -1,3 +1,11 @@
+## 2026-11-23
+- Playwright 1.65.0, Node 20 plus testé (5 nov 2026) — https://javascript.plainenglish.io/playwright-1-65-is-here-what-qa-engineers-need-to-know-before-upgrading-df96aa8be121
+- Sentry @sentry/node 11.12/11.13 (nov 2026) — https://newreleases.io/project/npm/@sentry/node/release/11.13.0
+- CNIL : dix sanctions simplifiées contre des collectivités, cybersécurité (9 nov 2026) — https://cnil.fr/fr/node/169128
+- Ivanti ALE-013 : IOC ajoutés le 5 nov (mise à jour) — https://ayinedjimi-consultants.fr/news/ivanti-connect-secure-certfr-2026-ale-013
+- [reco] Passer à Playwright 1.65 et vérifier Node 22/24/26 en CI
+- [reco] Relayer les sanctions CNIL à la mairie
+
 ## 2026-11-16
 - Node.js : versions de sécurité 22/24/26, gravité HIGH (4-11 nov 2026) — https://www.openwall.com/lists/oss-security/2026/11/11/25
 - Chrome 157 stable, 213 correctifs dont 7 critiques (3 nov 2026) — https://smartscope.blog/en/blog/chrome-157-stable-released-213-security-fixes-7-2026/
