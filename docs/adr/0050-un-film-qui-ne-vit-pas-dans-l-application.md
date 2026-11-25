@@ -30,6 +30,11 @@ Et une frontière : **rien de tout cela n'entre dans l'application**. Le dossier
 
 ## Pourquoi pas une vraie vidéo intégrée à l'app
 
+> **Mise à jour v4.130** — les actualités acceptent désormais une vidéo ou un son
+> (ADR-0057) : les critères 4.x sont applicables et tenus par un engagement exigé par
+> le serveur. Le raisonnement ci-dessous reste valable pour ce film, qui ne vit pas
+> dans l'app.
+
 Ce fut la première idée, et elle coûte deux choses :
 
 - **Le poids.** `img/installer-ios.mp4` pèse déjà 10,7 Mo — c'est pour cela qu'il

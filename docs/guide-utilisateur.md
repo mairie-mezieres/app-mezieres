@@ -188,6 +188,10 @@ La rubrique **Actualités** affiche les dernières nouvelles publiées par la ma
   notification. C'est vrai aussi des publications reprises **depuis Facebook** :
   un album y donne une actualité qui porte toutes ses photos (depuis la v4.115 —
   avant, une seule était reprise).
+- **Vidéo ou son** : une actualité peut contenir une vidéo (toujours **sous-titrée**)
+  ou un enregistrement audio (dont le **texte de l'actualité reprend le contenu**).
+  Rien ne démarre tout seul ni ne se télécharge avant votre appui sur ▶ ; fermer
+  l'écran arrête la lecture. Une connexion est nécessaire pour les lire.
 - Les actualités sont mises à jour automatiquement dès qu'une publication est faite sur la page Facebook de la mairie.
 - Les 30 dernières actualités sont conservées.
 

@@ -151,7 +151,9 @@ ci-dessous.
 
 ### Aucune non-conformité restante
 
-Les 65 critères applicables sont conformes. **Aucune action de mise en conformité
+Les 75 critères applicables sont conformes (65 jusqu'à la v4.129 ; les dix critères
+multimédia 4.x le sont devenus à la v4.130, avec la vidéo et le son dans les
+actualités — voir l'audit, treizième passe). **Aucune action de mise en conformité
 n'est en attente** : les deux derniers chantiers — 3.2 le 29 août 2026 (v4.96),
 10.5 le même jour (v4.97) — sont clos. Ce plan devient un plan de **maintien**.
 

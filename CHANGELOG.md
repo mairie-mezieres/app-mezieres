@@ -7,6 +7,15 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/).
 
 ## [non publié]
 
+### Ajouté
+
+- **Vidéo ou son dans une actualité** (v4.130) — la mairie joint une vidéo
+  (sous-titres incrustés) ou un enregistrement audio (transcription dans le texte) ;
+  envoi direct signé vers Cloudinary, engagement d'accessibilité exigé par le backend,
+  lecteur natif sans lecture automatique, pause à la fermeture de l'écran. Critères
+  RGAA 4.x désormais applicables : 75/75, 100 %. ADR-0057,
+  `tests/e2e/actu-media.spec.js`.
+
 ### Corrigé
 
 - **Accessibilité de l'accueil — contre-vérification RGAA** (v4.129) — `<main>`

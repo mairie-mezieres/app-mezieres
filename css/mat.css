@@ -442,6 +442,16 @@ html.colorblind-mode .app-splash{background:linear-gradient(160deg,#1f3a5f,#2563
 .actu-fb-link{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;color:#1877f2;margin-top:6px;text-decoration:none;}
 .actu-detail-card{background:white;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:var(--shadow);}
 .actu-detail-media{margin:-14px -14px 12px;}
+/* ── Vidéo ou son d'une actualité (v4.130, ADR-0057) ──────────────────────
+   Lecteur NATIF (clavier, lecteurs d'écran). La légende est sur un fond
+   opaque déclaré, jamais posée sur l'image : son contraste doit être
+   mesurable (RGAA 3.2 / 10.5). ⛔ `color:var(--text)`, pas `--forest` (le
+   thème sombre redéfinit --forest en fond). */
+.actu-media{margin:8px 0 8px;padding:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--mist);}
+.actu-media-player{display:block;width:100%;}
+.actu-media-video .actu-media-player{max-height:360px;background:#000;}
+.actu-media-audio .actu-media-player{min-height:44px;}
+.actu-media-cap{font-size:0.75rem;font-weight:800;color:var(--text);background:var(--mist);padding:6px 10px;line-height:1.5;}
 .actu-detail-img{display:block;width:100%;max-height:320px;object-fit:contain;border-radius:18px 18px 0 0;background:var(--mist);}
 /* ── Carrousel de photos d'une actualité (≥ 2 images) ───────────────────
    Le balayage est NATIF : `scroll-snap-type:x mandatory` + des images en

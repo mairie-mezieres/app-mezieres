@@ -646,6 +646,31 @@ dès 256 Ko.
 
 Voir `docs/adr/0039-plusieurs-photos-une-couverture-et-un-balayage.md`.
 
+### Vidéo ou son d'une actualité (v4.130)
+
+Voir **ADR-0057**. Une actu peut porter **un** média, en plus des photos :
+`media: {kind: 'video'|'audio', url, publicId, format, bytes, duration, poster, accessibilite}`.
+
+- **Envoi** : l'admin obtient une signature (`POST /admin/actus/media/signature`) et
+  envoie le fichier **directement** à Cloudinary (`mat/actus-media`, 100 Mo max), au
+  clic sur « Publier ». Le backend relit la ressource (`lib/actu-media.js`) : genre
+  déduit du **format**, taille revérifiée. ⚠️ L'audio est un `resource_type: "video"`
+  chez Cloudinary.
+- ⛔ **Engagement d'accessibilité exigé par le serveur** (`accessibilite: true`) —
+  vidéo : sous-titres incrustés et tout l'essentiel dit à l'oral ; son : la
+  description en reprend le contenu (non vide). Sinon 400 et fichier supprimé.
+  C'est ce qui garde les critères RGAA 4.x conformes.
+- **Affichage** : `renderActuMedia` (`js/mat-actus.js`), dans la carte et le détail.
+  Lecteur natif `controls`, jamais d'`autoplay`, `preload="none"`, légende sur fond
+  opaque déclaré, URL `https://res.cloudinary.com/` seulement. Un seul média joue à
+  la fois ; `closeOv` (`js/mat-core.js`) met en pause les médias de l'écran fermé.
+- **Pas sur Facebook** (avertissement renvoyé), **pas hors ligne** (le SW ne cache
+  pas Cloudinary). CSP : `media-src` et `connect-src` (`api.cloudinary.com`) dans
+  `_headers`.
+- **Suppression** : `actuMediaPublicIds` dans les trois chemins (actu, purge,
+  programmation annulée). Tests : `tests/e2e/actu-media.spec.js`,
+  `chatbot-mairie-mezieres/test/actu-media.test.js`.
+
 ### Prix carburant — le bandeau et le panneau détaillé (v4.101, v4.116)
 
 Tout vit dans `js/mat-widgets.js`, alimenté par `GET /carburant` (backend
