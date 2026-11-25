@@ -4,8 +4,14 @@
 |---|---|---|
 | `funk-down-mk2.mp3` | Funk Down | MK2 |
 
-Piste **fournie par la mairie** le 19 septembre 2026 pour la version sonore du
-film (`film/sortie/mat-presentation-vertical-musique.mp4`).
+Piste **fournie par la mairie** le 19 septembre 2026 pour une version sonore du
+film.
+
+⛔ **Depuis le 14 octobre 2026, le film publié est muet** : la mairie l'a demandé
+ainsi, et le MP4 sonore a été retiré du dépôt. Deux raisons de ne pas en laisser
+traîner un : il finit par être envoyé à la place de l'autre, et il cesse de
+correspondre au montage dès que celui-ci bouge. Ce fichier audio reste ici pour
+le jour où une version sonore sera redemandée.
 
 ## ⛔ La preuve de licence ne vit pas ici
 
