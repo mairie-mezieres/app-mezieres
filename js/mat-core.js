@@ -247,6 +247,10 @@ function closeOv(id){
   const idx = _ovStack.lastIndexOf(id);
   if(idx !== -1) _ovStack.splice(idx,1);
   const prev = _ovReturnFocus.pop();
+  // Un écran fermé reste dans le DOM (masqué) : une vidéo ou un son lancé
+  // dedans continuerait de jouer, sans contrôle visible pour l'arrêter
+  // (RGAA 4.10). On met en pause tout média de l'écran qu'on ferme.
+  try { el.querySelectorAll('video,audio').forEach(function(m){ try { m.pause(); } catch(_){} }); } catch(_){}
   _ovVisual(function(){
     el.classList.remove('open');
     el.style.zIndex = '';

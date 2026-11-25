@@ -1527,6 +1527,14 @@ function renderActus() {
         <button type="button" id="pub-image-remove-btn" class="pub-image-remove" style="display:none" onclick="pubRemoveImage()">🗑️ Retirer toutes les images</button>
       </div>
       <div class="pub-row">
+        <label class="pub-label" for="pub-media-input">Vidéo ou son (facultatif — un seul fichier, 100 Mo maximum)</label>
+        <input type="file" id="pub-media-input" class="pub-input" accept="video/mp4,video/webm,video/quicktime,audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg" onchange="pubHandleMedia(event)">
+        <div class="pub-hint">🎬 Vidéo (MP4, WEBM) : <strong>sous-titres incrustés obligatoires</strong>, et tout ce qui compte doit être dit à l'oral (une information seulement affichée à l'écran manquerait aux personnes aveugles). 🎧 Son (MP3, M4A) : la <strong>description doit reprendre ce qui est dit</strong>. Visible dans l'application seulement — Facebook ne reçoit que le texte et les photos.</div>
+        <div id="pub-media-info" class="pub-hint" style="display:none"></div>
+        <label class="pub-checkbox-row" id="pub-media-a11y-row" style="display:none;margin-top:6px"><input type="checkbox" id="pub-media-a11y"><span id="pub-media-a11y-text"></span></label>
+        <button type="button" id="pub-media-remove-btn" class="pub-image-remove" style="display:none" onclick="pubRemoveMedia()">🗑️ Retirer le fichier</button>
+      </div>
+      <div class="pub-row">
         <label class="pub-label">Date de l'événement (facultatif)</label>
         <input type="datetime-local" id="pub-event-date" class="pub-input" oninput="pubUpdate(); pubCheckDuplicates();">
         <div class="pub-hint">Si rempli, un événement sera créé dans Google Agenda.<br>⚠️ Si un événement au titre similaire existe déjà ce jour-là, il sera <strong>automatiquement remplacé</strong> (similarité > 60%).</div>
@@ -1594,7 +1602,7 @@ function renderActus() {
           </td>
           <td style="max-width:220px;font-size:0.72rem;color:var(--muted)">${a.description?(safe(a.description.substring(0,100))+(a.description.length>100?'…':'')):' —'}</td>
           <td style="font-size:0.72rem">${safe(a.date||'')}${a.eventDate?'<br><span style="color:var(--leaf);font-weight:800">📅 '+new Date(a.eventDate).toLocaleDateString('fr-FR')+'</span>':''}</td>
-          <td>${a.photo?('<span class="badge badge-green">'+((a.photos&&a.photos.length>1)?('🖼️ '+a.photos.length):'✓')+'</span>'):'<span class="badge">—</span>'}</td>
+          <td>${a.photo?('<span class="badge badge-green">'+((a.photos&&a.photos.length>1)?('🖼️ '+a.photos.length):'✓')+'</span>'):'<span class="badge">—</span>'}${a.media&&a.media.kind?(' <span class="badge badge-green" title="'+(a.media.kind==='video'?'Vidéo jointe':'Son joint')+'">'+(a.media.kind==='video'?'🎬':'🎧')+'</span>'):''}</td>
           <td>${a.source==='admin'
             ?'<span class="badge badge-blue">Admin</span>'+(a.fb&&a.fb.postId
               ?' <a href="https://www.facebook.com/'+encodeURIComponent(a.fb.postId)+'" target="_blank" rel="noopener" class="badge badge-green" style="text-decoration:none" title="'+(a.fb.fallback?'Publiée sur Facebook en texte seul (photo refusée)':'Publiée sur Facebook')+' — voir le post">📘</a>'
@@ -1661,7 +1669,7 @@ async function renderScheduledActus(){
         <span style="font-size:1.1rem">${failed?'⚠️':'🕒'}</span>
         <div style="flex:1;min-width:0">
           <div style="font-weight:800">${safe(s.title||'—')}</div>
-          <div style="color:var(--muted)">${failed?('Échec : '+safe(s.failedReason||'inconnu')):('Diffusion le '+when)} · ${chans}${s.photoUrl?(' · 🖼️'+((s.photos&&s.photos.length>1)?(' ×'+s.photos.length):'')):''}</div>
+          <div style="color:var(--muted)">${failed?('Échec : '+safe(s.failedReason||'inconnu')):('Diffusion le '+when)} · ${chans}${s.photoUrl?(' · 🖼️'+((s.photos&&s.photos.length>1)?(' ×'+s.photos.length):'')):''}${s.media&&s.media.kind?(s.media.kind==='video'?' · 🎬':' · 🎧'):''}</div>
         </div>
         <button onclick="cancelScheduledActu(${s.id})" class="del-btn" title="Annuler">🗑️</button>
       </div>`;
@@ -1825,6 +1833,89 @@ function pubRemoveImage() {
   pubRenderImages();
 }
 
+// ── Vidéo ou son d'une actualité (v4.130, ADR-0057 de l'app) ─────
+// ⛔ Le fichier part DIRECTEMENT chez Cloudinary (signature fournie par le
+// backend) : en base64 dans le JSON, il dépasserait la limite de 6 Mo du
+// backend. Il n'est envoyé qu'au clic sur « Publier » — choisir puis retirer
+// un fichier ne laisse donc rien sur Cloudinary.
+// ⛔ La case d'accessibilité est revérifiée par le BACKEND : la décocher ici
+// ou contourner l'admin aboutit au même refus (RGAA 4.1 / 4.3).
+const PUB_MEDIA_MAX = 100 * 1024 * 1024;
+let _pubMedia = null;   // { file, kind: 'video'|'audio' }
+
+function _pubMediaKind(file) {
+  const t = String(file.type || '').toLowerCase();
+  if (t.startsWith('video/')) return 'video';
+  if (t.startsWith('audio/')) return 'audio';
+  const ext = (String(file.name || '').split('.').pop() || '').toLowerCase();
+  if (['mp4', 'm4v', 'mov', 'webm'].includes(ext)) return 'video';
+  if (['mp3', 'm4a', 'aac', 'wav', 'ogg', 'oga', 'opus', 'flac'].includes(ext)) return 'audio';
+  return null;
+}
+
+function pubHandleMedia(e) {
+  const file = e.target && e.target.files && e.target.files[0];
+  if (!file) return;
+  const kind = _pubMediaKind(file);
+  if (!kind) { alert('Format non reconnu : MP4 ou WEBM pour une vidéo, MP3 ou M4A pour un son.'); e.target.value = ''; return; }
+  if (file.size > PUB_MEDIA_MAX) { alert('« ' + file.name + ' » est trop lourd (' + (file.size / 1048576).toFixed(0) + ' Mo, maximum 100 Mo).'); e.target.value = ''; return; }
+  _pubMedia = { file, kind };
+  pubRenderMedia();
+}
+
+function pubRenderMedia() {
+  const info = document.getElementById('pub-media-info');
+  const row = document.getElementById('pub-media-a11y-row');
+  const txt = document.getElementById('pub-media-a11y-text');
+  const box = document.getElementById('pub-media-a11y');
+  const rm = document.getElementById('pub-media-remove-btn');
+  if (!_pubMedia) {
+    [info, row, rm].forEach(el => { if (el) el.style.display = 'none'; });
+    if (box) box.checked = false;
+    return;
+  }
+  const f = _pubMedia.file;
+  if (info) { info.textContent = (_pubMedia.kind === 'video' ? '🎬 Vidéo : ' : '🎧 Son : ') + f.name + ' — ' + (f.size / 1048576).toFixed(1) + ' Mo'; info.style.display = 'block'; }
+  if (txt) txt.textContent = _pubMedia.kind === 'video'
+    ? "Je confirme que la vidéo porte des sous-titres incrustés, et que tout ce qui compte y est dit à l'oral — rien d'important seulement montré ou écrit à l'écran (obligatoire)"
+    : "Je confirme que la description reprend le contenu de l'enregistrement (obligatoire)";
+  if (box) box.checked = false;
+  if (row) row.style.display = 'flex';
+  if (rm) rm.style.display = 'inline-block';
+}
+
+function pubRemoveMedia() {
+  _pubMedia = null;
+  const input = document.getElementById('pub-media-input'); if (input) input.value = '';
+  pubRenderMedia();
+}
+
+async function pubUploadMedia(onProgress) {
+  const sr = await fetch(`${API}/admin/actus/media/signature`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-token': TOKEN }, body: '{}' });
+  const sig = await sr.json().catch(() => ({}));
+  if (!sr.ok || !sig.ok) throw new Error(sig.error || ('signature refusée (' + sr.status + ')'));
+  const fd = new FormData();
+  fd.append('file', _pubMedia.file);
+  fd.append('api_key', sig.apiKey);
+  fd.append('timestamp', String(sig.timestamp));
+  fd.append('folder', sig.folder);
+  fd.append('signature', sig.signature);
+  // XMLHttpRequest plutôt que fetch : seul lui donne la progression d'un envoi
+  // (un fichier de 100 Mo peut prendre plusieurs minutes en ADSL).
+  return await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', sig.uploadUrl);
+    xhr.upload.onprogress = (ev) => { if (ev.lengthComputable && onProgress) onProgress(Math.round(ev.loaded * 100 / ev.total)); };
+    xhr.onload = () => {
+      let d = {}; try { d = JSON.parse(xhr.responseText); } catch (_) {}
+      if (xhr.status >= 200 && xhr.status < 300 && d.public_id) resolve(d.public_id);
+      else reject(new Error((d.error && d.error.message) || ('Cloudinary HTTP ' + xhr.status)));
+    };
+    xhr.onerror = () => reject(new Error('envoi interrompu (réseau)'));
+    xhr.send(fd);
+  });
+}
+
 async function pubCheckDuplicates() {
   const eventDate=document.getElementById('pub-event-date')?.value;
   const warn=document.getElementById('pub-calendar-warn'); if(!warn)return;
@@ -1855,6 +1946,12 @@ async function pubSubmit() {
 
   if(!title){alert("Le titre est obligatoire");return;}
   if(!description){alert("La description est obligatoire");return;}
+  if(_pubMedia && !document.getElementById('pub-media-a11y')?.checked){
+    alert(_pubMedia.kind==='video'
+      ? "Cochez la confirmation : la vidéo doit porter des sous-titres incrustés."
+      : "Cochez la confirmation : la description doit reprendre le contenu de l'enregistrement.");
+    return;
+  }
   if(pubMode==='schedule'){
     if(!scheduleAt){alert("Choisissez la date et l'heure de programmation.");return;}
     if(new Date(scheduleAt).getTime()<=Date.now()){alert("La date de programmation doit être dans le futur.");return;}
@@ -1870,6 +1967,18 @@ async function pubSubmit() {
     // envoyé (la couverture) pour qu'un backend non encore déployé continue de
     // publier une image plutôt que rien.
     const payload = {title, description, imageBase64:_pubImageBase64, imagesBase64:_pubImages.map(im=>im.b64), eventDate:eventDate||null, eventLocation:eventLocation||null, publishFacebook, sendPush, createCalendar};
+    if(_pubMedia){
+      try {
+        const publicId = await pubUploadMedia(p => { btn.textContent = '⏳ Envoi ' + (_pubMedia.kind==='video'?'de la vidéo':'du son') + '… ' + p + ' %'; });
+        payload.media = { publicId, accessibilite: true };
+      } catch(me) {
+        status.className='pub-status error';
+        status.textContent='❌ Envoi du média impossible : '+me.message;
+        status.style.display='block';
+        return;
+      }
+      btn.textContent='⏳ Publication en cours…';
+    }
     if(pubMode==='schedule') payload.scheduledAt = new Date(scheduleAt).toISOString();
     const r=await fetch(`${API}${endpoint}`,{
       method:'POST', headers:{'Content-Type':'application/json','x-admin-token':TOKEN},
@@ -1893,6 +2002,7 @@ async function pubSubmit() {
       document.getElementById('pub-event-date').value='';
       document.getElementById('pub-event-location').value='';
       pubRemoveImage();
+      pubRemoveMedia();
       const _sa=document.getElementById('pub-schedule-at'); if(_sa) _sa.value='';
       document.getElementById('pub-calendar-warn').style.display='none';
       pubUpdate();
@@ -1956,6 +2066,7 @@ async function pubSubmit() {
     document.getElementById('pub-event-date').value='';
     document.getElementById('pub-event-location').value='';
     pubRemoveImage();
+    pubRemoveMedia();
     if(document.getElementById('pub-push-sched-1'))document.getElementById('pub-push-sched-1').value='';
     if(document.getElementById('pub-push-sched-2'))document.getElementById('pub-push-sched-2').value='';
     document.getElementById('pub-calendar-warn').style.display='none';

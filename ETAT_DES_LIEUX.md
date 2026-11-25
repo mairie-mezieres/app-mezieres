@@ -399,9 +399,9 @@ passes successives, chacune corrigeant les défauts de la précédente.
 
 | | |
 |---|---|
-| Critères non applicables | 41 (ni vidéo, ni son, ni cadre, ni CAPTCHA) |
-| Critères applicables | **65** |
-| Conformes | **65** |
+| Critères non applicables | 31 (ni cadre, ni CAPTCHA ; vidéo et son applicables depuis la v4.130) |
+| Critères applicables | **75** |
+| Conformes | **75** |
 | Non conformes | **0** |
 | **Taux de conformité** | **100 %** |
 | **Mention RGAA** | **totalement conforme** |

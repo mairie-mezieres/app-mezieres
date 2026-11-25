@@ -774,6 +774,33 @@ chargement de l'accueil — voir ADR-0056.
 Verrouillé par `tests/e2e/accessibilite-accueil.spec.js` (20 tests, dont 18 échouent sur
 la v4.128).
 
+### Treizième passe — vidéo et son dans les actualités (v4.130, 25 novembre 2026)
+
+La mairie peut joindre **une vidéo ou un enregistrement audio** à une actualité. Les
+critères **4.1 à 4.13**, classés `NA` (« aucun média temporel ») depuis l'origine,
+deviennent applicables pour dix d'entre eux. Ils sont satisfaits **par construction**,
+parce que le backend refuse la publication sans l'engagement de la mairie (ADR-0057) :
+
+| Critère | Verdict | Comment il est tenu |
+|---|---|---|
+| **4.1** transcription ou audiodescription | `C` | Son : le texte de l'actu reprend ce qui est dit (une description vide est refusée). Vidéo : tout l'essentiel est dit à l'oral — l'audiodescription n'est alors pas « nécessaire » au sens du critère. |
+| **4.2** pertinence de l'alternative | `C` | Engagement éditorial confirmé à chaque publication. |
+| **4.3** sous-titres synchronisés | `C` | Vidéo : sous-titres **incrustés**, exigés. Le son seul n'est pas un média synchronisé. |
+| **4.4** pertinence des sous-titres | `C` | Engagement éditorial. |
+| **4.5 / 4.6** audiodescription | `C` | Non nécessaire : aucune information seulement visuelle (engagement exigé). |
+| **4.7** identification du média | `C` | Légende « 🎬 Vidéo sous-titrée » / « 🎧 Enregistrement audio … le texte en reprend le contenu », et nom accessible du lecteur. |
+| **4.8 / 4.9 / 4.12** médias non temporels | `NA` | Aucun. |
+| **4.10** son déclenché automatiquement | `C` | Jamais d'`autoplay`, `preload="none"` ; fermer l'écran met le média en pause (`closeOv`). |
+| **4.11** contrôle au clavier | `C` | Lecteur natif `controls`. |
+| **4.13** compatibilité technologies d'assistance | `C` | Lecteur natif, `aria-label`, lien de secours vers le fichier. |
+
+⚠️ **Ces verdicts reposent en partie sur un engagement éditorial** (4.1, 4.2, 4.4,
+4.5) : le code peut exiger la case, pas vérifier les sous-titres. Le contrôle humain
+— regarder la vidéo avant de cocher — reste la condition du 100 %.
+
+Verrouillé par `tests/e2e/actu-media.spec.js` (app) et
+`chatbot-mairie-mezieres/test/actu-media.test.js` (refus serveur).
+
 ## 5. Les 106 critères
 
 `C` conforme · `NC` non conforme · `NA` non applicable
@@ -786,7 +813,7 @@ la v4.128).
 | **1. Images** (9) | 1.1 `C` · 1.2 `C` · 1.3 `C` · 1.4 à 1.9 `NA` | Deux images porteuses d'information avec `alt` ; une décorative en `alt=""`. 1.3 tranché par le référent (cinquième passe). |
 | **2. Cadres** (2) | 2.1 `NA` · 2.2 `NA` | Aucun `iframe` dans l'échantillon. |
 | **3. Couleurs** (3) | 3.1 `C` · 3.2 `C` · 3.3 `C` | 3.1 : partout un mot ou un symbole double la couleur (référent). 3.2 : levé en neuvième passe. **Zéro défaut** sur les 29 écrans × **5 rendus** (normal, daltonisme, contraste élevé, thème bleu, thème sombre) × 2 mises en page, mesuré à chaque exécution de la suite. |
-| **4. Multimédia** (13) | 4.1 à 4.13 `NA` | Aucun média temporel. |
+| **4. Multimédia** (13) | 4.1 à 4.7 `C` · 4.8 `NA` · 4.9 `NA` · 4.10 `C` · 4.11 `C` · 4.12 `NA` · 4.13 `C` | Vidéo ou son d'une actualité depuis la v4.130 (treizième passe). Jusqu'à la v4.129 : 4.1 à 4.13 `NA`. |
 | **5. Tableaux** (8) | 5.1 `NA` · 5.2 `NA` · 5.3 `NA` · 5.4 `C` · 5.5 `C` · 5.6 `C` · 5.7 `C` · 5.8 `NA` | Horaires de la mairie et tableaux RGPD balisés. |
 | **6. Liens** (2) | 6.1 `C` · 6.2 `C` | |
 | **7. Scripts** (5) | 7.1 `C` · 7.2 `NA` · 7.3 `C` · 7.4 `C` · 7.5 `C` | |
@@ -801,18 +828,19 @@ la v4.128).
 
 | | Nombre |
 |---|---|
-| Conformes | **65** |
+| Conformes | **75** |
 | Non conformes | **0** |
-| Non applicables | **41** |
+| Non applicables | **31** |
 | Non tranchés | **0** |
 | Total | **106** |
 
 ## 6. Taux de conformité
 
-Critères applicables : 106 − 41 = **65**. **Aucun critère n'est laissé sans verdict** :
+Critères applicables : 106 − 31 = **75** (65 jusqu'à la v4.129 ; les dix critères
+multimédia sont applicables depuis la v4.130). **Aucun critère n'est laissé sans verdict** :
 le taux n'est plus un plancher prudent, c'est la mesure.
 
-> ## Taux de conformité : **100 %** (65 sur 65)
+> ## Taux de conformité : **100 %** (75 sur 75)
 > ### Mention RGAA : **totalement conforme**
 
 | Étape | Conformes | Taux |
@@ -826,7 +854,8 @@ le taux n'est plus un plancher prudent, c'est la mesure.
 | Septième passe | 63 | 96,9 % |
 | Huitième passe | 63 | 96,9 % — 3.2 largement traité mais **pas** levé |
 | Neuvième passe | 64 | 98,5 % — 3.2 levé |
-| **Dixième passe** | **65** | **100 %** — 10.5 levé |
+| Dixième passe | 65 | 100 % — 10.5 levé |
+| **Treizième passe** | **75** | **100 %** — 4.x applicables (vidéo / son), tous conformes |
 
 > Le saut de 78,5 % à 86,2 % n'est pas de 6 critères mais de 5 : les cinq questions
 > de jugement ont reçu une réponse favorable, le sixième — 8.2 — a été **mesuré** et

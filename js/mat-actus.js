@@ -101,6 +101,57 @@ function actuGalSync(id){
   }
 }
 
+// ── Vidéo ou son d'une actualité (v4.130) ───────────────────────────
+// ⛔ RGAA 4.1 à 4.13 : ces critères deviennent APPLICABLES dès qu'un média
+// temporel est affiché (ADR-0057). Ils restent satisfaits parce que :
+//  - le backend refuse un média sans l'engagement de la mairie (vidéo =
+//    sous-titres incrustés, 4.3 ; son = transcription dans le texte de l'actu,
+//    4.1) — la légende ci-dessous le DIT à l'habitant, c'est ce qui permet de
+//    le trouver (4.2 / 4.4) ;
+//  - aucune lecture automatique (4.10) : jamais d'`autoplay` ;
+//  - lecteur NATIF à `controls` (4.11 / 4.13) : clavier et lecteurs d'écran.
+// `preload="none"` : rien n'est téléchargé avant le clic (une carte de liste
+// ne doit pas coûter 100 Mo à qui fait défiler les actualités).
+// ⚠️ Le service worker NE CACHE PAS res.cloudinary.com : un média n'est donc
+// pas disponible hors connexion — c'est voulu (poids, requêtes Range).
+const ACTU_MEDIA_URL_RE=/^https:\/\/res\.cloudinary\.com\//;
+function getActuMedia(a){
+  const m=a&&a.media;
+  if(!m||typeof m!=='object') return null;
+  if(m.kind!=='video'&&m.kind!=='audio') return null;
+  if(typeof m.url!=='string'||!ACTU_MEDIA_URL_RE.test(m.url)) return null;
+  return m;
+}
+function _actuMediaDuree(sec){
+  const n=Math.round(Number(sec));
+  if(!isFinite(n)||n<=0) return '';
+  const min=Math.floor(n/60), s=n%60;
+  return min ? (min+' min'+(s?' '+String(s).padStart(2,'0')+' s':'')) : (s+' s');
+}
+function renderActuMedia(a){
+  const m=getActuMedia(a);
+  if(!m) return '';
+  const titre=getActuDisplayTitle(a);
+  const duree=_actuMediaDuree(m.duration);
+  const secours=`<a href="${esc(m.url)}" target="_blank" rel="noopener">ouvrir le fichier</a>`;
+  if(m.kind==='video'){
+    const poster=(typeof m.poster==='string'&&ACTU_MEDIA_URL_RE.test(m.poster))?` poster="${esc(m.poster)}"`:'';
+    return `<figure class="actu-media actu-media-video">`
+      + `<video class="actu-media-player" controls preload="none" playsinline${poster} src="${esc(m.url)}" aria-label="Vidéo : ${esc(titre)}">Votre navigateur ne lit pas cette vidéo : ${secours}.</video>`
+      + `<figcaption class="actu-media-cap"><span aria-hidden="true">🎬</span> Vidéo sous-titrée${duree?' · '+esc(duree):''}</figcaption></figure>`;
+  }
+  return `<figure class="actu-media actu-media-audio">`
+    + `<figcaption class="actu-media-cap"><span aria-hidden="true">🎧</span> Enregistrement audio${duree?' · '+esc(duree):''} — le texte de l'actualité en reprend le contenu</figcaption>`
+    + `<audio class="actu-media-player" controls preload="none" src="${esc(m.url)}" aria-label="Son : ${esc(titre)}">Votre navigateur ne lit pas ce son : ${secours}.</audio></figure>`;
+}
+// Un seul média à la fois : lancer une vidéo met en pause celle d'une autre
+// carte (l'événement `play` ne remonte pas, d'où la capture).
+document.addEventListener('play', function(e){
+  const t=e.target;
+  if(!t||!t.classList||!t.classList.contains('actu-media-player')) return;
+  document.querySelectorAll('.actu-media-player').forEach(function(m){ if(m!==t){ try{ m.pause(); }catch(_){} } });
+}, true);
+
 function getActuPlainDescription(a){
   if(a && a.description && String(a.description).trim()) return String(a.description).trim();
   const fullText=((a && (a.text||a.title))||'').replace(/#(?:MAT(?![a-zA-ZÀ-ÿ0-9_])|app-mezieres)/gi,'').trim();
@@ -286,7 +337,8 @@ function renderActuListItem(a){
   const likeCount = a.likes || 0;
   const likedLS = _isActuLikedLocally(id);
   const likeBtn = reactionsEnabled ? `<button id="like-btn-${id}" class="actu-btn actu-btn-like${likedLS?' liked':''}" onclick="toggleLikeActu(${jsId})" aria-label="J’aime${likeCount?' · '+likeCount:''}" aria-pressed="${likedLS}">❤️ J’aime${likeCount?` <span class="like-count">${likeCount}</span>`:''}</button>` : '';
-  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button>${likeBtn}</div></div></div>`;
+  const mediaHTML=renderActuMedia(a);
+  return `<div class="actu-item">${imgHTML}<div class="actu-body"><div class="actu-title">${titre}</div>${descriptionHTML}${mediaHTML}${eventHTML}<div class="actu-date">📅 Publié ${esc(a.date)}</div><div class="actu-actions"><button class="actu-btn actu-btn-detail" onclick="openActuDetail(${jsId})">📰 Détails</button>${likeBtn}</div></div></div>`;
 }
 
 const _LIKES_KEY = 'mat_liked_actus_v1';
@@ -351,7 +403,7 @@ function renderActuDetail(actu){
   const ttsBtn = (_actuDetailTtsText && ('speechSynthesis' in window))
     ? `<button id="actu-tts-btn" class="actu-btn actu-btn-detail" onclick="ttsReadActuDetail()">🔊 Écouter</button>`
     : '';
-  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title" tabindex="-1">${title}</h2>${eventHTML}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
+  el.innerHTML = `<div class="actu-detail-card">${imgHTML}<div class="actu-detail-meta">${esc(sourceLabel)} · ${esc(actu.date||'')}</div><h2 class="actu-detail-title" tabindex="-1">${title}</h2>${eventHTML}${renderActuMedia(actu)}${descHTML}<div class="actu-detail-actions"><button class="actu-btn actu-btn-detail" onclick="backToActus()">← Retour aux actualités</button>${ttsBtn}${likeBtn}</div></div>`;
 
   // Lecteurs d'écran : porter le focus sur le titre pour que l'article soit
   // annoncé/lu directement (les personnes aveugles utilisent leur propre synthèse).

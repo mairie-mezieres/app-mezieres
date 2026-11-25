@@ -49,7 +49,7 @@ document.documentElement.style.background = bg;
 }catch(e){}
 })();
 </script>
-<link rel="stylesheet" href="css/mat.css?v=4.15.3">
+<link rel="stylesheet" href="css/mat.css?v=4.15.4">
 <link rel="stylesheet" href="css/mat-desktop.css?v=4.7.0">
 <!-- RGAA 8.2 — ce bloc était dans le <body>, ce que le validateur du W3C
      refuse. Déplacé ici, juste après mat-desktop.css : rien d'autre ne pose
@@ -71,14 +71,14 @@ document.documentElement.style.background = bg;
 <!-- ⚙️ Config backend (window.MAT_API) — chargé en PREMIER, synchrone, avant tous les scripts -->
 <script src="js/mat-config.js?v=1"></script>
 <script defer src="js/mat-utils.js?v=4.3.11"></script>
-<script defer src="js/mat-core.js?v=4.4.3"></script>
+<script defer src="js/mat-core.js?v=4.4.4"></script>
 <script defer src="js/mat-accessibility.js?v=4.3.12"></script>
 <script defer src="js/mat-widgets.js?v=4.5.14"></script>
 <script defer src="js/mat-ambiance.js?v=1.9.0"></script>
 <script defer src="js/mat-agenda.js?v=4.3.5"></script>
 <script defer src="js/mat-forms.js?v=4.6.10"></script>
 <script defer src="js/mat-photos.js?v=1.3.6"></script>
-<script defer src="js/mat-actus.js?v=4.5.2"></script>
+<script defer src="js/mat-actus.js?v=4.5.3"></script>
 <script defer src="js/mat-trombi.js?v=4.3.1"></script>
 <script defer src="js/mat-mel.js?v=4.5.8"></script>
 <script defer src="js/mat-perf.js?v=1.0.10"></script>
@@ -174,7 +174,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <div class="mat-badge" id="mat-date-badge">Chargement…</div>
 <h1 class="mat-title">Mézières Avec Toi</h1>
 <p class="territoria territoria-mobile"><span class="territoria-ico" aria-hidden="true">🏆</span><span class="territoria-txt">Territoria d’Or 2026</span></p>
-<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.129 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
+<div class="mat-version" onclick="openChangelog()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openChangelog();}" style="font-size:0.75rem;color:rgba(255,255,255,0.82);margin-top:2px;margin-bottom:2px;cursor:pointer;user-select:none" title="Voir les nouveautés">v4.130 · <span style="text-decoration:underline dotted">Nouveautés</span></div>
 <div id="install-count-badge" style="display:none;font-size:0.75rem;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.01em"><span aria-hidden="true">🏘️</span> <span id="install-count-val"></span> Macérien(ne)s ont installé MAT</div>
 </div>
 <img src="img/MAT%20et%20MEL.webp" alt="Qui suis-je ? Découvrir MAT et MEL" class="mat-img" onclick="openMajordome()" role="button" tabindex="0" aria-label="Qui suis-je ? Découvrir MAT et MEL" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMajordome();}" onerror="this.onerror=null;this.src='img/mat-header.webp'" title="Qui suis-je ?">
@@ -560,7 +560,7 @@ function matOpenNewSite(){ window.open('https://mezieres-lez-clery.fr','_blank')
 <button onclick="openPlanSite()"><span aria-hidden="true">🗺️</span> Plan du site</button>
 <a href="partager.html" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Kit pour déployer MAT dans une autre commune"><span aria-hidden="true">🏛️</span> Créer la vôtre</a>
 <a href="https://mairie-mezieres.github.io/mat-communes/" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;text-decoration:none;padding:5px 0" title="Votre commune veut MAT ? Site d’entraide entre communes : questions fréquentes, guide pas à pas, entraide"><span aria-hidden="true">🤝</span> Entraide communes</a>
-<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0"><span aria-hidden="true">🆕</span> v4.129</button>
+<button onclick="openChangelog()" style="color:rgba(255,255,255,.8);font-family:'Nunito',sans-serif;font-size:.65rem;font-weight:700;background:none;border:none;cursor:pointer;padding:5px 0"><span aria-hidden="true">🆕</span> v4.130</button>
 </div>
 </div>
 </div>
@@ -1908,6 +1908,12 @@ et accompagnée des documents suivants :
 <div class="panel-body">
 <div style="display:flex;flex-direction:column;gap:10px">
 <div style="background:var(--mist);border-radius:12px;padding:12px 14px">
+<div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 25 novembre 2026 — v4.130</div>
+<ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
+<li>Actualités : la mairie peut désormais joindre une <strong>vidéo</strong> (sous-titrée) ou un <strong>enregistrement audio</strong> (dont le texte de l’actualité reprend le contenu). Rien ne se lance tout seul ni ne se télécharge avant votre clic.</li>
+</ul>
+</div>
+<div style="border:1px solid var(--border);border-radius:12px;padding:12px 14px">
 <div style="font-size:0.65rem;font-weight:900;color:var(--leaf);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🗓️ 19 novembre 2026 — v4.129</div>
 <ul style="margin:0;padding-left:18px;font-size:0.8rem;color:var(--text);line-height:1.7">
 <li>Accessibilité : sur téléphone, le lien « Aller au contenu principal » mène enfin aux tuiles de l’accueil.</li>
